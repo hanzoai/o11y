@@ -460,10 +460,10 @@ components:
     GatewaytypesLimitValue:
       properties:
         count:
-          format: int64
+          nullable: true
           type: integer
         size:
-          format: int64
+          nullable: true
           type: integer
       type: object
     GatewaytypesPagination:
@@ -5091,7 +5091,7 @@ paths:
             schema:
               $ref: '#/components/schemas/GatewaytypesPostableIngestionKey'
       responses:
-        "200":
+        "201":
           content:
             application/json:
               schema:
@@ -5104,7 +5104,7 @@ paths:
                 - status
                 - data
                 type: object
-          description: OK
+          description: Created
         "401":
           content:
             application/json:
