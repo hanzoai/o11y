@@ -623,14 +623,14 @@ export interface GatewaytypesLimitMetricValueDTO {
 export interface GatewaytypesLimitValueDTO {
 	/**
 	 * @type integer
-	 * @format int64
+	 * @nullable true
 	 */
-	count?: number;
+	count?: number | null;
 	/**
 	 * @type integer
-	 * @format int64
+	 * @nullable true
 	 */
-	size?: number;
+	size?: number | null;
 }
 
 export interface GatewaytypesPaginationDTO {
@@ -3137,7 +3137,7 @@ export type GetIngestionKeys200 = {
 	status: string;
 };
 
-export type CreateIngestionKey200 = {
+export type CreateIngestionKey201 = {
 	data: GatewaytypesGettableCreatedIngestionKeyDTO;
 	/**
 	 * @type string
