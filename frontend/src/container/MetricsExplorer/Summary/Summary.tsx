@@ -342,7 +342,7 @@ function Summary(): JSX.Element {
 					openInspectModal={openInspectModal}
 				/>
 			)}
-			{isInspectModalOpen && (
+			{isInspectModalOpen && selectedMetricName && (
 				<InspectModal
 					isOpen={isInspectModalOpen}
 					onClose={closeInspectModal}
