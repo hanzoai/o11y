@@ -300,7 +300,7 @@ func (handler *handler) UpdateFactorAPIKey(rw http.ResponseWriter, r *http.Reque
 	}
 
 	factorAPIKey.Update(req.Name, req.ExpiresAt)
-	err = handler.module.UpdateFactorAPIKey(ctx, serviceAccount.ID, factorAPIKey)
+	err = handler.module.UpdateFactorAPIKey(ctx, valuer.MustNewUUID(claims.OrgID), serviceAccount.ID, factorAPIKey)
 	if err != nil {
 		render.Error(rw, err)
 		return
