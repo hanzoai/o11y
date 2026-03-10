@@ -198,7 +198,6 @@ describe('Dashboard landing page actions header tests', () => {
 			setPanelMap: jest.fn(),
 			setLayouts: jest.fn(),
 			setSelectedDashboard: jest.fn(),
-			updatedTimeRef: { current: null },
 			toScrollWidgetId: '',
 			setToScrollWidgetId: jest.fn(),
 			updateLocalStorageDashboardVariables: jest.fn(),

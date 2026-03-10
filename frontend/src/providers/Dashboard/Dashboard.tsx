@@ -21,7 +21,7 @@ import locked from 'api/v1/dashboards/id/lock';
 import { ALL_SELECTED_VALUE } from 'components/NewSelect/utils';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import ROUTES from 'constants/routes';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { useDashboardVariablesFromLocalStorage } from 'hooks/dashboard/useDashboardFromLocalStorage';
 import useVariablesFromUrl from 'hooks/dashboard/useVariablesFromUrl';
 import useTabVisibility from 'hooks/useTabFocus';
@@ -74,7 +74,6 @@ export const DashboardContext = createContext<IDashboardContext>({
 
 	setLayouts: () => {},
 	setSelectedDashboard: () => {},
-	updatedTimeRef: {} as React.MutableRefObject<Dayjs | null>,
 	toScrollWidgetId: '',
 	setToScrollWidgetId: () => {},
 	updateLocalStorageDashboardVariables: () => {},
@@ -165,13 +164,11 @@ export function DashboardProvider({
 
 	const { getUrlVariables, updateUrlVariable } = useVariablesFromUrl();
 
-	const updatedTimeRef = useRef<Dayjs | null>(null); // Using ref to store the updated time
 	const modalRef = useRef<any>(null);
 
 	const isVisible = useTabVisibility();
 
 	const { t } = useTranslation(['dashboard']);
-	const dashboardRef = useRef<Dashboard>();
 
 	const [isDashboardFetching, setIsDashboardFetching] = useState<boolean>(false);
 
@@ -304,101 +301,94 @@ export function DashboardProvider({
 				if (variables) {
 					initializeDefaultVariables(variables, getUrlVariables, updateUrlVariable);
 				}
+			},
+		},
+	);
 
-				const updatedDashboardData = transformDashboardVariables(data?.data);
-				const updatedDate = dayjs(updatedDashboardData?.updatedAt);
+	// Handle dashboard data updates in a useEffect so that selectedDashboard state
+	// is always current when comparing timestamps (avoids stale closure issues in onSuccess)
+	useEffect(() => {
+		if (!dashboardResponse.data?.data) {
+			return;
+		}
 
-				setIsDashboardLocked(updatedDashboardData?.locked || false);
+		const updatedDashboardData = transformDashboardVariables(
+			dashboardResponse.data.data,
+		);
+		const updatedDate = dayjs(updatedDashboardData?.updatedAt);
 
-				// on first render
-				if (updatedTimeRef.current === null) {
+		setIsDashboardLocked(updatedDashboardData?.locked || false);
+
+		// on first render
+		if (!selectedDashboard) {
+			setSelectedDashboard(updatedDashboardData);
+			setLayouts(sortLayout(getUpdatedLayout(updatedDashboardData?.data.layout)));
+			setPanelMap(defaultTo(updatedDashboardData?.data?.panelMap, {}));
+			return;
+		}
+
+		if (
+			updatedDate.isAfter(dayjs(selectedDashboard.updatedAt)) &&
+			isVisible &&
+			selectedDashboard.id === updatedDashboardData?.id
+		) {
+			// show modal when state is out of sync
+			const modal = onModal.confirm({
+				centered: true,
+				title: t('dashboard_has_been_updated'),
+				content: t('do_you_want_to_refresh_the_dashboard'),
+				onOk() {
 					setSelectedDashboard(updatedDashboardData);
 
-					updatedTimeRef.current = updatedDate;
+					const { maxTime, minTime } = getMinMaxForSelectedTime(
+						globalTime.selectedTime,
+						globalTime.minTime,
+						globalTime.maxTime,
+					);
 
-					dashboardRef.current = updatedDashboardData;
+					dispatch({
+						type: UPDATE_TIME_INTERVAL,
+						payload: {
+							maxTime,
+							minTime,
+							selectedTime: globalTime.selectedTime,
+						},
+					});
 
 					setLayouts(
 						sortLayout(getUpdatedLayout(updatedDashboardData?.data.layout)),
 					);
 
-					setPanelMap(defaultTo(updatedDashboardData?.data?.panelMap, {}));
-				}
+					setPanelMap(defaultTo(updatedDashboardData?.data.panelMap, {}));
+				},
+			});
 
-				if (
-					updatedTimeRef.current !== null &&
-					updatedDate.isAfter(updatedTimeRef.current) &&
-					isVisible &&
-					dashboardRef.current?.id === updatedDashboardData?.id
-				) {
-					// show modal when state is out of sync
-					const modal = onModal.confirm({
-						centered: true,
-						title: t('dashboard_has_been_updated'),
-						content: t('do_you_want_to_refresh_the_dashboard'),
-						onOk() {
-							setSelectedDashboard(updatedDashboardData);
+			modalRef.current = modal;
+		} else {
+			// normal flow
+			if (!isEqual(selectedDashboard, updatedDashboardData)) {
+				setSelectedDashboard(updatedDashboardData);
+			}
 
-							const { maxTime, minTime } = getMinMaxForSelectedTime(
-								globalTime.selectedTime,
-								globalTime.minTime,
-								globalTime.maxTime,
-							);
+			if (
+				!isEqual(
+					[omitBy(layouts, (value): boolean => isUndefined(value))[0]],
+					updatedDashboardData?.data.layout,
+				)
+			) {
+				setLayouts(sortLayout(getUpdatedLayout(updatedDashboardData?.data.layout)));
 
-							dispatch({
-								type: UPDATE_TIME_INTERVAL,
-								payload: {
-									maxTime,
-									minTime,
-									selectedTime: globalTime.selectedTime,
-								},
-							});
-
-							dashboardRef.current = updatedDashboardData;
-
-							updatedTimeRef.current = dayjs(updatedDashboardData?.updatedAt);
-
-							setLayouts(
-								sortLayout(getUpdatedLayout(updatedDashboardData?.data.layout)),
-							);
-
-							setPanelMap(defaultTo(updatedDashboardData?.data.panelMap, {}));
-						},
-					});
-
-					modalRef.current = modal;
-				} else {
-					// normal flow
-					updatedTimeRef.current = dayjs(updatedDashboardData?.updatedAt);
-
-					dashboardRef.current = updatedDashboardData;
-
-					if (!isEqual(selectedDashboard, updatedDashboardData)) {
-						setSelectedDashboard(updatedDashboardData);
-					}
-
-					if (
-						!isEqual(
-							[omitBy(layouts, (value): boolean => isUndefined(value))[0]],
-							updatedDashboardData?.data.layout,
-						)
-					) {
-						setLayouts(
-							sortLayout(getUpdatedLayout(updatedDashboardData?.data.layout)),
-						);
-
-						setPanelMap(defaultTo(updatedDashboardData?.data.panelMap, {}));
-					}
-				}
-			},
-		},
-	);
+				setPanelMap(defaultTo(updatedDashboardData?.data.panelMap, {}));
+			}
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [dashboardResponse.data]);
 
 	useEffect(() => {
 		// make the call on tab visibility only if the user is on dashboard / widget page
 		if (
 			isVisible &&
-			updatedTimeRef.current &&
+			!!selectedDashboard &&
 			(!!isDashboardPage || !!isDashboardWidgetPage)
 		) {
 			dashboardResponse.refetch();
@@ -456,7 +446,6 @@ export function DashboardProvider({
 			setLayouts,
 			setPanelMap,
 			setSelectedDashboard,
-			updatedTimeRef,
 			setToScrollWidgetId,
 			updateLocalStorageDashboardVariables,
 			dashboardQueryRangeCalled,
