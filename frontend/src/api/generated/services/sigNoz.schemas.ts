@@ -2175,6 +2175,11 @@ export interface ServiceaccounttypesServiceAccountDTO {
 	createdAt?: Date;
 	/**
 	 * @type string
+	 * @format date-time
+	 */
+	deletedAt: Date;
+	/**
+	 * @type string
 	 */
 	email: string;
 	/**
