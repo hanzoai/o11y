@@ -198,26 +198,28 @@ func (module *module) Update(ctx context.Context, orgID valuer.UUID, input *serv
 }
 
 func (module *module) UpdateStatus(ctx context.Context, orgID valuer.UUID, input *serviceaccounttypes.ServiceAccount) error {
-	serviceAccount, err := module.Get(ctx, orgID, input.ID)
+	err := module.authz.Revoke(ctx, orgID, input.Roles, authtypes.MustNewSubject(authtypes.TypeableServiceAccount, input.ID.String(), orgID, nil))
 	if err != nil {
 		return err
 	}
 
-	if input.Status == serviceAccount.Status {
-		return nil
-	}
+	err = module.store.RunInTx(ctx, func(ctx context.Context) error {
+		// revoke all the API keys on disable
+		err := module.store.RevokeAllFactorAPIKeys(ctx, input.ID)
+		if err != nil {
+			return err
+		}
 
-	switch input.Status {
-	case serviceaccounttypes.StatusActive:
-		err := module.activateServiceAccount(ctx, orgID, input)
+		// update the status but do not delete the role mappings as we will use them for audits
+		err = module.store.Update(ctx, orgID, serviceaccounttypes.NewStorableServiceAccount(input))
 		if err != nil {
 			return err
 		}
-	case serviceaccounttypes.StatusDisabled:
-		err := module.disableServiceAccount(ctx, orgID, input)
-		if err != nil {
-			return err
-		}
+
+		return nil
+	})
+	if err != nil {
+		return err
 	}
 
 	module.analytics.TrackUser(ctx, orgID.String(), input.ID.String(), "Service Account Deleted", map[string]any{})
@@ -358,46 +360,4 @@ func (module *module) Collect(ctx context.Context, orgID valuer.UUID) (map[strin
 	}
 
 	return stats, nil
-}
-
-func (module *module) disableServiceAccount(ctx context.Context, orgID valuer.UUID, input *serviceaccounttypes.ServiceAccount) error {
-	err := module.authz.Revoke(ctx, orgID, input.Roles, authtypes.MustNewSubject(authtypes.TypeableServiceAccount, input.ID.String(), orgID, nil))
-	if err != nil {
-		return err
-	}
-
-	err = module.store.RunInTx(ctx, func(ctx context.Context) error {
-		// revoke all the API keys on disable
-		err := module.store.RevokeAllFactorAPIKeys(ctx, input.ID)
-		if err != nil {
-			return err
-		}
-
-		// update the status but do not delete the role mappings as we will reuse them on activation.
-		err = module.Update(ctx, orgID, input)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (module *module) activateServiceAccount(ctx context.Context, orgID valuer.UUID, input *serviceaccounttypes.ServiceAccount) error {
-	err := module.authz.Grant(ctx, orgID, input.Roles, authtypes.MustNewSubject(authtypes.TypeableServiceAccount, input.ID.String(), orgID, nil))
-	if err != nil {
-		return err
-	}
-
-	err = module.Update(ctx, orgID, input)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
