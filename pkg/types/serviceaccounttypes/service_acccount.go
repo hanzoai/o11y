@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"slices"
 	"time"
 
 	"github.com/SigNoz/signoz/pkg/errors"
@@ -34,20 +33,22 @@ type StorableServiceAccount struct {
 
 	types.Identifiable
 	types.TimeAuditable
-	Name   string        `bun:"name"`
-	Email  string        `bun:"email"`
-	Status valuer.String `bun:"status"`
-	OrgID  string        `bun:"org_id"`
+	Name      string        `bun:"name"`
+	Email     string        `bun:"email"`
+	Status    valuer.String `bun:"status"`
+	OrgID     string        `bun:"org_id"`
+	DeletedAt time.Time     `bun:"deleted_at"`
 }
 
 type ServiceAccount struct {
 	types.Identifiable
 	types.TimeAuditable
-	Name   string        `json:"name" required:"true"`
-	Email  valuer.Email  `json:"email" required:"true"`
-	Roles  []string      `json:"roles" required:"true" nullable:"false"`
-	Status valuer.String `json:"status" required:"true"`
-	OrgID  valuer.UUID   `json:"orgID" required:"true"`
+	Name      string        `json:"name" required:"true"`
+	Email     valuer.Email  `json:"email" required:"true"`
+	Roles     []string      `json:"roles" required:"true" nullable:"false"`
+	Status    valuer.String `json:"status" required:"true"`
+	OrgID     valuer.UUID   `json:"orgID" required:"true"`
+	DeletedAt time.Time     `json:"deletedAt" required:"true"`
 }
 
 type PostableServiceAccount struct {
@@ -75,11 +76,12 @@ func NewServiceAccount(name string, email valuer.Email, roles []string, status v
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
-		Name:   name,
-		Email:  email,
-		Roles:  roles,
-		Status: status,
-		OrgID:  orgID,
+		Name:      name,
+		Email:     email,
+		Roles:     roles,
+		Status:    status,
+		OrgID:     orgID,
+		DeletedAt: time.Time{},
 	}
 }
 
@@ -92,6 +94,7 @@ func NewServiceAccountFromStorables(storableServiceAccount *StorableServiceAccou
 		Roles:         roles,
 		Status:        storableServiceAccount.Status,
 		OrgID:         valuer.MustNewUUID(storableServiceAccount.OrgID),
+		DeletedAt:     storableServiceAccount.DeletedAt,
 	}
 }
 
@@ -128,6 +131,7 @@ func NewStorableServiceAccount(serviceAccount *ServiceAccount) *StorableServiceA
 		Email:         serviceAccount.Email.String(),
 		Status:        serviceAccount.Status,
 		OrgID:         serviceAccount.OrgID.String(),
+		DeletedAt:     serviceAccount.DeletedAt,
 	}
 }
 
@@ -151,6 +155,7 @@ func (sa *ServiceAccount) UpdateStatus(status valuer.String) error {
 
 	sa.Status = status
 	sa.UpdatedAt = time.Now()
+	sa.DeletedAt = time.Now()
 	return nil
 }
 
@@ -269,8 +274,8 @@ func (sa *UpdatableServiceAccountStatus) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if !slices.Contains(ValidStatus, temp.Status) {
-		return errors.Newf(errors.TypeInvalidInput, ErrCodeServiceAccountInvalidInput, "invalid status: %s, allowed status are: %v", temp.Status, ValidStatus)
+	if temp.Status != StatusDisabled {
+		return errors.Newf(errors.TypeInvalidInput, ErrCodeServiceAccountInvalidInput, "invalid status: %s, allowed status are: %v", temp.Status, StatusDisabled)
 	}
 
 	*sa = UpdatableServiceAccountStatus(temp)
