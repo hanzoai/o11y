@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { UseQueryResult } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
 import { WarningOutlined } from '@ant-design/icons';
 import { Button, Flex, Modal, Space, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
@@ -32,7 +32,6 @@ import { GetQueryResultsProps } from 'lib/dashboard/getQueryResults';
 import { getDashboardVariables } from 'lib/dashboardVariables/getDashboardVariables';
 import { cloneDeep, defaultTo, isEmpty, isUndefined } from 'lodash-es';
 import { Check, X } from 'lucide-react';
-import { DashboardWidgetPageParams } from 'pages/DashboardWidget';
 import { useDashboard } from 'providers/Dashboard/Dashboard';
 import {
 	clearSelectedRowWidgetId,
@@ -82,16 +81,13 @@ import {
 import './NewWidget.styles.scss';
 
 function NewWidget({
+	dashboardId,
 	selectedGraph,
 	enableDrillDown = false,
+	selectedDashboard,
 }: NewWidgetProps): JSX.Element {
 	const { safeNavigate } = useSafeNavigate();
-	const {
-		selectedDashboard,
-		setSelectedDashboard,
-		setToScrollWidgetId,
-		columnWidths,
-	} = useDashboard();
+	const { setToScrollWidgetId, columnWidths } = useDashboard();
 
 	const { dashboardVariables } = useDashboardVariables();
 
@@ -135,8 +131,6 @@ function NewWidget({
 	const { widgets = [] } = selectedDashboard?.data || {};
 
 	const query = useUrlQuery();
-
-	const { dashboardId } = useParams<DashboardWidgetPageParams>();
 
 	const [isNewDashboard, setIsNewDashboard] = useState<boolean>(false);
 
@@ -283,7 +277,7 @@ function NewWidget({
 				isLogScale,
 				legendPosition,
 				customLegendColors,
-				columnWidths: columnWidths?.[selectedWidget?.id],
+				columnWidths: selectedWidget.columnWidths,
 				contextLinks,
 			};
 		});
@@ -557,8 +551,7 @@ function NewWidget({
 		};
 
 		updateDashboardMutation.mutateAsync(dashboard, {
-			onSuccess: (updatedDashboard) => {
-				setSelectedDashboard(updatedDashboard.data);
+			onSuccess: () => {
 				setToScrollWidgetId(selectedWidget?.id || '');
 				safeNavigate({
 					pathname: generatePath(ROUTES.DASHBOARD, { dashboardId }),
@@ -577,7 +570,6 @@ function NewWidget({
 		preWidgets,
 		updateDashboardMutation,
 		widgets,
-		setSelectedDashboard,
 		setToScrollWidgetId,
 		safeNavigate,
 		dashboardId,
@@ -818,6 +810,7 @@ function NewWidget({
 								isLoadingPanelData={isLoadingPanelData}
 								setQueryResponse={setQueryResponse}
 								enableDrillDown={enableDrillDown}
+								selectedDashboard={selectedDashboard}
 							/>
 						)}
 					</OverlayScrollbar>
