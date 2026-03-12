@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/statsreporter"
-	"github.com/SigNoz/signoz/pkg/types/licensetypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/statsreporter"
+	"github.com/hanzoai/o11y/pkg/types/licensetypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 var (

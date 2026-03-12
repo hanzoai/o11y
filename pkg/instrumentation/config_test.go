@@ -5,17 +5,17 @@ import (
 	"log/slog"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/config"
-	"github.com/SigNoz/signoz/pkg/config/envprovider"
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/config"
+	"github.com/hanzoai/o11y/pkg/config/envprovider"
+	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewWithEnvProvider(t *testing.T) {
-	t.Setenv("SIGNOZ_INSTRUMENTATION_LOGS_LEVEL", "debug")
-	t.Setenv("SIGNOZ_INSTRUMENTATION_METRICS_READERS_PULL_EXPORTER_PROMETHEUS_PORT", "1111")
-	t.Setenv("SIGNOZ_INSTRUMENTATION_TRACES_ENABLED", "true")
+	t.Setenv("HANZO_INSTRUMENTATION_LOGS_LEVEL", "debug")
+	t.Setenv("HANZO_INSTRUMENTATION_METRICS_READERS_PULL_EXPORTER_PROMETHEUS_PORT", "1111")
+	t.Setenv("HANZO_INSTRUMENTATION_TRACES_ENABLED", "true")
 
 	conf, err := config.New(
 		context.Background(),

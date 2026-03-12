@@ -42,7 +42,7 @@ interface MockSignupResponse extends SignupResponse {
 const mockSignupResponse: MockSignupResponse = {
 	orgId: 'test-org-id',
 	createdAt: Date.now(),
-	email: 'test@signoz.io',
+	email: 'test@o11y.hanzo.ai',
 	id: 'test-user-id',
 	displayName: 'Test User',
 	role: 'ADMIN',
@@ -54,7 +54,7 @@ const mockTokenResponse: Token = {
 };
 
 const mockInviteDetails: InviteDetails = {
-	email: 'invited@signoz.io',
+	email: 'invited@o11y.hanzo.ai',
 	name: 'Invited User',
 	organization: 'Test Org',
 	createdAt: Date.now(),
@@ -130,7 +130,7 @@ describe('SignUp Component - Regular Signup', () => {
 			// Missing password
 			await user.clear(passwordInput);
 			await user.clear(confirmPasswordInput);
-			await user.type(emailInput, 'test@signoz.io');
+			await user.type(emailInput, 'test@o11y.hanzo.ai');
 			await user.type(confirmPasswordInput, 'password123');
 			expect(submitButton).toBeDisabled();
 
@@ -225,7 +225,7 @@ describe('SignUp Component - Regular Signup', () => {
 				name: /access my workspace/i,
 			});
 
-			await user.type(emailInput, 'test@signoz.io');
+			await user.type(emailInput, 'test@o11y.hanzo.ai');
 			await user.type(passwordInput, 'password123');
 			await user.type(confirmPasswordInput, 'password123');
 
@@ -273,7 +273,7 @@ describe('SignUp Component - Regular Signup', () => {
 				name: /access my workspace/i,
 			});
 
-			await user.type(emailInput, 'existing@signoz.io');
+			await user.type(emailInput, 'existing@o11y.hanzo.ai');
 			await user.type(passwordInput, 'password123');
 			await user.type(confirmPasswordInput, 'password123');
 
@@ -320,7 +320,7 @@ describe('SignUp Component - Accept Invite', () => {
 			const emailInput = await screen.findByLabelText(/email address/i);
 
 			await waitFor(() => {
-				expect(emailInput).toHaveValue('invited@signoz.io');
+				expect(emailInput).toHaveValue('invited@o11y.hanzo.ai');
 			});
 		});
 
@@ -413,7 +413,7 @@ describe('SignUp Component - Accept Invite', () => {
 
 			const emailInput = await screen.findByLabelText(/email address/i);
 			await waitFor(() => {
-				expect(emailInput).toHaveValue('invited@signoz.io');
+				expect(emailInput).toHaveValue('invited@o11y.hanzo.ai');
 			});
 
 			const passwordInput = screen.getByPlaceholderText(/enter new password/i);
@@ -501,7 +501,7 @@ describe('SignUp Component - Accept Invite', () => {
 
 			const emailInput = await screen.findByLabelText(/email address/i);
 			await waitFor(() => {
-				expect(emailInput).toHaveValue('invited@signoz.io');
+				expect(emailInput).toHaveValue('invited@o11y.hanzo.ai');
 			});
 
 			const passwordInput = screen.getByPlaceholderText(/enter new password/i);

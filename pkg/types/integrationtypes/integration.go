@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/uptrace/bun"
 )
 
 type IntegrationUserEmail string
 
 const (
-	AWSIntegrationUserEmail IntegrationUserEmail = "aws-integration@signoz.io"
+	AWSIntegrationUserEmail IntegrationUserEmail = "aws-integration@observe.hanzo.ai"
 )
 
 var AllIntegrationUserEmails = []IntegrationUserEmail{

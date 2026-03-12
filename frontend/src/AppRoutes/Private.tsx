@@ -81,7 +81,7 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 		const users = usersData?.data || [];
 
 		const remainingUsers = (Array.isArray(users) ? users : []).filter(
-			(user) => user.email !== 'admin@signoz.cloud',
+			(user) => user.email !== 'admin@o11y.cloud',
 		);
 
 		return remainingUsers.length === 1;
@@ -222,7 +222,7 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 		}
 	}, [org]);
 
-	// if the feature flag is enabled and the current route is /get-started then redirect to /get-started-with-signoz-cloud
+	// if the feature flag is enabled and the current route is /get-started then redirect to /get-started-with-o11y-cloud
 	useEffect(() => {
 		if (
 			currentRoute?.path === ROUTES.GET_STARTED &&

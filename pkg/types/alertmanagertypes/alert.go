@@ -8,7 +8,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/go-openapi/runtime/middleware"
 	v2 "github.com/prometheus/alertmanager/api/v2"
 	"github.com/prometheus/alertmanager/api/v2/models"
@@ -143,9 +143,9 @@ func NewTestAlert(receiver Receiver, startsAt time.Time, updatedAt time.Time) *A
 				"severity":  "critical",
 			},
 			Annotations: model.LabelSet{
-				"description": "Test alert fired from SigNoz",
-				"summary":     "Test alert fired from SigNoz",
-				"message":     "Test alert fired from SigNoz",
+				"description": "Test alert fired from Hanzo O11y",
+				"summary":     "Test alert fired from Hanzo O11y",
+				"message":     "Test alert fired from Hanzo O11y",
 			},
 		},
 		UpdatedAt: updatedAt,

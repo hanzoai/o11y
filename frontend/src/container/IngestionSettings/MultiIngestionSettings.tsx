@@ -2,7 +2,7 @@ import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import { useCopyToClipboard } from 'react-use';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import {
 	Button,
 	Col,
@@ -37,7 +37,7 @@ import {
 import {
 	GatewaytypesIngestionKeyDTO,
 	RenderErrorResponseDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/observe.schemas';
 import { AxiosError } from 'axios';
 import { getYAxisFormattedValue } from 'components/Graph/yAxisConfig';
 import Tags from 'components/Tags/Tags';
@@ -857,13 +857,13 @@ function MultiIngestionSettings(): JSX.Element {
 
 		switch (signal.signal) {
 			case 'metrics':
-				metricName = 'signoz.meter.metric.datapoint.count';
+				metricName = 'o11y.meter.metric.datapoint.count';
 				break;
 			case 'traces':
-				metricName = 'signoz.meter.span.size';
+				metricName = 'o11y.meter.span.size';
 				break;
 			case 'logs':
-				metricName = 'signoz.meter.log.size';
+				metricName = 'o11y.meter.log.size';
 				break;
 			default:
 				return;
@@ -890,7 +890,7 @@ function MultiIngestionSettings(): JSX.Element {
 							},
 						],
 						filter: {
-							expression: `signoz.workspace.key.id='${APIKey.id}'`,
+							expression: `o11y.workspace.key.id='${APIKey.id}'`,
 						},
 					},
 				],
@@ -1584,9 +1584,9 @@ function MultiIngestionSettings(): JSX.Element {
 				<header>
 					<Typography.Title className="title"> Ingestion Keys </Typography.Title>
 					<Typography.Text className="subtitle">
-						Create and manage ingestion keys for the SigNoz Cloud{' '}
+						Create and manage ingestion keys for the Hanzo O11y Cloud{' '}
 						<a
-							href="https://signoz.io/docs/ingestion/signoz-cloud/keys/"
+							href="https://o11y.hanzo.ai/docs/ingestion/o11y-cloud/keys/"
 							target="_blank"
 							className="learn-more"
 							rel="noreferrer"

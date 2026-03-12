@@ -5,7 +5,7 @@ import {
 	useEffect,
 	useState,
 } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Input } from 'antd';
 import logEvent from 'api/common/logEvent';
 import cx from 'classnames';

@@ -3,8 +3,8 @@ package v4
 import (
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -559,7 +559,7 @@ func Test_orderByAttributeKeyTags(t *testing.T) {
 						Order:      "asc",
 					},
 					{
-						ColumnName: constants.SigNozOrderByValue,
+						ColumnName: constants.Hanzo O11yOrderByValue,
 						Order:      "desc",
 					},
 				},
@@ -604,7 +604,7 @@ func Test_orderByAttributeKeyTags(t *testing.T) {
 						Order:      "asc",
 					},
 					{
-						ColumnName: constants.SigNozOrderByValue,
+						ColumnName: constants.Hanzo O11yOrderByValue,
 						Order:      "asc",
 					},
 					{
@@ -631,7 +631,7 @@ func Test_orderByAttributeKeyTags(t *testing.T) {
 						Order:      "asc",
 					},
 					{
-						ColumnName: constants.SigNozOrderByValue,
+						ColumnName: constants.Hanzo O11yOrderByValue,
 						Order:      "asc",
 					},
 					{
@@ -692,7 +692,7 @@ func Test_generateAggregateClause(t *testing.T) {
 				having:      "",
 				orderBy:     " order by `user_name` desc",
 			},
-			want: " count(test)/60.000000 as value from signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND " +
+			want: " count(test)/60.000000 as value from observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND " +
 				"(ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) AND attributes_string['service.name'] = 'test' " +
 				"group by `user_name` order by `user_name` desc",
 		},
@@ -709,7 +709,7 @@ func Test_generateAggregateClause(t *testing.T) {
 				having:      " having value > 10",
 				orderBy:     " order by `user_name` desc",
 			},
-			want: " count(test)/60.000000 as value from signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND " +
+			want: " count(test)/60.000000 as value from observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND " +
 				"(ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) AND attributes_string['service.name'] = 'test' group by `user_name` having value > 10 order by " +
 				"`user_name` desc",
 		},
@@ -728,7 +728,7 @@ func Test_generateAggregateClause(t *testing.T) {
 				having:      "",
 				orderBy:     " order by `user_name` desc",
 			},
-			want: " count(test)/3600.000000 as value from signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND " +
+			want: " count(test)/3600.000000 as value from observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND " +
 				"(ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) AND attributes_string['service.name'] = 'test' " +
 				"group by `user_name` order by `user_name` desc",
 		},
@@ -799,7 +799,7 @@ func Test_buildLogsQuery(t *testing.T) {
 					},
 				},
 			},
-			want: "SELECT attributes_string['user_name'] as `user_name`, toFloat64(count(*)) as value from signoz_logs.distributed_logs_v2 " +
+			want: "SELECT attributes_string['user_name'] as `user_name`, toFloat64(count(*)) as value from observe_logs.distributed_logs_v2 " +
 				"where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
 				"AND attributes_string['service.name'] = 'test' AND mapContains(attributes_string, 'service.name') AND mapContains(attributes_string, 'user_name') " +
 				"group by `user_name` order by `user_name` desc",
@@ -835,7 +835,7 @@ func Test_buildLogsQuery(t *testing.T) {
 				},
 			},
 			want: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string " +
-				"from signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
+				"from observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
 				"AND attributes_string['service.name'] = 'test' AND mapContains(attributes_string, 'service.name') order by timestamp desc",
 		},
 		{
@@ -890,9 +890,9 @@ func Test_buildLogsQuery(t *testing.T) {
 				},
 			},
 			want: "SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, resources_string['host'] as `host`, avg(attributes_number['duration']) as value " +
-				"from signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
+				"from observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
 				"AND attributes_number['duration'] > 1000.000000 AND mapContains(attributes_number, 'duration') AND mapContains(attributes_number, 'duration') AND " +
-				"(resource_fingerprint GLOBAL IN (SELECT fingerprint FROM signoz_logs.distributed_logs_v2_resource WHERE (seen_at_ts_bucket_start >= 1680064560) AND (seen_at_ts_bucket_start <= 1680066458) " +
+				"(resource_fingerprint GLOBAL IN (SELECT fingerprint FROM observe_logs.distributed_logs_v2_resource WHERE (seen_at_ts_bucket_start >= 1680064560) AND (seen_at_ts_bucket_start <= 1680066458) " +
 				"AND simpleJSONExtractString(labels, 'service.name') = 'test' AND labels like '%service.name\":\"test%' AND ( (simpleJSONHas(labels, 'host') AND labels like '%host%') ))) " +
 				"group by `host`,ts order by `host` desc",
 		},
@@ -960,10 +960,10 @@ func TestPrepareLogsQuery(t *testing.T) {
 					},
 				},
 			},
-			want: "SELECT attributes_string['name'] as `name`, resources_string['host'] as `host`, toFloat64(count(*)) as value from signoz_logs.distributed_logs_v2 where " +
+			want: "SELECT attributes_string['name'] as `name`, resources_string['host'] as `host`, toFloat64(count(*)) as value from observe_logs.distributed_logs_v2 where " +
 				"(timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) AND lower(body) like lower('%requestor_list%') " +
 				"AND lower(body) like lower('%index_service%') AND has(JSONExtract(JSON_QUERY(body, '$.\"requestor_list\"[*]'), 'Array(String)'), 'index_service') AND mapContains(attributes_string, 'name') AND " +
-				"(resource_fingerprint GLOBAL IN (SELECT fingerprint FROM signoz_logs.distributed_logs_v2_resource WHERE (seen_at_ts_bucket_start >= 1680064560) AND (seen_at_ts_bucket_start <= 1680066458) AND " +
+				"(resource_fingerprint GLOBAL IN (SELECT fingerprint FROM observe_logs.distributed_logs_v2_resource WHERE (seen_at_ts_bucket_start >= 1680064560) AND (seen_at_ts_bucket_start <= 1680066458) AND " +
 				"( (simpleJSONHas(labels, 'host') AND labels like '%host%') ))) group by `name`,`host` order by `name` DESC",
 		},
 		{
@@ -989,10 +989,10 @@ func TestPrepareLogsQuery(t *testing.T) {
 				},
 				options: v3.QBOptions{GraphLimitQtype: constants.FirstQueryGraphLimit},
 			},
-			want: "SELECT `user` from (SELECT attributes_string['user'] as `user`, toFloat64(count(distinct(attributes_string['name']))) as value from signoz_logs.distributed_logs_v2 " +
+			want: "SELECT `user` from (SELECT attributes_string['user'] as `user`, toFloat64(count(distinct(attributes_string['name']))) as value from observe_logs.distributed_logs_v2 " +
 				"where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) AND attributes_string['method'] = 'GET' " +
 				"AND mapContains(attributes_string, 'method') AND mapContains(attributes_string, 'user') AND mapContains(attributes_string, 'name') AND (resource_fingerprint GLOBAL IN " +
-				"(SELECT fingerprint FROM signoz_logs.distributed_logs_v2_resource WHERE (seen_at_ts_bucket_start >= 1680064560) AND (seen_at_ts_bucket_start <= 1680066458) AND simpleJSONExtractString(labels, 'service.name') = 'app' " +
+				"(SELECT fingerprint FROM observe_logs.distributed_logs_v2_resource WHERE (seen_at_ts_bucket_start >= 1680064560) AND (seen_at_ts_bucket_start <= 1680066458) AND simpleJSONExtractString(labels, 'service.name') = 'app' " +
 				"AND labels like '%service.name\":\"app%')) group by `user` order by value DESC) LIMIT 10",
 		},
 		{
@@ -1019,9 +1019,9 @@ func TestPrepareLogsQuery(t *testing.T) {
 				options: v3.QBOptions{GraphLimitQtype: constants.SecondQueryGraphLimit},
 			},
 			want: "SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, attributes_string['user'] as `user`, toFloat64(count(distinct(attributes_string['name']))) as value " +
-				"from signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) AND " +
+				"from observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) AND " +
 				"attributes_string['method'] = 'GET' AND mapContains(attributes_string, 'method') AND mapContains(attributes_string, 'user') AND mapContains(attributes_string, 'name') AND " +
-				"(resource_fingerprint GLOBAL IN (SELECT fingerprint FROM signoz_logs.distributed_logs_v2_resource WHERE (seen_at_ts_bucket_start >= 1680064560) AND (seen_at_ts_bucket_start <= 1680066458) AND " +
+				"(resource_fingerprint GLOBAL IN (SELECT fingerprint FROM observe_logs.distributed_logs_v2_resource WHERE (seen_at_ts_bucket_start >= 1680064560) AND (seen_at_ts_bucket_start <= 1680066458) AND " +
 				"simpleJSONExtractString(labels, 'service.name') = 'app' AND labels like '%service.name\":\"app%')) AND (`user`) GLOBAL IN (#LIMIT_PLACEHOLDER) group by `user`,ts order by value DESC",
 		},
 		{
@@ -1044,7 +1044,7 @@ func TestPrepareLogsQuery(t *testing.T) {
 				options: v3.QBOptions{IsLivetailQuery: true},
 			},
 			want: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string " +
-				"from signoz_logs.distributed_logs_v2 where attributes_string['method'] = 'GET' AND mapContains(attributes_string, 'method') AND ",
+				"from observe_logs.distributed_logs_v2 where attributes_string['method'] = 'GET' AND mapContains(attributes_string, 'method') AND ",
 		},
 		{
 			name: "Live Tail Query with resource attribute",
@@ -1067,8 +1067,8 @@ func TestPrepareLogsQuery(t *testing.T) {
 				options: v3.QBOptions{IsLivetailQuery: true},
 			},
 			want: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string from " +
-				"signoz_logs.distributed_logs_v2 where attributes_string['method'] = 'GET' AND mapContains(attributes_string, 'method') AND " +
-				"(resource_fingerprint GLOBAL IN (SELECT fingerprint FROM signoz_logs.distributed_logs_v2_resource WHERE simpleJSONExtractString(lower(labels), 'service.name') LIKE '%app%' AND lower(labels) like '%service.name%app%' AND ",
+				"observe_logs.distributed_logs_v2 where attributes_string['method'] = 'GET' AND mapContains(attributes_string, 'method') AND " +
+				"(resource_fingerprint GLOBAL IN (SELECT fingerprint FROM observe_logs.distributed_logs_v2_resource WHERE simpleJSONExtractString(lower(labels), 'service.name') LIKE '%app%' AND lower(labels) like '%service.name%app%' AND ",
 		},
 		{
 			name: "Live Tail Query W/O filter",
@@ -1087,7 +1087,7 @@ func TestPrepareLogsQuery(t *testing.T) {
 				options: v3.QBOptions{IsLivetailQuery: true},
 			},
 			want: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string " +
-				"from signoz_logs.distributed_logs_v2 where ",
+				"from observe_logs.distributed_logs_v2 where ",
 		},
 		{
 			name: "Table query with limit",
@@ -1105,7 +1105,7 @@ func TestPrepareLogsQuery(t *testing.T) {
 					Limit:             10,
 				},
 			},
-			want: "SELECT toFloat64(count(*)) as value from signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) order by value DESC LIMIT 10",
+			want: "SELECT toFloat64(count(*)) as value from observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) order by value DESC LIMIT 10",
 		},
 		{
 			name: "Test limit less than pageSize - order by ts",
@@ -1127,7 +1127,7 @@ func TestPrepareLogsQuery(t *testing.T) {
 				},
 			},
 			want: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string from " +
-				"signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
+				"observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
 				"order by timestamp desc LIMIT 1 OFFSET 0",
 		},
 		{
@@ -1152,7 +1152,7 @@ func TestPrepareLogsQuery(t *testing.T) {
 				},
 			},
 			want: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string from " +
-				"signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
+				"observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
 				"AND id < '2TNh4vp2TpiWyLt3SzuadLJF2s4' order by timestamp desc LIMIT 10 OFFSET 10",
 		},
 		{
@@ -1175,7 +1175,7 @@ func TestPrepareLogsQuery(t *testing.T) {
 				},
 			},
 			want: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string from " +
-				"signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
+				"observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) " +
 				"order by attributes_string['method'] desc LIMIT 1 OFFSET 0",
 		},
 		{
@@ -1200,7 +1200,7 @@ func TestPrepareLogsQuery(t *testing.T) {
 				},
 			},
 			want: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string from " +
-				"signoz_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) AND " +
+				"observe_logs.distributed_logs_v2 where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND (ts_bucket_start >= 1680064560 AND ts_bucket_start <= 1680066458) AND " +
 				"id < '2TNh4vp2TpiWyLt3SzuadLJF2s4' order by attributes_string['method'] desc LIMIT 50 OFFSET 50",
 		},
 	}

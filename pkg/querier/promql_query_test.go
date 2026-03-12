@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	qbv5 "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/errors"
+	qbv5 "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/stretchr/testify/assert"
 )
 

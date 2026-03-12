@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { matchPath, useLocation } from 'react-router-dom';
 import { useCopyToClipboard } from 'react-use';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Button, Switch, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { QueryParams } from 'constants/query';

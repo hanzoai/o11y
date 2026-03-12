@@ -3,7 +3,7 @@ package licensetypes
 import (
 	"encoding/json"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 type GettableSubscription struct {

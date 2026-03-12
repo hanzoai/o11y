@@ -3,8 +3,8 @@ package v3
 import (
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -357,7 +357,7 @@ var testOrderBy = []struct {
 				Order:      "asc",
 			},
 			{
-				ColumnName: constants.SigNozOrderByValue,
+				ColumnName: constants.Hanzo O11yOrderByValue,
 				Order:      "desc",
 			},
 		},
@@ -394,7 +394,7 @@ var testOrderBy = []struct {
 				Order:      "asc",
 			},
 			{
-				ColumnName: constants.SigNozOrderByValue,
+				ColumnName: constants.Hanzo O11yOrderByValue,
 				Order:      "asc",
 			},
 			{

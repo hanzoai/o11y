@@ -9,8 +9,8 @@ Create a `setenv.sh` file in the same directory as your Dockerfile
 ```bash
 #!/bin/sh
 export CATALINA_OPTS="$CATALINA_OPTS -javaagent:/usr/local/tomcat/opentelemetry-javaagent.jar"
-export OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}"
-export OTEL_EXPORTER_OTLP_ENDPOINT=https://ingest.{{REGION}}.signoz.cloud:443
+export OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}"
+export OTEL_EXPORTER_OTLP_ENDPOINT=https://ingest.{{REGION}}.o11y.hanzo.ai:443
 export OTEL_RESOURCE_ATTRIBUTES=service.name={{MYAPP}}
 ```
 

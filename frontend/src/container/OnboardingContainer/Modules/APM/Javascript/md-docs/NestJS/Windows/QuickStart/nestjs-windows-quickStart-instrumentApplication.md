@@ -8,7 +8,7 @@ npm install --save @opentelemetry/exporter-trace-otlp-http@^0.45.0
 ```
 
 **Step 2.** Create `tracer.ts` file<br></br>
-You need to configure the endpoint for SigNoz cloud in this file.
+You need to configure the endpoint for Hanzo O11y cloud in this file.
 
 ```bash
 'use strict';
@@ -23,8 +23,8 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 // Enable all auto-instrumentations from the meta package
 const exporterOptions = {
   //highlight-start
-  url: 'https://ingest.{{REGION}}.signoz.cloud:443/v1/traces',
-  headers: { 'signoz-ingestion-key': '{{SIGNOZ_INGESTION_KEY}}' },
+  url: 'https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces',
+  headers: { 'signoz-ingestion-key': '{{HANZO_INGESTION_KEY}}' },
   //highlight-end
 };
 

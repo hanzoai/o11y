@@ -1,9 +1,9 @@
 # SQL
-SigNoz utilizes a relational database to store metadata including organization information, user data and other settings.
+Hanzo O11y utilizes a relational database to store metadata including organization information, user data and other settings.
 
 ## How to use it?
 
-The database interface is defined in [SQLStore](/pkg/sqlstore/sqlstore.go). SigNoz leverages the Bun ORM to interact with the underlying database. To access the database instance, use the `BunDBCtx` function. For operations that require transactions across multiple database operations, use the `RunInTxCtx` function. This function embeds a transaction in the context, which propagates through various functions in the callback.
+The database interface is defined in [SQLStore](/pkg/sqlstore/sqlstore.go). Hanzo O11y leverages the Bun ORM to interact with the underlying database. To access the database instance, use the `BunDBCtx` function. For operations that require transactions across multiple database operations, use the `RunInTxCtx` function. This function embeds a transaction in the context, which propagates through various functions in the callback.
 
 ```go
 type Thing struct {
@@ -46,7 +46,7 @@ Hooks are user-defined functions that execute before and/or after specific datab
 
 ## How is the schema designed?
 
-SigNoz implements a star schema design with the organizations table as the central entity. All other tables link to the organizations table via foreign key constraints on the `org_id` column. This design ensures that every entity within the system is either directly or indirectly associated with an organization.
+Hanzo O11y implements a star schema design with the organizations table as the central entity. All other tables link to the organizations table via foreign key constraints on the `org_id` column. This design ensures that every entity within the system is either directly or indirectly associated with an organization.
 
 ```mermaid
 erDiagram

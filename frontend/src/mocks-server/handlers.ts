@@ -48,10 +48,10 @@ export const handlers = [
 			const metricName = req.url.searchParams.get('metricName');
 			const match = req.url.searchParams.get('match');
 
-			if (metricName === 'signoz_calls_total' && match === 'resource_') {
+			if (metricName === 'observe_calls_total' && match === 'resource_') {
 				return res(
 					ctx.status(200),
-					ctx.json({ status: 'success', data: ['resource_signoz_collector_id'] }),
+					ctx.json({ status: 'success', data: ['resource_o11y_collector_id'] }),
 				);
 			}
 
@@ -62,7 +62,7 @@ export const handlers = [
 	rest.get(
 		'http://localhost/api/v3/autocomplete/attribute_values',
 		(req, res, ctx) => {
-			// ?metricName=signoz_calls_total&tagKey=resource_signoz_collector_id
+			// ?metricName=observe_calls_total&tagKey=resource_o11y_collector_id
 			const metricName = req.url.searchParams.get('metricName');
 			const tagKey = req.url.searchParams.get('tagKey');
 
@@ -112,8 +112,8 @@ export const handlers = [
 			}
 
 			if (
-				metricName === 'signoz_calls_total' &&
-				tagKey === 'resource_signoz_collector_id'
+				metricName === 'observe_calls_total' &&
+				tagKey === 'resource_o11y_collector_id'
 			) {
 				return res(
 					ctx.status(200),
@@ -140,7 +140,7 @@ export const handlers = [
 	),
 	rest.get('http://localhost/api/v1/loginPrecheck', (req, res, ctx) => {
 		const email = req.url.searchParams.get('email');
-		if (email === 'failEmail@signoz.io') {
+		if (email === 'failEmail@o11y.hanzo.ai') {
 			return res(ctx.status(500));
 		}
 

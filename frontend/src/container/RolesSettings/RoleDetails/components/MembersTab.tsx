@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search } from '@signozhq/icons';
+import { Search } from '@hanzo/o11y-icons';
 
 function MembersTab(): JSX.Element {
 	const [searchQuery, setSearchQuery] = useState('');

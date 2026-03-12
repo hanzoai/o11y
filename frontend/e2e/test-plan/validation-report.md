@@ -1,4 +1,4 @@
-# SigNoz Test Plan Validation Report
+# Hanzo O11y Test Plan Validation Report
 
 This report documents the validation of the E2E test plan against the current live application using Playwright MCP. Each module is reviewed for coverage, gaps, and required updates.
 

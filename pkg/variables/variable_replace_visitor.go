@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	grammar "github.com/SigNoz/signoz/pkg/parser/grammar"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/errors"
+	grammar "github.com/hanzoai/o11y/pkg/parser/grammar"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/antlr4-go/antlr/v4"
 )
 

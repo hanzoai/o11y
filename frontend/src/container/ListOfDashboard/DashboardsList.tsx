@@ -11,7 +11,7 @@ import { Layout } from 'react-grid-layout';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { useCopyToClipboard } from 'react-use';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import {
 	Button,
 	Dropdown,
@@ -573,7 +573,7 @@ function DashboardsList(): JSX.Element {
 			{
 				label: (
 					<a
-						href="https://signoz.io/docs/dashboards/dashboard-templates/overview/"
+						href="https://o11y.hanzo.ai/docs/dashboards/dashboard-templates/overview/"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
@@ -744,7 +744,7 @@ function DashboardsList(): JSX.Element {
 									data-testid="learn-more"
 									onClick={(): void => {
 										window.open(
-											'https://signoz.io/docs/userguide/manage-dashboards?utm_source=product&utm_medium=dashboard-list-empty-state',
+											'https://o11y.hanzo.ai/docs/userguide/manage-dashboards?utm_source=product&utm_medium=dashboard-list-empty-state',
 											'_blank',
 										);
 									}}

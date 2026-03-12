@@ -5,9 +5,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 // queryName returns the name from any query envelope spec type.

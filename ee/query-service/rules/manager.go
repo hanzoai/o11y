@@ -6,12 +6,12 @@ import (
 
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	basemodel "github.com/SigNoz/signoz/pkg/query-service/model"
-	baserules "github.com/SigNoz/signoz/pkg/query-service/rules"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/labels"
-	"github.com/SigNoz/signoz/pkg/types/ruletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	basemodel "github.com/hanzoai/o11y/pkg/query-service/model"
+	baserules "github.com/hanzoai/o11y/pkg/query-service/rules"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )

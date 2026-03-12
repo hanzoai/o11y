@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/SigNoz/signoz/ee/query-service/constants"
-	"github.com/SigNoz/signoz/ee/query-service/model"
+	"github.com/hanzoai/o11y/ee/query-service/constants"
+	"github.com/hanzoai/o11y/ee/query-service/model"
 )
 
 type DayWiseBreakdown struct {
@@ -64,7 +64,7 @@ func (ah *APIHandler) getBilling(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	billingURL := fmt.Sprintf("%s/usage?licenseKey=%s", constants.LicenseSignozIo, licenseKey)
+	billingURL := fmt.Sprintf("%s/usage?licenseKey=%s", constants.LicenseHanzoAi, licenseKey)
 
 	hClient := &http.Client{}
 	req, err := http.NewRequest("GET", billingURL, nil)
@@ -72,7 +72,7 @@ func (ah *APIHandler) getBilling(w http.ResponseWriter, r *http.Request) {
 		RespondError(w, model.InternalError(err), nil)
 		return
 	}
-	req.Header.Add("X-SigNoz-SecretKey", constants.LicenseAPIKey)
+	req.Header.Add("X-Hanzo O11y-SecretKey", constants.LicenseAPIKey)
 	billingResp, err := hClient.Do(req)
 	if err != nil {
 		RespondError(w, model.InternalError(err), nil)

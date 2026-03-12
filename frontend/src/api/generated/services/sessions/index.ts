@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for SigNoz
+ * * The file has been auto-generated using Orval for Hanzo O11y
  * * regenerate with 'yarn generate:api'
- * SigNoz
+ * Hanzo O11y
  */
 import type {
 	InvalidateOptions,
@@ -31,7 +31,7 @@ import type {
 	GetSessionContext200,
 	RenderErrorResponseDTO,
 	RotateSession200,
-} from '../sigNoz.schemas';
+} from '../observe.schemas';
 
 /**
  * This endpoint creates a session for a user using google callback

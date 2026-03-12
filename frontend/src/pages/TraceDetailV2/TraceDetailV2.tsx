@@ -4,7 +4,7 @@ import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
-} from '@signozhq/resizable';
+} from '@hanzo/o11y-resizable';
 import { Button, Tabs } from 'antd';
 import FlamegraphImg from 'assets/TraceDetail/Flamegraph';
 import cx from 'classnames';

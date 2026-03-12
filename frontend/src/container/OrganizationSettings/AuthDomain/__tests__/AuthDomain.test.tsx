@@ -9,7 +9,7 @@ import {
 	mockErrorResponse,
 } from './mocks';
 
-jest.mock('@signozhq/sonner', () => ({
+jest.mock('@hanzo/o11y-sonner', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),
@@ -51,7 +51,7 @@ describe('AuthDomain', () => {
 			render(<AuthDomain />);
 
 			await waitFor(() => {
-				expect(screen.getByText('signoz.io')).toBeInTheDocument();
+				expect(screen.getByText('o11y.hanzo.ai')).toBeInTheDocument();
 				expect(screen.getByText('example.com')).toBeInTheDocument();
 				expect(screen.getByText('corp.io')).toBeInTheDocument();
 			});
@@ -124,7 +124,7 @@ describe('AuthDomain', () => {
 			render(<AuthDomain />);
 
 			await waitFor(() => {
-				expect(screen.getByText('signoz.io')).toBeInTheDocument();
+				expect(screen.getByText('o11y.hanzo.ai')).toBeInTheDocument();
 			});
 
 			const configureLinks = await screen.findAllByText(/configure google auth/i);

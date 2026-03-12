@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { toast } from '@signozhq/sonner';
+import { toast } from '@hanzo/o11y-sonner';
 import getResetPasswordToken from 'api/v1/factor_password/getResetPasswordToken';
 import cancelInvite from 'api/v1/invite/id/delete';
 import deleteUser from 'api/v1/user/id/delete';
@@ -16,7 +16,7 @@ import { ROLES } from 'types/roles';
 
 import EditMemberDrawer, { EditMemberDrawerProps } from '../EditMemberDrawer';
 
-jest.mock('@signozhq/drawer', () => ({
+jest.mock('@hanzo/o11y-drawer', () => ({
 	DrawerWrapper: ({
 		content,
 		open,
@@ -26,7 +26,7 @@ jest.mock('@signozhq/drawer', () => ({
 	}): JSX.Element | null => (open ? <div>{content}</div> : null),
 }));
 
-jest.mock('@signozhq/dialog', () => ({
+jest.mock('@hanzo/o11y-dialog', () => ({
 	DialogWrapper: ({
 		children,
 		open,
@@ -51,7 +51,7 @@ jest.mock('api/v1/user/id/delete');
 jest.mock('api/v1/invite/id/delete');
 jest.mock('api/v1/invite/create');
 jest.mock('api/v1/factor_password/getResetPasswordToken');
-jest.mock('@signozhq/sonner', () => ({
+jest.mock('@hanzo/o11y-sonner', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),
@@ -66,7 +66,7 @@ const mockGetResetPasswordToken = jest.mocked(getResetPasswordToken);
 const activeMember = {
 	id: 'user-1',
 	name: 'Alice Smith',
-	email: 'alice@signoz.io',
+	email: 'alice@o11y.hanzo.ai',
 	role: 'ADMIN' as ROLES,
 	status: MemberStatus.Active,
 	joinedOn: '1700000000000',
@@ -76,7 +76,7 @@ const activeMember = {
 const invitedMember = {
 	id: 'invite-abc123',
 	name: '',
-	email: 'bob@signoz.io',
+	email: 'bob@o11y.hanzo.ai',
 	role: 'VIEWER' as ROLES,
 	status: MemberStatus.Invited,
 	joinedOn: '1700000000000',
@@ -109,7 +109,7 @@ describe('EditMemberDrawer', () => {
 		renderDrawer();
 
 		expect(screen.getByDisplayValue('Alice Smith')).toBeInTheDocument();
-		expect(screen.getByText('alice@signoz.io')).toBeInTheDocument();
+		expect(screen.getByText('alice@o11y.hanzo.ai')).toBeInTheDocument();
 		expect(screen.getByText('ACTIVE')).toBeInTheDocument();
 		expect(
 			screen.getByRole('button', { name: /save member details/i }),

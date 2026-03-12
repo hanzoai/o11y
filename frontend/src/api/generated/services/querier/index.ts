@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for SigNoz
+ * * The file has been auto-generated using Orval for Hanzo O11y
  * * regenerate with 'yarn generate:api'
- * SigNoz
+ * Hanzo O11y
  */
 import type {
 	MutationFunction,
@@ -18,7 +18,7 @@ import type {
 	QueryRangeV5200,
 	RenderErrorResponseDTO,
 	ReplaceVariables200,
-} from '../sigNoz.schemas';
+} from '../observe.schemas';
 
 /**
  * Execute a composite query over a time range. Supports builder queries (traces, logs, metrics), formulas, trace operators, PromQL, and ClickHouse SQL.

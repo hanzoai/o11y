@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	format "github.com/SigNoz/signoz/pkg/query-service/utils"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	format "github.com/hanzoai/o11y/pkg/query-service/utils"
 )
 
 // generateOverviewSQL builds the ClickHouse SQL query with optional filters.
@@ -65,7 +65,7 @@ WITH
             ) AS destination,
             durationNano,
             status_code
-        FROM signoz_traces.distributed_signoz_index_v3
+        FROM observe_traces.distributed_observe_index_v3
         WHERE
             ts_bucket_start >= toDateTime64(%f, 9)
             AND ts_bucket_start <= toDateTime64(%f, 9)

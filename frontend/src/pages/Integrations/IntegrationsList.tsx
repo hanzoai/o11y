@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useMemo } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Button, List, Typography } from 'antd';
 import { useGetAllIntegrations } from 'hooks/Integrations/useGetAllIntegrations';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
@@ -13,11 +13,11 @@ import './Integrations.styles.scss';
 export const AWS_INTEGRATION = {
 	id: INTEGRATION_TYPES.AWS_INTEGRATION,
 	title: 'Amazon Web Services',
-	description: 'One-click setup for AWS monitoring with SigNoz',
+	description: 'One-click setup for AWS monitoring with Hanzo O11y',
 	author: {
-		name: 'SigNoz',
-		email: 'integrations@signoz.io',
-		homepage: 'https://signoz.io',
+		name: 'Hanzo O11y',
+		email: 'integrations@o11y.hanzo.ai',
+		homepage: 'https://o11y.hanzo.ai',
 	},
 	icon: `Logos/aws-dark.svg`,
 	is_installed: false,

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
-import { Button } from '@signozhq/button';
-import { Callout } from '@signozhq/callout';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/o11y-button';
+import { Callout } from '@hanzo/o11y-callout';
+import { Input } from '@hanzo/o11y-input';
 import { Form, Input as AntdInput, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import accept from 'api/v1/invite/id/accept';
@@ -78,7 +78,7 @@ function SignUp(): JSX.Element {
 				email: responseDetails.email,
 				name: responseDetails.name,
 				company_name: responseDetails.organization,
-				source: 'SigNoz Cloud',
+				source: 'Hanzo O11y Cloud',
 			});
 		}
 	}, [
@@ -226,7 +226,7 @@ function SignUp(): JSX.Element {
 					</Typography.Title>
 					<Typography.Paragraph className="signup-header-subtitle">
 						You&apos;re almost in. Create a password to start monitoring your
-						applications with SigNoz.
+						applications with Hanzo O11y.
 					</Typography.Paragraph>
 				</div>
 
@@ -242,7 +242,7 @@ function SignUp(): JSX.Element {
 								<Label htmlFor="signupEmail">Email address</Label>
 								<FormContainer.Item noStyle name="email">
 									<Input
-										placeholder="e.g. john@signoz.io"
+										placeholder="e.g. john@o11y.hanzo.ai"
 										type="email"
 										autoFocus
 										required

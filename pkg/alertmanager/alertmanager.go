@@ -5,11 +5,11 @@ import (
 
 	amConfig "github.com/prometheus/alertmanager/config"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/statsreporter"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/statsreporter"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 var (

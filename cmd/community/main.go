@@ -3,8 +3,8 @@ package main
 import (
 	"log/slog"
 
-	"github.com/SigNoz/signoz/cmd"
-	"github.com/SigNoz/signoz/pkg/instrumentation"
+	"github.com/hanzoai/o11y/cmd"
+	"github.com/hanzoai/o11y/pkg/instrumentation"
 )
 
 func main() {

@@ -1,14 +1,14 @@
-package signoz
+package o11y
 
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/authn"
-	"github.com/SigNoz/signoz/pkg/authn/callbackauthn/googlecallbackauthn"
-	"github.com/SigNoz/signoz/pkg/authn/passwordauthn/emailpasswordauthn"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/authn"
+	"github.com/hanzoai/o11y/pkg/authn/callbackauthn/googlecallbackauthn"
+	"github.com/hanzoai/o11y/pkg/authn/passwordauthn/emailpasswordauthn"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 )
 
 func NewAuthNs(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {

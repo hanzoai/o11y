@@ -4,14 +4,14 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/http/render"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	"github.com/SigNoz/signoz/pkg/types/roletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/gorilla/mux"
 )
 
@@ -56,9 +56,9 @@ func (middleware *AuthZ) ViewAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.SigNozAdminRoleName),
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.SigNozEditorRoleName),
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.SigNozViewerRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yAdminRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yEditorRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yViewerRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -108,8 +108,8 @@ func (middleware *AuthZ) EditAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.SigNozAdminRoleName),
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.SigNozEditorRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yAdminRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yEditorRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -159,7 +159,7 @@ func (middleware *AuthZ) AdminAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.SigNozAdminRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yAdminRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(

@@ -1,6 +1,6 @@
 Update `JAVA_OPTS` environment variable
 
-Update `JAVA_OPTS` environment variable with configurations required to send data to SigNoz cloud in your configuration file.
+Update `JAVA_OPTS` environment variable with configurations required to send data to Hanzo O11y cloud in your configuration file.
 
 ```bash
 JAVA_OPTS="-javaagent:C:/path/to/opentelemetry-javaagent.jar"

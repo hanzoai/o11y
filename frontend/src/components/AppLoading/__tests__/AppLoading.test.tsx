@@ -12,7 +12,7 @@ jest.mock('../../../api/browser/localstorage/get', () => ({
 const mockGet = (getLocal as unknown) as jest.Mock;
 
 describe('AppLoading', () => {
-	const SIGNOZ_TEXT = 'SigNoz';
+	const HANZO_TEXT = 'Hanzo O11y';
 	const TAGLINE_TEXT =
 		'OpenTelemetry-Native Logs, Metrics and Traces in a single pane';
 	const CONTAINER_SELECTOR = '.app-loading-container';
@@ -28,12 +28,12 @@ describe('AppLoading', () => {
 		render(<AppLoading />);
 
 		// Check if main elements are rendered
-		expect(screen.getByAltText(SIGNOZ_TEXT)).toBeInTheDocument();
-		expect(screen.getByText(SIGNOZ_TEXT)).toBeInTheDocument();
+		expect(screen.getByAltText(HANZO_TEXT)).toBeInTheDocument();
+		expect(screen.getByText(HANZO_TEXT)).toBeInTheDocument();
 		expect(screen.getByText(TAGLINE_TEXT)).toBeInTheDocument();
 
 		// Check if dark theme class is applied
-		const container = screen.getByText(SIGNOZ_TEXT).closest(CONTAINER_SELECTOR);
+		const container = screen.getByText(HANZO_TEXT).closest(CONTAINER_SELECTOR);
 		expect(container).toHaveClass('dark');
 		expect(container).not.toHaveClass('lightMode');
 	});
@@ -45,12 +45,12 @@ describe('AppLoading', () => {
 		render(<AppLoading />);
 
 		// Check for brand logo
-		const logo = screen.getByAltText(SIGNOZ_TEXT);
+		const logo = screen.getByAltText(HANZO_TEXT);
 		expect(logo).toBeInTheDocument();
-		expect(logo).toHaveAttribute('src', '/Logos/signoz-brand-logo.svg');
+		expect(logo).toHaveAttribute('src', '/Logos/observe-brand-logo.svg');
 
 		// Check for brand title
-		const title = screen.getByText(SIGNOZ_TEXT);
+		const title = screen.getByText(HANZO_TEXT);
 		expect(title).toBeInTheDocument();
 
 		// Check for tagline
@@ -71,8 +71,8 @@ describe('AppLoading', () => {
 		render(<AppLoading />);
 
 		// Should still render with dark theme as fallback
-		expect(screen.getByText(SIGNOZ_TEXT)).toBeInTheDocument();
-		const container = screen.getByText(SIGNOZ_TEXT).closest(CONTAINER_SELECTOR);
+		expect(screen.getByText(HANZO_TEXT)).toBeInTheDocument();
+		const container = screen.getByText(HANZO_TEXT).closest(CONTAINER_SELECTOR);
 		expect(container).toHaveClass('dark');
 	});
 });

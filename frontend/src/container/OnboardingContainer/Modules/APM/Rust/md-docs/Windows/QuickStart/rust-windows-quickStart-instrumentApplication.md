@@ -34,11 +34,11 @@ use tonic::metadata::{MetadataMap, MetadataValue};
 
 **Step 2: Initialize the tracer and create env file**
 
-Add this function in main.rs file, `init_tracer` is initializing an OpenTelemetry tracer with the OpenTelemetry OTLP exporter which is sending data to SigNoz Cloud. 
+Add this function in main.rs file, `init_tracer` is initializing an OpenTelemetry tracer with the OpenTelemetry OTLP exporter which is sending data to Hanzo O11y Cloud. 
 
 ```bash
 fn init_tracer() -> Result<sdktrace::Tracer, TraceError> {
-    let signoz_access_token = std::env::var("SIGNOZ_ACCESS_TOKEN").expect("SIGNOZ_ACCESS_TOKEN not set");
+    let signoz_access_token = std::env::var("HANZO_ACCESS_TOKEN").expect("HANZO_ACCESS_TOKEN not set");
     let mut metadata = MetadataMap::new();
     metadata.insert(
         "signoz-ingestion-key",
@@ -50,7 +50,7 @@ fn init_tracer() -> Result<sdktrace::Tracer, TraceError> {
             opentelemetry_otlp::new_exporter()
                 .tonic()
                 .with_metadata(metadata)
-                .with_endpoint(std::env::var("SIGNOZ_ENDPOINT").expect("SIGNOZ_ENDPOINT not set")),
+                .with_endpoint(std::env::var("HANZO_ENDPOINT").expect("HANZO_ENDPOINT not set")),
         )
         .with_trace_config(
             sdktrace::config().with_resource(Resource::new(vec![
@@ -87,8 +87,8 @@ Paste these in `.env` file
 ```bash 
 PORT=3000
 APP_NAME={{MYAPP}}
-SIGNOZ_ENDPOINT=https://ingest.{{REGION}}.signoz.cloud:443/v1/traces
-SIGNOZ_ACCESS_TOKEN={{SIGNOZ_INGESTION_KEY}}
+HANZO_ENDPOINT=https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces
+HANZO_ACCESS_TOKEN={{HANZO_INGESTION_KEY}}
 ```
 
 &nbsp;
@@ -146,7 +146,7 @@ async fn main() {
 &nbsp;
 
 
-Now comes the most interesting part, Sending data to SigNoz to get sense of your traces. After adding the below block you can send data to SigNoz cloud
+Now comes the most interesting part, Sending data to Hanzo O11y to get sense of your traces. After adding the below block you can send data to Hanzo O11y cloud
 
 ```bash
   let tracer = global::tracer("global_tracer");
@@ -159,7 +159,7 @@ Now comes the most interesting part, Sending data to SigNoz to get sense of your
         span.add_event(
             format!("Operations"),
             vec![
-                Key::new("SigNoz is").string("Awesome"),
+                Key::new("Hanzo O11y is").string("Awesome"),
             ],
         );
     });

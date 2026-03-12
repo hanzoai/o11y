@@ -24,7 +24,7 @@ jobs:
           echo "release_type=${release_type}" >> "$GITHUB_OUTPUT"
   charts:
     if: ${{ !startsWith(github.event.release.tag_name, 'histogram-quantile/') }}
-    uses: signoz/primus.workflows/.github/workflows/github-trigger.yaml@main
+    uses: observe/primus.workflows/.github/workflows/github-trigger.yaml@main
     secrets: inherit
     needs: [detect]
     with:

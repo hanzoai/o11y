@@ -84,8 +84,8 @@ export const getTotalLogSizeWidgetData = (): Widgets =>
 				{
 					aggregateAttribute: {
 						dataType: DataTypes.Float64,
-						key: 'signoz.meter.log.size',
-						id: 'signoz.meter.log.size--float64--Sum--true',
+						key: 'o11y.meter.log.size',
+						id: 'o11y.meter.log.size--float64--Sum--true',
 						type: 'Sum',
 					},
 					aggregateOperator: 'increase',
@@ -121,8 +121,8 @@ export const getTotalTraceSizeWidgetData = (): Widgets =>
 				{
 					aggregateAttribute: {
 						dataType: DataTypes.Float64,
-						key: 'signoz.meter.span.size',
-						id: 'signoz.meter.span.size--float64--Sum--true',
+						key: 'o11y.meter.span.size',
+						id: 'o11y.meter.span.size--float64--Sum--true',
 						type: 'Sum',
 					},
 					aggregateOperator: 'increase',
@@ -158,8 +158,8 @@ export const getTotalMetricDatapointCountWidgetData = (): Widgets =>
 				{
 					aggregateAttribute: {
 						dataType: DataTypes.Float64,
-						key: 'signoz.meter.metric.datapoint.count',
-						id: 'signoz.meter.metric.datapoint.count--float64--Sum--true',
+						key: 'o11y.meter.metric.datapoint.count',
+						id: 'o11y.meter.metric.datapoint.count--float64--Sum--true',
 						type: 'Sum',
 					},
 					aggregateOperator: 'increase',
@@ -195,8 +195,8 @@ export const getLogCountWidgetData = (): Widgets =>
 				{
 					aggregateAttribute: {
 						dataType: DataTypes.Float64,
-						key: 'signoz.meter.log.count',
-						id: 'signoz.meter.log.count--float64--Sum--true',
+						key: 'o11y.meter.log.count',
+						id: 'o11y.meter.log.count--float64--Sum--true',
 						type: 'Sum',
 					},
 					aggregateOperator: 'increase',
@@ -232,8 +232,8 @@ export const getLogSizeWidgetData = (): Widgets =>
 				{
 					aggregateAttribute: {
 						dataType: DataTypes.Float64,
-						key: 'signoz.meter.log.size',
-						id: 'signoz.meter.log.size--float64--Sum--true',
+						key: 'o11y.meter.log.size',
+						id: 'o11y.meter.log.size--float64--Sum--true',
 						type: 'Sum',
 					},
 					aggregateOperator: 'increase',
@@ -269,8 +269,8 @@ export const getSpanCountWidgetData = (): Widgets =>
 				{
 					aggregateAttribute: {
 						dataType: DataTypes.Float64,
-						key: 'signoz.meter.span.count',
-						id: 'signoz.meter.span.count--float64--Sum--true',
+						key: 'o11y.meter.span.count',
+						id: 'o11y.meter.span.count--float64--Sum--true',
 						type: 'Sum',
 					},
 					aggregateOperator: 'increase',
@@ -306,8 +306,8 @@ export const getSpanSizeWidgetData = (): Widgets =>
 				{
 					aggregateAttribute: {
 						dataType: DataTypes.Float64,
-						key: 'signoz.meter.span.size',
-						id: 'signoz.meter.span.size--float64--Sum--true',
+						key: 'o11y.meter.span.size',
+						id: 'o11y.meter.span.size--float64--Sum--true',
 						type: 'Sum',
 					},
 					aggregateOperator: 'increase',
@@ -343,8 +343,8 @@ export const getMetricCountWidgetData = (): Widgets =>
 				{
 					aggregateAttribute: {
 						dataType: DataTypes.Float64,
-						key: 'signoz.meter.metric.datapoint.count',
-						id: 'signoz.meter.metric.datapoint.count--float64--Sum--true',
+						key: 'o11y.meter.metric.datapoint.count',
+						id: 'o11y.meter.metric.datapoint.count--float64--Sum--true',
 						type: 'Sum',
 					},
 					aggregateOperator: 'increase',

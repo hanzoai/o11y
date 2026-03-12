@@ -1,6 +1,6 @@
 import { useQueryClient } from 'react-query';
 import { useHistory } from 'react-router-dom';
-import SignozModal from 'components/SignozModal/SignozModal';
+import O11yModal from 'components/O11yModal/O11yModal';
 import { LOCALSTORAGE } from 'constants/localStorage';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import ROUTES from 'constants/routes';
@@ -75,7 +75,7 @@ function DeleteFunnel({
 	};
 
 	return (
-		<SignozModal
+		<O11yModal
 			open={isOpen}
 			title="Delete this funnel"
 			width={390}
@@ -102,7 +102,7 @@ function DeleteFunnel({
 				Deleting the funnel would stop further analytics using this funnel. This is
 				irreversible and cannot be undone.
 			</div>
-		</SignozModal>
+		</O11yModal>
 	);
 }
 

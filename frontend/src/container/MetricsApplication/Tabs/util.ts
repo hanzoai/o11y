@@ -72,7 +72,7 @@ export function generateExplorerPath(
 	}=${JSONCompositeQuery}&${queryString.join('&')}`;
 }
 
-// TODO(@rahul-signoz): update the name of this function once we have view logs button in every panel
+// TODO(@rahul-o11y): update the name of this function once we have view logs button in every panel
 
 /**
  * Handles click events for viewing trace/logs popup

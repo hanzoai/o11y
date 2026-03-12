@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/instrumentation/instrumentationtest"
-	"github.com/SigNoz/signoz/pkg/querybuilder"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/huandu/go-sqlbuilder"
 	"github.com/stretchr/testify/require"
 )
@@ -161,10 +161,10 @@ func TestFilterExprLogs(t *testing.T) {
 		},
 		{
 			category:              "Special characters",
-			query:                 "srikanth@signoz.io",
+			query:                 "srikanth@observe.hanzo.ai",
 			shouldPass:            true,
 			expectedQuery:         "WHERE match(LOWER(body), LOWER(?))",
-			expectedArgs:          []any{"srikanth@signoz.io"},
+			expectedArgs:          []any{"srikanth@observe.hanzo.ai"},
 			expectedErrorContains: "",
 		},
 		{

@@ -35,7 +35,7 @@ jobs:
       - name: primus-checkout
         uses: actions/checkout@v4
         with:
-          repository: signoz/primus
+          repository: observe/primus
           ref: main
           path: .primus
           token: ${{ steps.token.outputs.token }}
@@ -46,7 +46,7 @@ jobs:
           echo "time=$($MAKE info-timestamp)" >> $GITHUB_OUTPUT
           echo "branch=$($MAKE info-branch)" >> $GITHUB_OUTPUT
   js-build:
-    uses: signoz/primus.workflows/.github/workflows/js-build.yaml@main
+    uses: observe/primus.workflows/.github/workflows/js-build.yaml@main
     needs: prepare
     secrets: inherit
     with:
@@ -57,25 +57,25 @@ jobs:
       DOCKER_BUILD: false
       DOCKER_MANIFEST: false
   go-build:
-    uses: signoz/primus.workflows/.github/workflows/go-build.yaml@main
+    uses: observe/primus.workflows/.github/workflows/go-build.yaml@main
     needs: [prepare, js-build]
     secrets: inherit
     with:
       PRIMUS_REF: main
       GO_VERSION: 1.24
-      GO_NAME: signoz-community
+      GO_NAME: observe-community
       GO_INPUT_ARTIFACT_CACHE_KEY: community-jsbuild-${{ github.sha }}
       GO_INPUT_ARTIFACT_PATH: frontend/build
       GO_BUILD_CONTEXT: ./cmd/community
       GO_BUILD_FLAGS: >-
         -tags timetzdata
         -ldflags='-s -w
-        -X github.com/SigNoz/signoz/pkg/version.version=${{ needs.prepare.outputs.version }}
-        -X github.com/SigNoz/signoz/pkg/version.variant=community
-        -X github.com/SigNoz/signoz/pkg/version.hash=${{ needs.prepare.outputs.hash }}
-        -X github.com/SigNoz/signoz/pkg/version.time=${{ needs.prepare.outputs.time }}
-        -X github.com/SigNoz/signoz/pkg/version.branch=${{ needs.prepare.outputs.branch }}
-        -X github.com/SigNoz/signoz/pkg/analytics.key=9kRrJ7oPCGPEJLF6QjMPLt5bljFhRQBr'
+        -X github.com/Hanzo O11y/observe/pkg/version.version=${{ needs.prepare.outputs.version }}
+        -X github.com/Hanzo O11y/observe/pkg/version.variant=community
+        -X github.com/Hanzo O11y/observe/pkg/version.hash=${{ needs.prepare.outputs.hash }}
+        -X github.com/Hanzo O11y/observe/pkg/version.time=${{ needs.prepare.outputs.time }}
+        -X github.com/Hanzo O11y/observe/pkg/version.branch=${{ needs.prepare.outputs.branch }}
+        -X github.com/Hanzo O11y/observe/pkg/analytics.key=9kRrJ7oPCGPEJLF6QjMPLt5bljFhRQBr'
       DOCKER_BASE_IMAGES: '{"alpine": "alpine:3.20.3"}'
       DOCKER_DOCKERFILE_PATH: ./cmd/community/Dockerfile.multi-arch
       DOCKER_MANIFEST: true

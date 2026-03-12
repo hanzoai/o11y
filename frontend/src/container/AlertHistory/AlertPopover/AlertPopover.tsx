@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Popover } from 'antd';
 import LogsIcon from 'assets/AlertHistory/LogsIcon';
 import ROUTES from 'constants/routes';

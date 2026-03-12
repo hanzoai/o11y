@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	traceFunnels "github.com/SigNoz/signoz/pkg/types/tracefunneltypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	traceFunnels "github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

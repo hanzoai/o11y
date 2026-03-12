@@ -1,6 +1,6 @@
 # Development Guide
 
-Welcome! This guide will help you set up your local development environment for SigNoz. Let's get you started! 🚀
+Welcome! This guide will help you set up your local development environment for Hanzo O11y. Let's get you started! 🚀
 
 ## What do I need?
 
@@ -31,7 +31,7 @@ Before diving in, make sure you have these tools installed:
 1. Open your terminal
 2. Clone the repository:
    ```bash
-   git clone https://github.com/SigNoz/signoz.git
+   git clone https://github.com/Hanzo O11y/signoz.git
    ```
 3. Navigate to the project:
    ```bash
@@ -40,7 +40,7 @@ Before diving in, make sure you have these tools installed:
 
 ## How do I run it locally?
 
-SigNoz has three main components: Clickhouse, Backend, and Frontend. Let's set them up one by one.
+Hanzo O11y has three main components: Clickhouse, Backend, and Frontend. Let's set them up one by one.
 
 ### 1. Setting up ClickHouse
 
@@ -55,7 +55,7 @@ This command:
 - Sets up Zookeeper
 - Runs the latest schema migrations
 
-### 2. Setting up SigNoz OpenTelemetry Collector
+### 2. Setting up Hanzo O11y OpenTelemetry Collector
 
 Next, start the OpenTelemetry Collector to receive telemetry data:
 
@@ -64,7 +64,7 @@ make devenv-signoz-otel-collector
 ```
 
 This command:
-- Starts the SigNoz OpenTelemetry Collector
+- Starts the Hanzo O11y OpenTelemetry Collector
 - Listens on port 4317 (gRPC) and 4318 (HTTP) for incoming telemetry data
 - Forwards data to ClickHouse for storage
 
@@ -122,7 +122,7 @@ To verify everything is working correctly:
 
 ## How to send test data?
 
-You can now send telemetry data to your local SigNoz instance:
+You can now send telemetry data to your local Hanzo O11y instance:
 
 - **OTLP gRPC**: `localhost:4317`
 - **OTLP HTTP**: `localhost:4318`

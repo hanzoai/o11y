@@ -4,14 +4,14 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/SigNoz/signoz/pkg/config"
-	"github.com/SigNoz/signoz/pkg/config/envprovider"
-	"github.com/SigNoz/signoz/pkg/config/fileprovider"
-	"github.com/SigNoz/signoz/pkg/signoz"
+	"github.com/hanzoai/o11y/pkg/config"
+	"github.com/hanzoai/o11y/pkg/config/envprovider"
+	"github.com/hanzoai/o11y/pkg/config/fileprovider"
+	"github.com/hanzoai/o11y/pkg/o11y"
 )
 
-func NewSigNozConfig(ctx context.Context, logger *slog.Logger, flags signoz.DeprecatedFlags) (signoz.Config, error) {
-	config, err := signoz.NewConfig(
+func NewHanzo O11yConfig(ctx context.Context, logger *slog.Logger, flags o11y.DeprecatedFlags) (o11y.Config, error) {
+	config, err := o11y.NewConfig(
 		ctx,
 		logger,
 		config.ResolverConfig{
@@ -24,7 +24,7 @@ func NewSigNozConfig(ctx context.Context, logger *slog.Logger, flags signoz.Depr
 		flags,
 	)
 	if err != nil {
-		return signoz.Config{}, err
+		return o11y.Config{}, err
 	}
 
 	return config, nil

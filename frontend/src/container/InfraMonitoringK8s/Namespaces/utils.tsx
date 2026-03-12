@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Tag } from 'antd';
 import { TableColumnType as ColumnType } from 'antd';
 import {

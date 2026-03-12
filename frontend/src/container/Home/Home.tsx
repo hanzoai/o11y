@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
-import { Color } from '@signozhq/design-tokens';
-import { Compass, Dot, House, Plus, Wrench } from '@signozhq/icons';
+import { Color } from '@hanzo/o11y-design-tokens';
+import { Compass, Dot, House, Plus, Wrench } from '@hanzo/o11y-icons';
 import { Button, Popover } from 'antd';
 import logEvent from 'api/common/logEvent';
 import listUserPreferences from 'api/v1/user/preferences/list';
@@ -339,7 +339,7 @@ export default function Home(): JSX.Element {
 			<div className="home-content">
 				<div className="home-left-content">
 					<DataSourceInfo
-						dataSentToSigNoz={
+						dataSentToHanzo O11y={
 							isLogsIngestionActive ||
 							isTracesIngestionActive ||
 							isMetricsIngestionActive

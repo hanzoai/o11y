@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { Color } from '@signozhq/design-tokens';
-import { DialogWrapper } from '@signozhq/dialog';
-import { CircleAlert, CircleCheck, LoaderCircle } from '@signozhq/icons';
-import { Input } from '@signozhq/input';
-import { RenderErrorResponseDTO } from 'api/generated/services/sigNoz.schemas';
+import { Button } from '@hanzo/o11y-button';
+import { Color } from '@hanzo/o11y-design-tokens';
+import { DialogWrapper } from '@hanzo/o11y-dialog';
+import { CircleAlert, CircleCheck, LoaderCircle } from '@hanzo/o11y-icons';
+import { Input } from '@hanzo/o11y-input';
+import { RenderErrorResponseDTO } from 'api/generated/services/observe.schemas';
 import { AxiosError } from 'axios';
 import LaunchChatSupport from 'components/LaunchChatSupport/LaunchChatSupport';
 
@@ -115,7 +115,7 @@ export default function CustomDomainEditModal({
 					Enter your preferred subdomain to create a unique URL for your team. Need
 					help?{' '}
 					<a
-						href="https://signoz.io/support"
+						href="https://o11y.hanzo.ai/support"
 						target="_blank"
 						rel="noreferrer"
 						className="edit-modal-link"
@@ -162,7 +162,7 @@ export default function CustomDomainEditModal({
 					>
 						{hasError
 							? errorMessage
-							: "To help you easily explore SigNoz, we've selected a tenant sub domain name for you."}
+							: "To help you easily explore Hanzo O11y, we've selected a tenant sub domain name for you."}
 					</span>
 				</div>
 

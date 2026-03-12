@@ -26,7 +26,7 @@
 		"dataSource": "migrate-from-datadog",
 		"label": "From Datadog",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Hanzo O11y"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -34,11 +34,11 @@
 			"from datadog",
 			"home",
 			"migrate",
-			"migrate to signoz",
+			"migrate to o11y",
 			"migrate-from-datadog",
 			"opentelemetry",
 			"otel",
-			"signoz"
+			"o11y"
 		],
 		"imgUrl": "/Logos/datadog.svg",
 		"question": {
@@ -76,7 +76,7 @@
 		"dataSource": "migrate-from-grafana",
 		"label": "From Grafana",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Hanzo O11y"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -87,12 +87,12 @@
 			"lgtm",
 			"loki",
 			"migrate",
-			"migrate to signoz",
+			"migrate to o11y",
 			"migrate-from-lgtm",
 			"mirmir",
 			"opentelemetry",
 			"otel",
-			"signoz",
+			"o11y",
 			"tempo"
 		],
 		"imgUrl": "/Logos/grafana.svg",
@@ -125,7 +125,7 @@
 		"dataSource": "migrate-from-elk",
 		"label": "From ELK",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Hanzo O11y"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -138,12 +138,12 @@
 			"kibana",
 			"logstash",
 			"migrate",
-			"migrate to signoz",
+			"migrate to o11y",
 			"migrate-from-elk",
 			"migration",
 			"opentelemetry",
 			"otel",
-			"signoz"
+			"o11y"
 		],
 		"imgUrl": "/Logos/elk.svg",
 		"question": {
@@ -175,7 +175,7 @@
 		"dataSource": "migrate-from-newrelic",
 		"label": "From New Relic",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Hanzo O11y"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -183,7 +183,7 @@
 			"from new relic",
 			"home",
 			"migrate",
-			"migrate to signoz",
+			"migrate to o11y",
 			"migrate-from-newrelic",
 			"migration",
 			"migration guide",
@@ -193,7 +193,7 @@
 			"opentelemetry",
 			"otel",
 			"relic",
-			"signoz"
+			"o11y"
 		],
 		"imgUrl": "/Logos/newrelic.svg",
 		"question": {
@@ -225,7 +225,7 @@
 		"dataSource": "migrate-from-honeycomb",
 		"label": "From Honeycomb",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Hanzo O11y"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -234,50 +234,50 @@
 			"home",
 			"honeycomb",
 			"migrate",
-			"migrate to signoz",
+			"migrate to o11y",
 			"migrate-from-honeycomb",
 			"migration",
 			"migration guide",
 			"opentelemetry",
 			"otel",
-			"signoz"
+			"o11y"
 		],
 		"imgUrl": "/Logos/honeycomb.svg",
 		"link": "/docs/migration/migrate-from-honeycomb/data/"
 	},
 	{
-		"dataSource": "migrate-signoz-self-host-to-cloud",
-		"label": "From SigNoz Self-Host",
+		"dataSource": "migrate-o11y-self-host-to-cloud",
+		"label": "From Hanzo O11y Self-Host",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Hanzo O11y"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
 			"cloud",
 			"data migration",
-			"from signoz self-host",
+			"from o11y self-host",
 			"home",
 			"host",
 			"migrate",
-			"migrate to signoz",
-			"migrate-signoz-self-host-to-cloud",
+			"migrate to o11y",
+			"migrate-o11y-self-host-to-cloud",
 			"migration",
 			"self",
 			"self-host",
 			"self-host to cloud",
-			"selfhosted signoz",
-			"signoz",
-			"signoz cloud",
-			"signoz self-hosted"
+			"selfhosted o11y",
+			"o11y",
+			"o11y cloud",
+			"o11y self-hosted"
 		],
-		"imgUrl": "/Logos/signoz-brand-logo.svg",
-		"link": "/docs/migration/migrate-from-signoz-self-host-to-signoz-cloud/"
+		"imgUrl": "/Logos/o11y-brand-logo.svg",
+		"link": "/docs/migration/migrate-from-o11y-self-host-to-o11y-cloud/"
 	},
 	{
 		"dataSource": "migrate-from-existing-opentelemetry",
 		"label": "From Existing OpenTelemetry",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Hanzo O11y"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -286,7 +286,7 @@
 			"from existing opentelemetry",
 			"home",
 			"migrate",
-			"migrate to signoz",
+			"migrate to o11y",
 			"migrate-from-existing-opentelemetry",
 			"migration",
 			"migration guide",
@@ -295,11 +295,11 @@
 			"otel",
 			"otel collector",
 			"otlp",
-			"signoz",
+			"o11y",
 			"open telemetry"
 		],
 		"imgUrl": "/Logos/opentelemetry.svg",
-		"link": "/docs/migration/migrate-from-opentelemetry-to-signoz/"
+		"link": "/docs/migration/migrate-from-opentelemetry-to-o11y/"
 	},
 	{
 		"dataSource": "java",
@@ -1401,7 +1401,7 @@
 			"cloudflare metrics",
 			"cloudflare monitoring",
 			"cloudflare observability",
-			"cloudflare to signoz",
+			"cloudflare to o11y",
 			"cloudflare tracing",
 			"cloudflare workers",
 			"edge computing monitoring",
@@ -1432,7 +1432,7 @@
 			"cloudflare logs",
 			"cloudflare monitoring",
 			"cloudflare observability",
-			"cloudflare to signoz",
+			"cloudflare to o11y",
 			"cloudflare workers",
 			"edge computing monitoring",
 			"logging",
@@ -1464,7 +1464,7 @@
 			"logs"
 		],
 		"id": "convex-logs",
-		"link": "/docs/logs-management/send-logs/convex-log-streams-signoz/"
+		"link": "/docs/logs-management/send-logs/convex-log-streams-o11y/"
 	},
 	{
 		"dataSource": "kubernetes-pod-logs",
@@ -1513,7 +1513,7 @@
 			"docker log collection setup",
 			"docker log monitoring",
 			"docker logging opentelemetry",
-			"docker logging to signoz",
+			"docker logging to o11y",
 			"docker logs observability",
 			"docker stdout stderr logs",
 			"docker-container-logs",
@@ -1541,14 +1541,14 @@
 			"vercel log monitoring",
 			"vercel logging setup",
 			"vercel logs",
-			"vercel logs to signoz",
+			"vercel logs to o11y",
 			"vercel observability",
 			"vercel opentelemetry integration",
 			"vercel to otel",
 			"vercel-logs"
 		],
 		"id": "vercel-logs",
-		"link": "/docs/userguide/vercel_logs_to_signoz/"
+		"link": "/docs/userguide/vercel_logs_to_o11y/"
 	},
 	{
 		"dataSource": "heroku-logs",
@@ -1566,7 +1566,7 @@
 			"heroku log shipper",
 			"heroku logging setup",
 			"heroku logs",
-			"heroku logs to signoz",
+			"heroku logs to o11y",
 			"heroku observability",
 			"heroku opentelemetry integration",
 			"heroku to otel",
@@ -1575,7 +1575,7 @@
 			"logs"
 		],
 		"id": "heroku-logs",
-		"link": "/docs/userguide/heroku_logs_to_signoz/"
+		"link": "/docs/userguide/heroku_logs_to_o11y/"
 	},
 	{
 		"dataSource": "http-logs",
@@ -1593,7 +1593,7 @@
 			"http log collector",
 			"http log forwarding",
 			"http logs",
-			"http logs to signoz",
+			"http logs to o11y",
 			"http-logs",
 			"logging",
 			"logs",
@@ -1620,7 +1620,7 @@
 			"logging",
 			"logs",
 			"rsyslog to otel",
-			"send syslogs to signoz",
+			"send syslogs to o11y",
 			"syslog exporter",
 			"syslog forwarding",
 			"syslog monitoring",
@@ -1652,7 +1652,7 @@
 			"systemd log collection",
 			"systemd log monitoring",
 			"systemd logs",
-			"systemd logs to signoz",
+			"systemd logs to o11y",
 			"systemd opentelemetry",
 			"systemd to otel",
 			"systemd-logs"
@@ -1679,12 +1679,12 @@
 			"fluentd observability",
 			"fluentd opentelemetry",
 			"fluentd to otel",
-			"fluentd to signoz",
+			"fluentd to o11y",
 			"logging",
 			"logs"
 		],
 		"id": "fluentd",
-		"link": "/docs/userguide/fluentd_to_signoz/"
+		"link": "/docs/userguide/fluentd_to_o11y/"
 	},
 	{
 		"dataSource": "fluentbit",
@@ -1705,12 +1705,12 @@
 			"fluentbit observability",
 			"fluentbit opentelemetry integration",
 			"fluentbit to otel",
-			"fluentbit to signoz",
+			"fluentbit to o11y",
 			"logging",
 			"logs"
 		],
 		"id": "fluentbit",
-		"link": "/docs/userguide/fluentbit_to_signoz/"
+		"link": "/docs/userguide/fluentbit_to_o11y/"
 	},
 	{
 		"dataSource": "logstash",
@@ -1733,10 +1733,10 @@
 			"logstash opentelemetry integration",
 			"logstash pipeline monitoring",
 			"logstash to otel",
-			"logstash to signoz"
+			"logstash to o11y"
 		],
 		"id": "logstash",
-		"link": "/docs/userguide/logstash_to_signoz/"
+		"link": "/docs/userguide/logstash_to_o11y/"
 	},
 	{
 		"dataSource": "tomcat-logs",
@@ -1758,7 +1758,7 @@
 			"tomcat gc logs",
 			"tomcat log monitoring",
 			"tomcat logs",
-			"tomcat logs to signoz",
+			"tomcat logs to o11y",
 			"tomcat observability",
 			"tomcat-logs"
 		],
@@ -1786,11 +1786,11 @@
 			"vector structured logging",
 			"vector telemetry pipeline",
 			"vector to otel",
-			"vector to signoz",
+			"vector to o11y",
 			"vector-logs"
 		],
 		"id": "vector-logs",
-		"link": "/docs/logs-management/send-logs/vector-logs-to-signoz/"
+		"link": "/docs/logs-management/send-logs/vector-logs-to-o11y/"
 	},
 	{
 		"dataSource": "windows-events-logs",
@@ -1813,7 +1813,7 @@
 			"windows log monitoring",
 			"windows logging setup",
 			"windows logs opentelemetry",
-			"windows logs to signoz",
+			"windows logs to o11y",
 			"windows observability",
 			"windows server logs",
 			"windows-events-logs"
@@ -1843,9 +1843,9 @@
 			"cloudwatch-logs",
 			"logging",
 			"logs",
-			"send logs to signoz"
+			"send logs to o11y"
 		],
-		"link": "/docs/userguide/send-cloudwatch-logs-to-signoz/"
+		"link": "/docs/userguide/send-cloudwatch-logs-to-o11y/"
 	},
 	{
 		"dataSource": "from-log-file",
@@ -1885,7 +1885,7 @@
 			"linux",
 			"log",
 			"log file ingestion",
-			"log file to signoz",
+			"log file to o11y",
 			"log files opentelemetry",
 			"log tailing with otel",
 			"logging",
@@ -1935,7 +1935,7 @@
 			"lambda cloudwatch logs",
 			"lambda log monitoring",
 			"lambda logs opentelemetry",
-			"lambda logs to signoz",
+			"lambda logs to o11y",
 			"lambda nodejs logs",
 			"lambda observability",
 			"lambda structured logging",
@@ -1974,7 +1974,7 @@
 			"python logging opentelemetry",
 			"python logging sdk",
 			"python logs",
-			"python logs to signoz",
+			"python logs to o11y",
 			"python observability",
 			"python on kubernetes",
 			"python on windows",
@@ -1998,7 +1998,7 @@
 			"java log exporter",
 			"java logging opentelemetry",
 			"java logs",
-			"java logs to signoz",
+			"java logs to o11y",
 			"java observability",
 			"logging",
 			"java-agent",
@@ -2036,7 +2036,7 @@
 			"nodejs",
 			"nodejs bunyan logs",
 			"nodejs logging",
-			"nodejs logs to signoz",
+			"nodejs logs to o11y",
 			"nodejs pino logs",
 			"nodejs winston logs",
 			"opentelemetry",
@@ -2110,19 +2110,19 @@
 					"key": "golang-zerolog-logs",
 					"label": "Zerolog",
 					"imgUrl": "/Logos/logs.svg",
-					"link": "/docs/logs-management/send-logs/zerolog-to-signoz/"
+					"link": "/docs/logs-management/send-logs/zerolog-to-o11y/"
 				},
 				{
 					"key": "golang-logrus-logs",
 					"label": "Logrus",
 					"imgUrl": "/Logos/logrus.svg",
-					"link": "/docs/logs-management/send-logs/logrus-to-signoz/"
+					"link": "/docs/logs-management/send-logs/logrus-to-o11y/"
 				},
 				{
 					"key": "golang-zap-logs",
 					"label": "Zap",
 					"imgUrl": "/Logos/zap.svg",
-					"link": "/docs/logs-management/send-logs/zap-to-signoz/"
+					"link": "/docs/logs-management/send-logs/zap-to-o11y/"
 				}
 			]
 		}
@@ -2139,7 +2139,7 @@
 			"collect node metrics",
 			"host",
 			"host metrics",
-			"host metrics to signoz",
+			"host metrics to o11y",
 			"host monitoring",
 			"host resource usage",
 			"hostmetrics",
@@ -2182,7 +2182,7 @@
 			"kubernetes",
 			"kubernetes cluster monitoring",
 			"kubernetes metrics",
-			"kubernetes metrics to signoz",
+			"kubernetes metrics to o11y",
 			"kubernetes monitoring",
 			"kubernetes resource usage",
 			"metrics",
@@ -2212,7 +2212,7 @@
 			"docker container metrics",
 			"docker container telemetry",
 			"docker metrics opentelemetry",
-			"docker metrics to signoz",
+			"docker metrics to o11y",
 			"docker performance monitoring",
 			"docker resource metrics",
 			"docker-container-metrics",
@@ -2473,7 +2473,7 @@
 			"vpc log monitoring",
 			"vpc logs",
 			"vpc logs opentelemetry",
-			"vpc logs to signoz",
+			"vpc logs to o11y",
 			"vpc network traffic logs",
 			"vpc-logs"
 		],
@@ -2508,7 +2508,7 @@
 			"postgresql",
 			"rds",
 			"rds logs",
-			"rds logs to signoz",
+			"rds logs to o11y",
 			"rds metrics",
 			"rds mysql logs",
 			"rds observability",
@@ -2569,7 +2569,7 @@
 			"lambda metrics",
 			"lambda monitoring otel",
 			"lambda observability",
-			"lambda to signoz",
+			"lambda to o11y",
 			"lambda tracing",
 			"logging",
 			"logs",
@@ -2666,7 +2666,7 @@
 			"azure vm metrics",
 			"azure vm observability",
 			"azure vm performance",
-			"azure vm to signoz",
+			"azure vm to o11y",
 			"collect logs azure vm",
 			"logging",
 			"logs",
@@ -2696,7 +2696,7 @@
 			"app service",
 			"app service observability",
 			"app service telemetry",
-			"app service to signoz",
+			"app service to o11y",
 			"app service tracing",
 			"app-service",
 			"application performance monitoring",
@@ -2750,7 +2750,7 @@
 			"aks observability",
 			"aks opentelemetry integration",
 			"aks telemetry",
-			"aks to signoz",
+			"aks to o11y",
 			"apm",
 			"application performance monitoring",
 			"azure",
@@ -2781,7 +2781,7 @@
 			"apps",
 			"azure",
 			"azure container apps logs",
-			"azure container apps to signoz",
+			"azure container apps to o11y",
 			"azure microservice monitoring",
 			"azure-container-apps",
 			"container",
@@ -2837,7 +2837,7 @@
 			"azure functions logs",
 			"azure functions observability",
 			"azure functions telemetry",
-			"azure functions to signoz",
+			"azure functions to o11y",
 			"azure functions tracing",
 			"azure serverless logs",
 			"azure-functions",
@@ -2895,7 +2895,7 @@
 			"monitor azure sql",
 			"opentelemetry sql metrics",
 			"sql",
-			"sql metrics to signoz",
+			"sql metrics to o11y",
 			"sql telemetry azure",
 			"sql-database-metrics",
 			"telemetry"
@@ -2924,7 +2924,7 @@
 			"blob storage monitoring",
 			"blob storage observability",
 			"blob storage telemetry",
-			"blob storage to signoz",
+			"blob storage to o11y",
 			"monitor azure storage",
 			"opentelemetry azure blob",
 			"otel blob storage",
@@ -2964,7 +2964,7 @@
 			"azure mysql metrics",
 			"azure mysql observability",
 			"azure mysql telemetry",
-			"azure mysql to signoz",
+			"azure mysql to o11y",
 			"azure-mysql-flexible-server",
 			"flexible",
 			"metrics",
@@ -2996,7 +2996,7 @@
 			"cloud functions log export",
 			"cloud functions logs",
 			"cloud functions metrics",
-			"cloud functions to signoz",
+			"cloud functions to o11y",
 			"cloud functions tracing",
 			"cloud-functions",
 			"functions",
@@ -3056,7 +3056,7 @@
 			"app engine logs",
 			"app engine opentelemetry integration",
 			"app engine telemetry",
-			"app engine to signoz",
+			"app engine to o11y",
 			"app engine tracing",
 			"app-engine",
 			"application performance monitoring",
@@ -3112,7 +3112,7 @@
 			"compute engine logs",
 			"compute engine metrics",
 			"compute engine observability",
-			"compute engine to signoz",
+			"compute engine to o11y",
 			"compute engine tracing",
 			"compute-engine",
 			"engine",
@@ -3170,7 +3170,7 @@
 			"gcs logging opentelemetry",
 			"gcs observability",
 			"gcs performance metrics",
-			"gcs to signoz",
+			"gcs to o11y",
 			"google cloud storage telemetry",
 			"monitor cloud storage",
 			"storage",
@@ -3212,7 +3212,7 @@
 			"cloud sql metrics gcp",
 			"cloud sql monitoring setup",
 			"cloud sql observability",
-			"cloud sql to signoz",
+			"cloud sql to o11y",
 			"cloud-sql",
 			"collect sql logs gcp",
 			"gcp",
@@ -3258,7 +3258,7 @@
 			"balancer",
 			"clb logs collection",
 			"clb observability",
-			"clb to signoz",
+			"clb to o11y",
 			"clb tracing gcp",
 			"cloud",
 			"cloud load balancer",
@@ -3317,7 +3317,7 @@
 			"vpc flow logs gcp",
 			"vpc monitoring gcp",
 			"vpc observability",
-			"vpc to signoz"
+			"vpc to o11y"
 		],
 		"question": {
 			"desc": "What telemetry data do you want to visualise ?",
@@ -3357,7 +3357,7 @@
 			"gke metrics collection",
 			"gke monitoring",
 			"gke observability",
-			"gke to signoz",
+			"gke to o11y",
 			"gke tracing opentelemetry",
 			"gke workload monitoring",
 			"google",
@@ -3411,7 +3411,7 @@
 			"cloud run logs",
 			"cloud run metrics",
 			"cloud run observability",
-			"cloud run to signoz",
+			"cloud run to o11y",
 			"cloud run tracing",
 			"cloud-run",
 			"gcp",
@@ -3464,7 +3464,7 @@
 			"cloud monitoring exporter",
 			"cloud monitoring opentelemetry",
 			"cloud monitoring telemetry",
-			"cloud monitoring to signoz",
+			"cloud monitoring to o11y",
 			"cloud-monitoring",
 			"gcp",
 			"gcp cloud monitoring metrics",
@@ -3515,7 +3515,7 @@
 			"openai monitoring",
 			"openai observability",
 			"openai performance monitoring",
-			"openai to signoz",
+			"openai to o11y",
 			"openai tracing",
 			"openai-monitoring",
 			"opentelemetry openai",
@@ -4138,7 +4138,7 @@
 			"github observability",
 			"github repository monitoring",
 			"github telemetry",
-			"github to signoz",
+			"github to o11y",
 			"github-metrics",
 			"metrics",
 			"monitor github repos",
@@ -4163,7 +4163,7 @@
 			"github actions monitoring",
 			"github actions observability",
 			"github actions telemetry",
-			"github actions to signoz",
+			"github actions to o11y",
 			"github actions traces",
 			"github actions tracing",
 			"github cicd tracing",
@@ -4197,7 +4197,7 @@
 			"jenkins node monitoring",
 			"jenkins observability",
 			"jenkins telemetry",
-			"jenkins to signoz",
+			"jenkins to o11y",
 			"jenkins-agent-node-monitoring",
 			"metrics",
 			"monitor jenkins agents",
@@ -4227,7 +4227,7 @@
 			"jenkins pipeline observability",
 			"jenkins pipeline tracing",
 			"jenkins telemetry",
-			"jenkins to signoz",
+			"jenkins to o11y",
 			"jenkins tracing",
 			"jenkins workflow monitoring",
 			"jenkins-tracing",
@@ -4254,7 +4254,7 @@
 			"argocd monitoring",
 			"argocd observability",
 			"argocd telemetry",
-			"argocd to signoz",
+			"argocd to o11y",
 			"argocd-metrics",
 			"cicd",
 			"dashboards",
@@ -4375,7 +4375,7 @@
 			"android java",
 			"android java instrumentation",
 			"android java monitoring",
-			"android java to signoz",
+			"android java to o11y",
 			"android logs",
 			"android observability",
 			"android performance monitoring",
@@ -4409,7 +4409,7 @@
 			"android app performance kotlin",
 			"android kotlin",
 			"android kotlin monitoring",
-			"android kotlin to signoz",
+			"android kotlin to o11y",
 			"android observability kotlin",
 			"android telemetry sdk",
 			"android-kotlin",
@@ -4451,7 +4451,7 @@
 			"flutter monitoring",
 			"flutter observability",
 			"flutter performance metrics",
-			"flutter to signoz",
+			"flutter to o11y",
 			"mobile",
 			"mobile app monitoring",
 			"monitoring",
@@ -4490,7 +4490,7 @@
 			"otel swift sdk",
 			"swift",
 			"swift app tracing",
-			"swift to signoz",
+			"swift to o11y",
 			"swiftui tracing",
 			"traces",
 			"tracing"
@@ -4554,7 +4554,7 @@
 			"user experience tracing",
 			"web tracing",
 			"web vitals traces",
-			"web vitals to signoz",
+			"web vitals to o11y",
 			"react",
 			"angular",
 			"vuejs",
@@ -4581,7 +4581,7 @@
 			"document",
 			"document load",
 			"document load time",
-			"document load to signoz",
+			"document load to o11y",
 			"document load trace",
 			"document-load",
 			"dom content loaded metrics",
@@ -4722,7 +4722,7 @@
 			"snowflake observability",
 			"snowflake performance monitoring",
 			"snowflake telemetry",
-			"snowflake to signoz",
+			"snowflake to o11y",
 			"telemetry"
 		],
 		"imgUrl": "/Logos/snowflake.svg",

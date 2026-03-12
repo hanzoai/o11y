@@ -1,6 +1,6 @@
 import ROUTES from './routes';
 
-export const DOCS_BASE_URL = process.env.DOCS_BASE_URL || 'https://signoz.io';
+export const DOCS_BASE_URL = process.env.DOCS_BASE_URL || 'https://o11y.hanzo.ai';
 
 export const WITHOUT_SESSION_PATH = ['/redirect'];
 
@@ -10,8 +10,8 @@ export const DEFAULT_AUTH0_APP_REDIRECTION_PATH = ROUTES.APPLICATION;
 
 export const INVITE_MEMBERS_HASH = '#invite-team-members';
 
-export const SIGNOZ_UPGRADE_PLAN_URL =
-	'https://upgrade.signoz.io/upgrade-from-app';
+export const HANZO_UPGRADE_PLAN_URL =
+	'https://upgrade.o11y.hanzo.ai/upgrade-from-app';
 
 export const DASHBOARD_TIME_IN_DURATION = 'refreshInterval';
 

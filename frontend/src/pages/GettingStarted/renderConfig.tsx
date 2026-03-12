@@ -18,21 +18,21 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 	} = store.getState();
 	return [
 		{
-			heading: 'Send data from your applications to SigNoz',
+			heading: 'Send data from your applications to Hanzo O11y',
 			items: [
 				{
 					title: 'Instrument your Java Application',
 					icon: (
 						<img src={`/Logos/java.png?currentVersion=${currentVersion}`} alt="" />
 					),
-					url: 'https://signoz.io/docs/instrumentation/java/',
+					url: 'https://o11y.hanzo.ai/docs/instrumentation/java/',
 				},
 				{
 					title: 'Instrument your Python Application',
 					icon: (
 						<img src={`/Logos/python.png?currentVersion=${currentVersion}`} alt="" />
 					),
-					url: 'https://signoz.io/docs/instrumentation/python/',
+					url: 'https://o11y.hanzo.ai/docs/instrumentation/python/',
 				},
 				{
 					title: 'Instrument your JS Application',
@@ -42,14 +42,14 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 							alt=""
 						/>
 					),
-					url: 'https://signoz.io/docs/instrumentation/javascript/',
+					url: 'https://o11y.hanzo.ai/docs/instrumentation/javascript/',
 				},
 				{
 					title: 'Instrument your Go Application',
 					icon: (
 						<img src={`/Logos/go.png?currentVersion=${currentVersion}`} alt="" />
 					),
-					url: 'https://signoz.io/docs/instrumentation/golang/',
+					url: 'https://o11y.hanzo.ai/docs/instrumentation/golang/',
 				},
 				{
 					title: 'Instrument your .NET Application',
@@ -59,35 +59,35 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 							alt=""
 						/>
 					),
-					url: 'https://signoz.io/docs/instrumentation/dotnet/',
+					url: 'https://o11y.hanzo.ai/docs/instrumentation/dotnet/',
 				},
 				{
 					title: 'Instrument your PHP Application',
 					icon: (
 						<img src={`/Logos/php.png?currentVersion=${currentVersion}`} alt="" />
 					),
-					url: 'https://signoz.io/docs/instrumentation/php/',
+					url: 'https://o11y.hanzo.ai/docs/instrumentation/php/',
 				},
 				{
 					title: 'Instrument your Rails Application',
 					icon: (
 						<img src={`/Logos/rails.png?currentVersion=${currentVersion}`} alt="" />
 					),
-					url: 'https://signoz.io/docs/instrumentation/ruby-on-rails/',
+					url: 'https://o11y.hanzo.ai/docs/instrumentation/ruby-on-rails/',
 				},
 				{
 					title: 'Instrument your Rust Application',
 					icon: (
 						<img src={`/Logos/rust.png?currentVersion=${currentVersion}`} alt="" />
 					),
-					url: 'https://signoz.io/docs/instrumentation/rust/',
+					url: 'https://o11y.hanzo.ai/docs/instrumentation/rust/',
 				},
 				{
 					title: 'Instrument your Elixir Application',
 					icon: (
 						<img src={`/Logos/elixir.png?currentVersion=${currentVersion}`} alt="" />
 					),
-					url: 'https://signoz.io/docs/instrumentation/elixir/',
+					url: 'https://o11y.hanzo.ai/docs/instrumentation/elixir/',
 				},
 			],
 		},
@@ -95,29 +95,29 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 			heading: 'Send Metrics from your Infrastructure & create Dashboards',
 			items: [
 				{
-					title: 'Send metrics to SigNoz',
+					title: 'Send metrics to Hanzo O11y',
 					icon: <BarChartOutlined style={{ fontSize: '3.5rem' }} />,
-					url: 'https://signoz.io/docs/userguide/send-metrics/',
+					url: 'https://o11y.hanzo.ai/docs/userguide/send-metrics/',
 				},
 				{
 					title: 'Create and Manage Dashboards',
 					icon: <DashboardFilled style={{ fontSize: '3.5rem' }} />,
-					url: 'https://signoz.io/docs/userguide/manage-dashboards-and-panels/',
+					url: 'https://o11y.hanzo.ai/docs/userguide/manage-dashboards-and-panels/',
 				},
 			],
 		},
 		{
-			heading: 'Send your logs to SigNoz',
+			heading: 'Send your logs to Hanzo O11y',
 			items: [
 				{
-					title: 'Send your logs to SigNoz',
+					title: 'Send your logs to Hanzo O11y',
 					icon: <AlignLeftOutlined style={{ fontSize: '3.5rem' }} />,
-					url: 'https://signoz.io/docs/userguide/logs/',
+					url: 'https://o11y.hanzo.ai/docs/userguide/logs/',
 				},
 				{
-					title: 'Existing log collectors to SigNoz',
+					title: 'Existing log collectors to Hanzo O11y',
 					icon: <ApiFilled style={{ fontSize: '3.5rem' }} />,
-					url: 'https://signoz.io/docs/userguide/fluentbit_to_signoz/',
+					url: 'https://o11y.hanzo.ai/docs/userguide/fluentbit_to_o11y/',
 				},
 			],
 		},
@@ -127,13 +127,13 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 				{
 					title: 'Create alert rules on metrics',
 					icon: <AlertFilled style={{ fontSize: '3.5rem' }} />,
-					url: 'https://signoz.io/docs/userguide/alerts-management/',
+					url: 'https://o11y.hanzo.ai/docs/userguide/alerts-management/',
 				},
 				{
 					title: 'Configure alert notification channels',
 					icon: <SoundFilled style={{ fontSize: '3.5rem' }} />,
 					url:
-						'https://signoz.io/docs/userguide/alerts-management/#setting-up-a-notification-channel',
+						'https://o11y.hanzo.ai/docs/userguide/alerts-management/#setting-up-a-notification-channel',
 				},
 			],
 		},
@@ -143,14 +143,14 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 				<>
 					{'Join our slack community and ask any question you may have on '}
 					<Typography.Link
-						href="https://signoz-community.slack.com/archives/C01HWUTP4HH"
+						href="https://o11y-community.slack.com/archives/C01HWUTP4HH"
 						target="_blank"
 					>
 						#support
 					</Typography.Link>
 					{' or '}
 					<Typography.Link
-						href="https://signoz-community.slack.com/archives/C01HWQ1R0BC"
+						href="https://o11y-community.slack.com/archives/C01HWQ1R0BC"
 						target="_blank"
 					>
 						#dummy_channel
@@ -160,13 +160,13 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 
 			items: [
 				{
-					title: 'Join SigNoz slack community ',
+					title: 'Join Hanzo O11y slack community ',
 					icon: (
 						<div style={{ padding: '0.7rem' }}>
 							<Slack width={30} height={30} />
 						</div>
 					),
-					url: 'https://signoz.io/slack',
+					url: 'https://o11y.hanzo.ai/slack',
 				},
 			],
 		},

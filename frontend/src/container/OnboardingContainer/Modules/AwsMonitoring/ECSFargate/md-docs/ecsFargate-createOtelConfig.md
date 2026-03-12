@@ -1,8 +1,8 @@
 These steps will help you to collect **metrics, logs and traces** from your ECS infrastructure. 
 
-## Create SigNoz OTel Collector Configuration file 
+## Create Hanzo O11y OTel Collector Configuration file 
 
-To setup the SigNoz OTel Collector config, follow these two steps:
+To setup the Hanzo O11y OTel Collector config, follow these two steps:
 
 ### Step 1: 
 Navigate to the AWS Parameter store and create a new parameter named **/ecs/signoz/otelcol-sidecar.yaml**
@@ -10,15 +10,15 @@ Navigate to the AWS Parameter store and create a new parameter named **/ecs/sign
 ### Step 2:
 Download the otelcol-sidecar YAML configuration file:
 ```bash
-wget https://github.com/SigNoz/benchmark/raw/main/ecs/otelcol-sidecar.yaml
+wget https://github.com/Hanzo O11y/benchmark/raw/main/ecs/otelcol-sidecar.yaml
 ```
 &nbsp;
 
-Update `{region}` and `SIGNOZ_INGESTION_KEY` values in your YAML configuration file with your SigNoz cloud values mentioned below:
+Update `{region}` and `HANZO_INGESTION_KEY` values in your YAML configuration file with your Hanzo O11y cloud values mentioned below:
 
 {region} : `{{REGION}}`
 
-SIGNOZ_INGESTION_KEY : `{{SIGNOZ_INGESTION_KEY}}`
+HANZO_INGESTION_KEY : `{{HANZO_INGESTION_KEY}}`
 
 &nbsp;
 

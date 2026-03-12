@@ -89,7 +89,7 @@ describe('ChangelogModal', () => {
 		renderChangelog();
 		fireEvent.click(screen.getByText('Update my workspace'));
 		expect(window.open).toHaveBeenCalledWith(
-			'https://signoz.io/upgrade-path',
+			'https://o11y.hanzo.ai/upgrade-path',
 			'_blank',
 			'noopener,noreferrer',
 		);

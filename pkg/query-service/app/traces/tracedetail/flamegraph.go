@@ -3,7 +3,7 @@ package tracedetail
 import (
 	"sort"
 
-	"github.com/SigNoz/signoz/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
 )
 
 var (

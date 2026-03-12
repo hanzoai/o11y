@@ -10,13 +10,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/http/render"
-	"github.com/SigNoz/signoz/pkg/modules/user"
-	basemodel "github.com/SigNoz/signoz/pkg/query-service/model"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/modules/user"
+	basemodel "github.com/hanzoai/o11y/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 )
@@ -24,8 +24,8 @@ import (
 type CloudIntegrationConnectionParamsResponse struct {
 	IngestionUrl string `json:"ingestion_url,omitempty"`
 	IngestionKey string `json:"ingestion_key,omitempty"`
-	SigNozAPIUrl string `json:"signoz_api_url,omitempty"`
-	SigNozAPIKey string `json:"signoz_api_key,omitempty"`
+	Hanzo O11yAPIUrl string `json:"o11y_api_url,omitempty"`
+	Hanzo O11yAPIKey string `json:"o11y_api_key,omitempty"`
 }
 
 func (ah *APIHandler) CloudIntegrationsGenerateConnectionParams(w http.ResponseWriter, r *http.Request) {
@@ -58,10 +58,10 @@ func (ah *APIHandler) CloudIntegrationsGenerateConnectionParams(w http.ResponseW
 	}
 
 	result := CloudIntegrationConnectionParamsResponse{
-		SigNozAPIKey: apiKey,
+		Hanzo O11yAPIKey: apiKey,
 	}
 
-	license, err := ah.Signoz.Licensing.GetActive(r.Context(), orgID)
+	license, err := ah.O11y.Licensing.GetActive(r.Context(), orgID)
 	if err != nil {
 		render.Error(w, err)
 		return
@@ -71,21 +71,21 @@ func (ah *APIHandler) CloudIntegrationsGenerateConnectionParams(w http.ResponseW
 		// Return the API Key (PAT) even if the rest of the params can not be deduced.
 		// Params not returned from here will be requested from the user via form inputs.
 		// This enables gracefully degraded but working experience even for non-cloud deployments.
-		zap.L().Info("ingestion params and signoz api url can not be deduced since no license was found")
+		zap.L().Info("ingestion params and o11y api url can not be deduced since no license was found")
 		ah.Respond(w, result)
 		return
 	}
 
-	signozApiUrl, apiErr := ah.getIngestionUrlAndSigNozAPIUrl(r.Context(), license.Key)
+	o11yApiUrl, apiErr := ah.getIngestionUrlAndHanzo O11yAPIUrl(r.Context(), license.Key)
 	if apiErr != nil {
 		RespondError(w, basemodel.WrapApiError(
-			apiErr, "couldn't deduce ingestion url and signoz api url",
+			apiErr, "couldn't deduce ingestion url and o11y api url",
 		), nil)
 		return
 	}
 
 	result.IngestionUrl = ah.opts.GlobalConfig.IngestionURL.String()
-	result.SigNozAPIUrl = signozApiUrl
+	result.Hanzo O11yAPIUrl = o11yApiUrl
 
 	gatewayUrl := ah.opts.GatewayUrl
 	if len(gatewayUrl) > 0 {
@@ -126,7 +126,7 @@ func (ah *APIHandler) getOrCreateCloudIntegrationPAT(ctx context.Context, orgId 
 		))
 	}
 
-	allPats, err := ah.Signoz.Modules.User.ListAPIKeys(ctx, orgIdUUID)
+	allPats, err := ah.O11y.Modules.User.ListAPIKeys(ctx, orgIdUUID)
 	if err != nil {
 		return "", basemodel.InternalError(fmt.Errorf(
 			"couldn't list PATs: %w", err,
@@ -155,7 +155,7 @@ func (ah *APIHandler) getOrCreateCloudIntegrationPAT(ctx context.Context, orgId 
 		))
 	}
 
-	err = ah.Signoz.Modules.User.CreateAPIKey(ctx, newPAT)
+	err = ah.O11y.Modules.User.CreateAPIKey(ctx, newPAT)
 	if err != nil {
 		return "", basemodel.InternalError(fmt.Errorf(
 			"couldn't create cloud integration PAT: %w", err,
@@ -168,7 +168,7 @@ func (ah *APIHandler) getOrCreateCloudIntegrationUser(
 	ctx context.Context, orgId string, cloudProvider string,
 ) (*types.User, *basemodel.ApiError) {
 	cloudIntegrationUserName := fmt.Sprintf("%s-integration", cloudProvider)
-	email := valuer.MustNewEmail(fmt.Sprintf("%s@signoz.io", cloudIntegrationUserName))
+	email := valuer.MustNewEmail(fmt.Sprintf("%s@observe.hanzo.ai", cloudIntegrationUserName))
 
 	cloudIntegrationUser, err := types.NewUser(cloudIntegrationUserName, email, types.RoleViewer, valuer.MustNewUUID(orgId), types.UserStatusActive)
 	if err != nil {
@@ -177,7 +177,7 @@ func (ah *APIHandler) getOrCreateCloudIntegrationUser(
 
 	password := types.MustGenerateFactorPassword(cloudIntegrationUser.ID.StringValue())
 
-	cloudIntegrationUser, err = ah.Signoz.Modules.User.GetOrCreateUser(ctx, cloudIntegrationUser, user.WithFactorPassword(password))
+	cloudIntegrationUser, err = ah.O11y.Modules.User.GetOrCreateUser(ctx, cloudIntegrationUser, user.WithFactorPassword(password))
 	if err != nil {
 		return nil, basemodel.InternalError(fmt.Errorf("couldn't look for integration user: %w", err))
 	}
@@ -185,7 +185,7 @@ func (ah *APIHandler) getOrCreateCloudIntegrationUser(
 	return cloudIntegrationUser, nil
 }
 
-func (ah *APIHandler) getIngestionUrlAndSigNozAPIUrl(ctx context.Context, licenseKey string) (
+func (ah *APIHandler) getIngestionUrlAndHanzo O11yAPIUrl(ctx context.Context, licenseKey string) (
 	string, *basemodel.ApiError,
 ) {
 	// TODO: remove this struct from here
@@ -198,7 +198,7 @@ func (ah *APIHandler) getIngestionUrlAndSigNozAPIUrl(ctx context.Context, licens
 		} `json:"cluster"`
 	}
 
-	respBytes, err := ah.Signoz.Zeus.GetDeployment(ctx, licenseKey)
+	respBytes, err := ah.O11y.Zeus.GetDeployment(ctx, licenseKey)
 	if err != nil {
 		return "", basemodel.InternalError(fmt.Errorf(
 			"couldn't query for deployment info: error: %w", err,
@@ -224,9 +224,9 @@ func (ah *APIHandler) getIngestionUrlAndSigNozAPIUrl(ctx context.Context, licens
 		))
 	}
 
-	signozApiUrl := fmt.Sprintf("https://%s.%s", deploymentName, regionDns)
+	o11yApiUrl := fmt.Sprintf("https://%s.%s", deploymentName, regionDns)
 
-	return signozApiUrl, nil
+	return o11yApiUrl, nil
 }
 
 type ingestionKey struct {
@@ -330,7 +330,7 @@ func requestGateway[ResponseType any](
 	reqUrl := fmt.Sprintf("%s%s", baseUrl, path)
 
 	headers := map[string]string{
-		"X-Signoz-Cloud-Api-Key": licenseKey,
+		"X-O11y-Cloud-Api-Key": licenseKey,
 		"X-Consumer-Username":    "lid:00000000-0000-0000-0000-000000000000",
 		"X-Consumer-Groups":      "ns:default",
 	}

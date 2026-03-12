@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
 
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
 // groupingSets returns a string of comma separated tags for group by clause

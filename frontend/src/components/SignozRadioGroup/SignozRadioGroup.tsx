@@ -1,6 +1,6 @@
 import { Radio, RadioChangeEvent } from 'antd';
 
-import './SignozRadioGroup.styles.scss';
+import './O11yRadioGroup.styles.scss';
 
 interface Option {
 	value: string;
@@ -8,7 +8,7 @@ interface Option {
 	icon?: React.ReactNode;
 }
 
-interface SignozRadioGroupProps {
+interface O11yRadioGroupProps {
 	value: string;
 	options: Option[];
 	onChange: (e: RadioChangeEvent) => void;
@@ -16,18 +16,18 @@ interface SignozRadioGroupProps {
 	disabled?: boolean;
 }
 
-function SignozRadioGroup({
+function O11yRadioGroup({
 	value,
 	options,
 	onChange,
 	className = '',
 	disabled = false,
-}: SignozRadioGroupProps): JSX.Element {
+}: O11yRadioGroupProps): JSX.Element {
 	return (
 		<Radio.Group
 			value={value}
 			buttonStyle="solid"
-			className={`signoz-radio-group ${className}`}
+			className={`o11y-radio-group ${className}`}
 			onChange={onChange}
 			disabled={disabled}
 		>
@@ -47,9 +47,9 @@ function SignozRadioGroup({
 	);
 }
 
-SignozRadioGroup.defaultProps = {
+O11yRadioGroup.defaultProps = {
 	className: '',
 	disabled: false,
 };
 
-export default SignozRadioGroup;
+export default O11yRadioGroup;

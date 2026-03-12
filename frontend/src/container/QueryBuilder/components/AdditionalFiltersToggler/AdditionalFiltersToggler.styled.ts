@@ -1,5 +1,5 @@
 import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Col, Typography } from 'antd';
 import styled, { css } from 'styled-components';
 

@@ -1,6 +1,6 @@
 package telemetrymetrics
 
-import "github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+import "github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 
 var IntrinsicFields = []string{
 	"__normalized",

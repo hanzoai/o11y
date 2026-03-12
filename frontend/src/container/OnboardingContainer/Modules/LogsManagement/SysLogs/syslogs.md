@@ -1,6 +1,6 @@
-## Collect Syslogs in SigNoz cloud
+## Collect Syslogs in Hanzo O11y cloud
 
-- Add otel collector binary to your VM by following this [guide](https://signoz.io/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/).
+- Add otel collector binary to your VM by following this [guide](https://o11y.hanzo.ai/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/).
 
 - Add the syslog reciever to `config.yaml` to otel-collector.
 
@@ -18,7 +18,7 @@
   ```
 
   Here we are collecting the logs and moving message from attributes to body using operators that are available.
-  You can read more about operators [here](https://signoz.io/docs/userguide/logs/#operators-for-parsing-and-manipulating-logs).
+  You can read more about operators [here](https://o11y.hanzo.ai/docs/userguide/logs/#operators-for-parsing-and-manipulating-logs).
 
   For more configurations that are available for syslog receiver please check [here](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/syslogreceiver).
 
@@ -72,4 +72,4 @@
 
 - You can check the status of service by running `sudo systemctl status rsyslog.service`
 
-- If there are no errors your logs will be visible on SigNoz UI.
+- If there are no errors your logs will be visible on Hanzo O11y UI.
