@@ -3,7 +3,7 @@ package queryfilterextractor
 import (
 	"sort"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/promql/parser"
 )

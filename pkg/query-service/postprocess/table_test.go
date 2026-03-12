@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
 func TestSortRows(t *testing.T) {
@@ -31,7 +31,7 @@ func TestSortRows(t *testing.T) {
 				{Name: "A"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "asc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "asc"}}},
 			},
 			queryNames: []string{"A"},
 			expected: []*v3.TableRow{
@@ -52,7 +52,7 @@ func TestSortRows(t *testing.T) {
 				{Name: "A"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "desc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"}}},
 			},
 			queryNames: []string{"A"},
 			expected: []*v3.TableRow{
@@ -96,8 +96,8 @@ func TestSortRows(t *testing.T) {
 				{Name: "B"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "asc"}}},
-				"B": {OrderBy: []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "desc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "asc"}}},
+				"B": {OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"}}},
 			},
 			queryNames: []string{"A", "B"},
 			expected: []*v3.TableRow{
@@ -108,7 +108,7 @@ func TestSortRows(t *testing.T) {
 			},
 		},
 		{
-			name: "Sort with SigNozOrderByValue",
+			name: "Sort with Hanzo O11yOrderByValue",
 			rows: []*v3.TableRow{
 				{Data: map[string]interface{}{"service": "service1", "A": 20.0}},
 				{Data: map[string]interface{}{"service": "service2", "A": 10.0}},
@@ -119,7 +119,7 @@ func TestSortRows(t *testing.T) {
 				{Name: "A"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "desc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"}}},
 			},
 			queryNames: []string{"A"},
 			expected: []*v3.TableRow{

@@ -43,9 +43,9 @@ provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.addSpanProcessor(
   new BatchSpanProcessor(
     new OTLPTraceExporter({
-      url: 'https://ingest.{{REGION}}.signoz.cloud:443/v1/traces',
+      url: 'https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces',
       headers: {
-        'signoz-ingestion-key': '{{SIGNOZ_INGESTION_KEY}}',
+        'signoz-ingestion-key': '{{HANZO_INGESTION_KEY}}',
       },
     })
   )

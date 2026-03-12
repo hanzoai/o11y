@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	logsV3 "github.com/SigNoz/signoz/pkg/query-service/app/logs/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/app/resource"
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
+	logsV3 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/app/resource"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
 )
 
 var logOperators = map[v3.FilterOperator]string{
@@ -45,7 +45,7 @@ const (
 	BODY                         = "body"
 	DISTRIBUTED_LOGS_V2          = "distributed_logs_v2"
 	DISTRIBUTED_LOGS_V2_RESOURCE = "distributed_logs_v2_resource"
-	DB_NAME                      = "signoz_logs"
+	DB_NAME                      = "observe_logs"
 	NANOSECOND                   = 1000000000
 )
 
@@ -74,7 +74,7 @@ func getClickhouseKey(key v3.AttributeKey) string {
 	}
 
 	// materialized column created from query
-	// https://github.com/SigNoz/signoz/pull/4775
+	// https://github.com/hanzoai/o11y/pull/4775
 	return "`" + utils.GetClickhouseColumnNameV2(string(key.Type), string(key.DataType), key.Key) + "`"
 }
 
@@ -265,7 +265,7 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 	var orderBy []string
 
 	for _, item := range items {
-		if item.ColumnName == constants.SigNozOrderByValue {
+		if item.ColumnName == constants.Hanzo O11yOrderByValue {
 			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order))
 		} else if _, ok := tagLookup[item.ColumnName]; ok {
 			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
@@ -308,7 +308,7 @@ func generateAggregateClause(panelType v3.PanelType, start, end int64, aggOp v3.
 	having string,
 	orderBy string,
 ) (string, error) {
-	queryTmpl := " %s as value from signoz_logs." + DISTRIBUTED_LOGS_V2 +
+	queryTmpl := " %s as value from observe_logs." + DISTRIBUTED_LOGS_V2 +
 		" where " + timeFilter + "%s" +
 		"%s%s" +
 		"%s"
@@ -405,7 +405,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 	if mq.AggregateOperator == v3.AggregateOperatorNoOp {
 		// with noop any filter or different order by other than ts will use new table
 		sqlSelect := constants.LogsSQLSelectV2
-		queryTmpl := sqlSelect + "from signoz_logs.%s where %s%s order by %s"
+		queryTmpl := sqlSelect + "from observe_logs.%s where %s%s order by %s"
 		query := fmt.Sprintf(queryTmpl, DISTRIBUTED_LOGS_V2, timeFilter, filterSubQuery, orderBy)
 		return query, nil
 		// ---- NOOP ends here ----
@@ -488,7 +488,7 @@ func buildLogsLiveTailQuery(mq *v3.BuilderQuery) (string, error) {
 	// the reader will add the timestamp and id filters
 	switch mq.AggregateOperator {
 	case v3.AggregateOperatorNoOp:
-		query := constants.LogsSQLSelectV2 + "from signoz_logs." + DISTRIBUTED_LOGS_V2 + " where "
+		query := constants.LogsSQLSelectV2 + "from observe_logs." + DISTRIBUTED_LOGS_V2 + " where "
 		if len(filterSubQuery) > 0 {
 			query = query + filterSubQuery + " AND "
 		}

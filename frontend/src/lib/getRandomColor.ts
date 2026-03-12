@@ -40,7 +40,7 @@ export function hexToRgba(hex: string, alpha: number = 1): string {
 	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-export const SIGNOZ_UI_COLOR_HEX = 'signoz_ui_color_hex';
+export const HANZO_UI_COLOR_HEX = 'o11y_ui_color_hex';
 
 export const spanServiceNameToColorMapping = (
 	spans: Span[],
@@ -48,23 +48,23 @@ export const spanServiceNameToColorMapping = (
 	const allServiceMap = new Map<string, string | undefined>();
 
 	spans.forEach((spanItem) => {
-		const signozUiColorKeyIndex = spanItem[7].findIndex(
-			(span) => span === SIGNOZ_UI_COLOR_HEX,
+		const o11yUiColorKeyIndex = spanItem[7].findIndex(
+			(span) => span === HANZO_UI_COLOR_HEX,
 		);
 
 		allServiceMap.set(
 			spanItem[3],
-			signozUiColorKeyIndex === -1
+			o11yUiColorKeyIndex === -1
 				? undefined
-				: spanItem[8][signozUiColorKeyIndex],
+				: spanItem[8][o11yUiColorKeyIndex],
 		);
 	});
 
 	const serviceToColorMap: { [key: string]: string } = {};
 
-	Array.from(allServiceMap).forEach(([serviceName, signozColor], idx) => {
+	Array.from(allServiceMap).forEach(([serviceName, o11yColor], idx) => {
 		serviceToColorMap[`${serviceName}`] =
-			signozColor || colors[idx % colors.length];
+			o11yColor || colors[idx % colors.length];
 	});
 
 	return serviceToColorMap;

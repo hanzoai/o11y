@@ -1,8 +1,8 @@
 package agentConf
 
 import (
-	"github.com/SigNoz/signoz/pkg/types/opamptypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/opamptypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 // Interface for features implemented via agent config.

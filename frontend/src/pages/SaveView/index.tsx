@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import {
 	Button,
 	ColorPicker,
@@ -317,7 +317,7 @@ function SaveView(): JSX.Element {
 					Manage your saved views for {ROUTES_VS_SOURCEPAGE[pathname]}.{' '}
 					<Typography.Link
 						className="learn-more"
-						href="https://signoz.io/docs/product-features/saved-view/?utm_source=product&utm_medium=views-tab"
+						href="https://o11y.hanzo.ai/docs/product-features/saved-view/?utm_source=product&utm_medium=views-tab"
 						target="_blank"
 					>
 						Learn more

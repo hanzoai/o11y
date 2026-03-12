@@ -3,7 +3,7 @@ package clickhouseprometheus
 import "time"
 
 const (
-	databaseName                string = "signoz_metrics"
+	databaseName                string = "observe_metrics"
 	distributedTimeSeriesV4     string = "distributed_time_series_v4"
 	distributedTimeSeriesV46hrs string = "distributed_time_series_v4_6hrs"
 	distributedTimeSeriesV41day string = "distributed_time_series_v4_1day"

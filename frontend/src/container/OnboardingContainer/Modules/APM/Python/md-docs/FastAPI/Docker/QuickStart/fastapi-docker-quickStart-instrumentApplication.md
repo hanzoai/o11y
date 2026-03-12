@@ -35,8 +35,8 @@ EXPOSE 5000
 
 # Set environment variables for OpenTelemetry
 ENV OTEL_RESOURCE_ATTRIBUTES=service.name={{MYAPP}}
-ENV OTEL_EXPORTER_OTLP_ENDPOINT=https://ingest.{REGION}.signoz.cloud:443
-ENV OTEL_EXPORTER_OTLP_HEADERS=signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}
+ENV OTEL_EXPORTER_OTLP_ENDPOINT=https://ingest.{REGION}.o11y.hanzo.ai:443
+ENV OTEL_EXPORTER_OTLP_HEADERS=signoz-ingestion-key={{HANZO_INGESTION_KEY}}
 ENV OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 
 # Run app.py with OpenTelemetry instrumentation when the container launches

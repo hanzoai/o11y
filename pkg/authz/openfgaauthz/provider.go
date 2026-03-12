@@ -3,16 +3,16 @@ package openfgaauthz
 import (
 	"context"
 
-	authz "github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/authz/authzstore/sqlauthzstore"
-	"github.com/SigNoz/signoz/pkg/authz/openfgaserver"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/roletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	authz "github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/authz/authzstore/sqlauthzstore"
+	"github.com/hanzoai/o11y/pkg/authz/openfgaserver"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
 	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 	openfgapkgtransformer "github.com/openfga/language/pkg/go/transformer"
 )
@@ -199,7 +199,7 @@ func (provider *provider) CreateManagedRoles(ctx context.Context, _ valuer.UUID,
 }
 
 func (provider *provider) CreateManagedUserRoleTransactions(ctx context.Context, orgID valuer.UUID, userID valuer.UUID) error {
-	return provider.Grant(ctx, orgID, []string{roletypes.SigNozAdminRoleName}, authtypes.MustNewSubject(authtypes.TypeableUser, userID.String(), orgID, nil))
+	return provider.Grant(ctx, orgID, []string{roletypes.Hanzo O11yAdminRoleName}, authtypes.MustNewSubject(authtypes.TypeableUser, userID.String(), orgID, nil))
 }
 
 func (setter *provider) Create(_ context.Context, _ valuer.UUID, _ *roletypes.Role) error {

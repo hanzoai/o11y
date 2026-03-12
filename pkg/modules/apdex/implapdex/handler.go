@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/http/render"
-	"github.com/SigNoz/signoz/pkg/modules/apdex"
-	"github.com/SigNoz/signoz/pkg/types/apdextypes"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/modules/apdex"
+	"github.com/hanzoai/o11y/pkg/types/apdextypes"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 )
 
 type handler struct {

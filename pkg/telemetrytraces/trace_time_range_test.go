@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/instrumentation/instrumentationtest"
-	"github.com/SigNoz/signoz/pkg/querybuilder"
-	"github.com/SigNoz/signoz/pkg/querybuilder/resourcefilter"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes/telemetrytypestest"
+	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes/telemetrytypestest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -143,7 +143,7 @@ func TestTraceTimeRangeFinderQuery(t *testing.T) {
 		SELECT 
 			toUnixTimestamp64Nano(min(timestamp)) as start_time,
 			toUnixTimestamp64Nano(max(timestamp)) as end_time
-		FROM signoz_traces.distributed_signoz_spans
+		FROM observe_traces.distributed_o11y_spans
 		WHERE traceID = ?
 		AND timestamp >= now() - INTERVAL 30 DAY
 	`
@@ -154,7 +154,7 @@ func TestTraceTimeRangeFinderQuery(t *testing.T) {
 		SELECT 
 			toUnixTimestamp64Nano(min(timestamp)) as start_time,
 			toUnixTimestamp64Nano(max(timestamp)) as end_time
-		FROM signoz_traces.distributed_signoz_spans
+		FROM observe_traces.distributed_o11y_spans
 		WHERE traceID = ?
 		AND timestamp >= now() - INTERVAL 30 DAY
 	`

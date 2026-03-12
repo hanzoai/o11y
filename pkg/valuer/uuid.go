@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/google/uuid"
 )
 

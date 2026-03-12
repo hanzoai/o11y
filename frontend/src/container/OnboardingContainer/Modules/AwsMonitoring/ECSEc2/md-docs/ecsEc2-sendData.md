@@ -4,10 +4,10 @@
 
 ## Send Traces Data
 
-To send traces data from applications deployed in ECS to SigNoz Cloud using Daemon Service we created in the previous section, follow these steps:
+To send traces data from applications deployed in ECS to Hanzo O11y Cloud using Daemon Service we created in the previous section, follow these steps:
 
 ### Step 1: Instrument your application
-To add OpenTelemetry instrumentation to your application, check out the Application Monitoring section in onboarding you can follow the docs [here](https://signoz.io/docs/instrumentation/).
+To add OpenTelemetry instrumentation to your application, check out the Application Monitoring section in onboarding you can follow the docs [here](https://o11y.hanzo.ai/docs/instrumentation/).
 
 &nbsp;
 
@@ -85,6 +85,6 @@ Once you follow the above steps, you need to rebuild the application container a
 
 &nbsp;
 
-### Step 5: Verify Data in SigNoz
+### Step 5: Verify Data in Hanzo O11y
 
-Generate some traffic to your application and go to your SigNoz cloud **Services** page to see your application name in the service list.
+Generate some traffic to your application and go to your Hanzo O11y cloud **Services** page to see your application name in the service list.

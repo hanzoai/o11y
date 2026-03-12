@@ -58,4 +58,4 @@ config :opentelemetry, :processors,
 
 ### Step 3: Dockerize your application
 
-Since the environment variables like SIGNOZ_INGESTION_KEY, Ingestion Endpoint and Service name are set in the above steps, you don't need to add any additional steps in your Dockerfile.
+Since the environment variables like HANZO_INGESTION_KEY, Ingestion Endpoint and Service name are set in the above steps, you don't need to add any additional steps in your Dockerfile.

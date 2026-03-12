@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/statsreporter"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/statsreporter"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type Module interface {

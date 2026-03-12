@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/tidwall/gjson"
 	"github.com/uptrace/bun"
 )

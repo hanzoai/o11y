@@ -43,7 +43,7 @@ function TraceOperatorSection({
 					<div style={{ textAlign: 'center' }}>
 						Add Trace Matching
 						<Typography.Link
-							href="https://signoz.io/docs/userguide/query-builder-v5/#multi-query-analysis-trace-operators"
+							href="https://o11y.hanzo.ai/docs/userguide/query-builder-v5/#multi-query-analysis-trace-operators"
 							target="_blank"
 							style={{ textDecoration: 'underline' }}
 						>
@@ -105,7 +105,7 @@ export default function QueryFooter({
 								<div style={{ textAlign: 'center' }}>
 									Add New Formula
 									<Typography.Link
-										href="https://signoz.io/docs/userguide/query-builder-v5/#multi-query-analysis-advanced-comparisons"
+										href="https://o11y.hanzo.ai/docs/userguide/query-builder-v5/#multi-query-analysis-advanced-comparisons"
 										target="_blank"
 										style={{ textDecoration: 'underline' }}
 									>

@@ -3,8 +3,8 @@ package telemetrylogs
 import (
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/instrumentation/instrumentationtest"
-	"github.com/SigNoz/signoz/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/stretchr/testify/require"
 )
 

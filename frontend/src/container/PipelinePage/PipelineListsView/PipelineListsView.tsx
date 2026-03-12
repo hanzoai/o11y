@@ -75,7 +75,7 @@ function PipelinesListEmptyState(): JSX.Element {
 						<Typography>
 							{t('learn_more')}&nbsp;
 							<a
-								href="https://signoz.io/docs/logs-pipelines/introduction/?utm_source=product&utm_medium=pipelines-tab"
+								href="https://o11y.hanzo.ai/docs/logs-pipelines/introduction/?utm_source=product&utm_medium=pipelines-tab"
 								target="_blank"
 								rel="noopener noreferrer"
 							>
@@ -390,7 +390,7 @@ function PipelineListsView({
 		pipelineForm.resetFields();
 
 		logEvent('Logs: Pipelines: Clicked Add New Pipeline', {
-			source: 'signoz-ui',
+			source: 'observe-ui',
 		});
 	}, [setActionType, pipelineForm]);
 
@@ -468,7 +468,7 @@ function PipelineListsView({
 			logEvent('Logs: Pipelines: Saved Pipelines', {
 				count: pipelinesInDB.length,
 				enabled: pipelinesInDB.filter((p) => p.enabled).length,
-				source: 'signoz-ui',
+				source: 'observe-ui',
 			});
 		} catch (error) {
 			modifiedPipelineData.forEach((item: PipelineData) => {

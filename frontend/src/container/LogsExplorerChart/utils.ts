@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { colors } from 'lib/getRandomColor';
 
 // Function to determine if a color is "red-like" based on its RGB values

@@ -1,40 +1,40 @@
-package signoz
+package o11y
 
 import (
-	"github.com/SigNoz/signoz/pkg/analytics"
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/authz/signozauthzapi"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/gateway"
-	"github.com/SigNoz/signoz/pkg/global"
-	"github.com/SigNoz/signoz/pkg/global/signozglobal"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/modules/apdex"
-	"github.com/SigNoz/signoz/pkg/modules/apdex/implapdex"
-	"github.com/SigNoz/signoz/pkg/modules/dashboard"
-	"github.com/SigNoz/signoz/pkg/modules/dashboard/impldashboard"
-	"github.com/SigNoz/signoz/pkg/modules/fields"
-	"github.com/SigNoz/signoz/pkg/modules/fields/implfields"
-	"github.com/SigNoz/signoz/pkg/modules/metricsexplorer"
-	"github.com/SigNoz/signoz/pkg/modules/metricsexplorer/implmetricsexplorer"
-	"github.com/SigNoz/signoz/pkg/modules/quickfilter"
-	"github.com/SigNoz/signoz/pkg/modules/quickfilter/implquickfilter"
-	"github.com/SigNoz/signoz/pkg/modules/rawdataexport"
-	"github.com/SigNoz/signoz/pkg/modules/rawdataexport/implrawdataexport"
-	"github.com/SigNoz/signoz/pkg/modules/savedview"
-	"github.com/SigNoz/signoz/pkg/modules/savedview/implsavedview"
-	"github.com/SigNoz/signoz/pkg/modules/serviceaccount"
-	"github.com/SigNoz/signoz/pkg/modules/serviceaccount/implserviceaccount"
-	"github.com/SigNoz/signoz/pkg/modules/services"
-	"github.com/SigNoz/signoz/pkg/modules/services/implservices"
-	"github.com/SigNoz/signoz/pkg/modules/spanpercentile"
-	"github.com/SigNoz/signoz/pkg/modules/spanpercentile/implspanpercentile"
-	"github.com/SigNoz/signoz/pkg/modules/tracefunnel"
-	"github.com/SigNoz/signoz/pkg/modules/tracefunnel/impltracefunnel"
-	"github.com/SigNoz/signoz/pkg/querier"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/pkg/analytics"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/authz/o11yauthzapi"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/gateway"
+	"github.com/hanzoai/o11y/pkg/global"
+	"github.com/hanzoai/o11y/pkg/global/o11yglobal"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/modules/apdex"
+	"github.com/hanzoai/o11y/pkg/modules/apdex/implapdex"
+	"github.com/hanzoai/o11y/pkg/modules/dashboard"
+	"github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard"
+	"github.com/hanzoai/o11y/pkg/modules/fields"
+	"github.com/hanzoai/o11y/pkg/modules/fields/implfields"
+	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer"
+	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer/implmetricsexplorer"
+	"github.com/hanzoai/o11y/pkg/modules/quickfilter"
+	"github.com/hanzoai/o11y/pkg/modules/quickfilter/implquickfilter"
+	"github.com/hanzoai/o11y/pkg/modules/rawdataexport"
+	"github.com/hanzoai/o11y/pkg/modules/rawdataexport/implrawdataexport"
+	"github.com/hanzoai/o11y/pkg/modules/savedview"
+	"github.com/hanzoai/o11y/pkg/modules/savedview/implsavedview"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount/implserviceaccount"
+	"github.com/hanzoai/o11y/pkg/modules/services"
+	"github.com/hanzoai/o11y/pkg/modules/services/implservices"
+	"github.com/hanzoai/o11y/pkg/modules/spanpercentile"
+	"github.com/hanzoai/o11y/pkg/modules/spanpercentile/implspanpercentile"
+	"github.com/hanzoai/o11y/pkg/modules/tracefunnel"
+	"github.com/hanzoai/o11y/pkg/modules/tracefunnel/impltracefunnel"
+	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/zeus"
 )
 
 type Handlers struct {
@@ -80,11 +80,11 @@ func NewHandlers(
 		Services:              implservices.NewHandler(modules.Services),
 		MetricsExplorer:       implmetricsexplorer.NewHandler(modules.MetricsExplorer),
 		SpanPercentile:        implspanpercentile.NewHandler(modules.SpanPercentile),
-		Global:                signozglobal.NewHandler(global),
+		Global:                o11yglobal.NewHandler(global),
 		FlaggerHandler:        flagger.NewHandler(flaggerService),
 		GatewayHandler:        gateway.NewHandler(gatewayService),
 		Fields:                implfields.NewHandler(providerSettings, telemetryMetadataStore),
-		AuthzHandler:          signozauthzapi.NewHandler(authz),
+		AuthzHandler:          o11yauthzapi.NewHandler(authz),
 		ZeusHandler:           zeus.NewHandler(zeusService, licensing),
 		QuerierHandler:        querierHandler,
 		ServiceAccountHandler: implserviceaccount.NewHandler(modules.ServiceAccount),

@@ -3,8 +3,8 @@ package services
 import (
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/stretchr/testify/require"
 )
 

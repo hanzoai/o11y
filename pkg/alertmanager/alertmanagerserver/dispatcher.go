@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/alertmanager/nfmanager"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 
 	"github.com/prometheus/alertmanager/dispatch"
 	"github.com/prometheus/alertmanager/notify"
@@ -74,7 +74,7 @@ func NewDispatcher(
 		route:               r,
 		marker:              mk,
 		timeout:             to,
-		logger:              l.With("component", "signoz-dispatcher"),
+		logger:              l.With("component", "o11y-dispatcher"),
 		metrics:             m,
 		limits:              lim,
 		notificationManager: n,
@@ -117,7 +117,7 @@ func (d *Dispatcher) run(it provider.AlertIterator) {
 			}
 			alert := alertWrapper.Data
 
-			d.logger.DebugContext(d.ctx, "SigNoz Custom Dispatcher: Received alert", "alert", alert)
+			d.logger.DebugContext(d.ctx, "Hanzo O11y Custom Dispatcher: Received alert", "alert", alert)
 
 			// Log errors but keep trying.
 			if err := it.Err(); err != nil {
@@ -510,7 +510,7 @@ func (ag *aggrGroup) flush(notify func(...*types.Alert) bool) {
 	}
 }
 
-// unlimitedLimits provides unlimited aggregation groups for SigNoz
+// unlimitedLimits provides unlimited aggregation groups for Hanzo O11y
 type unlimitedLimits struct{}
 
 func (u *unlimitedLimits) MaxNumberOfAggregationGroups() int { return 0 }

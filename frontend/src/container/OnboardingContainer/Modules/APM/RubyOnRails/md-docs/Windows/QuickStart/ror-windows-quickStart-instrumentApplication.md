@@ -1,4 +1,4 @@
-### Send traces directly to SigNoz Cloud
+### Send traces directly to Hanzo O11y Cloud
 
 **Step 1. Install dependencies**
 
@@ -43,8 +43,8 @@ OpenTelemetry::SDK.configure do |c|
   c.add_span_processor(
     OpenTelemetry::SDK::Trace::Export::BatchSpanProcessor.new(
       OpenTelemetry::Exporter::OTLP::Exporter.new(
-        endpoint: '<SIGNOZ_URL>',
-        headers: { 'signoz-ingestion-key' => '{{SIGNOZ_INGESTION_KEY}}' } 
+        endpoint: '<HANZO_URL>',
+        headers: { 'signoz-ingestion-key' => '{{HANZO_INGESTION_KEY}}' } 
       )
     )
   )

@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	"github.com/SigNoz/signoz/pkg/query-service/metrics"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	"github.com/hanzoai/o11y/pkg/query-service/metrics"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"go.uber.org/zap"
 )
 

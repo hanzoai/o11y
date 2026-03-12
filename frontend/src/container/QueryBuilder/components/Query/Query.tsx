@@ -383,7 +383,7 @@ export const Query = memo(function Query({
 															Select Aggregate Operator
 															<Typography.Link
 																className="learn-more"
-																href="https://signoz.io/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#aggregation"
+																href="https://o11y.hanzo.ai/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#aggregation"
 																target="_blank"
 																style={{ textDecoration: 'underline' }}
 															>
@@ -422,7 +422,7 @@ export const Query = memo(function Query({
 																Select Aggregate Operator
 																<Typography.Link
 																	className="learn-more"
-																	href="https://signoz.io/docs/metrics-management/types-and-aggregation/?utm_source=product&utm_medium=query-builder#aggregation"
+																	href="https://o11y.hanzo.ai/docs/metrics-management/types-and-aggregation/?utm_source=product&utm_medium=query-builder#aggregation"
 																	target="_blank"
 																	style={{ textDecoration: 'underline' }}
 																>
@@ -482,7 +482,7 @@ export const Query = memo(function Query({
 											<div style={{ textAlign: 'center' }}>
 												Select Aggregate Operator
 												<Typography.Link
-													href="https://signoz.io/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#aggregation"
+													href="https://o11y.hanzo.ai/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#aggregation"
 													target="_blank"
 													style={{ textDecoration: 'underline' }}
 												>
@@ -601,7 +601,7 @@ export const Query = memo(function Query({
 										Name of legend
 										<Typography.Link
 											style={{ textDecoration: 'underline' }}
-											href="https://signoz.io/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#legend-format"
+											href="https://o11y.hanzo.ai/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#legend-format"
 											target="_blank"
 										>
 											{' '}

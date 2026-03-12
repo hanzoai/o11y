@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	schema "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
-	"github.com/SigNoz/signoz/pkg/errors"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	schema "github.com/hanzoai/o11y-otel-collector/cmd/o11yschemamigrator/schema_migrator"
+	"github.com/hanzoai/o11y/pkg/errors"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/huandu/go-sqlbuilder"
 	"golang.org/x/exp/maps"
 )

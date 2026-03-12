@@ -46,7 +46,7 @@ helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm
 
 
 
-Below is an example targeting the SigNoz backend with Azure Monitor receivers configured:
+Below is an example targeting the Hanzo O11y backend with Azure Monitor receivers configured:
 
 ```yaml
 service:
@@ -88,11 +88,11 @@ processors:
   batch: {}
 exporters:
   otlp:
-    endpoint: "ingest.{{REGION}}.signoz.cloud:443"
+    endpoint: "ingest.{{REGION}}.o11y.hanzo.ai:443"
     tls:
       insecure: false
     headers:
-      "signoz-ingestion-key": "{{SIGNOZ_INGESTION_KEY}}"
+      "signoz-ingestion-key": "{{HANZO_INGESTION_KEY}}"
 ```
 
 &nbsp;

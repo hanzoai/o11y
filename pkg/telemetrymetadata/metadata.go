@@ -6,18 +6,18 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/querybuilder"
-	"github.com/SigNoz/signoz/pkg/telemetrylogs"
-	"github.com/SigNoz/signoz/pkg/telemetrymetrics"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/telemetrytraces"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	"github.com/SigNoz/signoz/pkg/types/instrumentationtypes"
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/huandu/go-sqlbuilder"
 	"golang.org/x/exp/maps"
 )
@@ -79,7 +79,7 @@ func NewTelemetryMetaStore(
 	relatedMetadataDBName string,
 	relatedMetadataTblName string,
 ) telemetrytypes.MetadataStore {
-	metadataSettings := factory.NewScopedProviderSettings(settings, "github.com/SigNoz/signoz/pkg/telemetrymetadata")
+	metadataSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/telemetrymetadata")
 
 	t := &telemetryMetaStore{
 		logger:                    metadataSettings.Logger(),

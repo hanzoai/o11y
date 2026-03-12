@@ -1,9 +1,9 @@
 package v4
 
 import (
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
 )
 
 // if the field is timestamp/id/value we don't need to enrich
@@ -13,7 +13,7 @@ import (
 // but the query should work regardless and shouldn't fail
 func isEnriched(field v3.AttributeKey) bool {
 	// if it is timestamp/id dont check
-	if field.Key == "timestamp" || field.Key == constants.SigNozOrderByValue {
+	if field.Key == "timestamp" || field.Key == constants.Hanzo O11yOrderByValue {
 		return true
 	}
 

@@ -4,18 +4,18 @@ import (
 	"context"
 	"slices"
 
-	"github.com/SigNoz/signoz/pkg/analytics"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/modules/dashboard"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/queryparser"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/dashboardtypes"
-	"github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/analytics"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/dashboard"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/queryparser"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
+	"github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type module struct {
@@ -27,7 +27,7 @@ type module struct {
 }
 
 func NewModule(store dashboardtypes.Store, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser) dashboard.Module {
-	scopedProviderSettings := factory.NewScopedProviderSettings(settings, "github.com/SigNoz/signoz/pkg/modules/dashboard/impldashboard")
+	scopedProviderSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard")
 	return &module{
 		store:       store,
 		settings:    scopedProviderSettings,

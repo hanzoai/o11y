@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
 )
 
 // rowsWithHooks wraps driver.Rows and defers AfterQuery hooks until Close(),

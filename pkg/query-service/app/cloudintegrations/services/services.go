@@ -9,9 +9,9 @@ import (
 	"path"
 	"sort"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/query-service/app/integrations"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
 	koanfJson "github.com/knadh/koanf/parsers/json"
 	"golang.org/x/exp/maps"
 )

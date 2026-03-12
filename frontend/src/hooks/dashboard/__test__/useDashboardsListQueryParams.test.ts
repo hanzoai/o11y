@@ -109,7 +109,7 @@ describe('useDashboardsListQueryParams', () => {
 				columnKey: 'createdAt',
 				order: 'ascend',
 				page: '2',
-				search: 'signoz',
+				search: 'o11y',
 			};
 
 			act(() => {
@@ -168,7 +168,7 @@ describe('useDashboardsListQueryParams', () => {
 				columnKey: 'updatedAt',
 				order: 'descend',
 				page: '1',
-				search: 'signoz',
+				search: 'o11y',
 			};
 
 			act(() => {

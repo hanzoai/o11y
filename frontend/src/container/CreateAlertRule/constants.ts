@@ -8,33 +8,33 @@ export const ALERT_TYPE_URL_MAP: Record<
 > = {
 	[AlertTypes.METRICS_BASED_ALERT]: {
 		selection:
-			'https://signoz.io/docs/alerts-management/metrics-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples',
+			'https://o11y.hanzo.ai/docs/alerts-management/metrics-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples',
 		creation:
-			'https://signoz.io/docs/alerts-management/metrics-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
+			'https://o11y.hanzo.ai/docs/alerts-management/metrics-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
 	},
 	[AlertTypes.LOGS_BASED_ALERT]: {
 		selection:
-			'https://signoz.io/docs/alerts-management/log-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples',
+			'https://o11y.hanzo.ai/docs/alerts-management/log-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples',
 		creation:
-			'https://signoz.io/docs/alerts-management/log-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
+			'https://o11y.hanzo.ai/docs/alerts-management/log-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
 	},
 	[AlertTypes.TRACES_BASED_ALERT]: {
 		selection:
-			'https://signoz.io/docs/alerts-management/trace-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples',
+			'https://o11y.hanzo.ai/docs/alerts-management/trace-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples',
 		creation:
-			'https://signoz.io/docs/alerts-management/trace-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
+			'https://o11y.hanzo.ai/docs/alerts-management/trace-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
 	},
 	[AlertTypes.EXCEPTIONS_BASED_ALERT]: {
 		selection:
-			'https://signoz.io/docs/alerts-management/exceptions-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples',
+			'https://o11y.hanzo.ai/docs/alerts-management/exceptions-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples',
 		creation:
-			'https://signoz.io/docs/alerts-management/exceptions-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
+			'https://o11y.hanzo.ai/docs/alerts-management/exceptions-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
 	},
 	[AlertTypes.ANOMALY_BASED_ALERT]: {
 		selection:
-			'https://signoz.io/docs/alerts-management/anomaly-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples',
+			'https://o11y.hanzo.ai/docs/alerts-management/anomaly-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples',
 		creation:
-			'https://signoz.io/docs/alerts-management/anomaly-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
+			'https://o11y.hanzo.ai/docs/alerts-management/anomaly-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
 	},
 };
 

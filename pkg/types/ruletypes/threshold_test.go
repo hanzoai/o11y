@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
 func TestBasicRuleThresholdEval_UnitConversion(t *testing.T) {

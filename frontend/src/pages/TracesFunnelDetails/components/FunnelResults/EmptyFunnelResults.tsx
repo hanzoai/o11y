@@ -18,7 +18,7 @@ function EmptyFunnelResults({
 				<div className="empty-funnel-results__title">{title}</div>
 				<div className="empty-funnel-results__description">{description}</div>
 				<div className="empty-funnel-results__learn-more">
-					<LearnMore url="https://signoz.io/blog/tracing-funnels-observability-distributed-systems/" />
+					<LearnMore url="https://o11y.hanzo.ai/blog/tracing-funnels-observability-distributed-systems/" />
 				</div>
 			</div>
 		</div>

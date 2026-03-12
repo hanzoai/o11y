@@ -1,6 +1,6 @@
 # Provider
 
-SigNoz is built on the provider pattern, a design approach where code is organized into providers that handle specific application responsibilities. Providers act as adapter components that integrate with external services and deliver required functionality to the application.
+Hanzo O11y is built on the provider pattern, a design approach where code is organized into providers that handle specific application responsibilities. Providers act as adapter components that integrate with external services and deliver required functionality to the application.
 
 > 💡 **Note**: Coming from a DDD background? Providers are similar (not exactly the same) to adapter/infrastructure services.
 
@@ -59,16 +59,16 @@ func NewMyProviderFactories() factory.NamedMap[factory.ProviderFactory[myprovide
 }
 ```
 
-3. Instantiate the provider by adding it to the `SigNoz` struct in `pkg/signoz/signoz.go`:
+3. Instantiate the provider by adding it to the `Hanzo O11y` struct in `pkg/signoz/signoz.go`:
 
 ```go
-type SigNoz struct {
+type Hanzo O11y struct {
     ...
     MyProvider myprovider.MyProvider
     ...
 }
 
-func New(...) (*SigNoz, error) {
+func New(...) (*Hanzo O11y, error) {
     ...
     myprovider, err := myproviderone.New(ctx, settings, config.MyProvider, "one/two")
     if err != nil {
@@ -83,7 +83,7 @@ func New(...) (*SigNoz, error) {
 To use a provider, import its interface. For example, to use the prometheus provider, import `pkg/prometheus/prometheus.go`:
 
 ```go
-import "github.com/SigNoz/signoz/pkg/prometheus/prometheus"
+import "github.com/Hanzo O11y/signoz/pkg/prometheus/prometheus"
 
 func CreateSomething(ctx context.Context, prometheus prometheus.Prometheus) {
     ...
@@ -94,7 +94,7 @@ func CreateSomething(ctx context.Context, prometheus prometheus.Prometheus) {
 
 ## Why do we need this?
 
-Like any dependency injection framework, providers decouple the codebase from implementation details. This is especially valuable in SigNoz's large codebase, where we need to swap implementations without changing dependent code. The provider pattern offers several benefits apart from the obvious one of decoupling:
+Like any dependency injection framework, providers decouple the codebase from implementation details. This is especially valuable in Hanzo O11y's large codebase, where we need to swap implementations without changing dependent code. The provider pattern offers several benefits apart from the obvious one of decoupling:
 
 - Configuration is **defined with each provider and centralized in one place**, making it easier to understand and manage through various methods (environment variables, config files, etc.)
 - Provider mocking is **straightforward for unit testing**, with a consistent pattern for locating mocks

@@ -1,8 +1,8 @@
 package configtest
 
 import (
-	"github.com/SigNoz/signoz/pkg/config"
-	"github.com/SigNoz/signoz/pkg/config/envprovider"
+	"github.com/hanzoai/o11y/pkg/config"
+	"github.com/hanzoai/o11y/pkg/config/envprovider"
 )
 
 func NewResolverConfig() config.ResolverConfig {

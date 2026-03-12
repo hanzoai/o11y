@@ -1,6 +1,6 @@
 # Flagger
 
-Flagger is SigNoz's feature flagging system built on top of the [OpenFeature](https://openfeature.dev/) standard. It provides a unified interface for evaluating feature flags across the application, allowing features to be enabled, disabled, or configured dynamically without code changes.
+Flagger is Hanzo O11y's feature flagging system built on top of the [OpenFeature](https://openfeature.dev/) standard. It provides a unified interface for evaluating feature flags across the application, allowing features to be enabled, disabled, or configured dynamically without code changes.
 
 > 💡 **Note**: OpenFeature is a CNCF project that provides a vendor-agnostic feature flagging API, making it easy to switch providers without changing application code.
 
@@ -77,8 +77,8 @@ Use the `Flagger` interface to evaluate feature flags. The interface provides ty
 
 ```go
 import (
-    "github.com/SigNoz/signoz/pkg/flagger"
-    "github.com/SigNoz/signoz/pkg/types/featuretypes"
+    "github.com/Hanzo O11y/signoz/pkg/flagger"
+    "github.com/Hanzo O11y/signoz/pkg/types/featuretypes"
 )
 
 func DoSomething(ctx context.Context, flagger flagger.Flagger) error {

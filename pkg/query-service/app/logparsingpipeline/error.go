@@ -1,6 +1,6 @@
 package logparsingpipeline
 
-import "github.com/SigNoz/signoz/pkg/errors"
+import "github.com/hanzoai/o11y/pkg/errors"
 
 var (
 	CodeInvalidOperatorType       = errors.MustNewCode("operator_type_mismatch")

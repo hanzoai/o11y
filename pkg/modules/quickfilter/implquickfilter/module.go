@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/modules/quickfilter"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/types/quickfiltertypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/modules/quickfilter"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/types/quickfiltertypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type module struct {

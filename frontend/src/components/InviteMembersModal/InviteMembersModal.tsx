@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { Callout } from '@signozhq/callout';
-import { Style } from '@signozhq/design-tokens';
-import { DialogFooter, DialogWrapper } from '@signozhq/dialog';
-import { ChevronDown, CircleAlert, Plus, Trash2, X } from '@signozhq/icons';
-import { Input } from '@signozhq/input';
-import { toast } from '@signozhq/sonner';
+import { Button } from '@hanzo/o11y-button';
+import { Callout } from '@hanzo/o11y-callout';
+import { Style } from '@hanzo/o11y-design-tokens';
+import { DialogFooter, DialogWrapper } from '@hanzo/o11y-dialog';
+import { ChevronDown, CircleAlert, Plus, Trash2, X } from '@hanzo/o11y-icons';
+import { Input } from '@hanzo/o11y-input';
+import { toast } from '@hanzo/o11y-sonner';
 import { Select } from 'antd';
 import inviteUsers from 'api/v1/invite/bulk/create';
 import sendInvite from 'api/v1/invite/create';
@@ -250,7 +250,7 @@ function InviteMembersModal({
 									<div className="team-member-cell email-cell">
 										<Input
 											type="email"
-											placeholder="john@signoz.io"
+											placeholder="john@o11y.hanzo.ai"
 											value={row.email}
 											onChange={(e): void => updateEmail(row.id, e.target.value)}
 											className="team-member-email-input"

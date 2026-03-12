@@ -35,12 +35,12 @@ export const externalCallErrorPercent = ({
 	dotMetricsEnabled,
 }: ExternalCallDurationByAddressProps): QueryBuilderData => {
 	const autocompleteDataA: BaseAutocompleteData = {
-		key: WidgetKeys.SignozExternalCallLatencyCount,
+		key: WidgetKeys.O11yExternalCallLatencyCount,
 		dataType: DataTypes.Float64,
 		type: '',
 	};
 	const autocompleteDataB: BaseAutocompleteData = {
-		key: WidgetKeys.SignozExternalCallLatencyCount,
+		key: WidgetKeys.O11yExternalCallLatencyCount,
 		dataType: DataTypes.Float64,
 		type: '',
 	};
@@ -124,12 +124,12 @@ export const externalCallDuration = ({
 }: ExternalCallProps): QueryBuilderData => {
 	const autocompleteDataA: BaseAutocompleteData = {
 		dataType: DataTypes.Float64,
-		key: WidgetKeys.SignozExternalCallLatencySum,
+		key: WidgetKeys.O11yExternalCallLatencySum,
 		type: '',
 	};
 	const autocompleteDataB: BaseAutocompleteData = {
 		dataType: DataTypes.Float64,
-		key: WidgetKeys.SignozExternalCallLatencyCount,
+		key: WidgetKeys.O11yExternalCallLatencyCount,
 		type: '',
 	};
 	const expressions = [FORMULA.DATABASE_CALLS_AVG_DURATION];
@@ -188,7 +188,7 @@ export const externalCallRpsByAddress = ({
 	const autocompleteData: BaseAutocompleteData[] = [
 		{
 			dataType: DataTypes.Float64,
-			key: WidgetKeys.SignozExternalCallLatencyCount,
+			key: WidgetKeys.O11yExternalCallLatencyCount,
 			type: '',
 		},
 	];
@@ -235,12 +235,12 @@ export const externalCallDurationByAddress = ({
 }: ExternalCallDurationByAddressProps): QueryBuilderData => {
 	const autocompleteDataA: BaseAutocompleteData = {
 		dataType: DataTypes.Float64,
-		key: WidgetKeys.SignozExternalCallLatencySum,
+		key: WidgetKeys.O11yExternalCallLatencySum,
 		type: '',
 	};
 	const autocompleteDataB: BaseAutocompleteData = {
 		dataType: DataTypes.Float64,
-		key: WidgetKeys.SignozExternalCallLatencyCount,
+		key: WidgetKeys.O11yExternalCallLatencyCount,
 		type: '',
 	};
 	const expressions = [FORMULA.DATABASE_CALLS_AVG_DURATION];

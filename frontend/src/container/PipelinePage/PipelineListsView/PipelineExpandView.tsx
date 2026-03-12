@@ -194,7 +194,7 @@ function PipelineExpandView({
 		setActionType(ActionType.AddProcessor);
 
 		logEvent('Logs: Pipelines: Clicked Add New Processor', {
-			source: 'signoz-ui',
+			source: 'observe-ui',
 		});
 	}, [setActionType]);
 

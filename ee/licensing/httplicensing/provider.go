@@ -5,17 +5,17 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/SigNoz/signoz/ee/licensing/licensingstore/sqllicensingstore"
-	"github.com/SigNoz/signoz/pkg/analytics"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types/analyticstypes"
-	"github.com/SigNoz/signoz/pkg/types/licensetypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/ee/licensing/licensingstore/sqllicensingstore"
+	"github.com/hanzoai/o11y/pkg/analytics"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types/analyticstypes"
+	"github.com/hanzoai/o11y/pkg/types/licensetypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/zeus"
 	"github.com/tidwall/gjson"
 )
 
@@ -36,7 +36,7 @@ func NewProviderFactory(store sqlstore.SQLStore, zeus zeus.Zeus, orgGetter organ
 }
 
 func New(ctx context.Context, ps factory.ProviderSettings, config licensing.Config, sqlstore sqlstore.SQLStore, zeus zeus.Zeus, orgGetter organization.Getter, analytics analytics.Analytics) (licensing.Licensing, error) {
-	settings := factory.NewScopedProviderSettings(ps, "github.com/SigNoz/signoz/ee/licensing/httplicensing")
+	settings := factory.NewScopedProviderSettings(ps, "github.com/hanzoai/o11y/ee/licensing/httplicensing")
 	licensestore := sqllicensingstore.New(sqlstore)
 	return &provider{
 		store:     licensestore,

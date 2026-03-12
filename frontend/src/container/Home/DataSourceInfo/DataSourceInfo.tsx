@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Button } from '@signozhq/button';
+import { Button } from '@hanzo/o11y-button';
 import { Skeleton } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { useGetHosts } from 'api/generated/services/zeus';
@@ -13,15 +13,15 @@ import { LicensePlatform } from 'types/api/licensesV3/getActive';
 import { DOCS_LINKS } from '../constants';
 
 function DataSourceInfo({
-	dataSentToSigNoz,
+	dataSentToHanzo O11y,
 	isLoading,
 }: {
-	dataSentToSigNoz: boolean;
+	dataSentToHanzo O11y: boolean;
 	isLoading: boolean;
 }): JSX.Element {
 	const { activeLicense } = useAppContext();
 
-	const notSendingData = !dataSentToSigNoz;
+	const notSendingData = !dataSentToHanzo O11y;
 
 	const isEnabled =
 		activeLicense && activeLicense.platform === LicensePlatform.CLOUD;
@@ -54,13 +54,13 @@ function DataSourceInfo({
 	const renderNotSendingData = (): JSX.Element => (
 		<>
 			<h2 className="welcome-title">
-				Hello there, Welcome to your SigNoz workspace
+				Hello there, Welcome to your Hanzo O11y workspace
 			</h2>
 
 			<p className="welcome-description">
 				You’re not sending any data yet. <br />
-				SigNoz is so much better with your data ⎯ start by sending your telemetry
-				data to SigNoz.
+				Hanzo O11y is so much better with your data ⎯ start by sending your telemetry
+				data to Hanzo O11y.
 			</p>
 
 			<Card className="welcome-card">
@@ -109,7 +109,7 @@ function DataSourceInfo({
 	const renderDataReceived = (): JSX.Element => (
 		<>
 			<h2 className="welcome-title">
-				Hello there, Welcome to your SigNoz workspace
+				Hello there, Welcome to your Hanzo O11y workspace
 			</h2>
 
 			{!isError && hostsData && (
@@ -151,7 +151,7 @@ function DataSourceInfo({
 				</>
 			)}
 
-			{!isLoading && dataSentToSigNoz && renderDataReceived()}
+			{!isLoading && dataSentToHanzo O11y && renderDataReceived()}
 
 			{!isLoading && notSendingData && renderNotSendingData()}
 		</div>

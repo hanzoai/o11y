@@ -1,5 +1,5 @@
 FROM alpine:3.20.3
-LABEL maintainer="signoz"
+LABEL maintainer="hanzoai"
 WORKDIR /root
 
 ARG OS="linux"
@@ -10,10 +10,10 @@ RUN apk update && \
 	rm -rf /var/cache/apk/*
 
 
-COPY ./target/${OS}-${TARGETARCH}/signoz-community /root/signoz
+COPY ./target/${OS}-${TARGETARCH}/o11y-community /root/o11y
 COPY ./templates/email /root/templates
-COPY frontend/build/ /etc/signoz/web/
+COPY frontend/build/ /etc/o11y/web/
 
-RUN chmod 755 /root /root/signoz
+RUN chmod 755 /root /root/o11y
 
-ENTRYPOINT ["./signoz", "server"]
+ENTRYPOINT ["./o11y", "server"]

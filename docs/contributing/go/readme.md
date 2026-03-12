@@ -1,6 +1,6 @@
 # Go
 
-This document provides an overview of contributing to the SigNoz backend written in Go. The SigNoz backend is built with Go, focusing on performance, maintainability, and developer experience. We strive for clean, idiomatic code that follows established Go practices while addressing the unique needs of an observability platform.
+This document provides an overview of contributing to the Hanzo O11y backend written in Go. The Hanzo O11y backend is built with Go, focusing on performance, maintainability, and developer experience. We strive for clean, idiomatic code that follows established Go practices while addressing the unique needs of an observability platform.
 
 We adhere to three primary style guides as our foundation:
 

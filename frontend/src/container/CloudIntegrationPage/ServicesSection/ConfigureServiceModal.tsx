@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { Form, Switch } from 'antd';
-import SignozModal from 'components/SignozModal/SignozModal';
+import O11yModal from 'components/O11yModal/O11yModal';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import {
 	ServiceConfig,
@@ -136,7 +136,7 @@ function ConfigureServiceModal({
 	}, [form, onClose]);
 
 	return (
-		<SignozModal
+		<O11yModal
 			title={
 				<div className="account-settings-modal__title">Configure {serviceName}</div>
 			}
@@ -229,7 +229,7 @@ function ConfigureServiceModal({
 					)}
 				</div>
 			</Form>
-		</SignozModal>
+		</O11yModal>
 	);
 }
 

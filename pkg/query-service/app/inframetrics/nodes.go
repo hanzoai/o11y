@@ -7,16 +7,16 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/query-service/app/metrics/v4/helpers"
-	"github.com/SigNoz/signoz/pkg/query-service/common"
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	"github.com/SigNoz/signoz/pkg/query-service/interfaces"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/postprocess"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	"github.com/SigNoz/signoz/pkg/types/instrumentationtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4/helpers"
+	"github.com/hanzoai/o11y/pkg/query-service/common"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/postprocess"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"golang.org/x/exp/slices"
 )
 
@@ -72,7 +72,7 @@ func (n *NodesRepo) DidSendNodeMetrics(ctx context.Context) (bool, error) {
 	namesStr := "'" + strings.Join(nodeMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(didSendNodeMetricsQuery,
-		constants.SIGNOZ_METRIC_DBNAME, constants.SIGNOZ_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
+		constants.HANZO_METRIC_DBNAME, constants.HANZO_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
 
 	count, err := n.reader.GetCountOfThings(ctx, query)
 	if err != nil {

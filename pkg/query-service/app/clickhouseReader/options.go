@@ -16,19 +16,19 @@ const (
 )
 
 const (
-	defaultTraceDB                 string        = "signoz_traces"
-	defaultOperationsTable         string        = "distributed_signoz_operations"
-	defaultIndexTable              string        = "distributed_signoz_index_v2"
-	defaultLocalIndexTable         string        = "signoz_index_v2"
-	defaultErrorTable              string        = "distributed_signoz_error_index_v2"
+	defaultTraceDB                 string        = "observe_traces"
+	defaultOperationsTable         string        = "distributed_o11y_operations"
+	defaultIndexTable              string        = "distributed_observe_index_v2"
+	defaultLocalIndexTable         string        = "observe_index_v2"
+	defaultErrorTable              string        = "distributed_o11y_error_index_v2"
 	defaultDurationTable           string        = "distributed_durationSort"
 	defaultUsageExplorerTable      string        = "distributed_usage_explorer"
-	defaultSpansTable              string        = "distributed_signoz_spans"
+	defaultSpansTable              string        = "distributed_o11y_spans"
 	defaultDependencyGraphTable    string        = "distributed_dependency_graph_minutes_v2"
 	defaultTopLevelOperationsTable string        = "distributed_top_level_operations"
 	defaultSpanAttributeTableV2    string        = "distributed_tag_attributes_v2"
 	defaultSpanAttributeKeysTable  string        = "distributed_span_attributes_keys"
-	defaultLogsDB                  string        = "signoz_logs"
+	defaultLogsDB                  string        = "observe_logs"
 	defaultLogsTable               string        = "distributed_logs"
 	defaultLogsLocalTable          string        = "logs"
 	defaultLogAttributeKeysTable   string        = "distributed_logs_attribute_keys"
@@ -44,12 +44,12 @@ const (
 	defaultLogsResourceLocalTableV2 string = "logs_v2_resource"
 	defaultLogsResourceTableV2      string = "distributed_logs_v2_resource"
 
-	defaultTraceIndexTableV3    string = "distributed_signoz_index_v3"
-	defaultTraceLocalTableName  string = "signoz_index_v3"
+	defaultTraceIndexTableV3    string = "distributed_observe_index_v3"
+	defaultTraceLocalTableName  string = "observe_index_v3"
 	defaultTraceResourceTableV3 string = "distributed_traces_v3_resource"
 	defaultTraceSummaryTable    string = "distributed_trace_summary"
 
-	defaultMetadataDB    string = "signoz_metadata"
+	defaultMetadataDB    string = "observe_metadata"
 	defaultMetadataTable string = "distributed_attributes_metadata"
 )
 

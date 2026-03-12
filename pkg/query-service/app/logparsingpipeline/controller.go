@@ -7,18 +7,18 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/query-service/agentConf"
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
-	"github.com/SigNoz/signoz/pkg/querybuilder"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/opamptypes"
-	"github.com/SigNoz/signoz/pkg/types/pipelinetypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/opamptypes"
+	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/google/uuid"
 
 	"go.uber.org/zap"
@@ -126,7 +126,7 @@ func (ic *LogParsingPipelineController) ValidatePipelines(ctx context.Context,
 		})
 	}
 
-	sampleLogs := []model.SignozLog{{Body: ""}}
+	sampleLogs := []model.O11yLog{{Body: ""}}
 	_, _, err := SimulatePipelinesProcessing(ctx, gettablePipelines, sampleLogs)
 	return err
 }
@@ -249,11 +249,11 @@ func (ic *LogParsingPipelineController) GetPipelinesByVersion(
 
 type PipelinesPreviewRequest struct {
 	Pipelines []pipelinetypes.GettablePipeline `json:"pipelines"`
-	Logs      []model.SignozLog                `json:"logs"`
+	Logs      []model.O11yLog                `json:"logs"`
 }
 
 type PipelinesPreviewResponse struct {
-	OutputLogs    []model.SignozLog `json:"logs"`
+	OutputLogs    []model.O11yLog `json:"logs"`
 	CollectorLogs []string          `json:"collectorLogs"`
 }
 

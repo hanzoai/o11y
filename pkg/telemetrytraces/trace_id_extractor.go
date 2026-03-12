@@ -3,7 +3,7 @@ package telemetrytraces
 import (
 	"strings"
 
-	grammar "github.com/SigNoz/signoz/pkg/parser/grammar"
+	grammar "github.com/hanzoai/o11y/pkg/parser/grammar"
 	"github.com/antlr4-go/antlr/v4"
 )
 

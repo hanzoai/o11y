@@ -124,7 +124,7 @@ export default function WorkspaceBlocked(): JSX.Element {
 			description: (
 				<Typography>
 					{t('extendTrialMsgPart1')}{' '}
-					<a href="mailto:cloud-support@signoz.io">cloud-support@signoz.io</a>{' '}
+					<a href="mailto:cloud-support@o11y.hanzo.ai">cloud-support@o11y.hanzo.ai</a>{' '}
 					{t('extendTrialMsgPart2')}
 				</Typography>
 			),
@@ -155,8 +155,8 @@ export default function WorkspaceBlocked(): JSX.Element {
 
 	const tabItems: TabsProps['items'] = [
 		{
-			key: 'whyChooseSignoz',
-			label: t('whyChooseSignoz'),
+			key: 'whyChooseO11y',
+			label: t('whyChooseO11y'),
 			children: (
 				<Row align="middle" justify="center">
 					<Col span={12}>
@@ -256,7 +256,7 @@ export default function WorkspaceBlocked(): JSX.Element {
 						>
 							<Collapse
 								items={faqData}
-								defaultActiveKey={['signoz-cloud-vs-community']}
+								defaultActiveKey={['o11y-cloud-vs-community']}
 								onChange={handleCollapseChange}
 							/>
 							{isAdmin && (
@@ -307,7 +307,7 @@ export default function WorkspaceBlocked(): JSX.Element {
 								type="default"
 								shape="round"
 								size="middle"
-								href="mailto:cloud-support@signoz.io"
+								href="mailto:cloud-support@o11y.hanzo.ai"
 								role="button"
 								className="periscope-btn"
 								onClick={handleContactUsClick}

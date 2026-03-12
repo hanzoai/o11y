@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/types/pipelinetypes"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
@@ -350,8 +350,8 @@ func TestPipelineRouterWorksEvenIfFirstOpIsDisabled(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
-			makeTestSignozLog(
+		[]model.O11yLog{
+			makeTestO11yLog(
 				"test log body",
 				map[string]any{
 					"method": "GET",
@@ -414,8 +414,8 @@ func TestPipeCharInAliasDoesntBreakCollectorConfig(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
-			makeTestSignozLog(
+		[]model.O11yLog{
+			makeTestO11yLog(
 				"test log body",
 				map[string]any{
 					"method": "GET",

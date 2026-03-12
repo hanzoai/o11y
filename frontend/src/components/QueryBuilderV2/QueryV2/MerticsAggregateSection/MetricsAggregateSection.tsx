@@ -100,7 +100,7 @@ const MetricsAggregateSection = memo(function MetricsAggregateSection({
 								<Tooltip
 									title={
 										<a
-											href="https://signoz.io/docs/metrics-management/types-and-aggregation/#aggregation"
+											href="https://o11y.hanzo.ai/docs/metrics-management/types-and-aggregation/#aggregation"
 											target="_blank"
 											rel="noopener noreferrer"
 											style={{ color: '#1890ff', textDecoration: 'underline' }}
@@ -131,7 +131,7 @@ const MetricsAggregateSection = memo(function MetricsAggregateSection({
 												Set the time interval for aggregation
 												<br />
 												<a
-													href="https://signoz.io/docs/userguide/query-builder-v5/#time-aggregation-windows"
+													href="https://o11y.hanzo.ai/docs/userguide/query-builder-v5/#time-aggregation-windows"
 													target="_blank"
 													rel="noopener noreferrer"
 													style={{ color: '#1890ff', textDecoration: 'underline' }}
@@ -169,7 +169,7 @@ const MetricsAggregateSection = memo(function MetricsAggregateSection({
 								<Tooltip
 									title={
 										<a
-											href="https://signoz.io/docs/metrics-management/types-and-aggregation/#aggregation"
+											href="https://o11y.hanzo.ai/docs/metrics-management/types-and-aggregation/#aggregation"
 											target="_blank"
 											rel="noopener noreferrer"
 											style={{ color: '#1890ff', textDecoration: 'underline' }}
@@ -254,7 +254,7 @@ const MetricsAggregateSection = memo(function MetricsAggregateSection({
 										Set the time interval for aggregation
 										<br />
 										<a
-											href="https://signoz.io/docs/userguide/query-builder-v5/#time-aggregation-windows"
+											href="https://o11y.hanzo.ai/docs/userguide/query-builder-v5/#time-aggregation-windows"
 											target="_blank"
 											rel="noopener noreferrer"
 											style={{ color: '#1890ff', textDecoration: 'underline' }}

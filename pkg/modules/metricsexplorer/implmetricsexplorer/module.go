@@ -8,23 +8,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/modules/dashboard"
-	"github.com/SigNoz/signoz/pkg/modules/metricsexplorer"
-	"github.com/SigNoz/signoz/pkg/querybuilder"
-	"github.com/SigNoz/signoz/pkg/telemetrymeter"
-	"github.com/SigNoz/signoz/pkg/telemetrymetrics"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	"github.com/SigNoz/signoz/pkg/types/instrumentationtypes"
-	"github.com/SigNoz/signoz/pkg/types/metricsexplorertypes"
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/ruletypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/dashboard"
+	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/telemetrymeter"
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
+	"github.com/hanzoai/o11y/pkg/types/metricsexplorertypes"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	sqlbuilder "github.com/huandu/go-sqlbuilder"
 	"golang.org/x/sync/errgroup"
 )
@@ -839,7 +839,7 @@ func (m *module) fetchMetricsStatsWithSamples(
 	)
 	tsSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, distributedTsTable))
 	tsSB.Where(tsSB.Between("unix_milli", start, end))
-	tsSB.Where("NOT startsWith(metric_name, 'signoz')")
+	tsSB.Where("NOT startsWith(metric_name, 'o11y')")
 	tsSB.Where(tsSB.E("__normalized", normalized))
 	if filterWhereClause != nil {
 		tsSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
@@ -854,7 +854,7 @@ func (m *module) fetchMetricsStatsWithSamples(
 	)
 	samplesSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, samplesTable))
 	samplesSB.Where(samplesSB.Between("unix_milli", req.Start, req.End))
-	samplesSB.Where("NOT startsWith(metric_name, 'signoz')")
+	samplesSB.Where("NOT startsWith(metric_name, 'o11y')")
 
 	ctes := []*sqlbuilder.CTEQueryBuilder{
 		sqlbuilder.CTEQuery("__time_series_counts").As(tsSB),
@@ -865,7 +865,7 @@ func (m *module) fetchMetricsStatsWithSamples(
 		fingerprintSB.Select("fingerprint")
 		fingerprintSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, localTsTable))
 		fingerprintSB.Where(fingerprintSB.Between("unix_milli", start, end))
-		fingerprintSB.Where("NOT startsWith(metric_name, 'signoz')")
+		fingerprintSB.Where("NOT startsWith(metric_name, 'o11y')")
 		fingerprintSB.Where(fingerprintSB.E("__normalized", normalized))
 		fingerprintSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
 		fingerprintSB.GroupBy("fingerprint")
@@ -950,7 +950,7 @@ func (m *module) computeTimeseriesTreemap(ctx context.Context, req *metricsexplo
 	)
 	metricsSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, distributedTsTable))
 	metricsSB.Where(metricsSB.Between("unix_milli", start, end))
-	metricsSB.Where("NOT startsWith(metric_name, 'signoz')")
+	metricsSB.Where("NOT startsWith(metric_name, 'o11y')")
 	metricsSB.Where(metricsSB.E("__normalized", false))
 	if filterWhereClause != nil {
 		metricsSB.WhereClause.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
@@ -1010,7 +1010,7 @@ func (m *module) computeSamplesTreemap(ctx context.Context, req *metricsexplorer
 	metricCandidatesSB := sqlbuilder.NewSelectBuilder()
 	metricCandidatesSB.Select("metric_name")
 	metricCandidatesSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, distributedTsTable))
-	metricCandidatesSB.Where("NOT startsWith(metric_name, 'signoz')")
+	metricCandidatesSB.Where("NOT startsWith(metric_name, 'o11y')")
 	metricCandidatesSB.Where(metricCandidatesSB.E("__normalized", false))
 	metricCandidatesSB.Where(metricCandidatesSB.Between("unix_milli", start, end))
 	if filterWhereClause != nil {
@@ -1043,7 +1043,7 @@ func (m *module) computeSamplesTreemap(ctx context.Context, req *metricsexplorer
 		fingerprintSB.Select("fingerprint")
 		fingerprintSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, localTsTable))
 		fingerprintSB.Where(fingerprintSB.Between("unix_milli", start, end))
-		fingerprintSB.Where("NOT startsWith(metric_name, 'signoz')")
+		fingerprintSB.Where("NOT startsWith(metric_name, 'o11y')")
 		fingerprintSB.Where(fingerprintSB.E("__normalized", false))
 		fingerprintSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
 		fingerprintSB.Where("metric_name GLOBAL IN (SELECT metric_name FROM __metric_candidates)")

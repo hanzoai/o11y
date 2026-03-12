@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Typography } from 'antd';
-import { MetrictypesTypeDTO } from 'api/generated/services/sigNoz.schemas';
+import { MetrictypesTypeDTO } from 'api/generated/services/observe.schemas';
 import {
 	BarChart,
 	BarChart2,

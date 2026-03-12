@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from 'react-query';
 import { CheckCircleOutlined, CloudDownloadOutlined } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import {
 	Alert,
 	Button,
@@ -369,7 +369,7 @@ export default function BillingContainer(): JSX.Element {
 				{t('here')}
 			</Text>
 			{` if your payment information has changed. Email us at `}
-			<Text type="secondary">cloud-support@signoz.io</Text>
+			<Text type="secondary">cloud-support@o11y.hanzo.ai</Text>
 			{` otherwise. Be sure to provide this information immediately to avoid interruption to your service.`}
 		</Typography>
 	);
@@ -560,7 +560,7 @@ export default function BillingContainer(): JSX.Element {
 								<span>
 									{t('checkout_plans')} &nbsp;
 									<a
-										href="https://signoz.io/pricing/"
+										href="https://o11y.hanzo.ai/pricing/"
 										style={{
 											color: '#f99781',
 										}}

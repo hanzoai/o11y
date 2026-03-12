@@ -3,10 +3,10 @@ package noopzeus
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/types/zeustypes"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/types/zeustypes"
+	"github.com/hanzoai/o11y/pkg/zeus"
 )
 
 type provider struct{}

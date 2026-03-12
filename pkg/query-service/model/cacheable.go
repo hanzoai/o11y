@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"maps"
 
-	"github.com/SigNoz/signoz/pkg/types/cachetypes"
+	"github.com/hanzoai/o11y/pkg/types/cachetypes"
 )
 
 type GetWaterfallSpansForTraceWithMetadataCache struct {

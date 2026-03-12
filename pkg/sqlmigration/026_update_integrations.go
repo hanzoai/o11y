@@ -5,10 +5,10 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/migrate"
@@ -365,7 +365,7 @@ func (migration *updateIntegrations) copyOldAwsIntegrationUser(tx bun.IDB, orgID
 	}
 
 	user := &oldUser{}
-	err := tx.NewSelect().Model(user).Where("email = ?", "aws-integration@signoz.io").Scan(context.Background())
+	err := tx.NewSelect().Model(user).Where("email = ?", "aws-integration@observe.hanzo.ai").Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

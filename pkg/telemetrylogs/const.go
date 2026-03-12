@@ -1,9 +1,9 @@
 package telemetrylogs
 
 import (
-	"github.com/SigNoz/signoz-otel-collector/constants"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y-otel-collector/constants"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 const (

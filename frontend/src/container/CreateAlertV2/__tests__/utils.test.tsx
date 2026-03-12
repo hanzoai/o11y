@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { UniversalYAxisUnit } from 'components/YAxisUnitSelector/types';
 import { PostableAlertRuleV2 } from 'types/api/alerts/alertTypesV2';
 

@@ -13,16 +13,16 @@ interface FooterItem {
 const footerItems: FooterItem[] = [
 	{
 		text: 'All systems operational',
-		url: 'https://status.signoz.io/',
+		url: 'https://status.o11y.hanzo.ai/',
 		statusIndicator: true,
 	},
 	{
 		text: 'Privacy',
-		url: 'https://www.signoz.io/privacy',
+		url: 'https://www.o11y.hanzo.ai/privacy',
 	},
 	{
 		text: 'Security',
-		url: 'https://www.signoz.io/security',
+		url: 'https://www.o11y.hanzo.ai/security',
 	},
 ];
 

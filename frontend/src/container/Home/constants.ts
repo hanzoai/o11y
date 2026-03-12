@@ -16,14 +16,14 @@ export const checkListStepToPreferenceKeyMap = {
 };
 
 export const DOCS_LINKS = {
-	ADD_DATA_SOURCE: 'https://signoz.io/docs/instrumentation/overview/',
-	SEND_LOGS: 'https://signoz.io/docs/userguide/logs/',
-	SEND_TRACES: 'https://signoz.io/docs/userguide/traces/',
-	SEND_METRICS: 'https://signoz.io/docs/metrics-management/metrics-explorer/',
-	SETUP_ALERTS: 'https://signoz.io/docs/userguide/alerts-management/',
+	ADD_DATA_SOURCE: 'https://o11y.hanzo.ai/docs/instrumentation/overview/',
+	SEND_LOGS: 'https://o11y.hanzo.ai/docs/userguide/logs/',
+	SEND_TRACES: 'https://o11y.hanzo.ai/docs/userguide/traces/',
+	SEND_METRICS: 'https://o11y.hanzo.ai/docs/metrics-management/metrics-explorer/',
+	SETUP_ALERTS: 'https://o11y.hanzo.ai/docs/userguide/alerts-management/',
 	SETUP_SAVED_VIEWS:
-		'https://signoz.io/docs/product-features/saved-view/#step-2-save-your-view',
-	SETUP_DASHBOARDS: 'https://signoz.io/docs/userguide/manage-dashboards/',
+		'https://o11y.hanzo.ai/docs/product-features/saved-view/#step-2-save-your-view',
+	SETUP_DASHBOARDS: 'https://o11y.hanzo.ai/docs/userguide/manage-dashboards/',
 };
 
 export const defaultChecklistItemsState: ChecklistItem[] = [
@@ -51,7 +51,7 @@ export const defaultChecklistItemsState: ChecklistItem[] = [
 		id: 'SEND_LOGS',
 		title: 'Send your logs',
 		description:
-			'Send your logs to SigNoz to get more visibility into how your resources interact.',
+			'Send your logs to Hanzo O11y to get more visibility into how your resources interact.',
 		completed: false,
 		isSkipped: false,
 		isSkippable: true,
@@ -63,7 +63,7 @@ export const defaultChecklistItemsState: ChecklistItem[] = [
 		id: 'SEND_TRACES',
 		title: 'Send your traces',
 		description:
-			'Send your traces to SigNoz to get more visibility into how your resources interact.',
+			'Send your traces to Hanzo O11y to get more visibility into how your resources interact.',
 		completed: false,
 		isSkipped: false,
 		isSkippable: true,
@@ -75,7 +75,7 @@ export const defaultChecklistItemsState: ChecklistItem[] = [
 		id: 'SEND_METRICS',
 		title: 'Send your metrics',
 		description:
-			'Send your metrics to SigNoz to get more visibility into how your resources interact.',
+			'Send your metrics to Hanzo O11y to get more visibility into how your resources interact.',
 		completed: false,
 		isSkipped: false,
 		isSkippable: true,

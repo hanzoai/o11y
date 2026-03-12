@@ -1,6 +1,6 @@
 package authtypes
 
-import "github.com/SigNoz/signoz/pkg/valuer"
+import "github.com/hanzoai/o11y/pkg/valuer"
 
 func NewSubject(subjectType Typeable, selector string, orgID valuer.UUID, relation *Relation) (string, error) {
 	if relation == nil {

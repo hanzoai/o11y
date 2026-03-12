@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for SigNoz
+ * * The file has been auto-generated using Orval for Hanzo O11y
  * * regenerate with 'yarn generate:api'
- * SigNoz
+ * Hanzo O11y
  */
 import type {
 	InvalidateOptions,
@@ -19,7 +19,7 @@ import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type {
 	GetGlobalConfig200,
 	RenderErrorResponseDTO,
-} from '../sigNoz.schemas';
+} from '../observe.schemas';
 
 /**
  * This endpoint returns global config

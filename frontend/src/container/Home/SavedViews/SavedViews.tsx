@@ -192,7 +192,7 @@ export default function SavedViews({
 								});
 
 								window.open(
-									'https://signoz.io/docs/product-features/saved-view/',
+									'https://o11y.hanzo.ai/docs/product-features/saved-view/',
 									'_blank',
 									'noopener noreferrer',
 								);

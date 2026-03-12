@@ -25,12 +25,12 @@ function ApDexMetricsApplication({
 		featureFlags?.find((flag) => flag.name === FeatureKeys.DOT_METRICS_ENABLED)
 			?.active || false;
 
-	const signozLatencyBucketMetrics = dotMetricsEnabled
-		? WidgetKeys.Signoz_latency_bucket
-		: WidgetKeys.Signoz_latency_bucket_norm;
+	const o11yLatencyBucketMetrics = dotMetricsEnabled
+		? WidgetKeys.O11y_latency_bucket
+		: WidgetKeys.O11y_latency_bucket_norm;
 
 	const { data, isLoading, error } = useGetMetricMeta(
-		signozLatencyBucketMetrics,
+		o11yLatencyBucketMetrics,
 		servicename,
 	);
 	useErrorNotification(error);

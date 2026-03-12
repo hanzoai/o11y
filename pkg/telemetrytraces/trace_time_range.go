@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	"github.com/SigNoz/signoz/pkg/types/instrumentationtypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 type TraceTimeRangeFinder struct {
