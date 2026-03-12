@@ -1,5 +1,5 @@
 import { orange } from '@ant-design/colors';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { LogType } from 'components/Logs/LogStateIndicator/LogStateIndicator';
 
 export const getDefaultLogBackground = (

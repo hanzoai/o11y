@@ -3,8 +3,8 @@ import { CloudAccount } from 'container/CloudIntegrationPage/ServicesSection/typ
 export interface ConnectionParams {
 	ingestion_url?: string;
 	ingestion_key?: string;
-	signoz_api_url?: string;
-	signoz_api_key?: string;
+	observe_api_url?: string;
+	observe_api_key?: string;
 }
 
 export interface GenerateConnectionUrlPayload {

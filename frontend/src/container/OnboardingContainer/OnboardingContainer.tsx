@@ -143,7 +143,7 @@ export default function Onboarding(): JSX.Element {
 			};
 
 			updateIngestionData({
-				SIGNOZ_INGESTION_KEY: payload?.ingestionKey,
+				HANZO_INGESTION_KEY: payload?.ingestionKey,
 				REGION: payload?.dataRegion,
 			});
 		}

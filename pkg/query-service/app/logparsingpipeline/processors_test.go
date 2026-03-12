@@ -9,10 +9,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
-	"github.com/SigNoz/signoz/pkg/types/pipelinetypes"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	"github.com/stretchr/testify/require"
 )
 
@@ -65,7 +65,7 @@ func TestRegexProcessor(t *testing.T) {
 	testPipelines[0].Config = append(testPipelines[0].Config, parserOp)
 
 	testPan := "GDTSJ4756E"
-	testLog := makeTestSignozLog(
+	testLog := makeTestO11yLog(
 		fmt.Sprintf("test string with PAN: %s and some more text", testPan),
 		map[string]interface{}{
 			"method": "GET",
@@ -75,7 +75,7 @@ func TestRegexProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			testLog,
 		},
 	)
@@ -132,7 +132,7 @@ func TestGrokProcessor(t *testing.T) {
 	testPipelines[0].Config = append(testPipelines[0].Config, parserOp)
 
 	testStatusCode := int64(404)
-	testLog := makeTestSignozLog(
+	testLog := makeTestO11yLog(
 		fmt.Sprintf("some http log with status: %d and some more text", testStatusCode),
 		map[string]interface{}{
 			"method": "GET",
@@ -142,7 +142,7 @@ func TestGrokProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			testLog,
 		},
 	)
@@ -197,7 +197,7 @@ func TestJSONProcessor(t *testing.T) {
 	require.Nil(err)
 	testPipelines[0].Config = append(testPipelines[0].Config, parserOp)
 
-	testLog := makeTestSignozLog(
+	testLog := makeTestO11yLog(
 		`{"test_str": "value", "test_float": 1.1}`,
 		map[string]interface{}{
 			"method": "GET",
@@ -207,7 +207,7 @@ func TestJSONProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			testLog,
 		},
 	)
@@ -280,7 +280,7 @@ func TestTraceParsingProcessor(t *testing.T) {
 	testTraceFlags, err := utils.RandomHex(1)
 	require.Nil(err)
 
-	testLog := model.SignozLog{
+	testLog := model.O11yLog{
 		Timestamp: uint64(time.Now().UnixNano()),
 		Body:      "test log",
 		Attributes_string: map[string]string{
@@ -297,7 +297,7 @@ func TestTraceParsingProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			testLog,
 		},
 	)
@@ -318,7 +318,7 @@ func TestTraceParsingProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err = SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			testLog,
 		},
 	)
@@ -372,7 +372,7 @@ func TestAddProcessor(t *testing.T) {
 	require.Nil(err)
 	testPipelines[0].Config = append(testPipelines[0].Config, parserOp)
 
-	testLog := makeTestSignozLog(
+	testLog := makeTestO11yLog(
 		"test log",
 		map[string]interface{}{
 			"method": "GET",
@@ -382,7 +382,7 @@ func TestAddProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			testLog,
 		},
 	)
@@ -436,7 +436,7 @@ func TestRemoveProcessor(t *testing.T) {
 	require.Nil(err)
 	testPipelines[0].Config = append(testPipelines[0].Config, parserOp)
 
-	testLog := makeTestSignozLog(
+	testLog := makeTestO11yLog(
 		"test log",
 		map[string]interface{}{
 			"method": "GET",
@@ -446,7 +446,7 @@ func TestRemoveProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			testLog,
 		},
 	)
@@ -502,7 +502,7 @@ func TestCopyProcessor(t *testing.T) {
 	require.Nil(err)
 	testPipelines[0].Config = append(testPipelines[0].Config, parserOp)
 
-	testLog := makeTestSignozLog(
+	testLog := makeTestO11yLog(
 		"test log",
 		map[string]interface{}{
 			"method": "GET",
@@ -512,7 +512,7 @@ func TestCopyProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			testLog,
 		},
 	)
@@ -568,7 +568,7 @@ func TestMoveProcessor(t *testing.T) {
 	require.Nil(err)
 	testPipelines[0].Config = append(testPipelines[0].Config, parserOp)
 
-	testLog := makeTestSignozLog(
+	testLog := makeTestO11yLog(
 		"test log",
 		map[string]interface{}{
 			"method": "GET",
@@ -578,7 +578,7 @@ func TestMoveProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			testLog,
 		},
 	)

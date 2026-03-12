@@ -3,9 +3,9 @@ package telemetrytraces
 import (
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/instrumentation/instrumentationtest"
-	"github.com/SigNoz/signoz/pkg/querybuilder"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/huandu/go-sqlbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -32,13 +32,13 @@ func TestSpanScopeFilterExpression(t *testing.T) {
 		{
 			name:              "simple isentrypoint filter (unbounded)",
 			expression:        "isentrypoint = true",
-			expectedCondition: "((name, resource_string_service$$name) GLOBAL IN (SELECT DISTINCT name, serviceName from signoz_traces.distributed_top_level_operations)) AND parent_span_id != ''",
+			expectedCondition: "((name, resource_string_service$$name) GLOBAL IN (SELECT DISTINCT name, serviceName from observe_traces.distributed_top_level_operations)) AND parent_span_id != ''",
 			startNs:           0,
 		},
 		{
 			name:              "simple isentrypoint filter (bounded)",
 			expression:        "isentrypoint = true",
-			expectedCondition: "((name, resource_string_service$$name) GLOBAL IN (SELECT DISTINCT name, serviceName from signoz_traces.distributed_top_level_operations WHERE time >= toDateTime(1761437108))) AND parent_span_id != ''",
+			expectedCondition: "((name, resource_string_service$$name) GLOBAL IN (SELECT DISTINCT name, serviceName from observe_traces.distributed_top_level_operations WHERE time >= toDateTime(1761437108))) AND parent_span_id != ''",
 			startNs:           1761437108000000000,
 		},
 		{
@@ -50,7 +50,7 @@ func TestSpanScopeFilterExpression(t *testing.T) {
 		{
 			name:              "combined filter with OR",
 			expression:        "isentrypoint = true OR has_error = true",
-			expectedCondition: "((name, resource_string_service$$name) GLOBAL IN (SELECT DISTINCT name, serviceName from signoz_traces.distributed_top_level_operations WHERE time >= toDateTime(1761437108))) AND parent_span_id != ''",
+			expectedCondition: "((name, resource_string_service$$name) GLOBAL IN (SELECT DISTINCT name, serviceName from observe_traces.distributed_top_level_operations WHERE time >= toDateTime(1761437108))) AND parent_span_id != ''",
 			startNs:           1761437108000000000,
 		},
 	}

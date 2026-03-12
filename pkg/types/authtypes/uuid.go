@@ -3,7 +3,7 @@ package authtypes
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 type uuidKey struct{}

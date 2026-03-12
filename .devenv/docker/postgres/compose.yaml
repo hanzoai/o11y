@@ -4,7 +4,7 @@ services:
     image: postgres:15
     container_name: postgres
     environment:
-      POSTGRES_DB: signoz
+      POSTGRES_DB: observe
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     healthcheck:
@@ -13,7 +13,7 @@ services:
           "CMD",
           "pg_isready",
           "-d",
-          "signoz",
+          "observe",
           "-U",
           "postgres"
         ]

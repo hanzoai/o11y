@@ -74,7 +74,7 @@ describe('textContainsVariableReference', () => {
 	describe('embedded in larger text', () => {
 		it('finds variable in a multi-line query', () => {
 			const query = `SELECT JSONExtractString(labels, 'k8s_node_name') AS k8s_node_name
-FROM signoz_metrics.distributed_time_series_v4_1day
+FROM observe_metrics.distributed_time_series_v4_1day
 WHERE metric_name = 'k8s_node_cpu_time' AND JSONExtractString(labels, 'k8s_cluster_name') = {{.k8s_cluster_name}}
 GROUP BY k8s_node_name`;
 			expect(textContainsVariableReference(query, 'k8s_cluster_name')).toBe(true);

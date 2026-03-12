@@ -1,11 +1,11 @@
-package signoz
+package o11y
 
 import (
 	"context"
 	"log/slog"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/config/configtest"
+	"github.com/hanzoai/o11y/pkg/config/configtest"
 	"github.com/stretchr/testify/assert"
 )
 

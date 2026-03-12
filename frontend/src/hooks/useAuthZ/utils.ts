@@ -1,4 +1,4 @@
-import { AuthtypesTransactionDTO } from '../../api/generated/services/sigNoz.schemas';
+import { AuthtypesTransactionDTO } from '../../api/generated/services/observe.schemas';
 import permissionsType from './permissions.type';
 import {
 	AuthZObject,

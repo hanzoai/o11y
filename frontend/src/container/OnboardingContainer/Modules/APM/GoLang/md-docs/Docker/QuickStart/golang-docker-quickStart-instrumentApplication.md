@@ -11,7 +11,7 @@ go get go.opentelemetry.io/otel \
   go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc
 ```
 
-**Note:** We are assuming you are using gin request router. If you are using other request routers, check out the [corresponding package](https://signoz.io/docs/instrumentation/golang/#request-routers).
+**Note:** We are assuming you are using gin request router. If you are using other request routers, check out the [corresponding package](https://o11y.hanzo.ai/docs/instrumentation/golang/#request-routers).
 &nbsp;
 &nbsp;
 
@@ -128,8 +128,8 @@ Set the environment variables in your Dockerfile.
 # Set environment variables
 ENV SERVICE_NAME={{MYAPP}} \
     INSECURE_MODE=false \
-    OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key=b{{SIGNOZ_INGESTION_KEY}}" \
-    OTEL_EXPORTER_OTLP_ENDPOINT=ingest.{{REGION}}.signoz.cloud:443
+    OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key=b{{HANZO_INGESTION_KEY}}" \
+    OTEL_EXPORTER_OTLP_ENDPOINT=ingest.{{REGION}}.o11y.hanzo.ai:443
 ...
 ```
 

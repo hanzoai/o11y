@@ -1,11 +1,11 @@
-package signozapiserver
+package o11yapiserver
 
 import (
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/http/handler"
-	"github.com/SigNoz/signoz/pkg/types"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/types"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/gorilla/mux"
 )
 
@@ -369,10 +369,10 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 								"spec": map[string]any{
 									"name": "span_rate",
 									"query": "WITH __resource_filter AS (" +
-										" SELECT fingerprint FROM signoz_traces.distributed_traces_v3_resource" +
+										" SELECT fingerprint FROM observe_traces.distributed_traces_v3_resource" +
 										" WHERE seen_at_ts_bucket_start >= $start_timestamp - 1800 AND seen_at_ts_bucket_start <= $end_timestamp" +
 										" ) SELECT toStartOfInterval(timestamp, INTERVAL 60 SECOND) AS ts, count() AS value" +
-										" FROM signoz_traces.distributed_signoz_index_v3" +
+										" FROM observe_traces.distributed_observe_index_v3" +
 										" WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter)" +
 										" AND timestamp >= $start_datetime AND timestamp <= $end_datetime" +
 										" AND ts_bucket_start >= $start_timestamp - 1800 AND ts_bucket_start <= $end_timestamp" +
@@ -398,10 +398,10 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 								"spec": map[string]any{
 									"name": "recent_errors",
 									"query": "WITH __resource_filter AS (" +
-										" SELECT fingerprint FROM signoz_logs.distributed_logs_v2_resource" +
+										" SELECT fingerprint FROM observe_logs.distributed_logs_v2_resource" +
 										" WHERE seen_at_ts_bucket_start >= $start_timestamp - 1800 AND seen_at_ts_bucket_start <= $end_timestamp" +
 										" ) SELECT timestamp, body" +
-										" FROM signoz_logs.distributed_logs_v2" +
+										" FROM observe_logs.distributed_logs_v2" +
 										" WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter)" +
 										" AND timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano" +
 										" AND ts_bucket_start >= $start_timestamp - 1800 AND ts_bucket_start <= $end_timestamp" +
@@ -428,10 +428,10 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 								"spec": map[string]any{
 									"name": "total_spans",
 									"query": "WITH __resource_filter AS (" +
-										" SELECT fingerprint FROM signoz_traces.distributed_traces_v3_resource" +
+										" SELECT fingerprint FROM observe_traces.distributed_traces_v3_resource" +
 										" WHERE seen_at_ts_bucket_start >= $start_timestamp - 1800 AND seen_at_ts_bucket_start <= $end_timestamp" +
 										" ) SELECT count() AS value" +
-										" FROM signoz_traces.distributed_signoz_index_v3" +
+										" FROM observe_traces.distributed_observe_index_v3" +
 										" WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter)" +
 										" AND timestamp >= $start_datetime AND timestamp <= $end_datetime" +
 										" AND ts_bucket_start >= $start_timestamp - 1800 AND ts_bucket_start <= $end_timestamp",

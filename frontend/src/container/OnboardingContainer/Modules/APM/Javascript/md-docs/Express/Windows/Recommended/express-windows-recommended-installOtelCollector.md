@@ -1,11 +1,11 @@
 **Step 1.** Install OpenTelemetry Collector binary
 
-OTel Collector binary helps to collect logs, hostmetrics, resource and infra attributes. It is recommended to install Otel Collector binary to collect and send traces to SigNoz cloud. You can correlate signals and have rich contextual data through this way.
+OTel Collector binary helps to collect logs, hostmetrics, resource and infra attributes. It is recommended to install Otel Collector binary to collect and send traces to Hanzo O11y cloud. You can correlate signals and have rich contextual data through this way.
 
-You can find instructions to install OTel Collector binary [here](https://signoz.io/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/) in your VM. 
+You can find instructions to install OTel Collector binary [here](https://o11y.hanzo.ai/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/) in your VM. 
 
 While creating the `config.yaml` during the installation fo the OTel Collector Binary, you need to enable CORS under the receivers section of the config file. This is needed so that you don't get 
-CORS error which can hinder sending your Traces to SigNoz Cloud. See the code snippet below to understand how you can enable CORS in your config file:
+CORS error which can hinder sending your Traces to Hanzo O11y Cloud. See the code snippet below to understand how you can enable CORS in your config file:
 
 &nbsp;
 

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Badge } from '@signozhq/badge';
-import { Button } from '@signozhq/button';
-import { DialogFooter, DialogWrapper } from '@signozhq/dialog';
-import { DrawerWrapper } from '@signozhq/drawer';
+import { Badge } from '@hanzo/o11y-badge';
+import { Button } from '@hanzo/o11y-button';
+import { DialogFooter, DialogWrapper } from '@hanzo/o11y-dialog';
+import { DrawerWrapper } from '@hanzo/o11y-drawer';
 import {
 	Check,
 	ChevronDown,
@@ -12,9 +12,9 @@ import {
 	RefreshCw,
 	Trash2,
 	X,
-} from '@signozhq/icons';
-import { Input } from '@signozhq/input';
-import { toast } from '@signozhq/sonner';
+} from '@hanzo/o11y-icons';
+import { Input } from '@hanzo/o11y-input';
+import { toast } from '@hanzo/o11y-sonner';
 import { Select } from 'antd';
 import getResetPasswordToken from 'api/v1/factor_password/getResetPasswordToken';
 import sendInvite from 'api/v1/invite/create';
@@ -444,7 +444,7 @@ function EditMemberDrawer({
 				<div className="reset-link-dialog__content">
 					<p className="reset-link-dialog__description">
 						This creates a one-time link the team member can use to set a new password
-						for their SigNoz account.
+						for their Hanzo O11y account.
 					</p>
 					<div className="reset-link-dialog__link-row">
 						<div className="reset-link-dialog__link-text-wrap">

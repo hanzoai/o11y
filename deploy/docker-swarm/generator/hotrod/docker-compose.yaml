@@ -1,7 +1,7 @@
 version: "3"
 x-common: &common
   networks:
-    - signoz-net
+    - o11y-net
   extra_hosts:
     - host.docker.internal:host-gateway
   logging:
@@ -20,7 +20,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://host.docker.internal:4318  #
   load-hotrod:
     <<: *common
-    image: "signoz/locust:1.2.3"
+    image: "observe/locust:1.2.3"
     environment:
       ATTACKED_HOST: http://hotrod:8080
       LOCUST_MODE: standalone
@@ -33,6 +33,6 @@ services:
       - ../../../common/locust-scripts:/locust
 
 networks:
-  signoz-net:
-    name: signoz-net
+  o11y-net:
+    name: o11y-net
     external: true

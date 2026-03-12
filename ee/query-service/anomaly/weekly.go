@@ -3,9 +3,9 @@ package anomaly
 import (
 	"context"
 
-	querierV2 "github.com/SigNoz/signoz/pkg/query-service/app/querier/v2"
-	"github.com/SigNoz/signoz/pkg/query-service/app/queryBuilder"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	querierV2 "github.com/hanzoai/o11y/pkg/query-service/app/querier/v2"
+	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type WeeklyProvider struct {

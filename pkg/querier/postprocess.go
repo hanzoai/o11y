@@ -8,9 +8,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/SigNoz/govaluate"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/Hanzo O11y/govaluate"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 // queryInfo holds common query properties

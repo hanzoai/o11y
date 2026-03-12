@@ -10,15 +10,15 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 
 	html_template "html/template"
 	text_template "text/template"
 
 	"golang.org/x/text/cases"
 
-	"github.com/SigNoz/signoz/pkg/query-service/common"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/times"
+	"github.com/hanzoai/o11y/pkg/query-service/common"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/times"
 )
 
 // this file contains all the methods and structs

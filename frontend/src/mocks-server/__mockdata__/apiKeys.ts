@@ -1,4 +1,4 @@
-const createdByEmail = 'mando@signoz.io';
+const createdByEmail = 'mando@o11y.hanzo.ai';
 
 export const getAPIKeysResponse = {
 	status: 'success',

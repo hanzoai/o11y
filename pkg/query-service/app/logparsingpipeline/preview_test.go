@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/types/pipelinetypes"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	"github.com/google/uuid"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/entry"
 	"github.com/stretchr/testify/require"
@@ -94,13 +94,13 @@ func TestPipelinePreview(t *testing.T) {
 		},
 	}
 
-	matchingLog := makeTestSignozLog(
+	matchingLog := makeTestO11yLog(
 		"test log body",
 		map[string]interface{}{
 			"method": "GET",
 		},
 	)
-	nonMatchingLog := makeTestSignozLog(
+	nonMatchingLog := makeTestO11yLog(
 		"test log body",
 		map[string]interface{}{
 			"method": "POST",
@@ -110,7 +110,7 @@ func TestPipelinePreview(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			matchingLog,
 			nonMatchingLog,
 		},
@@ -189,7 +189,7 @@ func TestGrokParsingProcessor(t *testing.T) {
 		},
 	}
 
-	testLog := makeTestSignozLog(
+	testLog := makeTestO11yLog(
 		"2023-10-26T04:38:00.602Z INFO route/server.go:71 HTTP request received",
 		map[string]interface{}{
 			"method": "GET",
@@ -198,7 +198,7 @@ func TestGrokParsingProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.SignozLog{
+		[]model.O11yLog{
 			testLog,
 		},
 	)
@@ -212,12 +212,12 @@ func TestGrokParsingProcessor(t *testing.T) {
 	require.Equal("route/server.go:71", processed.Attributes_string["location"])
 }
 
-func makeTestSignozLog(
+func makeTestO11yLog(
 	body string,
 	attributes map[string]interface{},
-) model.SignozLog {
+) model.O11yLog {
 
-	testLog := model.SignozLog{
+	testLog := model.O11yLog{
 		Timestamp:          uint64(time.Now().UnixNano()),
 		Body:               body,
 		Attributes_bool:    map[string]bool{},

@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Form, Select, Switch } from 'antd';
 import { ChevronDown } from 'lucide-react';
 import { Region } from 'utils/regions';
@@ -18,7 +18,7 @@ function RegionDeploymentSection({
 	return (
 		<div className="cloud-account-setup-form__form-group">
 			<div className="cloud-account-setup-form__title">
-				Where should we deploy the SigNoz Cloud stack?
+				Where should we deploy the Hanzo O11y Cloud stack?
 			</div>
 			<div className="cloud-account-setup-form__description">
 				Choose the AWS region for CloudFormation stack deployment
@@ -70,7 +70,7 @@ function MonitoringRegionsSection({
 				Which regions do you want to monitor?
 			</div>
 			<div className="cloud-account-setup-form__description">
-				Choose only the regions you want SigNoz to monitor. You can enable all at
+				Choose only the regions you want Hanzo O11y to monitor. You can enable all at
 				once, or pick specific ones:
 			</div>
 			<Form.Item

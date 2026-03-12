@@ -1,6 +1,6 @@
 ## Create Sidecar Collector Container
 
-This step involves integrating the SigNoz collector into your ECS task definitions as a sidecar container. The sidecar collector container will run alongside your application container(s) within the same ECS task and will collect ECS container metrics and send them to SigNoz Cloud. Follow these steps to create the Sidecar collector container:
+This step involves integrating the Hanzo O11y collector into your ECS task definitions as a sidecar container. The sidecar collector container will run alongside your application container(s) within the same ECS task and will collect ECS container metrics and send them to Hanzo O11y Cloud. Follow these steps to create the Sidecar collector container:
 
 ### Step 1: Update task definition of your application
 
@@ -16,11 +16,11 @@ In your ECS task definition, include a new container definition specifically for
             "image": "signoz/signoz-otel-collector:0.88.13",
             "user": "root",
             "command": [
-                "--config=env:SIGNOZ_CONFIG_CONTENT"
+                "--config=env:HANZO_CONFIG_CONTENT"
             ],
             "secrets": [
                 {
-                "name": "SIGNOZ_CONFIG_CONTENT",
+                "name": "HANZO_CONFIG_CONTENT",
                 "valueFrom": "/ecs/signoz/otelcol-sidecar.yaml"
                 }
             ],
@@ -123,7 +123,7 @@ There are two ways to grant access to the Parameter store:
 
     - AmazonSSMReadOnlyAccess
 
-- **Add Inline Policy for Granular Access:** For tighter security, you might opt to create an inline policy that specifies exactly which resources the tasks can access and what actions they can perform on those resources. This is particularly important for accessing specific resources like the Parameter Store parameters used by the SigNoz sidecar. The JSON for the inline policy will be:
+- **Add Inline Policy for Granular Access:** For tighter security, you might opt to create an inline policy that specifies exactly which resources the tasks can access and what actions they can perform on those resources. This is particularly important for accessing specific resources like the Parameter Store parameters used by the Hanzo O11y sidecar. The JSON for the inline policy will be:
 
 ```json
 {

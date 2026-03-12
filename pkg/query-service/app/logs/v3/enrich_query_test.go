@@ -5,7 +5,7 @@ import (
 	"sort"
 	"testing"
 
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -198,7 +198,7 @@ var testEnrichmentRequiredData = []struct {
 						DataSource: v3.DataSourceLogs,
 						// here we have to fallback to trace_id attribute instead of column
 						GroupBy: []v3.AttributeKey{{Key: "trace_id", DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag}},
-						OrderBy: []v3.OrderBy{{ColumnName: "#SIGNOZ_VALUE", Order: "ASC"}},
+						OrderBy: []v3.OrderBy{{ColumnName: "#HANZO_VALUE", Order: "ASC"}},
 					},
 				},
 			},

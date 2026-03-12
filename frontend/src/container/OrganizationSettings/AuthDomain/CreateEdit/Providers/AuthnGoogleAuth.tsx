@@ -1,14 +1,14 @@
 import { useCallback, useState } from 'react';
-import { Callout } from '@signozhq/callout';
-import { Checkbox } from '@signozhq/checkbox';
-import { Color, Style } from '@signozhq/design-tokens';
+import { Callout } from '@hanzo/o11y-callout';
+import { Checkbox } from '@hanzo/o11y-checkbox';
+import { Color, Style } from '@hanzo/o11y-design-tokens';
 import {
 	ChevronDown,
 	ChevronRight,
 	CircleHelp,
 	TriangleAlert,
-} from '@signozhq/icons';
-import { Input } from '@signozhq/input';
+} from '@hanzo/o11y-icons';
+import { Input } from '@hanzo/o11y-input';
 import { Collapse, Form, Input as AntdInput, Tooltip } from 'antd';
 import { useCollapseSectionErrors } from 'hooks/useCollapseSectionErrors';
 
@@ -64,7 +64,7 @@ function ConfigureGoogleAuthAuthnProvider({
 					Enter OAuth 2.0 credentials obtained from the Google API Console below.
 					Read the{' '}
 					<a
-						href="https://signoz.io/docs/userguide/sso-authentication"
+						href="https://o11y.hanzo.ai/docs/userguide/sso-authentication"
 						target="_blank"
 						rel="noreferrer"
 					>

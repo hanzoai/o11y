@@ -7,7 +7,7 @@ import {
 } from 'types/api/queryBuilder/queryBuilderData';
 
 import { ORDERBY_FILTERS } from './config';
-import { SIGNOZ_VALUE } from './constants';
+import { HANZO_VALUE } from './constants';
 
 export const orderByValueDelimiter = '|';
 
@@ -16,7 +16,7 @@ export const transformToOrderByStringValues = (
 	entityVersion?: string,
 ): IOption[] => {
 	const prepareSelectedValue: IOption[] = query.orderBy.map((item) => {
-		if (item.columnName === SIGNOZ_VALUE) {
+		if (item.columnName === HANZO_VALUE) {
 			return {
 				label: `${
 					entityVersion === 'v4' ? query.spaceAggregation : query.aggregateOperator

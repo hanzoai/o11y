@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
 func Test_buildResourceFilter(t *testing.T) {
@@ -530,7 +530,7 @@ func Test_buildResourceSubQuery(t *testing.T) {
 					Type:     v3.AttributeKeyTypeResource,
 				},
 			},
-			want: "(SELECT fingerprint FROM signoz_logs.distributed_logs_v2_resource WHERE " +
+			want: "(SELECT fingerprint FROM observe_logs.distributed_logs_v2_resource WHERE " +
 				"(seen_at_ts_bucket_start >= 1680064560) AND (seen_at_ts_bucket_start <= 1680066458) AND " +
 				"simpleJSONExtractString(labels, 'service.name') = 'test' AND labels like '%service.name\":\"test%' " +
 				"AND simpleJSONExtractString(lower(labels), 'namespace') LIKE '%test1%' AND lower(labels) like '%namespace%test1%' " +
@@ -541,7 +541,7 @@ func Test_buildResourceSubQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := BuildResourceSubQuery("signoz_logs", "distributed_logs_v2_resource", tt.args.bucketStart, tt.args.bucketEnd, tt.args.fs, tt.args.groupBy, tt.args.aggregateAttribute, false)
+			got, err := BuildResourceSubQuery("observe_logs", "distributed_logs_v2_resource", tt.args.bucketStart, tt.args.bucketEnd, tt.args.fs, tt.args.groupBy, tt.args.aggregateAttribute, false)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("buildResourceSubQuery() error = %v, wantErr %v", err, tt.wantErr)
 				return

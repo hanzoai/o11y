@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Progress, TabsProps, Tag, Tooltip, Typography } from 'antd';
 import { TableColumnType as ColumnType } from 'antd';
 import {
@@ -35,7 +35,7 @@ export interface HostRowData {
 }
 
 const HOSTNAME_DOCS_URL =
-	'https://signoz.io/docs/infrastructure-monitoring/hostmetrics/#host-name-is-blankempty';
+	'https://o11y.hanzo.ai/docs/infrastructure-monitoring/hostmetrics/#host-name-is-blankempty';
 
 export function HostnameCell({
 	hostName,

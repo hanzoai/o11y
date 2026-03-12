@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/o11y-button';
+import { Input } from '@hanzo/o11y-input';
 import {
 	RadioGroup,
 	RadioGroupItem,
 	RadioGroupLabel,
-} from '@signozhq/radio-group';
+} from '@hanzo/o11y-radio-group';
 import { Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { ArrowRight } from 'lucide-react';
@@ -131,7 +131,7 @@ function OrgQuestions({ orgDetails, onNext }: OrgQuestionsProps): JSX.Element {
 			<div className="onboarding-header-section">
 				<div className="onboarding-header-icon">🎉</div>
 				<Typography.Title level={4} className="onboarding-header-title">
-					Welcome to SigNoz Cloud
+					Welcome to Hanzo O11y Cloud
 				</Typography.Title>
 				<Typography.Paragraph className="onboarding-header-subtitle">
 					Let&apos;s get you started
@@ -185,7 +185,7 @@ function OrgQuestions({ orgDetails, onNext }: OrgQuestionsProps): JSX.Element {
 					{showMigrationQuestion && (
 						<div className="form-group">
 							<div className="question">
-								What is your timeline for migrating to SigNoz?
+								What is your timeline for migrating to Hanzo O11y?
 							</div>
 							<RadioGroup
 								value={migrationTimeline || ''}

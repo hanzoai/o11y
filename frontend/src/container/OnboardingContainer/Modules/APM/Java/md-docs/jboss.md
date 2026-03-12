@@ -2,21 +2,21 @@
 
 Java 8 or higher
 
-## Send Traces to SigNoz Cloud
+## Send Traces to Hanzo O11y Cloud
 
 OpenTelemetry provides a handy Java JAR agent that can be attached to any Java 8+ application and dynamically injects bytecode to capture telemetry from a number of popular libraries and frameworks.
 
-Based on your application environment, you can choose the setup below to send traces to SigNoz Cloud.
+Based on your application environment, you can choose the setup below to send traces to Hanzo O11y Cloud.
 
 ### Application on VMs
 
-From VMs, there are two ways to send data to SigNoz Cloud.
+From VMs, there are two ways to send data to Hanzo O11y Cloud.
 
-- Send traces directly to SigNoz Cloud (quick start)
+- Send traces directly to Hanzo O11y Cloud (quick start)
 - Send traces via OTel Collector binary (recommended)
 
-#### **Send traces directly to SigNoz Cloud**
-OpenTelemetry Java agent can send traces directly to SigNoz Cloud.
+#### **Send traces directly to Hanzo O11y Cloud**
+OpenTelemetry Java agent can send traces directly to Hanzo O11y Cloud.
   
 Step 1. Download otel java binary agent
 
@@ -32,12 +32,12 @@ vim /opt/jboss-eap-7.1/bin/standalone.conf
     
 Step 3. Update `JAVA_OPTS` environment variable
 
-Update `JAVA_OPTS` environment variable with configurations required to send data to SigNoz cloud in your configuration file.
+Update `JAVA_OPTS` environment variable with configurations required to send data to Hanzo O11y cloud in your configuration file.
 
 ```bash
 JAVA_OPTS="-javaagent:/<path>/opentelemetry-javaagent.jar
--Dotel.exporter.otlp.endpoint=https://ingest.{{REGION}}.signoz.cloud:443
--Dotel.exporter.otlp.headers="signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}"
+-Dotel.exporter.otlp.endpoint=https://ingest.{{REGION}}.o11y.hanzo.ai:443
+-Dotel.exporter.otlp.headers="signoz-ingestion-key={{HANZO_INGESTION_KEY}}"
 -Dotel.resource.attributes="service.name={{MYAPP}}""
 ```
 You need to replace the following things based on your environment:
@@ -54,9 +54,9 @@ Step 4. [Optional] Write the output/logs of standalone.sh script to a file nohup
 
 #### **Send traces via OTel Collector binary**
 
-OTel Collector binary helps to collect logs, hostmetrics, resource and infra attributes. It is recommended to install Otel Collector binary to collect and send traces to SigNoz cloud. You can correlate signals and have rich contextual data through this way.
+OTel Collector binary helps to collect logs, hostmetrics, resource and infra attributes. It is recommended to install Otel Collector binary to collect and send traces to Hanzo O11y cloud. You can correlate signals and have rich contextual data through this way.
 
-You can find instructions to install OTel Collector binary [here](https://signoz.io/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/) in your VM. Once you are done setting up your OTel Collector binary, you can follow the below steps for instrumenting your Java application.
+You can find instructions to install OTel Collector binary [here](https://o11y.hanzo.ai/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/) in your VM. Once you are done setting up your OTel Collector binary, you can follow the below steps for instrumenting your Java application.
 
 Step 1. Download OTel java binary agent
 ```bash
@@ -72,7 +72,7 @@ vim /opt/jboss-eap-7.1/bin/standalone.conf
 
 Step 3. Update `JAVA_OPTS` environment variable
 
-Update `JAVA_OPTS` environment variable with configurations required to send data to SigNoz cloud in your configuration file.
+Update `JAVA_OPTS` environment variable with configurations required to send data to Hanzo O11y cloud in your configuration file.
 
 ```bash
 JAVA_OPTS="-javaagent:/<path>/opentelemetry-javaagent.jar"
@@ -85,7 +85,7 @@ where,
 
 ### Applications Deployed on Kubernetes
 
-For Java application deployed on Kubernetes, you need to install OTel Collector agent in your k8s infra to collect and send traces to SigNoz Cloud. You can find the instructions to install OTel Collector agent [here](https://signoz.io/docs/tutorial/kubernetes-infra-metrics/).
+For Java application deployed on Kubernetes, you need to install OTel Collector agent in your k8s infra to collect and send traces to Hanzo O11y Cloud. You can find the instructions to install OTel Collector agent [here](https://o11y.hanzo.ai/docs/tutorial/kubernetes-infra-metrics/).
 
 Once you have set up OTel Collector agent, you can proceed with OpenTelemetry java instrumentation by following the below steps:
 
@@ -103,7 +103,7 @@ vim /opt/jboss-eap-7.1/bin/standalone.conf
 
 Step 3. Update `JAVA_OPTS` environment variable
 
-Update `JAVA_OPTS` environment variable with configurations required to send data to SigNoz cloud in your configuration file.
+Update `JAVA_OPTS` environment variable with configurations required to send data to Hanzo O11y cloud in your configuration file.
 
 ```bash
 JAVA_OPTS="-javaagent:/<path>/opentelemetry-javaagent.jar"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/SigNoz/signoz/pkg/query-service/utils/labels"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
 )
 
 // common result format of query

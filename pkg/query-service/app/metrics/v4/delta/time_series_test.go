@@ -3,7 +3,7 @@ package delta
 import (
 	"testing"
 
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -66,7 +66,7 @@ func TestPrepareTimeAggregationSubQuery(t *testing.T) {
 			},
 			start:                 1701794980000,
 			end:                   1701796780000,
-			expectedQueryContains: "SELECT fingerprint, any(service_name) as service_name, toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, avg(value) as per_series_value FROM signoz_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, fingerprint FROM signoz_metrics.time_series_v4 WHERE metric_name IN ['http_requests'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1701792000000 AND unix_milli < 1701796780000 AND JSONExtractString(labels, 'service_name') != 'payment_service' AND JSONExtractString(labels, 'endpoint') IN ['/paycallback','/payme','/paypal']) as filtered_time_series USING fingerprint WHERE metric_name IN ['http_requests'] AND unix_milli >= 1701794980000 AND unix_milli < 1701796780000 AND bitAnd(flags, 1) = 0 GROUP BY fingerprint, ts ORDER BY fingerprint, ts",
+			expectedQueryContains: "SELECT fingerprint, any(service_name) as service_name, toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, avg(value) as per_series_value FROM observe_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, fingerprint FROM observe_metrics.time_series_v4 WHERE metric_name IN ['http_requests'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1701792000000 AND unix_milli < 1701796780000 AND JSONExtractString(labels, 'service_name') != 'payment_service' AND JSONExtractString(labels, 'endpoint') IN ['/paycallback','/payme','/paypal']) as filtered_time_series USING fingerprint WHERE metric_name IN ['http_requests'] AND unix_milli >= 1701794980000 AND unix_milli < 1701796780000 AND bitAnd(flags, 1) = 0 GROUP BY fingerprint, ts ORDER BY fingerprint, ts",
 		},
 		{
 			name: "test time aggregation = rate, temporality = delta",
@@ -107,7 +107,7 @@ func TestPrepareTimeAggregationSubQuery(t *testing.T) {
 			},
 			start:                 1701794980000,
 			end:                   1701796780000,
-			expectedQueryContains: "SELECT fingerprint, any(service_name) as service_name, toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as per_series_value FROM signoz_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, fingerprint FROM signoz_metrics.time_series_v4 WHERE metric_name IN ['http_requests'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1701792000000 AND unix_milli < 1701796780000 AND like(JSONExtractString(labels, 'service_name'), '%payment_service%')) as filtered_time_series USING fingerprint WHERE metric_name IN ['http_requests'] AND unix_milli >= 1701794980000 AND unix_milli < 1701796780000 AND bitAnd(flags, 1) = 0 GROUP BY fingerprint, ts ORDER BY fingerprint, ts",
+			expectedQueryContains: "SELECT fingerprint, any(service_name) as service_name, toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as per_series_value FROM observe_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, fingerprint FROM observe_metrics.time_series_v4 WHERE metric_name IN ['http_requests'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1701792000000 AND unix_milli < 1701796780000 AND like(JSONExtractString(labels, 'service_name'), '%payment_service%')) as filtered_time_series USING fingerprint WHERE metric_name IN ['http_requests'] AND unix_milli >= 1701794980000 AND unix_milli < 1701796780000 AND bitAnd(flags, 1) = 0 GROUP BY fingerprint, ts ORDER BY fingerprint, ts",
 		},
 	}
 
@@ -168,7 +168,7 @@ func TestPrepareTimeseriesQuery(t *testing.T) {
 			},
 			start:                 1701794980000,
 			end:                   1701796780000,
-			expectedQueryContains: "SELECT ts, sum(per_series_value) as value FROM (SELECT fingerprint,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, avg(value) as per_series_value FROM signoz_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM signoz_metrics.time_series_v4 WHERE metric_name IN ['system_memory_usage'] AND temporality = 'Unspecified' AND __normalized = false AND unix_milli >= 1701792000000 AND unix_milli < 1701796780000 AND JSONExtractString(labels, 'state') != 'idle') as filtered_time_series USING fingerprint WHERE metric_name IN ['system_memory_usage'] AND unix_milli >= 1701794980000 AND unix_milli < 1701796780000 AND bitAnd(flags, 1) = 0 GROUP BY fingerprint, ts ORDER BY fingerprint, ts) WHERE isNaN(per_series_value) = 0 GROUP BY ts ORDER BY ts ASC",
+			expectedQueryContains: "SELECT ts, sum(per_series_value) as value FROM (SELECT fingerprint,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, avg(value) as per_series_value FROM observe_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM observe_metrics.time_series_v4 WHERE metric_name IN ['system_memory_usage'] AND temporality = 'Unspecified' AND __normalized = false AND unix_milli >= 1701792000000 AND unix_milli < 1701796780000 AND JSONExtractString(labels, 'state') != 'idle') as filtered_time_series USING fingerprint WHERE metric_name IN ['system_memory_usage'] AND unix_milli >= 1701794980000 AND unix_milli < 1701796780000 AND bitAnd(flags, 1) = 0 GROUP BY fingerprint, ts ORDER BY fingerprint, ts) WHERE isNaN(per_series_value) = 0 GROUP BY ts ORDER BY ts ASC",
 		},
 		{
 			name: "test time aggregation = rate, space aggregation = sum, temporality = delta",
@@ -210,7 +210,7 @@ func TestPrepareTimeseriesQuery(t *testing.T) {
 			},
 			start:                 1701794980000,
 			end:                   1701796780000,
-			expectedQueryContains: "SELECT service_name, toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM signoz_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, fingerprint FROM signoz_metrics.time_series_v4 WHERE metric_name IN ['http_requests'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1701792000000 AND unix_milli < 1701796780000 AND like(JSONExtractString(labels, 'service_name'), '%payment_service%')) as filtered_time_series USING fingerprint WHERE metric_name IN ['http_requests'] AND unix_milli >= 1701794980000 AND unix_milli < 1701796780000 AND bitAnd(flags, 1) = 0 GROUP BY service_name, ts ORDER BY service_name ASC, ts ASC",
+			expectedQueryContains: "SELECT service_name, toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM observe_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, fingerprint FROM observe_metrics.time_series_v4 WHERE metric_name IN ['http_requests'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1701792000000 AND unix_milli < 1701796780000 AND like(JSONExtractString(labels, 'service_name'), '%payment_service%')) as filtered_time_series USING fingerprint WHERE metric_name IN ['http_requests'] AND unix_milli >= 1701794980000 AND unix_milli < 1701796780000 AND bitAnd(flags, 1) = 0 GROUP BY service_name, ts ORDER BY service_name ASC, ts ASC",
 		},
 		{
 			name: "test time aggregation = rate, space aggregation percentile99, type = ExponentialHistogram",
@@ -219,7 +219,7 @@ func TestPrepareTimeseriesQuery(t *testing.T) {
 				StepInterval: 60,
 				DataSource:   v3.DataSourceMetrics,
 				AggregateAttribute: v3.AttributeKey{
-					Key:      "signoz_latency",
+					Key:      "observe_latency",
 					DataType: v3.AttributeKeyDataTypeFloat64,
 					Type:     v3.AttributeKeyType(v3.MetricTypeExponentialHistogram),
 					IsColumn: true,
@@ -244,7 +244,7 @@ func TestPrepareTimeseriesQuery(t *testing.T) {
 			},
 			start:                 1701794980000,
 			end:                   1701796780000,
-			expectedQueryContains: "SELECT service_name, toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, quantilesDDMerge(0.01, 0.990000)(sketch)[1] as value FROM signoz_metrics.distributed_exp_hist INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, fingerprint FROM signoz_metrics.time_series_v4 WHERE metric_name IN ['signoz_latency'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1701792000000 AND unix_milli < 1701796780000) as filtered_time_series USING fingerprint WHERE metric_name IN ['signoz_latency'] AND unix_milli >= 1701794980000 AND unix_milli < 1701796780000 AND bitAnd(flags, 1) = 0 GROUP BY service_name, ts ORDER BY service_name ASC, ts ASC",
+			expectedQueryContains: "SELECT service_name, toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, quantilesDDMerge(0.01, 0.990000)(sketch)[1] as value FROM observe_metrics.distributed_exp_hist INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, fingerprint FROM observe_metrics.time_series_v4 WHERE metric_name IN ['observe_latency'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1701792000000 AND unix_milli < 1701796780000) as filtered_time_series USING fingerprint WHERE metric_name IN ['observe_latency'] AND unix_milli >= 1701794980000 AND unix_milli < 1701796780000 AND bitAnd(flags, 1) = 0 GROUP BY service_name, ts ORDER BY service_name ASC, ts ASC",
 		},
 		{
 			name: "test time aggregation = rate, space aggregation = max, temporality = delta, testing metrics and attribute name with dot",
@@ -253,7 +253,7 @@ func TestPrepareTimeseriesQuery(t *testing.T) {
 				DataSource:        v3.DataSourceMetrics,
 				AggregateOperator: v3.AggregateOperatorRate,
 				AggregateAttribute: v3.AttributeKey{
-					Key:      "signoz.latency.sum",
+					Key:      "o11y.latency.sum",
 					DataType: v3.AttributeKeyDataTypeFloat64,
 					Type:     v3.AttributeKeyType("Sum"),
 					IsColumn: true,
@@ -299,7 +299,7 @@ func TestPrepareTimeseriesQuery(t *testing.T) {
 			},
 			start:                 1735036101000,
 			end:                   1735637901000,
-			expectedQueryContains: "SELECT `host.name`, ts, max(per_series_value) as value FROM (SELECT fingerprint, any(`host.name`) as `host.name`, toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(sum)/60 as per_series_value FROM signoz_metrics.distributed_samples_v4_agg_5m INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'host.name') as `host.name`, fingerprint FROM signoz_metrics.time_series_v4_1day WHERE metric_name IN ['signoz.latency.sum'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1734998400000 AND unix_milli < 1735637901000 AND JSONExtractString(labels, 'host_name') = '4f6ec470feea') as filtered_time_series USING fingerprint WHERE metric_name IN ['signoz.latency.sum'] AND unix_milli >= 1735036101000 AND unix_milli < 1735637901000 GROUP BY fingerprint, ts ORDER BY fingerprint, ts) WHERE isNaN(per_series_value) = 0 GROUP BY `host.name`, ts ORDER BY `host.name` ASC, ts ASC",
+			expectedQueryContains: "SELECT `host.name`, ts, max(per_series_value) as value FROM (SELECT fingerprint, any(`host.name`) as `host.name`, toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(sum)/60 as per_series_value FROM observe_metrics.distributed_samples_v4_agg_5m INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'host.name') as `host.name`, fingerprint FROM observe_metrics.time_series_v4_1day WHERE metric_name IN ['o11y.latency.sum'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1734998400000 AND unix_milli < 1735637901000 AND JSONExtractString(labels, 'host_name') = '4f6ec470feea') as filtered_time_series USING fingerprint WHERE metric_name IN ['o11y.latency.sum'] AND unix_milli >= 1735036101000 AND unix_milli < 1735637901000 GROUP BY fingerprint, ts ORDER BY fingerprint, ts) WHERE isNaN(per_series_value) = 0 GROUP BY `host.name`, ts ORDER BY `host.name` ASC, ts ASC",
 		},
 	}
 

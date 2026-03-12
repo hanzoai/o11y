@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types"
 )
 
 type AttributeMapping struct {
@@ -53,7 +53,7 @@ func (attr *AttributeMapping) UnmarshalJSON(data []byte) error {
 type RoleMapping struct {
 	// Default role any new SSO users. Defaults to "VIEWER"
 	DefaultRole string `json:"defaultRole"`
-	// Map of IDP group names to SigNoz roles. Key is group name, value is SigNoz role
+	// Map of IDP group names to Hanzo O11y roles. Key is group name, value is Hanzo O11y role
 	GroupMappings map[string]string `json:"groupMappings"`
 	// If true, use the role claim directly from IDP instead of group mappings
 	UseRoleAttribute bool `json:"useRoleAttribute"`

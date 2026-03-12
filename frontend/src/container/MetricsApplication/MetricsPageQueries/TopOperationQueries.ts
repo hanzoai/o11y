@@ -25,22 +25,22 @@ export const topOperationQueries = ({
 }: TopOperationQueryFactoryProps): QueryBuilderData => {
 	const latencyAutoCompleteData: BaseAutocompleteData = {
 		key: dotMetricsEnabled
-			? WidgetKeys.Signoz_latency_bucket
-			: WidgetKeys.Signoz_latency_bucket_norm,
+			? WidgetKeys.O11y_latency_bucket
+			: WidgetKeys.O11y_latency_bucket_norm,
 		dataType: DataTypes.Float64,
 		type: '',
 	};
 
 	const errorRateAutoCompleteData: BaseAutocompleteData = {
-		key: WidgetKeys.SignozCallsTotal,
+		key: WidgetKeys.O11yCallsTotal,
 		dataType: DataTypes.Float64,
 		type: '',
 	};
 
 	const numOfCallAutoCompleteData: BaseAutocompleteData = {
 		key: dotMetricsEnabled
-			? WidgetKeys.SignozLatencyCount
-			: WidgetKeys.SignozLatencyCountNorm,
+			? WidgetKeys.O11yLatencyCount
+			: WidgetKeys.O11yLatencyCountNorm,
 		dataType: DataTypes.Float64,
 		type: '',
 	};

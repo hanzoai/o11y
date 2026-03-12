@@ -8,11 +8,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/http/client"
-	"github.com/SigNoz/signoz/pkg/types/zeustypes"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/http/client"
+	"github.com/hanzoai/o11y/pkg/types/zeustypes"
+	"github.com/hanzoai/o11y/pkg/zeus"
 	"github.com/tidwall/gjson"
 )
 
@@ -29,7 +29,7 @@ func NewProviderFactory() factory.ProviderFactory[zeus.Zeus, zeus.Config] {
 }
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config zeus.Config) (zeus.Zeus, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/ee/zeus/httpzeus")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/ee/zeus/httpzeus")
 
 	httpClient, err := client.New(
 		settings.Logger(),
@@ -160,7 +160,7 @@ func (provider *Provider) do(ctx context.Context, url *url.URL, method string, k
 	if err != nil {
 		return nil, err
 	}
-	request.Header.Set("X-Signoz-Cloud-Api-Key", key)
+	request.Header.Set("X-O11y-Cloud-Api-Key", key)
 	request.Header.Set("Content-Type", "application/json")
 
 	response, err := provider.httpClient.Do(request)

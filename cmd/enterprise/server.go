@@ -5,51 +5,51 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/SigNoz/signoz/cmd"
-	"github.com/SigNoz/signoz/ee/authn/callbackauthn/oidccallbackauthn"
-	"github.com/SigNoz/signoz/ee/authn/callbackauthn/samlcallbackauthn"
-	"github.com/SigNoz/signoz/ee/authz/openfgaauthz"
-	eequerier "github.com/SigNoz/signoz/ee/querier"
-	"github.com/SigNoz/signoz/ee/authz/openfgaschema"
-	"github.com/SigNoz/signoz/ee/gateway/httpgateway"
-	enterpriselicensing "github.com/SigNoz/signoz/ee/licensing"
-	"github.com/SigNoz/signoz/ee/licensing/httplicensing"
-	"github.com/SigNoz/signoz/ee/modules/dashboard/impldashboard"
-	enterpriseapp "github.com/SigNoz/signoz/ee/query-service/app"
-	"github.com/SigNoz/signoz/ee/sqlschema/postgressqlschema"
-	"github.com/SigNoz/signoz/ee/sqlstore/postgressqlstore"
-	enterprisezeus "github.com/SigNoz/signoz/ee/zeus"
-	"github.com/SigNoz/signoz/ee/zeus/httpzeus"
-	"github.com/SigNoz/signoz/pkg/analytics"
-	"github.com/SigNoz/signoz/pkg/authn"
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/gateway"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/modules/dashboard"
-	pkgimpldashboard "github.com/SigNoz/signoz/pkg/modules/dashboard/impldashboard"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/querier"
-	"github.com/SigNoz/signoz/pkg/queryparser"
-	"github.com/SigNoz/signoz/pkg/signoz"
-	"github.com/SigNoz/signoz/pkg/sqlschema"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/sqlstore/sqlstorehook"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/version"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/cmd"
+	"github.com/hanzoai/o11y/ee/authn/callbackauthn/oidccallbackauthn"
+	"github.com/hanzoai/o11y/ee/authn/callbackauthn/samlcallbackauthn"
+	"github.com/hanzoai/o11y/ee/authz/openfgaauthz"
+	eequerier "github.com/hanzoai/o11y/ee/querier"
+	"github.com/hanzoai/o11y/ee/authz/openfgaschema"
+	"github.com/hanzoai/o11y/ee/gateway/httpgateway"
+	enterpriselicensing "github.com/hanzoai/o11y/ee/licensing"
+	"github.com/hanzoai/o11y/ee/licensing/httplicensing"
+	"github.com/hanzoai/o11y/ee/modules/dashboard/impldashboard"
+	enterpriseapp "github.com/hanzoai/o11y/ee/query-service/app"
+	"github.com/hanzoai/o11y/ee/sqlschema/postgressqlschema"
+	"github.com/hanzoai/o11y/ee/sqlstore/postgressqlstore"
+	enterprisezeus "github.com/hanzoai/o11y/ee/zeus"
+	"github.com/hanzoai/o11y/ee/zeus/httpzeus"
+	"github.com/hanzoai/o11y/pkg/analytics"
+	"github.com/hanzoai/o11y/pkg/authn"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/gateway"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/modules/dashboard"
+	pkgimpldashboard "github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/queryparser"
+	"github.com/hanzoai/o11y/pkg/o11y"
+	"github.com/hanzoai/o11y/pkg/sqlschema"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstorehook"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/version"
+	"github.com/hanzoai/o11y/pkg/zeus"
 	"github.com/spf13/cobra"
 )
 
 func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
-	var flags signoz.DeprecatedFlags
+	var flags o11y.DeprecatedFlags
 
 	serverCmd := &cobra.Command{
 		Use:                "server",
-		Short:              "Run the SigNoz server",
+		Short:              "Run the Hanzo O11y server",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		RunE: func(currCmd *cobra.Command, args []string) error {
-			config, err := cmd.NewSigNozConfig(currCmd.Context(), logger, flags)
+			config, err := cmd.NewHanzo O11yConfig(currCmd.Context(), logger, flags)
 			if err != nil {
 				return err
 			}
@@ -62,18 +62,18 @@ func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
 	parentCmd.AddCommand(serverCmd)
 }
 
-func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) error {
+func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) error {
 	// print the version
 	version.Info.PrettyPrint(config.Version)
 
 	// add enterprise sqlstore factories to the community sqlstore factories
-	sqlstoreFactories := signoz.NewSQLStoreProviderFactories()
+	sqlstoreFactories := o11y.NewSQLStoreProviderFactories()
 	if err := sqlstoreFactories.Add(postgressqlstore.NewFactory(sqlstorehook.NewLoggingFactory(), sqlstorehook.NewInstrumentationFactory())); err != nil {
 		logger.ErrorContext(ctx, "failed to add postgressqlstore factory", "error", err)
 		return err
 	}
 
-	signoz, err := signoz.New(
+	o11y, err := o11y.New(
 		ctx,
 		config,
 		enterprisezeus.Config(),
@@ -82,11 +82,11 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		func(sqlstore sqlstore.SQLStore, zeus zeus.Zeus, orgGetter organization.Getter, analytics analytics.Analytics) factory.ProviderFactory[licensing.Licensing, licensing.Config] {
 			return httplicensing.NewProviderFactory(sqlstore, zeus, orgGetter, analytics)
 		},
-		signoz.NewEmailingProviderFactories(),
-		signoz.NewCacheProviderFactories(),
-		signoz.NewWebProviderFactories(),
+		o11y.NewEmailingProviderFactories(),
+		o11y.NewCacheProviderFactories(),
+		o11y.NewWebProviderFactories(),
 		func(sqlstore sqlstore.SQLStore) factory.NamedMap[factory.ProviderFactory[sqlschema.SQLSchema, sqlschema.Config]] {
-			existingFactories := signoz.NewSQLSchemaProviderFactories(sqlstore)
+			existingFactories := o11y.NewSQLSchemaProviderFactories(sqlstore)
 			if err := existingFactories.Add(postgressqlschema.NewFactory(sqlstore)); err != nil {
 				panic(err)
 			}
@@ -94,7 +94,7 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 			return existingFactories
 		},
 		sqlstoreFactories,
-		signoz.NewTelemetryStoreProviderFactories(),
+		o11y.NewTelemetryStoreProviderFactories(),
 		func(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
 			samlCallbackAuthN, err := samlcallbackauthn.New(ctx, store, licensing)
 			if err != nil {
@@ -106,7 +106,7 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 				return nil, err
 			}
 
-			authNs, err := signoz.NewAuthNs(ctx, providerSettings, store, licensing)
+			authNs, err := o11y.NewAuthNs(ctx, providerSettings, store, licensing)
 			if err != nil {
 				return nil, err
 			}
@@ -132,11 +132,11 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 	)
 
 	if err != nil {
-		logger.ErrorContext(ctx, "failed to create signoz", "error", err)
+		logger.ErrorContext(ctx, "failed to create o11y", "error", err)
 		return err
 	}
 
-	server, err := enterpriseapp.NewServer(config, signoz)
+	server, err := enterpriseapp.NewServer(config, o11y)
 	if err != nil {
 		logger.ErrorContext(ctx, "failed to create server", "error", err)
 		return err
@@ -147,10 +147,10 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		return err
 	}
 
-	signoz.Start(ctx)
+	o11y.Start(ctx)
 
-	if err := signoz.Wait(ctx); err != nil {
-		logger.ErrorContext(ctx, "failed to start signoz", "error", err)
+	if err := o11y.Wait(ctx); err != nil {
+		logger.ErrorContext(ctx, "failed to start o11y", "error", err)
 		return err
 	}
 
@@ -160,9 +160,9 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		return err
 	}
 
-	err = signoz.Stop(ctx)
+	err = o11y.Stop(ctx)
 	if err != nil {
-		logger.ErrorContext(ctx, "failed to stop signoz", "error", err)
+		logger.ErrorContext(ctx, "failed to stop o11y", "error", err)
 		return err
 	}
 

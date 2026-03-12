@@ -25,4 +25,4 @@ docker run <your-image-name>
 **Note**
 
 
-If you encounter any difficulties, please consult this [documentation](https://signoz.io/docs/instrumentation/reactjs/) for assistance.
+If you encounter any difficulties, please consult this [documentation](https://o11y.hanzo.ai/docs/instrumentation/reactjs/) for assistance.

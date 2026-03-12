@@ -163,7 +163,7 @@ function BreakDown(): JSX.Element {
 								Meter metrics data is aggregated over 1 hour period. Please select time
 								range accordingly.&nbsp;
 								<a
-									href="https://signoz.io/docs/cost-meter/overview/#accessing-cost-meter"
+									href="https://o11y.hanzo.ai/docs/cost-meter/overview/#accessing-cost-meter"
 									rel="noopener noreferrer"
 									target="_blank"
 									style={{ textDecoration: 'underline' }}

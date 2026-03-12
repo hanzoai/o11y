@@ -4,21 +4,21 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SigNoz/signoz/ee/licensing/httplicensing"
-	"github.com/SigNoz/signoz/ee/query-service/usage"
-	"github.com/SigNoz/signoz/pkg/alertmanager"
-	"github.com/SigNoz/signoz/pkg/global"
-	"github.com/SigNoz/signoz/pkg/http/middleware"
-	baseapp "github.com/SigNoz/signoz/pkg/query-service/app"
-	"github.com/SigNoz/signoz/pkg/query-service/app/cloudintegrations"
-	"github.com/SigNoz/signoz/pkg/query-service/app/integrations"
-	"github.com/SigNoz/signoz/pkg/query-service/app/logparsingpipeline"
-	"github.com/SigNoz/signoz/pkg/query-service/interfaces"
-	basemodel "github.com/SigNoz/signoz/pkg/query-service/model"
-	rules "github.com/SigNoz/signoz/pkg/query-service/rules"
-	"github.com/SigNoz/signoz/pkg/queryparser"
-	"github.com/SigNoz/signoz/pkg/signoz"
-	"github.com/SigNoz/signoz/pkg/version"
+	"github.com/hanzoai/o11y/ee/licensing/httplicensing"
+	"github.com/hanzoai/o11y/ee/query-service/usage"
+	"github.com/hanzoai/o11y/pkg/alertmanager"
+	"github.com/hanzoai/o11y/pkg/global"
+	"github.com/hanzoai/o11y/pkg/http/middleware"
+	baseapp "github.com/hanzoai/o11y/pkg/query-service/app"
+	"github.com/hanzoai/o11y/pkg/query-service/app/cloudintegrations"
+	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
+	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
+	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
+	basemodel "github.com/hanzoai/o11y/pkg/query-service/model"
+	rules "github.com/hanzoai/o11y/pkg/query-service/rules"
+	"github.com/hanzoai/o11y/pkg/queryparser"
+	"github.com/hanzoai/o11y/pkg/o11y"
+	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/gorilla/mux"
 )
 
@@ -41,7 +41,7 @@ type APIHandler struct {
 }
 
 // NewAPIHandler returns an APIHandler
-func NewAPIHandler(opts APIHandlerOptions, signoz *signoz.SigNoz, config signoz.Config) (*APIHandler, error) {
+func NewAPIHandler(opts APIHandlerOptions, o11y *o11y.Hanzo O11y, config o11y.Config) (*APIHandler, error) {
 	baseHandler, err := baseapp.NewAPIHandler(baseapp.APIHandlerOpts{
 		Reader:                        opts.DataConnector,
 		RuleManager:                   opts.RulesManager,
@@ -49,10 +49,10 @@ func NewAPIHandler(opts APIHandlerOptions, signoz *signoz.SigNoz, config signoz.
 		CloudIntegrationsController:   opts.CloudIntegrationsController,
 		LogsParsingPipelineController: opts.LogsParsingPipelineController,
 		FluxInterval:                  opts.FluxInterval,
-		AlertmanagerAPI:               alertmanager.NewAPI(signoz.Alertmanager),
-		LicensingAPI:                  httplicensing.NewLicensingAPI(signoz.Licensing),
-		Signoz:                        signoz,
-		QueryParserAPI:                queryparser.NewAPI(signoz.Instrumentation.ToProviderSettings(), signoz.QueryParser),
+		AlertmanagerAPI:               alertmanager.NewAPI(o11y.Alertmanager),
+		LicensingAPI:                  httplicensing.NewLicensingAPI(o11y.Licensing),
+		O11y:                        o11y,
+		QueryParserAPI:                queryparser.NewAPI(o11y.Instrumentation.ToProviderSettings(), o11y.QueryParser),
 	}, config)
 
 	if err != nil {

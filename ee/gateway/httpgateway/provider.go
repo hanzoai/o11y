@@ -10,13 +10,13 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/gateway"
-	"github.com/SigNoz/signoz/pkg/http/client"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/types/gatewaytypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/gateway"
+	"github.com/hanzoai/o11y/pkg/http/client"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/types/gatewaytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/tidwall/gjson"
 )
 
@@ -34,7 +34,7 @@ func NewProviderFactory(licensing licensing.Licensing) factory.ProviderFactory[g
 }
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config gateway.Config, licensing licensing.Licensing) (gateway.Gateway, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/ee/gateway/httpgateway")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/ee/gateway/httpgateway")
 
 	httpClient, err := client.New(
 		settings.Logger(),
@@ -233,7 +233,7 @@ func (provider *Provider) do(ctx context.Context, orgID valuer.UUID, method stri
 
 	// add headers needed to call gateway
 	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("X-Signoz-Cloud-Api-Key", license.Key)
+	request.Header.Set("X-O11y-Cloud-Api-Key", license.Key)
 	request.Header.Set("X-Consumer-Username", "lid:00000000-0000-0000-0000-000000000000")
 	request.Header.Set("X-Consumer-Groups", "ns:default")
 

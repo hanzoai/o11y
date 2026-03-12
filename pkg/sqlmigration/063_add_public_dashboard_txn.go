@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types/roletypes"
 	"github.com/oklog/ulid/v2"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect"
@@ -48,7 +48,7 @@ func (migration *addAnonymousPublicDashboardTransaction) Up(ctx context.Context,
 	}()
 
 	var storeID string
-	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "signoz").Scan(&storeID)
+	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "observe").Scan(&storeID)
 	if err != nil {
 		return err
 	}
@@ -76,14 +76,14 @@ func (migration *addAnonymousPublicDashboardTransaction) Up(ctx context.Context,
 		now := time.Now().UTC()
 		tupleID := ulid.MustNew(ulid.Timestamp(now), entropy).String()
 
-		// Add wildcard (*) transaction for signoz-anonymous role to read all public-dashboards
-		// This grants the signoz-anonymous role read access to all public dashboards in the organization
+		// Add wildcard (*) transaction for o11y-anonymous role to read all public-dashboards
+		// This grants the o11y-anonymous role read access to all public dashboards in the organization
 		if migration.sqlstore.BunDB().Dialect().Name() == dialect.PG {
 			result, err := tx.ExecContext(ctx, `
 			INSERT INTO tuple (store, object_type, object_id, relation, _user, user_type, ulid, inserted_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT (store, object_type, object_id, relation, _user) DO NOTHING`,
-				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role:organization/"+orgID+"/role/"+roletypes.SigNozAnonymousRoleName+"#assignee", "userset", tupleID, now,
+				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role:organization/"+orgID+"/role/"+roletypes.Hanzo O11yAnonymousRoleName+"#assignee", "userset", tupleID, now,
 			)
 			if err != nil {
 				return err
@@ -102,7 +102,7 @@ func (migration *addAnonymousPublicDashboardTransaction) Up(ctx context.Context,
 			INSERT INTO changelog (store, object_type, object_id, relation, _user, operation, ulid, inserted_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT (store, ulid, object_type) DO NOTHING`,
-				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role:organization/"+orgID+"/role/"+roletypes.SigNozAnonymousRoleName+"#assignee", "TUPLE_OPERATION_WRITE", tupleID, now,
+				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role:organization/"+orgID+"/role/"+roletypes.Hanzo O11yAnonymousRoleName+"#assignee", "TUPLE_OPERATION_WRITE", tupleID, now,
 			)
 			if err != nil {
 				return err
@@ -113,7 +113,7 @@ func (migration *addAnonymousPublicDashboardTransaction) Up(ctx context.Context,
 			INSERT INTO tuple (store, object_type, object_id, relation, user_object_type, user_object_id, user_relation, user_type, ulid, inserted_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT (store, object_type, object_id, relation, user_object_type, user_object_id, user_relation) DO NOTHING`,
-				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role", "organization/"+orgID+"/role/"+roletypes.SigNozAnonymousRoleName, "assignee", "userset", tupleID, now,
+				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role", "organization/"+orgID+"/role/"+roletypes.Hanzo O11yAnonymousRoleName, "assignee", "userset", tupleID, now,
 			)
 			if err != nil {
 				return err
@@ -132,7 +132,7 @@ func (migration *addAnonymousPublicDashboardTransaction) Up(ctx context.Context,
 			INSERT INTO changelog (store, object_type, object_id, relation, user_object_type, user_object_id, user_relation, operation, ulid, inserted_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT (store, ulid, object_type) DO NOTHING`,
-				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role", "organization/"+orgID+"/role/"+roletypes.SigNozAnonymousRoleName, "assignee", 0, tupleID, now,
+				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role", "organization/"+orgID+"/role/"+roletypes.Hanzo O11yAnonymousRoleName, "assignee", 0, tupleID, now,
 			)
 			if err != nil {
 				return err

@@ -41,8 +41,8 @@ receivers:
         field: attributes.timestamp
       # please remove names from below if you want to collect logs from them
       - type: filter
-        id: signoz_logs_filter
-        expr: 'attributes.container_name matches "^(signoz_(logspout|signoz|otel-collector|clickhouse|zookeeper))|(infra_(logspout|otel-agent|otel-metrics)).*"'
+        id: observe_logs_filter
+        expr: 'attributes.container_name matches "^(observe_(logspout|observe|otel-collector|clickhouse|zookeeper))|(infra_(logspout|otel-agent|otel-metrics)).*"'
 processors:
   batch:
     send_batch_size: 10000
@@ -64,11 +64,11 @@ extensions:
     endpoint: 0.0.0.0:1777
 exporters:
   otlp:
-    endpoint: ${env:SIGNOZ_COLLECTOR_ENDPOINT}
+    endpoint: ${env:HANZO_COLLECTOR_ENDPOINT}
     tls:
       insecure: true
     headers:
-      signoz-access-token: ${env:SIGNOZ_ACCESS_TOKEN}
+      observe-access-token: ${env:HANZO_ACCESS_TOKEN}
   # debug: {}
 service:
   telemetry:

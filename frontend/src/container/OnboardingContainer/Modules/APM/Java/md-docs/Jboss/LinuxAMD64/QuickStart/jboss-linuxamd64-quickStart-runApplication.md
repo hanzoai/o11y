@@ -5,12 +5,12 @@ vim /opt/jboss-eap-7.1/bin/standalone.conf
 &nbsp;
 
 ### Update `JAVA_OPTS` environment variable
-Update `JAVA_OPTS` environment variable with configurations required to send data to SigNoz cloud in your configuration file.
+Update `JAVA_OPTS` environment variable with configurations required to send data to Hanzo O11y cloud in your configuration file.
 
 ```bash
 JAVA_OPTS="-javaagent:/<path>/opentelemetry-javaagent.jar
--Dotel.exporter.otlp.endpoint=https://ingest.{{REGION}}.signoz.cloud:443
--Dotel.exporter.otlp.headers="signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}"
+-Dotel.exporter.otlp.endpoint=https://ingest.{{REGION}}.o11y.hanzo.ai:443
+-Dotel.exporter.otlp.headers="signoz-ingestion-key={{HANZO_INGESTION_KEY}}"
 -Dotel.resource.attributes="service.name={{MYAPP}}""
 ```
 
@@ -25,4 +25,4 @@ JAVA_OPTS="-javaagent:/<path>/opentelemetry-javaagent.jar
 ```
 &nbsp;
 
-If you encounter any difficulties, please consult the [troubleshooting section](https://signoz.io/docs/instrumentation/jboss/#troubleshooting-your-installation) for assistance.
+If you encounter any difficulties, please consult the [troubleshooting section](https://o11y.hanzo.ai/docs/instrumentation/jboss/#troubleshooting-your-installation) for assistance.

@@ -6,7 +6,7 @@ import (
 
 	"sync"
 
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 )
 
 // Batcher is responsible for batching alerts and broadcasting them on a channel.

@@ -1,4 +1,4 @@
-import { RoletypesRoleDTO } from 'api/generated/services/sigNoz.schemas';
+import { RoletypesRoleDTO } from 'api/generated/services/observe.schemas';
 
 const orgId = '019ba2bb-2fa1-7b24-8159-cfca08617ef9';
 
@@ -7,9 +7,9 @@ export const managedRoles: RoletypesRoleDTO[] = [
 		id: '019c24aa-2248-756f-9833-984f1ab63819',
 		createdAt: new Date('2026-02-03T18:00:55.624356Z'),
 		updatedAt: new Date('2026-02-03T18:00:55.624356Z'),
-		name: 'signoz-admin',
+		name: 'observe-admin',
 		description:
-			'Role assigned to users who have full administrative access to SigNoz resources.',
+			'Role assigned to users who have full administrative access to Hanzo O11y resources.',
 		type: 'managed',
 		orgId,
 	},
@@ -17,9 +17,9 @@ export const managedRoles: RoletypesRoleDTO[] = [
 		id: '019c24aa-2248-757c-9faf-7b1e899751e0',
 		createdAt: new Date('2026-02-03T18:00:55.624359Z'),
 		updatedAt: new Date('2026-02-03T18:00:55.624359Z'),
-		name: 'signoz-editor',
+		name: 'o11y-editor',
 		description:
-			'Role assigned to users who can create, edit, and manage SigNoz resources but do not have full administrative privileges.',
+			'Role assigned to users who can create, edit, and manage Hanzo O11y resources but do not have full administrative privileges.',
 		type: 'managed',
 		orgId,
 	},
@@ -27,9 +27,9 @@ export const managedRoles: RoletypesRoleDTO[] = [
 		id: '019c24aa-2248-7585-a129-4188b3473c27',
 		createdAt: new Date('2026-02-03T18:00:55.624362Z'),
 		updatedAt: new Date('2026-02-03T18:00:55.624362Z'),
-		name: 'signoz-viewer',
+		name: 'o11y-viewer',
 		description:
-			'Role assigned to users who have read-only access to SigNoz resources.',
+			'Role assigned to users who have read-only access to Hanzo O11y resources.',
 		type: 'managed',
 		orgId,
 	},
