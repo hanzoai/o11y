@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for SigNoz
+ * * The file has been auto-generated using Orval for Hanzo O11y
  * * regenerate with 'yarn generate:api'
- * SigNoz
+ * Hanzo O11y
  */
 import type {
 	InvalidateOptions,
@@ -24,7 +24,7 @@ import type {
 	AuthzCheck200,
 	AuthzResources200,
 	RenderErrorResponseDTO,
-} from '../sigNoz.schemas';
+} from '../observe.schemas';
 
 /**
  * Checks if the authenticated user has permissions for given transactions

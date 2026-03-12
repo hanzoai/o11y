@@ -1,5 +1,5 @@
 
-You can stream logs from Vercel to SigNoz using [log drains](https://vercel.com/docs/observability/log-drains-overview/log-drains#configure-a-log-drain).
+You can stream logs from Vercel to Hanzo O11y using [log drains](https://vercel.com/docs/observability/log-drains-overview/log-drains#configure-a-log-drain).
 
 **Note:** Log Drains are only supported in **Vercel Pro** and **Enterprise accounts**.
 
@@ -28,13 +28,13 @@ You can stream logs from Vercel to SigNoz using [log drains](https://vercel.com/
 
 * Enter the endpoint URL as follows:
 ```bash
-https://ingest.{{REGION}}.signoz.cloud:443/logs/json
+https://ingest.{{REGION}}.o11y.hanzo.ai:443/logs/json
 ```
 &nbsp;
 
 * Enable **Custom Headers** and add the headers `signoz-ingestion-key` and `x-vercel-verify`
 ```bash
-signoz-ingestion-key: {{SIGNOZ_INGESTION_KEY}}
+signoz-ingestion-key: {{HANZO_INGESTION_KEY}}
 ```
 ```bash
 x-vercel-verify: <YOUR_VERCEL_VERIFY_TOKEN>
@@ -47,4 +47,4 @@ x-vercel-verify: <YOUR_VERCEL_VERIFY_TOKEN>
 
 &nbsp;
 
-Click on the **Done** button below and you should be able to see your logs in SigNoz.
+Click on the **Done** button below and you should be able to see your logs in Hanzo O11y.

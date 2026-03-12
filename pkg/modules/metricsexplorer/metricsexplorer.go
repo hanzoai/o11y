@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/types/metricsexplorertypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/metricsexplorertypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 // Handler exposes HTTP handlers for the metrics module.

@@ -3,8 +3,8 @@ package postprocess
 import (
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
 func TestApplyLimitOnMetricResult(t *testing.T) {
@@ -149,7 +149,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 							Expression:         "A",
 							GroupBy:            []v3.AttributeKey{{Key: "service_name"}},
 							Limit:              1,
-							OrderBy:            []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "asc"}},
+							OrderBy:            []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "asc"}},
 						},
 					},
 					QueryType: v3.QueryTypeBuilder,
@@ -232,7 +232,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 							Expression:         "A",
 							GroupBy:            []v3.AttributeKey{{Key: "service_name"}},
 							Limit:              1,
-							OrderBy:            []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "asc"}},
+							OrderBy:            []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "asc"}},
 						},
 					},
 					QueryType: v3.QueryTypeBuilder,

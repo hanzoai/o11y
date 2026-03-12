@@ -9,7 +9,7 @@ import {
 import {
 	MetricsexplorertypesListMetricDTO,
 	MetrictypesTypeDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/observe.schemas';
 import { ENTITY_VERSION_V5 } from 'constants/app';
 import { ATTRIBUTE_TYPES } from 'constants/queryBuilder';
 import { useQueryOperations } from 'hooks/queryBuilder/useQueryBuilderOperations';
@@ -270,7 +270,7 @@ describe('MetricNameSelector', () => {
 	});
 
 	it('updates search text when metric name is hydrated after initial mount', async () => {
-		returnMetrics([makeMetric({ metricName: 'signoz_latency.bucket' })]);
+		returnMetrics([makeMetric({ metricName: 'observe_latency.bucket' })]);
 
 		const emptyQuery = makeQuery({
 			aggregateAttribute: {
@@ -296,7 +296,7 @@ describe('MetricNameSelector', () => {
 			},
 			aggregations: [
 				{
-					metricName: 'signoz_latency.bucket',
+					metricName: 'observe_latency.bucket',
 					timeAggregation: 'rate',
 					spaceAggregation: 'sum',
 					temporality: '',
@@ -324,7 +324,7 @@ describe('MetricNameSelector', () => {
 			const lastCall =
 				mockUseListMetrics.mock.calls[mockUseListMetrics.mock.calls.length - 1];
 			expect(lastCall?.[0]).toMatchObject({
-				searchText: 'signoz_latency.bucket',
+				searchText: 'observe_latency.bucket',
 				limit: 100,
 			});
 		});

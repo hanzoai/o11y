@@ -19,11 +19,11 @@ const config: Config.InitialOptions = {
 		'^.*/useSafeNavigate$': USE_SAFE_NAVIGATE_MOCK_PATH,
 		'^constants/env$': '<rootDir>/__mocks__/env.ts',
 		'^src/constants/env$': '<rootDir>/__mocks__/env.ts',
-		'^@signozhq/icons$':
-			'<rootDir>/node_modules/@signozhq/icons/dist/index.esm.js',
+		'^@o11yhq/icons$':
+			'<rootDir>/node_modules/@o11yhq/icons/dist/index.esm.js',
 		'^react-syntax-highlighter/dist/esm/(.*)$':
 			'<rootDir>/node_modules/react-syntax-highlighter/dist/cjs/$1',
-		'^@signozhq/([^/]+)$': '<rootDir>/node_modules/@signozhq/$1/dist/$1.js',
+		'^@o11yhq/([^/]+)$': '<rootDir>/node_modules/@o11yhq/$1/dist/$1.js',
 	},
 	extensionsToTreatAsEsm: ['.ts'],
 	testMatch: ['<rootDir>/src/**/*?(*.)(test).(ts|js)?(x)'],
@@ -39,7 +39,7 @@ const config: Config.InitialOptions = {
 		'^.+\\.(js|jsx)$': 'babel-jest',
 	},
 	transformIgnorePatterns: [
-		'node_modules/(?!(lodash-es|react-dnd|core-dnd|@react-dnd|dnd-core|react-dnd-html5-backend|axios|@signozhq/design-tokens|@signozhq/table|@signozhq/calendar|@signozhq/input|@signozhq/popover|@signozhq/button|@signozhq/sonner|@signozhq/*|date-fns|d3-interpolate|d3-color|api|@codemirror|@lezer|@marijn|@grafana|nuqs)/)',
+		'node_modules/(?!(lodash-es|react-dnd|core-dnd|@react-dnd|dnd-core|react-dnd-html5-backend|axios|@o11yhq/design-tokens|@o11yhq/table|@o11yhq/calendar|@o11yhq/input|@o11yhq/popover|@o11yhq/button|@o11yhq/sonner|@o11yhq/*|date-fns|d3-interpolate|d3-color|api|@codemirror|@lezer|@marijn|@grafana|nuqs)/)',
 	],
 	setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 	testPathIgnorePatterns: ['/node_modules/', '/public/'],

@@ -24,20 +24,20 @@ export const serviceMetricsQuery = (
 	const p99AutoCompleteData: BaseAutocompleteData = {
 		dataType: DataTypes.Float64,
 		key: dotMetricsEnabled
-			? WidgetKeys.Signoz_latency_bucket
-			: WidgetKeys.Signoz_latency_bucket_norm,
+			? WidgetKeys.O11y_latency_bucket
+			: WidgetKeys.O11y_latency_bucket_norm,
 		type: '',
 	};
 
 	const errorRateAutoCompleteData: BaseAutocompleteData = {
 		dataType: DataTypes.Float64,
-		key: WidgetKeys.SignozCallsTotal,
+		key: WidgetKeys.O11yCallsTotal,
 		type: '',
 	};
 
 	const operationPrSecondAutoCompleteData: BaseAutocompleteData = {
 		dataType: DataTypes.Float64,
-		key: WidgetKeys.SignozCallsTotal,
+		key: WidgetKeys.O11yCallsTotal,
 		type: '',
 	};
 

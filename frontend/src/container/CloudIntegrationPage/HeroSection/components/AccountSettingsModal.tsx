@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { useQueryClient } from 'react-query';
 import { Form, Select, Switch } from 'antd';
-import SignozModal from 'components/SignozModal/SignozModal';
+import O11yModal from 'components/O11yModal/O11yModal';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import {
 	getRegionPreviewText,
@@ -154,7 +154,7 @@ function AccountSettingsModal({
 	);
 
 	return (
-		<SignozModal
+		<O11yModal
 			open
 			title={modalTitle}
 			onCancel={handleClose}
@@ -206,7 +206,7 @@ function AccountSettingsModal({
 					</div>
 				</div>
 			</Form>
-		</SignozModal>
+		</O11yModal>
 	);
 }
 

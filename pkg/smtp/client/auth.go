@@ -4,7 +4,7 @@ import (
 	"net/smtp"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 type loginAuth struct {

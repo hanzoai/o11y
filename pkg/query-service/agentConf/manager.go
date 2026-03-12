@@ -8,14 +8,14 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/query-service/app/opamp"
-	filterprocessor "github.com/SigNoz/signoz/pkg/query-service/app/opamp/otelconfig/filterprocessor"
-	tsp "github.com/SigNoz/signoz/pkg/query-service/app/opamp/otelconfig/tailsampler"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types/opamptypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/query-service/app/opamp"
+	filterprocessor "github.com/hanzoai/o11y/pkg/query-service/app/opamp/otelconfig/filterprocessor"
+	tsp "github.com/hanzoai/o11y/pkg/query-service/app/opamp/otelconfig/tailsampler"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types/opamptypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	yaml "gopkg.in/yaml.v3"
@@ -240,10 +240,10 @@ func Redeploy(ctx context.Context, orgId valuer.UUID, typ opamptypes.ElementType
 
 		// merge current config with new filter params
 		processorConf := map[string]interface{}{
-			"signoz_tail_sampling": config,
+			"o11y_tail_sampling": config,
 		}
 
-		opamp.AddToTracePipelineSpec("signoz_tail_sampling")
+		opamp.AddToTracePipelineSpec("o11y_tail_sampling")
 		configHash, err := opamp.UpsertControlProcessors(ctx, "traces", processorConf, m.OnConfigUpdate)
 		if err != nil {
 			zap.L().Error("failed to call agent config update for trace processor", zap.Error(err))
@@ -335,10 +335,10 @@ func UpsertSamplingProcessor(ctx context.Context, orgId valuer.UUID, version int
 
 	// merge current config with new filter params
 	processorConf := map[string]interface{}{
-		"signoz_tail_sampling": config,
+		"o11y_tail_sampling": config,
 	}
 
-	opamp.AddToTracePipelineSpec("signoz_tail_sampling")
+	opamp.AddToTracePipelineSpec("o11y_tail_sampling")
 	configHash, err := opamp.UpsertControlProcessors(ctx, "traces", processorConf, m.OnConfigUpdate)
 	if err != nil {
 		zap.L().Error("failed to call agent config update for trace processor", zap.Error(err))

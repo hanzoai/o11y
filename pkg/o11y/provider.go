@@ -1,67 +1,67 @@
-package signoz
+package o11y
 
 import (
-	"github.com/SigNoz/signoz/pkg/alertmanager"
-	"github.com/SigNoz/signoz/pkg/alertmanager/nfmanager"
-	"github.com/SigNoz/signoz/pkg/alertmanager/nfmanager/rulebasednotification"
-	"github.com/SigNoz/signoz/pkg/alertmanager/signozalertmanager"
-	"github.com/SigNoz/signoz/pkg/analytics"
-	"github.com/SigNoz/signoz/pkg/analytics/noopanalytics"
-	"github.com/SigNoz/signoz/pkg/analytics/segmentanalytics"
-	"github.com/SigNoz/signoz/pkg/apiserver"
-	"github.com/SigNoz/signoz/pkg/apiserver/signozapiserver"
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/cache/memorycache"
-	"github.com/SigNoz/signoz/pkg/cache/rediscache"
-	"github.com/SigNoz/signoz/pkg/emailing"
-	"github.com/SigNoz/signoz/pkg/emailing/noopemailing"
-	"github.com/SigNoz/signoz/pkg/emailing/smtpemailing"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/flagger/configflagger"
-	"github.com/SigNoz/signoz/pkg/global"
-	"github.com/SigNoz/signoz/pkg/global/signozglobal"
-	"github.com/SigNoz/signoz/pkg/modules/authdomain/implauthdomain"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/modules/organization/implorganization"
-	"github.com/SigNoz/signoz/pkg/modules/preference/implpreference"
-	"github.com/SigNoz/signoz/pkg/modules/promote/implpromote"
-	"github.com/SigNoz/signoz/pkg/modules/session/implsession"
-	"github.com/SigNoz/signoz/pkg/modules/user"
-	"github.com/SigNoz/signoz/pkg/modules/user/impluser"
-	"github.com/SigNoz/signoz/pkg/prometheus"
-	"github.com/SigNoz/signoz/pkg/prometheus/clickhouseprometheus"
-	"github.com/SigNoz/signoz/pkg/querier"
-	"github.com/SigNoz/signoz/pkg/querier/signozquerier"
-	"github.com/SigNoz/signoz/pkg/queryparser"
-	"github.com/SigNoz/signoz/pkg/ruler"
-	"github.com/SigNoz/signoz/pkg/ruler/signozruler"
-	"github.com/SigNoz/signoz/pkg/sharder"
-	"github.com/SigNoz/signoz/pkg/sharder/noopsharder"
-	"github.com/SigNoz/signoz/pkg/sharder/singlesharder"
-	"github.com/SigNoz/signoz/pkg/sqlmigration"
-	"github.com/SigNoz/signoz/pkg/sqlschema"
-	"github.com/SigNoz/signoz/pkg/sqlschema/sqlitesqlschema"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/sqlstore/sqlitesqlstore"
-	"github.com/SigNoz/signoz/pkg/sqlstore/sqlstorehook"
-	"github.com/SigNoz/signoz/pkg/statsreporter"
-	"github.com/SigNoz/signoz/pkg/statsreporter/analyticsstatsreporter"
-	"github.com/SigNoz/signoz/pkg/statsreporter/noopstatsreporter"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/telemetrystore/clickhousetelemetrystore"
-	"github.com/SigNoz/signoz/pkg/telemetrystore/telemetrystorehook"
-	"github.com/SigNoz/signoz/pkg/tokenizer"
-	"github.com/SigNoz/signoz/pkg/tokenizer/jwttokenizer"
-	"github.com/SigNoz/signoz/pkg/tokenizer/opaquetokenizer"
-	"github.com/SigNoz/signoz/pkg/tokenizer/tokenizerstore/sqltokenizerstore"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
-	"github.com/SigNoz/signoz/pkg/types/featuretypes"
-	"github.com/SigNoz/signoz/pkg/version"
-	"github.com/SigNoz/signoz/pkg/web"
-	"github.com/SigNoz/signoz/pkg/web/noopweb"
-	"github.com/SigNoz/signoz/pkg/web/routerweb"
+	"github.com/hanzoai/o11y/pkg/alertmanager"
+	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
+	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager/rulebasednotification"
+	"github.com/hanzoai/o11y/pkg/alertmanager/o11yalertmanager"
+	"github.com/hanzoai/o11y/pkg/analytics"
+	"github.com/hanzoai/o11y/pkg/analytics/noopanalytics"
+	"github.com/hanzoai/o11y/pkg/analytics/segmentanalytics"
+	"github.com/hanzoai/o11y/pkg/apiserver"
+	"github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/cache/memorycache"
+	"github.com/hanzoai/o11y/pkg/cache/rediscache"
+	"github.com/hanzoai/o11y/pkg/emailing"
+	"github.com/hanzoai/o11y/pkg/emailing/noopemailing"
+	"github.com/hanzoai/o11y/pkg/emailing/smtpemailing"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/flagger/configflagger"
+	"github.com/hanzoai/o11y/pkg/global"
+	"github.com/hanzoai/o11y/pkg/global/o11yglobal"
+	"github.com/hanzoai/o11y/pkg/modules/authdomain/implauthdomain"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/modules/organization/implorganization"
+	"github.com/hanzoai/o11y/pkg/modules/preference/implpreference"
+	"github.com/hanzoai/o11y/pkg/modules/promote/implpromote"
+	"github.com/hanzoai/o11y/pkg/modules/session/implsession"
+	"github.com/hanzoai/o11y/pkg/modules/user"
+	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/prometheus/clickhouseprometheus"
+	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/querier/o11yquerier"
+	"github.com/hanzoai/o11y/pkg/queryparser"
+	"github.com/hanzoai/o11y/pkg/ruler"
+	"github.com/hanzoai/o11y/pkg/ruler/o11yruler"
+	"github.com/hanzoai/o11y/pkg/sharder"
+	"github.com/hanzoai/o11y/pkg/sharder/noopsharder"
+	"github.com/hanzoai/o11y/pkg/sharder/singlesharder"
+	"github.com/hanzoai/o11y/pkg/sqlmigration"
+	"github.com/hanzoai/o11y/pkg/sqlschema"
+	"github.com/hanzoai/o11y/pkg/sqlschema/sqlitesqlschema"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/sqlstore/sqlitesqlstore"
+	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstorehook"
+	"github.com/hanzoai/o11y/pkg/statsreporter"
+	"github.com/hanzoai/o11y/pkg/statsreporter/analyticsstatsreporter"
+	"github.com/hanzoai/o11y/pkg/statsreporter/noopstatsreporter"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/clickhousetelemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystorehook"
+	"github.com/hanzoai/o11y/pkg/tokenizer"
+	"github.com/hanzoai/o11y/pkg/tokenizer/jwttokenizer"
+	"github.com/hanzoai/o11y/pkg/tokenizer/opaquetokenizer"
+	"github.com/hanzoai/o11y/pkg/tokenizer/tokenizerstore/sqltokenizerstore"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
+	"github.com/hanzoai/o11y/pkg/version"
+	"github.com/hanzoai/o11y/pkg/web"
+	"github.com/hanzoai/o11y/pkg/web/noopweb"
+	"github.com/hanzoai/o11y/pkg/web/routerweb"
 )
 
 func NewAnalyticsProviderFactories() factory.NamedMap[factory.ProviderFactory[analytics.Analytics, analytics.Config]] {
@@ -200,13 +200,13 @@ func NewNotificationManagerProviderFactories(routeStore alertmanagertypes.RouteS
 
 func NewAlertmanagerProviderFactories(sqlstore sqlstore.SQLStore, orgGetter organization.Getter, nfManager nfmanager.NotificationManager) factory.NamedMap[factory.ProviderFactory[alertmanager.Alertmanager, alertmanager.Config]] {
 	return factory.MustNewNamedMap(
-		signozalertmanager.NewFactory(sqlstore, orgGetter, nfManager),
+		o11yalertmanager.NewFactory(sqlstore, orgGetter, nfManager),
 	)
 }
 
 func NewRulerProviderFactories(sqlstore sqlstore.SQLStore, queryParser queryparser.QueryParser) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]] {
 	return factory.MustNewNamedMap(
-		signozruler.NewFactory(sqlstore, queryParser),
+		o11yruler.NewFactory(sqlstore, queryParser),
 	)
 }
 
@@ -233,13 +233,13 @@ func NewStatsReporterProviderFactories(telemetryStore telemetrystore.TelemetrySt
 
 func NewQuerierProviderFactories(telemetryStore telemetrystore.TelemetryStore, prometheus prometheus.Prometheus, cache cache.Cache, flagger flagger.Flagger) factory.NamedMap[factory.ProviderFactory[querier.Querier, querier.Config]] {
 	return factory.MustNewNamedMap(
-		signozquerier.NewFactory(telemetryStore, prometheus, cache, flagger),
+		o11yquerier.NewFactory(telemetryStore, prometheus, cache, flagger),
 	)
 }
 
 func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.AuthZ, global global.Global, modules Modules, handlers Handlers) factory.NamedMap[factory.ProviderFactory[apiserver.APIServer, apiserver.Config]] {
 	return factory.MustNewNamedMap(
-		signozapiserver.NewFactory(
+		o11yapiserver.NewFactory(
 			orgGetter,
 			authz,
 			implorganization.NewHandler(modules.OrgGetter, modules.OrgSetter),
@@ -247,7 +247,7 @@ func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.Au
 			implsession.NewHandler(modules.Session),
 			implauthdomain.NewHandler(modules.AuthDomain),
 			implpreference.NewHandler(modules.Preference),
-			signozglobal.NewHandler(global),
+			o11yglobal.NewHandler(global),
 			implpromote.NewHandler(modules.Promote),
 			handlers.FlaggerHandler,
 			modules.Dashboard,
@@ -273,7 +273,7 @@ func NewTokenizerProviderFactories(cache cache.Cache, sqlstore sqlstore.SQLStore
 
 func NewGlobalProviderFactories() factory.NamedMap[factory.ProviderFactory[global.Global, global.Config]] {
 	return factory.MustNewNamedMap(
-		signozglobal.NewFactory(),
+		o11yglobal.NewFactory(),
 	)
 }
 

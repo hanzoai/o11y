@@ -4,13 +4,13 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/SigNoz/signoz/pkg/version"
+	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap" //nolint:depguard
 )
 
 var RootCmd = &cobra.Command{
-	Use:               "signoz",
+	Use:               "observe",
 	Short:             "OpenTelemetry-Native Logs, Metrics and Traces in a single pane",
 	Version:           version.Info.Version(),
 	SilenceUsage:      true,

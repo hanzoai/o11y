@@ -25,7 +25,7 @@ docker compose up
 ## Without Docker
 Follow the steps below
 
-1. ```git clone https://github.com/SigNoz/signoz.git && cd signoz/frontend```
+1. ```git clone https://github.com/Hanzo O11y/signoz.git && cd signoz/frontend```
 1. change baseURL to ```<test environment URL>``` in file ```src/constants/env.ts```
 
 1. ```yarn install```

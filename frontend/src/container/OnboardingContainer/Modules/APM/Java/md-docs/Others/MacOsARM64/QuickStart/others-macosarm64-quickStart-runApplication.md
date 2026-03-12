@@ -3,8 +3,8 @@ Once you are done intrumenting your Java application, you can run it using the b
 
 ```bash
 OTEL_RESOURCE_ATTRIBUTES=service.name={{MYAPP}} \
-OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}" \
-OTEL_EXPORTER_OTLP_ENDPOINT=https://ingest.{{REGION}}.signoz.cloud:443 \
+OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}" \
+OTEL_EXPORTER_OTLP_ENDPOINT=https://ingest.{{REGION}}.o11y.hanzo.ai:443 \
 java -javaagent:<path>/opentelemetry-javaagent.jar -jar <my-app>.jar
 ```
 
@@ -13,5 +13,5 @@ java -javaagent:<path>/opentelemetry-javaagent.jar -jar <my-app>.jar
 
 &nbsp;
 
-If you encounter any difficulties, please consult the [troubleshooting section](https://signoz.io/docs/instrumentation/java/#troubleshooting-your-installation) for assistance.
+If you encounter any difficulties, please consult the [troubleshooting section](https://o11y.hanzo.ai/docs/instrumentation/java/#troubleshooting-your-installation) for assistance.
 

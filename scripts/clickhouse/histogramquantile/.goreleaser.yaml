@@ -12,7 +12,7 @@ before:
     - go mod tidy
 
 builds:
-  - id: signoz
+  - id: observe
     binary: bin/histogram-quantile
     main: scripts/clickhouse/histogramquantile/main.go
     goos:

@@ -115,7 +115,7 @@ describe('drilldownUtils', () => {
 					{
 						queryName: 'metrics_query',
 						dataSource: 'metrics' as any,
-						aggregations: [{ metricName: 'signoz_test_metric' }] as any,
+						aggregations: [{ metricName: 'o11y_test_metric' }] as any,
 						groupBy: [],
 						expression: '',
 						disabled: false,

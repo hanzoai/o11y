@@ -11,9 +11,9 @@ Follow these steps if you want to monitor System metrics like CPU Percentage, Me
 
 ## Dashboard Example
 
-Once you have completed the prerequisites, you can start monitoring your Azure Function's system metrics with SigNoz. Here's how you can do it:
+Once you have completed the prerequisites, you can start monitoring your Azure Function's system metrics with Hanzo O11y. Here's how you can do it:
 
-1. Log in to your SigNoz account.
+1. Log in to your Hanzo O11y account.
 2. Navigate to the Dashboards, and add an dashboard
 3. Add a Timeseries Panel
 4. In *Metrics*, select `azure_requests_total`  and *Avg By* select tag `location`
@@ -21,8 +21,8 @@ Once you have completed the prerequisites, you can start monitoring your Azure F
 6. Hit “Save Changes” You now have Total Requests of your Azure Function in a Dashboard for reporting and alerting 
 
 
-That's it! You have successfully set up monitoring for your Azure Function's system metrics with SigNoz.
+That's it! You have successfully set up monitoring for your Azure Function's system metrics with Hanzo O11y.
 
 &nbsp;
 
-If you encounter any difficulties, please refer to this [troubleshooting section](https://signoz.io/docs/azure-monitoring/az-fns/metrics/#troubleshooting) 
+If you encounter any difficulties, please refer to this [troubleshooting section](https://o11y.hanzo.ai/docs/azure-monitoring/az-fns/metrics/#troubleshooting) 

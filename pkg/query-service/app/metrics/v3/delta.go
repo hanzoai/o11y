@@ -3,10 +3,10 @@ package v3
 import (
 	"fmt"
 
-	"github.com/SigNoz/signoz/pkg/query-service/app/metrics/v4/helpers"
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4/helpers"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
 )
 
 func buildDeltaMetricQuery(start, end, step int64, mq *v3.BuilderQuery) (string, error) {
@@ -43,7 +43,7 @@ func buildDeltaMetricQuery(start, end, step int64, mq *v3.BuilderQuery) (string,
 		"SELECT %s" +
 			" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 			" %s as value" +
-			" FROM " + constants.SIGNOZ_METRIC_DBNAME + "." + constants.SIGNOZ_SAMPLES_V4_TABLENAME +
+			" FROM " + constants.HANZO_METRIC_DBNAME + "." + constants.HANZO_SAMPLES_V4_TABLENAME +
 			" INNER JOIN" +
 			" (%s) as filtered_time_series" +
 			" USING fingerprint" +
@@ -143,7 +143,7 @@ func buildDeltaMetricQuery(start, end, step int64, mq *v3.BuilderQuery) (string,
 			"SELECT fingerprint, labels as fullLabels," +
 				" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 				" any(value) as value" +
-				" FROM " + constants.SIGNOZ_METRIC_DBNAME + "." + constants.SIGNOZ_SAMPLES_V4_TABLENAME +
+				" FROM " + constants.HANZO_METRIC_DBNAME + "." + constants.HANZO_SAMPLES_V4_TABLENAME +
 				" INNER JOIN" +
 				" (%s) as filtered_time_series" +
 				" USING fingerprint" +

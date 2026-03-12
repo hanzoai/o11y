@@ -19,7 +19,7 @@ import { DataSource, ReduceOperators } from 'types/common/queryBuilder';
 import { v4 as uuid } from 'uuid';
 
 export const KAFKA_SETUP_DOC_LINK =
-	'https://signoz.io/docs/messaging-queues/kafka?utm_source=product&utm_medium=kafka-get-started';
+	'https://o11y.hanzo.ai/docs/messaging-queues/kafka?utm_source=product&utm_medium=kafka-get-started';
 
 export function convertToTitleCase(text: string): string {
 	return text

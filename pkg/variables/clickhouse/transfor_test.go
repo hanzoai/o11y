@@ -15,12 +15,12 @@ func TestTransform(t *testing.T) {
 		{
 			name: "Example 1: Only service_name is __all__",
 			sql: `SELECT trace_id, name, kind, status 
-FROM signoz_traces.signoz_index_v3
+FROM observe_traces.observe_index_v3
 WHERE service_name = $service_name
   AND operation_name IN ($operation_names)
   AND duration >= $min_duration
   AND attributes['http.method'] = $http_method
-  AND op IN (SELECT op FROM signoz_traces.operations WHERE service_name = $service_name AND kind = 'server')
+  AND op IN (SELECT op FROM observe_traces.operations WHERE service_name = $service_name AND kind = 'server')
   AND timestamp BETWEEN $start_time AND $end_time`,
 
 			// Define our variables and their values/metadata
@@ -62,17 +62,17 @@ WHERE service_name = $service_name
 					FieldType:   "scalar",
 				},
 			},
-			expected: `SELECT trace_id, name, kind, status FROM signoz_traces.signoz_index_v3 WHERE operation_name IN ($operation_names) AND duration >= $min_duration AND attributes['http.method'] = $http_method AND op IN (SELECT op FROM signoz_traces.operations WHERE kind = 'server') AND timestamp BETWEEN $start_time AND $end_time;`,
+			expected: `SELECT trace_id, name, kind, status FROM observe_traces.observe_index_v3 WHERE operation_name IN ($operation_names) AND duration >= $min_duration AND attributes['http.method'] = $http_method AND op IN (SELECT op FROM observe_traces.operations WHERE kind = 'server') AND timestamp BETWEEN $start_time AND $end_time;`,
 		},
 		{
 			name: "Example 2: Multiple __all__ selections and map lookups",
 			sql: `SELECT trace_id, name, kind, status 
-FROM signoz_traces.signoz_index_v3
+FROM observe_traces.observe_index_v3
 WHERE service_name = $service_name
   AND operation_name IN ($operation_names)
   AND duration >= $min_duration
   AND attributes['http.method'] = $http_method
-  AND op IN (SELECT op FROM signoz_traces.operations WHERE service_name = $service_name AND kind = 'server')
+  AND op IN (SELECT op FROM observe_traces.operations WHERE service_name = $service_name AND kind = 'server')
   AND timestamp BETWEEN $start_time AND $end_time`,
 
 			variables: []VariableValue{
@@ -113,17 +113,17 @@ WHERE service_name = $service_name
 					FieldType:   "scalar",
 				},
 			},
-			expected: `SELECT trace_id, name, kind, status FROM signoz_traces.signoz_index_v3 WHERE attributes['http.method'] = $http_method AND op IN (SELECT op FROM signoz_traces.operations WHERE kind = 'server') AND timestamp BETWEEN $start_time AND $end_time;`,
+			expected: `SELECT trace_id, name, kind, status FROM observe_traces.observe_index_v3 WHERE attributes['http.method'] = $http_method AND op IN (SELECT op FROM observe_traces.operations WHERE kind = 'server') AND timestamp BETWEEN $start_time AND $end_time;`,
 		},
 		{
 			name: "Example 3: Multiple __all__ selections and map lookups",
 			sql: `SELECT trace_id, name, kind, status 
-FROM signoz_traces.signoz_index_v3
+FROM observe_traces.observe_index_v3
 WHERE service_name = $service_name 
   AND operation_name IN ($operation_names)
   AND duration >= $min_duration
   AND attributes['http.method'] = $http_method
-  AND op IN (SELECT op FROM signoz_traces.operations WHERE service_name = $service_name AND kind = 'server')
+  AND op IN (SELECT op FROM observe_traces.operations WHERE service_name = $service_name AND kind = 'server')
   AND timestamp BETWEEN $start_time AND $end_time`,
 
 			variables: []VariableValue{
@@ -152,17 +152,17 @@ WHERE service_name = $service_name
 					FieldType:   "map",
 				},
 			},
-			expected: `SELECT trace_id, name, kind, status FROM signoz_traces.signoz_index_v3 WHERE op IN (SELECT op FROM signoz_traces.operations WHERE kind = 'server') AND timestamp BETWEEN $start_time AND $end_time;`,
+			expected: `SELECT trace_id, name, kind, status FROM observe_traces.observe_index_v3 WHERE op IN (SELECT op FROM observe_traces.operations WHERE kind = 'server') AND timestamp BETWEEN $start_time AND $end_time;`,
 		},
 		{
 			name: "Example 3: Multiple __all__ selections and map lookups",
 			sql: `SELECT trace_id, name, kind, status 
-FROM signoz_traces.signoz_index_v3
+FROM observe_traces.observe_index_v3
 WHERE service_name = {{service_name}} 
   AND operation_name IN {{.operation_names}}
   AND duration >= {{min_duration}}
   AND attributes['http.method'] = $http_method
-  AND op IN (SELECT op FROM signoz_traces.operations WHERE service_name = {{service_name}} AND kind = 'server')`,
+  AND op IN (SELECT op FROM observe_traces.operations WHERE service_name = {{service_name}} AND kind = 'server')`,
 
 			variables: []VariableValue{
 				{
@@ -190,7 +190,7 @@ WHERE service_name = {{service_name}}
 					FieldType:   "map",
 				},
 			},
-			expected: `SELECT trace_id, name, kind, status FROM signoz_traces.signoz_index_v3 WHERE op IN (SELECT op FROM signoz_traces.operations WHERE kind = 'server');`,
+			expected: `SELECT trace_id, name, kind, status FROM observe_traces.observe_index_v3 WHERE op IN (SELECT op FROM observe_traces.operations WHERE kind = 'server');`,
 		},
 	}
 

@@ -67,13 +67,13 @@ processors:
     timeout: 10s
 
 exporters:
-  # export to SigNoz cloud
+  # export to Hanzo O11y cloud
   otlp/mongodb-logs:
     endpoint: "${env:OTLP_DESTINATION_ENDPOINT}"
     tls:
       insecure: false
     headers:
-      "signoz-access-token": "${env:SIGNOZ_INGESTION_KEY}"
+      "signoz-access-token": "${env:HANZO_INGESTION_KEY}"
 
   # export to local collector
   # otlp/mongodb-logs:
@@ -101,11 +101,11 @@ Set the following environment variables in your otel-collector environment:
 # mongod.conf file can also be checked for finding log file location
 export MONGODB_LOG_FILE=/var/log/mongodb/mongodb.log
 
-# region specific SigNoz cloud ingestion endpoint
-export OTLP_DESTINATION_ENDPOINT="ingest.us.signoz.cloud:443"
+# region specific Hanzo O11y cloud ingestion endpoint
+export OTLP_DESTINATION_ENDPOINT="ingest.us.o11y.hanzo.ai:443"
 
-# your SigNoz ingestion key
-export SIGNOZ_INGESTION_KEY="signoz-ingestion-key"
+# your Hanzo O11y ingestion key
+export HANZO_INGESTION_KEY="signoz-ingestion-key"
 
 ```
 

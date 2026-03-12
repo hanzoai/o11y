@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Switch } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { Delete } from 'lucide-react';
@@ -57,7 +57,7 @@ function TimezoneAdaptation(): JSX.Element {
 			</div>
 
 			<p className="timezone-adaption__description">
-				Adapt the timestamps shown in the SigNoz console to my active timezone.
+				Adapt the timestamps shown in the Hanzo O11y console to my active timezone.
 			</p>
 
 			<div className="timezone-adaption__note">

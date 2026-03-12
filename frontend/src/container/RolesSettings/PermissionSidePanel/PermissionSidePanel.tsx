@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { ChevronDown, ChevronRight, X } from '@signozhq/icons';
+import { Button } from '@hanzo/o11y-button';
+import { ChevronDown, ChevronRight, X } from '@hanzo/o11y-icons';
 import {
 	RadioGroup,
 	RadioGroupItem,
 	RadioGroupLabel,
-} from '@signozhq/radio-group';
+} from '@hanzo/o11y-radio-group';
 import { Select, Skeleton } from 'antd';
 
 import {

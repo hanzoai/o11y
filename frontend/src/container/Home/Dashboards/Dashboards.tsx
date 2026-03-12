@@ -88,7 +88,7 @@ export default function Dashboards({
 									source: 'Dashboards',
 								});
 								window.open(
-									'https://signoz.io/docs/userguide/manage-dashboards/',
+									'https://o11y.hanzo.ai/docs/userguide/manage-dashboards/',
 									'_blank',
 								);
 							}}

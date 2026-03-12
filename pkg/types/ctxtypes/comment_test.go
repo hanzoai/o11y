@@ -23,42 +23,42 @@ func TestCommentFromHTTPRequest(t *testing.T) {
 		},
 		{
 			name:     "ControlCharacterInReferer",
-			req:      &http.Request{Header: http.Header{"Referer": {"https://signoz.io/logs/logs-explorer\x00"}}},
+			req:      &http.Request{Header: http.Header{"Referer": {"https://observe.hanzo.ai/logs/logs-explorer\x00"}}},
 			expected: map[string]string{},
 		},
 		{
 			name:     "LogsExplorer",
-			req:      &http.Request{Header: http.Header{"Referer": {"https://signoz.io/logs/logs-explorer"}}},
+			req:      &http.Request{Header: http.Header{"Referer": {"https://observe.hanzo.ai/logs/logs-explorer"}}},
 			expected: map[string]string{"http_path": "/logs/logs-explorer", "module_name": "logs-explorer"},
 		},
 		{
 			name:     "TracesExplorer",
-			req:      &http.Request{Header: http.Header{"Referer": {"https://signoz.io/traces-explorer"}}},
+			req:      &http.Request{Header: http.Header{"Referer": {"https://observe.hanzo.ai/traces-explorer"}}},
 			expected: map[string]string{"http_path": "/traces-explorer", "module_name": "traces-explorer"},
 		},
 		{
 			name:     "MetricsExplorer",
-			req:      &http.Request{Header: http.Header{"Referer": {"https://signoz.io/metrics-explorer/explorer"}}},
+			req:      &http.Request{Header: http.Header{"Referer": {"https://observe.hanzo.ai/metrics-explorer/explorer"}}},
 			expected: map[string]string{"http_path": "/metrics-explorer/explorer", "module_name": "metrics-explorer"},
 		},
 		{
 			name:     "DashboardWithID",
-			req:      &http.Request{Header: http.Header{"Referer": {"https://signoz.io/dashboard/123/new"}}},
+			req:      &http.Request{Header: http.Header{"Referer": {"https://observe.hanzo.ai/dashboard/123/new"}}},
 			expected: map[string]string{"http_path": "/dashboard/123/new", "module_name": "dashboard", "dashboard_id": "123"},
 		},
 		{
 			name:     "DashboardLandingPage",
-			req:      &http.Request{Header: http.Header{"Referer": {"https://signoz.io/dashboard/01982be0-d67e-7326-8955-2e99720a9f72?relativeTime=30m"}}},
+			req:      &http.Request{Header: http.Header{"Referer": {"https://observe.hanzo.ai/dashboard/01982be0-d67e-7326-8955-2e99720a9f72?relativeTime=30m"}}},
 			expected: map[string]string{"http_path": "/dashboard/01982be0-d67e-7326-8955-2e99720a9f72", "module_name": "dashboard", "dashboard_id": "01982be0-d67e-7326-8955-2e99720a9f72"},
 		},
 		{
 			name:     "Rule",
-			req:      &http.Request{Header: http.Header{"Referer": {"https://signoz.io/alerts/new"}}},
+			req:      &http.Request{Header: http.Header{"Referer": {"https://observe.hanzo.ai/alerts/new"}}},
 			expected: map[string]string{"http_path": "/alerts/new", "module_name": "rule"},
 		},
 		{
 			name:     "RuleWithID",
-			req:      &http.Request{Header: http.Header{"Referer": {"https://signoz.io/alerts/edit?ruleId=123"}}},
+			req:      &http.Request{Header: http.Header{"Referer": {"https://observe.hanzo.ai/alerts/edit?ruleId=123"}}},
 			expected: map[string]string{"http_path": "/alerts/edit", "module_name": "rule", "rule_id": "123"},
 		},
 	}

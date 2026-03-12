@@ -3,7 +3,7 @@ package render
 import (
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 	jsoniter "github.com/json-iterator/go"
 )
 

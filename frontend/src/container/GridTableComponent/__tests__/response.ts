@@ -106,8 +106,8 @@ export const widgetQueryWithLegend = {
 				aggregateOperator: 'count',
 				aggregateAttribute: {
 					dataType: 'float64',
-					id: 'signoz_latency--float64--ExponentialHistogram--true',
-					key: 'signoz_latency',
+					id: 'observe_latency--float64--ExponentialHistogram--true',
+					key: 'observe_latency',
 					type: 'ExponentialHistogram',
 				},
 				timeAggregation: '',
@@ -343,8 +343,8 @@ export const widgetQueryQBv5MultiAggregations = {
 				aggregateOperator: 'count',
 				aggregateAttribute: {
 					dataType: 'float64',
-					id: 'signoz_latency--float64--ExponentialHistogram--true',
-					key: 'signoz_latency',
+					id: 'observe_latency--float64--ExponentialHistogram--true',
+					key: 'observe_latency',
 					type: 'ExponentialHistogram',
 				},
 				timeAggregation: '',
@@ -423,8 +423,8 @@ export const widgetQueryQBv5MultiAggregations = {
 				aggregateOperator: 'count',
 				aggregateAttribute: {
 					dataType: 'float64',
-					id: 'signoz_latency--float64--ExponentialHistogram--true',
-					key: 'signoz_latency',
+					id: 'observe_latency--float64--ExponentialHistogram--true',
+					key: 'observe_latency',
 					type: 'ExponentialHistogram',
 				},
 				timeAggregation: '',

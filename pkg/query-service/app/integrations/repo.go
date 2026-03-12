@@ -3,8 +3,8 @@ package integrations
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	"github.com/SigNoz/signoz/pkg/types/integrationtypes"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/types/integrationtypes"
 )
 
 type InstalledIntegrationsRepo interface {

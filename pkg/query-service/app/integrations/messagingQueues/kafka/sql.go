@@ -16,7 +16,7 @@ WITH consumer_query AS (
         COUNT(*) AS total_requests,
         sumIf(1, status_code = 2) AS error_count,
         avg(CASE WHEN has(attributes_number, 'messaging.message.body.size') THEN attributes_number['messaging.message.body.size'] ELSE NULL END) AS avg_msg_size
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         timestamp >= '%d'
         AND timestamp <= '%d'
@@ -56,7 +56,7 @@ WITH partition_query AS (
         count(*) AS total_requests,
         attributes_string['messaging.destination.name'] AS topic,
 		attributes_string['messaging.destination.partition.id'] AS partition
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         timestamp >= '%d'
         AND timestamp <= '%d'
@@ -93,7 +93,7 @@ WITH consumer_pl AS (
         quantile(0.99)(durationNano) / 1000000 AS p99,
         COUNT(*) AS total_requests,
         sumIf(1, status_code = 2) AS error_count
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         timestamp >= '%d'
         AND timestamp <= '%d'
@@ -133,7 +133,7 @@ WITH producer_latency AS (
 		attributes_string['messaging.destination.name'] AS topic,
         COUNT(*) AS total_requests,
         sumIf(1, status_code = 2) AS error_count
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         timestamp >= '%d'
         AND timestamp <= '%d'
@@ -168,7 +168,7 @@ WITH consumer_latency AS (
 		attributes_string['messaging.destination.partition.id'] AS partition,
         COUNT(*) AS total_requests,
         sumIf(1, status_code = 2) AS error_count
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         timestamp >= '%d'
         AND timestamp <= '%d'
@@ -206,7 +206,7 @@ WITH consumer_latency AS (
         COUNT(*) AS total_requests,
         sumIf(1, status_code = 2) AS error_count,
         SUM(attributes_number['messaging.message.body.size']) AS total_bytes
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         timestamp >= '%d'
         AND timestamp <= '%d'
@@ -244,7 +244,7 @@ WITH consumer_latency AS (
 		attributes_string['messaging.destination.partition.id'] AS partition,
         COUNT(*) AS total_requests,
         sumIf(1, status_code = 2) AS error_count
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         timestamp >= '%d'
         AND timestamp <= '%d'
@@ -281,9 +281,9 @@ WITH trace_data AS (
         p.durationNano AS durationNano,
         (toUnixTimestamp64Nano(c.timestamp) - toUnixTimestamp64Nano(p.timestamp)) + p.durationNano AS time_difference
     FROM
-        signoz_traces.distributed_signoz_index_v3 p
+        observe_traces.distributed_observe_index_v3 p
     GLOBAL INNER JOIN
-        signoz_traces.distributed_signoz_index_v3 c
+        observe_traces.distributed_observe_index_v3 c
             ON p.trace_id = c.trace_id
             AND c.parent_span_id = p.span_id
     WHERE
@@ -329,7 +329,7 @@ WITH producer_query AS (
         quantile(0.99)(durationNano) / 1000000 AS p99,
         count(*) AS total_count,
         sumIf(1, status_code = 2) AS error_count
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         timestamp >= '%d'
         AND timestamp <= '%d'
@@ -365,7 +365,7 @@ SELECT
 	resources_string['service.instance.id'] AS service_instance_id,
     resource_string_service$$name AS service_name,
     count(*) / %d AS throughput
-FROM signoz_traces.distributed_signoz_index_v3
+FROM observe_traces.distributed_observe_index_v3
 WHERE
     timestamp >= '%d'
     AND timestamp <= '%d'
@@ -392,7 +392,7 @@ SELECT
     COUNT(IF(has(attributes_string, 'messaging.destination.name'), 1, NULL)) = 0 AS destination,
     COUNT(IF(has(attributes_string, 'messaging.destination.partition.id'), 1, NULL)) = 0 AS partition
 FROM 
-    signoz_traces.distributed_signoz_index_v3
+    observe_traces.distributed_observe_index_v3
 WHERE 
     timestamp >= '%d'
     AND timestamp <= '%d'
@@ -416,7 +416,7 @@ SELECT
     COUNT(IF(has(attributes_number, 'messaging.message.body.size'), 1, NULL)) = 0 AS bodysize,
     COUNT(IF(has(attributes_string, 'messaging.client_id'), 1, NULL)) = 0 AS clientid,
     COUNT(IF(has(resources_string, 'service.instance.id'), 1, NULL)) = 0 AS instanceid
-FROM signoz_traces.distributed_signoz_index_v3
+FROM observe_traces.distributed_observe_index_v3
 WHERE 
     timestamp >= '%d'
     AND timestamp <= '%d'

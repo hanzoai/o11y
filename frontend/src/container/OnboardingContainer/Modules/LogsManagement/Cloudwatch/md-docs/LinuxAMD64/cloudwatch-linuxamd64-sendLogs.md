@@ -1,4 +1,4 @@
-### Send logs to SigNoz
+### Send logs to Hanzo O11y
 
 To test out the receiver, create a pipeline in the pipeline section of the `config.yaml` of the **`otecol-contrib`** directory that you created in the Setup Otel Collector Step.
 
@@ -32,7 +32,7 @@ To test out the receiver, create a pipeline in the pipeline section of the `conf
 ./otelcol-contrib --config ./config.yaml 
 ```
 
-You should be able to see your Cloudwatch logs in the logs tabs of SigNoz Cloud UI.
+You should be able to see your Cloudwatch logs in the logs tabs of Hanzo O11y Cloud UI.
 
 
 

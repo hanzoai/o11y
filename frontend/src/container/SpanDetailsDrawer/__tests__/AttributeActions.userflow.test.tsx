@@ -42,7 +42,7 @@ jest.mock('hooks/queryBuilder/useQueryBuilder', () => ({
 				queryData: [
 					{
 						aggregateOperator: 'count',
-						aggregateAttribute: { key: 'signoz_span_duration' },
+						aggregateAttribute: { key: 'observe_span_duration' },
 						filters: { items: [], op: 'AND' },
 						filter: { expression: '' },
 						groupBy: [],
@@ -68,7 +68,7 @@ jest.mock('react-query', () => ({
 	useQueryClient: (): any => mockQueryClient,
 }));
 
-jest.mock('@signozhq/sonner', () => ({ toast: jest.fn() }));
+jest.mock('@hanzo/o11y-sonner', () => ({ toast: jest.fn() }));
 
 // Mock the API response for getAggregateKeys
 const mockAggregateKeysResponse = {

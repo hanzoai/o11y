@@ -1,6 +1,6 @@
 # Onboarding Configuration Guide
 
-This guide explains how to add new data sources to the SigNoz onboarding flow. The onboarding configuration controls the "New Source" / "Get Started" experience in SigNoz Cloud.
+This guide explains how to add new data sources to the Hanzo O11y onboarding flow. The onboarding configuration controls the "New Source" / "Get Started" experience in Hanzo O11y Cloud.
 
 ## Configuration File Location
 

@@ -10,31 +10,31 @@ import (
 	"sync"
 	"time"
 
-	"github.com/SigNoz/signoz/ee/query-service/anomaly"
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/query-service/common"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	"github.com/SigNoz/signoz/pkg/transition"
-	"github.com/SigNoz/signoz/pkg/types/ruletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/ee/query-service/anomaly"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/query-service/common"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/transition"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 
-	querierV2 "github.com/SigNoz/signoz/pkg/query-service/app/querier/v2"
-	"github.com/SigNoz/signoz/pkg/query-service/app/queryBuilder"
-	"github.com/SigNoz/signoz/pkg/query-service/interfaces"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/labels"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/times"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/timestamp"
+	querierV2 "github.com/hanzoai/o11y/pkg/query-service/app/querier/v2"
+	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
+	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/times"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/timestamp"
 
-	"github.com/SigNoz/signoz/pkg/units"
+	"github.com/hanzoai/o11y/pkg/units"
 
-	baserules "github.com/SigNoz/signoz/pkg/query-service/rules"
+	baserules "github.com/hanzoai/o11y/pkg/query-service/rules"
 
-	querierV5 "github.com/SigNoz/signoz/pkg/querier"
+	querierV5 "github.com/hanzoai/o11y/pkg/querier"
 
-	anomalyV2 "github.com/SigNoz/signoz/ee/anomaly"
+	anomalyV2 "github.com/hanzoai/o11y/ee/anomaly"
 
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
 const (

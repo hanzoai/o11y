@@ -1,6 +1,6 @@
 package model
 
-import "github.com/SigNoz/signoz/pkg/valuer"
+import "github.com/hanzoai/o11y/pkg/valuer"
 
 // Interface for source of otel collector config recommendations.
 type AgentConfigProvider interface {

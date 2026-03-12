@@ -2,7 +2,7 @@ import { ReduceOperators } from 'types/common/queryBuilder';
 
 export const valuePanelWidget = {
 	id: 'b8b93086-ef01-47bf-9044-1e7abd583be4',
-	title: 'signoz latency in ms',
+	title: 'o11y latency in ms',
 	description: '',
 	nullZeroValues: 'zero',
 	opacity: '1',
@@ -31,10 +31,10 @@ export const valuePanelWidget = {
 					queryName: 'A',
 					aggregateOperator: 'count',
 					aggregateAttribute: {
-						key: 'signoz_latency',
+						key: 'observe_latency',
 						dataType: 'float64',
 						type: 'ExponentialHistogram',
-						id: 'signoz_latency--float64--ExponentialHistogram--true',
+						id: 'observe_latency--float64--ExponentialHistogram--true',
 					},
 					timeAggregation: '',
 					spaceAggregation: 'p90',
@@ -211,10 +211,10 @@ export const valuePanelQueryResponse = {
 						queryName: 'A',
 						aggregateOperator: 'count',
 						aggregateAttribute: {
-							key: 'signoz_latency',
+							key: 'observe_latency',
 							dataType: 'float64',
 							type: 'ExponentialHistogram',
-							id: 'signoz_latency--float64--ExponentialHistogram--true',
+							id: 'observe_latency--float64--ExponentialHistogram--true',
 						},
 						timeAggregation: '',
 						spaceAggregation: 'p90',

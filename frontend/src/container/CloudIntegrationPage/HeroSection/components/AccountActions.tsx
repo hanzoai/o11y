@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Button, Select, Skeleton } from 'antd';
 import type { SelectProps } from 'antd/lib';
 import logEvent from 'api/common/logEvent';

@@ -73,4 +73,4 @@ If you call this `doWork` function, it will add a trace with span name "doWork" 
 
 ### Step 4: Dockerize your application
 
-Since the environment variables like SIGNOZ_INGESTION_KEY, Ingestion URL and Service name are set in the `main.swift` file, you don't need to add any additional steps in your Dockerfile.
+Since the environment variables like HANZO_INGESTION_KEY, Ingestion URL and Service name are set in the `main.swift` file, you don't need to add any additional steps in your Dockerfile.

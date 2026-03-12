@@ -1,5 +1,5 @@
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { MetricType } from 'api/metricsExplorer/getMetricsList';
 import {
 	BarChart,
@@ -95,9 +95,9 @@ export const INITIAL_INSPECT_METRICS_OPTIONS: MetricInspectionState = {
 };
 
 export const TEMPORAL_AGGREGATION_LINK =
-	'https://signoz.io/docs/metrics-management/types-and-aggregation/#step-2-temporal-aggregation';
+	'https://o11y.hanzo.ai/docs/metrics-management/types-and-aggregation/#step-2-temporal-aggregation';
 
 export const SPACE_AGGREGATION_LINK =
-	'https://signoz.io/docs/metrics-management/types-and-aggregation/#step-3-spatial-aggregation';
+	'https://o11y.hanzo.ai/docs/metrics-management/types-and-aggregation/#step-3-spatial-aggregation';
 
 export const GRAPH_CLICK_PIXEL_TOLERANCE = 10;

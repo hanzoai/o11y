@@ -4,9 +4,9 @@ import (
 	"context"
 	"crypto/sha256"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	model "github.com/SigNoz/signoz/pkg/query-service/app/opamp/model"
-	"github.com/SigNoz/signoz/pkg/query-service/app/opamp/otelconfig"
+	"github.com/hanzoai/o11y/pkg/errors"
+	model "github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
+	"github.com/hanzoai/o11y/pkg/query-service/app/opamp/otelconfig"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/open-telemetry/opamp-go/protobufs"
 	"go.opentelemetry.io/collector/confmap"

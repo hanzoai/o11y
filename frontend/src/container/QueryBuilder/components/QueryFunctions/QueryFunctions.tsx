@@ -221,7 +221,7 @@ export default function QueryFunctions({
 							Add new function
 							<Typography.Link
 								style={{ textDecoration: 'underline' }}
-								href="https://signoz.io/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#functions-for-extended-data-analysis"
+								href="https://o11y.hanzo.ai/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#functions-for-extended-data-analysis"
 								target="_blank"
 							>
 								{' '}

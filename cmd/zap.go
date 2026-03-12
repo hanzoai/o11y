@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"go.uber.org/zap"         //nolint:depguard
 	"go.uber.org/zap/zapcore" //nolint:depguard
 )

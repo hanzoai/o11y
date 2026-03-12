@@ -1,6 +1,6 @@
 # Packages
 
-All shared Go code in SigNoz lives under `pkg/`. Each package represents a distinct domain concept and exposes a clear public interface. This guide covers the conventions for creating, naming, and organising packages so the codebase stays consistent as it grows.
+All shared Go code in Hanzo O11y lives under `pkg/`. Each package represents a distinct domain concept and exposes a clear public interface. This guide covers the conventions for creating, naming, and organising packages so the codebase stays consistent as it grows.
 
 ## How should I name a package?
 
@@ -81,8 +81,8 @@ import (
     "github.com/gorilla/mux"
 
     // 3. Internal
-    "github.com/SigNoz/signoz/pkg/errors"
-    "github.com/SigNoz/signoz/pkg/types"
+    "github.com/Hanzo O11y/signoz/pkg/errors"
+    "github.com/Hanzo O11y/signoz/pkg/types"
 )
 ```
 

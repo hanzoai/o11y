@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/stretchr/testify/assert"
 )
 

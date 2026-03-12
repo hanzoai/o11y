@@ -6,10 +6,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/queryBuilderToExpr"
-	"github.com/SigNoz/signoz/pkg/types"
+	"github.com/hanzoai/o11y/pkg/errors"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/queryBuilderToExpr"
+	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/uptrace/bun"
 )
 

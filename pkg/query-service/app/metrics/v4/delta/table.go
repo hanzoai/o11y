@@ -3,8 +3,8 @@ package delta
 import (
 	"fmt"
 
-	"github.com/SigNoz/signoz/pkg/query-service/app/metrics/v4/helpers"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4/helpers"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
 // PrepareMetricQueryDeltaTable builds the query to be used for fetching metrics

@@ -547,7 +547,7 @@ function Success(props: ISuccessProps): JSX.Element {
 						type="text"
 						onClick={(): WindowProxy | null =>
 							window.open(
-								'https://signoz.io/docs/userguide/traces/#missing-spans',
+								'https://o11y.hanzo.ai/docs/userguide/traces/#missing-spans',
 								'_blank',
 							)
 						}

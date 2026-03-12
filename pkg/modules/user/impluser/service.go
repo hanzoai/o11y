@@ -4,15 +4,15 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/modules/user"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/roletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/modules/user"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type service struct {
@@ -34,7 +34,7 @@ func NewService(
 	config user.RootConfig,
 ) user.Service {
 	return &service{
-		settings:  factory.NewScopedProviderSettings(providerSettings, "go.signoz.io/pkg/modules/user"),
+		settings:  factory.NewScopedProviderSettings(providerSettings, "go.observe.hanzo.ai/pkg/modules/user"),
 		store:     store,
 		module:    module,
 		orgGetter: orgGetter,
@@ -159,8 +159,8 @@ func (s *service) createOrPromoteRootUser(ctx context.Context, orgID valuer.UUID
 		if oldRole != types.RoleAdmin {
 			if err := s.authz.ModifyGrant(ctx,
 				orgID,
-				[]string{roletypes.MustGetSigNozManagedRoleFromExistingRole(oldRole)},
-				[]string{roletypes.MustGetSigNozManagedRoleFromExistingRole(types.RoleAdmin)},
+				[]string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(oldRole)},
+				[]string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(types.RoleAdmin)},
 				authtypes.MustNewSubject(authtypes.TypeableUser, existingUser.ID.StringValue(), orgID, nil),
 			); err != nil {
 				return err

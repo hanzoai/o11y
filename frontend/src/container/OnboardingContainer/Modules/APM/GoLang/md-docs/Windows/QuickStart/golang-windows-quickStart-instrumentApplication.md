@@ -21,8 +21,8 @@
    ```bash
     var (
         serviceName  = "{{MYAPP}}")
-        collectorURL = "https://ingest.{{REGION}}.signoz.cloud:443"
-        headers="signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}"
+        collectorURL = "https://ingest.{{REGION}}.o11y.hanzo.ai:443"
+        headers="signoz-ingestion-key={{HANZO_INGESTION_KEY}}"
         insecure = os.Getenv("INSECURE_MODE")
     )
     ```

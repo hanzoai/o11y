@@ -1,7 +1,7 @@
 version: "3"
 x-common: &common
   networks:
-    - signoz-net
+    - o11y-net
   extra_hosts:
     - host.docker.internal:host-gateway
   logging:
@@ -16,11 +16,11 @@ services:
     container_name: hotrod
     command: [ "all" ]
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://host.docker.internal:4318  # In case of external SigNoz or cloud, update the endpoint and access token
-      # - OTEL_OTLP_HEADERS=signoz-access-token=<your-access-token>
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://host.docker.internal:4318  # In case of external Hanzo O11y or cloud, update the endpoint and access token
+      # - OTEL_OTLP_HEADERS=observe-access-token=<your-access-token>
   load-hotrod:
     <<: *common
-    image: "signoz/locust:1.2.3"
+    image: "observe/locust:1.2.3"
     container_name: load-hotrod
     environment:
       ATTACKED_HOST: http://hotrod:8080
@@ -34,6 +34,6 @@ services:
       - ../../../common/locust-scripts:/locust
 
 networks:
-  signoz-net:
-    name: signoz-net
+  o11y-net:
+    name: o11y-net
     external: true

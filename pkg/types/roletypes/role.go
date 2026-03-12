@@ -5,10 +5,10 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 	"github.com/uptrace/bun"
 )
@@ -32,21 +32,21 @@ var (
 )
 
 var (
-	SigNozAnonymousRoleName        = "signoz-anonymous"
-	SigNozAnonymousRoleDescription = "Role assigned to anonymous users for access to public resources."
-	SigNozAdminRoleName            = "signoz-admin"
-	SigNozAdminRoleDescription     = "Role assigned to users who have full administrative access to SigNoz resources."
-	SigNozEditorRoleName           = "signoz-editor"
-	SigNozEditorRoleDescription    = "Role assigned to users who can create, edit, and manage SigNoz resources but do not have full administrative privileges."
-	SigNozViewerRoleName           = "signoz-viewer"
-	SigNozViewerRoleDescription    = "Role assigned to users who have read-only access to SigNoz resources."
+	Hanzo O11yAnonymousRoleName        = "o11y-anonymous"
+	Hanzo O11yAnonymousRoleDescription = "Role assigned to anonymous users for access to public resources."
+	Hanzo O11yAdminRoleName            = "o11y-admin"
+	Hanzo O11yAdminRoleDescription     = "Role assigned to users who have full administrative access to Hanzo O11y resources."
+	Hanzo O11yEditorRoleName           = "o11y-editor"
+	Hanzo O11yEditorRoleDescription    = "Role assigned to users who can create, edit, and manage Hanzo O11y resources but do not have full administrative privileges."
+	Hanzo O11yViewerRoleName           = "o11y-viewer"
+	Hanzo O11yViewerRoleDescription    = "Role assigned to users who have read-only access to Hanzo O11y resources."
 )
 
 var (
-	ExistingRoleToSigNozManagedRoleMap = map[types.Role]string{
-		types.RoleAdmin:  SigNozAdminRoleName,
-		types.RoleEditor: SigNozEditorRoleName,
-		types.RoleViewer: SigNozViewerRoleName,
+	ExistingRoleToHanzo O11yManagedRoleMap = map[types.Role]string{
+		types.RoleAdmin:  Hanzo O11yAdminRoleName,
+		types.RoleEditor: Hanzo O11yEditorRoleName,
+		types.RoleViewer: Hanzo O11yViewerRoleName,
 	}
 )
 
@@ -123,10 +123,10 @@ func NewRole(name, description string, roleType valuer.String, orgID valuer.UUID
 
 func NewManagedRoles(orgID valuer.UUID) []*Role {
 	return []*Role{
-		NewRole(SigNozAdminRoleName, SigNozAdminRoleDescription, RoleTypeManaged, orgID),
-		NewRole(SigNozEditorRoleName, SigNozEditorRoleDescription, RoleTypeManaged, orgID),
-		NewRole(SigNozViewerRoleName, SigNozViewerRoleDescription, RoleTypeManaged, orgID),
-		NewRole(SigNozAnonymousRoleName, SigNozAnonymousRoleDescription, RoleTypeManaged, orgID),
+		NewRole(Hanzo O11yAdminRoleName, Hanzo O11yAdminRoleDescription, RoleTypeManaged, orgID),
+		NewRole(Hanzo O11yEditorRoleName, Hanzo O11yEditorRoleDescription, RoleTypeManaged, orgID),
+		NewRole(Hanzo O11yViewerRoleName, Hanzo O11yViewerRoleDescription, RoleTypeManaged, orgID),
+		NewRole(Hanzo O11yAnonymousRoleName, Hanzo O11yAnonymousRoleDescription, RoleTypeManaged, orgID),
 	}
 
 }
@@ -246,8 +246,8 @@ func GetDeletionTuples(name string, orgID valuer.UUID, relation authtypes.Relati
 	return tuples, nil
 }
 
-func MustGetSigNozManagedRoleFromExistingRole(role types.Role) string {
-	managedRole, ok := ExistingRoleToSigNozManagedRoleMap[role]
+func MustGetHanzo O11yManagedRoleFromExistingRole(role types.Role) string {
+	managedRole, ok := ExistingRoleToHanzo O11yManagedRoleMap[role]
 	if !ok {
 		panic(errors.Newf(errors.TypeInternal, errors.CodeInternal, "invalid role: %s", role.String()))
 	}

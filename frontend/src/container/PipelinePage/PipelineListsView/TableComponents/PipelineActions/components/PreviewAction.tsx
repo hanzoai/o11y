@@ -22,7 +22,7 @@ function PreviewAction({ pipeline }: PreviewActionProps): JSX.Element | null {
 	const onOpenPreview = (): void => {
 		openModal();
 		logEvent('Logs: Pipelines: Clicked Preview Pipeline', {
-			source: 'signoz-ui',
+			source: 'observe-ui',
 		});
 	};
 

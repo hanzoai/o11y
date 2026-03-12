@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/alertmanager/alertmanagerserver"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerserver"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
 )
 
 type Config struct {
@@ -15,10 +15,10 @@ type Config struct {
 	Provider string `mapstructure:"provider"`
 
 	// Internal is the internal alertmanager configuration.
-	Signoz Signoz `mapstructure:"signoz" yaml:"signoz"`
+	O11y O11y `mapstructure:"observe" yaml:"observe"`
 }
 
-type Signoz struct {
+type O11y struct {
 	// PollInterval is the interval at which the alertmanager is synced.
 	PollInterval time.Duration `mapstructure:"poll_interval"`
 
@@ -27,7 +27,7 @@ type Signoz struct {
 }
 
 type Legacy struct {
-	// ApiURL is the URL of the legacy signoz alertmanager.
+	// ApiURL is the URL of the legacy o11y alertmanager.
 	ApiURL *url.URL `mapstructure:"api_url"`
 }
 
@@ -37,8 +37,8 @@ func NewConfigFactory() factory.ConfigFactory {
 
 func newConfig() factory.Config {
 	return Config{
-		Provider: "signoz",
-		Signoz: Signoz{
+		Provider: "observe",
+		O11y: O11y{
 			PollInterval: 1 * time.Minute,
 			Config:       alertmanagerserver.NewConfig(),
 		},
@@ -46,8 +46,8 @@ func newConfig() factory.Config {
 }
 
 func (c Config) Validate() error {
-	if c.Provider != "signoz" {
-		return errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "provider must be one of [%s], got %s", strings.Join([]string{"signoz"}, ", "), c.Provider)
+	if c.Provider != "observe" {
+		return errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "provider must be one of [%s], got %s", strings.Join([]string{"observe"}, ", "), c.Provider)
 	}
 
 	return nil

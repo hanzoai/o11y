@@ -78,7 +78,7 @@ describe('AttributeActions (unit)', () => {
 				queryData: [
 					{
 						aggregateOperator: 'count',
-						aggregateAttribute: { key: 'signoz_span_duration' },
+						aggregateAttribute: { key: 'observe_span_duration' },
 						filters: { items: [], op: 'AND' },
 						filter: { expression: '' },
 						groupBy: [],
@@ -126,7 +126,7 @@ describe('AttributeActions (unit)', () => {
 				queryData: [
 					{
 						aggregateOperator: 'count',
-						aggregateAttribute: { key: 'signoz_span_duration' },
+						aggregateAttribute: { key: 'observe_span_duration' },
 						filters: { items: [], op: 'AND' },
 						filter: { expression: '' },
 						groupBy: [],
@@ -174,7 +174,7 @@ describe('AttributeActions (unit)', () => {
 				queryData: [
 					{
 						aggregateOperator: 'count',
-						aggregateAttribute: { key: 'signoz_span_duration' },
+						aggregateAttribute: { key: 'observe_span_duration' },
 						filters: { items: [], op: 'AND' },
 						filter: { expression: '' },
 						groupBy: [],

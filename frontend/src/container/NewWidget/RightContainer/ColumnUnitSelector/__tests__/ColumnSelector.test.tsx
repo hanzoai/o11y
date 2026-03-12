@@ -16,10 +16,10 @@ const compositeQueryParam = {
 				queryName: 'A',
 				aggregateOperator: 'count',
 				aggregateAttribute: {
-					key: 'signoz_latency',
+					key: 'observe_latency',
 					dataType: 'float64',
 					type: 'ExponentialHistogram',
-					id: 'signoz_latency--float64--ExponentialHistogram--true',
+					id: 'observe_latency--float64--ExponentialHistogram--true',
 				},
 				timeAggregation: '',
 				spaceAggregation: 'p90',

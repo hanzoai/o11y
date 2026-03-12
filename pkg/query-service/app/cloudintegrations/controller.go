@@ -8,14 +8,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/query-service/app/cloudintegrations/services"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/dashboardtypes"
-	"github.com/SigNoz/signoz/pkg/types/integrationtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/query-service/app/cloudintegrations/services"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
+	"github.com/hanzoai/o11y/pkg/types/integrationtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"golang.org/x/exp/maps"
 )
 
@@ -84,17 +84,17 @@ type GenerateConnectionUrlRequest struct {
 
 	AccountConfig integrationtypes.AccountConfig `json:"account_config"`
 
-	AgentConfig SigNozAgentConfig `json:"agent_config"`
+	AgentConfig Hanzo O11yAgentConfig `json:"agent_config"`
 }
 
-type SigNozAgentConfig struct {
-	// The region in which SigNoz agent should be installed.
+type Hanzo O11yAgentConfig struct {
+	// The region in which Hanzo O11y agent should be installed.
 	Region string `json:"region"`
 
 	IngestionUrl string `json:"ingestion_url"`
 	IngestionKey string `json:"ingestion_key"`
-	SigNozAPIUrl string `json:"signoz_api_url"`
-	SigNozAPIKey string `json:"signoz_api_key"`
+	Hanzo O11yAPIUrl string `json:"o11y_api_url"`
+	Hanzo O11yAPIKey string `json:"o11y_api_key"`
 
 	Version string `json:"version,omitempty"`
 }
@@ -128,15 +128,15 @@ func (c *Controller) GenerateConnectionUrl(ctx context.Context, orgId string, cl
 	)
 
 	for qp, value := range map[string]string{
-		"param_SigNozIntegrationAgentVersion": agentVersion,
-		"param_SigNozApiUrl":                  req.AgentConfig.SigNozAPIUrl,
-		"param_SigNozApiKey":                  req.AgentConfig.SigNozAPIKey,
-		"param_SigNozAccountId":               account.ID.StringValue(),
+		"param_Hanzo O11yIntegrationAgentVersion": agentVersion,
+		"param_Hanzo O11yApiUrl":                  req.AgentConfig.Hanzo O11yAPIUrl,
+		"param_Hanzo O11yApiKey":                  req.AgentConfig.Hanzo O11yAPIKey,
+		"param_Hanzo O11yAccountId":               account.ID.StringValue(),
 		"param_IngestionUrl":                  req.AgentConfig.IngestionUrl,
 		"param_IngestionKey":                  req.AgentConfig.IngestionKey,
-		"stackName":                           "signoz-integration",
+		"stackName":                           "o11y-integration",
 		"templateURL": fmt.Sprintf(
-			"https://signoz-integrations.s3.us-east-1.amazonaws.com/aws-quickcreate-template-%s.json",
+			"https://o11y-integrations.s3.us-east-1.amazonaws.com/aws-quickcreate-template-%s.json",
 			agentVersion,
 		),
 	} {

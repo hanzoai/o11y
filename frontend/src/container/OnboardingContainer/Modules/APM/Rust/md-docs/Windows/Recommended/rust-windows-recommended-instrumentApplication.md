@@ -33,7 +33,7 @@ use tonic::metadata::{MetadataMap, MetadataValue};
 
 **Step 2: Initialize the tracer and create env file**
 
-Add this function in main.rs file, `init_tracer` is initializing an OpenTelemetry tracer with the OpenTelemetry OTLP exporter which is sending data to SigNoz Cloud. 
+Add this function in main.rs file, `init_tracer` is initializing an OpenTelemetry tracer with the OpenTelemetry OTLP exporter which is sending data to Hanzo O11y Cloud. 
 
 This tracer initializes the connection with the OTel collector from the system variables passed while starting the app. 
 
@@ -79,7 +79,7 @@ async fn main() {
 }
 ```
 
-Now comes the most interesting part, Sending data to SigNoz to get sense of your traces. After adding the below block you can send traces to SigNoz cloud
+Now comes the most interesting part, Sending data to Hanzo O11y to get sense of your traces. After adding the below block you can send traces to Hanzo O11y cloud
 
 ```rust
   let tracer = global::tracer("global_tracer");
@@ -92,7 +92,7 @@ Now comes the most interesting part, Sending data to SigNoz to get sense of your
         span.add_event(
             format!("Operations"),
             vec![
-                Key::new("SigNoz is").string("Awesome"),
+                Key::new("Hanzo O11y is").string("Awesome"),
             ],
         );
     });

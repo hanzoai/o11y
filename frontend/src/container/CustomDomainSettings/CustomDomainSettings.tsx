@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { Callout } from '@signozhq/callout';
+import { Button } from '@hanzo/o11y-button';
+import { Callout } from '@hanzo/o11y-callout';
 import {
 	Check,
 	ChevronDown,
@@ -10,13 +10,13 @@ import {
 	Link2,
 	SolidAlertCircle,
 	X,
-} from '@signozhq/icons';
-import { toast } from '@signozhq/sonner';
+} from '@hanzo/o11y-icons';
+import { toast } from '@hanzo/o11y-sonner';
 import { Dropdown, Skeleton } from 'antd';
 import {
 	RenderErrorResponseDTO,
 	ZeustypesHostDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/observe.schemas';
 import { useGetHosts, usePutHost } from 'api/generated/services/zeus';
 import { AxiosError } from 'axios';
 import { useAppContext } from 'providers/App/App';

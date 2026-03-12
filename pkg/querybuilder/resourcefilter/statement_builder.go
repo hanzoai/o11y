@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/querybuilder"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/huandu/go-sqlbuilder"
 )
 
@@ -59,7 +59,7 @@ func NewTraceResourceFilterStatementBuilder(
 	conditionBuilder qbtypes.ConditionBuilder,
 	metadataStore telemetrytypes.MetadataStore,
 ) *resourceFilterStatementBuilder[qbtypes.TraceAggregation] {
-	set := factory.NewScopedProviderSettings(settings, "github.com/SigNoz/signoz/pkg/querybuilder/resourcefilter")
+	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter")
 	return &resourceFilterStatementBuilder[qbtypes.TraceAggregation]{
 		logger:           set.Logger(),
 		fieldMapper:      fieldMapper,
@@ -77,7 +77,7 @@ func NewLogResourceFilterStatementBuilder(
 	fullTextColumn *telemetrytypes.TelemetryFieldKey,
 	jsonKeyToKey qbtypes.JsonKeyToFieldFunc,
 ) *resourceFilterStatementBuilder[qbtypes.LogAggregation] {
-	set := factory.NewScopedProviderSettings(settings, "github.com/SigNoz/signoz/pkg/querybuilder/resourcefilter")
+	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter")
 	return &resourceFilterStatementBuilder[qbtypes.LogAggregation]{
 		logger:           set.Logger(),
 		fieldMapper:      fieldMapper,

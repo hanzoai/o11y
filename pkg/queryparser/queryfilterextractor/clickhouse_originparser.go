@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/AfterShip/clickhouse-sql-parser/parser"
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 // excludedFunctions contains functions that should cause ExtractOriginField to return empty string.

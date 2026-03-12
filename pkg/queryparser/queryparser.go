@@ -3,9 +3,9 @@ package queryparser
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/queryparser/queryfilterextractor"
-	"github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/queryparser/queryfilterextractor"
+	"github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
 // QueryParser defines the interface for parsing and analyzing queries.

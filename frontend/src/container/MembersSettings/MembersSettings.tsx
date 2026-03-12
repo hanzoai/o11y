@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory } from 'react-router-dom';
-import { Button } from '@signozhq/button';
-import { Check, ChevronDown, Plus } from '@signozhq/icons';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/o11y-button';
+import { Check, ChevronDown, Plus } from '@hanzo/o11y-icons';
+import { Input } from '@hanzo/o11y-input';
 import type { MenuProps } from 'antd';
 import { Dropdown } from 'antd';
 import getPendingInvites from 'api/v1/invite/get';

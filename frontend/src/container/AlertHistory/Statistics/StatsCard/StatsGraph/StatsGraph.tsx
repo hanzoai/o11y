@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import Uplot from 'components/Uplot';
 import { useResizeObserver } from 'hooks/useDimensions';
 import { AlertRuleStats } from 'types/api/alerts/def';

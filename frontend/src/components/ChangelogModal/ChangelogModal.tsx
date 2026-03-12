@@ -87,7 +87,7 @@ function ChangelogModal({ changelog, onClose }: Props): JSX.Element {
 
 	const onClickUpdateWorkspace = (): void => {
 		window.open(
-			'https://signoz.io/upgrade-path',
+			'https://o11y.hanzo.ai/upgrade-path',
 			'_blank',
 			'noopener,noreferrer',
 		);

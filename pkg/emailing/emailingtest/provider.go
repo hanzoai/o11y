@@ -3,8 +3,8 @@ package emailingtest
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/emailing"
-	"github.com/SigNoz/signoz/pkg/types/emailtypes"
+	"github.com/hanzoai/o11y/pkg/emailing"
+	"github.com/hanzoai/o11y/pkg/types/emailtypes"
 )
 
 var _ emailing.Emailing = (*Provider)(nil)

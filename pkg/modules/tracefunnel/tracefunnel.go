@@ -2,10 +2,10 @@ package tracefunnel
 
 import (
 	"context"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"net/http"
 
-	traceFunnels "github.com/SigNoz/signoz/pkg/types/tracefunneltypes"
+	traceFunnels "github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
 )
 
 // Module defines the interface for trace funnel operations

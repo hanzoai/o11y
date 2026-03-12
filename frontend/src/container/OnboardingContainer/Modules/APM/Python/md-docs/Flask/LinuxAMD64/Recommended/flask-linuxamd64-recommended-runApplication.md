@@ -40,4 +40,4 @@ OTEL_EXPORTER_OTLP_PROTOCOL=grpc opentelemetry-instrument <your run command>
 
 &nbsp;
 
-If you encounter any difficulties, please consult the [troubleshooting section](https://signoz.io/docs/instrumentation/flask/#troubleshooting-your-installation) for assistance.
+If you encounter any difficulties, please consult the [troubleshooting section](https://o11y.hanzo.ai/docs/instrumentation/flask/#troubleshooting-your-installation) for assistance.

@@ -1,4 +1,4 @@
-import { AuthtypesGettableAuthDomainDTO } from 'api/generated/services/sigNoz.schemas';
+import { AuthtypesGettableAuthDomainDTO } from 'api/generated/services/observe.schemas';
 
 // API Endpoints
 export const AUTH_DOMAINS_LIST_ENDPOINT = '*/api/v1/domains';
@@ -9,7 +9,7 @@ export const AUTH_DOMAINS_DELETE_ENDPOINT = '*/api/v1/domains/:id';
 // Mock Auth Domain with Google Auth
 export const mockGoogleAuthDomain: AuthtypesGettableAuthDomainDTO = {
 	id: 'domain-1',
-	name: 'signoz.io',
+	name: 'o11y.hanzo.ai',
 	ssoEnabled: true,
 	ssoType: 'google_auth',
 	googleAuthConfig: {
@@ -137,7 +137,7 @@ export const mockSamlWithAttributeMapping: AuthtypesGettableAuthDomainDTO = {
 		attributeMapping: {
 			name: 'user_display_name',
 			groups: 'member_of',
-			role: 'signoz_role',
+			role: 'o11y_role',
 		},
 	},
 	authNProviderInfo: {

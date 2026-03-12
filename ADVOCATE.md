@@ -1,12 +1,12 @@
-# SigNoz Community Advocate Program
+# Hanzo O11y Community Advocate Program
 
-Our community is filled with passionate developers who love SigNoz and have been helping spread the word about observability across the world. The SigNoz Community Advocate Program is our way of recognizing these incredible community members and creating deeper collaboration opportunities.
+Our community is filled with passionate developers who love Hanzo O11y and have been helping spread the word about observability across the world. The Hanzo O11y Community Advocate Program is our way of recognizing these incredible community members and creating deeper collaboration opportunities.
 
-## What is the SigNoz Community Advocate Program?
+## What is the Hanzo O11y Community Advocate Program?
 
-The SigNoz Community Advocate Program celebrates and supports community members who are already passionate about observability and helping fellow developers. If you're someone who loves discussing SigNoz, helping others with their implementations, or sharing knowledge about observability practices, this program is designed with you in mind.
+The Hanzo O11y Community Advocate Program celebrates and supports community members who are already passionate about observability and helping fellow developers. If you're someone who loves discussing Hanzo O11y, helping others with their implementations, or sharing knowledge about observability practices, this program is designed with you in mind.
 
-Our advocates are the heart of the SigNoz community, helping other developers succeed with observability and providing valuable insights that help us build better products.
+Our advocates are the heart of the Hanzo O11y community, helping other developers succeed with observability and providing valuable insights that help us build better products.
 
 ## What Do Advocates Do?
 
@@ -14,7 +14,7 @@ Our advocates are the heart of the SigNoz community, helping other developers su
 
     - Help fellow developers in our Slack community and GitHub Discussions
     - Answer questions and share solutions
-    - Guide newcomers through SigNoz self-host implementations
+    - Guide newcomers through Hanzo O11y self-host implementations
 
 2. **Knowledge Sharing**
 
@@ -32,7 +32,7 @@ Our advocates are the heart of the SigNoz community, helping other developers su
 
 **Recognition & Swag**
 
-- Official recognition as a SigNoz advocate
+- Official recognition as a Hanzo O11y advocate
 - Welcome hamper upon joining
 - Exclusive swag box within your first 3 months
 - Feature on our website (with your permission)
@@ -40,7 +40,7 @@ Our advocates are the heart of the SigNoz community, helping other developers su
 **Early Access**
 
 - First look at new features and updates
-- Direct line to the SigNoz team for feedback and suggestions
+- Direct line to the Hanzo O11y team for feedback and suggestions
 - Opportunity to influence product roadmap
 
 **Community Impact**
@@ -51,12 +51,12 @@ Our advocates are the heart of the SigNoz community, helping other developers su
 
 ## How Does It Work?
 
-Currently, the SigNoz Community Advocate Program is **invite-only**. We're starting with a small group of passionate community members who have already been making a difference.
+Currently, the Hanzo O11y Community Advocate Program is **invite-only**. We're starting with a small group of passionate community members who have already been making a difference.
 
 We'll be working closely with our first advocates to shape the program details, benefits, and structure based on what works best for everyone involved.
 
-If you're interested in learning more about the program or want to get more involved in the SigNoz community, join our [Slack community](https://signoz-community.slack.com/) and let us know!
+If you're interested in learning more about the program or want to get more involved in the Hanzo O11y community, join our [Slack community](https://signoz-community.slack.com/) and let us know!
 
 ---
 
-*The SigNoz Community Advocate Program recognizes and celebrates the amazing community members who are already passionate about helping fellow developers succeed with observability.*
+*The Hanzo O11y Community Advocate Program recognizes and celebrates the amazing community members who are already passionate about helping fellow developers succeed with observability.*

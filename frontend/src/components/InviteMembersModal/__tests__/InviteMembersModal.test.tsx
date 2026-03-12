@@ -6,7 +6,7 @@ import InviteMembersModal from '../InviteMembersModal';
 
 jest.mock('api/v1/invite/create');
 jest.mock('api/v1/invite/bulk/create');
-jest.mock('@signozhq/sonner', () => ({
+jest.mock('@hanzo/o11y-sonner', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),
@@ -35,7 +35,7 @@ describe('InviteMembersModal', () => {
 	it('renders 3 initial empty rows and disables the submit button', () => {
 		render(<InviteMembersModal {...defaultProps} />);
 
-		const emailInputs = screen.getAllByPlaceholderText('john@signoz.io');
+		const emailInputs = screen.getAllByPlaceholderText('john@o11y.hanzo.ai');
 		expect(emailInputs).toHaveLength(3);
 
 		expect(
@@ -49,11 +49,11 @@ describe('InviteMembersModal', () => {
 		render(<InviteMembersModal {...defaultProps} />);
 
 		await user.click(screen.getByRole('button', { name: /add another/i }));
-		expect(screen.getAllByPlaceholderText('john@signoz.io')).toHaveLength(4);
+		expect(screen.getAllByPlaceholderText('john@o11y.hanzo.ai')).toHaveLength(4);
 
 		const removeButtons = screen.getAllByRole('button', { name: /remove row/i });
 		await user.click(removeButtons[0]);
-		expect(screen.getAllByPlaceholderText('john@signoz.io')).toHaveLength(3);
+		expect(screen.getAllByPlaceholderText('john@o11y.hanzo.ai')).toHaveLength(3);
 	});
 
 	describe('validation callout messages', () => {
@@ -63,7 +63,7 @@ describe('InviteMembersModal', () => {
 			render(<InviteMembersModal {...defaultProps} />);
 
 			await user.type(
-				screen.getAllByPlaceholderText('john@signoz.io')[0],
+				screen.getAllByPlaceholderText('john@o11y.hanzo.ai')[0],
 				'not-an-email',
 			);
 			await user.click(
@@ -82,7 +82,7 @@ describe('InviteMembersModal', () => {
 
 			render(<InviteMembersModal {...defaultProps} />);
 
-			const emailInputs = screen.getAllByPlaceholderText('john@signoz.io');
+			const emailInputs = screen.getAllByPlaceholderText('john@o11y.hanzo.ai');
 			await user.type(emailInputs[0], 'not-an-email');
 
 			await user.click(screen.getAllByText('Select roles')[0]);
@@ -103,8 +103,8 @@ describe('InviteMembersModal', () => {
 			render(<InviteMembersModal {...defaultProps} />);
 
 			await user.type(
-				screen.getAllByPlaceholderText('john@signoz.io')[0],
-				'valid@signoz.io',
+				screen.getAllByPlaceholderText('john@o11y.hanzo.ai')[0],
+				'valid@o11y.hanzo.ai',
 			);
 			await user.click(
 				screen.getByRole('button', { name: /invite team members/i }),
@@ -122,8 +122,8 @@ describe('InviteMembersModal', () => {
 
 		render(<InviteMembersModal {...defaultProps} onComplete={onComplete} />);
 
-		const emailInputs = screen.getAllByPlaceholderText('john@signoz.io');
-		await user.type(emailInputs[0], 'single@signoz.io');
+		const emailInputs = screen.getAllByPlaceholderText('john@o11y.hanzo.ai');
+		await user.type(emailInputs[0], 'single@o11y.hanzo.ai');
 
 		const roleSelects = screen.getAllByText('Select roles');
 		await user.click(roleSelects[0]);
@@ -135,7 +135,7 @@ describe('InviteMembersModal', () => {
 
 		await waitFor(() => {
 			expect(mockSendInvite).toHaveBeenCalledWith(
-				expect.objectContaining({ email: 'single@signoz.io', role: 'VIEWER' }),
+				expect.objectContaining({ email: 'single@o11y.hanzo.ai', role: 'VIEWER' }),
 			);
 			expect(mockInviteUsers).not.toHaveBeenCalled();
 			expect(onComplete).toHaveBeenCalled();
@@ -148,13 +148,13 @@ describe('InviteMembersModal', () => {
 
 		render(<InviteMembersModal {...defaultProps} onComplete={onComplete} />);
 
-		const emailInputs = screen.getAllByPlaceholderText('john@signoz.io');
+		const emailInputs = screen.getAllByPlaceholderText('john@o11y.hanzo.ai');
 
-		await user.type(emailInputs[0], 'alice@signoz.io');
+		await user.type(emailInputs[0], 'alice@o11y.hanzo.ai');
 		await user.click(screen.getAllByText('Select roles')[0]);
 		await user.click(await screen.findByText('Viewer'));
 
-		await user.type(emailInputs[1], 'bob@signoz.io');
+		await user.type(emailInputs[1], 'bob@o11y.hanzo.ai');
 		await user.click(screen.getAllByText('Select roles')[0]);
 		const editorOptions = await screen.findAllByText('Editor');
 		await user.click(editorOptions[editorOptions.length - 1]);
@@ -166,8 +166,8 @@ describe('InviteMembersModal', () => {
 		await waitFor(() => {
 			expect(mockInviteUsers).toHaveBeenCalledWith({
 				invites: expect.arrayContaining([
-					expect.objectContaining({ email: 'alice@signoz.io', role: 'VIEWER' }),
-					expect.objectContaining({ email: 'bob@signoz.io', role: 'EDITOR' }),
+					expect.objectContaining({ email: 'alice@o11y.hanzo.ai', role: 'VIEWER' }),
+					expect.objectContaining({ email: 'bob@o11y.hanzo.ai', role: 'EDITOR' }),
 				]),
 			});
 			expect(mockSendInvite).not.toHaveBeenCalled();

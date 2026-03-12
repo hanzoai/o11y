@@ -1,8 +1,8 @@
 ### Install otel-collector in your Kubernetes infra
 
-Add the SigNoz Helm Chart repository
+Add the Hanzo O11y Helm Chart repository
 ```bash
-helm repo add signoz https://charts.signoz.io
+helm repo add signoz https://charts.o11y.hanzo.ai
 ```
 
 &nbsp;
@@ -21,9 +21,9 @@ global:
   cloud: aws
   clusterName: <CLUSTER_NAME>
   deploymentEnvironment: <DEPLOYMENT_ENVIRONMENT>
-otelCollectorEndpoint: ingest.{region}.signoz.cloud:443
+otelCollectorEndpoint: ingest.{region}.o11y.hanzo.ai:443
 otelInsecure: false
-signozApiKey: <SIGNOZ_INGESTION_KEY>
+signozApiKey: <HANZO_INGESTION_KEY>
 presets:
   otlpExporter:
     enabled: true

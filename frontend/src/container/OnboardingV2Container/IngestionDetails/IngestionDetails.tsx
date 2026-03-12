@@ -3,7 +3,7 @@ import { useCopyToClipboard } from 'react-use';
 import { Button, Skeleton, Tooltip, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { useGetIngestionKeys } from 'api/generated/services/gateway';
-import { GatewaytypesIngestionKeyDTO } from 'api/generated/services/sigNoz.schemas';
+import { GatewaytypesIngestionKeyDTO } from 'api/generated/services/observe.schemas';
 import { DOCS_BASE_URL } from 'constants/app';
 import { useGetGlobalConfig } from 'hooks/globalConfig/useGetGlobalConfig';
 import { useNotifications } from 'hooks/useNotifications';
@@ -89,9 +89,9 @@ export default function OnboardingIngestionDetails(): JSX.Element {
 						<Info size={14} />
 
 						<span>
-							Find your ingestion URL and learn more about sending data to SigNoz{' '}
+							Find your ingestion URL and learn more about sending data to Hanzo O11y{' '}
 							<a
-								href={`${DOCS_BASE_URL}/docs/ingestion/signoz-cloud/overview/`}
+								href={`${DOCS_BASE_URL}/docs/ingestion/o11y-cloud/overview/`}
 								target="_blank"
 								className="learn-more"
 								rel="noreferrer"
@@ -107,7 +107,7 @@ export default function OnboardingIngestionDetails(): JSX.Element {
 				<>
 					<div className="ingestion-key-details-section">
 						<Typography.Text className="ingestion-key-details-section-text">
-							You can use this key to send your telemetry data to SigNoz.
+							You can use this key to send your telemetry data to Hanzo O11y.
 						</Typography.Text>
 
 						<div className="ingestion-key-details-section-key">
@@ -206,7 +206,7 @@ export default function OnboardingIngestionDetails(): JSX.Element {
 						<span>
 							We support{' '}
 							<a
-								href={`${DOCS_BASE_URL}/docs/ingestion/signoz-cloud/keys/`}
+								href={`${DOCS_BASE_URL}/docs/ingestion/o11y-cloud/keys/`}
 								target="_blank"
 								className="learn-more"
 								rel="noreferrer"

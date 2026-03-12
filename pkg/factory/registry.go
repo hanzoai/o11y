@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 var (
@@ -37,7 +37,7 @@ func NewRegistry(logger *slog.Logger, services ...NamedService) (*Registry, erro
 	}
 
 	return &Registry{
-		logger:   logger.With("pkg", "go.signoz.io/pkg/factory"),
+		logger:   logger.With("pkg", "go.observe.hanzo.ai/pkg/factory"),
 		services: m,
 		startCh:  make(chan error, 1),
 		stopCh:   make(chan error, len(services)),

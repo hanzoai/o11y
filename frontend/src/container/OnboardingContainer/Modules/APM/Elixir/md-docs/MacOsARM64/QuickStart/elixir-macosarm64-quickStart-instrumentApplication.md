@@ -51,9 +51,9 @@ config :opentelemetry, :processors,
     exporter: {
       :opentelemetry_exporter,
       %{
-        endpoints: ["https://ingest.{{REGION}}.signoz.cloud:443"],
+        endpoints: ["https://ingest.{{REGION}}.o11y.hanzo.ai:443"],
         headers: [
-          {"signoz-ingestion-key", {{SIGNOZ_ACCESS_TOKEN}} }
+          {"signoz-ingestion-key", {{HANZO_ACCESS_TOKEN}} }
         ]
       }
     }

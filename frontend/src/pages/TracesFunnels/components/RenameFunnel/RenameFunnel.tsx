@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { Input } from 'antd';
-import SignozModal from 'components/SignozModal/SignozModal';
+import O11yModal from 'components/O11yModal/O11yModal';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import { useRenameFunnel } from 'hooks/TracesFunnels/useFunnels';
 import { useNotifications } from 'hooks/useNotifications';
@@ -61,7 +61,7 @@ function RenameFunnel({
 	};
 
 	return (
-		<SignozModal
+		<O11yModal
 			open={isOpen}
 			title="Rename Funnel"
 			width={384}
@@ -95,7 +95,7 @@ function RenameFunnel({
 					autoFocus
 				/>
 			</div>
-		</SignozModal>
+		</O11yModal>
 	);
 }
 

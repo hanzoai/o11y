@@ -10,8 +10,8 @@ import (
 
 	"slices"
 
-	"github.com/SigNoz/govaluate"
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/Hanzo O11y/govaluate"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 type QueryBuilderFormula struct {
@@ -130,7 +130,7 @@ type seriesLookup struct {
 // FormulaEvaluator handles formula evaluation b/w time series from different aggregations
 // Why do we evaluate the formula expression in query-service?
 // In the initial iteration, we let the CH take care of the formula evaluation.
-// Look at the query here https://github.com/SigNoz/signoz/blob/ad2d4ed56cf8457a0feee2b6947aed95c355c957/pkg/query-service/app/queryBuilder/query_builder_test.go#L459
+// Look at the query here https://github.com/hanzoai/o11y/blob/ad2d4ed56cf8457a0feee2b6947aed95c355c957/pkg/query-service/app/queryBuilder/query_builder_test.go#L459
 // This was achieved using the INNER JOIN between the query results.
 //
 // What are the issues with this approach?
@@ -145,7 +145,7 @@ type seriesLookup struct {
 // This also makes use of any application caching to avoid recomputing on same data
 type FormulaEvaluator struct {
 	// expression to evaluate, prepared from the expression string with list of
-	// supported functions https://github.com/SigNoz/govaluate?tab=readme-ov-file#what-operators-and-types-does-this-support
+	// supported functions https://github.com/Hanzo O11y/govaluate?tab=readme-ov-file#what-operators-and-types-does-this-support
 	expression *govaluate.EvaluableExpression
 	// list of variables in the expression
 	// For example, in sqrt(A*A + B*B), variables are A and B

@@ -54,7 +54,7 @@ describe('PipelinePage container test', () => {
 		await userEvent.click(editButton);
 
 		expect(logEvent).toHaveBeenCalledWith('Logs: Pipelines: Entered Edit Mode', {
-			source: 'signoz-ui',
+			source: 'observe-ui',
 		});
 	});
 
@@ -81,7 +81,7 @@ describe('PipelinePage container test', () => {
 		expect(logEvent).toHaveBeenCalledWith(
 			'Logs: Pipelines: Clicked Add New Pipeline',
 			{
-				source: 'signoz-ui',
+				source: 'observe-ui',
 			},
 		);
 	});

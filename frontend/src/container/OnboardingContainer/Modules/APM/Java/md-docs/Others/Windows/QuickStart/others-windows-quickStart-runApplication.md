@@ -3,8 +3,8 @@ Run your application
 
 ```bash
 setx OTEL_RESOURCE_ATTRIBUTES=service.name={{MYAPP}} 
-setx OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}" 
-setx OTEL_EXPORTER_OTLP_ENDPOINT=https://ingest.{{REGION}}.signoz.cloud:443 
+setx OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}" 
+setx OTEL_EXPORTER_OTLP_ENDPOINT=https://ingest.{{REGION}}.o11y.hanzo.ai:443 
 ```
 
 &nbsp;

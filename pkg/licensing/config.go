@@ -3,7 +3,7 @@ package licensing
 import (
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/factory"
 )
 
 var _ factory.Config = (*Config)(nil)

@@ -1,6 +1,6 @@
 # Handler
 
-Handlers in SigNoz are responsible for exposing module functionality over HTTP. They are thin adapters that:
+Handlers in Hanzo O11y are responsible for exposing module functionality over HTTP. They are thin adapters that:
 
 - Decode incoming HTTP requests
 - Call the appropriate module layer

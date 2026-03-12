@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/types/servicetypes/servicetypesv1"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/servicetypes/servicetypesv1"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 // Handler exposes HTTP handler for services_qbv5

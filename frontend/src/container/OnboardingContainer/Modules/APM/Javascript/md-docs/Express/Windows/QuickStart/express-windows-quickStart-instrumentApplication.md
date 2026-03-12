@@ -29,7 +29,7 @@ const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventi
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#specifying-headers-via-environment-variables
 
 const exporterOptions = {
-  url: 'https://ingest.{{REGION}}.signoz.cloud:443/v1/traces'
+  url: 'https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces'
 }
 
 const traceExporter = new OTLPTraceExporter(exporterOptions);

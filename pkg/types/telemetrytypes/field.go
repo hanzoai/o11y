@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SigNoz/signoz-otel-collector/exporter/jsontypeexporter"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y-otel-collector/exporter/jsontypeexporter"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 // FieldSelectorMatchType is the match type of the field key selector.

@@ -5,19 +5,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/config"
-	"github.com/SigNoz/signoz/pkg/config/envprovider"
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/config"
+	"github.com/hanzoai/o11y/pkg/config/envprovider"
+	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewWithEnvProvider(t *testing.T) {
-	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN", "tcp://localhost:9000")
-	t.Setenv("SIGNOZ_TELEMETRYSTORE_MAX__IDLE__CONNS", "60")
-	t.Setenv("SIGNOZ_TELEMETRYSTORE_MAX__OPEN__CONNS", "150")
-	t.Setenv("SIGNOZ_TELEMETRYSTORE_DIAL__TIMEOUT", "5s")
-	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DEBUG", "true")
+	t.Setenv("HANZO_TELEMETRYSTORE_CLICKHOUSE_DSN", "tcp://localhost:9000")
+	t.Setenv("HANZO_TELEMETRYSTORE_MAX__IDLE__CONNS", "60")
+	t.Setenv("HANZO_TELEMETRYSTORE_MAX__OPEN__CONNS", "150")
+	t.Setenv("HANZO_TELEMETRYSTORE_DIAL__TIMEOUT", "5s")
+	t.Setenv("HANZO_TELEMETRYSTORE_CLICKHOUSE_DEBUG", "true")
 
 	conf, err := config.New(
 		context.Background(),
@@ -50,11 +50,11 @@ func TestNewWithEnvProvider(t *testing.T) {
 }
 
 func TestNewWithEnvProviderWithQuerySettings(t *testing.T) {
-	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__EXECUTION__TIME", "10")
-	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__EXECUTION__TIME__LEAF", "10")
-	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_TIMEOUT__BEFORE__CHECKING__EXECUTION__SPEED", "10")
-	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__BYTES__TO__READ", "1000000")
-	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__RESULT__ROWS", "10000")
+	t.Setenv("HANZO_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__EXECUTION__TIME", "10")
+	t.Setenv("HANZO_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__EXECUTION__TIME__LEAF", "10")
+	t.Setenv("HANZO_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_TIMEOUT__BEFORE__CHECKING__EXECUTION__SPEED", "10")
+	t.Setenv("HANZO_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__BYTES__TO__READ", "1000000")
+	t.Setenv("HANZO_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__RESULT__ROWS", "10000")
 
 	conf, err := config.New(
 		context.Background(),

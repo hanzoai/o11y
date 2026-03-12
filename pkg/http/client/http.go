@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/http/client/plugin"
+	"github.com/hanzoai/o11y/pkg/http/client/plugin"
 	"github.com/gojek/heimdall/v7"
 	"github.com/gojek/heimdall/v7/httpclient"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
