@@ -207,7 +207,7 @@ func (m *Module) CreateBulkInvite(ctx context.Context, orgID valuer.UUID, userID
 		tokenLifetime := m.config.Password.Reset.MaxTokenLifetime
 		humanizedTokenLifetime := strings.TrimSpace(humanize.RelTime(time.Now(), time.Now().Add(tokenLifetime), "", ""))
 
-		if err := m.emailing.SendHTML(ctx, userWithToken.User.Email.String(), "You're Invited to Join Hanzo O11y", emailtypes.TemplateNameInvitationEmail, map[string]any{
+		if err := m.emailing.SendHTML(ctx, userWithToken.User.Email.String(), "You're Invited to Join HanzoO11y", emailtypes.TemplateNameInvitationEmail, map[string]any{
 			"inviter_email": creator.Email,
 			"link":          resetLink,
 			"Expiry":        humanizedTokenLifetime,
@@ -263,7 +263,7 @@ func (module *Module) CreateUser(ctx context.Context, input *types.User, opts ..
 	createUserOpts := root.NewCreateUserOptions(opts...)
 
 	// since assign is idempotant multiple calls to assign won't cause issues in case of retries.
-	err := module.authz.Grant(ctx, input.OrgID, []string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(input.Role)}, authtypes.MustNewSubject(authtypes.TypeableUser, input.ID.StringValue(), input.OrgID, nil))
+	err := module.authz.Grant(ctx, input.OrgID, []string{roletypes.MustGetHanzoO11yManagedRoleFromExistingRole(input.Role)}, authtypes.MustNewSubject(authtypes.TypeableUser, input.ID.StringValue(), input.OrgID, nil))
 	if err != nil {
 		return err
 	}
@@ -333,8 +333,8 @@ func (m *Module) UpdateUser(ctx context.Context, orgID valuer.UUID, id string, u
 	if user.Role != "" && user.Role != existingUser.Role {
 		err = m.authz.ModifyGrant(ctx,
 			orgID,
-			[]string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(existingUser.Role)},
-			[]string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(user.Role)},
+			[]string{roletypes.MustGetHanzoO11yManagedRoleFromExistingRole(existingUser.Role)},
+			[]string{roletypes.MustGetHanzoO11yManagedRoleFromExistingRole(user.Role)},
 			authtypes.MustNewSubject(authtypes.TypeableUser, id, orgID, nil),
 		)
 		if err != nil {
@@ -395,7 +395,7 @@ func (module *Module) DeleteUser(ctx context.Context, orgID valuer.UUID, id stri
 	}
 
 	// since revoke is idempotant multiple calls to revoke won't cause issues in case of retries
-	err = module.authz.Revoke(ctx, orgID, []string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(user.Role)}, authtypes.MustNewSubject(authtypes.TypeableUser, id, orgID, nil))
+	err = module.authz.Revoke(ctx, orgID, []string{roletypes.MustGetHanzoO11yManagedRoleFromExistingRole(user.Role)}, authtypes.MustNewSubject(authtypes.TypeableUser, id, orgID, nil))
 	if err != nil {
 		return err
 	}
@@ -506,7 +506,7 @@ func (module *Module) ForgotPassword(ctx context.Context, orgID valuer.UUID, ema
 	if err := module.emailing.SendHTML(
 		ctx,
 		user.Email.String(),
-		"A Password Reset Was Requested for Hanzo O11y",
+		"A Password Reset Was Requested for HanzoO11y",
 		emailtypes.TemplateNameResetPassword,
 		map[string]any{
 			"Link":   resetLink,
@@ -558,7 +558,7 @@ func (module *Module) UpdatePasswordByResetPasswordToken(ctx context.Context, to
 		if err = module.authz.Grant(
 			ctx,
 			user.OrgID,
-			[]string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(user.Role)},
+			[]string{roletypes.MustGetHanzoO11yManagedRoleFromExistingRole(user.Role)},
 			authtypes.MustNewSubject(authtypes.TypeableUser, user.ID.StringValue(), user.OrgID, nil),
 		); err != nil {
 			return err
@@ -793,7 +793,7 @@ func (module *Module) activatePendingUser(ctx context.Context, user *types.User)
 	err := module.authz.Grant(
 		ctx,
 		user.OrgID,
-		[]string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(user.Role)},
+		[]string{roletypes.MustGetHanzoO11yManagedRoleFromExistingRole(user.Role)},
 		authtypes.MustNewSubject(authtypes.TypeableUser, user.ID.StringValue(), user.OrgID, nil),
 	)
 	if err != nil {

@@ -953,7 +953,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -997,7 +997,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1042,7 +1042,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1088,7 +1088,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 								{Key: "le"},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1131,7 +1131,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 								{Key: "le"},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1175,7 +1175,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1219,7 +1219,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1264,7 +1264,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1311,7 +1311,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 								{Key: "le"},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1437,7 +1437,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 								{Key: "le"},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1504,7 +1504,7 @@ func TestGenerateCacheKeysLogs(t *testing.T) {
 								},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 						},
 					},
@@ -1546,7 +1546,7 @@ func TestGenerateCacheKeysLogs(t *testing.T) {
 								},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
+								{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"},
 							},
 						},
 					},
