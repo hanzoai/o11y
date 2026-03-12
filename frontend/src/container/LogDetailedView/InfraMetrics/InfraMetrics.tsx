@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Empty } from 'antd';
 import type { RadioChangeEvent } from 'antd/lib';
-import O11yRadioGroup from 'components/O11yRadioGroup/O11yRadioGroup';
+import O11yRadioGroup from 'components/SignozRadioGroup/SignozRadioGroup';
 import { History, Table } from 'lucide-react';
 import { DataSource } from 'types/common/queryBuilder';
 

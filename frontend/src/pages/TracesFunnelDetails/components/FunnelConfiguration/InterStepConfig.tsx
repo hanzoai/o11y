@@ -1,5 +1,5 @@
 import { Divider } from 'antd';
-import O11yRadioGroup from 'components/O11yRadioGroup/O11yRadioGroup';
+import O11yRadioGroup from 'components/SignozRadioGroup/SignozRadioGroup';
 import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 import { useAppContext } from 'providers/App/App';
 import { FunnelStepData, LatencyOptions } from 'types/api/traceFunnels';

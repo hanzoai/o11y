@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useQueryClient } from 'react-query';
 import { Color } from '@signozhq/design-tokens';
-import O11yModal from 'components/O11yModal/O11yModal';
+import O11yModal from 'components/SignozModal/SignozModal';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import { useIntegrationModal } from 'hooks/integration/aws/useIntegrationModal';
 import { SquareArrowOutUpRight } from 'lucide-react';
