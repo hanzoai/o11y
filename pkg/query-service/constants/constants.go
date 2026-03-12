@@ -310,7 +310,7 @@ var StaticFieldsLogsV3 = map[string]v3.AttributeKey{
 	},
 }
 
-const Hanzo O11yOrderByValue = "#HANZO_VALUE"
+const HanzoO11yOrderByValue = "#HANZO_VALUE"
 
 const TIMESTAMP = "timestamp"
 

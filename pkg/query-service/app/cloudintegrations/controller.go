@@ -84,17 +84,17 @@ type GenerateConnectionUrlRequest struct {
 
 	AccountConfig integrationtypes.AccountConfig `json:"account_config"`
 
-	AgentConfig Hanzo O11yAgentConfig `json:"agent_config"`
+	AgentConfig HanzoO11yAgentConfig `json:"agent_config"`
 }
 
-type Hanzo O11yAgentConfig struct {
-	// The region in which Hanzo O11y agent should be installed.
+type HanzoO11yAgentConfig struct {
+	// The region in which HanzoO11y agent should be installed.
 	Region string `json:"region"`
 
 	IngestionUrl string `json:"ingestion_url"`
 	IngestionKey string `json:"ingestion_key"`
-	Hanzo O11yAPIUrl string `json:"o11y_api_url"`
-	Hanzo O11yAPIKey string `json:"o11y_api_key"`
+	HanzoO11yAPIUrl string `json:"o11y_api_url"`
+	HanzoO11yAPIKey string `json:"o11y_api_key"`
 
 	Version string `json:"version,omitempty"`
 }
@@ -128,10 +128,10 @@ func (c *Controller) GenerateConnectionUrl(ctx context.Context, orgId string, cl
 	)
 
 	for qp, value := range map[string]string{
-		"param_Hanzo O11yIntegrationAgentVersion": agentVersion,
-		"param_Hanzo O11yApiUrl":                  req.AgentConfig.Hanzo O11yAPIUrl,
-		"param_Hanzo O11yApiKey":                  req.AgentConfig.Hanzo O11yAPIKey,
-		"param_Hanzo O11yAccountId":               account.ID.StringValue(),
+		"param_HanzoO11yIntegrationAgentVersion": agentVersion,
+		"param_HanzoO11yApiUrl":                  req.AgentConfig.HanzoO11yAPIUrl,
+		"param_HanzoO11yApiKey":                  req.AgentConfig.HanzoO11yAPIKey,
+		"param_HanzoO11yAccountId":               account.ID.StringValue(),
 		"param_IngestionUrl":                  req.AgentConfig.IngestionUrl,
 		"param_IngestionKey":                  req.AgentConfig.IngestionKey,
 		"stackName":                           "o11y-integration",

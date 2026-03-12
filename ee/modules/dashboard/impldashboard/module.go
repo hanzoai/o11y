@@ -224,7 +224,7 @@ func (module *module) MustGetTypeables() []authtypes.Typeable {
 
 func (module *module) MustGetManagedRoleTransactions() map[string][]*authtypes.Transaction {
 	return map[string][]*authtypes.Transaction{
-		roletypes.Hanzo O11yAnonymousRoleName: {
+		roletypes.HanzoO11yAnonymousRoleName: {
 			{
 				ID:       valuer.GenerateUUID(),
 				Relation: authtypes.RelationRead,

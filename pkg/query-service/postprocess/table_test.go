@@ -31,7 +31,7 @@ func TestSortRows(t *testing.T) {
 				{Name: "A"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "asc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "asc"}}},
 			},
 			queryNames: []string{"A"},
 			expected: []*v3.TableRow{
@@ -52,7 +52,7 @@ func TestSortRows(t *testing.T) {
 				{Name: "A"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"}}},
 			},
 			queryNames: []string{"A"},
 			expected: []*v3.TableRow{
@@ -96,8 +96,8 @@ func TestSortRows(t *testing.T) {
 				{Name: "B"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "asc"}}},
-				"B": {OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "asc"}}},
+				"B": {OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"}}},
 			},
 			queryNames: []string{"A", "B"},
 			expected: []*v3.TableRow{
@@ -108,7 +108,7 @@ func TestSortRows(t *testing.T) {
 			},
 		},
 		{
-			name: "Sort with Hanzo O11yOrderByValue",
+			name: "Sort with HanzoO11yOrderByValue",
 			rows: []*v3.TableRow{
 				{Data: map[string]interface{}{"service": "service1", "A": 20.0}},
 				{Data: map[string]interface{}{"service": "service2", "A": 10.0}},
@@ -119,7 +119,7 @@ func TestSortRows(t *testing.T) {
 				{Name: "A"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"}}},
 			},
 			queryNames: []string{"A"},
 			expected: []*v3.TableRow{

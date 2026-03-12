@@ -117,7 +117,7 @@ type APIHandler struct {
 
 	LogsParsingPipelineController *logparsingpipeline.LogParsingPipelineController
 
-	// SetupCompleted indicates if Hanzo O11y is ready for general use.
+	// SetupCompleted indicates if HanzoO11y is ready for general use.
 	// at the moment, we mark the app ready when the first user
 	// is registers.
 	SetupCompleted bool
@@ -147,7 +147,7 @@ type APIHandler struct {
 
 	QueryParserAPI *queryparser.API
 
-	O11y *o11y.Hanzo O11y
+	O11y *o11y.HanzoO11y
 }
 
 type APIHandlerOpts struct {
@@ -175,7 +175,7 @@ type APIHandlerOpts struct {
 
 	QueryParserAPI *queryparser.API
 
-	O11y *o11y.Hanzo O11y
+	O11y *o11y.HanzoO11y
 }
 
 // NewAPIHandler returns an APIHandler

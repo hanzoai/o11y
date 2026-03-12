@@ -20,7 +20,7 @@ type migrateRbacToAuthz struct {
 }
 
 var (
-	existingRoleToHanzo O11yManagedRoleMap = map[string]string{
+	existingRoleToHanzoO11yManagedRoleMap = map[string]string{
 		"ADMIN":  "o11y-admin",
 		"EDITOR": "o11y-editor",
 		"VIEWER": "o11y-viewer",
@@ -111,7 +111,7 @@ func (migration *migrateRbacToAuthz) Up(ctx context.Context, db *bun.DB) error {
 				return err
 			}
 
-			managedRole, ok := existingRoleToHanzo O11yManagedRoleMap[role]
+			managedRole, ok := existingRoleToHanzoO11yManagedRoleMap[role]
 			if !ok {
 				return errors.Newf(errors.TypeInternal, errors.CodeInternal, "invalid role assignment: %s for user_id: %s", role, id)
 			}
