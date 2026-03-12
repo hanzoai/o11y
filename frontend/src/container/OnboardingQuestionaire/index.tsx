@@ -24,7 +24,7 @@ import {
 import InviteTeamMembers from './InviteTeamMembers/InviteTeamMembers';
 import OptimiseO11yNeeds, {
 	OptimiseO11yDetails,
-} from './OptimiseO11yNeeds/OptimiseO11yNeeds';
+} from './OptimiseSignozNeeds/OptimiseSignozNeeds';
 import OrgQuestions, { OrgDetails } from './OrgQuestions/OrgQuestions';
 
 import './OnboardingQuestionaire.styles.scss';
