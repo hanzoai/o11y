@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/hanzoai/otel-collector/exporter/jsontypeexporter"
+	"github.com/SigNoz/signoz-otel-collector/exporter/jsontypeexporter"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )

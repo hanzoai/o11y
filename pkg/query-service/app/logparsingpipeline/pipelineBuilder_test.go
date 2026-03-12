@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	o11ystanzahelper "github.com/hanzoai/otel-collector/processor/o11ylogspipelineprocessor/stanza/operator/helper"
+	signozstanzahelper "github.com/SigNoz/signoz-otel-collector/processor/signozlogspipelineprocessor/stanza/operator/helper"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
@@ -902,7 +902,7 @@ func TestProcessJSONParser_WithFlatteningAndMapping(t *testing.T) {
 	var traceParserCount, moveCount, severityParserCount int
 	for _, op := range ops[1:] {
 		require.NotEmpty(t, op.ID)
-		require.Equal(t, op.OnError, o11ystanzahelper.SendOnErrorQuiet)
+		require.Equal(t, op.OnError, signozstanzahelper.SendOnErrorQuiet)
 
 		switch op.Type {
 		case "move":
