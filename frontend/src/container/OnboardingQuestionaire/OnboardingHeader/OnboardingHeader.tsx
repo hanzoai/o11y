@@ -5,7 +5,7 @@ export function OnboardingHeader(): JSX.Element {
 		<div className="header-container">
 			<div className="logo-container">
 				<img src="/Logos/hanzo-icon.svg" alt="Hanzo" />
-				<span className="logo-text">Hanzo Observability</span>
+				<span className="logo-text">Hanzo O11y</span>
 			</div>
 		</div>
 	);
