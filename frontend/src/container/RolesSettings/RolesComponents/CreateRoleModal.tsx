@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useQueryClient } from 'react-query';
 import { generatePath, useHistory } from 'react-router-dom';
-import { Button } from '@hanzo/o11y-button';
-import { X } from '@hanzo/o11y-icons';
-import { Input, inputVariants } from '@hanzo/o11y-input';
-import { toast } from '@hanzo/o11y-sonner';
+import { Button } from '@signozhq/button';
+import { X } from '@signozhq/icons';
+import { Input, inputVariants } from '@signozhq/input';
+import { toast } from '@signozhq/sonner';
 import { Form, Modal } from 'antd';
 import {
 	invalidateGetRole,

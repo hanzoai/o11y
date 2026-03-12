@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ColumnDef, DataTable, Row } from '@hanzo/o11y-table';
+import { ColumnDef, DataTable, Row } from '@signozhq/table';
 import LogDetail from 'components/LogDetail';
 import { VIEW_TYPES } from 'components/LogDetail/constants';
 import LogStateIndicator from 'components/Logs/LogStateIndicator/LogStateIndicator';

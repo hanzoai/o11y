@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { UseQueryResult } from 'react-query';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { Progress, Skeleton, Tooltip, Typography } from 'antd';
 import {
 	getDisplayValue,

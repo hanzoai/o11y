@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation } from 'react-query';
 import { useCopyToClipboard } from 'react-use';
-import { Checkbox } from '@hanzo/o11y-checkbox';
-import { toast } from '@hanzo/o11y-sonner';
+import { Checkbox } from '@signozhq/checkbox';
+import { toast } from '@signozhq/sonner';
 import { Button, Select, Typography } from 'antd';
 import createPublicDashboardAPI from 'api/dashboard/public/createPublicDashboard';
 import revokePublicDashboardAccessAPI from 'api/dashboard/public/revokePublicDashboardAccess';

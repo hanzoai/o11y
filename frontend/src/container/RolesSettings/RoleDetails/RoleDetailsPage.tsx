@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Button } from '@hanzo/o11y-button';
-import { Table2, Trash2, Users } from '@hanzo/o11y-icons';
-import { toast } from '@hanzo/o11y-sonner';
-import { ToggleGroup, ToggleGroupItem } from '@hanzo/o11y-toggle-group';
+import { Button } from '@signozhq/button';
+import { Table2, Trash2, Users } from '@signozhq/icons';
+import { toast } from '@signozhq/sonner';
+import { ToggleGroup, ToggleGroupItem } from '@signozhq/toggle-group';
 import { Skeleton } from 'antd';
 import { useAuthzResources } from 'api/generated/services/authz';
 import {

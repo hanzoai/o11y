@@ -1,4 +1,4 @@
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import uPlot from 'uplot';
 
 const bucketIncr = 5;

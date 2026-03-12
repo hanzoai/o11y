@@ -7,7 +7,7 @@ import {
 	useRef,
 	useState,
 } from 'react';
-import { Input as O11yInput } from '@hanzo/o11y-input';
+import { Input as O11yInput } from '@signozhq/input';
 import { Col, Row, Select } from 'antd';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import { find } from 'lodash-es';

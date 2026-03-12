@@ -1,5 +1,5 @@
 import { Fragment, memo, ReactNode, useState } from 'react';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { Col, Row, Typography } from 'antd';
 import { Minus, Plus } from 'lucide-react';
 

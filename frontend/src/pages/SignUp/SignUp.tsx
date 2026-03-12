@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
-import { Button } from '@hanzo/o11y-button';
-import { Callout } from '@hanzo/o11y-callout';
-import { Input } from '@hanzo/o11y-input';
+import { Button } from '@signozhq/button';
+import { Callout } from '@signozhq/callout';
+import { Input } from '@signozhq/input';
 import { Form, Input as AntdInput, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import accept from 'api/v1/invite/id/accept';

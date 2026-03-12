@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@hanzo/o11y-button';
-import { Checkbox } from '@hanzo/o11y-checkbox';
-import { Input } from '@hanzo/o11y-input';
+import { Button } from '@signozhq/button';
+import { Checkbox } from '@signozhq/checkbox';
+import { Input } from '@signozhq/input';
 import { Input as AntdInput } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { ArrowRight } from 'lucide-react';
