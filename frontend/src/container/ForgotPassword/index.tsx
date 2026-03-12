@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { Button } from '@hanzo/o11y-button';
-import { ArrowLeft, ArrowRight } from '@hanzo/o11y-icons';
-import { Input } from '@hanzo/o11y-input';
+import { Button } from '@signozhq/button';
+import { ArrowLeft, ArrowRight } from '@signozhq/icons';
+import { Input } from '@signozhq/input';
 import { Form, Select } from 'antd';
 import { ErrorResponseHandlerForGeneratedAPIs } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import { useForgotPassword } from 'api/generated/services/users';

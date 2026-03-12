@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { Button, Skeleton, Switch, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import Uplot from 'components/Uplot';

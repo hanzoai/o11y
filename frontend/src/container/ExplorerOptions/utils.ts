@@ -1,4 +1,4 @@
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { showErrorNotification } from 'components/ExplorerCard/utils';
 import { LOCALSTORAGE } from 'constants/localStorage';
 import { QueryParams } from 'constants/query';

@@ -9,7 +9,7 @@ import {
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { useCopyToClipboard } from 'react-use';
-import { toast } from '@hanzo/o11y-sonner';
+import { toast } from '@signozhq/sonner';
 import { QueryParams } from 'constants/query';
 import ROUTES from 'constants/routes';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from 'react-query';
 import { CheckCircleOutlined, CloudDownloadOutlined } from '@ant-design/icons';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import {
 	Alert,
 	Button,

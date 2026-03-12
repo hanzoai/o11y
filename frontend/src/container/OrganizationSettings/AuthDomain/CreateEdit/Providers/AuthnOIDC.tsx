@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
-import { Callout } from '@hanzo/o11y-callout';
-import { Checkbox } from '@hanzo/o11y-checkbox';
-import { Style } from '@hanzo/o11y-design-tokens';
-import { CircleHelp } from '@hanzo/o11y-icons';
-import { Input } from '@hanzo/o11y-input';
+import { Callout } from '@signozhq/callout';
+import { Checkbox } from '@signozhq/checkbox';
+import { Style } from '@signozhq/design-tokens';
+import { CircleHelp } from '@signozhq/icons';
+import { Input } from '@signozhq/input';
 import { Form, Tooltip } from 'antd';
 
 import ClaimMappingSection from './components/ClaimMappingSection';

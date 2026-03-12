@@ -68,7 +68,7 @@ jest.mock('react-query', () => ({
 	useQueryClient: (): any => mockQueryClient,
 }));
 
-jest.mock('@hanzo/o11y-sonner', () => ({ toast: jest.fn() }));
+jest.mock('@signozhq/sonner', () => ({ toast: jest.fn() }));
 
 // Mock the API response for getAggregateKeys
 const mockAggregateKeysResponse = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '@hanzo/o11y-badge';
+import { Badge } from '@signozhq/badge';
 import type {
 	AuthtypesGettableObjectsDTO,
 	AuthtypesGettableResourcesDTO,

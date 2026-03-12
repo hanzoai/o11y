@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Switch } from '@hanzo/o11y-switch';
+import { Switch } from '@signozhq/switch';
 import { ErrorResponseHandlerV2 } from 'api/ErrorResponseHandlerV2';
 import { useUpdateAuthDomain } from 'api/generated/services/authdomains';
 import {

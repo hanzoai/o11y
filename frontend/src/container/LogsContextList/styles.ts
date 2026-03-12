@@ -1,4 +1,4 @@
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { Typography } from 'antd';
 import styled from 'styled-components';
 

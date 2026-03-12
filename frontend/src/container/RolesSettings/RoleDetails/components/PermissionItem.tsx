@@ -1,4 +1,4 @@
-import { ChevronRight } from '@hanzo/o11y-icons';
+import { ChevronRight } from '@signozhq/icons';
 
 import { PermissionType } from '../../utils';
 

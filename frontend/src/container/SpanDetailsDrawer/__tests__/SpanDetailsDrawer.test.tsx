@@ -45,7 +45,7 @@ jest.mock('react-router-dom', () => ({
 	}),
 }));
 
-jest.mock('@hanzo/o11y-button', () => ({
+jest.mock('@signozhq/button', () => ({
 	Button: ({ children }: { children: React.ReactNode }): JSX.Element => (
 		<div>{children}</div>
 	),

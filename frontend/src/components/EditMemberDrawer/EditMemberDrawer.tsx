@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Badge } from '@hanzo/o11y-badge';
-import { Button } from '@hanzo/o11y-button';
-import { DialogFooter, DialogWrapper } from '@hanzo/o11y-dialog';
-import { DrawerWrapper } from '@hanzo/o11y-drawer';
+import { Badge } from '@signozhq/badge';
+import { Button } from '@signozhq/button';
+import { DialogFooter, DialogWrapper } from '@signozhq/dialog';
+import { DrawerWrapper } from '@signozhq/drawer';
 import {
 	Check,
 	ChevronDown,
@@ -12,9 +12,9 @@ import {
 	RefreshCw,
 	Trash2,
 	X,
-} from '@hanzo/o11y-icons';
-import { Input } from '@hanzo/o11y-input';
-import { toast } from '@hanzo/o11y-sonner';
+} from '@signozhq/icons';
+import { Input } from '@signozhq/input';
+import { toast } from '@signozhq/sonner';
 import { Select } from 'antd';
 import getResetPasswordToken from 'api/v1/factor_password/getResetPasswordToken';
 import sendInvite from 'api/v1/invite/create';

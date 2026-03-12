@@ -1,5 +1,5 @@
-import { Button } from '@hanzo/o11y-button';
-import { ArrowLeft, Mail } from '@hanzo/o11y-icons';
+import { Button } from '@signozhq/button';
+import { ArrowLeft, Mail } from '@signozhq/icons';
 
 interface SuccessScreenProps {
 	onBackToLogin: () => void;

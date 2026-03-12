@@ -1,5 +1,5 @@
 import { RocketOutlined } from '@ant-design/icons';
-import { Style } from '@hanzo/o11y-design-tokens';
+import { Style } from '@signozhq/design-tokens';
 import { MenuProps } from 'antd';
 import ROUTES from 'constants/routes';
 import {
