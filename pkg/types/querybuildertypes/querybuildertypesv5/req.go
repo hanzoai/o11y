@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/HanzoO11y/govaluate"
+	"github.com/SigNoz/govaluate"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
