@@ -264,8 +264,8 @@ describe('Public Dashboard Container', () => {
 			);
 
 			expect(screen.getByText(TEST_DASHBOARD_TITLE)).toBeInTheDocument();
-			expect(screen.getByText('HanzoO11y')).toBeInTheDocument();
-			expect(screen.getByAltText('HanzoO11y')).toBeInTheDocument();
+			expect(screen.getByText('Hanzo')).toBeInTheDocument();
+			expect(screen.getByAltText('Hanzo')).toBeInTheDocument();
 		});
 
 		it('should render time range selector when timeRangeEnabled is true', () => {
@@ -713,7 +713,7 @@ describe('Public Dashboard Container', () => {
 				/>,
 			);
 
-			expect(screen.getByText('HanzoO11y')).toBeInTheDocument();
+			expect(screen.getByText('Hanzo')).toBeInTheDocument();
 		});
 
 		it('should handle missing layout data', () => {

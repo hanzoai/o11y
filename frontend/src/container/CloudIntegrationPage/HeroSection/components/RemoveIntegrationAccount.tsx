@@ -79,7 +79,7 @@ function RemoveIntegrationAccount({
 			>
 				<div className="remove-integration-modal__text">
 					Removing this account will remove all components created for sending
-					telemetry to HanzoO11y in your AWS account within the next ~15 minutes
+					telemetry to Hanzo in your AWS account within the next ~15 minutes
 					(cloudformation stacks named o11y-integration-telemetry-collection in
 					enabled regions). <br />
 					<br />

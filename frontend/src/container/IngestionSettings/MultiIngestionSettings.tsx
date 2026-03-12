@@ -1584,7 +1584,7 @@ function MultiIngestionSettings(): JSX.Element {
 				<header>
 					<Typography.Title className="title"> Ingestion Keys </Typography.Title>
 					<Typography.Text className="subtitle">
-						Create and manage ingestion keys for the HanzoO11y Cloud{' '}
+						Create and manage ingestion keys for the Hanzo Cloud{' '}
 						<a
 							href="https://o11y.hanzo.ai/docs/ingestion/o11y-cloud/keys/"
 							target="_blank"

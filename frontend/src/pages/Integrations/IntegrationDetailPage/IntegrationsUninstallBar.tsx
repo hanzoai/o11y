@@ -27,7 +27,7 @@ function IntergrationsUninstallBar(
 		integrationId,
 		onUnInstallSuccess,
 		connectionStatus,
-		removeIntegrationTitle = 'Remove from HanzoO11y',
+		removeIntegrationTitle = 'Remove from Hanzo',
 	} = props;
 	const { notifications } = useNotifications();
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,7 +96,7 @@ function IntergrationsUninstallBar(
 				}}
 			>
 				<Typography.Text className="remove-integration-text">
-					Removing this integration makes HanzoO11y stop listening for data from{' '}
+					Removing this integration makes Hanzo stop listening for data from{' '}
 					{integrationTitle} instances. You would still have to manually remove the
 					configuration in your code to stop sending data.
 				</Typography.Text>
@@ -106,7 +106,7 @@ function IntergrationsUninstallBar(
 }
 
 IntergrationsUninstallBar.defaultProps = {
-	removeIntegrationTitle: 'Remove from HanzoO11y',
+	removeIntegrationTitle: 'Remove from Hanzo',
 };
 
 export default IntergrationsUninstallBar;

@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for HanzoO11y
+ * * The file has been auto-generated using Orval for Hanzo Observability
  * * regenerate with 'yarn generate:api'
- * HanzoO11y
+ * Hanzo Observability
  */
 import type {
 	MutationFunction,

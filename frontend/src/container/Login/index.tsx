@@ -305,14 +305,13 @@ function Login(): JSX.Element {
 			<FormContainer form={form} onFinish={onSubmitHandler}>
 				<div className="login-form-header">
 					<div className="login-form-emoji">
-						<img src="/svgs/tv.svg" alt="TV" width="32" height="32" />
+						<img src="/Logos/hanzo-icon.svg" alt="Hanzo" width="32" height="32" />
 					</div>
 					<Typography.Title level={4} className="login-form-title">
-						Sign in to your workspace
+						Hanzo Observability
 					</Typography.Title>
 					<Typography.Paragraph className="login-form-description">
-						Sign in to monitor, trace, and troubleshoot your applications
-						effortlessly.
+						Sign in to monitor, trace, and troubleshoot your applications.
 					</Typography.Paragraph>
 				</div>
 
