@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@hanzo/o11y-button';
+import { Button } from '@signozhq/button';
 import { Slider, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { ArrowRight, Loader2, Minus } from 'lucide-react';

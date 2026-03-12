@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { Button } from '@hanzo/o11y-button';
-import { toast } from '@hanzo/o11y-sonner';
+import { Button } from '@signozhq/button';
+import { toast } from '@signozhq/sonner';
 import { Form, Modal } from 'antd';
 import { ErrorResponseHandlerV2 } from 'api/ErrorResponseHandlerV2';
 import {

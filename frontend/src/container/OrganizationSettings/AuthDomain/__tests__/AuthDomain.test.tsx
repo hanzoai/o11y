@@ -9,7 +9,7 @@ import {
 	mockErrorResponse,
 } from './mocks';
 
-jest.mock('@hanzo/o11y-sonner', () => ({
+jest.mock('@signozhq/sonner', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),

@@ -6,7 +6,7 @@ import InviteMembersModal from '../InviteMembersModal';
 
 jest.mock('api/v1/invite/create');
 jest.mock('api/v1/invite/bulk/create');
-jest.mock('@hanzo/o11y-sonner', () => ({
+jest.mock('@signozhq/sonner', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { Button } from 'antd';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { CircleCheck, Link2 } from 'lucide-react';

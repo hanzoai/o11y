@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Color, Spacing } from '@hanzo/o11y-design-tokens';
+import { Color, Spacing } from '@signozhq/design-tokens';
 import { Divider, Drawer, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { PANEL_TYPES } from 'constants/queryBuilder';

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { QueryKey } from 'react-query';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { Button, Tabs, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import PromQLIcon from 'assets/Dashboard/PromQl';

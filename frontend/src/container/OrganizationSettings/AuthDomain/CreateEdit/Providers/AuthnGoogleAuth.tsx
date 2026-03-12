@@ -1,14 +1,14 @@
 import { useCallback, useState } from 'react';
-import { Callout } from '@hanzo/o11y-callout';
-import { Checkbox } from '@hanzo/o11y-checkbox';
-import { Color, Style } from '@hanzo/o11y-design-tokens';
+import { Callout } from '@signozhq/callout';
+import { Checkbox } from '@signozhq/checkbox';
+import { Color, Style } from '@signozhq/design-tokens';
 import {
 	ChevronDown,
 	ChevronRight,
 	CircleHelp,
 	TriangleAlert,
-} from '@hanzo/o11y-icons';
-import { Input } from '@hanzo/o11y-input';
+} from '@signozhq/icons';
+import { Input } from '@signozhq/input';
 import { Collapse, Form, Input as AntdInput, Tooltip } from 'antd';
 import { useCollapseSectionErrors } from 'hooks/useCollapseSectionErrors';
 

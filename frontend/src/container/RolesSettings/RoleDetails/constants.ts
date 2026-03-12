@@ -5,7 +5,7 @@ import {
 	PencilRuler,
 	Settings,
 	Trash2,
-} from '@hanzo/o11y-icons';
+} from '@signozhq/icons';
 
 export const ROLE_ID_REGEX = /\/settings\/roles\/([^/]+)/;
 

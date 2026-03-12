@@ -14,7 +14,7 @@ const SELECTED_NON_MATCHING_SPAN_CLASS = 'selected-non-matching-span';
 
 // Mock the hooks
 jest.mock('hooks/useUrlQuery');
-jest.mock('@hanzo/o11y-badge', () => ({
+jest.mock('@signozhq/badge', () => ({
 	Badge: jest.fn(),
 }));
 

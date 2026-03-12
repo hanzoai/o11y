@@ -1,4 +1,4 @@
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { themeColors } from 'constants/theme';
 import getLabelName from 'lib/getLabelName';
 import { drawStyles } from 'lib/uPlotLib/utils/constants';

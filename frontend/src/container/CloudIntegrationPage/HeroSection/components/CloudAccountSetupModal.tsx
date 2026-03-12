@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useQueryClient } from 'react-query';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import O11yModal from 'components/O11yModal/O11yModal';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import { useIntegrationModal } from 'hooks/integration/aws/useIntegrationModal';

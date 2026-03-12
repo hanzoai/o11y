@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { Switch } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { Delete } from 'lucide-react';

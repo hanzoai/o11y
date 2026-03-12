@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Color, Spacing } from '@hanzo/o11y-design-tokens';
+import { Color, Spacing } from '@signozhq/design-tokens';
 import { Button, Divider, Drawer, RadioChangeEvent, Typography } from 'antd';
 import LogsIcon from 'assets/AlertHistory/LogsIcon';
 import O11yRadioGroup from 'components/O11yRadioGroup/O11yRadioGroup';

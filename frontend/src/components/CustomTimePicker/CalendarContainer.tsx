@@ -1,4 +1,4 @@
-import { Calendar } from '@hanzo/o11y-calendar';
+import { Calendar } from '@signozhq/calendar';
 import { Button } from 'antd';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import dayjs from 'dayjs';

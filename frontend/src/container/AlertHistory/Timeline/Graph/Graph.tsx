@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch } from 'react-redux';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import Uplot from 'components/Uplot';
 import { QueryParams } from 'constants/query';
 import { useIsDarkMode } from 'hooks/useDarkMode';

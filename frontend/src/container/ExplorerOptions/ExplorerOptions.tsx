@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { useHistory } from 'react-router-dom';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import {
 	Button,
 	ColorPicker,

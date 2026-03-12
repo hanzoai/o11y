@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
-import { Button } from '@hanzo/o11y-button';
-import { Checkbox } from '@hanzo/o11y-checkbox';
-import { Color, Style } from '@hanzo/o11y-design-tokens';
+import { Button } from '@signozhq/button';
+import { Checkbox } from '@signozhq/checkbox';
+import { Color, Style } from '@signozhq/design-tokens';
 import {
 	ChevronDown,
 	ChevronRight,
@@ -9,8 +9,8 @@ import {
 	Plus,
 	Trash2,
 	TriangleAlert,
-} from '@hanzo/o11y-icons';
-import { Input } from '@hanzo/o11y-input';
+} from '@signozhq/icons';
+import { Input } from '@signozhq/input';
 import { Collapse, Form, Select, Tooltip } from 'antd';
 import { useCollapseSectionErrors } from 'hooks/useCollapseSectionErrors';
 
