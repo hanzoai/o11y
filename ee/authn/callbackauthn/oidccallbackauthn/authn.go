@@ -77,7 +77,8 @@ func (a *AuthN) HandleCallback(ctx context.Context, query url.Values) (*authtype
 
 	_, err = a.licensing.GetActive(ctx, authDomain.StorableAuthDomain().OrgID)
 	if err != nil {
-		return nil, errors.New(errors.TypeLicenseUnavailable, errors.CodeLicenseUnavailable, "a valid license is not available").WithAdditional("this feature requires a valid license").WithAdditional(err.Error())
+		// Log but do not block OIDC login — allow SSO even without an enterprise license
+		a.settings.Logger().WarnContext(ctx, "oidc: no active license found, proceeding with SSO login", "orgID", authDomain.StorableAuthDomain().OrgID, "error", err.Error())
 	}
 
 	oidcProvider, oauth2Config, err := a.oidcProviderAndoauth2Config(ctx, state.URL, authDomain)
