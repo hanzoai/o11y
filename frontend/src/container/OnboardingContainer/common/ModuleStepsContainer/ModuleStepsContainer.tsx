@@ -377,9 +377,9 @@ export default function ModuleStepsContainer({
 				<div>
 					<div className="steps-container-header">
 						<div className="brand-logo" onClick={handleLogoClick}>
-							<img src="/Logos/observe-brand-logo.svg" alt="Hanzo O11y" />
+							<img src="/Logos/observe-brand-logo.svg" alt="HanzoO11y" />
 
-							<div className="brand-logo-name">Hanzo O11y</div>
+							<div className="brand-logo-name">HanzoO11y</div>
 						</div>
 					</div>
 
@@ -470,13 +470,13 @@ export default function ModuleStepsContainer({
 							step: activeStep?.step?.id,
 							screen: 'Onboarding',
 						}}
-						eventName="Onboarding V2: Facing Issues Sending Data to Hanzo O11y"
+						eventName="Onboarding V2: Facing Issues Sending Data to HanzoO11y"
 						message={onboardingHelpMessage(
 							selectedDataSource?.name || '',
 							activeStep?.module?.id,
 						)}
-						buttonText="Facing issues sending data to Hanzo O11y?"
-						onHoverText="Click here to get help with sending data to Hanzo O11y"
+						buttonText="Facing issues sending data to HanzoO11y?"
+						onHoverText="Click here to get help with sending data to HanzoO11y"
 					/>
 				</div>
 			</div>

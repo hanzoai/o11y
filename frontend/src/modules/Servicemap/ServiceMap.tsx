@@ -73,7 +73,7 @@ function ServiceMap(props: ServiceMapProps): JSX.Element {
 	useEffect(() => {
 		/*
 			Call the apis only when the route is loaded.
-			Check this issue: https://github.com/Hanzo O11y/o11y/issues/110
+			Check this issue: https://github.com/HanzoO11y/o11y/issues/110
 		 */
 		getDetailedServiceMapItems(globalTime, queries);
 	}, [globalTime, getDetailedServiceMapItems, queries]);

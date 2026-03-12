@@ -13,9 +13,9 @@ export default function FullScreenHeader({
 	return (
 		<div className="full-screen-header-container">
 			<div className="brand-logo" onClick={handleLogoClick}>
-				<img src="/Logos/observe-brand-logo.svg" alt="Hanzo O11y" />
+				<img src="/Logos/observe-brand-logo.svg" alt="HanzoO11y" />
 
-				<div className="brand-logo-name">Hanzo O11y</div>
+				<div className="brand-logo-name">HanzoO11y</div>
 			</div>
 		</div>
 	);

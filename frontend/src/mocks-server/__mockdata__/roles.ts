@@ -9,7 +9,7 @@ export const managedRoles: RoletypesRoleDTO[] = [
 		updatedAt: new Date('2026-02-03T18:00:55.624356Z'),
 		name: 'observe-admin',
 		description:
-			'Role assigned to users who have full administrative access to Hanzo O11y resources.',
+			'Role assigned to users who have full administrative access to HanzoO11y resources.',
 		type: 'managed',
 		orgId,
 	},
@@ -19,7 +19,7 @@ export const managedRoles: RoletypesRoleDTO[] = [
 		updatedAt: new Date('2026-02-03T18:00:55.624359Z'),
 		name: 'o11y-editor',
 		description:
-			'Role assigned to users who can create, edit, and manage Hanzo O11y resources but do not have full administrative privileges.',
+			'Role assigned to users who can create, edit, and manage HanzoO11y resources but do not have full administrative privileges.',
 		type: 'managed',
 		orgId,
 	},
@@ -29,7 +29,7 @@ export const managedRoles: RoletypesRoleDTO[] = [
 		updatedAt: new Date('2026-02-03T18:00:55.624362Z'),
 		name: 'o11y-viewer',
 		description:
-			'Role assigned to users who have read-only access to Hanzo O11y resources.',
+			'Role assigned to users who have read-only access to HanzoO11y resources.',
 		type: 'managed',
 		orgId,
 	},

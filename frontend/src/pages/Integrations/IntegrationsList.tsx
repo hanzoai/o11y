@@ -13,9 +13,9 @@ import './Integrations.styles.scss';
 export const AWS_INTEGRATION = {
 	id: INTEGRATION_TYPES.AWS_INTEGRATION,
 	title: 'Amazon Web Services',
-	description: 'One-click setup for AWS monitoring with Hanzo O11y',
+	description: 'One-click setup for AWS monitoring with HanzoO11y',
 	author: {
-		name: 'Hanzo O11y',
+		name: 'HanzoO11y',
 		email: 'integrations@o11y.hanzo.ai',
 		homepage: 'https://o11y.hanzo.ai',
 	},

@@ -32,7 +32,7 @@ function OnNoPermissionsFallback(response: {
 					<br />
 					Object: <span>{object}</span>
 					<br />
-					Ask your Hanzo O11y administrator to grant access.
+					Ask your HanzoO11y administrator to grant access.
 				</p>
 			</div>
 		</div>

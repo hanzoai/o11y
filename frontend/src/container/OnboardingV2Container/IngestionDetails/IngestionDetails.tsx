@@ -89,7 +89,7 @@ export default function OnboardingIngestionDetails(): JSX.Element {
 						<Info size={14} />
 
 						<span>
-							Find your ingestion URL and learn more about sending data to Hanzo O11y{' '}
+							Find your ingestion URL and learn more about sending data to HanzoO11y{' '}
 							<a
 								href={`${DOCS_BASE_URL}/docs/ingestion/o11y-cloud/overview/`}
 								target="_blank"
@@ -107,7 +107,7 @@ export default function OnboardingIngestionDetails(): JSX.Element {
 				<>
 					<div className="ingestion-key-details-section">
 						<Typography.Text className="ingestion-key-details-section-text">
-							You can use this key to send your telemetry data to Hanzo O11y.
+							You can use this key to send your telemetry data to HanzoO11y.
 						</Typography.Text>
 
 						<div className="ingestion-key-details-section-key">

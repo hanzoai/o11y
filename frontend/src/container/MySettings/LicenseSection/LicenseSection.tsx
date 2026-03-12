@@ -56,7 +56,7 @@ function LicenseSection(): JSX.Element | null {
 					</div>
 
 					<div className="license-section-content-item-description">
-						Your Hanzo O11y license key.
+						Your HanzoO11y license key.
 					</div>
 				</div>
 			</div>

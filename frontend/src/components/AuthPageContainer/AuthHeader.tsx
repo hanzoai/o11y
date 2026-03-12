@@ -14,10 +14,10 @@ function AuthHeader(): JSX.Element {
 			<div className="auth-header-logo">
 				<img
 					src="/Logos/observe-brand-logo.svg"
-					alt="Hanzo O11y"
+					alt="HanzoO11y"
 					className="auth-header-logo-icon"
 				/>
-				<span className="auth-header-logo-text">Hanzo O11y</span>
+				<span className="auth-header-logo-text">HanzoO11y</span>
 			</div>
 			<Button
 				className="auth-header-help-button"
