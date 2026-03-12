@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 func TestRollingWindow_EvaluationTime(t *testing.T) {

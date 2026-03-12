@@ -1,25 +1,25 @@
-package signozalertmanager
+package o11yalertmanager
 
 import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/query-service/utils/labels"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
 	"github.com/prometheus/common/model"
 
 	amConfig "github.com/prometheus/alertmanager/config"
 
-	"github.com/SigNoz/signoz/pkg/alertmanager"
-	"github.com/SigNoz/signoz/pkg/alertmanager/alertmanagerstore/sqlalertmanagerstore"
-	"github.com/SigNoz/signoz/pkg/alertmanager/nfmanager"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/alertmanager"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerstore/sqlalertmanagerstore"
+	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type provider struct {
@@ -33,13 +33,13 @@ type provider struct {
 }
 
 func NewFactory(sqlstore sqlstore.SQLStore, orgGetter organization.Getter, notificationManager nfmanager.NotificationManager) factory.ProviderFactory[alertmanager.Alertmanager, alertmanager.Config] {
-	return factory.NewProviderFactory(factory.MustNewName("signoz"), func(ctx context.Context, settings factory.ProviderSettings, config alertmanager.Config) (alertmanager.Alertmanager, error) {
+	return factory.NewProviderFactory(factory.MustNewName("observe"), func(ctx context.Context, settings factory.ProviderSettings, config alertmanager.Config) (alertmanager.Alertmanager, error) {
 		return New(ctx, settings, config, sqlstore, orgGetter, notificationManager)
 	})
 }
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config alertmanager.Config, sqlstore sqlstore.SQLStore, orgGetter organization.Getter, notificationManager nfmanager.NotificationManager) (*provider, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/alertmanager/signozalertmanager")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/alertmanager/o11yalertmanager")
 	configStore := sqlalertmanagerstore.NewConfigStore(sqlstore)
 	stateStore := sqlalertmanagerstore.NewStateStore(sqlstore)
 
@@ -47,7 +47,7 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 		service: alertmanager.New(
 			ctx,
 			settings,
-			config.Signoz.Config,
+			config.O11y.Config,
 			stateStore,
 			configStore,
 			orgGetter,
@@ -70,7 +70,7 @@ func (provider *provider) Start(ctx context.Context) error {
 		return err
 	}
 
-	ticker := time.NewTicker(provider.config.Signoz.PollInterval)
+	ticker := time.NewTicker(provider.config.O11y.PollInterval)
 	defer ticker.Stop()
 	for {
 		select {
@@ -131,7 +131,7 @@ func (provider *provider) ListChannels(ctx context.Context, orgID string) ([]*al
 }
 
 func (provider *provider) ListAllChannels(ctx context.Context) ([]*alertmanagertypes.Channel, error) {
-	return nil, errors.Newf(errors.TypeUnsupported, errors.CodeUnsupported, "not supported by provider signoz")
+	return nil, errors.Newf(errors.TypeUnsupported, errors.CodeUnsupported, "not supported by provider o11y")
 }
 
 func (provider *provider) GetChannelByID(ctx context.Context, orgID string, channelID valuer.UUID) (*alertmanagertypes.Channel, error) {
@@ -216,7 +216,7 @@ func (provider *provider) GetConfig(ctx context.Context, orgID string) (*alertma
 }
 
 func (provider *provider) SetDefaultConfig(ctx context.Context, orgID string) error {
-	config, err := alertmanagertypes.NewDefaultConfig(provider.config.Signoz.Config.Global, provider.config.Signoz.Config.Route, orgID)
+	config, err := alertmanagertypes.NewDefaultConfig(provider.config.O11y.Config.Global, provider.config.O11y.Config.Route, orgID)
 	if err != nil {
 		return err
 	}

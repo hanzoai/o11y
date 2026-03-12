@@ -1,23 +1,23 @@
 import { useCallback } from 'react';
-import { Button } from '@signozhq/button';
+import { Button } from '@hanzo/o11y-button';
 import { LifeBuoy } from 'lucide-react';
 
 import './AuthHeader.styles.scss';
 
 function AuthHeader(): JSX.Element {
 	const handleGetHelp = useCallback((): void => {
-		window.open('https://signoz.io/support/', '_blank');
+		window.open('https://o11y.hanzo.ai/support/', '_blank');
 	}, []);
 
 	return (
 		<header className="auth-header">
 			<div className="auth-header-logo">
 				<img
-					src="/Logos/signoz-brand-logo.svg"
-					alt="SigNoz"
+					src="/Logos/observe-brand-logo.svg"
+					alt="Hanzo O11y"
 					className="auth-header-logo-icon"
 				/>
-				<span className="auth-header-logo-text">SigNoz</span>
+				<span className="auth-header-logo-text">Hanzo O11y</span>
 			</div>
 			<Button
 				className="auth-header-help-button"

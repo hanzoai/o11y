@@ -1,6 +1,6 @@
 // Mock dependencies before imports
 import { useLocation } from 'react-router-dom';
-import { toast } from '@signozhq/sonner';
+import { toast } from '@hanzo/o11y-sonner';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import logEvent from 'api/common/logEvent';
@@ -19,7 +19,7 @@ jest.mock('react-router-dom', () => ({
 	useLocation: jest.fn(),
 }));
 
-jest.mock('@signozhq/sonner', () => ({
+jest.mock('@hanzo/o11y-sonner', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),
@@ -231,7 +231,7 @@ describe('FeedbackModal', () => {
 		const docsLink = screen.getByText('Read our docs');
 		expect(docsLink).toHaveAttribute(
 			'href',
-			'https://signoz.io/docs/introduction/',
+			'https://o11y.hanzo.ai/docs/introduction/',
 		);
 		expect(docsLink).toHaveAttribute('target', '_blank');
 		expect(docsLink).toHaveAttribute('rel', 'noreferrer');

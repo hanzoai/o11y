@@ -42,13 +42,13 @@ cd generator/hotrod
 docker compose up -d
 ```
 
-In a couple of minutes, you should see the data generated from hotrod in SigNoz UI.
+In a couple of minutes, you should see the data generated from hotrod in Hanzo O11y UI.
 
-For more details, please refer to the [SigNoz documentation](https://signoz.io/docs/install/docker/).
+For more details, please refer to the [Hanzo O11y documentation](https://o11y.hanzo.ai/docs/install/docker/).
 
 ## Docker Swarm
 
-To install SigNoz using Docker Swarm, run the following command:
+To install Hanzo O11y using Docker Swarm, run the following command:
 
 ```sh
 cd deploy/docker-swarm
@@ -71,11 +71,11 @@ cd generator/hotrod
 docker stack deploy -c docker-compose.yaml hotrod
 ```
 
-In a couple of minutes, you should see the data generated from hotrod in SigNoz UI.
+In a couple of minutes, you should see the data generated from hotrod in Hanzo O11y UI.
 
-For more details, please refer to the [SigNoz documentation](https://signoz.io/docs/install/docker-swarm/).
+For more details, please refer to the [Hanzo O11y documentation](https://o11y.hanzo.ai/docs/install/docker-swarm/).
 
 ## Uninstall/Troubleshoot?
 
-Go to our official documentation site [signoz.io/docs](https://signoz.io/docs) for more.
+Go to our official documentation site [o11y.hanzo.ai/docs](https://o11y.hanzo.ai/docs) for more.
 

@@ -2,14 +2,14 @@ package clickhouseprometheus
 
 import (
 	"context"
-	"github.com/SigNoz/signoz/pkg/telemetrystore/telemetrystoretest"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	cmock "github.com/srikanthccv/ClickHouse-go-mock"
 	"github.com/stretchr/testify/require"
 	"sort"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/stretchr/testify/assert"
 )

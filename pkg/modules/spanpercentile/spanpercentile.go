@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/types/spanpercentiletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/spanpercentiletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type Module interface {

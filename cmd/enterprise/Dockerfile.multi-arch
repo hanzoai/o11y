@@ -1,7 +1,7 @@
 ARG ALPINE_SHA="pass-a-valid-docker-sha-otherwise-this-will-fail"
 
 FROM alpine@sha256:${ALPINE_SHA}
-LABEL maintainer="signoz"
+LABEL maintainer="hanzoai"
 WORKDIR /root
 
 ARG OS="linux"
@@ -11,10 +11,10 @@ RUN apk update && \
     apk add ca-certificates && \
     rm -rf /var/cache/apk/*
 
-COPY ./target/${OS}-${ARCH}/signoz /root/signoz
+COPY ./target/${OS}-${ARCH}/signoz /root/o11y
 COPY ./templates/email /root/templates
-COPY frontend/build/ /etc/signoz/web/
+COPY frontend/build/ /etc/o11y/web/
 
-RUN chmod 755 /root /root/signoz
+RUN chmod 755 /root /root/o11y
 
-ENTRYPOINT ["./signoz", "server"]
+ENTRYPOINT ["./o11y", "server"]

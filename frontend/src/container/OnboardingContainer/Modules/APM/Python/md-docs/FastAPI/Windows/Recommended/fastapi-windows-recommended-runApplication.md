@@ -25,8 +25,8 @@ kill "$(< otel-pid)"
 
 ```bash
 setx OTEL_RESOURCE_ATTRIBUTES=service.name={{MYAPP}} 
-setx OTEL_EXPORTER_OTLP_ENDPOINT="https://ingest.{{REGION}}.signoz.cloud:443" 
-setx OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}" 
+setx OTEL_EXPORTER_OTLP_ENDPOINT="https://ingest.{{REGION}}.o11y.hanzo.ai:443" 
+setx OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}" 
 setx OTEL_EXPORTER_OTLP_PROTOCOL=grpc 
 
 opentelemetry-instrument <your run command>
@@ -41,5 +41,5 @@ opentelemetry-instrument <your run command>
 
 &nbsp;
 
-If you encounter any difficulties, please consult the [troubleshooting section](https://signoz.io/docs/instrumentation/fastapi/#troubleshooting-your-installation) for assistance.
+If you encounter any difficulties, please consult the [troubleshooting section](https://o11y.hanzo.ai/docs/instrumentation/fastapi/#troubleshooting-your-installation) for assistance.
 

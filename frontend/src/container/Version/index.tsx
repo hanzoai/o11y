@@ -83,7 +83,7 @@ function Version(): JSX.Element {
 							<div className="version-page-latest-version-container-title">
 								<CheckCircle size={16} />
 
-								{t('latest_version_signoz')}
+								{t('latest_version_o11y')}
 							</div>
 						</div>
 					)}
@@ -100,7 +100,7 @@ function Version(): JSX.Element {
 					{!isError && !isLatestVersion && (
 						<div className="version-page-upgrade-container">
 							<Button
-								href="https://signoz.io/docs/operate/docker-standalone/#upgrade"
+								href="https://o11y.hanzo.ai/docs/operate/docker-standalone/#upgrade"
 								target="_blank"
 								type="primary"
 								className="periscope-btn primary"

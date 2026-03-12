@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { toast } from '@signozhq/sonner';
+import { toast } from '@hanzo/o11y-sonner';
 import { Button, Input, Radio, RadioChangeEvent, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
@@ -143,7 +143,7 @@ function FeedbackModal({ onClose }: { onClose: () => void }): JSX.Element {
 						</Typography.Link>
 						or{' '}
 						<a
-							href="https://signoz.io/docs/introduction/"
+							href="https://o11y.hanzo.ai/docs/introduction/"
 							target="_blank"
 							rel="noreferrer"
 							className="read-docs-link"

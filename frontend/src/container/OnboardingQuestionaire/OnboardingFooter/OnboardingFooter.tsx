@@ -7,7 +7,7 @@ export function OnboardingFooter(): JSX.Element {
 		<section className="footer-main-container">
 			<div className="footer-container">
 				<a
-					href="https://trust.signoz.io/"
+					href="https://trust.o11y.hanzo.ai/"
 					target="_blank"
 					className="footer-content"
 					rel="noreferrer"
@@ -17,7 +17,7 @@ export function OnboardingFooter(): JSX.Element {
 				</a>
 				<Dot size={24} color="#2C3140" />
 				<a
-					href="https://trust.signoz.io/"
+					href="https://trust.o11y.hanzo.ai/"
 					target="_blank"
 					className="footer-content"
 					rel="noreferrer"

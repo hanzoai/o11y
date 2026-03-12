@@ -14,18 +14,18 @@ ARCHS					?= amd64 arm64
 TARGET_DIR              ?= $(shell pwd)/target
 
 ZEUS_URL					   		?= https://api.signoz.cloud
-GO_BUILD_LDFLAG_ZEUS_URL 			= -X github.com/SigNoz/signoz/ee/zeus.url=$(ZEUS_URL)
+GO_BUILD_LDFLAG_ZEUS_URL 			= -X github.com/hanzoai/o11y/ee/zeus.url=$(ZEUS_URL)
 LICENSE_URL 						?= https://license.signoz.io
-GO_BUILD_LDFLAG_LICENSE_SIGNOZ_IO 	= -X github.com/SigNoz/signoz/ee/zeus.deprecatedURL=$(LICENSE_URL)
+GO_BUILD_LDFLAG_LICENSE_HANZO_IO 	= -X github.com/hanzoai/o11y/ee/zeus.deprecatedURL=$(LICENSE_URL)
 
-GO_BUILD_VERSION_LDFLAGS 		= -X github.com/SigNoz/signoz/pkg/version.version=$(VERSION) -X github.com/SigNoz/signoz/pkg/version.hash=$(COMMIT_SHORT_SHA) -X github.com/SigNoz/signoz/pkg/version.time=$(TIMESTAMP) -X github.com/SigNoz/signoz/pkg/version.branch=$(BRANCH_NAME)
+GO_BUILD_VERSION_LDFLAGS 		= -X github.com/hanzoai/o11y/pkg/version.version=$(VERSION) -X github.com/hanzoai/o11y/pkg/version.hash=$(COMMIT_SHORT_SHA) -X github.com/hanzoai/o11y/pkg/version.time=$(TIMESTAMP) -X github.com/hanzoai/o11y/pkg/version.branch=$(BRANCH_NAME)
 GO_BUILD_ARCHS_COMMUNITY 		= $(addprefix go-build-community-,$(ARCHS))
 GO_BUILD_CONTEXT_COMMUNITY 		= $(SRC)/cmd/community
-GO_BUILD_LDFLAGS_COMMUNITY 		= $(GO_BUILD_VERSION_LDFLAGS) -X github.com/SigNoz/signoz/pkg/version.variant=community
+GO_BUILD_LDFLAGS_COMMUNITY 		= $(GO_BUILD_VERSION_LDFLAGS) -X github.com/hanzoai/o11y/pkg/version.variant=community
 GO_BUILD_ARCHS_ENTERPRISE 		= $(addprefix go-build-enterprise-,$(ARCHS))
 GO_BUILD_ARCHS_ENTERPRISE_RACE  = $(addprefix go-build-enterprise-race-,$(ARCHS))
 GO_BUILD_CONTEXT_ENTERPRISE 	= $(SRC)/cmd/enterprise
-GO_BUILD_LDFLAGS_ENTERPRISE 	= $(GO_BUILD_VERSION_LDFLAGS) -X github.com/SigNoz/signoz/pkg/version.variant=enterprise $(GO_BUILD_LDFLAG_ZEUS_URL) $(GO_BUILD_LDFLAG_LICENSE_SIGNOZ_IO)
+GO_BUILD_LDFLAGS_ENTERPRISE 	= $(GO_BUILD_VERSION_LDFLAGS) -X github.com/hanzoai/o11y/pkg/version.variant=enterprise $(GO_BUILD_LDFLAG_ZEUS_URL) $(GO_BUILD_LDFLAG_LICENSE_HANZO_IO)
 
 DOCKER_BUILD_ARCHS_COMMUNITY 	= $(addprefix docker-build-community-,$(ARCHS))
 DOCKERFILE_COMMUNITY 			= $(SRC)/cmd/community/Dockerfile
@@ -83,14 +83,14 @@ devenv-clickhouse-clean: ## Clean all ClickHouse data from filesystem
 ##############################################################
 .PHONY: go-run-enterprise
 go-run-enterprise: ## Runs the enterprise go backend server
-	@SIGNOZ_INSTRUMENTATION_LOGS_LEVEL=debug \
-	SIGNOZ_SQLSTORE_SQLITE_PATH=signoz.db \
-	SIGNOZ_WEB_ENABLED=false \
-	SIGNOZ_TOKENIZER_JWT_SECRET=secret \
-	SIGNOZ_ALERTMANAGER_PROVIDER=signoz \
-	SIGNOZ_TELEMETRYSTORE_PROVIDER=clickhouse \
-	SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://127.0.0.1:9000 \
-	SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER=cluster \
+	@HANZO_INSTRUMENTATION_LOGS_LEVEL=debug \
+	HANZO_SQLSTORE_SQLITE_PATH=signoz.db \
+	HANZO_WEB_ENABLED=false \
+	HANZO_TOKENIZER_JWT_SECRET=secret \
+	HANZO_ALERTMANAGER_PROVIDER=signoz \
+	HANZO_TELEMETRYSTORE_PROVIDER=clickhouse \
+	HANZO_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://127.0.0.1:9000 \
+	HANZO_TELEMETRYSTORE_CLICKHOUSE_CLUSTER=cluster \
 	go run -race \
 		$(GO_BUILD_CONTEXT_ENTERPRISE)/*.go server
 
@@ -100,14 +100,14 @@ go-test: ## Runs go unit tests
 
 .PHONY: go-run-community
 go-run-community: ## Runs the community go backend server
-	@SIGNOZ_INSTRUMENTATION_LOGS_LEVEL=debug \
-	SIGNOZ_SQLSTORE_SQLITE_PATH=signoz.db \
-	SIGNOZ_WEB_ENABLED=false \
-	SIGNOZ_TOKENIZER_JWT_SECRET=secret \
-	SIGNOZ_ALERTMANAGER_PROVIDER=signoz \
-	SIGNOZ_TELEMETRYSTORE_PROVIDER=clickhouse \
-	SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://127.0.0.1:9000 \
-	SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER=cluster \
+	@HANZO_INSTRUMENTATION_LOGS_LEVEL=debug \
+	HANZO_SQLSTORE_SQLITE_PATH=signoz.db \
+	HANZO_WEB_ENABLED=false \
+	HANZO_TOKENIZER_JWT_SECRET=secret \
+	HANZO_ALERTMANAGER_PROVIDER=signoz \
+	HANZO_TELEMETRYSTORE_PROVIDER=clickhouse \
+	HANZO_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://127.0.0.1:9000 \
+	HANZO_TELEMETRYSTORE_CLICKHOUSE_CLUSTER=cluster \
 	go run -race \
 		$(GO_BUILD_CONTEXT_COMMUNITY)/*.go server
 

@@ -3,9 +3,9 @@ package noopemailing
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/emailing"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/types/emailtypes"
+	"github.com/hanzoai/o11y/pkg/emailing"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/types/emailtypes"
 )
 
 type provider struct {
@@ -17,7 +17,7 @@ func NewFactory() factory.ProviderFactory[emailing.Emailing, emailing.Config] {
 }
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config emailing.Config) (emailing.Emailing, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/emailing/noopemailing")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/emailing/noopemailing")
 	return &provider{
 		settings: settings,
 	}, nil

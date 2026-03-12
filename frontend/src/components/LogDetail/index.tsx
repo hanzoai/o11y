@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { useCopyToClipboard, useLocation } from 'react-use';
-import { Color, Spacing } from '@signozhq/design-tokens';
+import { Color, Spacing } from '@hanzo/o11y-design-tokens';
 import { Button, Divider, Drawer, Radio, Tooltip, Typography } from 'antd';
 import type { RadioChangeEvent } from 'antd/lib';
 import cx from 'classnames';

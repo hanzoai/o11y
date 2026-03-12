@@ -95,7 +95,7 @@ describe('RoleDetailsPage', () => {
 			initialRoute: `/settings/roles/${MANAGED_ROLE_ID}`,
 		});
 
-		expect(await screen.findByText(/Role — signoz-admin/)).toBeInTheDocument();
+		expect(await screen.findByText(/Role — observe-admin/)).toBeInTheDocument();
 
 		expect(
 			screen.getByText(

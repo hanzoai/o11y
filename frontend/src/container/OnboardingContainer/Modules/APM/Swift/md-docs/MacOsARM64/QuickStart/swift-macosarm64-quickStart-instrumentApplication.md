@@ -30,9 +30,9 @@ var resources = DefaultResources().get()
 let instrumentationScopeName = "{{MYAPP}}"
 let instrumentationScopeVersion = "semver:0.1.0"
 
-let otlpConfiguration: OtlpConfiguration = OtlpConfiguration(timeout: TimeInterval(10), headers: [("signoz-ingestion-key", {{SIGNOZ_INGESTION_KEY}})])
+let otlpConfiguration: OtlpConfiguration = OtlpConfiguration(timeout: TimeInterval(10), headers: [("signoz-ingestion-key", {{HANZO_INGESTION_KEY}})])
 
-let grpcChannel = ClientConnection.usingPlatformAppropriateTLS(for: MultiThreadedEventLoopGroup(numberOfThreads:1)).connect(host: "https://ingest.{{REGION}}.signoz.cloud:443", port: 443)
+let grpcChannel = ClientConnection.usingPlatformAppropriateTLS(for: MultiThreadedEventLoopGroup(numberOfThreads:1)).connect(host: "https://ingest.{{REGION}}.o11y.hanzo.ai:443", port: 443)
 
 let otlpTraceExporter = OtlpTraceExporter(channel: grpcChannel,
                                       config: otlpConfiguration)

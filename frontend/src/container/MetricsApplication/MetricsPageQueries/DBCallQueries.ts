@@ -25,7 +25,7 @@ export const databaseCallsRPS = ({
 }: DatabaseCallsRPSProps): QueryBuilderData => {
 	const autocompleteData: BaseAutocompleteData[] = [
 		{
-			key: WidgetKeys.SignozDBLatencyCount,
+			key: WidgetKeys.O11yDBLatencyCount,
 			dataType: DataTypes.Float64,
 			type: '',
 		},
@@ -78,12 +78,12 @@ export const databaseCallsAvgDuration = ({
 	dotMetricsEnabled,
 }: DatabaseCallProps): QueryBuilderData => {
 	const autocompleteDataA: BaseAutocompleteData = {
-		key: WidgetKeys.SignozDbLatencySum,
+		key: WidgetKeys.O11yDbLatencySum,
 		dataType: DataTypes.Float64,
 		type: '',
 	};
 	const autocompleteDataB: BaseAutocompleteData = {
-		key: WidgetKeys.SignozDBLatencyCount,
+		key: WidgetKeys.O11yDBLatencyCount,
 		dataType: DataTypes.Float64,
 		type: '',
 	};

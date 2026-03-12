@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/query-service/utils/labels"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	ruletypes "github.com/SigNoz/signoz/pkg/types/ruletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	opentracing "github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 )

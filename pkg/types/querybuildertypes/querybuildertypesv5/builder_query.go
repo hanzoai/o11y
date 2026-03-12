@@ -3,8 +3,8 @@ package querybuildertypesv5
 import (
 	"fmt"
 
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 type QueryBuilderQuery[T any] struct {

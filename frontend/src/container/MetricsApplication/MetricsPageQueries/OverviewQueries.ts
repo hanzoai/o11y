@@ -39,16 +39,16 @@ export const latency = ({
 	topLevelOperationsRoute,
 	dotMetricsEnabled,
 }: LatencyProps): QueryBuilderData => {
-	const signozLatencyBucketMetrics = dotMetricsEnabled
-		? WidgetKeys.Signoz_latency_bucket
-		: WidgetKeys.Signoz_latency_bucket_norm;
+	const o11yLatencyBucketMetrics = dotMetricsEnabled
+		? WidgetKeys.O11y_latency_bucket
+		: WidgetKeys.O11y_latency_bucket_norm;
 
-	const signozMetricsServiceName = dotMetricsEnabled
+	const o11yMetricsServiceName = dotMetricsEnabled
 		? WidgetKeys.Service_name
 		: WidgetKeys.Service_name_norm;
 	const newAutoCompleteData: BaseAutocompleteData = {
 		key: isSpanMetricEnable
-			? signozLatencyBucketMetrics
+			? o11yLatencyBucketMetrics
 			: WidgetKeys.DurationNano,
 		dataType: DataTypes.Float64,
 		type: isSpanMetricEnable ? '' : MetricsType.Tag,
@@ -60,7 +60,7 @@ export const latency = ({
 		{
 			id: '',
 			key: {
-				key: isSpanMetricEnable ? signozMetricsServiceName : WidgetKeys.ServiceName,
+				key: isSpanMetricEnable ? o11yMetricsServiceName : WidgetKeys.ServiceName,
 				dataType: DataTypes.String,
 				type: isSpanMetricEnable ? MetricsType.Resource : MetricsType.Tag,
 			},
@@ -291,24 +291,24 @@ export const apDexMetricsQueryBuilderQueries = ({
 }: ApDexMetricsQueryBuilderQueriesProps): QueryBuilderData => {
 	const autoCompleteDataA: BaseAutocompleteData = {
 		key: dotMetricsEnabled
-			? WidgetKeys.SignozLatencyCount
-			: WidgetKeys.SignozLatencyCountNorm,
+			? WidgetKeys.O11yLatencyCount
+			: WidgetKeys.O11yLatencyCountNorm,
 		dataType: DataTypes.Float64,
 		type: '',
 	};
 
 	const autoCompleteDataB: BaseAutocompleteData = {
 		key: dotMetricsEnabled
-			? WidgetKeys.Signoz_latency_bucket
-			: WidgetKeys.Signoz_latency_bucket_norm,
+			? WidgetKeys.O11y_latency_bucket
+			: WidgetKeys.O11y_latency_bucket_norm,
 		dataType: DataTypes.Float64,
 		type: '',
 	};
 
 	const autoCompleteDataC: BaseAutocompleteData = {
 		key: dotMetricsEnabled
-			? WidgetKeys.Signoz_latency_bucket
-			: WidgetKeys.Signoz_latency_bucket_norm,
+			? WidgetKeys.O11y_latency_bucket
+			: WidgetKeys.O11y_latency_bucket_norm,
 		dataType: DataTypes.Float64,
 		type: '',
 	};
@@ -479,8 +479,8 @@ export const operationPerSec = ({
 	const autocompleteData: BaseAutocompleteData[] = [
 		{
 			key: dotMetricsEnabled
-				? WidgetKeys.SignozLatencyCount
-				: WidgetKeys.SignozLatencyCountNorm,
+				? WidgetKeys.O11yLatencyCount
+				: WidgetKeys.O11yLatencyCountNorm,
 			dataType: DataTypes.Float64,
 			type: '',
 		},
@@ -537,12 +537,12 @@ export const errorPercentage = ({
 	dotMetricsEnabled,
 }: OperationPerSecProps): QueryBuilderData => {
 	const autocompleteDataA: BaseAutocompleteData = {
-		key: WidgetKeys.SignozCallsTotal,
+		key: WidgetKeys.O11yCallsTotal,
 		dataType: DataTypes.Float64,
 		type: '',
 	};
 	const autocompleteDataB: BaseAutocompleteData = {
-		key: WidgetKeys.SignozCallsTotal,
+		key: WidgetKeys.O11yCallsTotal,
 		dataType: DataTypes.Float64,
 		type: '',
 	};

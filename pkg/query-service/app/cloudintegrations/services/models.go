@@ -1,7 +1,7 @@
 package services
 
 import (
-	"github.com/SigNoz/signoz/pkg/types/dashboardtypes"
+	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
 )
 
 type Metadata struct {

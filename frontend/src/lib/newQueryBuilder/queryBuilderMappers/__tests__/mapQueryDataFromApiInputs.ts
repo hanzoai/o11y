@@ -94,7 +94,7 @@ export const compositeQueryWithVariables = ({
 			dataSource: 'metrics',
 			aggregateOperator: 'sum_rate',
 			aggregateAttribute: {
-				key: 'signoz_calls_total',
+				key: 'observe_calls_total',
 				dataType: 'float64',
 				type: '',
 			},
@@ -166,7 +166,7 @@ export const replaceVariables = {
 				queryName: 'A',
 				aggregateOperator: 'sum_rate',
 				aggregateAttribute: {
-					key: 'signoz_calls_total',
+					key: 'observe_calls_total',
 					dataType: 'float64',
 					type: '',
 				},
@@ -310,7 +310,7 @@ export const compositeQueriesWithFunctions = ({
 			dataSource: 'metrics',
 			aggregateOperator: 'count',
 			aggregateAttribute: {
-				key: 'signoz_latency_bucket',
+				key: 'observe_latency_bucket',
 				dataType: 'float64',
 				type: 'Histogram',
 			},
@@ -381,7 +381,7 @@ export const outputWithFunctions = {
 				queryName: 'A',
 				aggregateOperator: 'count',
 				aggregateAttribute: {
-					key: 'signoz_latency_bucket',
+					key: 'observe_latency_bucket',
 					dataType: 'float64',
 					type: 'Histogram',
 				},

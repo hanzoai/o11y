@@ -3,10 +3,10 @@ package configflagger
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/types/featuretypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	"github.com/open-feature/go-sdk/openfeature"
 )
 
@@ -26,7 +26,7 @@ func NewFactory(registry featuretypes.Registry) factory.ProviderFactory[flagger.
 }
 
 func New(ctx context.Context, ps factory.ProviderSettings, c flagger.Config, registry featuretypes.Registry) (flagger.FlaggerProvider, error) {
-	settings := factory.NewScopedProviderSettings(ps, "github.com/SigNoz/signoz/pkg/flagger/configflagger")
+	settings := factory.NewScopedProviderSettings(ps, "github.com/hanzoai/o11y/pkg/flagger/configflagger")
 
 	featureVariants := make(map[featuretypes.Name]*featuretypes.FeatureVariant)
 

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Tooltip, Typography } from 'antd';
 import cx from 'classnames';
 import { isEmpty, isObject } from 'lodash-es';

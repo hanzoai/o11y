@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useQueryClient } from 'react-query';
-import { Color } from '@signozhq/design-tokens';
-import SignozModal from 'components/SignozModal/SignozModal';
+import { Color } from '@hanzo/o11y-design-tokens';
+import O11yModal from 'components/O11yModal/O11yModal';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import { useIntegrationModal } from 'hooks/integration/aws/useIntegrationModal';
 import { SquareArrowOutUpRight } from 'lucide-react';
@@ -163,7 +163,7 @@ function CloudAccountSetupModal({
 	const modalConfig = getModalConfig();
 
 	return (
-		<SignozModal
+		<O11yModal
 			open
 			className="cloud-account-setup-modal"
 			title={modalConfig.title}
@@ -183,7 +183,7 @@ function CloudAccountSetupModal({
 			width={672}
 		>
 			{renderContent()}
-		</SignozModal>
+		</O11yModal>
 	);
 }
 

@@ -6,9 +6,9 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 const (
@@ -101,38 +101,38 @@ var GroupByColMap = map[string]struct{}{
 }
 
 const (
-	SIGNOZ_METRIC_DBNAME                       = "signoz_metrics"
-	SIGNOZ_SAMPLES_V4_LOCAL_TABLENAME          = "samples_v4"
-	SIGNOZ_SAMPLES_V4_TABLENAME                = "distributed_samples_v4"
-	SIGNOZ_SAMPLES_V4_AGG_5M_TABLENAME         = "distributed_samples_v4_agg_5m"
-	SIGNOZ_SAMPLES_V4_AGG_30M_TABLENAME        = "distributed_samples_v4_agg_30m"
-	SIGNOZ_EXP_HISTOGRAM_TABLENAME             = "distributed_exp_hist"
-	SIGNOZ_EXP_HISTOGRAM_LOCAL_TABLENAME       = "exp_hist"
-	SIGNOZ_TRACE_DBNAME                        = "signoz_traces"
-	SIGNOZ_SPAN_INDEX_TABLENAME                = "distributed_signoz_index_v2"
-	SIGNOZ_SPAN_INDEX_V3                       = "distributed_signoz_index_v3"
-	SIGNOZ_SPAN_INDEX_LOCAL_TABLENAME          = "signoz_index_v2"
-	SIGNOZ_SPAN_INDEX_V3_LOCAL_TABLENAME       = "signoz_index_v3"
-	SIGNOZ_TIMESERIES_v4_LOCAL_TABLENAME       = "time_series_v4"
-	SIGNOZ_TIMESERIES_V4_TABLENAME             = "distributed_time_series_v4"
-	SIGNOZ_TIMESERIES_v4_6HRS_LOCAL_TABLENAME  = "time_series_v4_6hrs"
-	SIGNOZ_TIMESERIES_v4_1DAY_LOCAL_TABLENAME  = "time_series_v4_1day"
-	SIGNOZ_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME = "time_series_v4_1week"
-	SIGNOZ_TIMESERIES_v4_1DAY_TABLENAME        = "distributed_time_series_v4_1day"
-	SIGNOZ_TOP_LEVEL_OPERATIONS_TABLENAME      = "distributed_top_level_operations"
-	SIGNOZ_TIMESERIES_v4_TABLENAME             = "distributed_time_series_v4"
-	SIGNOZ_TIMESERIES_v4_1WEEK_TABLENAME       = "distributed_time_series_v4_1week"
-	SIGNOZ_TIMESERIES_v4_6HRS_TABLENAME        = "distributed_time_series_v4_6hrs"
-	SIGNOZ_ATTRIBUTES_METADATA_TABLENAME       = "distributed_attributes_metadata"
-	SIGNOZ_ATTRIBUTES_METADATA_LOCAL_TABLENAME = "attributes_metadata"
-	SIGNOZ_METADATA_TABLENAME                  = "distributed_metadata"
-	SIGNOZ_METADATA_LOCAL_TABLENAME            = "metadata"
+	HANZO_METRIC_DBNAME                       = "observe_metrics"
+	HANZO_SAMPLES_V4_LOCAL_TABLENAME          = "samples_v4"
+	HANZO_SAMPLES_V4_TABLENAME                = "distributed_samples_v4"
+	HANZO_SAMPLES_V4_AGG_5M_TABLENAME         = "distributed_samples_v4_agg_5m"
+	HANZO_SAMPLES_V4_AGG_30M_TABLENAME        = "distributed_samples_v4_agg_30m"
+	HANZO_EXP_HISTOGRAM_TABLENAME             = "distributed_exp_hist"
+	HANZO_EXP_HISTOGRAM_LOCAL_TABLENAME       = "exp_hist"
+	HANZO_TRACE_DBNAME                        = "observe_traces"
+	HANZO_SPAN_INDEX_TABLENAME                = "distributed_observe_index_v2"
+	HANZO_SPAN_INDEX_V3                       = "distributed_observe_index_v3"
+	HANZO_SPAN_INDEX_LOCAL_TABLENAME          = "observe_index_v2"
+	HANZO_SPAN_INDEX_V3_LOCAL_TABLENAME       = "observe_index_v3"
+	HANZO_TIMESERIES_v4_LOCAL_TABLENAME       = "time_series_v4"
+	HANZO_TIMESERIES_V4_TABLENAME             = "distributed_time_series_v4"
+	HANZO_TIMESERIES_v4_6HRS_LOCAL_TABLENAME  = "time_series_v4_6hrs"
+	HANZO_TIMESERIES_v4_1DAY_LOCAL_TABLENAME  = "time_series_v4_1day"
+	HANZO_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME = "time_series_v4_1week"
+	HANZO_TIMESERIES_v4_1DAY_TABLENAME        = "distributed_time_series_v4_1day"
+	HANZO_TOP_LEVEL_OPERATIONS_TABLENAME      = "distributed_top_level_operations"
+	HANZO_TIMESERIES_v4_TABLENAME             = "distributed_time_series_v4"
+	HANZO_TIMESERIES_v4_1WEEK_TABLENAME       = "distributed_time_series_v4_1week"
+	HANZO_TIMESERIES_v4_6HRS_TABLENAME        = "distributed_time_series_v4_6hrs"
+	HANZO_ATTRIBUTES_METADATA_TABLENAME       = "distributed_attributes_metadata"
+	HANZO_ATTRIBUTES_METADATA_LOCAL_TABLENAME = "attributes_metadata"
+	HANZO_METADATA_TABLENAME                  = "distributed_metadata"
+	HANZO_METADATA_LOCAL_TABLENAME            = "metadata"
 )
 
 // alert related constants
 const (
 	// AlertHelpPage is used in case default alert repo url is not set
-	AlertHelpPage   = "https://signoz.io/docs/userguide/alerts-management/#generator-url"
+	AlertHelpPage   = "https://observe.hanzo.ai/docs/userguide/alerts-management/#generator-url"
 	AlertTimeFormat = "2006-01-02 15:04:05"
 )
 
@@ -244,7 +244,7 @@ var ReservedColumnTargetAliases = map[string]struct{}{
 
 // logsPPLPfx is a short constant for logsPipelinePrefix
 // TODO(Raj): Remove old prefix after new processor based pipelines have been rolled out
-const LogsPPLPfx = "signozlogspipeline/pipeline_"
+const LogsPPLPfx = "o11ylogspipeline/pipeline_"
 const OldLogsPPLPfx = "logstransform/pipeline_"
 
 const IntegrationPipelineIdPrefix = "integration"
@@ -310,7 +310,7 @@ var StaticFieldsLogsV3 = map[string]v3.AttributeKey{
 	},
 }
 
-const SigNozOrderByValue = "#SIGNOZ_VALUE"
+const Hanzo O11yOrderByValue = "#HANZO_VALUE"
 
 const TIMESTAMP = "timestamp"
 

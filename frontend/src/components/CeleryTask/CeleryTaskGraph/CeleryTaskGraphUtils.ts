@@ -545,7 +545,7 @@ export const celeryTaskLatencyWidgetData = (
 					limit: null,
 					orderBy: [
 						{
-							columnName: '#SIGNOZ_VALUE',
+							columnName: '#HANZO_VALUE',
 							order: 'asc',
 						},
 					],
@@ -596,7 +596,7 @@ export const celerySlowestTasksTableWidgetData = getWidgetQueryBuilder(
 				limit: 10,
 				orderBy: [
 					{
-						columnName: '#SIGNOZ_VALUE',
+						columnName: '#HANZO_VALUE',
 						order: 'desc',
 					},
 				],
@@ -658,7 +658,7 @@ export const celeryRetryTasksTableWidgetData = getWidgetQueryBuilder(
 				limit: 10,
 				orderBy: [
 					{
-						columnName: '#SIGNOZ_VALUE',
+						columnName: '#HANZO_VALUE',
 						order: 'desc',
 					},
 				],
@@ -721,7 +721,7 @@ export const celeryFailedTasksTableWidgetData = getWidgetQueryBuilder(
 				limit: null,
 				orderBy: [
 					{
-						columnName: '#SIGNOZ_VALUE',
+						columnName: '#HANZO_VALUE',
 						order: 'desc',
 					},
 				],
@@ -782,7 +782,7 @@ export const celerySuccessTasksTableWidgetData = getWidgetQueryBuilder(
 				limit: null,
 				orderBy: [
 					{
-						columnName: '#SIGNOZ_VALUE',
+						columnName: '#HANZO_VALUE',
 						order: 'desc',
 					},
 				],

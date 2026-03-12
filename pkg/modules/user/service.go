@@ -1,6 +1,6 @@
 package user
 
-import "github.com/SigNoz/signoz/pkg/factory"
+import "github.com/hanzoai/o11y/pkg/factory"
 
 type Service interface {
 	factory.Service

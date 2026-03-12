@@ -3,7 +3,7 @@ package telemetrylogs
 import (
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 // Helper function to limit string length for display

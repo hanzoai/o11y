@@ -7,7 +7,7 @@ import {
 	CommandItem,
 	CommandList,
 	CommandShortcut,
-} from '@signozhq/command';
+} from '@hanzo/o11y-command';
 import logEvent from 'api/common/logEvent';
 import { useThemeMode } from 'hooks/useDarkMode';
 import history from 'lib/history';

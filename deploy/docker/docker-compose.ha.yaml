@@ -1,7 +1,7 @@
 version: "3"
 x-common: &common
   networks:
-    - signoz-net
+    - o11y-net
   restart: unless-stopped
   logging:
     options:
@@ -10,12 +10,12 @@ x-common: &common
 x-clickhouse-defaults: &clickhouse-defaults
   !!merge <<: *common
   # addding non LTS version due to this fix https://github.com/ClickHouse/ClickHouse/commit/32caf8716352f45c1b617274c7508c86b7d1afab
-  image: clickhouse/clickhouse-server:25.5.6
+  image: ghcr.io/hanzoai/datastore:25.5.6
   tty: true
   labels:
-    signoz.io/scrape: "true"
-    signoz.io/port: "9363"
-    signoz.io/path: "/metrics"
+    o11y.hanzo.ai/scrape: "true"
+    o11y.hanzo.ai/port: "9363"
+    o11y.hanzo.ai/path: "/metrics"
   depends_on:
     init-clickhouse:
       condition: service_completed_successfully
@@ -44,12 +44,12 @@ x-clickhouse-defaults: &clickhouse-defaults
     - CLICKHOUSE_SKIP_USER_SETUP=1
 x-zookeeper-defaults: &zookeeper-defaults
   !!merge <<: *common
-  image: signoz/zookeeper:3.7.1
+  image: ghcr.io/hanzoai/zookeeper:3.7.1
   user: root
   labels:
-    signoz.io/scrape: "true"
-    signoz.io/port: "9141"
-    signoz.io/path: "/metrics"
+    o11y.hanzo.ai/scrape: "true"
+    o11y.hanzo.ai/port: "9141"
+    o11y.hanzo.ai/path: "/metrics"
   healthcheck:
     test:
       - CMD-SHELL
@@ -69,8 +69,8 @@ x-db-depend: &db-depend
 services:
   init-clickhouse:
     !!merge <<: *common
-    image: clickhouse/clickhouse-server:25.5.6
-    container_name: signoz-init-clickhouse
+    image: ghcr.io/hanzoai/datastore:25.5.6
+    container_name: o11y-init-datastore
     command:
       - bash
       - -c
@@ -80,7 +80,7 @@ services:
         node_arch=$$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/)
         echo "Fetching histogram-binary for $${node_os}/$${node_arch}"
         cd /tmp
-        wget -O histogram-quantile.tar.gz "https://github.com/SigNoz/signoz/releases/download/histogram-quantile%2F$${version}/histogram-quantile_$${node_os}_$${node_arch}.tar.gz"
+        wget -O histogram-quantile.tar.gz "https://github.com/Hanzo O11y/observe/releases/download/histogram-quantile%2F$${version}/histogram-quantile_$${node_os}_$${node_arch}.tar.gz"
         tar -xvzf histogram-quantile.tar.gz
         mv histogram-quantile /var/lib/clickhouse/user_scripts/histogramQuantile
     restart: on-failure
@@ -88,7 +88,7 @@ services:
       - ../common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
   zookeeper-1:
     !!merge <<: *zookeeper-defaults
-    container_name: signoz-zookeeper-1
+    container_name: o11y-zookeeper-1
     # ports:
     #   - "2181:2181"
     #   - "2888:2888"
@@ -104,7 +104,7 @@ services:
       - ZOO_PROMETHEUS_METRICS_PORT_NUMBER=9141
   zookeeper-2:
     !!merge <<: *zookeeper-defaults
-    container_name: signoz-zookeeper-2
+    container_name: o11y-zookeeper-2
     # ports:
     #   - "2182:2181"
     #   - "2889:2888"
@@ -120,7 +120,7 @@ services:
       - ZOO_PROMETHEUS_METRICS_PORT_NUMBER=9141
   zookeeper-3:
     !!merge <<: *zookeeper-defaults
-    container_name: signoz-zookeeper-3
+    container_name: o11y-zookeeper-3
     # ports:
     #   - "2183:2181"
     #   - "2890:2888"
@@ -136,7 +136,7 @@ services:
       - ZOO_PROMETHEUS_METRICS_PORT_NUMBER=9141
   clickhouse:
     !!merge <<: *clickhouse-defaults
-    container_name: signoz-clickhouse
+    container_name: o11y-datastore
     # ports:
     #   - "9000:9000"
     #   - "8123:8123"
@@ -151,7 +151,7 @@ services:
       # - ../common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
   clickhouse-2:
     !!merge <<: *clickhouse-defaults
-    container_name: signoz-clickhouse-2
+    container_name: o11y-datastore-2
     # ports:
     #   - "9001:9000"
     #   - "8124:8123"
@@ -166,7 +166,7 @@ services:
       # - ../common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
   clickhouse-3:
     !!merge <<: *clickhouse-defaults
-    container_name: signoz-clickhouse-3
+    container_name: o11y-datastore-3
     # ports:
     #   - "9002:9000"
     #   - "8125:8123"
@@ -179,19 +179,19 @@ services:
       - ../common/clickhouse/cluster.ha.xml:/etc/clickhouse-server/config.d/cluster.xml
       - clickhouse-3:/var/lib/clickhouse/
       # - ../common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
-  signoz:
+  observe:
     !!merge <<: *db-depend
-    image: signoz/signoz:${VERSION:-v0.115.0}
-    container_name: signoz
+    image: ghcr.io/hanzoai/o11y:${VERSION:-v0.115.0}
+    container_name: observe
     ports:
-      - "8080:8080" # signoz port
+      - "8080:8080" # observe port
     volumes:
-      - sqlite:/var/lib/signoz/
+      - sqlite:/var/lib/observe/
     environment:
-      - SIGNOZ_ALERTMANAGER_PROVIDER=signoz
-      - SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - SIGNOZ_SQLSTORE_SQLITE_PATH=/var/lib/signoz/signoz.db
-      - SIGNOZ_TOKENIZER_JWT_SECRET=secret
+      - HANZO_ALERTMANAGER_PROVIDER=observe
+      - HANZO_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - HANZO_SQLSTORE_SQLITE_PATH=/var/lib/ghcr.io/hanzoai/o11y.db
+      - HANZO_TOKENIZER_JWT_SECRET=secret
     healthcheck:
       test:
         - CMD
@@ -204,62 +204,62 @@ services:
       retries: 3
   otel-collector:
     !!merge <<: *db-depend
-    image: signoz/signoz-otel-collector:${OTELCOL_TAG:-v0.144.2}
-    container_name: signoz-otel-collector
+    image: ghcr.io/hanzoai/otel-collector:${OTELCOL_TAG:-v0.144.2}
+    container_name: o11y-otel-collector
     entrypoint:
       - /bin/sh
     command:
       - -c
       - |
-        /signoz-otel-collector migrate sync check &&
-        /signoz-otel-collector --config=/etc/otel-collector-config.yaml --manager-config=/etc/manager-config.yaml --copy-path=/var/tmp/collector-config.yaml
+        /o11y-otel-collector migrate sync check &&
+        /o11y-otel-collector --config=/etc/otel-collector-config.yaml --manager-config=/etc/manager-config.yaml --copy-path=/var/tmp/collector-config.yaml
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
-      - ../common/signoz/otel-collector-opamp-config.yaml:/etc/manager-config.yaml
+      - ../common/observe/otel-collector-opamp-config.yaml:/etc/manager-config.yaml
     environment:
-      - OTEL_RESOURCE_ATTRIBUTES=host.name=signoz-host,os.type=linux
+      - OTEL_RESOURCE_ATTRIBUTES=host.name=observe-host,os.type=linux
       - LOW_CARDINAL_EXCEPTION_GROUPING=false
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
-      - SIGNOZ_OTEL_COLLECTOR_TIMEOUT=10m
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - HANZO_OTEL_COLLECTOR_TIMEOUT=10m
     ports:
       # - "1777:1777"     # pprof extension
       - "4317:4317" # OTLP gRPC receiver
       - "4318:4318" # OTLP HTTP receiver
-  signoz-telemetrystore-migrator:
+  o11y-telemetrystore-migrator:
     !!merge <<: *db-depend
-    image: signoz/signoz-otel-collector:${OTELCOL_TAG:-v0.144.2}
-    container_name: signoz-telemetrystore-migrator
+    image: ghcr.io/hanzoai/otel-collector:${OTELCOL_TAG:-v0.144.2}
+    container_name: o11y-telemetrystore-migrator
     environment:
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
-      - SIGNOZ_OTEL_COLLECTOR_TIMEOUT=10m
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - HANZO_OTEL_COLLECTOR_TIMEOUT=10m
     entrypoint:
       - /bin/sh
     command:
       - -c
       - |
-        /signoz-otel-collector migrate bootstrap &&
-        /signoz-otel-collector migrate sync up &&
-        /signoz-otel-collector migrate async up
+        /o11y-otel-collector migrate bootstrap &&
+        /o11y-otel-collector migrate sync up &&
+        /o11y-otel-collector migrate async up
     restart: on-failure
 networks:
-  signoz-net:
-    name: signoz-net
+  o11y-net:
+    name: o11y-net
 volumes:
   clickhouse:
-    name: signoz-clickhouse
+    name: o11y-datastore
   clickhouse-2:
-    name: signoz-clickhouse-2
+    name: o11y-datastore-2
   clickhouse-3:
-    name: signoz-clickhouse-3
+    name: o11y-datastore-3
   sqlite:
-    name: signoz-sqlite
+    name: o11y-sqlite
   zookeeper-1:
-    name: signoz-zookeeper-1
+    name: o11y-zookeeper-1
   zookeeper-2:
-    name: signoz-zookeeper-2
+    name: o11y-zookeeper-2
   zookeeper-3:
-    name: signoz-zookeeper-3
+    name: o11y-zookeeper-3

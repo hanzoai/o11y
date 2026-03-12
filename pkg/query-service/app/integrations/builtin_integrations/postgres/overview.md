@@ -1,4 +1,4 @@
-### Monitor Postgres with SigNoz
+### Monitor Postgres with Hanzo O11y
 
 Collect key Postgres metrics and view them with an out of the box dashboard.  
 

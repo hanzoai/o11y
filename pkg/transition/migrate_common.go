@@ -9,7 +9,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/telemetrytraces"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 )
 
 type migrateCommon struct {
@@ -168,7 +168,7 @@ func (mc *migrateCommon) updateQueryData(ctx context.Context, queryData map[stri
 					columnName, _ := orderMap["columnName"].(string)
 					// skip timestamp, id (logs, traces), samples(metrics) ordering for aggregation queries
 					if columnName != "timestamp" && columnName != "samples" && columnName != "id" {
-						if columnName == "#SIGNOZ_VALUE" {
+						if columnName == "#HANZO_VALUE" {
 							if expr, has := mc.orderByExpr(queryData); has {
 								orderMap["columnName"] = expr
 							}

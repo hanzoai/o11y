@@ -59,7 +59,7 @@ export function RequestDashboardBtn(): JSX.Element {
 		<div className="request-entity-container">
 			<Typography.Text>
 				<a
-					href="https://signoz.io/docs/dashboards/dashboard-templates/overview/"
+					href="https://o11y.hanzo.ai/docs/dashboards/dashboard-templates/overview/"
 					target="_blank"
 					rel="noopener noreferrer"
 				>

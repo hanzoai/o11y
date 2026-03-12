@@ -590,7 +590,7 @@ type GetFieldsResponse struct {
 }
 
 // Represents a log record in query service requests and responses.
-type SignozLog struct {
+type O11yLog struct {
 	Timestamp          uint64             `json:"timestamp" ch:"timestamp"`
 	ID                 string             `json:"id" ch:"id"`
 	TraceID            string             `json:"trace_id" ch:"trace_id"`

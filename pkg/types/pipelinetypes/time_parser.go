@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 // Regex for strptime format placeholders supported by the time parser.

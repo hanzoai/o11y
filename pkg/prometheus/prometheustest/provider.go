@@ -3,10 +3,10 @@ package prometheustest
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/prometheus"
-	"github.com/SigNoz/signoz/pkg/prometheus/clickhouseprometheus"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/prometheus/clickhouseprometheus"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/storage"
@@ -26,7 +26,7 @@ var stCallback = func() (int64, error) {
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config prometheus.Config, telemetryStore telemetrystore.TelemetryStore) *Provider {
 
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/prometheus/prometheustest")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/prometheus/prometheustest")
 
 	engine := prometheus.NewEngine(settings.Logger(), config)
 

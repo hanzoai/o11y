@@ -191,7 +191,7 @@ A standalone service only has the `factory.Service` lifecycle i.e it does not se
         // ... dependencies ...
     ) user.Service {
         return &service{
-            settings: factory.NewScopedProviderSettings(providerSettings, "go.signoz.io/pkg/modules/user"),
+            settings: factory.NewScopedProviderSettings(providerSettings, "go.o11y.hanzo.ai/pkg/modules/user"),
             // ... dependencies ...
             stopC:    make(chan struct{}),
         }

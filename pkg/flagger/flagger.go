@@ -3,8 +3,8 @@ package flagger
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/types/featuretypes"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	"github.com/open-feature/go-sdk/openfeature"
 )
 
@@ -61,7 +61,7 @@ type flagger struct {
 }
 
 func New(ctx context.Context, ps factory.ProviderSettings, config Config, registry featuretypes.Registry, factories ...factory.ProviderFactory[FlaggerProvider, Config]) (Flagger, error) {
-	settings := factory.NewScopedProviderSettings(ps, "github.com/SigNoz/signoz/pkg/flagger")
+	settings := factory.NewScopedProviderSettings(ps, "github.com/hanzoai/o11y/pkg/flagger")
 
 	providers := make(map[string]FlaggerProvider)
 	clients := make(map[string]*openfeature.Client)

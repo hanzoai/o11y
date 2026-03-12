@@ -6,7 +6,7 @@ import { generatePath } from 'react-router-dom';
 import { red } from '@ant-design/colors';
 import { ExclamationCircleTwoTone } from '@ant-design/icons';
 import MEditor, { Monaco } from '@monaco-editor/react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import {
 	Button,
 	Flex,
@@ -195,7 +195,7 @@ function ImportJSON({
 								</Button>
 							</Upload>
 							<a
-								href="https://signoz.io/docs/dashboards/dashboard-templates/overview/"
+								href="https://o11y.hanzo.ai/docs/dashboards/dashboard-templates/overview/"
 								target="_blank"
 								rel="noopener noreferrer"
 							>

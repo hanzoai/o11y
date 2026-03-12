@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strconv"
 
-	"github.com/SigNoz/signoz/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/prometheus/prometheus/prompb"
 )
 

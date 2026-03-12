@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	chparser "github.com/AfterShip/clickhouse-sql-parser/parser"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/huandu/go-sqlbuilder"
 )
 
@@ -32,7 +32,7 @@ func NewAggExprRewriter(
 	conditionBuilder qbtypes.ConditionBuilder,
 	jsonKeyToKey qbtypes.JsonKeyToFieldFunc,
 ) *aggExprRewriter {
-	set := factory.NewScopedProviderSettings(settings, "github.com/SigNoz/signoz/pkg/querybuilder/agg_rewrite")
+	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querybuilder/agg_rewrite")
 
 	return &aggExprRewriter{
 		logger:           set.Logger(),

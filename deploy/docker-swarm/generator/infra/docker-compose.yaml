@@ -1,7 +1,7 @@
 version: "3"
 x-common: &common
   networks:
-    - signoz-net
+    - o11y-net
   extra_hosts:
     - host.docker.internal:host-gateway
   logging:
@@ -22,9 +22,9 @@ services:
       - ./otel-agent-config.yaml:/etc/otel-collector-config.yaml
       - /:/hostfs:ro
     environment:
-      - SIGNOZ_COLLECTOR_ENDPOINT=http://host.docker.internal:4317    # In case of external SigNoz or cloud, update the endpoint and access token
+      - HANZO_COLLECTOR_ENDPOINT=http://host.docker.internal:4317    # In case of external Hanzo O11y or cloud, update the endpoint and access token
       - OTEL_RESOURCE_ATTRIBUTES=host.name={{.Node.Hostname}},os.type={{.Node.Platform.OS}}
-      # - SIGNOZ_ACCESS_TOKEN="<your-access-token>"
+      # - HANZO_ACCESS_TOKEN="<your-access-token>"
     # Before exposing the ports, make sure the ports are not used by other services
     # ports:
     #   - "4317:4317"
@@ -39,9 +39,9 @@ services:
       - ./otel-metrics-config.yaml:/etc/otel-collector-config.yaml
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - SIGNOZ_COLLECTOR_ENDPOINT=http://host.docker.internal:4317    # In case of external SigNoz or cloud, update the endpoint and access token
+      - HANZO_COLLECTOR_ENDPOINT=http://host.docker.internal:4317    # In case of external Hanzo O11y or cloud, update the endpoint and access token
       - OTEL_RESOURCE_ATTRIBUTES=host.name={{.Node.Hostname}},os.type={{.Node.Platform.OS}}
-      # - SIGNOZ_ACCESS_TOKEN="<your-access-token>"
+      # - HANZO_ACCESS_TOKEN="<your-access-token>"
     # Before exposing the ports, make sure the ports are not used by other services
     # ports:
     #   - "4317:4317"
@@ -64,6 +64,6 @@ services:
       - otel-agent
 
 networks:
-  signoz-net:
-    name: signoz-net
+  o11y-net:
+    name: o11y-net
     external: true

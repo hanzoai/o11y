@@ -1,5 +1,5 @@
 import { themeColors } from 'constants/theme';
-import { SIGNOZ_UI_COLOR_HEX } from 'lib/getRandomColor';
+import { HANZO_UI_COLOR_HEX } from 'lib/getRandomColor';
 import { Span } from 'types/api/trace/getTraceItem';
 
 const spans: Span[] = [
@@ -11,7 +11,7 @@ const spans: Span[] = [
 		'op1',
 		'100',
 		'200',
-		[SIGNOZ_UI_COLOR_HEX],
+		[HANZO_UI_COLOR_HEX],
 		[themeColors.chartcolors.turquoise],
 		[''],
 		[''],
@@ -28,7 +28,7 @@ const spans: Span[] = [
 		'op2',
 		'200',
 		'300',
-		[SIGNOZ_UI_COLOR_HEX],
+		[HANZO_UI_COLOR_HEX],
 		[themeColors.chartcolors.turquoise],
 		[''],
 		[''],

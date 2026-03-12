@@ -1,4 +1,4 @@
-import { SIGNOZ_UPGRADE_PLAN_URL } from 'constants/app';
+import { HANZO_UPGRADE_PLAN_URL } from 'constants/app';
 import CreateAlertChannels from 'container/CreateAlertChannels';
 import { ChannelType } from 'container/CreateAlertChannels/config';
 import {
@@ -201,10 +201,10 @@ describe('Create Alert Channel (Normal User)', () => {
 					helpText: 'help_pager_client',
 				});
 			});
-			it('Should check if Client input contains the default value "SigNoz Alert Manager"', () => {
+			it('Should check if Client input contains the default value "Hanzo O11y Alert Manager"', () => {
 				const clientTextArea = screen.getByTestId('pager-client-textarea');
 
-				expect(clientTextArea).toHaveValue('SigNoz Alert Manager');
+				expect(clientTextArea).toHaveValue('Hanzo O11y Alert Manager');
 			});
 			it('Should check if Client URL label, text area, and info (Shows up as event source link in Pagerduty) are displayed properly', () => {
 				testLabelInputAndHelpValue({
@@ -213,11 +213,11 @@ describe('Create Alert Channel (Normal User)', () => {
 					helpText: 'help_pager_client_url',
 				});
 			});
-			it('Should check if Client URL contains the default value "https://enter-signoz-host-n-port-here/alerts"', () => {
+			it('Should check if Client URL contains the default value "https://enter-o11y-host-n-port-here/alerts"', () => {
 				const clientUrlTextArea = screen.getByTestId('pager-client-url-textarea');
 
 				expect(clientUrlTextArea).toHaveValue(
-					'https://enter-signoz-host-n-port-here/alerts',
+					'https://enter-o11y-host-n-port-here/alerts',
 				);
 			});
 		});
@@ -320,7 +320,7 @@ describe('Create Alert Channel (Normal User)', () => {
 				).toBeInTheDocument();
 				const link = screen.getByRole('link', { name: 'Click here' });
 				expect(link).toBeInTheDocument();
-				expect(link).toHaveAttribute('href', SIGNOZ_UPGRADE_PLAN_URL);
+				expect(link).toHaveAttribute('href', HANZO_UPGRADE_PLAN_URL);
 				expect(screen.getByText(/to Upgrade/)).toBeInTheDocument();
 			});
 			it('Should check if the form buttons are displayed properly (Save, Test, Back)', () => {

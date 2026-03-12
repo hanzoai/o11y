@@ -166,7 +166,7 @@ export default function LogsConnectionStatus(): JSX.Element {
 						entity="kubernetes"
 						heading="Collecting Kubernetes Pod logs"
 						imgURL="/Logos/kubernetes.svg"
-						docsURL="https://signoz.io/docs/userguide/collect_kubernetes_pod_logs/#collect-kubernetes-pod-logs-in-signoz-cloud"
+						docsURL="https://o11y.hanzo.ai/docs/userguide/collect_kubernetes_pod_logs/#collect-kubernetes-pod-logs-in-o11y-cloud"
 						imgClassName="supported-logs-type-img"
 					/>
 				);
@@ -177,7 +177,7 @@ export default function LogsConnectionStatus(): JSX.Element {
 						entity="docker"
 						heading="Collecting Docker container logs"
 						imgURL="/Logos/docker.svg"
-						docsURL="https://signoz.io/docs/userguide/collect_docker_logs/"
+						docsURL="https://o11y.hanzo.ai/docs/userguide/collect_docker_logs/"
 						imgClassName="supported-logs-type-img"
 					/>
 				);
@@ -188,7 +188,7 @@ export default function LogsConnectionStatus(): JSX.Element {
 						entity="syslog"
 						heading="Collecting Syslogs"
 						imgURL="/Logos/syslogs.svg"
-						docsURL="https://signoz.io/docs/userguide/collecting_syslogs/"
+						docsURL="https://o11y.hanzo.ai/docs/userguide/collecting_syslogs/"
 						imgClassName="supported-logs-type-img"
 					/>
 				);
@@ -198,7 +198,7 @@ export default function LogsConnectionStatus(): JSX.Element {
 						entity="nodejs"
 						heading="Collecting NodeJS winston logs"
 						imgURL="/Logos/node-js.svg"
-						docsURL="https://signoz.io/docs/userguide/collecting_nodejs_winston_logs/"
+						docsURL="https://o11y.hanzo.ai/docs/userguide/collecting_nodejs_winston_logs/"
 						imgClassName="supported-logs-type-img"
 					/>
 				);
@@ -219,8 +219,8 @@ export default function LogsConnectionStatus(): JSX.Element {
 						}.svg`}
 						docsURL={
 							logType === ApplicationLogsType.FROM_LOG_FILE
-								? 'https://signoz.io/docs/userguide/collect_logs_from_file/'
-								: 'https://signoz.io/docs/userguide/collecting_application_logs_otel_sdk_java/'
+								? 'https://o11y.hanzo.ai/docs/userguide/collect_logs_from_file/'
+								: 'https://o11y.hanzo.ai/docs/userguide/collecting_application_logs_otel_sdk_java/'
 						}
 						imgClassName="supported-logs-type-img"
 					/>

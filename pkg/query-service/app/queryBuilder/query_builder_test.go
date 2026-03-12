@@ -4,11 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	logsV3 "github.com/SigNoz/signoz/pkg/query-service/app/logs/v3"
-	logsV4 "github.com/SigNoz/signoz/pkg/query-service/app/logs/v4"
-	metricsv3 "github.com/SigNoz/signoz/pkg/query-service/app/metrics/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	logsV3 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v3"
+	logsV4 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v4"
+	metricsv3 "github.com/hanzoai/o11y/pkg/query-service/app/metrics/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/stretchr/testify/require"
 )
 
@@ -218,8 +218,8 @@ func TestBuildQueryWithThreeOrMoreQueriesRefAndFormula(t *testing.T) {
 			End:   1735637901000,
 			Step:  60,
 			Variables: map[string]interface{}{
-				"SIGNOZ_START_TIME": 1735034992000,
-				"SIGNOZ_END_TIME":   1735036792000,
+				"HANZO_START_TIME": 1735034992000,
+				"HANZO_END_TIME":   1735036792000,
 			},
 			FormatForWeb: false,
 			CompositeQuery: &v3.CompositeQuery{
@@ -259,7 +259,7 @@ func TestBuildQueryWithThreeOrMoreQueriesRefAndFormula(t *testing.T) {
 						StepInterval: 60,
 						OrderBy: []v3.OrderBy{
 							{
-								ColumnName: "#SIGNOZ_VALUE",
+								ColumnName: "#HANZO_VALUE",
 								Order:      v3.DirectionAsc,
 							},
 						},
@@ -337,7 +337,7 @@ func TestBuildQueryWithThreeOrMoreQueriesRefAndFormula(t *testing.T) {
 		qb := NewQueryBuilder(qbOptions)
 
 		queries, err := qb.PrepareQueries(q)
-		require.Contains(t, queries["F1"], "SELECT A.`os.type` as `os.type`, A.`ts` as `ts`, A.value + B.value as value FROM (SELECT `os.type`,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, avg(value) as value FROM signoz_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'os.type') as `os.type`, fingerprint FROM signoz_metrics.time_series_v4_1day WHERE metric_name IN ['system.memory.usage'] AND temporality = '' AND __normalized = false AND unix_milli >= 1734998400000 AND unix_milli < 1735637880000 AND JSONExtractString(labels, 'os.type') = 'linux') as filtered_time_series USING fingerprint WHERE metric_name IN ['system.memory.usage'] AND unix_milli >= 1735036080000 AND unix_milli < 1735637880000 GROUP BY `os.type`, ts ORDER BY `os.type` ASC, ts) as A  INNER JOIN (SELECT * FROM (SELECT `os.type`,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value) as value FROM signoz_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'os.type') as `os.type`, fingerprint FROM signoz_metrics.time_series_v4_1day WHERE metric_name IN ['system.network.io'] AND temporality = '' AND __normalized = false AND unix_milli >= 1734998400000 AND unix_milli < 1735637880000) as filtered_time_series USING fingerprint WHERE metric_name IN ['system.network.io'] AND unix_milli >= 1735036020000 AND unix_milli < 1735637880000 GROUP BY `os.type`, ts ORDER BY `os.type` ASC, ts) HAVING value > 4) as B  ON A.`os.type` = B.`os.type` AND A.`ts` = B.`ts`")
+		require.Contains(t, queries["F1"], "SELECT A.`os.type` as `os.type`, A.`ts` as `ts`, A.value + B.value as value FROM (SELECT `os.type`,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, avg(value) as value FROM observe_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'os.type') as `os.type`, fingerprint FROM observe_metrics.time_series_v4_1day WHERE metric_name IN ['system.memory.usage'] AND temporality = '' AND __normalized = false AND unix_milli >= 1734998400000 AND unix_milli < 1735637880000 AND JSONExtractString(labels, 'os.type') = 'linux') as filtered_time_series USING fingerprint WHERE metric_name IN ['system.memory.usage'] AND unix_milli >= 1735036080000 AND unix_milli < 1735637880000 GROUP BY `os.type`, ts ORDER BY `os.type` ASC, ts) as A  INNER JOIN (SELECT * FROM (SELECT `os.type`,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value) as value FROM observe_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'os.type') as `os.type`, fingerprint FROM observe_metrics.time_series_v4_1day WHERE metric_name IN ['system.network.io'] AND temporality = '' AND __normalized = false AND unix_milli >= 1734998400000 AND unix_milli < 1735637880000) as filtered_time_series USING fingerprint WHERE metric_name IN ['system.network.io'] AND unix_milli >= 1735036020000 AND unix_milli < 1735637880000 GROUP BY `os.type`, ts ORDER BY `os.type` ASC, ts) HAVING value > 4) as B  ON A.`os.type` = B.`os.type` AND A.`ts` = B.`ts`")
 		require.NoError(t, err)
 
 	})
@@ -362,7 +362,7 @@ func TestDeltaQueryBuilder(t *testing.T) {
 						"A": {
 							DataSource:         v3.DataSourceMetrics,
 							QueryName:          "A",
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_count"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_count"},
 							StepInterval:       60,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
 							Expression:         "A",
@@ -386,7 +386,7 @@ func TestDeltaQueryBuilder(t *testing.T) {
 				},
 			},
 			queryToTest: "A",
-			expected:    "SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM signoz_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM signoz_metrics.time_series_v4_1day WHERE metric_name IN ['signoz_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['signoz_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts",
+			expected:    "SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM observe_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM observe_metrics.time_series_v4_1day WHERE metric_name IN ['observe_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['observe_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts",
 		},
 		{
 			name: "TestQueryWithExpression - Error rate",
@@ -400,7 +400,7 @@ func TestDeltaQueryBuilder(t *testing.T) {
 						"A": {
 							QueryName:          "A",
 							DataSource:         v3.DataSourceMetrics,
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_count"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_count"},
 							StepInterval:       60,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
 							Expression:         "A",
@@ -428,7 +428,7 @@ func TestDeltaQueryBuilder(t *testing.T) {
 						"B": {
 							QueryName:          "B",
 							DataSource:         v3.DataSourceMetrics,
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_count"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_count"},
 							StepInterval:       60,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
 							Expression:         "B",
@@ -456,7 +456,7 @@ func TestDeltaQueryBuilder(t *testing.T) {
 				},
 			},
 			queryToTest: "C",
-			expected:    "SELECT A.`ts` as `ts`, A.value * 100 / B.value as value FROM (SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM signoz_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM signoz_metrics.time_series_v4_1day WHERE metric_name IN ['signoz_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, 'status_code') IN ['STATUS_CODE_ERROR'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['signoz_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts) as A  INNER JOIN (SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM signoz_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM signoz_metrics.time_series_v4_1day WHERE metric_name IN ['signoz_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['signoz_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts) as B  ON A.`ts` = B.`ts`",
+			expected:    "SELECT A.`ts` as `ts`, A.value * 100 / B.value as value FROM (SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM observe_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM observe_metrics.time_series_v4_1day WHERE metric_name IN ['observe_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, 'status_code') IN ['STATUS_CODE_ERROR'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['observe_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts) as A  INNER JOIN (SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM observe_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM observe_metrics.time_series_v4_1day WHERE metric_name IN ['observe_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['observe_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts) as B  ON A.`ts` = B.`ts`",
 		},
 		{
 			name: "TestQuery - Quantile",
@@ -470,7 +470,7 @@ func TestDeltaQueryBuilder(t *testing.T) {
 						"A": {
 							QueryName:          "A",
 							DataSource:         v3.DataSourceMetrics,
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_bucket"},
 							StepInterval:       60,
 							AggregateOperator:  v3.AggregateOperatorHistQuant95,
 							Expression:         "A",
@@ -484,7 +484,7 @@ func TestDeltaQueryBuilder(t *testing.T) {
 				},
 			},
 			queryToTest: "A",
-			expected:    "SELECT service_name,  ts, histogramQuantile(arrayMap(x -> toFloat64(x), groupArray(le)), groupArray(value), 0.950) as value FROM (SELECT service_name,le,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM signoz_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, JSONExtractString(labels, 'le') as le, fingerprint FROM signoz_metrics.time_series_v4_1day WHERE metric_name IN ['signoz_latency_bucket'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000) as filtered_time_series USING fingerprint WHERE metric_name IN ['signoz_latency_bucket'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY service_name,le,ts ORDER BY service_name ASC,le ASC, ts) GROUP BY service_name,ts ORDER BY service_name ASC, ts",
+			expected:    "SELECT service_name,  ts, histogramQuantile(arrayMap(x -> toFloat64(x), groupArray(le)), groupArray(value), 0.950) as value FROM (SELECT service_name,le,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM observe_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, JSONExtractString(labels, 'le') as le, fingerprint FROM observe_metrics.time_series_v4_1day WHERE metric_name IN ['observe_latency_bucket'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000) as filtered_time_series USING fingerprint WHERE metric_name IN ['observe_latency_bucket'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY service_name,le,ts ORDER BY service_name ASC,le ASC, ts) GROUP BY service_name,ts ORDER BY service_name ASC, ts",
 		},
 	}
 
@@ -563,9 +563,9 @@ var testLogsWithFormula = []struct {
 		},
 		ExpectedQuery: "SELECT A.`key_1` as `key_1`, A.`ts` as `ts`, A.value + B.value as value FROM " +
 			"(SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] as `key_1`, toFloat64(count(*)) as value from " +
-			"signoz_logs.distributed_logs where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] = true AND " +
+			"observe_logs.distributed_logs where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] = true AND " +
 			"has(attributes_bool_key, 'key_1') group by `key_1`,ts order by value DESC) as A  INNER JOIN (SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, " +
-			"attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] as `key_1`, toFloat64(count(*)) as value from signoz_logs.distributed_logs where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) " +
+			"attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] as `key_1`, toFloat64(count(*)) as value from observe_logs.distributed_logs where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) " +
 			"AND attributes_bool_value[indexOf(attributes_bool_key, 'key_2')] = true AND has(attributes_bool_key, 'key_1') group by `key_1`,ts order by value DESC) as B  ON A.`key_1` = B.`key_1` AND A.`ts` = B.`ts`",
 	},
 	{
@@ -623,9 +623,9 @@ var testLogsWithFormula = []struct {
 			},
 		},
 		ExpectedQuery: "SELECT A.`key1.1` as `key1.1`, A.value + B.value as value FROM (SELECT now() as ts, attributes_bool_value[indexOf(attributes_bool_key, 'key1.1')] as `key1.1`, " +
-			"toFloat64(count(*)) as value from signoz_logs.distributed_logs where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key1.1')] = true AND " +
+			"toFloat64(count(*)) as value from observe_logs.distributed_logs where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key1.1')] = true AND " +
 			"has(attributes_bool_key, 'key1.1') group by `key1.1` order by value DESC) as A  INNER JOIN (SELECT now() as ts, attributes_bool_value[indexOf(attributes_bool_key, 'key1.1')] as `key1.1`, " +
-			"toFloat64(count(*)) as value from signoz_logs.distributed_logs where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key1.2')] = true AND " +
+			"toFloat64(count(*)) as value from observe_logs.distributed_logs where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key1.2')] = true AND " +
 			"has(attributes_bool_key, 'key1.1') group by `key1.1` order by value DESC) as B  ON A.`key1.1` = B.`key1.1`",
 	},
 	{
@@ -683,9 +683,9 @@ var testLogsWithFormula = []struct {
 			},
 		},
 		ExpectedQuery: "SELECT A.`key1.1` as `key1.1`, A.`ts` as `ts`, A.value - B.value as value FROM (SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, " +
-			"`attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from signoz_logs.distributed_logs where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND " +
+			"`attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from observe_logs.distributed_logs where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND " +
 			"`attribute_bool_key_2` = true AND `attribute_bool_key1$$1_exists`=true group by `key1.1`,ts order by value DESC) as A  INNER JOIN (SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), " +
-			"INTERVAL 60 SECOND) AS ts, `attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from signoz_logs.distributed_logs where (timestamp >= 1702980884000000000 AND " +
+			"INTERVAL 60 SECOND) AS ts, `attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from observe_logs.distributed_logs where (timestamp >= 1702980884000000000 AND " +
 			"timestamp <= 1702984484000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] = true AND `attribute_bool_key1$$1_exists`=true group by `key1.1`,ts order by value DESC) as B  " +
 			"ON A.`key1.1` = B.`key1.1` AND A.`ts` = B.`ts`",
 	},
@@ -770,10 +770,10 @@ var testLogsWithFormulaV2 = []struct {
 		},
 		ExpectedQuery: "SELECT A.`key_1` as `key_1`, A.`ts` as `ts`, A.value + B.value as value FROM " +
 			"(SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, attributes_bool['key_1'] as `key_1`, toFloat64(count(*)) as value from " +
-			"signoz_logs.distributed_logs_v2 where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND (ts_bucket_start >= 1702977475 AND ts_bucket_start <= 1702981075) " +
+			"observe_logs.distributed_logs_v2 where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND (ts_bucket_start >= 1702977475 AND ts_bucket_start <= 1702981075) " +
 			"AND attributes_bool['key_1'] = true AND mapContains(attributes_bool, 'key_1') AND mapContains(attributes_bool, 'key_1') group by `key_1`,ts order by value DESC) as A  INNER JOIN (SELECT " +
 			"toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, attributes_bool['key_1'] as `key_1`, toFloat64(count(*)) as value " +
-			"from signoz_logs.distributed_logs_v2 where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND (ts_bucket_start >= 1702977475 AND ts_bucket_start <= 1702981075) " +
+			"from observe_logs.distributed_logs_v2 where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND (ts_bucket_start >= 1702977475 AND ts_bucket_start <= 1702981075) " +
 			"AND attributes_bool['key_2'] = true AND mapContains(attributes_bool, 'key_2') AND mapContains(attributes_bool, 'key_1') group by `key_1`,ts order by value DESC) as B  ON A.`key_1` = B.`key_1` AND A.`ts` = B.`ts`",
 	},
 	{
@@ -831,9 +831,9 @@ var testLogsWithFormulaV2 = []struct {
 			},
 		},
 		ExpectedQuery: "SELECT A.`key1.1` as `key1.1`, A.value + B.value as value FROM (SELECT attributes_bool['key1.1'] as `key1.1`, " +
-			"toFloat64(count(*)) as value from signoz_logs.distributed_logs_v2 where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND (ts_bucket_start >= 1702977256 AND ts_bucket_start <= 1702982656) " +
+			"toFloat64(count(*)) as value from observe_logs.distributed_logs_v2 where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND (ts_bucket_start >= 1702977256 AND ts_bucket_start <= 1702982656) " +
 			"AND attributes_bool['key1.1'] = true AND mapContains(attributes_bool, 'key1.1') AND mapContains(attributes_bool, 'key1.1') group by `key1.1` order by value DESC) as A  INNER JOIN (SELECT " +
-			"attributes_bool['key1.1'] as `key1.1`, toFloat64(count(*)) as value from signoz_logs.distributed_logs_v2 where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) " +
+			"attributes_bool['key1.1'] as `key1.1`, toFloat64(count(*)) as value from observe_logs.distributed_logs_v2 where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) " +
 			"AND (ts_bucket_start >= 1702977256 AND ts_bucket_start <= 1702982656) AND attributes_bool['key1.2'] = true AND mapContains(attributes_bool, 'key1.2') AND " +
 			"mapContains(attributes_bool, 'key1.1') group by `key1.1` order by value DESC) as B  ON A.`key1.1` = B.`key1.1`",
 	},
@@ -892,10 +892,10 @@ var testLogsWithFormulaV2 = []struct {
 			},
 		},
 		ExpectedQuery: "SELECT A.`key1.1` as `key1.1`, A.`ts` as `ts`, A.value - B.value as value FROM (SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, " +
-			"`attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from signoz_logs.distributed_logs_v2 where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND " +
+			"`attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from observe_logs.distributed_logs_v2 where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND " +
 			"(ts_bucket_start >= 1702979084 AND ts_bucket_start <= 1702984484) AND `attribute_bool_key_2` = true AND `attribute_bool_key1$$1_exists`=true group by `key1.1`,ts order by value DESC) as " +
 			"A  INNER JOIN (SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, `attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from " +
-			"signoz_logs.distributed_logs_v2 where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND (ts_bucket_start >= 1702979084 AND ts_bucket_start <= 1702984484) AND " +
+			"observe_logs.distributed_logs_v2 where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND (ts_bucket_start >= 1702979084 AND ts_bucket_start <= 1702984484) AND " +
 			"attributes_bool['key_1'] = true AND mapContains(attributes_bool, 'key_1') AND `attribute_bool_key1$$1_exists`=true group by `key1.1`,ts order by value DESC) as B  " +
 			"ON A.`key1.1` = B.`key1.1` AND A.`ts` = B.`ts`",
 	},
@@ -939,7 +939,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							StepInterval:       60,
 							DataSource:         v3.DataSourceMetrics,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_bucket"},
 							Temporality:        v3.Delta,
 							Filters: &v3.FilterSet{
 								Operator: "AND",
@@ -953,7 +953,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -967,7 +967,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=signoz_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
+				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=observe_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
 			},
 		},
 		{
@@ -983,7 +983,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							StepInterval:       60,
 							DataSource:         v3.DataSourceMetrics,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_bucket"},
 							Temporality:        v3.Delta,
 							Filters: &v3.FilterSet{
 								Operator: "AND",
@@ -997,7 +997,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1012,7 +1012,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=signoz_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
+				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=observe_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
 			},
 		},
 		{
@@ -1028,7 +1028,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							StepInterval:       60,
 							DataSource:         v3.DataSourceMetrics,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_bucket"},
 							Temporality:        v3.Delta,
 							Filters: &v3.FilterSet{
 								Operator: "AND",
@@ -1042,7 +1042,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1058,7 +1058,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&shiftBy=86400&aggregateAttribute=signoz_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
+				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&shiftBy=86400&aggregateAttribute=observe_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
 			},
 		},
 		{
@@ -1075,7 +1075,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							DataSource:         v3.DataSourceMetrics,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
 							Expression:         "A",
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_bucket"},
 							Temporality:        v3.Delta,
 							Filters: &v3.FilterSet{
 								Operator: "AND",
@@ -1088,7 +1088,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 								{Key: "le"},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1118,7 +1118,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							DataSource:         v3.DataSourceMetrics,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
 							Expression:         "A",
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_bucket"},
 							Temporality:        v3.Delta,
 							Filters: &v3.FilterSet{
 								Operator: "AND",
@@ -1131,7 +1131,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 								{Key: "le"},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1161,7 +1161,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							StepInterval:       60,
 							DataSource:         v3.DataSourceMetrics,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_bucket"},
 							Temporality:        v3.Delta,
 							Filters: &v3.FilterSet{
 								Operator: "AND",
@@ -1175,7 +1175,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1189,7 +1189,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=signoz_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
+				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=observe_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
 			},
 		},
 		{
@@ -1205,7 +1205,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							StepInterval:       60,
 							DataSource:         v3.DataSourceMetrics,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_bucket"},
 							Temporality:        v3.Delta,
 							Filters: &v3.FilterSet{
 								Operator: "AND",
@@ -1219,7 +1219,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1234,7 +1234,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=signoz_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
+				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=observe_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
 			},
 		},
 		{
@@ -1250,7 +1250,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							StepInterval:       60,
 							DataSource:         v3.DataSourceMetrics,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_bucket"},
 							Temporality:        v3.Delta,
 							Filters: &v3.FilterSet{
 								Operator: "AND",
@@ -1264,7 +1264,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							},
 							Expression: "A",
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1280,7 +1280,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&shiftBy=86400&aggregateAttribute=signoz_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
+				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&shiftBy=86400&aggregateAttribute=observe_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
 			},
 		},
 		{
@@ -1298,7 +1298,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							AggregateOperator:    v3.AggregateOperatorSumRate,
 							SecondaryAggregation: v3.SecondaryAggregationMax,
 							Expression:           "A",
-							AggregateAttribute:   v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute:   v3.AttributeKey{Key: "observe_latency_bucket"},
 							Temporality:          v3.Delta,
 							Filters: &v3.FilterSet{
 								Operator: "AND",
@@ -1311,7 +1311,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 								{Key: "le"},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1326,7 +1326,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=signoz_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&secondaryAggregation=max&having-0=column:value,op:>,value:100",
+				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=observe_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&secondaryAggregation=max&having-0=column:value,op:>,value:100",
 			},
 		},
 		{
@@ -1424,7 +1424,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 							DataSource:         v3.DataSourceMetrics,
 							AggregateOperator:  v3.AggregateOperatorSumRate,
 							Expression:         "A",
-							AggregateAttribute: v3.AttributeKey{Key: "signoz_latency_bucket"},
+							AggregateAttribute: v3.AttributeKey{Key: "observe_latency_bucket"},
 							Temporality:        v3.Delta,
 							Filters: &v3.FilterSet{
 								Operator: "AND",
@@ -1437,7 +1437,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 								{Key: "le"},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 							Having: []v3.Having{
 								{
@@ -1451,7 +1451,7 @@ func TestGenerateCacheKeysMetricsBuilder(t *testing.T) {
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=signoz_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
+				"A": "source=metrics&step=60&aggregate=sum_rate&timeAggregation=&spaceAggregation=&aggregateAttribute=observe_latency_bucket---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=le---false&having-0=column:value,op:>,value:100",
 			},
 		},
 	}
@@ -1504,14 +1504,14 @@ func TestGenerateCacheKeysLogs(t *testing.T) {
 								},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 						},
 					},
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "source=logs&step=60&aggregate=count&limit=0&aggregateAttribute=log_level---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=log_level---false&orderBy-0=#SIGNOZ_VALUE-desc&having-0=column:value,op:>,value:100",
+				"A": "source=logs&step=60&aggregate=count&limit=0&aggregateAttribute=log_level---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=log_level---false&orderBy-0=#HANZO_VALUE-desc&having-0=column:value,op:>,value:100",
 			},
 		},
 		{
@@ -1546,7 +1546,7 @@ func TestGenerateCacheKeysLogs(t *testing.T) {
 								},
 							},
 							OrderBy: []v3.OrderBy{
-								{ColumnName: constants.SigNozOrderByValue, Order: "desc"},
+								{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"},
 							},
 						},
 					},
@@ -1608,13 +1608,13 @@ func TestGenerateCacheKeysMetricsPromQL(t *testing.T) {
 					QueryType: v3.QueryTypePromQL,
 					PromQueries: map[string]*v3.PromQuery{
 						"A": {
-							Query: "signoz_latency_bucket",
+							Query: "observe_latency_bucket",
 						},
 					},
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "signoz_latency_bucket",
+				"A": "observe_latency_bucket",
 			},
 		},
 		{
@@ -1625,13 +1625,13 @@ func TestGenerateCacheKeysMetricsPromQL(t *testing.T) {
 					QueryType: v3.QueryTypePromQL,
 					PromQueries: map[string]*v3.PromQuery{
 						"A": {
-							Query: "histogram_quantile(0.9, sum(rate(signoz_latency_bucket[1m])) by (le))",
+							Query: "histogram_quantile(0.9, sum(rate(observe_latency_bucket[1m])) by (le))",
 						},
 					},
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "histogram_quantile(0.9, sum(rate(signoz_latency_bucket[1m])) by (le))",
+				"A": "histogram_quantile(0.9, sum(rate(observe_latency_bucket[1m])) by (le))",
 			},
 		},
 		{
@@ -1642,7 +1642,7 @@ func TestGenerateCacheKeysMetricsPromQL(t *testing.T) {
 					QueryType: v3.QueryTypePromQL,
 					PromQueries: map[string]*v3.PromQuery{
 						"A": {
-							Query: "histogram_quantile(0.9, sum(rate(signoz_latency_bucket[1m])) by (le))",
+							Query: "histogram_quantile(0.9, sum(rate(observe_latency_bucket[1m])) by (le))",
 						},
 					},
 				},

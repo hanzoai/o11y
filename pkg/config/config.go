@@ -3,7 +3,7 @@ package config
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/factory"
 )
 
 func New(ctx context.Context, resolverConfig ResolverConfig, configFactories []factory.ConfigFactory) (*Conf, error) {

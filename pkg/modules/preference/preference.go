@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/types/preferencetypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/preferencetypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type Module interface {

@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback } from 'react';
 import MEditor, { Monaco } from '@monaco-editor/react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Input } from 'antd';
 import { LEGEND } from 'constants/global';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';

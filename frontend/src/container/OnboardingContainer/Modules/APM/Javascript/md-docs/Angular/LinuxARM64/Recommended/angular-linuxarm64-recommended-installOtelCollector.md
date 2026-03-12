@@ -65,11 +65,11 @@ extensions:
   zpages: {}
 exporters:
   otlp:
-    endpoint: "ingest.{{REGION}}.signoz.cloud:443"
+    endpoint: "ingest.{{REGION}}.o11y.hanzo.ai:443"
     tls:
       insecure: false
     headers:
-      "signoz-ingestion-key": "{{SIGNOZ_INGESTION_KEY}}"
+      "signoz-ingestion-key": "{{HANZO_INGESTION_KEY}}"
   logging:
     verbosity: normal
 service:

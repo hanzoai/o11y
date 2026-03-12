@@ -106,7 +106,7 @@ export const mockQueryRangeResponse = {
 								'{"t":{"$date":"2025-04-29T09:55:22.461+00:00"},"s":"I",  "c":"ACCESS",   "id":5286307, "ctx":"conn231150","msg":"Failed to authenticate","attr":{"client":"10.32.2.33:58258","isSpeculative":false,"isClusterMember":false,"mechanism":"SCRAM-SHA-1","user":"$(MONGO_USER)","db":"admin","error":"UserNotFound: Could not find user \\"$(MONGO_USER)\\" for db \\"admin\\"","result":11,"metrics":{"conversation_duration":{"micros":473,"summary":{"0":{"step":1,"step_total":2,"duration_micros":446}}}},"extraInfo":{}}}',
 							id: '2wOlVEhbqYipTUgs3PRMFF1hqjJ',
 							resources_string: {
-								'cloud.account.id': 'signoz-staging',
+								'cloud.account.id': 'o11y-staging',
 								'cloud.availability_zone': 'us-central1-c',
 								'cloud.platform': 'gcp_kubernetes_engine',
 								'cloud.provider': 'gcp',

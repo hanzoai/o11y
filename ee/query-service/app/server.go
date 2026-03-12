@@ -8,52 +8,52 @@ import (
 	_ "net/http/pprof" // http profiler
 	"slices"
 
-	"github.com/SigNoz/signoz/pkg/cache/memorycache"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/queryparser"
-	"github.com/SigNoz/signoz/pkg/ruler/rulestore/sqlrulestore"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/cache/memorycache"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/queryparser"
+	"github.com/hanzoai/o11y/pkg/ruler/rulestore/sqlrulestore"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel/propagation"
 
 	"github.com/gorilla/handlers"
 
-	"github.com/SigNoz/signoz/ee/query-service/app/api"
-	"github.com/SigNoz/signoz/ee/query-service/rules"
-	"github.com/SigNoz/signoz/ee/query-service/usage"
-	"github.com/SigNoz/signoz/pkg/alertmanager"
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/http/middleware"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/prometheus"
-	"github.com/SigNoz/signoz/pkg/querier"
-	"github.com/SigNoz/signoz/pkg/signoz"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/web"
+	"github.com/hanzoai/o11y/ee/query-service/app/api"
+	"github.com/hanzoai/o11y/ee/query-service/rules"
+	"github.com/hanzoai/o11y/ee/query-service/usage"
+	"github.com/hanzoai/o11y/pkg/alertmanager"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/o11y"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/web"
 	"github.com/rs/cors"
 	"github.com/soheilhy/cmux"
 
-	"github.com/SigNoz/signoz/pkg/query-service/agentConf"
-	baseapp "github.com/SigNoz/signoz/pkg/query-service/app"
-	"github.com/SigNoz/signoz/pkg/query-service/app/clickhouseReader"
-	"github.com/SigNoz/signoz/pkg/query-service/app/cloudintegrations"
-	"github.com/SigNoz/signoz/pkg/query-service/app/integrations"
-	"github.com/SigNoz/signoz/pkg/query-service/app/logparsingpipeline"
-	"github.com/SigNoz/signoz/pkg/query-service/app/opamp"
-	opAmpModel "github.com/SigNoz/signoz/pkg/query-service/app/opamp/model"
-	baseconst "github.com/SigNoz/signoz/pkg/query-service/constants"
-	"github.com/SigNoz/signoz/pkg/query-service/healthcheck"
-	baseint "github.com/SigNoz/signoz/pkg/query-service/interfaces"
-	baserules "github.com/SigNoz/signoz/pkg/query-service/rules"
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
+	baseapp "github.com/hanzoai/o11y/pkg/query-service/app"
+	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/query-service/app/cloudintegrations"
+	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
+	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
+	"github.com/hanzoai/o11y/pkg/query-service/app/opamp"
+	opAmpModel "github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
+	baseconst "github.com/hanzoai/o11y/pkg/query-service/constants"
+	"github.com/hanzoai/o11y/pkg/query-service/healthcheck"
+	baseint "github.com/hanzoai/o11y/pkg/query-service/interfaces"
+	baserules "github.com/hanzoai/o11y/pkg/query-service/rules"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
 	"go.uber.org/zap"
 )
 
 // Server runs HTTP, Mux and a grpc server
 type Server struct {
-	config      signoz.Config
-	signoz      *signoz.SigNoz
+	config      o11y.Config
+	o11y      *o11y.Hanzo O11y
 	ruleManager *baserules.Manager
 
 	// public http router
@@ -70,8 +70,8 @@ type Server struct {
 }
 
 // NewServer creates and initializes Server
-func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
-	cacheForTraceDetail, err := memorycache.New(context.TODO(), signoz.Instrumentation.ToProviderSettings(), cache.Config{
+func NewServer(config o11y.Config, o11y *o11y.Hanzo O11y) (*Server, error) {
+	cacheForTraceDetail, err := memorycache.New(context.TODO(), o11y.Instrumentation.ToProviderSettings(), cache.Config{
 		Provider: "memory",
 		Memory: cache.Memory{
 			NumCounters: 10 * 10000,
@@ -83,28 +83,28 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 	}
 
 	reader := clickhouseReader.NewReader(
-		signoz.SQLStore,
-		signoz.TelemetryStore,
-		signoz.Prometheus,
-		signoz.TelemetryStore.Cluster(),
+		o11y.SQLStore,
+		o11y.TelemetryStore,
+		o11y.Prometheus,
+		o11y.TelemetryStore.Cluster(),
 		config.Querier.FluxInterval,
 		cacheForTraceDetail,
-		signoz.Cache,
+		o11y.Cache,
 		nil,
 	)
 
 	rm, err := makeRulesManager(
 		reader,
-		signoz.Cache,
-		signoz.Alertmanager,
-		signoz.SQLStore,
-		signoz.TelemetryStore,
-		signoz.TelemetryMetadataStore,
-		signoz.Prometheus,
-		signoz.Modules.OrgGetter,
-		signoz.Querier,
-		signoz.Instrumentation.ToProviderSettings(),
-		signoz.QueryParser,
+		o11y.Cache,
+		o11y.Alertmanager,
+		o11y.SQLStore,
+		o11y.TelemetryStore,
+		o11y.TelemetryMetadataStore,
+		o11y.Prometheus,
+		o11y.Modules.OrgGetter,
+		o11y.Querier,
+		o11y.Instrumentation.ToProviderSettings(),
+		o11y.QueryParser,
 	)
 
 	if err != nil {
@@ -112,16 +112,16 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 	}
 
 	// initiate opamp
-	opAmpModel.Init(signoz.SQLStore, signoz.Instrumentation.Logger(), signoz.Modules.OrgGetter)
+	opAmpModel.Init(o11y.SQLStore, o11y.Instrumentation.Logger(), o11y.Modules.OrgGetter)
 
-	integrationsController, err := integrations.NewController(signoz.SQLStore)
+	integrationsController, err := integrations.NewController(o11y.SQLStore)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"couldn't create integrations controller: %w", err,
 		)
 	}
 
-	cloudIntegrationsController, err := cloudintegrations.NewController(signoz.SQLStore)
+	cloudIntegrationsController, err := cloudintegrations.NewController(o11y.SQLStore)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"couldn't create cloud provider integrations controller: %w", err,
@@ -130,7 +130,7 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 
 	// ingestion pipelines manager
 	logParsingPipelineController, err := logparsingpipeline.NewLogParsingPipelinesController(
-		signoz.SQLStore,
+		o11y.SQLStore,
 		integrationsController.GetPipelinesForInstalledIntegrations,
 	)
 	if err != nil {
@@ -139,7 +139,7 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 
 	// initiate agent config handler
 	agentConfMgr, err := agentConf.Initiate(&agentConf.ManagerOptions{
-		Store:         signoz.SQLStore,
+		Store:         o11y.SQLStore,
 		AgentFeatures: []agentConf.AgentFeature{logParsingPipelineController},
 	})
 	if err != nil {
@@ -147,7 +147,7 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 	}
 
 	// start the usagemanager
-	usageManager, err := usage.New(signoz.Licensing, signoz.TelemetryStore.ClickhouseDB(), signoz.Zeus, signoz.Modules.OrgGetter)
+	usageManager, err := usage.New(o11y.Licensing, o11y.TelemetryStore.ClickhouseDB(), o11y.Zeus, o11y.Modules.OrgGetter)
 	if err != nil {
 		return nil, err
 	}
@@ -168,21 +168,21 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 		GlobalConfig:                  config.Global,
 	}
 
-	apiHandler, err := api.NewAPIHandler(apiOpts, signoz, config)
+	apiHandler, err := api.NewAPIHandler(apiOpts, o11y, config)
 	if err != nil {
 		return nil, err
 	}
 
 	s := &Server{
 		config:             config,
-		signoz:             signoz,
+		o11y:             o11y,
 		ruleManager:        rm,
 		httpHostPort:       baseconst.HTTPHostPort,
 		unavailableChannel: make(chan healthcheck.Status),
 		usageManager:       usageManager,
 	}
 
-	httpServer, err := s.createPublicServer(apiHandler, signoz.Web)
+	httpServer, err := s.createPublicServer(apiHandler, o11y.Web)
 
 	if err != nil {
 		return nil, err
@@ -191,7 +191,7 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 	s.httpServer = httpServer
 
 	s.opampServer = opamp.InitializeServer(
-		&opAmpModel.AllAgents, agentConfMgr, signoz.Instrumentation,
+		&opAmpModel.AllAgents, agentConfMgr, o11y.Instrumentation,
 	)
 
 	return s, nil
@@ -204,26 +204,26 @@ func (s Server) HealthCheckStatus() chan healthcheck.Status {
 
 func (s *Server) createPublicServer(apiHandler *api.APIHandler, web web.Web) (*http.Server, error) {
 	r := baseapp.NewRouter()
-	am := middleware.NewAuthZ(s.signoz.Instrumentation.Logger(), s.signoz.Modules.OrgGetter, s.signoz.Authz)
+	am := middleware.NewAuthZ(s.o11y.Instrumentation.Logger(), s.o11y.Modules.OrgGetter, s.o11y.Authz)
 
 	r.Use(otelmux.Middleware(
 		"apiserver",
-		otelmux.WithMeterProvider(s.signoz.Instrumentation.MeterProvider()),
-		otelmux.WithTracerProvider(s.signoz.Instrumentation.TracerProvider()),
+		otelmux.WithMeterProvider(s.o11y.Instrumentation.MeterProvider()),
+		otelmux.WithTracerProvider(s.o11y.Instrumentation.TracerProvider()),
 		otelmux.WithPropagators(propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})),
 		otelmux.WithFilter(func(r *http.Request) bool {
 			return !slices.Contains([]string{"/api/v1/health"}, r.URL.Path)
 		}),
 		otelmux.WithPublicEndpoint(),
 	))
-	r.Use(middleware.NewAuthN([]string{"Authorization", "Sec-WebSocket-Protocol"}, s.signoz.Sharder, s.signoz.Tokenizer, s.signoz.Instrumentation.Logger()).Wrap)
-	r.Use(middleware.NewAPIKey(s.signoz.SQLStore, []string{"SIGNOZ-API-KEY"}, s.signoz.Instrumentation.Logger(), s.signoz.Sharder).Wrap)
-	r.Use(middleware.NewTimeout(s.signoz.Instrumentation.Logger(),
+	r.Use(middleware.NewAuthN([]string{"Authorization", "Sec-WebSocket-Protocol"}, s.o11y.Sharder, s.o11y.Tokenizer, s.o11y.Instrumentation.Logger()).Wrap)
+	r.Use(middleware.NewAPIKey(s.o11y.SQLStore, []string{"HANZO-API-KEY"}, s.o11y.Instrumentation.Logger(), s.o11y.Sharder).Wrap)
+	r.Use(middleware.NewTimeout(s.o11y.Instrumentation.Logger(),
 		s.config.APIServer.Timeout.ExcludedRoutes,
 		s.config.APIServer.Timeout.Default,
 		s.config.APIServer.Timeout.Max,
 	).Wrap)
-	r.Use(middleware.NewLogging(s.signoz.Instrumentation.Logger(), s.config.APIServer.Logging.ExcludedRoutes).Wrap)
+	r.Use(middleware.NewLogging(s.o11y.Instrumentation.Logger(), s.config.APIServer.Logging.ExcludedRoutes).Wrap)
 	r.Use(middleware.NewComment().Wrap)
 
 	apiHandler.RegisterRoutes(r, am)
@@ -239,7 +239,7 @@ func (s *Server) createPublicServer(apiHandler *api.APIHandler, web web.Web) (*h
 	apiHandler.MetricExplorerRoutes(r, am)
 	apiHandler.RegisterTraceFunnelsRoutes(r, am)
 
-	err := s.signoz.APIServer.AddToRouter(r)
+	err := s.o11y.APIServer.AddToRouter(r)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +247,7 @@ func (s *Server) createPublicServer(apiHandler *api.APIHandler, web web.Web) (*h
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "DELETE", "POST", "PUT", "PATCH", "OPTIONS"},
-		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "cache-control", "X-SIGNOZ-QUERY-ID", "Sec-WebSocket-Protocol"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "cache-control", "X-HANZO-QUERY-ID", "Sec-WebSocket-Protocol"},
 	})
 
 	handler := c.Handler(r)

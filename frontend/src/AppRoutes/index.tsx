@@ -25,7 +25,7 @@ import { ResourceProvider } from 'hooks/useResourceAttribute';
 import { StatusCodes } from 'http-status-codes';
 import history from 'lib/history';
 import ErrorBoundaryFallback from 'pages/ErrorBoundaryFallback/ErrorBoundaryFallback';
-import posthog from 'posthog-js';
+import posthog from '@hanzo/insights';
 import { useAppContext } from 'providers/App/App';
 import { IUser } from 'providers/App/types';
 import { CmdKProvider } from 'providers/cmdKProvider';
@@ -88,7 +88,7 @@ function App(): JSX.Element {
 					data_region: hostNameParts[1],
 					deployment_url: hostname,
 					company_domain: domain,
-					source: 'signoz-ui',
+					source: 'observe-ui',
 					role,
 				};
 
@@ -98,7 +98,7 @@ function App(): JSX.Element {
 					data_region: hostNameParts[1],
 					deployment_url: hostname,
 					company_domain: domain,
-					source: 'signoz-ui',
+					source: 'observe-ui',
 				};
 
 				if (email) {
@@ -129,7 +129,7 @@ function App(): JSX.Element {
 					data_region: hostNameParts[1],
 					deployment_url: hostname,
 					company_domain: domain,
-					source: 'signoz-ui',
+					source: 'observe-ui',
 					isPaidUser: !!trialInfo?.trialConvertedToSubscription,
 				});
 
@@ -139,7 +139,7 @@ function App(): JSX.Element {
 					data_region: hostNameParts[1],
 					deployment_url: hostname,
 					company_domain: domain,
-					source: 'signoz-ui',
+					source: 'observe-ui',
 					isPaidUser: !!trialInfo?.trialConvertedToSubscription,
 				});
 			}

@@ -1,1 +1,1 @@
-export const githubReleaseURL = 'https://github.com/SigNoz/signoz/releases';
+export const githubReleaseURL = 'https://github.com/Hanzo O11y/o11y/releases';

@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
-import { Color, Style } from '@signozhq/design-tokens';
+import { Color, Style } from '@hanzo/o11y-design-tokens';
 import {
 	ChevronDown,
 	ChevronRight,
 	CircleHelp,
 	TriangleAlert,
-} from '@signozhq/icons';
-import { Input } from '@signozhq/input';
+} from '@hanzo/o11y-icons';
+import { Input } from '@hanzo/o11y-input';
 import { Collapse, Form, Tooltip } from 'antd';
 import { useCollapseSectionErrors } from 'hooks/useCollapseSectionErrors';
 
@@ -67,7 +67,7 @@ function ClaimMappingSection({
 									Claim Mapping (Advanced)
 								</h4>
 								<p className="claim-mapping-section__section-description">
-									Configure how claims from your Identity Provider map to SigNoz user
+									Configure how claims from your Identity Provider map to Hanzo O11y user
 									attributes. Leave empty to use default values.
 								</p>
 							</div>

@@ -14,11 +14,11 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/SigNoz/signoz/ee/query-service/model"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/encryption"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/ee/query-service/model"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/encryption"
+	"github.com/hanzoai/o11y/pkg/zeus"
 )
 
 const (
@@ -95,7 +95,7 @@ func (lm *Manager) UploadUsage(ctx context.Context) {
 		usages := []model.UsageDB{}
 
 		// get usage from clickhouse
-		dbs := []string{"signoz_logs", "signoz_traces", "signoz_metrics"}
+		dbs := []string{"observe_logs", "observe_traces", "observe_metrics"}
 		query := `
 		SELECT tenant, collector_id, exporter_id, timestamp, data
 		FROM %s.distributed_usage as u1 

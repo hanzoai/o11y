@@ -1,4 +1,4 @@
-### Plot Metrics in SigNoz Cloud
+### Plot Metrics in Hanzo O11y Cloud
 
-You can follow the instructions [here](https://signoz.io/docs/tutorial/kubernetes-infra-metrics/#plot-metrics-in-signoz-ui) to create a metrics dashboard to see you metrics.
+You can follow the instructions [here](https://o11y.hanzo.ai/docs/tutorial/kubernetes-infra-metrics/#plot-metrics-in-signoz-ui) to create a metrics dashboard to see you metrics.
 

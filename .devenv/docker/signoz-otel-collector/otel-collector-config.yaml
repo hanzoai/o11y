@@ -26,8 +26,8 @@ processors:
     # Using OTEL_RESOURCE_ATTRIBUTES envvar, env detector adds custom labels.
     detectors: [env, system]
     timeout: 2s
-  signozspanmetrics/delta:
-    metrics_exporter: signozclickhousemetrics
+  observespanmetrics/delta:
+    metrics_exporter: observeclickhousemetrics
     metrics_flush_interval: 60s
     latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 50ms, 100ms, 250ms, 500ms, 1000ms, 1400ms, 2000ms, 5s, 10s, 20s, 40s, 60s ]
     dimensions_cache_size: 100000
@@ -41,7 +41,7 @@ processors:
       # This is added to ensure the uniqueness of the timeseries
       # Otherwise, identical timeseries produced by multiple replicas of
       # collectors result in incorrect APM metrics
-      - name: signoz.collector.id
+      - name: observe.collector.id
       - name: service.version
       - name: browser.platform
       - name: browser.mobile
@@ -60,13 +60,13 @@ extensions:
 
 exporters:
   clickhousetraces:
-    datasource: tcp://host.docker.internal:9000/signoz_traces
+    datasource: tcp://host.docker.internal:9000/observe_traces
     low_cardinal_exception_grouping: ${env:LOW_CARDINAL_EXCEPTION_GROUPING}
     use_new_schema: true
-  signozclickhousemetrics:
-    dsn: tcp://host.docker.internal:9000/signoz_metrics
+  observeclickhousemetrics:
+    dsn: tcp://host.docker.internal:9000/observe_metrics
   clickhouselogsexporter:
-    dsn: tcp://host.docker.internal:9000/signoz_logs
+    dsn: tcp://host.docker.internal:9000/observe_logs
     timeout: 10s
     use_new_schema: true
 
@@ -80,16 +80,16 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [signozspanmetrics/delta, batch]
+      processors: [observespanmetrics/delta, batch]
       exporters: [clickhousetraces]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [signozclickhousemetrics]
+      exporters: [observeclickhousemetrics]
     metrics/prometheus:
       receivers: [prometheus]
       processors: [batch]
-      exporters: [signozclickhousemetrics]
+      exporters: [observeclickhousemetrics]
     logs:
       receivers: [otlp]
       processors: [batch]

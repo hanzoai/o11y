@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@signozhq/button';
+import { Button } from '@hanzo/o11y-button';
 import { Slider, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { ArrowRight, Loader2, Minus } from 'lucide-react';
 
 import { OnboardingQuestionHeader } from '../OnboardingQuestionHeader';
 
-export interface OptimiseSignozDetails {
+export interface OptimiseO11yDetails {
 	logsPerDay: number;
 	hostsPerDay: number;
 	services: number;
@@ -46,9 +46,9 @@ const exponentialToLinear = (
 	return Math.round(linearValue); // Round to get a whole number within the 0-100 range
 };
 
-interface OptimiseSignozNeedsProps {
-	optimiseSignozDetails: OptimiseSignozDetails;
-	setOptimiseSignozDetails: (details: OptimiseSignozDetails) => void;
+interface OptimiseO11yNeedsProps {
+	optimiseO11yDetails: OptimiseO11yDetails;
+	setOptimiseO11yDetails: (details: OptimiseO11yDetails) => void;
 	onNext: () => void;
 	onWillDoLater: () => void;
 	isUpdatingProfile: boolean;
@@ -79,22 +79,22 @@ const serviceMarks = {
 	100: `${linearToExponential(100, servicesMin, servicesMax).toLocaleString()}`,
 };
 
-function OptimiseSignozNeeds({
+function OptimiseO11yNeeds({
 	isUpdatingProfile,
-	optimiseSignozDetails,
-	setOptimiseSignozDetails,
+	optimiseO11yDetails,
+	setOptimiseO11yDetails,
 	onNext,
 	onWillDoLater,
 	isNextDisabled,
-}: OptimiseSignozNeedsProps): JSX.Element {
+}: OptimiseO11yNeedsProps): JSX.Element {
 	const [logsPerDay, setLogsPerDay] = useState<number>(
-		optimiseSignozDetails?.logsPerDay || 0,
+		optimiseO11yDetails?.logsPerDay || 0,
 	);
 	const [hostsPerDay, setHostsPerDay] = useState<number>(
-		optimiseSignozDetails?.hostsPerDay || 0,
+		optimiseO11yDetails?.hostsPerDay || 0,
 	);
 	const [services, setServices] = useState<number>(
-		optimiseSignozDetails?.services || 0,
+		optimiseO11yDetails?.services || 0,
 	);
 
 	// Internal state for the linear slider
@@ -114,7 +114,7 @@ function OptimiseSignozNeeds({
 	}, []);
 
 	useEffect(() => {
-		setOptimiseSignozDetails({
+		setOptimiseO11yDetails({
 			logsPerDay,
 			hostsPerDay,
 			services,
@@ -133,7 +133,7 @@ function OptimiseSignozNeeds({
 	};
 
 	const handleWillDoLater = (): void => {
-		setOptimiseSignozDetails({
+		setOptimiseO11yDetails({
 			logsPerDay: 0,
 			hostsPerDay: 0,
 			services: 0,
@@ -188,7 +188,7 @@ function OptimiseSignozNeeds({
 		<div className="questions-container">
 			<OnboardingQuestionHeader
 				title="Set up your workspace"
-				subtitle="Tailor SigNoz to suit your observability needs."
+				subtitle="Tailor Hanzo O11y to suit your observability needs."
 			/>
 
 			<div className="questions-form-container">
@@ -315,4 +315,4 @@ function OptimiseSignozNeeds({
 	);
 }
 
-export default OptimiseSignozNeeds;
+export default OptimiseO11yNeeds;

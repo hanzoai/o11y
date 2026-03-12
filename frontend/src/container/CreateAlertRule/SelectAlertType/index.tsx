@@ -26,23 +26,23 @@ function SelectAlertType({ onSelect }: SelectAlertTypeProps): JSX.Element {
 		switch (option) {
 			case AlertTypes.ANOMALY_BASED_ALERT:
 				url =
-					'https://signoz.io/docs/alerts-management/anomaly-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples';
+					'https://o11y.hanzo.ai/docs/alerts-management/anomaly-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples';
 				break;
 			case AlertTypes.METRICS_BASED_ALERT:
 				url =
-					'https://signoz.io/docs/alerts-management/metrics-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples';
+					'https://o11y.hanzo.ai/docs/alerts-management/metrics-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples';
 				break;
 			case AlertTypes.LOGS_BASED_ALERT:
 				url =
-					'https://signoz.io/docs/alerts-management/log-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples';
+					'https://o11y.hanzo.ai/docs/alerts-management/log-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples';
 				break;
 			case AlertTypes.TRACES_BASED_ALERT:
 				url =
-					'https://signoz.io/docs/alerts-management/trace-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples';
+					'https://o11y.hanzo.ai/docs/alerts-management/trace-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples';
 				break;
 			case AlertTypes.EXCEPTIONS_BASED_ALERT:
 				url =
-					'https://signoz.io/docs/alerts-management/exceptions-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples';
+					'https://o11y.hanzo.ai/docs/alerts-management/exceptions-based-alerts/?utm_source=product&utm_medium=alert-source-selection-page#examples';
 				break;
 			default:
 				break;

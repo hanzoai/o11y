@@ -12,7 +12,7 @@ import {
 	LoadingOutlined,
 	ReloadOutlined,
 } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Button, Checkbox, Select, Typography } from 'antd';
 import cx from 'classnames';
 import TextToolTip from 'components/TextToolTip/TextToolTip';
@@ -1586,7 +1586,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
 									{isDynamicVariable && (
 										<TextToolTip
 											text="ALL in dynamic variable = No filter applied (unlike other variable types where ALL sends all selected values). Learn more"
-											url="https://signoz.io/docs/userguide/manage-variables/#note-about-all"
+											url="https://o11y.hanzo.ai/docs/userguide/manage-variables/#note-about-all"
 											urlText="here"
 											useFilledIcon={false}
 											outlinedIcon={
@@ -1636,7 +1636,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
 									{isDynamicVariable && (
 										<TextToolTip
 											text="Related values: Filtered by other variable selections. All values: Unfiltered complete list. Learn more"
-											url="https://signoz.io/docs/userguide/manage-variables/#dynamic-variable-dropdowns-display-values-in-two-sections"
+											url="https://o11y.hanzo.ai/docs/userguide/manage-variables/#dynamic-variable-dropdowns-display-values-in-two-sections"
 											urlText="here"
 											useFilledIcon={false}
 											outlinedIcon={

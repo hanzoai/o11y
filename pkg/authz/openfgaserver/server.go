@@ -5,13 +5,13 @@ import (
 	"strconv"
 	"sync"
 
-	authz "github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	authz "github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
 	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 	openfgapkgtransformer "github.com/openfga/language/pkg/go/transformer"
 	openfgapkgserver "github.com/openfga/openfga/pkg/server"
@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	openfgaDefaultStore = valuer.NewString("signoz")
+	openfgaDefaultStore = valuer.NewString("observe")
 )
 
 type Server struct {
@@ -34,7 +34,7 @@ type Server struct {
 }
 
 func NewOpenfgaServer(ctx context.Context, settings factory.ProviderSettings, config authz.Config, sqlstore sqlstore.SQLStore, openfgaSchema []openfgapkgtransformer.ModuleFile) (*Server, error) {
-	scopedProviderSettings := factory.NewScopedProviderSettings(settings, "github.com/SigNoz/signoz/pkg/authz/openfgaauthz")
+	scopedProviderSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/authz/openfgaauthz")
 
 	store, err := NewSQLStore(sqlstore)
 	if err != nil {

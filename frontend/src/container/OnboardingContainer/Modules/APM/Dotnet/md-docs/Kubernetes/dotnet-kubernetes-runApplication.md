@@ -7,4 +7,4 @@ dotnet build
 dotnet run
 ```
 
-Once you run your .NET application, interact with your application to generate some load and see your application in the SigNoz UI.
+Once you run your .NET application, interact with your application to generate some load and see your application in the Hanzo O11y UI.

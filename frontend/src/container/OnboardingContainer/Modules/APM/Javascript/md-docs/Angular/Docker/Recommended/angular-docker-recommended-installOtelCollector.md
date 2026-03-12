@@ -2,11 +2,11 @@
 
 &nbsp;
 
-As a first step, you should install the OTel collector Binary according to the instructions provided on [this link](https://signoz.io/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/).
+As a first step, you should install the OTel collector Binary according to the instructions provided on [this link](https://o11y.hanzo.ai/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/).
 
 &nbsp;
 
-While creating the `config.yaml` during the installation fo the OTel Collector Binary, you need to enable CORS under the receivers section so that you don't get CORS error while sending your Traces to SigNoz Cloud. See the code snippet below to understand how you can enable CORS in your config file:
+While creating the `config.yaml` during the installation fo the OTel Collector Binary, you need to enable CORS under the receivers section so that you don't get CORS error while sending your Traces to Hanzo O11y Cloud. See the code snippet below to understand how you can enable CORS in your config file:
 
 ```yaml
 
