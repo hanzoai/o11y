@@ -1,4 +1,4 @@
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { Drawer } from 'antd';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { AlertRuleStats, AlertRuleTopContributors } from 'types/api/alerts/def';

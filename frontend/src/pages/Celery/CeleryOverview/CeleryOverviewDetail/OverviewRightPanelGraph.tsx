@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
-import { Color } from '@hanzo/o11y-design-tokens';
+import { Color } from '@signozhq/design-tokens';
 import { Card } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { useGetGraphCustomSeries } from 'components/CeleryTask/useGetGraphCustomSeries';

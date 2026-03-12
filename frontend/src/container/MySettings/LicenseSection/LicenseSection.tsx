@@ -1,5 +1,5 @@
 import { useCopyToClipboard } from 'react-use';
-import { Button } from '@hanzo/o11y-button';
+import { Button } from '@signozhq/button';
 import { Typography } from 'antd';
 import { useNotifications } from 'hooks/useNotifications';
 import { Copy } from 'lucide-react';

@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
-import { Color, Style } from '@hanzo/o11y-design-tokens';
+import { Color, Style } from '@signozhq/design-tokens';
 import {
 	ChevronDown,
 	ChevronRight,
 	CircleHelp,
 	TriangleAlert,
-} from '@hanzo/o11y-icons';
-import { Input } from '@hanzo/o11y-input';
+} from '@signozhq/icons';
+import { Input } from '@signozhq/input';
 import { Collapse, Form, Tooltip } from 'antd';
 import { useCollapseSectionErrors } from 'hooks/useCollapseSectionErrors';
 

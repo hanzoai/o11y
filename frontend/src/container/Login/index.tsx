@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
-import { Button } from '@hanzo/o11y-button';
+import { Button } from '@signozhq/button';
 import { Form, Input, Select, Typography } from 'antd';
 import getVersion from 'api/v1/version/get';
 import get from 'api/v2/sessions/context/get';

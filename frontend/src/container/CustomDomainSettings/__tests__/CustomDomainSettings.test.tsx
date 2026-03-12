@@ -12,7 +12,7 @@ jest.mock('components/LaunchChatSupport/LaunchChatSupport', () => ({
 }));
 
 const mockToastCustom = jest.fn();
-jest.mock('@hanzo/o11y-sonner', () => ({
+jest.mock('@signozhq/sonner', () => ({
 	toast: {
 		custom: (...args: unknown[]): unknown => mockToastCustom(...args),
 		dismiss: jest.fn(),
