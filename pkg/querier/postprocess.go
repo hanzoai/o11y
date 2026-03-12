@@ -8,7 +8,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/Hanzo O11y/govaluate"
+	"github.com/HanzoO11y/govaluate"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )

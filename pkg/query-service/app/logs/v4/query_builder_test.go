@@ -559,7 +559,7 @@ func Test_orderByAttributeKeyTags(t *testing.T) {
 						Order:      "asc",
 					},
 					{
-						ColumnName: constants.Hanzo O11yOrderByValue,
+						ColumnName: constants.HanzoO11yOrderByValue,
 						Order:      "desc",
 					},
 				},
@@ -604,7 +604,7 @@ func Test_orderByAttributeKeyTags(t *testing.T) {
 						Order:      "asc",
 					},
 					{
-						ColumnName: constants.Hanzo O11yOrderByValue,
+						ColumnName: constants.HanzoO11yOrderByValue,
 						Order:      "asc",
 					},
 					{
@@ -631,7 +631,7 @@ func Test_orderByAttributeKeyTags(t *testing.T) {
 						Order:      "asc",
 					},
 					{
-						ColumnName: constants.Hanzo O11yOrderByValue,
+						ColumnName: constants.HanzoO11yOrderByValue,
 						Order:      "asc",
 					},
 					{

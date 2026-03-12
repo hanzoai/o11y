@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hanzoai/o11y-otel-collector/exporter/jsontypeexporter"
+	"github.com/hanzoai/otel-collector/exporter/jsontypeexporter"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 

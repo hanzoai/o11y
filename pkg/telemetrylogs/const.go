@@ -1,7 +1,7 @@
 package telemetrylogs
 
 import (
-	"github.com/hanzoai/o11y-otel-collector/constants"
+	"github.com/hanzoai/otel-collector/constants"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )

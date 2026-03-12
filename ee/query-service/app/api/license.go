@@ -72,7 +72,7 @@ func (ah *APIHandler) getBilling(w http.ResponseWriter, r *http.Request) {
 		RespondError(w, model.InternalError(err), nil)
 		return
 	}
-	req.Header.Add("X-Hanzo O11y-SecretKey", constants.LicenseAPIKey)
+	req.Header.Add("X-HanzoO11y-SecretKey", constants.LicenseAPIKey)
 	billingResp, err := hClient.Do(req)
 	if err != nil {
 		RespondError(w, model.InternalError(err), nil)

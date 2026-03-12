@@ -50,7 +50,7 @@ import (
 // Server runs HTTP, Mux and a grpc server
 type Server struct {
 	config      o11y.Config
-	o11y      *o11y.Hanzo O11y
+	o11y      *o11y.HanzoO11y
 	ruleManager *rules.Manager
 
 	// public http router
@@ -64,7 +64,7 @@ type Server struct {
 }
 
 // NewServer creates and initializes Server
-func NewServer(config o11y.Config, o11y *o11y.Hanzo O11y) (*Server, error) {
+func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 	integrationsController, err := integrations.NewController(o11y.SQLStore)
 	if err != nil {
 		return nil, err

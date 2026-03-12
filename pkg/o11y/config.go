@@ -266,7 +266,7 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 	}
 
 	if deprecatedFlags.Config != "" {
-		logger.WarnContext(ctx, "[Deprecated] flag --config is deprecated for passing prometheus config. The flag will be used for passing the entire Hanzo O11y config. More details can be found at https://github.com/hanzoai/o11y/issues/6805.")
+		logger.WarnContext(ctx, "[Deprecated] flag --config is deprecated for passing prometheus config. The flag will be used for passing the entire HanzoO11y config. More details can be found at https://github.com/hanzoai/o11y/issues/6805.")
 	}
 
 	if os.Getenv("INVITE_EMAIL_TEMPLATE") != "" {
