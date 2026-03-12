@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for Hanzo Observability
+ * * The file has been auto-generated using Orval for Hanzo O11y
  * * regenerate with 'yarn generate:api'
- * Hanzo Observability
+ * Hanzo O11y
  */
 import type {
 	InvalidateOptions,
