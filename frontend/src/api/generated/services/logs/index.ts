@@ -23,7 +23,7 @@ import type {
 	ListPromotedAndIndexedPaths200,
 	PromotetypesPromotePathDTO,
 	RenderErrorResponseDTO,
-} from '../observe.schemas';
+} from '../sigNoz.schemas';
 
 /**
  * This endpoints promotes and indexes paths

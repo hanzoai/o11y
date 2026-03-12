@@ -40,7 +40,7 @@ import type {
 	MetricsexplorertypesUpdateMetricMetadataRequestDTO,
 	RenderErrorResponseDTO,
 	UpdateMetricMetadataPathParameters,
-} from '../observe.schemas';
+} from '../sigNoz.schemas';
 
 /**
  * This endpoint returns a list of distinct metric names within the specified time range

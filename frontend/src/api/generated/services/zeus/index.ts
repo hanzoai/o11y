@@ -24,7 +24,7 @@ import type {
 	RenderErrorResponseDTO,
 	ZeustypesPostableHostDTO,
 	ZeustypesPostableProfileDTO,
-} from '../observe.schemas';
+} from '../sigNoz.schemas';
 
 /**
  * This endpoint gets the host info from zeus.

@@ -7,7 +7,7 @@ import {
 	GetMetricMetadata200,
 	MetrictypesTemporalityDTO,
 	MetrictypesTypeDTO,
-} from 'api/generated/services/observe.schemas';
+} from 'api/generated/services/sigNoz.schemas';
 
 export const MOCK_METRIC_NAME = 'test-metric';
 

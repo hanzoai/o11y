@@ -15,7 +15,7 @@ import {
 import {
 	RenderErrorResponseDTO,
 	RoletypesPostableRoleDTO,
-} from 'api/generated/services/observe.schemas';
+} from 'api/generated/services/sigNoz.schemas';
 import { ErrorType } from 'api/generatedAPIInstance';
 import ROUTES from 'constants/routes';
 import { useErrorModal } from 'providers/ErrorModalProvider';

@@ -37,7 +37,7 @@ import {
 import {
 	GatewaytypesIngestionKeyDTO,
 	RenderErrorResponseDTO,
-} from 'api/generated/services/observe.schemas';
+} from 'api/generated/services/sigNoz.schemas';
 import { AxiosError } from 'axios';
 import { getYAxisFormattedValue } from 'components/Graph/yAxisConfig';
 import Tags from 'components/Tags/Tags';

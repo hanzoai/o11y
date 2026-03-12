@@ -1,4 +1,4 @@
-import { MetrictypesTypeDTO } from 'api/generated/services/observe.schemas';
+import { MetrictypesTypeDTO } from 'api/generated/services/sigNoz.schemas';
 import { InspectMetricsSeries } from 'api/metricsExplorer/getInspectMetricsDetails';
 import { TagFilter } from 'types/api/queryBuilder/queryBuilderData';
 

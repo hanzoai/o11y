@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Pagination, Skeleton } from 'antd';
 import { useListRoles } from 'api/generated/services/role';
-import { RoletypesRoleDTO } from 'api/generated/services/observe.schemas';
+import { RoletypesRoleDTO } from 'api/generated/services/sigNoz.schemas';
 import ErrorInPlace from 'components/ErrorInPlace/ErrorInPlace';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import ROUTES from 'constants/routes';

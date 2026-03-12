@@ -1,4 +1,4 @@
-import { RoletypesRoleDTO } from 'api/generated/services/observe.schemas';
+import { RoletypesRoleDTO } from 'api/generated/services/sigNoz.schemas';
 
 const orgId = '019ba2bb-2fa1-7b24-8159-cfca08617ef9';
 
