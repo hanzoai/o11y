@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	o11ystanzahelper "github.com/hanzoai/o11y-otel-collector/processor/o11ylogspipelineprocessor/stanza/operator/helper"
+	o11ystanzahelper "github.com/hanzoai/otel-collector/processor/o11ylogspipelineprocessor/stanza/operator/helper"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/queryBuilderToExpr"

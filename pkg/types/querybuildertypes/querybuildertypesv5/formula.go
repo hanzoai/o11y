@@ -10,7 +10,7 @@ import (
 
 	"slices"
 
-	"github.com/Hanzo O11y/govaluate"
+	"github.com/HanzoO11y/govaluate"
 	"github.com/hanzoai/o11y/pkg/errors"
 )
 
@@ -145,7 +145,7 @@ type seriesLookup struct {
 // This also makes use of any application caching to avoid recomputing on same data
 type FormulaEvaluator struct {
 	// expression to evaluate, prepared from the expression string with list of
-	// supported functions https://github.com/Hanzo O11y/govaluate?tab=readme-ov-file#what-operators-and-types-does-this-support
+	// supported functions https://github.com/HanzoO11y/govaluate?tab=readme-ov-file#what-operators-and-types-does-this-support
 	expression *govaluate.EvaluableExpression
 	// list of variables in the expression
 	// For example, in sqrt(A*A + B*B), variables are A and B

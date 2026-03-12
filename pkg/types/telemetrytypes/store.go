@@ -3,7 +3,7 @@ package telemetrytypes
 import (
 	"context"
 
-	schemamigrator "github.com/hanzoai/o11y-otel-collector/cmd/o11yschemamigrator/schema_migrator"
+	schemamigrator "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 )
 

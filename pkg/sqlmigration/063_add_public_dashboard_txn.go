@@ -83,7 +83,7 @@ func (migration *addAnonymousPublicDashboardTransaction) Up(ctx context.Context,
 			INSERT INTO tuple (store, object_type, object_id, relation, _user, user_type, ulid, inserted_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT (store, object_type, object_id, relation, _user) DO NOTHING`,
-				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role:organization/"+orgID+"/role/"+roletypes.Hanzo O11yAnonymousRoleName+"#assignee", "userset", tupleID, now,
+				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role:organization/"+orgID+"/role/"+roletypes.HanzoO11yAnonymousRoleName+"#assignee", "userset", tupleID, now,
 			)
 			if err != nil {
 				return err
@@ -102,7 +102,7 @@ func (migration *addAnonymousPublicDashboardTransaction) Up(ctx context.Context,
 			INSERT INTO changelog (store, object_type, object_id, relation, _user, operation, ulid, inserted_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT (store, ulid, object_type) DO NOTHING`,
-				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role:organization/"+orgID+"/role/"+roletypes.Hanzo O11yAnonymousRoleName+"#assignee", "TUPLE_OPERATION_WRITE", tupleID, now,
+				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role:organization/"+orgID+"/role/"+roletypes.HanzoO11yAnonymousRoleName+"#assignee", "TUPLE_OPERATION_WRITE", tupleID, now,
 			)
 			if err != nil {
 				return err
@@ -113,7 +113,7 @@ func (migration *addAnonymousPublicDashboardTransaction) Up(ctx context.Context,
 			INSERT INTO tuple (store, object_type, object_id, relation, user_object_type, user_object_id, user_relation, user_type, ulid, inserted_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT (store, object_type, object_id, relation, user_object_type, user_object_id, user_relation) DO NOTHING`,
-				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role", "organization/"+orgID+"/role/"+roletypes.Hanzo O11yAnonymousRoleName, "assignee", "userset", tupleID, now,
+				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role", "organization/"+orgID+"/role/"+roletypes.HanzoO11yAnonymousRoleName, "assignee", "userset", tupleID, now,
 			)
 			if err != nil {
 				return err
@@ -132,7 +132,7 @@ func (migration *addAnonymousPublicDashboardTransaction) Up(ctx context.Context,
 			INSERT INTO changelog (store, object_type, object_id, relation, user_object_type, user_object_id, user_relation, operation, ulid, inserted_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			ON CONFLICT (store, ulid, object_type) DO NOTHING`,
-				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role", "organization/"+orgID+"/role/"+roletypes.Hanzo O11yAnonymousRoleName, "assignee", 0, tupleID, now,
+				storeID, "metaresource", "organization/"+orgID+"/public-dashboard/*", "read", "role", "organization/"+orgID+"/role/"+roletypes.HanzoO11yAnonymousRoleName, "assignee", 0, tupleID, now,
 			)
 			if err != nil {
 				return err

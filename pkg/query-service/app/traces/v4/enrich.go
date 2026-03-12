@@ -13,7 +13,7 @@ import (
 // but the query should work regardless and shouldn't fail
 func isEnriched(field v3.AttributeKey) bool {
 	// if it is timestamp/id dont check
-	if field.Key == "timestamp" || field.Key == constants.Hanzo O11yOrderByValue {
+	if field.Key == "timestamp" || field.Key == constants.HanzoO11yOrderByValue {
 		return true
 	}
 

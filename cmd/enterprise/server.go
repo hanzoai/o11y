@@ -46,10 +46,10 @@ func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
 
 	serverCmd := &cobra.Command{
 		Use:                "server",
-		Short:              "Run the Hanzo O11y server",
+		Short:              "Run the HanzoO11y server",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		RunE: func(currCmd *cobra.Command, args []string) error {
-			config, err := cmd.NewHanzo O11yConfig(currCmd.Context(), logger, flags)
+			config, err := cmd.NewHanzoO11yConfig(currCmd.Context(), logger, flags)
 			if err != nil {
 				return err
 			}

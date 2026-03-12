@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/o11y"
 )
 
-func NewHanzo O11yConfig(ctx context.Context, logger *slog.Logger, flags o11y.DeprecatedFlags) (o11y.Config, error) {
+func NewHanzoO11yConfig(ctx context.Context, logger *slog.Logger, flags o11y.DeprecatedFlags) (o11y.Config, error) {
 	config, err := o11y.NewConfig(
 		ctx,
 		logger,

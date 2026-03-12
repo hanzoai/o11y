@@ -3,7 +3,7 @@ package queryBuilderToExpr
 import (
 	"testing"
 
-	o11ystanzahelper "github.com/hanzoai/o11y-otel-collector/processor/o11ylogspipelineprocessor/stanza/operator/helper"
+	o11ystanzahelper "github.com/hanzoai/otel-collector/processor/o11ylogspipelineprocessor/stanza/operator/helper"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/expr-lang/expr/vm"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/entry"

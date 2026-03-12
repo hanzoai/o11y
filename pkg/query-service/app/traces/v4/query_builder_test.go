@@ -406,7 +406,7 @@ func Test_orderByAttributeKeyTags(t *testing.T) {
 			name: "order by value",
 			args: args{
 				panelType: v3.PanelTypeGraph,
-				items:     []v3.OrderBy{{ColumnName: "name", Order: "ASC"}, {ColumnName: constants.Hanzo O11yOrderByValue, Order: "DESC"}},
+				items:     []v3.OrderBy{{ColumnName: "name", Order: "ASC"}, {ColumnName: constants.HanzoO11yOrderByValue, Order: "DESC"}},
 				tags:      []v3.AttributeKey{{Key: "name", DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag}},
 			},
 			want: "`name` ASC,value DESC",

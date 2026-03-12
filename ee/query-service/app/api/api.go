@@ -41,7 +41,7 @@ type APIHandler struct {
 }
 
 // NewAPIHandler returns an APIHandler
-func NewAPIHandler(opts APIHandlerOptions, o11y *o11y.Hanzo O11y, config o11y.Config) (*APIHandler, error) {
+func NewAPIHandler(opts APIHandlerOptions, o11y *o11y.HanzoO11y, config o11y.Config) (*APIHandler, error) {
 	baseHandler, err := baseapp.NewAPIHandler(baseapp.APIHandlerOpts{
 		Reader:                        opts.DataConnector,
 		RuleManager:                   opts.RulesManager,
