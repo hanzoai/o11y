@@ -4,7 +4,7 @@ import { Color } from '@signozhq/design-tokens';
 import { DialogWrapper } from '@signozhq/dialog';
 import { CircleAlert, CircleCheck, LoaderCircle } from '@signozhq/icons';
 import { Input } from '@signozhq/input';
-import { RenderErrorResponseDTO } from 'api/generated/services/observe.schemas';
+import { RenderErrorResponseDTO } from 'api/generated/services/sigNoz.schemas';
 import { AxiosError } from 'axios';
 import LaunchChatSupport from 'components/LaunchChatSupport/LaunchChatSupport';
 

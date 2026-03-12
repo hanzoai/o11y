@@ -3,7 +3,7 @@ import {
 	GetMetricMetadata200,
 	MetrictypesTemporalityDTO,
 	MetrictypesTypeDTO,
-} from 'api/generated/services/observe.schemas';
+} from 'api/generated/services/sigNoz.schemas';
 import { SpaceAggregation, TimeAggregation } from 'api/v5/v5';
 import { initialQueriesMap, toAttributeType } from 'constants/queryBuilder';
 import { DataTypes } from 'types/api/queryBuilder/queryAutocompleteResponse';

@@ -33,7 +33,7 @@ import type {
 	RenderErrorResponseDTO,
 	RoletypesPatchableRoleDTO,
 	RoletypesPostableRoleDTO,
-} from '../observe.schemas';
+} from '../sigNoz.schemas';
 
 /**
  * This endpoint lists all roles

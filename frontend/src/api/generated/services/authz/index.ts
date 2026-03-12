@@ -24,7 +24,7 @@ import type {
 	AuthzCheck200,
 	AuthzResources200,
 	RenderErrorResponseDTO,
-} from '../observe.schemas';
+} from '../sigNoz.schemas';
 
 /**
  * Checks if the authenticated user has permissions for given transactions

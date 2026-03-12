@@ -4,7 +4,7 @@ import {
 	AuthtypesOIDCConfigDTO,
 	AuthtypesRoleMappingDTO,
 	AuthtypesSamlConfigDTO,
-} from 'api/generated/services/observe.schemas';
+} from 'api/generated/services/sigNoz.schemas';
 
 // Form values interface for internal use (includes array-based fields for UI)
 export interface FormValues {

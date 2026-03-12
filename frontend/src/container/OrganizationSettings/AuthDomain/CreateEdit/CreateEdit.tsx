@@ -12,7 +12,7 @@ import {
 	AuthtypesGoogleConfigDTO,
 	AuthtypesRoleMappingDTO,
 	RenderErrorResponseDTO,
-} from 'api/generated/services/observe.schemas';
+} from 'api/generated/services/sigNoz.schemas';
 import { AxiosError } from 'axios';
 import { FeatureKeys } from 'constants/features';
 import { defaultTo } from 'lodash-es';
