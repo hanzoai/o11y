@@ -6,7 +6,7 @@ import {
 	MetricsexplorertypesMetricMetadataDTO,
 	MetrictypesTemporalityDTO,
 	MetrictypesTypeDTO,
-} from 'api/generated/services/observe.schemas';
+} from 'api/generated/services/sigNoz.schemas';
 
 export interface MetricDetailsProps {
 	onClose: () => void;

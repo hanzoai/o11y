@@ -33,7 +33,7 @@ import type {
 	GetPublicDashboardWidgetQueryRangePathParameters,
 	RenderErrorResponseDTO,
 	UpdatePublicDashboardPathParameters,
-} from '../observe.schemas';
+} from '../sigNoz.schemas';
 
 /**
  * This endpoint deletes the public sharing config and disables the public sharing of a dashboard

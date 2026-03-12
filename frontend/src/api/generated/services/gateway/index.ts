@@ -35,7 +35,7 @@ import type {
 	SearchIngestionKeysParams,
 	UpdateIngestionKeyLimitPathParameters,
 	UpdateIngestionKeyPathParameters,
-} from '../observe.schemas';
+} from '../sigNoz.schemas';
 
 /**
  * This endpoint returns the ingestion keys for a workspace

@@ -3,7 +3,7 @@ import { Badge } from '@signozhq/badge';
 import type {
 	AuthtypesGettableObjectsDTO,
 	AuthtypesGettableResourcesDTO,
-} from 'api/generated/services/observe.schemas';
+} from 'api/generated/services/sigNoz.schemas';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import { capitalize } from 'lodash-es';
 import { useTimezone } from 'providers/Timezone';
