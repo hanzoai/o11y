@@ -188,7 +188,7 @@ function OptimiseO11yNeeds({
 		<div className="questions-container">
 			<OnboardingQuestionHeader
 				title="Set up your workspace"
-				subtitle="Tailor Hanzo O11y to suit your observability needs."
+				subtitle="Tailor HanzoO11y to suit your observability needs."
 			/>
 
 			<div className="questions-form-container">

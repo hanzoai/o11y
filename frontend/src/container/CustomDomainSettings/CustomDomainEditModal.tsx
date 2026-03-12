@@ -162,7 +162,7 @@ export default function CustomDomainEditModal({
 					>
 						{hasError
 							? errorMessage
-							: "To help you easily explore Hanzo O11y, we've selected a tenant sub domain name for you."}
+							: "To help you easily explore HanzoO11y, we've selected a tenant sub domain name for you."}
 					</span>
 				</div>
 

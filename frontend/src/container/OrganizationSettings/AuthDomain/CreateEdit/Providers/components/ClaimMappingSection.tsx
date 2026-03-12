@@ -67,7 +67,7 @@ function ClaimMappingSection({
 									Claim Mapping (Advanced)
 								</h4>
 								<p className="claim-mapping-section__section-description">
-									Configure how claims from your Identity Provider map to Hanzo O11y user
+									Configure how claims from your Identity Provider map to HanzoO11y user
 									attributes. Leave empty to use default values.
 								</p>
 							</div>

@@ -7,7 +7,7 @@ function InstrumentationPage(): JSX.Element {
 	return (
 		<>
 			<Typography>
-				Congrats, you have successfully installed Hanzo O11y! Now lets get some data in
+				Congrats, you have successfully installed HanzoO11y! Now lets get some data in
 				and start deriving insights from them
 			</Typography>
 			{GetStartedContent().map((section) => (

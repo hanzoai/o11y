@@ -16,7 +16,7 @@ export interface O11yDetails {
 	discoverO11y: string | null;
 }
 
-interface AboutHanzo O11yQuestionsProps {
+interface AboutHanzoO11yQuestionsProps {
 	o11yDetails: O11yDetails;
 	setO11yDetails: (details: O11yDetails) => void;
 	onNext: () => void;
@@ -31,11 +31,11 @@ const interestedInOptions: Record<string, string> = {
 	correlateSignals: 'Correlate signals for faster troubleshooting',
 };
 
-export function AboutHanzo O11yQuestions({
+export function AboutHanzoO11yQuestions({
 	o11yDetails,
 	setO11yDetails,
 	onNext,
-}: AboutHanzo O11yQuestionsProps): JSX.Element {
+}: AboutHanzoO11yQuestionsProps): JSX.Element {
 	const [interestInO11y, setInterestInO11y] = useState<string[]>(
 		o11yDetails?.interestInO11y || [],
 	);
@@ -93,13 +93,13 @@ export function AboutHanzo O11yQuestions({
 		<div className="questions-container">
 			<OnboardingQuestionHeader
 				title="Set up your workspace"
-				subtitle="Tailor Hanzo O11y to suit your observability needs."
+				subtitle="Tailor HanzoO11y to suit your observability needs."
 			/>
 
 			<div className="questions-form-container">
 				<div className="questions-form">
 					<div className="form-group">
-						<div className="question">How did you first come across Hanzo O11y?</div>
+						<div className="question">How did you first come across HanzoO11y?</div>
 
 						<AntdInput.TextArea
 							className="discover-o11y-input"
@@ -112,7 +112,7 @@ export function AboutHanzo O11yQuestions({
 					</div>
 
 					<div className="form-group">
-						<div className="question">What got you interested in Hanzo O11y?</div>
+						<div className="question">What got you interested in HanzoO11y?</div>
 						<div className="checkbox-grid">
 							{Object.keys(interestedInOptions).map((option: string) => (
 								<div key={option} className="checkbox-item">
@@ -136,7 +136,7 @@ export function AboutHanzo O11yQuestions({
 									<Input
 										type="text"
 										className="onboarding-questionaire-other-input"
-										placeholder="What got you interested in Hanzo O11y?"
+										placeholder="What got you interested in HanzoO11y?"
 										value={otherInterestInO11y}
 										autoFocus
 										onChange={(e): void => setOtherInterestInO11y(e.target.value)}

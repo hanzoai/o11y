@@ -13,15 +13,15 @@ import { LicensePlatform } from 'types/api/licensesV3/getActive';
 import { DOCS_LINKS } from '../constants';
 
 function DataSourceInfo({
-	dataSentToHanzo O11y,
+	dataSentToHanzoO11y,
 	isLoading,
 }: {
-	dataSentToHanzo O11y: boolean;
+	dataSentToHanzoO11y: boolean;
 	isLoading: boolean;
 }): JSX.Element {
 	const { activeLicense } = useAppContext();
 
-	const notSendingData = !dataSentToHanzo O11y;
+	const notSendingData = !dataSentToHanzoO11y;
 
 	const isEnabled =
 		activeLicense && activeLicense.platform === LicensePlatform.CLOUD;
@@ -54,13 +54,13 @@ function DataSourceInfo({
 	const renderNotSendingData = (): JSX.Element => (
 		<>
 			<h2 className="welcome-title">
-				Hello there, Welcome to your Hanzo O11y workspace
+				Hello there, Welcome to your HanzoO11y workspace
 			</h2>
 
 			<p className="welcome-description">
 				You’re not sending any data yet. <br />
-				Hanzo O11y is so much better with your data ⎯ start by sending your telemetry
-				data to Hanzo O11y.
+				HanzoO11y is so much better with your data ⎯ start by sending your telemetry
+				data to HanzoO11y.
 			</p>
 
 			<Card className="welcome-card">
@@ -109,7 +109,7 @@ function DataSourceInfo({
 	const renderDataReceived = (): JSX.Element => (
 		<>
 			<h2 className="welcome-title">
-				Hello there, Welcome to your Hanzo O11y workspace
+				Hello there, Welcome to your HanzoO11y workspace
 			</h2>
 
 			{!isError && hostsData && (
@@ -151,7 +151,7 @@ function DataSourceInfo({
 				</>
 			)}
 
-			{!isLoading && dataSentToHanzo O11y && renderDataReceived()}
+			{!isLoading && dataSentToHanzoO11y && renderDataReceived()}
 
 			{!isLoading && notSendingData && renderNotSendingData()}
 		</div>

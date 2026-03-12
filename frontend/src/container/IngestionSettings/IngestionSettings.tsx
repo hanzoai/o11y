@@ -76,7 +76,7 @@ export default function IngestionSettings(): JSX.Element {
 				}}
 			>
 				You can use the following ingestion credentials to start sending your
-				telemetry data to Hanzo O11y
+				telemetry data to HanzoO11y
 			</Typography>
 
 			<Table

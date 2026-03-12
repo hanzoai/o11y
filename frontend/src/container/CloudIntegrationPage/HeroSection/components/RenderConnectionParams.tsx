@@ -43,19 +43,19 @@ function RenderConnectionFields({
 			{!connectionParams?.observe_api_url && (
 				<Form.Item
 					name="observe_api_url"
-					label="Hanzo O11y API URL"
-					rules={[{ required: true, message: 'Please enter Hanzo O11y API URL' }]}
+					label="HanzoO11y API URL"
+					rules={[{ required: true, message: 'Please enter HanzoO11y API URL' }]}
 				>
-					<Input placeholder="Enter Hanzo O11y API URL" disabled={isFormDisabled} />
+					<Input placeholder="Enter HanzoO11y API URL" disabled={isFormDisabled} />
 				</Form.Item>
 			)}
 			{!connectionParams?.observe_api_key && (
 				<Form.Item
 					name="observe_api_key"
-					label="Hanzo O11y API KEY"
-					rules={[{ required: true, message: 'Please enter Hanzo O11y API Key' }]}
+					label="HanzoO11y API KEY"
+					rules={[{ required: true, message: 'Please enter HanzoO11y API Key' }]}
 				>
-					<Input placeholder="Enter Hanzo O11y API Key" disabled={isFormDisabled} />
+					<Input placeholder="Enter HanzoO11y API Key" disabled={isFormDisabled} />
 				</Form.Item>
 			)}
 		</Form.Item>

@@ -51,7 +51,7 @@ export default function ServiceTopLevelOperations(): JSX.Element {
 
 	const alertDesc = (): ReactNode => (
 		<div className="">
-			Hanzo O11y calculates the RED metrics for a service using the entry-point spans.
+			HanzoO11y calculates the RED metrics for a service using the entry-point spans.
 			For more details, you can check out our
 			<a
 				href="https://o11y.hanzo.ai/docs/userguide/metrics/#open-the-services-section"

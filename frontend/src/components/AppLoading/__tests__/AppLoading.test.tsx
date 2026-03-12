@@ -12,7 +12,7 @@ jest.mock('../../../api/browser/localstorage/get', () => ({
 const mockGet = (getLocal as unknown) as jest.Mock;
 
 describe('AppLoading', () => {
-	const HANZO_TEXT = 'Hanzo O11y';
+	const HANZO_TEXT = 'HanzoO11y';
 	const TAGLINE_TEXT =
 		'OpenTelemetry-Native Logs, Metrics and Traces in a single pane';
 	const CONTAINER_SELECTOR = '.app-loading-container';

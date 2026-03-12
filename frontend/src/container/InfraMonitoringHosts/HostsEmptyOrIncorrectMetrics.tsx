@@ -35,14 +35,14 @@ export default function HostsEmptyOrIncorrectMetrics({
 							>
 								this
 							</a>{' '}
-							to learn how to send host metrics to Hanzo O11y.
+							to learn how to send host metrics to HanzoO11y.
 						</Typography.Text>
 					</div>
 				)}
 
 				{incorrectData && (
 					<Typography.Text className="incorrect-metrics-message">
-						To see host metrics, upgrade to the latest version of Hanzo O11y k8s-infra
+						To see host metrics, upgrade to the latest version of HanzoO11y k8s-infra
 						chart. Please contact support if you need help.
 					</Typography.Text>
 				)}

@@ -28,7 +28,7 @@ describe('APIKeys component', () => {
 	it('renders APIKeys component without crashing', () => {
 		expect(screen.getByText('API Keys')).toBeInTheDocument();
 		expect(
-			screen.getByText('Create and manage API keys for the Hanzo O11y API'),
+			screen.getByText('Create and manage API keys for the HanzoO11y API'),
 		).toBeInTheDocument();
 	});
 

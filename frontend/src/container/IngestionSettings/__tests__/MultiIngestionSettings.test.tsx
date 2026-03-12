@@ -57,7 +57,7 @@ describe('MultiIngestionSettings Page', () => {
 		expect(screen.getByText('Ingestion Keys')).toBeInTheDocument();
 
 		expect(
-			screen.getByText('Create and manage ingestion keys for the Hanzo O11y Cloud'),
+			screen.getByText('Create and manage ingestion keys for the HanzoO11y Cloud'),
 		).toBeInTheDocument();
 
 		const aboutKeyslink = screen.getByRole('link', { name: /Learn more/i });
