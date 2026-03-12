@@ -1,6 +1,6 @@
 import { Radio, RadioChangeEvent } from 'antd';
 
-import './O11yRadioGroup.styles.scss';
+import './SignozRadioGroup.styles.scss';
 
 interface Option {
 	value: string;
