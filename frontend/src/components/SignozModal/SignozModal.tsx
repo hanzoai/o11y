@@ -1,6 +1,6 @@
 import { Modal, ModalProps } from 'antd';
 
-import './O11yModal.style.scss';
+import './SignozModal.style.scss';
 
 function O11yModal({
 	children,
