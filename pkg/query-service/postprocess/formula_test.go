@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/HanzoO11y/govaluate"
+	"github.com/SigNoz/govaluate"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
