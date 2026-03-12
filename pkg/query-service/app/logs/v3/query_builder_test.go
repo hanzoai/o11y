@@ -1081,7 +1081,7 @@ var testOrderBy = []struct {
 				Order:      "asc",
 			},
 			{
-				ColumnName: constants.Hanzo O11yOrderByValue,
+				ColumnName: constants.HanzoO11yOrderByValue,
 				Order:      "desc",
 			},
 		},
@@ -1141,7 +1141,7 @@ var testOrderBy = []struct {
 				Order:      "asc",
 			},
 			{
-				ColumnName: constants.Hanzo O11yOrderByValue,
+				ColumnName: constants.HanzoO11yOrderByValue,
 				Order:      "asc",
 			},
 			{
@@ -1164,7 +1164,7 @@ var testOrderBy = []struct {
 				Order:      "asc",
 			},
 			{
-				ColumnName: constants.Hanzo O11yOrderByValue,
+				ColumnName: constants.HanzoO11yOrderByValue,
 				Order:      "asc",
 			},
 			{
@@ -1253,7 +1253,7 @@ var testPrepLogsQueryData = []struct {
 			},
 			Limit:   10,
 			GroupBy: []v3.AttributeKey{{Key: "method", DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag}},
-			OrderBy: []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "ASC"}},
+			OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "ASC"}},
 		},
 		TableName:     "logs",
 		ExpectedQuery: "SELECT `method` from (SELECT attributes_string_value[indexOf(attributes_string_key, 'method')] as `method`, toFloat64(count(distinct(attributes_string_value[indexOf(attributes_string_key, 'name')]))) as value from observe_logs.distributed_logs where (timestamp >= 1680066360726000000 AND timestamp <= 1680066458000000000) AND attributes_string_value[indexOf(attributes_string_key, 'method')] = 'GET' AND has(attributes_string_key, 'method') AND has(attributes_string_key, 'name') group by `method` order by value ASC) LIMIT 10",

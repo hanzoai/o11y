@@ -24,8 +24,8 @@ import (
 type CloudIntegrationConnectionParamsResponse struct {
 	IngestionUrl string `json:"ingestion_url,omitempty"`
 	IngestionKey string `json:"ingestion_key,omitempty"`
-	Hanzo O11yAPIUrl string `json:"o11y_api_url,omitempty"`
-	Hanzo O11yAPIKey string `json:"o11y_api_key,omitempty"`
+	HanzoO11yAPIUrl string `json:"o11y_api_url,omitempty"`
+	HanzoO11yAPIKey string `json:"o11y_api_key,omitempty"`
 }
 
 func (ah *APIHandler) CloudIntegrationsGenerateConnectionParams(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +58,7 @@ func (ah *APIHandler) CloudIntegrationsGenerateConnectionParams(w http.ResponseW
 	}
 
 	result := CloudIntegrationConnectionParamsResponse{
-		Hanzo O11yAPIKey: apiKey,
+		HanzoO11yAPIKey: apiKey,
 	}
 
 	license, err := ah.O11y.Licensing.GetActive(r.Context(), orgID)
@@ -76,7 +76,7 @@ func (ah *APIHandler) CloudIntegrationsGenerateConnectionParams(w http.ResponseW
 		return
 	}
 
-	o11yApiUrl, apiErr := ah.getIngestionUrlAndHanzo O11yAPIUrl(r.Context(), license.Key)
+	o11yApiUrl, apiErr := ah.getIngestionUrlAndHanzoO11yAPIUrl(r.Context(), license.Key)
 	if apiErr != nil {
 		RespondError(w, basemodel.WrapApiError(
 			apiErr, "couldn't deduce ingestion url and o11y api url",
@@ -85,7 +85,7 @@ func (ah *APIHandler) CloudIntegrationsGenerateConnectionParams(w http.ResponseW
 	}
 
 	result.IngestionUrl = ah.opts.GlobalConfig.IngestionURL.String()
-	result.Hanzo O11yAPIUrl = o11yApiUrl
+	result.HanzoO11yAPIUrl = o11yApiUrl
 
 	gatewayUrl := ah.opts.GatewayUrl
 	if len(gatewayUrl) > 0 {
@@ -185,7 +185,7 @@ func (ah *APIHandler) getOrCreateCloudIntegrationUser(
 	return cloudIntegrationUser, nil
 }
 
-func (ah *APIHandler) getIngestionUrlAndHanzo O11yAPIUrl(ctx context.Context, licenseKey string) (
+func (ah *APIHandler) getIngestionUrlAndHanzoO11yAPIUrl(ctx context.Context, licenseKey string) (
 	string, *basemodel.ApiError,
 ) {
 	// TODO: remove this struct from here

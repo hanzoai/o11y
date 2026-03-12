@@ -151,11 +151,11 @@ func sortRows(rows []*v3.TableRow, builderQueries map[string]*v3.BuilderQuery, q
 			orderByList := query.OrderBy
 			if len(orderByList) == 0 {
 				// If no orderBy is specified, sort by value in descending order
-				orderByList = []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"}}
+				orderByList = []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"}}
 			}
 			for _, orderBy := range orderByList {
 				name := orderBy.ColumnName
-				if name == constants.Hanzo O11yOrderByValue {
+				if name == constants.HanzoO11yOrderByValue {
 					name = queryName
 				}
 

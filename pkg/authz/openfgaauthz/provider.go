@@ -199,7 +199,7 @@ func (provider *provider) CreateManagedRoles(ctx context.Context, _ valuer.UUID,
 }
 
 func (provider *provider) CreateManagedUserRoleTransactions(ctx context.Context, orgID valuer.UUID, userID valuer.UUID) error {
-	return provider.Grant(ctx, orgID, []string{roletypes.Hanzo O11yAdminRoleName}, authtypes.MustNewSubject(authtypes.TypeableUser, userID.String(), orgID, nil))
+	return provider.Grant(ctx, orgID, []string{roletypes.HanzoO11yAdminRoleName}, authtypes.MustNewSubject(authtypes.TypeableUser, userID.String(), orgID, nil))
 }
 
 func (setter *provider) Create(_ context.Context, _ valuer.UUID, _ *roletypes.Role) error {

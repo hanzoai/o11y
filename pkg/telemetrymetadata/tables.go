@@ -1,6 +1,6 @@
 package telemetrymetadata
 
-import otelcollectorconst "github.com/hanzoai/o11y-otel-collector/constants"
+import otelcollectorconst "github.com/hanzoai/otel-collector/constants"
 
 const (
 	DBName                           = "observe_metadata"

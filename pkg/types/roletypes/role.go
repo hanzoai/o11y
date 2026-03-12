@@ -32,21 +32,21 @@ var (
 )
 
 var (
-	Hanzo O11yAnonymousRoleName        = "o11y-anonymous"
-	Hanzo O11yAnonymousRoleDescription = "Role assigned to anonymous users for access to public resources."
-	Hanzo O11yAdminRoleName            = "o11y-admin"
-	Hanzo O11yAdminRoleDescription     = "Role assigned to users who have full administrative access to Hanzo O11y resources."
-	Hanzo O11yEditorRoleName           = "o11y-editor"
-	Hanzo O11yEditorRoleDescription    = "Role assigned to users who can create, edit, and manage Hanzo O11y resources but do not have full administrative privileges."
-	Hanzo O11yViewerRoleName           = "o11y-viewer"
-	Hanzo O11yViewerRoleDescription    = "Role assigned to users who have read-only access to Hanzo O11y resources."
+	HanzoO11yAnonymousRoleName        = "o11y-anonymous"
+	HanzoO11yAnonymousRoleDescription = "Role assigned to anonymous users for access to public resources."
+	HanzoO11yAdminRoleName            = "o11y-admin"
+	HanzoO11yAdminRoleDescription     = "Role assigned to users who have full administrative access to HanzoO11y resources."
+	HanzoO11yEditorRoleName           = "o11y-editor"
+	HanzoO11yEditorRoleDescription    = "Role assigned to users who can create, edit, and manage HanzoO11y resources but do not have full administrative privileges."
+	HanzoO11yViewerRoleName           = "o11y-viewer"
+	HanzoO11yViewerRoleDescription    = "Role assigned to users who have read-only access to HanzoO11y resources."
 )
 
 var (
-	ExistingRoleToHanzo O11yManagedRoleMap = map[types.Role]string{
-		types.RoleAdmin:  Hanzo O11yAdminRoleName,
-		types.RoleEditor: Hanzo O11yEditorRoleName,
-		types.RoleViewer: Hanzo O11yViewerRoleName,
+	ExistingRoleToHanzoO11yManagedRoleMap = map[types.Role]string{
+		types.RoleAdmin:  HanzoO11yAdminRoleName,
+		types.RoleEditor: HanzoO11yEditorRoleName,
+		types.RoleViewer: HanzoO11yViewerRoleName,
 	}
 )
 
@@ -123,10 +123,10 @@ func NewRole(name, description string, roleType valuer.String, orgID valuer.UUID
 
 func NewManagedRoles(orgID valuer.UUID) []*Role {
 	return []*Role{
-		NewRole(Hanzo O11yAdminRoleName, Hanzo O11yAdminRoleDescription, RoleTypeManaged, orgID),
-		NewRole(Hanzo O11yEditorRoleName, Hanzo O11yEditorRoleDescription, RoleTypeManaged, orgID),
-		NewRole(Hanzo O11yViewerRoleName, Hanzo O11yViewerRoleDescription, RoleTypeManaged, orgID),
-		NewRole(Hanzo O11yAnonymousRoleName, Hanzo O11yAnonymousRoleDescription, RoleTypeManaged, orgID),
+		NewRole(HanzoO11yAdminRoleName, HanzoO11yAdminRoleDescription, RoleTypeManaged, orgID),
+		NewRole(HanzoO11yEditorRoleName, HanzoO11yEditorRoleDescription, RoleTypeManaged, orgID),
+		NewRole(HanzoO11yViewerRoleName, HanzoO11yViewerRoleDescription, RoleTypeManaged, orgID),
+		NewRole(HanzoO11yAnonymousRoleName, HanzoO11yAnonymousRoleDescription, RoleTypeManaged, orgID),
 	}
 
 }
@@ -246,8 +246,8 @@ func GetDeletionTuples(name string, orgID valuer.UUID, relation authtypes.Relati
 	return tuples, nil
 }
 
-func MustGetHanzo O11yManagedRoleFromExistingRole(role types.Role) string {
-	managedRole, ok := ExistingRoleToHanzo O11yManagedRoleMap[role]
+func MustGetHanzoO11yManagedRoleFromExistingRole(role types.Role) string {
+	managedRole, ok := ExistingRoleToHanzoO11yManagedRoleMap[role]
 	if !ok {
 		panic(errors.Newf(errors.TypeInternal, errors.CodeInternal, "invalid role: %s", role.String()))
 	}

@@ -56,9 +56,9 @@ func (middleware *AuthZ) ViewAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yAdminRoleName),
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yEditorRoleName),
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yViewerRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yAdminRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yEditorRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yViewerRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -108,8 +108,8 @@ func (middleware *AuthZ) EditAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yAdminRoleName),
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yEditorRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yAdminRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yEditorRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -159,7 +159,7 @@ func (middleware *AuthZ) AdminAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yAdminRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yAdminRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
