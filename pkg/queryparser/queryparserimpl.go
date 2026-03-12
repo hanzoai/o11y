@@ -5,7 +5,7 @@ import (
 
 	"strings"
 
-	"github.com/Hanzo O11y/govaluate"
+	"github.com/HanzoO11y/govaluate"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/queryparser/queryfilterextractor"

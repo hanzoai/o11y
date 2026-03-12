@@ -283,7 +283,7 @@ func (provider *provider) getManagedRoleGrantTuples(orgID valuer.UUID, userID va
 		adminSubject,
 		authtypes.RelationAssignee,
 		[]authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yAdminRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yAdminRoleName),
 		},
 		orgID,
 	)
@@ -298,7 +298,7 @@ func (provider *provider) getManagedRoleGrantTuples(orgID valuer.UUID, userID va
 		anonymousSubject,
 		authtypes.RelationAssignee,
 		[]authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yAnonymousRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yAnonymousRoleName),
 		},
 		orgID,
 	)
