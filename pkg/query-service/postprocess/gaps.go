@@ -1,7 +1,7 @@
 package postprocess
 
 import (
-	"github.com/HanzoO11y/govaluate"
+	"github.com/SigNoz/govaluate"
 	"github.com/hanzoai/o11y/pkg/query-service/common"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
