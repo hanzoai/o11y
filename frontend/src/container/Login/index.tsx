@@ -173,7 +173,7 @@ function Login(): JSX.Element {
 						/>
 					</div>
 					<Typography.Title level={4} className="login-form-title">
-						Hanzo Observability
+						Hanzo O11y
 					</Typography.Title>
 				</div>
 				<AuthError error={errorMessage} />
@@ -206,7 +206,7 @@ function Login(): JSX.Element {
 					/>
 				</div>
 				<Typography.Title level={4} className="login-form-title">
-					Hanzo Observability
+					Hanzo O11y
 				</Typography.Title>
 				<Typography.Paragraph className="login-form-description">
 					Redirecting to Hanzo login...
