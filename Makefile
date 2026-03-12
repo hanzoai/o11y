@@ -3,7 +3,7 @@
 ##############################################################
 SHELL                   := /bin/bash
 SRC						?= $(shell pwd)
-NAME					?= signoz
+NAME					?= o11y
 OS                      ?= $(shell uname -s | tr '[A-Z]' '[a-z]')
 ARCH                    ?= $(shell uname -m | sed 's/x86_64/amd64/g' | sed 's/aarch64/arm64/g')
 COMMIT_SHORT_SHA        ?= $(shell git rev-parse --short HEAD)
@@ -13,9 +13,9 @@ TIMESTAMP               ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 ARCHS					?= amd64 arm64
 TARGET_DIR              ?= $(shell pwd)/target
 
-ZEUS_URL					   		?= https://api.signoz.cloud
+ZEUS_URL					   		?= https://api.o11y.hanzo.ai
 GO_BUILD_LDFLAG_ZEUS_URL 			= -X github.com/hanzoai/o11y/ee/zeus.url=$(ZEUS_URL)
-LICENSE_URL 						?= https://license.signoz.io
+LICENSE_URL 						?= https://license.o11y.hanzo.ai
 GO_BUILD_LDFLAG_LICENSE_HANZO_IO 	= -X github.com/hanzoai/o11y/ee/zeus.deprecatedURL=$(LICENSE_URL)
 
 GO_BUILD_VERSION_LDFLAGS 		= -X github.com/hanzoai/o11y/pkg/version.version=$(VERSION) -X github.com/hanzoai/o11y/pkg/version.hash=$(COMMIT_SHORT_SHA) -X github.com/hanzoai/o11y/pkg/version.time=$(TIMESTAMP) -X github.com/hanzoai/o11y/pkg/version.branch=$(BRANCH_NAME)
@@ -29,10 +29,10 @@ GO_BUILD_LDFLAGS_ENTERPRISE 	= $(GO_BUILD_VERSION_LDFLAGS) -X github.com/hanzoai
 
 DOCKER_BUILD_ARCHS_COMMUNITY 	= $(addprefix docker-build-community-,$(ARCHS))
 DOCKERFILE_COMMUNITY 			= $(SRC)/cmd/community/Dockerfile
-DOCKER_REGISTRY_COMMUNITY 		?= docker.io/signoz/signoz-community
+DOCKER_REGISTRY_COMMUNITY 		?= ghcr.io/hanzoai/o11y-community
 DOCKER_BUILD_ARCHS_ENTERPRISE 	= $(addprefix docker-build-enterprise-,$(ARCHS))
 DOCKERFILE_ENTERPRISE 			= $(SRC)/cmd/enterprise/Dockerfile
-DOCKER_REGISTRY_ENTERPRISE 		?= docker.io/signoz/signoz
+DOCKER_REGISTRY_ENTERPRISE 		?= ghcr.io/hanzoai/o11y
 JS_BUILD_CONTEXT 				= $(SRC)/frontend
 
 ##############################################################
@@ -61,16 +61,16 @@ devenv-postgres: ## Run postgres in devenv
 	@cd .devenv/docker/postgres; \
 	docker compose -f compose.yaml up -d
 
-.PHONY: devenv-signoz-otel-collector
-devenv-signoz-otel-collector: ## Run signoz-otel-collector in devenv (requires clickhouse to be running)
+.PHONY: devenv-otel-collector
+devenv-otel-collector: ## Run otel-collector in devenv (requires datastore to be running)
 	@cd .devenv/docker/signoz-otel-collector; \
 	docker compose -f compose.yaml up -d
 
 .PHONY: devenv-up
-devenv-up: devenv-clickhouse devenv-signoz-otel-collector ## Start both clickhouse and signoz-otel-collector for local development
+devenv-up: devenv-clickhouse devenv-otel-collector ## Start both datastore and otel-collector for local development
 	@echo "Development environment is ready!"
-	@echo "   - ClickHouse: http://localhost:8123"
-	@echo "   - Signoz OTel Collector: grpc://localhost:4317, http://localhost:4318"
+	@echo "   - Datastore: http://localhost:8123"
+	@echo "   - OTEL Collector: grpc://localhost:4317, http://localhost:4318"
 
 .PHONY: devenv-clickhouse-clean
 devenv-clickhouse-clean: ## Clean all ClickHouse data from filesystem
@@ -84,13 +84,13 @@ devenv-clickhouse-clean: ## Clean all ClickHouse data from filesystem
 .PHONY: go-run-enterprise
 go-run-enterprise: ## Runs the enterprise go backend server
 	@HANZO_INSTRUMENTATION_LOGS_LEVEL=debug \
-	HANZO_SQLSTORE_SQLITE_PATH=signoz.db \
+	HANZO_SQLSTORE_SQLITE_PATH=o11y.db \
 	HANZO_WEB_ENABLED=false \
 	HANZO_TOKENIZER_JWT_SECRET=secret \
-	HANZO_ALERTMANAGER_PROVIDER=signoz \
-	HANZO_TELEMETRYSTORE_PROVIDER=clickhouse \
-	HANZO_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://127.0.0.1:9000 \
-	HANZO_TELEMETRYSTORE_CLICKHOUSE_CLUSTER=cluster \
+	HANZO_ALERTMANAGER_PROVIDER=o11y \
+	HANZO_TELEMETRYSTORE_PROVIDER=datastore \
+	HANZO_TELEMETRYSTORE_DATASTORE_DSN=tcp://127.0.0.1:9000 \
+	HANZO_TELEMETRYSTORE_DATASTORE_CLUSTER=cluster \
 	go run -race \
 		$(GO_BUILD_CONTEXT_ENTERPRISE)/*.go server
 
@@ -101,13 +101,13 @@ go-test: ## Runs go unit tests
 .PHONY: go-run-community
 go-run-community: ## Runs the community go backend server
 	@HANZO_INSTRUMENTATION_LOGS_LEVEL=debug \
-	HANZO_SQLSTORE_SQLITE_PATH=signoz.db \
+	HANZO_SQLSTORE_SQLITE_PATH=o11y.db \
 	HANZO_WEB_ENABLED=false \
 	HANZO_TOKENIZER_JWT_SECRET=secret \
-	HANZO_ALERTMANAGER_PROVIDER=signoz \
-	HANZO_TELEMETRYSTORE_PROVIDER=clickhouse \
-	HANZO_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://127.0.0.1:9000 \
-	HANZO_TELEMETRYSTORE_CLICKHOUSE_CLUSTER=cluster \
+	HANZO_ALERTMANAGER_PROVIDER=o11y \
+	HANZO_TELEMETRYSTORE_PROVIDER=datastore \
+	HANZO_TELEMETRYSTORE_DATASTORE_DSN=tcp://127.0.0.1:9000 \
+	HANZO_TELEMETRYSTORE_DATASTORE_CLUSTER=cluster \
 	go run -race \
 		$(GO_BUILD_CONTEXT_COMMUNITY)/*.go server
 
