@@ -53,7 +53,7 @@ import (
 // Server runs HTTP, Mux and a grpc server
 type Server struct {
 	config      o11y.Config
-	o11y      *o11y.Hanzo O11y
+	o11y      *o11y.HanzoO11y
 	ruleManager *baserules.Manager
 
 	// public http router
@@ -70,7 +70,7 @@ type Server struct {
 }
 
 // NewServer creates and initializes Server
-func NewServer(config o11y.Config, o11y *o11y.Hanzo O11y) (*Server, error) {
+func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 	cacheForTraceDetail, err := memorycache.New(context.TODO(), o11y.Instrumentation.ToProviderSettings(), cache.Config{
 		Provider: "memory",
 		Memory: cache.Memory{

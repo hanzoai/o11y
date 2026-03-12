@@ -62,19 +62,19 @@ func (migration *addManagedRoles) Up(ctx context.Context, db *bun.DB) error {
 		}
 
 		// o11y admin
-		o11yAdminRole := roletypes.NewRole(roletypes.Hanzo O11yAdminRoleName, roletypes.Hanzo O11yAdminRoleDescription, roletypes.RoleTypeManaged, orgID)
+		o11yAdminRole := roletypes.NewRole(roletypes.HanzoO11yAdminRoleName, roletypes.HanzoO11yAdminRoleDescription, roletypes.RoleTypeManaged, orgID)
 		managedRoles = append(managedRoles, roletypes.NewStorableRoleFromRole(o11yAdminRole))
 
 		// o11y editor
-		o11yEditorRole := roletypes.NewRole(roletypes.Hanzo O11yEditorRoleName, roletypes.Hanzo O11yEditorRoleDescription, roletypes.RoleTypeManaged, orgID)
+		o11yEditorRole := roletypes.NewRole(roletypes.HanzoO11yEditorRoleName, roletypes.HanzoO11yEditorRoleDescription, roletypes.RoleTypeManaged, orgID)
 		managedRoles = append(managedRoles, roletypes.NewStorableRoleFromRole(o11yEditorRole))
 
 		// o11y viewer
-		o11yViewerRole := roletypes.NewRole(roletypes.Hanzo O11yViewerRoleName, roletypes.Hanzo O11yViewerRoleDescription, roletypes.RoleTypeManaged, orgID)
+		o11yViewerRole := roletypes.NewRole(roletypes.HanzoO11yViewerRoleName, roletypes.HanzoO11yViewerRoleDescription, roletypes.RoleTypeManaged, orgID)
 		managedRoles = append(managedRoles, roletypes.NewStorableRoleFromRole(o11yViewerRole))
 
 		// o11y anonymous
-		o11yAnonymousRole := roletypes.NewRole(roletypes.Hanzo O11yAnonymousRoleName, roletypes.Hanzo O11yAnonymousRoleDescription, roletypes.RoleTypeManaged, orgID)
+		o11yAnonymousRole := roletypes.NewRole(roletypes.HanzoO11yAnonymousRoleName, roletypes.HanzoO11yAnonymousRoleDescription, roletypes.RoleTypeManaged, orgID)
 		managedRoles = append(managedRoles, roletypes.NewStorableRoleFromRole(o11yAnonymousRole))
 	}
 

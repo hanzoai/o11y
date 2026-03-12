@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	schema "github.com/hanzoai/o11y-otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/hanzoai/o11y-otel-collector/utils"
+	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
+	"github.com/hanzoai/otel-collector/utils"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"

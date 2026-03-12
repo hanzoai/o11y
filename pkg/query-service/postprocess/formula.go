@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/Hanzo O11y/govaluate"
+	"github.com/HanzoO11y/govaluate"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 

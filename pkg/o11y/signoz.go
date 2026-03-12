@@ -46,7 +46,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/web"
 )
 
-type Hanzo O11y struct {
+type HanzoO11y struct {
 	*factory.Registry
 	Instrumentation        instrumentation.Instrumentation
 	Analytics              analytics.Analytics
@@ -91,7 +91,7 @@ func New(
 	dashboardModuleCallback func(sqlstore.SQLStore, factory.ProviderSettings, analytics.Analytics, organization.Getter, queryparser.QueryParser, querier.Querier, licensing.Licensing) dashboard.Module,
 	gatewayProviderFactory func(licensing.Licensing) factory.ProviderFactory[gateway.Gateway, gateway.Config],
 	querierHandlerCallback func(factory.ProviderSettings, querier.Querier, analytics.Analytics) querier.Handler,
-) (*Hanzo O11y, error) {
+) (*HanzoO11y, error) {
 	// Initialize instrumentation
 	instrumentation, err := instrumentation.New(ctx, config.Instrumentation, version.Info, "observe")
 	if err != nil {
@@ -450,7 +450,7 @@ func New(
 		return nil, err
 	}
 
-	return &Hanzo O11y{
+	return &HanzoO11y{
 		Registry:               registry,
 		Analytics:              analytics,
 		Instrumentation:        instrumentation,
