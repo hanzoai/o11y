@@ -19,7 +19,7 @@ import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type {
 	GetGlobalConfig200,
 	RenderErrorResponseDTO,
-} from '../observe.schemas';
+} from '../sigNoz.schemas';
 
 /**
  * This endpoint returns global config

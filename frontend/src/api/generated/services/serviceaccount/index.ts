@@ -39,7 +39,7 @@ import type {
 	UpdateServiceAccountKeyPathParameters,
 	UpdateServiceAccountPathParameters,
 	UpdateServiceAccountStatusPathParameters,
-} from '../observe.schemas';
+} from '../sigNoz.schemas';
 
 /**
  * This endpoint lists the service accounts for an organisation
