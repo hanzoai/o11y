@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	schemamigrator "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
+	schemamigrator "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
