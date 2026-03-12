@@ -41,6 +41,22 @@ import { getUserDefaults } from './utils';
 
 export const AppContext = createContext<IAppContext | undefined>(undefined);
 
+// Handle OIDC callback tokens from URL before any component renders.
+// The OIDC callback redirects to /?accessToken=...&refreshToken=... and
+// these must be stored in localStorage before getUserDefaults() reads them.
+(function handleOIDCCallbackTokens(): void {
+	const params = new URLSearchParams(window.location.search);
+	const accessToken = params.get('accessToken');
+	const refreshToken = params.get('refreshToken');
+	if (accessToken && refreshToken) {
+		setLocalStorageApi(LOCALSTORAGE.AUTH_TOKEN, accessToken);
+		setLocalStorageApi(LOCALSTORAGE.REFRESH_AUTH_TOKEN, refreshToken);
+		setLocalStorageApi(LOCALSTORAGE.IS_LOGGED_IN, 'true');
+		// Clean URL to prevent re-processing on refresh
+		window.history.replaceState({}, '', window.location.pathname);
+	}
+})();
+
 export function AppProvider({ children }: PropsWithChildren): JSX.Element {
 	// on load of the provider set the user defaults with access token , refresh token from local storage
 	const [user, setUser] = useState<IUser>(() => getUserDefaults());
