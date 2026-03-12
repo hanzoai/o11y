@@ -12,7 +12,7 @@ jest.mock('../../../api/browser/localstorage/get', () => ({
 const mockGet = (getLocal as unknown) as jest.Mock;
 
 describe('AppLoading', () => {
-	const HANZO_TEXT = 'HanzoO11y';
+	const HANZO_TEXT = 'Hanzo';
 	const TAGLINE_TEXT =
 		'OpenTelemetry-Native Logs, Metrics and Traces in a single pane';
 	const CONTAINER_SELECTOR = '.app-loading-container';
@@ -47,7 +47,7 @@ describe('AppLoading', () => {
 		// Check for brand logo
 		const logo = screen.getByAltText(HANZO_TEXT);
 		expect(logo).toBeInTheDocument();
-		expect(logo).toHaveAttribute('src', '/Logos/observe-brand-logo.svg');
+		expect(logo).toHaveAttribute('src', '/Logos/hanzo-icon.svg');
 
 		// Check for brand title
 		const title = screen.getByText(HANZO_TEXT);

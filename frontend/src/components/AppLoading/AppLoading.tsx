@@ -25,13 +25,13 @@ function AppLoading(): JSX.Element {
 			<div className="app-loading-content">
 				<div className="brand">
 					<img
-						src="/Logos/observe-brand-logo.svg"
-						alt="HanzoO11y"
+						src="/Logos/hanzo-icon.svg"
+						alt="Hanzo"
 						className="brand-logo"
 					/>
 
 					<Typography.Title level={2} className="brand-title">
-						HanzoO11y
+						Hanzo
 					</Typography.Title>
 				</div>
 

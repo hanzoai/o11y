@@ -53,12 +53,12 @@ export const getEmptyLogsListConfig = (
 	subTitle: 'This could be because :',
 	description: [
 		'Logs are not linked to Traces.',
-		'Logs are not being sent to HanzoO11y.',
+		'Logs are not being sent to Hanzo.',
 		'No logs are associated with this particular trace/span.',
 	],
 	documentationLinks: [
 		{
-			text: 'Sending logs to HanzoO11y',
+			text: 'Sending logs to Hanzo',
 			url: 'https://o11y.hanzo.ai/docs/logs-management/send-logs-to-o11y/',
 		},
 		{

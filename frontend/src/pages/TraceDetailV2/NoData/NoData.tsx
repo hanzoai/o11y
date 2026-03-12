@@ -27,7 +27,7 @@ function NoData(): JSX.Element {
 						className="construction-img"
 					/>
 					<Typography.Text className="text">
-						The trace data has not been rendered on your HanzoO11y server yet. You can
+						The trace data has not been rendered on your Hanzo server yet. You can
 						wait for a bit and refresh this page if this is the case.
 					</Typography.Text>
 				</div>

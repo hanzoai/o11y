@@ -704,7 +704,7 @@ function OnboardingAddDataSource(): JSX.Element {
 												Select your data source
 											</Typography.Title>
 											<Typography.Text className="question-sub-title">
-												Select from a host of services to start sending data to HanzoO11y
+												Select from a host of services to start sending data to Hanzo
 											</Typography.Text>
 										</div>
 									</div>
@@ -887,7 +887,7 @@ function OnboardingAddDataSource(): JSX.Element {
 																	>
 																		{option.imgUrl && (
 																			<img
-																				src={option.imgUrl || '/Logos/observe-brand-logo-new.svg'}
+																				src={option.imgUrl || '/Logos/hanzo-icon.svg'}
 																				alt={option.label}
 																				className="onboarding-data-source-button-img"
 																			/>
@@ -950,7 +950,7 @@ function OnboardingAddDataSource(): JSX.Element {
 																		}
 																	>
 																		<img
-																			src={option.imgUrl || '/Logos/observe-brand-logo-new.svg'}
+																			src={option.imgUrl || '/Logos/hanzo-icon.svg'}
 																			alt={option.label}
 																			className="onboarding-data-source-button-img"
 																		/>
