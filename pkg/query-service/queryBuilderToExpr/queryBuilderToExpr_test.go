@@ -3,7 +3,7 @@ package queryBuilderToExpr
 import (
 	"testing"
 
-	o11ystanzahelper "github.com/hanzoai/otel-collector/processor/o11ylogspipelineprocessor/stanza/operator/helper"
+	signozstanzahelper "github.com/SigNoz/signoz-otel-collector/processor/signozlogspipelineprocessor/stanza/operator/helper"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/expr-lang/expr/vm"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/entry"
@@ -518,14 +518,14 @@ func TestExpressionVSEntry(t *testing.T) {
 			expression, err := Parse(tt.Query)
 			assert.NoError(t, err)
 
-			compiled, hasBodyFieldRef, err := o11ystanzahelper.ExprCompileBool(expression)
+			compiled, hasBodyFieldRef, err := signozstanzahelper.ExprCompileBool(expression)
 			assert.NoError(t, err)
 
 			matchedIDs := []int{}
 			for _, d := range dataset {
-				env := o11ystanzahelper.GetExprEnv(d.Entry, hasBodyFieldRef)
+				env := signozstanzahelper.GetExprEnv(d.Entry, hasBodyFieldRef)
 				matches, err := vm.Run(compiled, env)
-				o11ystanzahelper.PutExprEnv(env)
+				signozstanzahelper.PutExprEnv(env)
 				if err != nil {
 					// Eval error (e.g. fromJSON on non-JSON body) => treat as no match
 					continue
