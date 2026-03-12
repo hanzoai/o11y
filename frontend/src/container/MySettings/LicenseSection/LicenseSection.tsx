@@ -1,5 +1,5 @@
 import { useCopyToClipboard } from 'react-use';
-import { Button } from '@signozhq/button';
+import { Button } from '@hanzo/o11y-button';
 import { Typography } from 'antd';
 import { useNotifications } from 'hooks/useNotifications';
 import { Copy } from 'lucide-react';
@@ -56,7 +56,7 @@ function LicenseSection(): JSX.Element | null {
 					</div>
 
 					<div className="license-section-content-item-description">
-						Your SigNoz license key.
+						Your Hanzo O11y license key.
 					</div>
 				</div>
 			</div>

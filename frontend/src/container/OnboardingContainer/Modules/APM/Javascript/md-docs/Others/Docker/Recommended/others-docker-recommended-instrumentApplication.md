@@ -57,7 +57,7 @@ process.on('SIGTERM', () => {
 
 ### Step 3: Dockerize your application
 
-Set the SigNoz ingestion key Environment variable and update your run command to include the `-r` flag and `./tracing.js` file in Dockerfile as:
+Set the Hanzo O11y ingestion key Environment variable and update your run command to include the `-r` flag and `./tracing.js` file in Dockerfile as:
 
 ```bash
 ...

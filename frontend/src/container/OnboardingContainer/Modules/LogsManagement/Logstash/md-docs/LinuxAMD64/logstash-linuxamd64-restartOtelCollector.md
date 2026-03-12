@@ -17,4 +17,4 @@ kill "$(< otel-pid)"
 ### Restart logstash 
  &nbsp;
 
-Now you should be able to see the Logs on your SigNoz Cloud UI
+Now you should be able to see the Logs on your Hanzo O11y Cloud UI

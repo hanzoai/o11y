@@ -1,9 +1,9 @@
 package postprocess
 
 import (
-	"github.com/SigNoz/govaluate"
-	"github.com/SigNoz/signoz/pkg/query-service/common"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	"github.com/Hanzo O11y/govaluate"
+	"github.com/hanzoai/o11y/pkg/query-service/common"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
 func StepIntervalForFunction(params *v3.QueryRangeParamsV3, query string) int64 {

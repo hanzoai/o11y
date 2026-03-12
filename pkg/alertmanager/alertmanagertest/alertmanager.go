@@ -7,8 +7,8 @@ package alertmanagertest
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/prometheus/alertmanager/config"
 	mock "github.com/stretchr/testify/mock"
 )

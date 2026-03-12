@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/types/pipelinetypes"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	"github.com/stretchr/testify/require"
 )
 
@@ -110,9 +110,9 @@ func TestSeverityParsingProcessor(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		inputLogs := []model.SignozLog{}
+		inputLogs := []model.O11yLog{}
 		for _, severityAttribValue := range testCase.severityValues {
-			inputLogs = append(inputLogs, makeTestSignozLog(
+			inputLogs = append(inputLogs, makeTestO11yLog(
 				"test log",
 				map[string]interface{}{
 					"method":        "GET",
@@ -171,7 +171,7 @@ func TestNoCollectorErrorsFromSeverityParserForMismatchedLogs(t *testing.T) {
 	type pipelineTestCase struct {
 		Name           string
 		Operator       pipelinetypes.PipelineOperator
-		NonMatchingLog model.SignozLog
+		NonMatchingLog model.O11yLog
 	}
 
 	testCases := []pipelineTestCase{
@@ -188,7 +188,7 @@ func TestNoCollectorErrorsFromSeverityParserForMismatchedLogs(t *testing.T) {
 				},
 				OverwriteSeverityText: true,
 			},
-			makeTestSignozLog("mismatching log", map[string]interface{}{
+			makeTestO11yLog("mismatching log", map[string]interface{}{
 				"method": "GET",
 			}),
 		}, {
@@ -204,7 +204,7 @@ func TestNoCollectorErrorsFromSeverityParserForMismatchedLogs(t *testing.T) {
 				},
 				OverwriteSeverityText: true,
 			},
-			makeTestSignozLog("mismatching log", map[string]interface{}{
+			makeTestO11yLog("mismatching log", map[string]interface{}{
 				"method":        "GET",
 				"test_severity": 200.3,
 			}),
@@ -217,7 +217,7 @@ func TestNoCollectorErrorsFromSeverityParserForMismatchedLogs(t *testing.T) {
 		result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 			context.Background(),
 			testPipelines,
-			[]model.SignozLog{testCase.NonMatchingLog},
+			[]model.O11yLog{testCase.NonMatchingLog},
 		)
 		require.Nil(err)
 		require.Equal(0, len(collectorWarnAndErrorLogs), strings.Join(collectorWarnAndErrorLogs, "\n"))

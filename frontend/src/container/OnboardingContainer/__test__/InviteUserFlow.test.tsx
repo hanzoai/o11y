@@ -26,7 +26,7 @@ describe('Onboarding invite team member flow', () => {
 			</OnboardingContextProvider>,
 		);
 
-		await expect(findByText('SigNoz')).resolves.toBeInTheDocument();
+		await expect(findByText('Hanzo O11y')).resolves.toBeInTheDocument();
 
 		// Check all the option present
 		const monitoringTexts = [

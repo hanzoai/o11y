@@ -3,7 +3,7 @@ package model
 import (
 	"errors"
 
-	basemodel "github.com/SigNoz/signoz/pkg/query-service/model"
+	basemodel "github.com/hanzoai/o11y/pkg/query-service/model"
 )
 
 type ApiError struct {

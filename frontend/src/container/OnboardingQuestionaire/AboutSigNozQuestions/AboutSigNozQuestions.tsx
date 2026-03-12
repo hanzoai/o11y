@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { Checkbox } from '@signozhq/checkbox';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/o11y-button';
+import { Checkbox } from '@hanzo/o11y-checkbox';
+import { Input } from '@hanzo/o11y-input';
 import { Input as AntdInput } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { ArrowRight } from 'lucide-react';
@@ -10,15 +10,15 @@ import { OnboardingQuestionHeader } from '../OnboardingQuestionHeader';
 
 import '../OnboardingQuestionaire.styles.scss';
 
-export interface SignozDetails {
-	interestInSignoz: string[] | null;
-	otherInterestInSignoz: string | null;
-	discoverSignoz: string | null;
+export interface O11yDetails {
+	interestInO11y: string[] | null;
+	otherInterestInO11y: string | null;
+	discoverO11y: string | null;
 }
 
-interface AboutSigNozQuestionsProps {
-	signozDetails: SignozDetails;
-	setSignozDetails: (details: SignozDetails) => void;
+interface AboutHanzo O11yQuestionsProps {
+	o11yDetails: O11yDetails;
+	setO11yDetails: (details: O11yDetails) => void;
 	onNext: () => void;
 }
 
@@ -31,39 +31,39 @@ const interestedInOptions: Record<string, string> = {
 	correlateSignals: 'Correlate signals for faster troubleshooting',
 };
 
-export function AboutSigNozQuestions({
-	signozDetails,
-	setSignozDetails,
+export function AboutHanzo O11yQuestions({
+	o11yDetails,
+	setO11yDetails,
 	onNext,
-}: AboutSigNozQuestionsProps): JSX.Element {
-	const [interestInSignoz, setInterestInSignoz] = useState<string[]>(
-		signozDetails?.interestInSignoz || [],
+}: AboutHanzo O11yQuestionsProps): JSX.Element {
+	const [interestInO11y, setInterestInO11y] = useState<string[]>(
+		o11yDetails?.interestInO11y || [],
 	);
-	const [otherInterestInSignoz, setOtherInterestInSignoz] = useState<string>(
-		signozDetails?.otherInterestInSignoz || '',
+	const [otherInterestInO11y, setOtherInterestInO11y] = useState<string>(
+		o11yDetails?.otherInterestInO11y || '',
 	);
-	const [discoverSignoz, setDiscoverSignoz] = useState<string>(
-		signozDetails?.discoverSignoz || '',
+	const [discoverO11y, setDiscoverO11y] = useState<string>(
+		o11yDetails?.discoverO11y || '',
 	);
 	const [isNextDisabled, setIsNextDisabled] = useState<boolean>(true);
 
 	useEffect((): void => {
 		if (
-			discoverSignoz !== '' &&
-			interestInSignoz.length > 0 &&
-			(!interestInSignoz.includes('Others') || otherInterestInSignoz !== '')
+			discoverO11y !== '' &&
+			interestInO11y.length > 0 &&
+			(!interestInO11y.includes('Others') || otherInterestInO11y !== '')
 		) {
 			setIsNextDisabled(false);
 		} else {
 			setIsNextDisabled(true);
 		}
-	}, [interestInSignoz, otherInterestInSignoz, discoverSignoz]);
+	}, [interestInO11y, otherInterestInO11y, discoverO11y]);
 
 	const handleInterestChange = (option: string, checked: boolean): void => {
 		if (checked) {
-			setInterestInSignoz((prev) => [...prev, option]);
+			setInterestInO11y((prev) => [...prev, option]);
 		} else {
-			setInterestInSignoz((prev) => prev.filter((item) => item !== option));
+			setInterestInO11y((prev) => prev.filter((item) => item !== option));
 		}
 	};
 
@@ -74,16 +74,16 @@ export function AboutSigNozQuestions({
 	};
 
 	const handleOnNext = (): void => {
-		setSignozDetails({
-			discoverSignoz,
-			interestInSignoz,
-			otherInterestInSignoz,
+		setO11yDetails({
+			discoverO11y,
+			interestInO11y,
+			otherInterestInO11y,
 		});
 
 		logEvent('Org Onboarding: Answered', {
-			discoverSignoz,
-			interestInSignoz,
-			otherInterestInSignoz,
+			discoverO11y,
+			interestInO11y,
+			otherInterestInO11y,
 		});
 
 		onNext();
@@ -93,32 +93,32 @@ export function AboutSigNozQuestions({
 		<div className="questions-container">
 			<OnboardingQuestionHeader
 				title="Set up your workspace"
-				subtitle="Tailor SigNoz to suit your observability needs."
+				subtitle="Tailor Hanzo O11y to suit your observability needs."
 			/>
 
 			<div className="questions-form-container">
 				<div className="questions-form">
 					<div className="form-group">
-						<div className="question">How did you first come across SigNoz?</div>
+						<div className="question">How did you first come across Hanzo O11y?</div>
 
 						<AntdInput.TextArea
-							className="discover-signoz-input"
+							className="discover-o11y-input"
 							placeholder={`e.g., googling "datadog alternative", a post on r/devops, from a friend/colleague, a LinkedIn post, ChatGPT, etc.`}
-							value={discoverSignoz}
+							value={discoverO11y}
 							autoFocus
 							rows={4}
-							onChange={(e): void => setDiscoverSignoz(e.target.value)}
+							onChange={(e): void => setDiscoverO11y(e.target.value)}
 						/>
 					</div>
 
 					<div className="form-group">
-						<div className="question">What got you interested in SigNoz?</div>
+						<div className="question">What got you interested in Hanzo O11y?</div>
 						<div className="checkbox-grid">
 							{Object.keys(interestedInOptions).map((option: string) => (
 								<div key={option} className="checkbox-item">
 									<Checkbox
 										id={`checkbox-${option}`}
-										checked={interestInSignoz.includes(option)}
+										checked={interestInO11y.includes(option)}
 										onCheckedChange={createInterestChangeHandler(option)}
 										labelName={interestedInOptions[option]}
 									/>
@@ -128,18 +128,18 @@ export function AboutSigNozQuestions({
 							<div className="checkbox-item checkbox-item-others">
 								<Checkbox
 									id="others-checkbox"
-									checked={interestInSignoz.includes('Others')}
+									checked={interestInO11y.includes('Others')}
 									onCheckedChange={createInterestChangeHandler('Others')}
-									labelName={interestInSignoz.includes('Others') ? '' : 'Others'}
+									labelName={interestInO11y.includes('Others') ? '' : 'Others'}
 								/>
-								{interestInSignoz.includes('Others') && (
+								{interestInO11y.includes('Others') && (
 									<Input
 										type="text"
 										className="onboarding-questionaire-other-input"
-										placeholder="What got you interested in SigNoz?"
-										value={otherInterestInSignoz}
+										placeholder="What got you interested in Hanzo O11y?"
+										value={otherInterestInO11y}
 										autoFocus
-										onChange={(e): void => setOtherInterestInSignoz(e.target.value)}
+										onChange={(e): void => setOtherInterestInO11y(e.target.value)}
 									/>
 								)}
 							</div>

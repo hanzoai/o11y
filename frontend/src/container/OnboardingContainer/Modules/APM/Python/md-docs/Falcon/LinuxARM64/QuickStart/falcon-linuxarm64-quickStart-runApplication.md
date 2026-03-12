@@ -2,8 +2,8 @@ Once you are done intrumenting your python application, you can run it using thi
 
 ```bash
 OTEL_RESOURCE_ATTRIBUTES=service.name={{MYAPP}} \
-OTEL_EXPORTER_OTLP_ENDPOINT="https://ingest.{{REGION}}.signoz.cloud:443" \
-OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}" \
+OTEL_EXPORTER_OTLP_ENDPOINT="https://ingest.{{REGION}}.o11y.hanzo.ai:443" \
+OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}" \
 OTEL_EXPORTER_OTLP_PROTOCOL=grpc \
 opentelemetry-instrument <your_run_command>
 ```
@@ -18,4 +18,4 @@ opentelemetry-instrument <your_run_command>
 
 &nbsp;
 
-If you encounter any difficulties, please consult the [troubleshooting section](https://signoz.io/docs/instrumentation/falcon/#troubleshooting-your-installation) for assistance.
+If you encounter any difficulties, please consult the [troubleshooting section](https://o11y.hanzo.ai/docs/instrumentation/falcon/#troubleshooting-your-installation) for assistance.

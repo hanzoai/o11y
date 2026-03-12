@@ -3,8 +3,8 @@ package querier
 import (
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
 )
 
 // Config represents the configuration for the querier
@@ -46,5 +46,5 @@ func (c Config) Validate() error {
 }
 
 func (c Config) Provider() string {
-	return "signoz"
+	return "observe"
 }

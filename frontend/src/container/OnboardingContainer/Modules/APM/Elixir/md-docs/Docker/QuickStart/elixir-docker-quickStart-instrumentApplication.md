@@ -51,9 +51,9 @@ config :opentelemetry, :processors,
     exporter: {
       :opentelemetry_exporter,
       %{
-        endpoints: ["https://ingest.{{REGION}}.signoz.cloud:443"],
+        endpoints: ["https://ingest.{{REGION}}.o11y.hanzo.ai:443"],
         headers: [
-          {"signoz-ingestion-key", {{SIGNOZ_ACCESS_TOKEN}} }
+          {"signoz-ingestion-key", {{HANZO_ACCESS_TOKEN}} }
         ]
       }
     }
@@ -64,4 +64,4 @@ config :opentelemetry, :processors,
 
 ### Step 3: Dockerize your application
 
-Since the environment variables like SIGNOZ_INGESTION_KEY, Ingestion Endpoint and Service name are set in the above steps, you don't need to add any additional steps in your Dockerfile.
+Since the environment variables like HANZO_INGESTION_KEY, Ingestion Endpoint and Service name are set in the above steps, you don't need to add any additional steps in your Dockerfile.

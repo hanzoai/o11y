@@ -1,4 +1,4 @@
-name: gor-signoz
+name: gor-observe
 
 on:
   push:
@@ -36,7 +36,7 @@ jobs:
           echo 'VITE_PYLON_APP_ID="${{ secrets.PYLON_APP_ID }}"' >> .env
           echo 'VITE_APPCUES_APP_ID="${{ secrets.APPCUES_APP_ID }}"' >> .env
           echo 'VITE_PYLON_IDENTITY_SECRET="${{ secrets.PYLON_IDENTITY_SECRET }}"' >> .env
-          echo 'VITE_DOCS_BASE_URL="https://signoz.io"' >> .env
+          echo 'VITE_DOCS_BASE_URL="https://o11y.hanzo.ai"' >> .env
       - name: node-setup
         uses: actions/setup-node@v5
         with:
@@ -98,13 +98,13 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         with:
           path: dist/linux
-          key: signoz-linux-${{ env.sha_short }}
+          key: observe-linux-${{ env.sha_short }}
       - name: cache-darwin
         uses: actions/cache@v4
         if: matrix.os == 'macos-latest'
         with:
           path: dist/darwin
-          key: signoz-darwin-${{ env.sha_short }}
+          key: observe-darwin-${{ env.sha_short }}
       - name: release
         uses: goreleaser/goreleaser-action@v6
         with:
@@ -153,13 +153,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: dist/linux
-          key: signoz-linux-${{ env.sha_short }}
+          key: observe-linux-${{ env.sha_short }}
       - name: cache-darwin
         id: cache-darwin
         uses: actions/cache@v4
         with:
           path: dist/darwin
-          key: signoz-darwin-${{ env.sha_short }}
+          key: observe-darwin-${{ env.sha_short }}
 
       # release
       - uses: goreleaser/goreleaser-action@v6

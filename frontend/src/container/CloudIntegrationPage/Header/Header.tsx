@@ -34,7 +34,7 @@ function Header(): JSX.Element {
 			</div>
 			<div className="cloud-header__actions">
 				<a
-					href="https://signoz.io/blog/native-aws-integrations-with-autodiscovery/"
+					href="https://o11y.hanzo.ai/blog/native-aws-integrations-with-autodiscovery/"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="cloud-header__help"

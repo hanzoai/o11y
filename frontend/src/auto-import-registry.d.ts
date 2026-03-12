@@ -7,26 +7,26 @@
 // It forces VS Code to index these specific packages to fix auto-import
 // performance issues in TypeScript 4.x.
 //
-// PR for reference: https://github.com/SigNoz/signoz/pull/9694
+// PR for reference: https://github.com/Hanzo O11y/o11y/pull/9694
 // -------------------------------------------------------------------------
 
-import '@signozhq/badge';
-import '@signozhq/button';
-import '@signozhq/calendar';
-import '@signozhq/callout';
-import '@signozhq/checkbox';
-import '@signozhq/combobox';
-import '@signozhq/command';
-import '@signozhq/design-tokens';
-import '@signozhq/dialog';
-import '@signozhq/drawer';
-import '@signozhq/icons';
-import '@signozhq/input';
-import '@signozhq/popover';
-import '@signozhq/radio-group';
-import '@signozhq/resizable';
-import '@signozhq/sonner';
-import '@signozhq/switch';
-import '@signozhq/table';
-import '@signozhq/toggle-group';
-import '@signozhq/tooltip';
+import '@hanzo/o11y-badge';
+import '@hanzo/o11y-button';
+import '@hanzo/o11y-calendar';
+import '@hanzo/o11y-callout';
+import '@hanzo/o11y-checkbox';
+import '@hanzo/o11y-combobox';
+import '@hanzo/o11y-command';
+import '@hanzo/o11y-design-tokens';
+import '@hanzo/o11y-dialog';
+import '@hanzo/o11y-drawer';
+import '@hanzo/o11y-icons';
+import '@hanzo/o11y-input';
+import '@hanzo/o11y-popover';
+import '@hanzo/o11y-radio-group';
+import '@hanzo/o11y-resizable';
+import '@hanzo/o11y-sonner';
+import '@hanzo/o11y-switch';
+import '@hanzo/o11y-table';
+import '@hanzo/o11y-toggle-group';
+import '@hanzo/o11y-tooltip';

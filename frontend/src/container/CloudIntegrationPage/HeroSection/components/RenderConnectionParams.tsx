@@ -14,8 +14,8 @@ function RenderConnectionFields({
 		isConnectionParamsLoading ||
 		(!!connectionParams?.ingestion_url &&
 			!!connectionParams?.ingestion_key &&
-			!!connectionParams?.signoz_api_url &&
-			!!connectionParams?.signoz_api_key)
+			!!connectionParams?.observe_api_url &&
+			!!connectionParams?.observe_api_key)
 	) {
 		return null;
 	}
@@ -40,22 +40,22 @@ function RenderConnectionFields({
 					<Input placeholder="Enter ingestion key" disabled={isFormDisabled} />
 				</Form.Item>
 			)}
-			{!connectionParams?.signoz_api_url && (
+			{!connectionParams?.observe_api_url && (
 				<Form.Item
-					name="signoz_api_url"
-					label="SigNoz API URL"
-					rules={[{ required: true, message: 'Please enter SigNoz API URL' }]}
+					name="observe_api_url"
+					label="Hanzo O11y API URL"
+					rules={[{ required: true, message: 'Please enter Hanzo O11y API URL' }]}
 				>
-					<Input placeholder="Enter SigNoz API URL" disabled={isFormDisabled} />
+					<Input placeholder="Enter Hanzo O11y API URL" disabled={isFormDisabled} />
 				</Form.Item>
 			)}
-			{!connectionParams?.signoz_api_key && (
+			{!connectionParams?.observe_api_key && (
 				<Form.Item
-					name="signoz_api_key"
-					label="SigNoz API KEY"
-					rules={[{ required: true, message: 'Please enter SigNoz API Key' }]}
+					name="observe_api_key"
+					label="Hanzo O11y API KEY"
+					rules={[{ required: true, message: 'Please enter Hanzo O11y API Key' }]}
 				>
-					<Input placeholder="Enter SigNoz API Key" disabled={isFormDisabled} />
+					<Input placeholder="Enter Hanzo O11y API Key" disabled={isFormDisabled} />
 				</Form.Item>
 			)}
 		</Form.Item>

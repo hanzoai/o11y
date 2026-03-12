@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	schemamigrator "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	schemamigrator "github.com/hanzoai/o11y-otel-collector/cmd/o11yschemamigrator/schema_migrator"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 // MockMetadataStore implements the MetadataStore interface for testing purposes

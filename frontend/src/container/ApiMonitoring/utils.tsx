@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Progress, TableColumnType as ColumnType, Tag, Tooltip } from 'antd';
 import { convertFiltersToExpressionWithExistingQuery } from 'components/QueryBuilderV2/utils';
 import {

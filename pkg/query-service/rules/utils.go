@@ -3,7 +3,7 @@ package rules
 import (
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 )
 
 // GenerateMetricQueryCHArgs generates query arguments for metric queries used in tests.
@@ -40,7 +40,7 @@ func GenerateMetricQueryCHArgs(
 
 	// Adjust start time to nearest hour
 	oneHourInMilliseconds := uint64(time.Hour.Milliseconds())
-	// start time for filtering signoz_metrics.time_series_v4 with start time
+	// start time for filtering observe_metrics.time_series_v4 with start time
 	timeSeriesCTEStartTime := start - (start % oneHourInMilliseconds)
 
 	queryArgs := []interface{}{
@@ -61,7 +61,7 @@ func GenerateMetricQueryCHArgs(
 	queryArgs = append(queryArgs, false)
 
 	// Step2: Add temporal aggregation args
-	// build args for filtering signoz_metrics.distributed_samples_v4 table
+	// build args for filtering observe_metrics.distributed_samples_v4 table
 	temporalAggArgs := []interface{}{
 		metricName,
 		start,

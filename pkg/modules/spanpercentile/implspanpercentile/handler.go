@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
-	errorsV2 "github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/http/render"
-	"github.com/SigNoz/signoz/pkg/modules/spanpercentile"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/spanpercentiletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/modules/spanpercentile"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/spanpercentiletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type handler struct {

@@ -1,6 +1,6 @@
 package client
 
-import "github.com/SigNoz/signoz/pkg/valuer"
+import "github.com/hanzoai/o11y/pkg/valuer"
 
 var (
 	ContentTypeText = ContentType{valuer.NewString("text/plain")}

@@ -5,7 +5,7 @@ import { UserResponse } from 'types/api/user/getUser';
 
 import MembersSettings from '../MembersSettings';
 
-jest.mock('@signozhq/sonner', () => ({
+jest.mock('@hanzo/o11y-sonner', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),
@@ -19,7 +19,7 @@ const mockUsers: UserResponse[] = [
 	{
 		id: 'user-1',
 		displayName: 'Alice Smith',
-		email: 'alice@signoz.io',
+		email: 'alice@o11y.hanzo.ai',
 		role: 'ADMIN',
 		createdAt: 1700000000,
 		organization: 'TestOrg',
@@ -28,7 +28,7 @@ const mockUsers: UserResponse[] = [
 	{
 		id: 'user-2',
 		displayName: 'Bob Jones',
-		email: 'bob@signoz.io',
+		email: 'bob@o11y.hanzo.ai',
 		role: 'VIEWER',
 		createdAt: 1700000001,
 		organization: 'TestOrg',
@@ -39,7 +39,7 @@ const mockUsers: UserResponse[] = [
 const mockInvites: PendingInvite[] = [
 	{
 		id: 'inv-1',
-		email: 'charlie@signoz.io',
+		email: 'charlie@o11y.hanzo.ai',
 		name: 'Charlie',
 		role: 'EDITOR',
 		createdAt: 1700000002,
@@ -69,7 +69,7 @@ describe('MembersSettings (integration)', () => {
 
 		await screen.findByText('Alice Smith');
 		expect(screen.getByText('Bob Jones')).toBeInTheDocument();
-		expect(screen.getByText('charlie@signoz.io')).toBeInTheDocument();
+		expect(screen.getByText('charlie@o11y.hanzo.ai')).toBeInTheDocument();
 		expect(screen.getAllByText('ACTIVE')).toHaveLength(2);
 		expect(screen.getByText('INVITED')).toBeInTheDocument();
 	});
@@ -86,7 +86,7 @@ describe('MembersSettings (integration)', () => {
 		const pendingOption = await screen.findByText(/pending invites/i);
 		await user.click(pendingOption);
 
-		await screen.findByText('charlie@signoz.io');
+		await screen.findByText('charlie@o11y.hanzo.ai');
 		expect(screen.queryByText('Alice Smith')).not.toBeInTheDocument();
 	});
 
@@ -104,7 +104,7 @@ describe('MembersSettings (integration)', () => {
 
 		await screen.findByText('Bob Jones');
 		expect(screen.queryByText('Alice Smith')).not.toBeInTheDocument();
-		expect(screen.queryByText('charlie@signoz.io')).not.toBeInTheDocument();
+		expect(screen.queryByText('charlie@o11y.hanzo.ai')).not.toBeInTheDocument();
 	});
 
 	it('opens EditMemberDrawer when a member row is clicked', async () => {
@@ -124,7 +124,7 @@ describe('MembersSettings (integration)', () => {
 
 		await user.click(screen.getByRole('button', { name: /invite member/i }));
 
-		expect(await screen.findAllByPlaceholderText('john@signoz.io')).toHaveLength(
+		expect(await screen.findAllByPlaceholderText('john@o11y.hanzo.ai')).toHaveLength(
 			3,
 		);
 	});

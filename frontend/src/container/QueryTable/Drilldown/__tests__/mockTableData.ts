@@ -341,10 +341,10 @@ export const MOCK_QUERY_RANGE_REQUEST = {
 		fillGaps: false,
 	},
 	variables: {
-		SIGNOZ_START_TIME: {
+		HANZO_START_TIME: {
 			value: 1756972732000,
 		},
-		SIGNOZ_END_TIME: {
+		HANZO_END_TIME: {
 			value: 1756974532000,
 		},
 		'service.name': {

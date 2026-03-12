@@ -101,7 +101,7 @@
             "multiSelect": true,
             "name": "host_name",
             "order": 0,
-            "queryValue": "SELECT JSONExtractString(labels, 'host_name') AS host_name\nFROM signoz_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'redis_cpu_time'\nGROUP BY host_name",
+            "queryValue": "SELECT JSONExtractString(labels, 'host_name') AS host_name\nFROM o11y_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'redis_cpu_time'\nGROUP BY host_name",
             "selectedValue": [
                 "Srikanths-MacBook-Pro.local"
             ],

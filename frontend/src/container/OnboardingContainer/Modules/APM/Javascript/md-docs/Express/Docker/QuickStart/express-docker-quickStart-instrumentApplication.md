@@ -29,7 +29,7 @@ const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventi
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#specifying-headers-via-environment-variables
 
 const exporterOptions = {
-  url: 'https://ingest.{{REGION}}.signoz.cloud:443/v1/traces'
+  url: 'https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces'
 }
 
 const traceExporter = new OTLPTraceExporter(exporterOptions);
@@ -58,12 +58,12 @@ process.on('SIGTERM', () => {
 
 ### Step 3: Dockerize your application
 
-Set the SigNoz ingestion key Environment variable and update your run command to include the `-r` flag and `./tracing.js` file in Dockerfile as:
+Set the Hanzo O11y ingestion key Environment variable and update your run command to include the `-r` flag and `./tracing.js` file in Dockerfile as:
 
 ```bash
 ...
 # Use an environment variable for the Signoz Ingestion Key
-ENV OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}"
+ENV OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}"
 
 # Run the app with the required OpenTelemetry configuration. app.js is your application main file.
 CMD ["node", "-r", "./tracing.js", "app.js"]

@@ -17,8 +17,8 @@ export const getDashboardVariables = (
 		});
 
 		const variablesTuple: Record<string, unknown> = {
-			SIGNOZ_START_TIME: parseInt(start, 10) * 1e3,
-			SIGNOZ_END_TIME: parseInt(end, 10) * 1e3,
+			HANZO_START_TIME: parseInt(start, 10) * 1e3,
+			HANZO_END_TIME: parseInt(end, 10) * 1e3,
 		};
 
 		Object.entries(variables).forEach(([, value]) => {

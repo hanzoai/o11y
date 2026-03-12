@@ -2,7 +2,7 @@ package queryprogress
 
 import (
 	"github.com/ClickHouse/clickhouse-go/v2"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
 )
 
 type QueryProgressTracker interface {

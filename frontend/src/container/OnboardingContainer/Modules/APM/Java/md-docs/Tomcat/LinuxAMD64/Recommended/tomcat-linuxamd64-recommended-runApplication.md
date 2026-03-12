@@ -25,7 +25,7 @@ kill "$(< otel-pid)"
 
 If you run your .war package by putting in webapps folder, just add setenv.sh in your Tomcat bin folder.
 
-This should set the environment variable and start sending telemetry data to SigNoz Cloud.
+This should set the environment variable and start sending telemetry data to Hanzo O11y Cloud.
 
 ```bash
 export CATALINA_OPTS="$CATALINA_OPTS -javaagent:/<path>/opentelemetry-javaagent.jar"
@@ -36,4 +36,4 @@ export CATALINA_OPTS="$CATALINA_OPTS -javaagent:/<path>/opentelemetry-javaagent.
 
 &nbsp;
 
-If you encounter any difficulties, please consult the [troubleshooting section](https://signoz.io/docs/instrumentation/tomcat/#troubleshooting-your-installation) for assistance.
+If you encounter any difficulties, please consult the [troubleshooting section](https://o11y.hanzo.ai/docs/instrumentation/tomcat/#troubleshooting-your-installation) for assistance.

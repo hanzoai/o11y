@@ -95,7 +95,7 @@ const EmptyState = memo(
 									source: 'Service Metrics',
 								});
 								window.open(
-									'https://signoz.io/docs/instrumentation/overview/',
+									'https://o11y.hanzo.ai/docs/instrumentation/overview/',
 									'_blank',
 								);
 							}}

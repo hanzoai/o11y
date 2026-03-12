@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for SigNoz
+ * * The file has been auto-generated using Orval for Hanzo O11y
  * * regenerate with 'yarn generate:api'
- * SigNoz
+ * Hanzo O11y
  */
 import type {
 	InvalidateOptions,
@@ -33,7 +33,7 @@ import type {
 	GetPublicDashboardWidgetQueryRangePathParameters,
 	RenderErrorResponseDTO,
 	UpdatePublicDashboardPathParameters,
-} from '../sigNoz.schemas';
+} from '../observe.schemas';
 
 /**
  * This endpoint deletes the public sharing config and disables the public sharing of a dashboard

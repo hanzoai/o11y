@@ -103,10 +103,10 @@ describe('InviteTeamMembers', () => {
 				screen.getByRole('heading', { name: /invite your team/i }),
 			).toBeInTheDocument();
 			expect(
-				screen.getByText(/signoz is a lot more useful with collaborators/i),
+				screen.getByText(/o11y is a lot more useful with collaborators/i),
 			).toBeInTheDocument();
 			expect(
-				screen.getAllByPlaceholderText(/e\.g\. john@signoz\.io/i),
+				screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i),
 			).toHaveLength(3);
 			expect(screen.getByText('Email address')).toBeInTheDocument();
 			expect(screen.getByText('Roles')).toBeInTheDocument();
@@ -134,13 +134,13 @@ describe('InviteTeamMembers', () => {
 			renderComponent();
 
 			expect(
-				screen.getAllByPlaceholderText(/e\.g\. john@signoz\.io/i),
+				screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i),
 			).toHaveLength(3);
 
 			await user.click(screen.getByRole('button', { name: /add another/i }));
 
 			expect(
-				screen.getAllByPlaceholderText(/e\.g\. john@signoz\.io/i),
+				screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i),
 			).toHaveLength(4);
 		});
 
@@ -149,7 +149,7 @@ describe('InviteTeamMembers', () => {
 			renderComponent();
 
 			const emailInputs = screen.getAllByPlaceholderText(
-				/e\.g\. john@signoz\.io/i,
+				/e\.g\. john@o11y\.io/i,
 			);
 			await user.type(emailInputs[0], 'first@example.com');
 			await screen.findByDisplayValue('first@example.com');
@@ -163,7 +163,7 @@ describe('InviteTeamMembers', () => {
 					screen.queryByDisplayValue('first@example.com'),
 				).not.toBeInTheDocument();
 				expect(
-					screen.getAllByPlaceholderText(/e\.g\. john@signoz\.io/i),
+					screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i),
 				).toHaveLength(2);
 			});
 		});
@@ -197,7 +197,7 @@ describe('InviteTeamMembers', () => {
 			renderComponent();
 
 			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@signoz\.io/i,
+				/e\.g\. john@o11y\.io/i,
 			);
 
 			await user.type(firstInput, 'not-an-email');
@@ -224,7 +224,7 @@ describe('InviteTeamMembers', () => {
 			renderComponent();
 
 			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@signoz\.io/i,
+				/e\.g\. john@o11y\.io/i,
 			);
 			await user.type(firstInput, 'a');
 			await user.clear(firstInput);
@@ -252,7 +252,7 @@ describe('InviteTeamMembers', () => {
 			);
 
 			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@signoz\.io/i,
+				/e\.g\. john@o11y\.io/i,
 			);
 
 			await user.type(firstInput, 'bad-email');
@@ -288,7 +288,7 @@ describe('InviteTeamMembers', () => {
 			await user.clear(firstInput);
 			await user.type(firstInput, 'valid@example.com');
 			await user.click(screen.getByRole('button', { name: /add another/i }));
-			const allInputs = screen.getAllByPlaceholderText(/e\.g\. john@signoz\.io/i);
+			const allInputs = screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i);
 			await user.type(allInputs[1], 'norole@example.com');
 			await user.click(screen.getByRole('button', { name: /send invites/i }));
 			await waitFor(() => {
@@ -317,7 +317,7 @@ describe('InviteTeamMembers', () => {
 			);
 
 			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@signoz\.io/i,
+				/e\.g\. john@o11y\.io/i,
 			);
 
 			await user.type(firstInput, '   ');
@@ -376,7 +376,7 @@ describe('InviteTeamMembers', () => {
 
 			// Type something to make a row touched
 			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@signoz\.io/i,
+				/e\.g\. john@o11y\.io/i,
 			);
 			await user.type(firstInput, 'a');
 
@@ -399,7 +399,7 @@ describe('InviteTeamMembers', () => {
 			renderComponent();
 
 			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@signoz\.io/i,
+				/e\.g\. john@o11y\.io/i,
 			);
 			await user.type(firstInput, 'only@example.com');
 			await selectRole(user, 0, 'Admin');
@@ -423,7 +423,7 @@ describe('InviteTeamMembers', () => {
 			renderComponent();
 
 			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@signoz\.io/i,
+				/e\.g\. john@o11y\.io/i,
 			);
 			await user.type(firstInput, 'alice@example.com');
 			await selectRole(user, 0, 'Admin');
@@ -459,7 +459,7 @@ describe('InviteTeamMembers', () => {
 			renderComponent();
 
 			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@signoz\.io/i,
+				/e\.g\. john@o11y\.io/i,
 			);
 			await user.type(firstInput, 'fail@example.com');
 			await selectRole(user, 0, 'Viewer');

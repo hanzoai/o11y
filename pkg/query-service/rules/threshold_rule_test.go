@@ -13,21 +13,21 @@ import (
 
 	cmock "github.com/srikanthccv/ClickHouse-go-mock"
 
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/cache/cachetest"
-	"github.com/SigNoz/signoz/pkg/instrumentation/instrumentationtest"
-	"github.com/SigNoz/signoz/pkg/prometheus"
-	"github.com/SigNoz/signoz/pkg/prometheus/prometheustest"
-	"github.com/SigNoz/signoz/pkg/query-service/app/clickhouseReader"
-	"github.com/SigNoz/signoz/pkg/query-service/common"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/labels"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/telemetrystore/telemetrystoretest"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/ruletypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/cache/cachetest"
+	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
+	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/query-service/common"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 func TestThresholdRuleEvalBackwardCompat(t *testing.T) {
@@ -626,7 +626,7 @@ func TestThresholdRuleUnitCombinations(t *testing.T) {
 						QueryName:    "A",
 						StepInterval: 60,
 						AggregateAttribute: v3.AttributeKey{
-							Key: "signoz_calls_total",
+							Key: "observe_calls_total",
 						},
 						AggregateOperator: v3.AggregateOperatorSumRate,
 						DataSource:        v3.DataSourceMetrics,
@@ -781,7 +781,7 @@ func TestThresholdRuleUnitCombinations(t *testing.T) {
 		reader := clickhouseReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Duration(time.Second), nil, readerCache, options)
 		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 		rule.TemporalityMap = map[string]map[v3.Temporality]bool{
-			"signoz_calls_total": {
+			"observe_calls_total": {
 				v3.Delta: true,
 			},
 		}
@@ -827,7 +827,7 @@ func TestThresholdRuleNoData(t *testing.T) {
 						QueryName:    "A",
 						StepInterval: 60,
 						AggregateAttribute: v3.AttributeKey{
-							Key: "signoz_calls_total",
+							Key: "observe_calls_total",
 						},
 						AggregateOperator: v3.AggregateOperatorSumRate,
 						DataSource:        v3.DataSourceMetrics,
@@ -897,7 +897,7 @@ func TestThresholdRuleNoData(t *testing.T) {
 
 		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 		rule.TemporalityMap = map[string]map[v3.Temporality]bool{
-			"signoz_calls_total": {
+			"observe_calls_total": {
 				v3.Delta: true,
 			},
 		}
@@ -980,7 +980,7 @@ func TestThresholdRuleTracesLink(t *testing.T) {
 			WillReturnRows(metaRows)
 
 		telemetryStore.Mock().
-			ExpectSelect("SHOW CREATE TABLE signoz_traces.distributed_signoz_index_v3").WillReturnRows(&cmock.Rows{})
+			ExpectSelect("SHOW CREATE TABLE observe_traces.distributed_observe_index_v3").WillReturnRows(&cmock.Rows{})
 
 		rows := cmock.NewRows(cols, c.values)
 
@@ -1017,7 +1017,7 @@ func TestThresholdRuleTracesLink(t *testing.T) {
 
 		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 		rule.TemporalityMap = map[string]map[v3.Temporality]bool{
-			"signoz_calls_total": {
+			"observe_calls_total": {
 				v3.Delta: true,
 			},
 		}
@@ -1106,17 +1106,17 @@ func TestThresholdRuleLogsLink(t *testing.T) {
 	for idx, c := range testCases {
 		attrMetaRows := cmock.NewRows(attrMetaCols, c.attrMetaValues)
 		telemetryStore.Mock().
-			ExpectSelect("SELECT DISTINCT name, datatype from signoz_logs.distributed_logs_attribute_keys where name in ('component','k8s.container.name') group by name, datatype").
+			ExpectSelect("SELECT DISTINCT name, datatype from observe_logs.distributed_logs_attribute_keys where name in ('component','k8s.container.name') group by name, datatype").
 			WillReturnRows(attrMetaRows)
 
 		resourceMetaRows := cmock.NewRows(resourceMetaCols, c.resourceMetaValues)
 		telemetryStore.Mock().
-			ExpectSelect("SELECT DISTINCT name, datatype from signoz_logs.distributed_logs_resource_keys where name in ('component','k8s.container.name') group by name, datatype").
+			ExpectSelect("SELECT DISTINCT name, datatype from observe_logs.distributed_logs_resource_keys where name in ('component','k8s.container.name') group by name, datatype").
 			WillReturnRows(resourceMetaRows)
 
 		createTableRows := cmock.NewRows(createTableCols, c.createTableValues)
 		telemetryStore.Mock().
-			ExpectSelect("SHOW CREATE TABLE signoz_logs.logs").
+			ExpectSelect("SHOW CREATE TABLE observe_logs.logs").
 			WillReturnRows(createTableRows)
 
 		rows := cmock.NewRows(cols, c.values)
@@ -1154,7 +1154,7 @@ func TestThresholdRuleLogsLink(t *testing.T) {
 
 		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 		rule.TemporalityMap = map[string]map[v3.Temporality]bool{
-			"signoz_calls_total": {
+			"observe_calls_total": {
 				v3.Delta: true,
 			},
 		}
@@ -1245,7 +1245,7 @@ func TestThresholdRuleShiftBy(t *testing.T) {
 		assert.NoError(t, err)
 	}
 	rule.TemporalityMap = map[string]map[v3.Temporality]bool{
-		"signoz_calls_total": {
+		"observe_calls_total": {
 			v3.Delta: true,
 		},
 	}
@@ -1275,7 +1275,7 @@ func TestMultipleThresholdRule(t *testing.T) {
 						QueryName:    "A",
 						StepInterval: 60,
 						AggregateAttribute: v3.AttributeKey{
-							Key: "signoz_calls_total",
+							Key: "observe_calls_total",
 						},
 						AggregateOperator: v3.AggregateOperatorSumRate,
 						DataSource:        v3.DataSourceMetrics,
@@ -1420,7 +1420,7 @@ func TestMultipleThresholdRule(t *testing.T) {
 		reader := clickhouseReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Second, nil, readerCache, options)
 		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 		rule.TemporalityMap = map[string]map[v3.Temporality]bool{
-			"signoz_calls_total": {
+			"observe_calls_total": {
 				v3.Delta: true,
 			},
 		}
@@ -2078,7 +2078,7 @@ func TestThresholdEval_RequireMinPoints(t *testing.T) {
 					"A": {
 						QueryName:          "A",
 						StepInterval:       60,
-						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
 						AggregateOperator:  v3.AggregateOperatorSumRate,
 						SpaceAggregation:   v3.SpaceAggregationSum,
 						TimeAggregation:    v3.TimeAggregationRate,
@@ -2185,7 +2185,7 @@ func TestThresholdEval_RequireMinPoints(t *testing.T) {
 			if version == "v4" {
 				telemetryStore.Mock().
 					ExpectQuery("SELECT metric_name, toUInt8(__normalized) .*").
-					WillReturnRows(cmock.NewRows(validateMetricNameColumns, [][]any{{"signoz_calls_total", 1}}))
+					WillReturnRows(cmock.NewRows(validateMetricNameColumns, [][]any{{"observe_calls_total", 1}}))
 			}
 			telemetryStore.Mock().
 				ExpectQuery("SELECT any").
@@ -2226,7 +2226,7 @@ func TestThresholdEval_RequireMinPoints(t *testing.T) {
 			t.Run(fmt.Sprintf("%d Version=%s, %s", idx, version, c.description), func(t *testing.T) {
 				require.NoError(t, err)
 				rule.TemporalityMap = map[string]map[v3.Temporality]bool{
-					"signoz_calls_total": {v3.Delta: true},
+					"observe_calls_total": {v3.Delta: true},
 				}
 
 				alertsFound, err := rule.Eval(context.Background(), time.Now())

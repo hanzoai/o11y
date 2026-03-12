@@ -38,10 +38,10 @@ COPY ./templates/email /root/templates
 
 COPY Makefile Makefile
 RUN TARGET_DIR=/root ARCHS=${TARGETARCH} ZEUS_URL=${ZEUSURL} LICENSE_URL=${ZEUSURL}/api/v1 make go-build-enterprise-race
-RUN mv /root/linux-${TARGETARCH}/signoz /root/signoz
+RUN mv /root/linux-${TARGETARCH}/signoz /root/o11y
 
 COPY --from=build /opt/build ./web/
 
-RUN chmod 755 /root /root/signoz
+RUN chmod 755 /root /root/o11y
 
-ENTRYPOINT ["/root/signoz", "server"]
+ENTRYPOINT ["/root/o11y", "server"]

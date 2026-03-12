@@ -1,9 +1,9 @@
 package cloudintegrations
 
 import (
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/query-service/app/cloudintegrations/services"
-	"github.com/SigNoz/signoz/pkg/types/integrationtypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/query-service/app/cloudintegrations/services"
+	"github.com/hanzoai/o11y/pkg/types/integrationtypes"
 )
 
 type ServiceSummary struct {

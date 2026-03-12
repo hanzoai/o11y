@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { UseQueryResult } from 'react-query';
-import { MetricsexplorertypesMetricMetadataDTO } from 'api/generated/services/sigNoz.schemas';
+import { MetricsexplorertypesMetricMetadataDTO } from 'api/generated/services/observe.schemas';
 import { RelatedMetric } from 'api/metricsExplorer/getRelatedMetrics';
 import { SuccessResponse, Warning } from 'types/api';
 import { MetricRangePayloadProps } from 'types/api/metrics/getQueryRange';

@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/alertmanager/nfmanager/nfmanagertest"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes/alertmanagertypestest"
+	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager/nfmanagertest"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes/alertmanagertypestest"
 	"github.com/go-openapi/strfmt"
 	"github.com/prometheus/alertmanager/api/v2/models"
 	"github.com/prometheus/alertmanager/config"

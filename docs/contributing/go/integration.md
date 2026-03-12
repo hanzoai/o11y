@@ -1,6 +1,6 @@
 # Integration Tests
 
-SigNoz uses integration tests to verify that different components work together correctly in a real environment. These tests run against actual services (ClickHouse, PostgreSQL, etc.) to ensure end-to-end functionality.
+Hanzo O11y uses integration tests to verify that different components work together correctly in a real environment. These tests run against actual services (ClickHouse, PostgreSQL, etc.) to ensure end-to-end functionality.
 
 ## How to set up the integration test environment?
 
@@ -92,7 +92,7 @@ Each test suite follows some important principles:
 
 ### Test Suite Design
 
-Test suites should target functional domains or subsystems within SigNoz. When designing a test suite, consider these principles:
+Test suites should target functional domains or subsystems within Hanzo O11y. When designing a test suite, consider these principles:
 
 - **Functional Cohesion**: Group tests around a specific capability or service boundary
 - **Data Flow**: Follow the path of data through related components
@@ -119,7 +119,7 @@ from fixtures.logger import setup_logger
 
 logger = setup_logger(__name__)
 
-def test_version(signoz: types.SigNoz) -> None:
+def test_version(signoz: types.Hanzo O11y) -> None:
     response = requests.get(signoz.self.host_config.get("/api/v1/version"), timeout=2)
     logger.info(response)
 ```
@@ -142,7 +142,7 @@ from fixtures.logger import setup_logger
 
 logger = setup_logger(__name__)
 
-def test_user_registration(signoz: types.SigNoz) -> None:
+def test_user_registration(signoz: types.Hanzo O11y) -> None:
     """Test user registration functionality."""
     response = requests.post(
         signoz.self.host_configs["8080"].get("/api/v1/register"),

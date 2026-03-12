@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Button, Spin, Tooltip, Typography } from 'antd';
 import { useGetMetricHighlights } from 'api/generated/services/metrics';
 import { InfoIcon } from 'lucide-react';

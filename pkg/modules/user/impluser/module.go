@@ -6,21 +6,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/analytics"
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/emailing"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/modules/user"
-	root "github.com/SigNoz/signoz/pkg/modules/user"
-	"github.com/SigNoz/signoz/pkg/tokenizer"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/emailtypes"
-	"github.com/SigNoz/signoz/pkg/types/integrationtypes"
-	"github.com/SigNoz/signoz/pkg/types/roletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/analytics"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/emailing"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/modules/user"
+	root "github.com/hanzoai/o11y/pkg/modules/user"
+	"github.com/hanzoai/o11y/pkg/tokenizer"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/emailtypes"
+	"github.com/hanzoai/o11y/pkg/types/integrationtypes"
+	"github.com/hanzoai/o11y/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/dustin/go-humanize"
 )
 
@@ -37,7 +37,7 @@ type Module struct {
 
 // This module is a WIP, don't take inspiration from this.
 func NewModule(store types.UserStore, tokenizer tokenizer.Tokenizer, emailing emailing.Emailing, providerSettings factory.ProviderSettings, orgSetter organization.Setter, authz authz.AuthZ, analytics analytics.Analytics, config user.Config) root.Module {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/modules/user/impluser")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/modules/user/impluser")
 	return &Module{
 		store:     store,
 		tokenizer: tokenizer,
@@ -207,7 +207,7 @@ func (m *Module) CreateBulkInvite(ctx context.Context, orgID valuer.UUID, userID
 		tokenLifetime := m.config.Password.Reset.MaxTokenLifetime
 		humanizedTokenLifetime := strings.TrimSpace(humanize.RelTime(time.Now(), time.Now().Add(tokenLifetime), "", ""))
 
-		if err := m.emailing.SendHTML(ctx, userWithToken.User.Email.String(), "You're Invited to Join SigNoz", emailtypes.TemplateNameInvitationEmail, map[string]any{
+		if err := m.emailing.SendHTML(ctx, userWithToken.User.Email.String(), "You're Invited to Join Hanzo O11y", emailtypes.TemplateNameInvitationEmail, map[string]any{
 			"inviter_email": creator.Email,
 			"link":          resetLink,
 			"Expiry":        humanizedTokenLifetime,
@@ -263,7 +263,7 @@ func (module *Module) CreateUser(ctx context.Context, input *types.User, opts ..
 	createUserOpts := root.NewCreateUserOptions(opts...)
 
 	// since assign is idempotant multiple calls to assign won't cause issues in case of retries.
-	err := module.authz.Grant(ctx, input.OrgID, []string{roletypes.MustGetSigNozManagedRoleFromExistingRole(input.Role)}, authtypes.MustNewSubject(authtypes.TypeableUser, input.ID.StringValue(), input.OrgID, nil))
+	err := module.authz.Grant(ctx, input.OrgID, []string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(input.Role)}, authtypes.MustNewSubject(authtypes.TypeableUser, input.ID.StringValue(), input.OrgID, nil))
 	if err != nil {
 		return err
 	}
@@ -333,8 +333,8 @@ func (m *Module) UpdateUser(ctx context.Context, orgID valuer.UUID, id string, u
 	if user.Role != "" && user.Role != existingUser.Role {
 		err = m.authz.ModifyGrant(ctx,
 			orgID,
-			[]string{roletypes.MustGetSigNozManagedRoleFromExistingRole(existingUser.Role)},
-			[]string{roletypes.MustGetSigNozManagedRoleFromExistingRole(user.Role)},
+			[]string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(existingUser.Role)},
+			[]string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(user.Role)},
 			authtypes.MustNewSubject(authtypes.TypeableUser, id, orgID, nil),
 		)
 		if err != nil {
@@ -395,7 +395,7 @@ func (module *Module) DeleteUser(ctx context.Context, orgID valuer.UUID, id stri
 	}
 
 	// since revoke is idempotant multiple calls to revoke won't cause issues in case of retries
-	err = module.authz.Revoke(ctx, orgID, []string{roletypes.MustGetSigNozManagedRoleFromExistingRole(user.Role)}, authtypes.MustNewSubject(authtypes.TypeableUser, id, orgID, nil))
+	err = module.authz.Revoke(ctx, orgID, []string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(user.Role)}, authtypes.MustNewSubject(authtypes.TypeableUser, id, orgID, nil))
 	if err != nil {
 		return err
 	}
@@ -506,7 +506,7 @@ func (module *Module) ForgotPassword(ctx context.Context, orgID valuer.UUID, ema
 	if err := module.emailing.SendHTML(
 		ctx,
 		user.Email.String(),
-		"A Password Reset Was Requested for SigNoz",
+		"A Password Reset Was Requested for Hanzo O11y",
 		emailtypes.TemplateNameResetPassword,
 		map[string]any{
 			"Link":   resetLink,
@@ -558,7 +558,7 @@ func (module *Module) UpdatePasswordByResetPasswordToken(ctx context.Context, to
 		if err = module.authz.Grant(
 			ctx,
 			user.OrgID,
-			[]string{roletypes.MustGetSigNozManagedRoleFromExistingRole(user.Role)},
+			[]string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(user.Role)},
 			authtypes.MustNewSubject(authtypes.TypeableUser, user.ID.StringValue(), user.OrgID, nil),
 		); err != nil {
 			return err
@@ -793,7 +793,7 @@ func (module *Module) activatePendingUser(ctx context.Context, user *types.User)
 	err := module.authz.Grant(
 		ctx,
 		user.OrgID,
-		[]string{roletypes.MustGetSigNozManagedRoleFromExistingRole(user.Role)},
+		[]string{roletypes.MustGetHanzo O11yManagedRoleFromExistingRole(user.Role)},
 		authtypes.MustNewSubject(authtypes.TypeableUser, user.ID.StringValue(), user.OrgID, nil),
 	)
 	if err != nil {

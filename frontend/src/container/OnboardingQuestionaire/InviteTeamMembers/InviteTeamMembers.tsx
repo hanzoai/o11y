@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
-import { Button } from '@signozhq/button';
-import { Callout } from '@signozhq/callout';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/o11y-button';
+import { Callout } from '@hanzo/o11y-callout';
+import { Input } from '@hanzo/o11y-input';
 import { Select, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import inviteUsers from 'api/v1/invite/bulk/create';
@@ -260,14 +260,14 @@ function InviteTeamMembers({
 		<div className="questions-container">
 			<OnboardingQuestionHeader
 				title="Invite your team"
-				subtitle="SigNoz is a lot more useful with collaborators on board."
+				subtitle="Hanzo O11y is a lot more useful with collaborators on board."
 			/>
 
 			<div className="questions-form-container">
 				<div className="questions-form invite-team-members-form">
 					<div className="form-group">
 						<div className="question-label">
-							Invite your team to the SigNoz workspace
+							Invite your team to the Hanzo O11y workspace
 						</div>
 
 						<div className="invite-team-members-table">
@@ -282,7 +282,7 @@ function InviteTeamMembers({
 									<div className="team-member-row" key={member.id}>
 										<div className="team-member-cell email-cell">
 											<Input
-												placeholder="e.g. john@signoz.io"
+												placeholder="e.g. john@o11y.hanzo.ai"
 												value={member.email}
 												type="email"
 												id={`email-input-${member.id}`}

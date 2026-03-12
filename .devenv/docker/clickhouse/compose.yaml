@@ -1,6 +1,6 @@
 services:
   init-clickhouse:
-    image: clickhouse/clickhouse-server:25.5.6
+    image: ghcr.io/hanzoai/datastore:25.5.6
     container_name: init-clickhouse
     command:
       - bash
@@ -11,14 +11,14 @@ services:
         node_arch=$$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/)
         echo "Fetching histogram-binary for $${node_os}/$${node_arch}"
         cd /tmp
-        wget -O histogram-quantile.tar.gz "https://github.com/SigNoz/signoz/releases/download/histogram-quantile%2F$${version}/histogram-quantile_$${node_os}_$${node_arch}.tar.gz"
+        wget -O histogram-quantile.tar.gz "https://github.com/Hanzo O11y/observe/releases/download/histogram-quantile%2F$${version}/histogram-quantile_$${node_os}_$${node_arch}.tar.gz"
         tar -xvzf histogram-quantile.tar.gz
         mv histogram-quantile /var/lib/clickhouse/user_scripts/histogramQuantile
     restart: on-failure
     volumes:
       - ${PWD}/fs/tmp/var/lib/clickhouse/user_scripts/:/var/lib/clickhouse/user_scripts/
   clickhouse:
-    image: clickhouse/clickhouse-server:25.5.6
+    image: ghcr.io/hanzoai/datastore:25.5.6
     container_name: clickhouse
     volumes:
       - ${PWD}/fs/etc/clickhouse-server/config.d/config.xml:/etc/clickhouse-server/config.d/config.xml
@@ -48,7 +48,7 @@ services:
     environment:
       - CLICKHOUSE_SKIP_USER_SETUP=1
   zookeeper:
-    image: signoz/zookeeper:3.7.1
+    image: observe/zookeeper:3.7.1
     container_name: zookeeper
     volumes:
       - ${PWD}/fs/tmp/zookeeper:/bitnami/zookeeper
@@ -64,21 +64,21 @@ services:
       timeout: 5s
       retries: 3
   telemetrystore-migrator:
-    image: signoz/signoz-otel-collector:v0.142.0
+    image: observe/observe-otel-collector:v0.142.0
     container_name: telemetrystore-migrator
     environment:
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
-      - SIGNOZ_OTEL_COLLECTOR_TIMEOUT=10m
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - HANZO_OTEL_COLLECTOR_TIMEOUT=10m
     entrypoint:
       - /bin/sh
     command:
     - -c 
     - |
-      /signoz-otel-collector migrate bootstrap &&
-      /signoz-otel-collector migrate sync up &&
-      /signoz-otel-collector migrate async up
+      /observe-otel-collector migrate bootstrap &&
+      /observe-otel-collector migrate sync up &&
+      /observe-otel-collector migrate async up
     depends_on:
       clickhouse:
         condition: service_healthy

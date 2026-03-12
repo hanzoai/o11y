@@ -1,11 +1,11 @@
-package signozglobal
+package o11yglobal
 
 import (
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/global"
-	"github.com/SigNoz/signoz/pkg/http/render"
-	"github.com/SigNoz/signoz/pkg/types"
+	"github.com/hanzoai/o11y/pkg/global"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/types"
 )
 
 type handler struct {

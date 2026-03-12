@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
-import { Color, Style } from '@signozhq/design-tokens';
+import { Color, Style } from '@hanzo/o11y-design-tokens';
 import {
 	ChevronDown,
 	ChevronRight,
 	CircleHelp,
 	TriangleAlert,
-} from '@signozhq/icons';
-import { Input } from '@signozhq/input';
+} from '@hanzo/o11y-icons';
+import { Input } from '@hanzo/o11y-input';
 import { Collapse, Form, Tooltip } from 'antd';
 import { useCollapseSectionErrors } from 'hooks/useCollapseSectionErrors';
 
@@ -68,7 +68,7 @@ function AttributeMappingSection({
 								</h4>
 								<p className="attribute-mapping-section__section-description">
 									Configure how SAML assertion attributes from your Identity Provider map
-									to SigNoz user attributes. Leave empty to use default values.
+									to Hanzo O11y user attributes. Leave empty to use default values.
 								</p>
 							</div>
 							{!expanded && hasErrors && (

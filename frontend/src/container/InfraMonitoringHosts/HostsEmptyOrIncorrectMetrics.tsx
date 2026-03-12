@@ -29,20 +29,20 @@ export default function HostsEmptyOrIncorrectMetrics({
 							</a>
 							. Please refer to{' '}
 							<a
-								href="https://signoz.io/docs/userguide/hostmetrics"
+								href="https://o11y.hanzo.ai/docs/userguide/hostmetrics"
 								target="_blank"
 								rel="noreferrer"
 							>
 								this
 							</a>{' '}
-							to learn how to send host metrics to SigNoz.
+							to learn how to send host metrics to Hanzo O11y.
 						</Typography.Text>
 					</div>
 				)}
 
 				{incorrectData && (
 					<Typography.Text className="incorrect-metrics-message">
-						To see host metrics, upgrade to the latest version of SigNoz k8s-infra
+						To see host metrics, upgrade to the latest version of Hanzo O11y k8s-infra
 						chart. Please contact support if you need help.
 					</Typography.Text>
 				)}

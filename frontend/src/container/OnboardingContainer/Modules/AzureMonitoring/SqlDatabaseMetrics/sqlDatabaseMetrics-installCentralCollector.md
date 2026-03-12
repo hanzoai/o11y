@@ -3,7 +3,7 @@ Set up the OpenTelemetry Collector on a Virtual Machine (VM). The setup is compa
 
 ## Download and Install the OpenTelemetry Collector Binary
 
-Please visit [Documentation For VM](https://signoz.io/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/) which  provides further guidance on a VM installation. 
+Please visit [Documentation For VM](https://o11y.hanzo.ai/docs/tutorial/opentelemetry-binary-usage-in-virtual-machine/) which  provides further guidance on a VM installation. 
 
 &nbsp;
 
@@ -34,11 +34,11 @@ processors:
   batch: {}
 exporters:
   otlp:
-    endpoint: "ingest.{{REGION}}.signoz.cloud:443"
+    endpoint: "ingest.{{REGION}}.o11y.hanzo.ai:443"
     tls:
       insecure: false
     headers:
-      "signoz-ingestion-key": "{{SIGNOZ_INGESTION_KEY}}"
+      "signoz-ingestion-key": "{{HANZO_INGESTION_KEY}}"
 service:
   pipelines:
     metrics/am:
@@ -127,4 +127,4 @@ To the IP address of the collector, you can add a DNS label to the Public IP add
 
 &nbsp;
 
-If you encounter any difficulties, please refer to this [troubleshooting section](https://signoz.io/docs/azure-monitoring/bootstrapping/collector-setup/#troubleshooting)
+If you encounter any difficulties, please refer to this [troubleshooting section](https://o11y.hanzo.ai/docs/azure-monitoring/bootstrapping/collector-setup/#troubleshooting)

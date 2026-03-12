@@ -1,4 +1,4 @@
-name: gor-signoz-community
+name: gor-observe-community
 
 on:
   push:
@@ -82,13 +82,13 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         with:
           path: dist/linux
-          key: signoz-community-linux-${{ env.sha_short }}
+          key: observe-community-linux-${{ env.sha_short }}
       - name: cache-darwin
         uses: actions/cache@v4
         if: matrix.os == 'macos-latest'
         with:
           path: dist/darwin
-          key: signoz-community-darwin-${{ env.sha_short }}
+          key: observe-community-darwin-${{ env.sha_short }}
       - name: release
         uses: goreleaser/goreleaser-action@v6
         with:
@@ -138,13 +138,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: dist/linux
-          key: signoz-community-linux-${{ env.sha_short }}
+          key: observe-community-linux-${{ env.sha_short }}
       - name: cache-darwin
         id: cache-darwin
         uses: actions/cache@v4
         with:
           path: dist/darwin
-          key: signoz-community-darwin-${{ env.sha_short }}
+          key: observe-community-darwin-${{ env.sha_short }}
 
       # release
       - uses: goreleaser/goreleaser-action@v6

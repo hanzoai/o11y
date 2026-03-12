@@ -27,7 +27,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 // Configure the SDK to export telemetry data to the console
 // Enable all auto-instrumentations from the meta package
 const exporterOptions = {
-  url: 'https://ingest.{{REGION}}.signoz.cloud:443/v1/traces',
+  url: 'https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces',
 };
 
 const traceExporter = new OTLPTraceExporter(exporterOptions);
@@ -87,12 +87,12 @@ async function bootstrap() {
 
 ### Step 5: Dockerize your application
 
-Set the SigNoz ingestion key Environment variable and expose port 3001 in Dockerfile as:
+Set the Hanzo O11y ingestion key Environment variable and expose port 3001 in Dockerfile as:
 
 ```bash
 ...
 # Use an environment variable for the Signoz Ingestion Key
-ENV OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{SIGNOZ_INGESTION_KEY}}"
+ENV OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}"
 
 # In step 4 above, you are configuring your NestJS application to listen on port 3001
 EXPOSE 3001

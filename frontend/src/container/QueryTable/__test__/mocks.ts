@@ -93,8 +93,8 @@ export const QueryTableProps: any = {
 				{
 					aggregateAttribute: {
 						dataType: 'float64',
-						id: 'signoz_calls_total--float64--Sum--true',
-						key: 'signoz_calls_total',
+						id: 'observe_calls_total--float64--Sum--true',
+						key: 'observe_calls_total',
 						type: 'Sum',
 					},
 					aggregateOperator: 'rate',
@@ -247,8 +247,8 @@ export const WidgetHeaderProps: any = {
 					{
 						aggregateAttribute: {
 							dataType: 'float64',
-							id: 'signoz_calls_total--float64--Sum--true',
-							key: 'signoz_calls_total',
+							id: 'observe_calls_total--float64--Sum--true',
+							key: 'observe_calls_total',
 							type: 'Sum',
 						},
 						aggregateOperator: 'rate',
@@ -576,8 +576,8 @@ export const WidgetHeaderProps: any = {
 						A: {
 							aggregateAttribute: {
 								dataType: 'float64',
-								id: 'signoz_calls_total--float64--Sum--true',
-								key: 'signoz_calls_total',
+								id: 'observe_calls_total--float64--Sum--true',
+								key: 'observe_calls_total',
 								type: 'Sum',
 							},
 							aggregateOperator: 'rate',

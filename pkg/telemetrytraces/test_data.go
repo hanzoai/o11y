@@ -1,7 +1,7 @@
 package telemetrytraces
 
 import (
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 func buildCompleteFieldKeyMap() map[string][]*telemetrytypes.TelemetryFieldKey {

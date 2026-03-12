@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 // UnmarshalJSONWithSuggestions unmarshals JSON data into the target struct

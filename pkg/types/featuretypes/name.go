@@ -3,7 +3,7 @@ package featuretypes
 import (
 	"regexp"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 var nameRegex = regexp.MustCompile(`^[a-z][a-z0-9_]+$`)

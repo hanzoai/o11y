@@ -1,4 +1,4 @@
-import { GatewaytypesGettableIngestionKeysDTO } from 'api/generated/services/sigNoz.schemas';
+import { GatewaytypesGettableIngestionKeysDTO } from 'api/generated/services/observe.schemas';
 import { QueryParams } from 'constants/query';
 import { rest, server } from 'mocks-server/server';
 import { render, screen, userEvent, waitFor } from 'tests/test-utils';
@@ -57,13 +57,13 @@ describe('MultiIngestionSettings Page', () => {
 		expect(screen.getByText('Ingestion Keys')).toBeInTheDocument();
 
 		expect(
-			screen.getByText('Create and manage ingestion keys for the SigNoz Cloud'),
+			screen.getByText('Create and manage ingestion keys for the Hanzo O11y Cloud'),
 		).toBeInTheDocument();
 
 		const aboutKeyslink = screen.getByRole('link', { name: /Learn more/i });
 		expect(aboutKeyslink).toHaveAttribute(
 			'href',
-			'https://signoz.io/docs/ingestion/signoz-cloud/keys/',
+			'https://o11y.hanzo.ai/docs/ingestion/o11y-cloud/keys/',
 		);
 		expect(aboutKeyslink).toHaveAttribute('target', '_blank');
 		expect(aboutKeyslink).toHaveClass('learn-more');
@@ -150,12 +150,12 @@ describe('MultiIngestionSettings Page', () => {
 		// Check that the query contains the correct filter expression for the key
 		const firstQueryData = compositeQuery.builder.queryData[0];
 		expect(firstQueryData.filter.expression).toContain(
-			"signoz.workspace.key.id='k1'",
+			"o11y.workspace.key.id='k1'",
 		);
 
 		// Verify metric name for metrics signal
 		expect(firstQueryData.aggregations[0].metricName).toBe(
-			'signoz.meter.metric.datapoint.count',
+			'o11y.meter.metric.datapoint.count',
 		);
 	});
 
@@ -239,12 +239,12 @@ describe('MultiIngestionSettings Page', () => {
 		// Check that the query contains the correct filter expression for the key
 		const firstQueryData = compositeQuery.builder.queryData[0];
 		expect(firstQueryData.filter.expression).toContain(
-			"signoz.workspace.key.id='k2'",
+			"o11y.workspace.key.id='k2'",
 		);
 
 		// Verify metric name for logs signal
 		expect(firstQueryData.aggregations[0].metricName).toBe(
-			'signoz.meter.log.size',
+			'o11y.meter.log.size',
 		);
 	});
 

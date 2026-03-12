@@ -23,7 +23,7 @@ test('API Keys Settings - View and Interact', async ({ page }) => {
 	// Assert heading and subheading
 	await expect(page.getByRole('heading', { name: 'API Keys' })).toBeVisible();
 	await expect(
-		page.getByText('Create and manage API keys for the SigNoz API'),
+		page.getByText('Create and manage API keys for the Hanzo O11y API'),
 	).toBeVisible();
 
 	// Assert presence of New Key button

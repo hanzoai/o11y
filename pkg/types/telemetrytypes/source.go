@@ -1,6 +1,6 @@
 package telemetrytypes
 
-import "github.com/SigNoz/signoz/pkg/valuer"
+import "github.com/hanzoai/o11y/pkg/valuer"
 
 type Source struct {
 	valuer.String

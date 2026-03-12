@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Sentry from '@sentry/react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Button, Drawer, Empty, Skeleton, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { useGetMetricDetails } from 'hooks/metricsExplorer/useGetMetricDetails';

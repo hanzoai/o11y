@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 )
 
 type Comment struct{}

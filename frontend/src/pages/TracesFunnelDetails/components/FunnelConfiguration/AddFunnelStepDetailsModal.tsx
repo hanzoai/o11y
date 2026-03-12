@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Input } from 'antd';
-import SignozModal from 'components/SignozModal/SignozModal';
+import O11yModal from 'components/O11yModal/O11yModal';
 import { useUpdateFunnelSteps } from 'hooks/TracesFunnels/useFunnels';
 import { useNotifications } from 'hooks/useNotifications';
 import { Check, X } from 'lucide-react';
@@ -84,12 +84,12 @@ function AddFunnelStepDetailsModal({
 	};
 
 	return (
-		<SignozModal
+		<O11yModal
 			open={isOpen}
 			title="Add funnel step details"
 			width={384}
 			onCancel={handleCancel}
-			rootClassName="funnel-step-modal funnel-modal signoz-modal"
+			rootClassName="funnel-step-modal funnel-modal o11y-modal"
 			cancelText="Cancel"
 			okText="Save changes"
 			okButtonProps={{
@@ -133,7 +133,7 @@ function AddFunnelStepDetailsModal({
 					/>
 				</div>
 			</div>
-		</SignozModal>
+		</O11yModal>
 	);
 }
 

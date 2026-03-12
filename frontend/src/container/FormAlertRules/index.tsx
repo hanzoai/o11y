@@ -69,15 +69,15 @@ export enum AlertDetectionTypes {
 
 const ALERT_SETUP_GUIDE_URLS: Record<AlertTypes, string> = {
 	[AlertTypes.METRICS_BASED_ALERT]:
-		'https://signoz.io/docs/alerts-management/metrics-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
+		'https://o11y.hanzo.ai/docs/alerts-management/metrics-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
 	[AlertTypes.LOGS_BASED_ALERT]:
-		'https://signoz.io/docs/alerts-management/log-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
+		'https://o11y.hanzo.ai/docs/alerts-management/log-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
 	[AlertTypes.TRACES_BASED_ALERT]:
-		'https://signoz.io/docs/alerts-management/trace-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
+		'https://o11y.hanzo.ai/docs/alerts-management/trace-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
 	[AlertTypes.EXCEPTIONS_BASED_ALERT]:
-		'https://signoz.io/docs/alerts-management/exceptions-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
+		'https://o11y.hanzo.ai/docs/alerts-management/exceptions-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
 	[AlertTypes.ANOMALY_BASED_ALERT]:
-		'https://signoz.io/docs/alerts-management/anomaly-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
+		'https://o11y.hanzo.ai/docs/alerts-management/anomaly-based-alerts/?utm_source=product&utm_medium=alert-creation-page',
 };
 
 // eslint-disable-next-line sonarjs/cognitive-complexity

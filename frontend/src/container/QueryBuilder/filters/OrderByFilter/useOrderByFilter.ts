@@ -10,7 +10,7 @@ import { OrderByPayload } from 'types/api/queryBuilder/queryBuilderData';
 import { getRemoveOrderFromValue } from '../QueryBuilderSearch/utils';
 import { getUniqueOrderByValues, getValidOrderByResult } from '../utils';
 import { ORDERBY_FILTERS } from './config';
-import { SIGNOZ_VALUE } from './constants';
+import { HANZO_VALUE } from './constants';
 import { OrderByFilterProps } from './OrderByFilter.interfaces';
 import {
 	getLabelFromValue,
@@ -106,7 +106,7 @@ export const useOrderByFilter = ({
 			const [columnName, order] = match.data.flat() as string[];
 
 			const columnNameValue =
-				columnName === SIGNOZ_VALUE ? SIGNOZ_VALUE : columnName;
+				columnName === HANZO_VALUE ? HANZO_VALUE : columnName;
 
 			const orderValue = order ?? 'asc';
 
@@ -131,13 +131,13 @@ export const useOrderByFilter = ({
 				label: `${
 					entityVersion === 'v4' ? query.spaceAggregation : query.aggregateOperator
 				}(${query.aggregateAttribute?.key}) ${ORDERBY_FILTERS.ASC}`,
-				value: `${SIGNOZ_VALUE}${orderByValueDelimiter}${ORDERBY_FILTERS.ASC}`,
+				value: `${HANZO_VALUE}${orderByValueDelimiter}${ORDERBY_FILTERS.ASC}`,
 			},
 			{
 				label: `${
 					entityVersion === 'v4' ? query.spaceAggregation : query.aggregateOperator
 				}(${query.aggregateAttribute?.key}) ${ORDERBY_FILTERS.DESC}`,
-				value: `${SIGNOZ_VALUE}${orderByValueDelimiter}${ORDERBY_FILTERS.DESC}`,
+				value: `${HANZO_VALUE}${orderByValueDelimiter}${ORDERBY_FILTERS.DESC}`,
 			},
 		],
 		[query, entityVersion],

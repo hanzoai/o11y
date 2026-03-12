@@ -1,7 +1,7 @@
 package web
 
 import (
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/factory"
 )
 
 // Config holds the configuration for web.
@@ -23,7 +23,7 @@ func newConfig() factory.Config {
 	return &Config{
 		Enabled:   true,
 		Prefix:    "/",
-		Directory: "/etc/signoz/web",
+		Directory: "/etc/o11y/web",
 	}
 }
 

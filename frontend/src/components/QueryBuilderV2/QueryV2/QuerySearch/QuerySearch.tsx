@@ -10,7 +10,7 @@ import {
 	startCompletion,
 } from '@codemirror/autocomplete';
 import { javascript } from '@codemirror/lang-javascript';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { copilot } from '@uiw/codemirror-theme-copilot';
 import { githubLight } from '@uiw/codemirror-theme-github';
 import CodeMirror, { EditorView, keymap, Prec } from '@uiw/react-codemirror';
@@ -1268,7 +1268,7 @@ function QuerySearch({
 			Need help with search syntax?
 			<br />
 			<a
-				href="https://signoz.io/docs/userguide/search-syntax/"
+				href="https://o11y.hanzo.ai/docs/userguide/search-syntax/"
 				target="_blank"
 				rel="noopener noreferrer"
 				style={{ color: '#1890ff', textDecoration: 'underline' }}
@@ -1324,7 +1324,7 @@ function QuerySearch({
 					placement="left"
 				>
 					<a
-						href="https://signoz.io/docs/userguide/search-syntax/"
+						href="https://o11y.hanzo.ai/docs/userguide/search-syntax/"
 						target="_blank"
 						rel="noopener noreferrer"
 						style={{
