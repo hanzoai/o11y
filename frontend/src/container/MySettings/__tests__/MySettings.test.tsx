@@ -244,7 +244,7 @@ describe('MySettings Flows', () => {
 		it('Should render license section content when license key exists', () => {
 			expect(screen.getByText('License')).toBeInTheDocument();
 			expect(screen.getByText('License key')).toBeInTheDocument();
-			expect(screen.getByText('Your Hanzo O11y license key.')).toBeInTheDocument();
+			expect(screen.getByText('Your HanzoO11y license key.')).toBeInTheDocument();
 		});
 
 		it('Should not render license section when license key is missing', () => {
@@ -258,7 +258,7 @@ describe('MySettings Flows', () => {
 			expect(scoped.queryByText('License')).not.toBeInTheDocument();
 			expect(scoped.queryByText('License key')).not.toBeInTheDocument();
 			expect(
-				scoped.queryByText('Your Hanzo O11y license key.'),
+				scoped.queryByText('Your HanzoO11y license key.'),
 			).not.toBeInTheDocument();
 		});
 

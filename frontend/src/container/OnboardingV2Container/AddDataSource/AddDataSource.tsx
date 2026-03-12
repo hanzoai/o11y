@@ -704,7 +704,7 @@ function OnboardingAddDataSource(): JSX.Element {
 												Select your data source
 											</Typography.Title>
 											<Typography.Text className="question-sub-title">
-												Select from a host of services to start sending data to Hanzo O11y
+												Select from a host of services to start sending data to HanzoO11y
 											</Typography.Text>
 										</div>
 									</div>

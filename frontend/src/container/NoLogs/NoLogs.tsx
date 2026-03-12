@@ -60,7 +60,7 @@ export default function NoLogs({
 				</Typography>
 
 				<Typography.Link className="send-logs-link" onClick={handleLinkClick}>
-					Sending {dataSource} to Hanzo O11y <ArrowUpRight size={16} />
+					Sending {dataSource} to HanzoO11y <ArrowUpRight size={16} />
 				</Typography.Link>
 			</div>
 		</div>

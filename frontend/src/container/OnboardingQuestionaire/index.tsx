@@ -18,9 +18,9 @@ import history from 'lib/history';
 import { useAppContext } from 'providers/App/App';
 
 import {
-	AboutHanzo O11yQuestions,
+	AboutHanzoO11yQuestions,
 	O11yDetails,
-} from './AboutHanzo O11yQuestions/AboutHanzo O11yQuestions';
+} from './AboutSigNozQuestions/AboutSigNozQuestions';
 import InviteTeamMembers from './InviteTeamMembers/InviteTeamMembers';
 import OptimiseO11yNeeds, {
 	OptimiseO11yDetails,
@@ -218,7 +218,7 @@ function OnboardingQuestionaire(): JSX.Element {
 				)}
 
 				{currentStep === 2 && (
-					<AboutHanzo O11yQuestions
+					<AboutHanzoO11yQuestions
 						o11yDetails={o11yDetails}
 						setO11yDetails={setO11yDetails}
 						onNext={(): void => {

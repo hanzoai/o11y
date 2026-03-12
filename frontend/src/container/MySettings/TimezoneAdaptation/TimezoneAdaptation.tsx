@@ -57,7 +57,7 @@ function TimezoneAdaptation(): JSX.Element {
 			</div>
 
 			<p className="timezone-adaption__description">
-				Adapt the timestamps shown in the Hanzo O11y console to my active timezone.
+				Adapt the timestamps shown in the HanzoO11y console to my active timezone.
 			</p>
 
 			<div className="timezone-adaption__note">

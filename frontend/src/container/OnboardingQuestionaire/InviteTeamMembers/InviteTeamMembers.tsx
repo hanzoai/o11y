@@ -260,14 +260,14 @@ function InviteTeamMembers({
 		<div className="questions-container">
 			<OnboardingQuestionHeader
 				title="Invite your team"
-				subtitle="Hanzo O11y is a lot more useful with collaborators on board."
+				subtitle="HanzoO11y is a lot more useful with collaborators on board."
 			/>
 
 			<div className="questions-form-container">
 				<div className="questions-form invite-team-members-form">
 					<div className="form-group">
 						<div className="question-label">
-							Invite your team to the Hanzo O11y workspace
+							Invite your team to the HanzoO11y workspace
 						</div>
 
 						<div className="invite-team-members-table">

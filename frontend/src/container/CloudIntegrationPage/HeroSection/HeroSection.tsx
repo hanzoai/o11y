@@ -23,7 +23,7 @@ function HeroSection(): JSX.Element {
 			<div className="hero-section__details">
 				<div className="title">Amazon Web Services</div>
 				<div className="description">
-					One-click setup for AWS monitoring with Hanzo O11y
+					One-click setup for AWS monitoring with HanzoO11y
 				</div>
 				<AccountActions />
 			</div>

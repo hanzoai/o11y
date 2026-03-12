@@ -84,7 +84,7 @@ function RoleMappingSection({
 								</h4>
 								<p className="role-mapping-section__section-description">
 									Configure how user roles are determined from your Identity Provider.
-									You can either use a direct role attribute or map IDP groups to Hanzo O11y
+									You can either use a direct role attribute or map IDP groups to HanzoO11y
 									roles.
 								</p>
 							</div>
@@ -139,7 +139,7 @@ function RoleMappingSection({
 									}}
 								/>
 							</Form.Item>
-							<Tooltip title="If enabled, the role claim/attribute from the IDP will be used directly instead of group mappings. The role value must match a Hanzo O11y role (VIEWER, EDITOR, or ADMIN).">
+							<Tooltip title="If enabled, the role claim/attribute from the IDP will be used directly instead of group mappings. The role value must match a HanzoO11y role (VIEWER, EDITOR, or ADMIN).">
 								<CircleHelp size={14} color={Style.L3_FOREGROUND} cursor="help" />
 							</Tooltip>
 						</div>
@@ -151,7 +151,7 @@ function RoleMappingSection({
 										Group to Role Mappings
 									</span>
 									<p className="role-mapping-section__group-description">
-										Map IDP group names to Hanzo O11y roles. If a user belongs to multiple
+										Map IDP group names to HanzoO11y roles. If a user belongs to multiple
 										groups, the highest privilege role will be assigned.
 									</p>
 								</div>

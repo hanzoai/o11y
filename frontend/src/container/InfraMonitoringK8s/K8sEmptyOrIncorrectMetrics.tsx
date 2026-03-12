@@ -22,7 +22,7 @@ export default function HostsEmptyOrIncorrectMetrics({
 
 				{incorrectData && (
 					<Typography.Text className="incorrect-metrics-message">
-						To see data, upgrade to the latest version of Hanzo O11y k8s-infra chart.
+						To see data, upgrade to the latest version of HanzoO11y k8s-infra chart.
 						Please contact support if you need help.
 					</Typography.Text>
 				)}

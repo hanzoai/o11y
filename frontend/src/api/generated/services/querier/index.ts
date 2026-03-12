@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for Hanzo O11y
+ * * The file has been auto-generated using Orval for HanzoO11y
  * * regenerate with 'yarn generate:api'
- * Hanzo O11y
+ * HanzoO11y
  */
 import type {
 	MutationFunction,

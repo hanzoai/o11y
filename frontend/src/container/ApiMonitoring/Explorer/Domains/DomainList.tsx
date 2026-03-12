@@ -153,7 +153,7 @@ function DomainList(): JSX.Element {
 								rel="noreferrer"
 								className="external-api-doc-link"
 							>
-								Learn how External API monitoring works in Hanzo O11y{' '}
+								Learn how External API monitoring works in HanzoO11y{' '}
 								<MoveUpRight size={14} />
 							</a>
 						</div>

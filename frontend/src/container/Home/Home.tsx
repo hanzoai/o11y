@@ -339,7 +339,7 @@ export default function Home(): JSX.Element {
 			<div className="home-content">
 				<div className="home-left-content">
 					<DataSourceInfo
-						dataSentToHanzo O11y={
+						dataSentToHanzoO11y={
 							isLogsIngestionActive ||
 							isTracesIngestionActive ||
 							isMetricsIngestionActive

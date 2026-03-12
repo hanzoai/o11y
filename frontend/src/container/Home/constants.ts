@@ -51,7 +51,7 @@ export const defaultChecklistItemsState: ChecklistItem[] = [
 		id: 'SEND_LOGS',
 		title: 'Send your logs',
 		description:
-			'Send your logs to Hanzo O11y to get more visibility into how your resources interact.',
+			'Send your logs to HanzoO11y to get more visibility into how your resources interact.',
 		completed: false,
 		isSkipped: false,
 		isSkippable: true,
@@ -63,7 +63,7 @@ export const defaultChecklistItemsState: ChecklistItem[] = [
 		id: 'SEND_TRACES',
 		title: 'Send your traces',
 		description:
-			'Send your traces to Hanzo O11y to get more visibility into how your resources interact.',
+			'Send your traces to HanzoO11y to get more visibility into how your resources interact.',
 		completed: false,
 		isSkipped: false,
 		isSkippable: true,
@@ -75,7 +75,7 @@ export const defaultChecklistItemsState: ChecklistItem[] = [
 		id: 'SEND_METRICS',
 		title: 'Send your metrics',
 		description:
-			'Send your metrics to Hanzo O11y to get more visibility into how your resources interact.',
+			'Send your metrics to HanzoO11y to get more visibility into how your resources interact.',
 		completed: false,
 		isSkipped: false,
 		isSkippable: true,

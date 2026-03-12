@@ -131,11 +131,11 @@ function PublicDashboardContainer({
 					<div className="brand-logo">
 						<img
 							src="/Logos/observe-brand-logo.svg"
-							alt="Hanzo O11y"
+							alt="HanzoO11y"
 							className="brand-logo-img"
 						/>
 
-						<Typography className="brand-logo-name">Hanzo O11y</Typography>
+						<Typography className="brand-logo-name">HanzoO11y</Typography>
 					</div>
 
 					<div className="public-dashboard-header-title">

@@ -522,7 +522,7 @@ function APIKeys(): JSX.Element {
 				<header>
 					<Typography.Title className="title">API Keys</Typography.Title>
 					<Typography.Text className="subtitle">
-						Create and manage API keys for the Hanzo O11y API
+						Create and manage API keys for the HanzoO11y API
 					</Typography.Text>
 				</header>
 

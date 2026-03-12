@@ -131,7 +131,7 @@ function OrgQuestions({ orgDetails, onNext }: OrgQuestionsProps): JSX.Element {
 			<div className="onboarding-header-section">
 				<div className="onboarding-header-icon">🎉</div>
 				<Typography.Title level={4} className="onboarding-header-title">
-					Welcome to Hanzo O11y Cloud
+					Welcome to HanzoO11y Cloud
 				</Typography.Title>
 				<Typography.Paragraph className="onboarding-header-subtitle">
 					Let&apos;s get you started
@@ -185,7 +185,7 @@ function OrgQuestions({ orgDetails, onNext }: OrgQuestionsProps): JSX.Element {
 					{showMigrationQuestion && (
 						<div className="form-group">
 							<div className="question">
-								What is your timeline for migrating to Hanzo O11y?
+								What is your timeline for migrating to HanzoO11y?
 							</div>
 							<RadioGroup
 								value={migrationTimeline || ''}
