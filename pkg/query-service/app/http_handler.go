@@ -4516,7 +4516,7 @@ func (aH *APIHandler) queryRangeV3(ctx context.Context, queryRangeParams *v3.Que
 		isUsed, traceIDs := tracesV3.TraceIdFilterUsedWithEqual(queryRangeParams)
 		if isUsed && len(traceIDs) > 0 {
 			zap.L().Debug("traceID used as filter in traces query")
-			// query o11y_spans table with traceID to get min and max timestamp
+			// query signoz_spans table with traceID to get min and max timestamp
 			min, max, err := aH.reader.GetMinAndMaxTimestampForTraceID(ctx, traceIDs)
 			if err == nil {
 				// add timestamp filter to queryRange params
@@ -4875,7 +4875,7 @@ func (aH *APIHandler) queryRangeV4(ctx context.Context, queryRangeParams *v3.Que
 		isUsed, traceIDs := tracesV3.TraceIdFilterUsedWithEqual(queryRangeParams)
 		if isUsed && len(traceIDs) > 0 {
 			zap.L().Debug("traceID used as filter in traces query")
-			// query o11y_spans table with traceID to get min and max timestamp
+			// query signoz_spans table with traceID to get min and max timestamp
 			min, max, err := aH.reader.GetMinAndMaxTimestampForTraceID(ctx, traceIDs)
 			if err == nil {
 				// add timestamp filter to queryRange params
