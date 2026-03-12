@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import O11yRadioGroup from 'components/O11yRadioGroup/O11yRadioGroup';
+import O11yRadioGroup from 'components/SignozRadioGroup/SignozRadioGroup';
 import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 
 import StepsTransitionMetrics from './StepsTransitionMetrics';
