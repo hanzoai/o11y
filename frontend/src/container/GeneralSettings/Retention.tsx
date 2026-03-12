@@ -7,7 +7,7 @@ import {
 	useRef,
 	useState,
 } from 'react';
-import { Input as SignozInput } from '@signozhq/input';
+import { Input as O11yInput } from '@hanzo/o11y-input';
 import { Col, Row, Select } from 'antd';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import { find } from 'lodash-es';
@@ -131,7 +131,7 @@ function Retention({
 	if (compact) {
 		return (
 			<div className="retention-input-group">
-				<SignozInput
+				<O11yInput
 					type="number"
 					min={0}
 					value={selectedValue && selectedValue >= 0 ? selectedValue : ''}

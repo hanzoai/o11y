@@ -9,22 +9,22 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/cache/cachetest"
-	"github.com/SigNoz/signoz/pkg/instrumentation/instrumentationtest"
-	"github.com/SigNoz/signoz/pkg/prometheus"
-	"github.com/SigNoz/signoz/pkg/prometheus/prometheustest"
-	"github.com/SigNoz/signoz/pkg/query-service/app/clickhouseReader"
-	logsV4 "github.com/SigNoz/signoz/pkg/query-service/app/logs/v4"
-	"github.com/SigNoz/signoz/pkg/query-service/app/queryBuilder"
-	tracesV3 "github.com/SigNoz/signoz/pkg/query-service/app/traces/v3"
-	tracesV4 "github.com/SigNoz/signoz/pkg/query-service/app/traces/v4"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/querycache"
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/telemetrystore/telemetrystoretest"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/cache/cachetest"
+	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
+	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	logsV4 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v4"
+	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
+	tracesV3 "github.com/hanzoai/o11y/pkg/query-service/app/traces/v3"
+	tracesV4 "github.com/hanzoai/o11y/pkg/query-service/app/traces/v4"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/querycache"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	cmock "github.com/srikanthccv/ClickHouse-go-mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -1073,7 +1073,7 @@ func TestQueryRangeValueTypePromQL(t *testing.T) {
 				PanelType: v3.PanelTypeValue,
 				PromQueries: map[string]*v3.PromQuery{
 					"A": {
-						Query: "signoz_calls_total",
+						Query: "observe_calls_total",
 					},
 				},
 			},
@@ -1087,7 +1087,7 @@ func TestQueryRangeValueTypePromQL(t *testing.T) {
 				PanelType: v3.PanelTypeValue,
 				PromQueries: map[string]*v3.PromQuery{
 					"A": {
-						Query: "signoz_latency_bucket",
+						Query: "observe_latency_bucket",
 					},
 				},
 			},
@@ -1128,13 +1128,13 @@ func TestQueryRangeValueTypePromQL(t *testing.T) {
 		ranges []querycache.MissInterval
 	}{
 		{
-			query: "signoz_calls_total",
+			query: "observe_calls_total",
 			ranges: []querycache.MissInterval{
 				{Start: 1675115596722, End: 1675115596722 + 120*60*1000},
 			},
 		},
 		{
-			query: "signoz_latency_bucket",
+			query: "observe_latency_bucket",
 			ranges: []querycache.MissInterval{
 				{Start: 1675115596722 + 60*60*1000, End: 1675115596722 + 180*60*1000},
 			},

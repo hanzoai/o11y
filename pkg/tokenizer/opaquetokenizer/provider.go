@@ -5,15 +5,15 @@ import (
 	"slices"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/tokenizer"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/cachetypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/tokenizer"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/cachetypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/dgraph-io/ristretto/v2"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -44,7 +44,7 @@ func NewFactory(cache cache.Cache, tokenStore authtypes.TokenStore, orgGetter or
 }
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config tokenizer.Config, cache cache.Cache, tokenStore authtypes.TokenStore, orgGetter organization.Getter) (tokenizer.Tokenizer, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/tokenizer/opaquetokenizer")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/tokenizer/opaquetokenizer")
 
 	// * move these hardcoded values to a config based value when needed
 	lastObservedAtCache, err := ristretto.NewCache(&ristretto.Config[string, time.Time]{

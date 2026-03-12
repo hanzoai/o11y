@@ -6,21 +6,21 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/SigNoz/signoz/pkg/alertmanager"
-	alertmanagermock "github.com/SigNoz/signoz/pkg/alertmanager/alertmanagertest"
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/cache/cachetest"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/instrumentation/instrumentationtest"
-	"github.com/SigNoz/signoz/pkg/prometheus"
-	"github.com/SigNoz/signoz/pkg/prometheus/prometheustest"
-	"github.com/SigNoz/signoz/pkg/querier"
-	"github.com/SigNoz/signoz/pkg/querier/signozquerier"
-	"github.com/SigNoz/signoz/pkg/query-service/app/clickhouseReader"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/sqlstore/sqlstoretest"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/telemetrystore/telemetrystoretest"
+	"github.com/hanzoai/o11y/pkg/alertmanager"
+	alertmanagermock "github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertest"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/cache/cachetest"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
+	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/querier/o11yquerier"
+	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstoretest"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 )
@@ -118,7 +118,7 @@ func NewTestManager(t *testing.T, testOpts *TestManagerOptions) *Manager {
 	}
 
 	// Create mock querierV5 with test values
-	providerFactory := signozquerier.NewFactory(telemetryStore, prometheus, readerCache, flagger)
+	providerFactory := o11yquerier.NewFactory(telemetryStore, prometheus, readerCache, flagger)
 	mockQuerier, err := providerFactory.New(context.Background(), providerSettings, querier.Config{})
 	require.NoError(t, err)
 

@@ -2,7 +2,7 @@
 
 Azure Event Hubs is a big data streaming platform ideal for centralizing logging and real-time log streaming for applications on Azure or on-premises.
 
-Integrate SigNoz with Azure Event Hubs for a robust log management solution, leveraging SigNoz's log aggregation, querying, visualization, and alerting features.
+Integrate Hanzo O11y with Azure Event Hubs for a robust log management solution, leveraging Hanzo O11y's log aggregation, querying, visualization, and alerting features.
 
 ## Prerequisites
 
@@ -45,7 +45,7 @@ Integrate SigNoz with Azure Event Hubs for a robust log management solution, lev
 
 1. Configure Azure services' diagnostic settings to forward logs to the Event Hub.
 2. Ensure logs are in [Azure Common Log Format](https://learn.microsoft.com/en-us/azure/azure-monitor/essentials/resource-logs-schema).
-3. Verify logs are streaming to Event Hubs and received by SigNoz.
+3. Verify logs are streaming to Event Hubs and received by Hanzo O11y.
 
 For detailed instructions, refer to the Azure documentation: [Azure Event Hub](https://learn.microsoft.com/en-us/azure/event-hubs/event-hubs-create). -->
 

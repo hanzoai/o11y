@@ -3,11 +3,11 @@ package emailpasswordauthn
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/authn"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/authn"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 var _ authn.PasswordAuthN = (*AuthN)(nil)

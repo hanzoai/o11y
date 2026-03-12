@@ -15,18 +15,18 @@ on:
 
 jobs:
   verify:
-    uses: signoz/primus.workflows/.github/workflows/github-verify.yaml@main
+    uses: observe/primus.workflows/.github/workflows/github-verify.yaml@main
     secrets: inherit
     with:
       PRIMUS_REF: main
       GITHUB_TEAM_NAME: releaser
       GITHUB_MEMBER_NAME: ${{ github.actor }}
-  signoz:
+  observe:
     if: ${{ always() && (needs.verify.result == 'success' || github.event.name == 'schedule') }}
-    uses: signoz/primus.workflows/.github/workflows/releaser.yaml@main
+    uses: observe/primus.workflows/.github/workflows/releaser.yaml@main
     secrets: inherit
     needs: [verify]
     with:
       PRIMUS_REF: main
-      PROJECT_NAME: signoz
+      PROJECT_NAME: observe
       RELEASE_TYPE: ${{ inputs.release_type || 'minor' }}

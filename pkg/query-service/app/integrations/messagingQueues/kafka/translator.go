@@ -3,9 +3,9 @@ package kafka
 import (
 	"fmt"
 
-	"github.com/SigNoz/signoz/pkg/query-service/common"
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/common"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
 var defaultStepInterval int64 = 60

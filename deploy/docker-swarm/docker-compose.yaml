@@ -1,7 +1,7 @@
 version: "3"
 x-common: &common
   networks:
-    - signoz-net
+    - o11y-net
   deploy:
     restart_policy:
       condition: on-failure
@@ -11,13 +11,13 @@ x-common: &common
       max-file: "3"
 x-clickhouse-defaults: &clickhouse-defaults
   !!merge <<: *common
-  image: clickhouse/clickhouse-server:25.5.6
+  image: ghcr.io/hanzoai/datastore:25.5.6
   tty: true
   deploy:
     labels:
-      signoz.io/scrape: "true"
-      signoz.io/port: "9363"
-      signoz.io/path: "/metrics"
+      o11y.hanzo.ai/scrape: "true"
+      o11y.hanzo.ai/port: "9363"
+      o11y.hanzo.ai/path: "/metrics"
   depends_on:
     - init-clickhouse
     - zookeeper-1
@@ -40,13 +40,13 @@ x-clickhouse-defaults: &clickhouse-defaults
     - CLICKHOUSE_SKIP_USER_SETUP=1
 x-zookeeper-defaults: &zookeeper-defaults
   !!merge <<: *common
-  image: signoz/zookeeper:3.7.1
+  image: ghcr.io/hanzoai/zookeeper:3.7.1
   user: root
   deploy:
     labels:
-      signoz.io/scrape: "true"
-      signoz.io/port: "9141"
-      signoz.io/path: "/metrics"
+      o11y.hanzo.ai/scrape: "true"
+      o11y.hanzo.ai/port: "9141"
+      o11y.hanzo.ai/path: "/metrics"
   healthcheck:
     test:
       - CMD-SHELL
@@ -61,7 +61,7 @@ x-db-depend: &db-depend
 services:
   init-clickhouse:
     !!merge <<: *common
-    image: clickhouse/clickhouse-server:25.5.6
+    image: ghcr.io/hanzoai/datastore:25.5.6
     command:
       - bash
       - -c
@@ -71,7 +71,7 @@ services:
         node_arch=$$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/)
         echo "Fetching histogram-binary for $${node_os}/$${node_arch}"
         cd /tmp
-        wget -O histogram-quantile.tar.gz "https://github.com/SigNoz/signoz/releases/download/histogram-quantile%2F$${version}/histogram-quantile_$${node_os}_$${node_arch}.tar.gz"
+        wget -O histogram-quantile.tar.gz "https://github.com/Hanzo O11y/observe/releases/download/histogram-quantile%2F$${version}/histogram-quantile_$${node_os}_$${node_arch}.tar.gz"
         tar -xvzf histogram-quantile.tar.gz
         mv histogram-quantile /var/lib/clickhouse/user_scripts/histogramQuantile
     deploy:
@@ -115,18 +115,18 @@ services:
       - clickhouse:/var/lib/clickhouse/
       - ../common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
       # - ../common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
-  signoz:
+  observe:
     !!merge <<: *db-depend
-    image: signoz/signoz:v0.115.0
+    image: ghcr.io/hanzoai/o11y:v0.115.0
     ports:
-      - "8080:8080" # signoz port
+      - "8080:8080" # observe port
     volumes:
-      - sqlite:/var/lib/signoz/
+      - sqlite:/var/lib/observe/
     environment:
-      - SIGNOZ_ALERTMANAGER_PROVIDER=signoz
-      - SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - SIGNOZ_SQLSTORE_SQLITE_PATH=/var/lib/signoz/signoz.db
-      - SIGNOZ_TOKENIZER_JWT_SECRET=secret
+      - HANZO_ALERTMANAGER_PROVIDER=observe
+      - HANZO_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - HANZO_SQLSTORE_SQLITE_PATH=/var/lib/ghcr.io/hanzoai/o11y.db
+      - HANZO_TOKENIZER_JWT_SECRET=secret
     healthcheck:
       test:
         - CMD
@@ -139,14 +139,14 @@ services:
       retries: 3
   otel-collector:
     !!merge <<: *db-depend
-    image: signoz/signoz-otel-collector:v0.144.2
+    image: ghcr.io/hanzoai/otel-collector:v0.144.2
     entrypoint:
       - /bin/sh
     command:
       - -c
       - |
-        /signoz-otel-collector migrate sync check &&
-        /signoz-otel-collector --config=/etc/otel-collector-config.yaml --manager-config=/etc/manager-config.yaml --copy-path=/var/tmp/collector-config.yaml
+        /o11y-otel-collector migrate sync check &&
+        /o11y-otel-collector --config=/etc/otel-collector-config.yaml --manager-config=/etc/manager-config.yaml --copy-path=/var/tmp/collector-config.yaml
     configs:
       - source: otel-collector-config
         target: /etc/otel-collector-config.yaml
@@ -155,42 +155,42 @@ services:
     environment:
       - OTEL_RESOURCE_ATTRIBUTES=host.name={{.Node.Hostname}},os.type={{.Node.Platform.OS}}
       - LOW_CARDINAL_EXCEPTION_GROUPING=false
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
-      - SIGNOZ_OTEL_COLLECTOR_TIMEOUT=10m
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - HANZO_OTEL_COLLECTOR_TIMEOUT=10m
     ports:
       # - "1777:1777"     # pprof extension
       - "4317:4317" # OTLP gRPC receiver
       - "4318:4318" # OTLP HTTP receiver
     deploy:
       replicas: 3
-  signoz-telemetrystore-migrator:
+  o11y-telemetrystore-migrator:
     !!merge <<: *db-depend
-    image: signoz/signoz-otel-collector:v0.144.2
+    image: ghcr.io/hanzoai/otel-collector:v0.144.2
     environment:
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
-      - SIGNOZ_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
-      - SIGNOZ_OTEL_COLLECTOR_TIMEOUT=10m
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
+      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - HANZO_OTEL_COLLECTOR_TIMEOUT=10m
     entrypoint:
       - /bin/sh
     command:
       - -c
       - |
-        /signoz-otel-collector migrate bootstrap &&
-        /signoz-otel-collector migrate sync up &&
-        /signoz-otel-collector migrate async up
+        /o11y-otel-collector migrate bootstrap &&
+        /o11y-otel-collector migrate sync up &&
+        /o11y-otel-collector migrate async up
 networks:
-  signoz-net:
-    name: signoz-net
+  o11y-net:
+    name: o11y-net
 volumes:
   clickhouse:
-    name: signoz-clickhouse
+    name: o11y-datastore
   sqlite:
-    name: signoz-sqlite
+    name: o11y-sqlite
   zookeeper-1:
-    name: signoz-zookeeper-1
+    name: o11y-zookeeper-1
 configs:
   clickhouse-config:
     file: ../common/clickhouse/config.xml
@@ -203,4 +203,4 @@ configs:
   otel-collector-config:
     file: ./otel-collector-config.yaml
   otel-manager-config:
-    file: ../common/signoz/otel-collector-opamp-config.yaml
+    file: ../common/observe/otel-collector-opamp-config.yaml

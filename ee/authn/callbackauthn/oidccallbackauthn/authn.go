@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/SigNoz/signoz/pkg/authn"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/http/client"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/authn"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/http/client"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"golang.org/x/oauth2"
 )
@@ -32,7 +32,7 @@ type AuthN struct {
 }
 
 func New(store authtypes.AuthNStore, licensing licensing.Licensing, providerSettings factory.ProviderSettings) (*AuthN, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/ee/authn/callbackauthn/oidccallbackauthn")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/ee/authn/callbackauthn/oidccallbackauthn")
 
 	httpClient, err := client.New(providerSettings.Logger, providerSettings.TracerProvider, providerSettings.MeterProvider)
 	if err != nil {

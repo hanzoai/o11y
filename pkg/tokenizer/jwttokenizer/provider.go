@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/tokenizer"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/tokenizer"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/dgraph-io/ristretto/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -41,10 +41,10 @@ func NewFactory(cache cache.Cache, tokenStore authtypes.TokenStore) factory.Prov
 }
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config tokenizer.Config, cache cache.Cache, tokenStore authtypes.TokenStore) (tokenizer.Tokenizer, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/tokenizer/jwttokenizer")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/tokenizer/jwttokenizer")
 
 	if config.JWT.Secret == "" {
-		settings.Logger().ErrorContext(ctx, "🚨 CRITICAL SECURITY ISSUE: No JWT secret key specified!", "error", "SIGNOZ_TOKENIZER_JWT_SECRET environment variable is not set. This has dire consequences for the security of the application. Without a JWT secret, user sessions are vulnerable to tampering and unauthorized access. Please set the SIGNOZ_TOKENIZER_JWT_SECRET environment variable immediately. For more information, please refer to https://github.com/SigNoz/signoz/issues/8400.")
+		settings.Logger().ErrorContext(ctx, "🚨 CRITICAL SECURITY ISSUE: No JWT secret key specified!", "error", "HANZO_TOKENIZER_JWT_SECRET environment variable is not set. This has dire consequences for the security of the application. Without a JWT secret, user sessions are vulnerable to tampering and unauthorized access. Please set the HANZO_TOKENIZER_JWT_SECRET environment variable immediately. For more information, please refer to https://github.com/hanzoai/o11y/issues/8400.")
 	}
 
 	lastObservedAtCache, err := ristretto.NewCache(&ristretto.Config[string, map[valuer.UUID]time.Time]{

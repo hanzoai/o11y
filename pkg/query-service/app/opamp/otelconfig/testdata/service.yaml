@@ -3,7 +3,7 @@ service:
   pipelines:
     traces:
       receivers: [jaeger, otlp]
-      processors: [signozspanmetrics/cumulative, batch]
+      processors: [observespanmetrics/cumulative, batch]
       exporters: [clickhousetraces]
     metrics:
       receivers: [otlp, hostmetrics]

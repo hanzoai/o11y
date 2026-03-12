@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/mail"
 
-	"github.com/SigNoz/signoz/pkg/emailing"
-	"github.com/SigNoz/signoz/pkg/emailing/templatestore/filetemplatestore"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/smtp/client"
-	"github.com/SigNoz/signoz/pkg/types/emailtypes"
+	"github.com/hanzoai/o11y/pkg/emailing"
+	"github.com/hanzoai/o11y/pkg/emailing/templatestore/filetemplatestore"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/smtp/client"
+	"github.com/hanzoai/o11y/pkg/types/emailtypes"
 )
 
 type provider struct {
@@ -23,7 +23,7 @@ func NewFactory() factory.ProviderFactory[emailing.Emailing, emailing.Config] {
 }
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config emailing.Config) (emailing.Emailing, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/emailing/smtpemailing")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/emailing/smtpemailing")
 
 	// Try to create a template store. If it fails, use an empty store.
 	store, err := filetemplatestore.NewStore(ctx, config.Templates.Directory, emailtypes.Templates, settings.Logger())

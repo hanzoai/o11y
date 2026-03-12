@@ -10,20 +10,20 @@ import (
 	"sync"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/prometheus"
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
-	"github.com/SigNoz/signoz/pkg/querybuilder"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	"github.com/SigNoz/signoz/pkg/types/instrumentationtypes"
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"golang.org/x/exp/maps"
 
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 var (
@@ -58,7 +58,7 @@ func New(
 	traceOperatorStmtBuilder qbtypes.TraceOperatorStatementBuilder,
 	bucketCache BucketCache,
 ) *querier {
-	querierSettings := factory.NewScopedProviderSettings(settings, "github.com/SigNoz/signoz/pkg/querier")
+	querierSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querier")
 	return &querier{
 		logger:                   querierSettings.Logger(),
 		telemetryStore:           telemetryStore,
@@ -251,9 +251,9 @@ func (q *querier) QueryRange(ctx context.Context, orgID valuer.UUID, req *qbtype
 			switch spec := query.Spec.(type) {
 			case qbtypes.ClickHouseQuery:
 				if strings.TrimSpace(spec.Query) != "" {
-					event.MetricsUsed = strings.Contains(spec.Query, "signoz_metrics")
-					event.LogsUsed = strings.Contains(spec.Query, "signoz_logs")
-					event.TracesUsed = strings.Contains(spec.Query, "signoz_traces")
+					event.MetricsUsed = strings.Contains(spec.Query, "observe_metrics")
+					event.LogsUsed = strings.Contains(spec.Query, "observe_logs")
+					event.TracesUsed = strings.Contains(spec.Query, "observe_traces")
 				}
 			}
 		} else if query.Type == qbtypes.QueryTypeTraceOperator {

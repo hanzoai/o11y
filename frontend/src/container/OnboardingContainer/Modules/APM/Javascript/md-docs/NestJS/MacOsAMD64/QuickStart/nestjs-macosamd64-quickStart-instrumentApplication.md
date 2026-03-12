@@ -27,7 +27,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 // Configure the SDK to export telemetry data to the console
 // Enable all auto-instrumentations from the meta package
 const exporterOptions = {
-  url: 'https://ingest.{{REGION}}.signoz.cloud:443/v1/traces',
+  url: 'https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces',
 };
 
 const traceExporter = new OTLPTraceExporter(exporterOptions);

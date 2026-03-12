@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/instrumentation"
-	model "github.com/SigNoz/signoz/pkg/query-service/app/opamp/model"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/instrumentation"
+	model "github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/open-telemetry/opamp-go/protobufs"
 	"github.com/open-telemetry/opamp-go/server"
 	"github.com/open-telemetry/opamp-go/server/types"

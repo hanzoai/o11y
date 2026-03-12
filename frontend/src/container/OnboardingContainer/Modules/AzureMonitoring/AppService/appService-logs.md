@@ -30,4 +30,4 @@ Follow these steps if you want to setup logging for your Azure App Service.
 6. Save the diagnostic settings
 
 
-This will start sending your Azure App Service Logs to SigNoz!
+This will start sending your Azure App Service Logs to Hanzo O11y!

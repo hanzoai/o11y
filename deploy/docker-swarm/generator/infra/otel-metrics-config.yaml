@@ -32,7 +32,7 @@ receivers:
             - action: keep
               regex: true
               source_labels:
-                - __meta_dockerswarm_service_label_signoz_io_scrape
+                - __meta_dockerswarm_service_label_observe_io_scrape
             - regex: ([^:]+)(?::\d+)?
               replacement: $1
               source_labels:
@@ -47,10 +47,10 @@ receivers:
             - target_label: __address__
               source_labels:
                 - swarm_container_ip
-                - __meta_dockerswarm_service_label_signoz_io_port
+                - __meta_dockerswarm_service_label_observe_io_port
               separator: ":"
             - source_labels:
-                - __meta_dockerswarm_service_label_signoz_io_path
+                - __meta_dockerswarm_service_label_observe_io_path
               target_label: __metrics_path__
             - source_labels:
               - __meta_dockerswarm_service_label_com_docker_stack_namespace
@@ -81,11 +81,11 @@ extensions:
     endpoint: 0.0.0.0:1777
 exporters:
   otlp:
-    endpoint: ${env:SIGNOZ_COLLECTOR_ENDPOINT}
+    endpoint: ${env:HANZO_COLLECTOR_ENDPOINT}
     tls:
       insecure: true
     headers:
-      signoz-access-token: ${env:SIGNOZ_ACCESS_TOKEN}
+      observe-access-token: ${env:HANZO_ACCESS_TOKEN}
   # debug: {}
 service:
   telemetry:

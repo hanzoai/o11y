@@ -57,7 +57,7 @@ SELECT
 FROM (
     SELECT
         %s
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         %s
     GROUP BY trace_id
@@ -182,7 +182,7 @@ WITH
 , funnel AS (
     SELECT
         %s
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         %s
     GROUP BY trace_id
@@ -297,7 +297,7 @@ SELECT
 FROM (
     SELECT
         %s
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         %s
     GROUP BY trace_id
@@ -431,7 +431,7 @@ FROM (
     FROM (
         SELECT
             %s
-        FROM signoz_traces.distributed_signoz_index_v3
+        FROM observe_traces.distributed_observe_index_v3
         WHERE
             %s
         GROUP BY trace_id
@@ -506,7 +506,7 @@ FROM (
         %[11]s AS t1_time,
         %[12]s AS t2_time,
         count() AS span_count
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         timestamp BETWEEN start_ts AND end_ts
         AND (
@@ -584,7 +584,7 @@ FROM (
         toUInt8(anyIf(has_error, resource_string_service$$name = step1.1 AND name = step1.2)) AS t1_error,
         toUInt8(anyIf(has_error, resource_string_service$$name = step2.1 AND name = step2.2)) AS t2_error,
         count() AS span_count
-    FROM signoz_traces.distributed_signoz_index_v3
+    FROM observe_traces.distributed_observe_index_v3
     WHERE
         timestamp BETWEEN start_ts AND end_ts
         AND (

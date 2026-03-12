@@ -14,19 +14,19 @@ func NewDispatcherMetrics(registerLimitMetrics bool, r prometheus.Registerer) *D
 	m := DispatcherMetrics{
 		aggrGroups: prometheus.NewGauge(
 			prometheus.GaugeOpts{
-				Name: "signoz_alertmanager_dispatcher_aggregation_groups",
+				Name: "o11y_alertmanager_dispatcher_aggregation_groups",
 				Help: "Number of active aggregation groups",
 			},
 		),
 		processingDuration: prometheus.NewSummary(
 			prometheus.SummaryOpts{
-				Name: "signoz_alertmanager_dispatcher_alert_processing_duration_seconds",
+				Name: "o11y_alertmanager_dispatcher_alert_processing_duration_seconds",
 				Help: "Summary of latencies for the processing of alerts.",
 			},
 		),
 		aggrGroupLimitReached: prometheus.NewCounter(
 			prometheus.CounterOpts{
-				Name: "signoz_alertmanager_dispatcher_aggregation_group_limit_reached_total",
+				Name: "o11y_alertmanager_dispatcher_aggregation_group_limit_reached_total",
 				Help: "Number of times when dispatcher failed to create new aggregation group due to limit.",
 			},
 		),

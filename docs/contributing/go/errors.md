@@ -1,10 +1,10 @@
 # Errors
 
-SigNoz includes its own structured [errors](/pkg/errors/errors.go) package. It's built on top of Go's `error` interface, extending it to add additional context that helps provide more meaningful error messages throughout the application.
+Hanzo O11y includes its own structured [errors](/pkg/errors/errors.go) package. It's built on top of Go's `error` interface, extending it to add additional context that helps provide more meaningful error messages throughout the application.
 
 ## How to use it?
 
-To use the SigNoz structured errors package, use these functions instead of the standard library alternatives:
+To use the Hanzo O11y structured errors package, use these functions instead of the standard library alternatives:
 
 ```go
 // Instead of errors.New()
@@ -81,7 +81,7 @@ func GetUserSecurely(id string) (*User, error) {
 
 ## Why do we need this?
 
-In a large codebase like SigNoz, error handling is critical for maintaining reliability, debuggability, and a good user experience. We believe that it is the **responsibility of a function** to return **well-defined** errors that **accurately describe what went wrong**. With our structured error system:
+In a large codebase like Hanzo O11y, error handling is critical for maintaining reliability, debuggability, and a good user experience. We believe that it is the **responsibility of a function** to return **well-defined** errors that **accurately describe what went wrong**. With our structured error system:
 
 - Functions can create precise errors with appropriate additional context
 - Callers can make informed decisions based on the additional context

@@ -6,9 +6,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/SigNoz/signoz-otel-collector/exporter/jsontypeexporter"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y-otel-collector/exporter/jsontypeexporter"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type JSONAccessBranchType struct {

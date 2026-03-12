@@ -71,7 +71,7 @@ function DisplayName({ index, id: orgId }: DisplayNameProps): JSX.Element {
 				label="Display name"
 				rules={[{ required: true, message: requireErrorMessage('Display name') }]}
 			>
-				<Input size="large" placeholder={t('signoz')} />
+				<Input size="large" placeholder={t('o11y')} />
 			</Form.Item>
 			<Form.Item>
 				<Button

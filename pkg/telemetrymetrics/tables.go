@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 )
 
 const (
-	DBName                           = "signoz_metrics"
+	DBName                           = "observe_metrics"
 	UpdatedMetadataTableName         = "distributed_updated_metadata"
 	UpdatedMetadataLocalTableName    = "updated_metadata"
 	SamplesV4TableName               = "distributed_samples_v4"

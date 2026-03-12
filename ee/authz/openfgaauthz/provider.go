@@ -4,17 +4,17 @@ import (
 	"context"
 	"slices"
 
-	"github.com/SigNoz/signoz/ee/authz/openfgaserver"
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/authz/authzstore/sqlauthzstore"
-	pkgopenfgaauthz "github.com/SigNoz/signoz/pkg/authz/openfgaauthz"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/roletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/ee/authz/openfgaserver"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/authz/authzstore/sqlauthzstore"
+	pkgopenfgaauthz "github.com/hanzoai/o11y/pkg/authz/openfgaauthz"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 	openfgapkgtransformer "github.com/openfga/language/pkg/go/transformer"
 )
@@ -283,7 +283,7 @@ func (provider *provider) getManagedRoleGrantTuples(orgID valuer.UUID, userID va
 		adminSubject,
 		authtypes.RelationAssignee,
 		[]authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.SigNozAdminRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yAdminRoleName),
 		},
 		orgID,
 	)
@@ -298,7 +298,7 @@ func (provider *provider) getManagedRoleGrantTuples(orgID valuer.UUID, userID va
 		anonymousSubject,
 		authtypes.RelationAssignee,
 		[]authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.SigNozAnonymousRoleName),
+			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.Hanzo O11yAnonymousRoleName),
 		},
 		orgID,
 	)

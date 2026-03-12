@@ -26,7 +26,7 @@ function CreatePipelineButton({
 		setActionMode(ActionMode.Editing);
 
 		logEvent('Logs: Pipelines: Entered Edit Mode', {
-			source: 'signoz-ui',
+			source: 'observe-ui',
 		});
 	};
 	const onAddNewPipeline = (): void => {
@@ -34,7 +34,7 @@ function CreatePipelineButton({
 		setActionType(ActionType.AddPipeline);
 
 		logEvent('Logs: Pipelines: Clicked Add New Pipeline', {
-			source: 'signoz-ui',
+			source: 'observe-ui',
 		});
 	};
 
@@ -42,7 +42,7 @@ function CreatePipelineButton({
 		<ButtonContainer>
 			<TextToolTip
 				text={t('learn_more')}
-				url="https://signoz.io/docs/logs-pipelines/introduction/?utm_source=product&utm_medium=pipelines-tab"
+				url="https://o11y.hanzo.ai/docs/logs-pipelines/introduction/?utm_source=product&utm_medium=pipelines-tab"
 			/>
 			{isAddNewPipelineVisible && (
 				<CustomButton

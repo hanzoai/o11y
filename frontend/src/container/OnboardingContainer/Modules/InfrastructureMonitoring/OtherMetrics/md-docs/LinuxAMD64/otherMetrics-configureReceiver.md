@@ -1,6 +1,6 @@
 # Enable a specific metrics Receiver
 
-SigNoz supports all the receivers that are listed in the [opentelemetry-collector-contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver) GitHub repository. To configure a new metric receiver, you must edit the **`receivers`** and **`service::pipelines`** sections of the **`config.yaml`** file that you created in the previous step.
+Hanzo O11y supports all the receivers that are listed in the [opentelemetry-collector-contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver) GitHub repository. To configure a new metric receiver, you must edit the **`receivers`** and **`service::pipelines`** sections of the **`config.yaml`** file that you created in the previous step.
 
 To enable a new OpenTelemetry receiver, follow the steps below:
 #### 1. Open the `config.yaml` file in a plain-text editor.
@@ -45,11 +45,11 @@ processors:
    hostname_sources: [os] # alternatively, use [dns,os] for setting FQDN as host.name and os as fallback
 exporters:
  otlp:
-  endpoint: 'ingest.{{REGION}}.signoz.cloud:443' # replace {region} with your region
+  endpoint: 'ingest.{{REGION}}.o11y.hanzo.ai:443' # replace {region} with your region
   tls:
    insecure: false
   headers:
-   'signoz-ingestion-key': '{{SIGNOZ_INGESTION_KEY}}'
+   'signoz-ingestion-key': '{{HANZO_INGESTION_KEY}}'
  logging:
   loglevel: debug
 service:
@@ -70,7 +70,7 @@ For details about configuring OpenTelemetry receivers, see the [README](https:/
 
 # Enable Prometheus Receiver
 
-SigNoz supports all the exporters that are listed on the [Exporters and Integrations](https://prometheus.io/docs/instrumenting/exporters/) page of the Prometheus documentation. If you have a running Prometheus instance, and you expose metrics in Prometheus, then you can scrape them in SigNoz by configuring Prometheus receivers in the **`receivers::prometheus::config::scrape_configs`** section of the **`config.yaml`** file you created in the previous step.
+Hanzo O11y supports all the exporters that are listed on the [Exporters and Integrations](https://prometheus.io/docs/instrumenting/exporters/) page of the Prometheus documentation. If you have a running Prometheus instance, and you expose metrics in Prometheus, then you can scrape them in Hanzo O11y by configuring Prometheus receivers in the **`receivers::prometheus::config::scrape_configs`** section of the **`config.yaml`** file you created in the previous step.
 
 To enable a Prometheus receiver, follow the steps below:
 

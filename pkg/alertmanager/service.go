@@ -7,12 +7,12 @@ import (
 	"github.com/prometheus/alertmanager/featurecontrol"
 	"github.com/prometheus/alertmanager/matcher/compat"
 
-	"github.com/SigNoz/signoz/pkg/alertmanager/alertmanagerserver"
-	"github.com/SigNoz/signoz/pkg/alertmanager/nfmanager"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerserver"
+	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 )
 
 type Service struct {

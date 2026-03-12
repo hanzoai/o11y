@@ -3,10 +3,10 @@ package queryparser
 import (
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/http/binding"
-	"github.com/SigNoz/signoz/pkg/http/render"
-	"github.com/SigNoz/signoz/pkg/types/parsertypes"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/http/binding"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/types/parsertypes"
 )
 
 type API struct {

@@ -53,18 +53,18 @@ export const getEmptyLogsListConfig = (
 	subTitle: 'This could be because :',
 	description: [
 		'Logs are not linked to Traces.',
-		'Logs are not being sent to SigNoz.',
+		'Logs are not being sent to Hanzo O11y.',
 		'No logs are associated with this particular trace/span.',
 	],
 	documentationLinks: [
 		{
-			text: 'Sending logs to SigNoz',
-			url: 'https://signoz.io/docs/logs-management/send-logs-to-signoz/',
+			text: 'Sending logs to Hanzo O11y',
+			url: 'https://o11y.hanzo.ai/docs/logs-management/send-logs-to-o11y/',
 		},
 		{
 			text: 'Correlate traces and logs',
 			url:
-				'https://signoz.io/docs/traces-management/guides/correlate-traces-and-logs/',
+				'https://o11y.hanzo.ai/docs/traces-management/guides/correlate-traces-and-logs/',
 		},
 	],
 	clearFiltersButtonText: 'Clear filters from Trace to view other logs',

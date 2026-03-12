@@ -3,8 +3,8 @@ package telemetrytypes
 import (
 	"context"
 
-	schemamigrator "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
+	schemamigrator "github.com/hanzoai/o11y-otel-collector/cmd/o11yschemamigrator/schema_migrator"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 )
 
 // MetadataStore is the interface for the telemetry metadata store.

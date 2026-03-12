@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/modules/tracefunnel"
-	"github.com/SigNoz/signoz/pkg/types"
-	traceFunnels "github.com/SigNoz/signoz/pkg/types/tracefunneltypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/modules/tracefunnel"
+	"github.com/hanzoai/o11y/pkg/types"
+	traceFunnels "github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type module struct {

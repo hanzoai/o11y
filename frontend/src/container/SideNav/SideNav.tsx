@@ -575,7 +575,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 							icon: <ScrollText size={14} />,
 							itemKey: changelogKey,
 							isExternal: true,
-							url: 'https://signoz.io/changelog/',
+							url: 'https://o11y.hanzo.ai/changelog/',
 						},
 					];
 				}
@@ -601,7 +601,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 						icon: <ScrollText size={14} />,
 						itemKey: changelogKey,
 						isExternal: true,
-						url: 'https://signoz.io/changelog/',
+						url: 'https://o11y.hanzo.ai/changelog/',
 					},
 				];
 			});
@@ -920,7 +920,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 									onClickHandler(ROUTES.HOME, event);
 								}}
 							>
-								<img src="/Logos/signoz-brand-logo.svg" alt="SigNoz" />
+								<img src="/Logos/observe-brand-logo.svg" alt="Hanzo O11y" />
 							</div>
 
 							{licenseTag && (

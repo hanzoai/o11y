@@ -3,11 +3,11 @@ package implfields
 import (
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/http/binding"
-	"github.com/SigNoz/signoz/pkg/http/render"
-	"github.com/SigNoz/signoz/pkg/modules/fields"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/http/binding"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/modules/fields"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 type handler struct {

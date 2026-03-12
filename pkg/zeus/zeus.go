@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/zeustypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/zeustypes"
 )
 
 var (

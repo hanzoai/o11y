@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Button } from 'antd';
 import { ArrowUpRight } from 'lucide-react';
 

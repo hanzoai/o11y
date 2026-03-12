@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"reflect"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 type Cacheable interface {

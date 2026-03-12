@@ -5,18 +5,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/config"
-	"github.com/SigNoz/signoz/pkg/config/envprovider"
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/config"
+	"github.com/hanzoai/o11y/pkg/config/envprovider"
+	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewWithEnvProvider(t *testing.T) {
-	t.Setenv("SIGNOZ_APISERVER_TIMEOUT_DEFAULT", "70s")
-	t.Setenv("SIGNOZ_APISERVER_TIMEOUT_MAX", "700s")
-	t.Setenv("SIGNOZ_APISERVER_TIMEOUT_EXCLUDED__ROUTES", "/excluded1,/excluded2")
-	t.Setenv("SIGNOZ_APISERVER_LOGGING_EXCLUDED__ROUTES", "/api/v1/health1")
+	t.Setenv("HANZO_APISERVER_TIMEOUT_DEFAULT", "70s")
+	t.Setenv("HANZO_APISERVER_TIMEOUT_MAX", "700s")
+	t.Setenv("HANZO_APISERVER_TIMEOUT_EXCLUDED__ROUTES", "/excluded1,/excluded2")
+	t.Setenv("HANZO_APISERVER_LOGGING_EXCLUDED__ROUTES", "/api/v1/health1")
 
 	conf, err := config.New(
 		context.Background(),

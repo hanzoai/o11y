@@ -32,11 +32,11 @@ use tonic::metadata::{MetadataMap, MetadataValue};
 &nbsp;
 
 ### Step 2: Initialize tracer and create env file
-Add `init_tracer` function to your `main.rs` file. It initializes an OpenTelemetry tracer with the OpenTelemetry OTLP exporter which is sending data to SigNoz Cloud.
+Add `init_tracer` function to your `main.rs` file. It initializes an OpenTelemetry tracer with the OpenTelemetry OTLP exporter which is sending data to Hanzo O11y Cloud.
 
 ```rust
 fn init_tracer() -> Result<sdktrace::Tracer, TraceError> {
-    let signoz_access_token = std::env::var("SIGNOZ_ACCESS_TOKEN").expect("SIGNOZ_ACCESS_TOKEN not set");
+    let signoz_access_token = std::env::var("HANZO_ACCESS_TOKEN").expect("HANZO_ACCESS_TOKEN not set");
     let mut metadata = MetadataMap::new();
     metadata.insert(
         "signoz-ingestion-key",
@@ -48,7 +48,7 @@ fn init_tracer() -> Result<sdktrace::Tracer, TraceError> {
             opentelemetry_otlp::new_exporter()
                 .tonic()
                 .with_metadata(metadata)
-                .with_endpoint(std::env::var("SIGNOZ_ENDPOINT").expect("SIGNOZ_ENDPOINT not set")),
+                .with_endpoint(std::env::var("HANZO_ENDPOINT").expect("HANZO_ENDPOINT not set")),
         )
         .with_trace_config(
             sdktrace::config().with_resource(Resource::new(vec![
@@ -77,8 +77,8 @@ In your environment file, paste the below variables which will be used in the ne
 ```rust
 PORT=3000 // If it is a web app pass port or else you can ignore this variable
 APP_NAME={{MYAPP}}
-SIGNOZ_ENDPOINT=https://ingest.{{REGION}}.signoz.cloud:443/v1/traces
-SIGNOZ_ACCESS_TOKEN={{SIGNOZ_INGESTION_KEY}}
+HANZO_ENDPOINT=https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces
+HANZO_ACCESS_TOKEN={{HANZO_INGESTION_KEY}}
 ```
 
 ### Step 3: Add OpenTelemetry instrumentation
@@ -110,7 +110,7 @@ async fn main() {
 }
 ```
 
-Add the below code block within a function or a section of your code where you're setting up and using the tracer for distributed tracing. After adding the below code block you can send traces to SigNoz Cloud
+Add the below code block within a function or a section of your code where you're setting up and using the tracer for distributed tracing. After adding the below code block you can send traces to Hanzo O11y Cloud
 
 ```rust
   let tracer = global::tracer("global_tracer");
@@ -123,14 +123,14 @@ Add the below code block within a function or a section of your code where you'r
         span.add_event(
             format!("Operations"),
             vec![
-                Key::new("SigNoz is").string("working!"),
+                Key::new("Hanzo O11y is").string("working!"),
             ],
         );
     });
     shutdown_tracer_provider()
 ```
 
-The above code block will create a span named operation which sets an attribute and an event to it saying "SigNoz is working!". 
+The above code block will create a span named operation which sets an attribute and an event to it saying "Hanzo O11y is working!". 
 
 &nbsp;
 

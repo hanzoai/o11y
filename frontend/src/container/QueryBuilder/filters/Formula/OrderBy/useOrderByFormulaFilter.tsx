@@ -9,7 +9,7 @@ import { BaseAutocompleteData } from 'types/api/queryBuilder/queryAutocompleteRe
 import { OrderByPayload } from 'types/api/queryBuilder/queryBuilderData';
 
 import { ORDERBY_FILTERS } from '../../OrderByFilter/config';
-import { SIGNOZ_VALUE } from '../../OrderByFilter/constants';
+import { HANZO_VALUE } from '../../OrderByFilter/constants';
 import { UseOrderByFilterResult } from '../../OrderByFilter/useOrderByFilter';
 import {
 	getLabelFromValue,
@@ -49,7 +49,7 @@ export const useOrderByFormulaFilter = ({
 			const [columnName, order] = match.data.flat() as string[];
 
 			const columnNameValue =
-				columnName === SIGNOZ_VALUE ? SIGNOZ_VALUE : columnName;
+				columnName === HANZO_VALUE ? HANZO_VALUE : columnName;
 
 			const orderValue = order ?? ORDERBY_FILTERS.ASC;
 
@@ -66,11 +66,11 @@ export const useOrderByFormulaFilter = ({
 	const aggregationOptions = [
 		{
 			label: `${formula.expression} ${ORDERBY_FILTERS.ASC}`,
-			value: `${SIGNOZ_VALUE}${orderByValueDelimiter}${ORDERBY_FILTERS.ASC}`,
+			value: `${HANZO_VALUE}${orderByValueDelimiter}${ORDERBY_FILTERS.ASC}`,
 		},
 		{
 			label: `${formula.expression} ${ORDERBY_FILTERS.DESC}`,
-			value: `${SIGNOZ_VALUE}${orderByValueDelimiter}${ORDERBY_FILTERS.DESC}`,
+			value: `${HANZO_VALUE}${orderByValueDelimiter}${ORDERBY_FILTERS.DESC}`,
 		},
 	];
 

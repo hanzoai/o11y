@@ -1,4 +1,4 @@
-import { GetHosts200 } from 'api/generated/services/sigNoz.schemas';
+import { GetHosts200 } from 'api/generated/services/observe.schemas';
 import { rest, server } from 'mocks-server/server';
 import { render, screen } from 'tests/test-utils';
 
@@ -37,7 +37,7 @@ describe('DataSourceInfo', () => {
 			),
 		);
 
-		render(<DataSourceInfo dataSentToSigNoz={false} isLoading={false} />);
+		render(<DataSourceInfo dataSentToHanzo O11y={false} isLoading={false} />);
 
 		await screen.findByText(/custom-host\.test\.cloud/i);
 	});
@@ -49,10 +49,10 @@ describe('DataSourceInfo', () => {
 			),
 		);
 
-		render(<DataSourceInfo dataSentToSigNoz={false} isLoading={false} />);
+		render(<DataSourceInfo dataSentToHanzo O11y={false} isLoading={false} />);
 
 		await screen.findByText(/Your workspace is ready/i);
-		expect(screen.queryByText(/signoz\.cloud/i)).not.toBeInTheDocument();
+		expect(screen.queryByText(/o11y\.cloud/i)).not.toBeInTheDocument();
 	});
 
 	it('renders active workspace URL in the data-received view when telemetry is flowing', async () => {
@@ -62,7 +62,7 @@ describe('DataSourceInfo', () => {
 			),
 		);
 
-		render(<DataSourceInfo dataSentToSigNoz={true} isLoading={false} />);
+		render(<DataSourceInfo dataSentToHanzo O11y={true} isLoading={false} />);
 
 		await screen.findByText(/custom-host\.test\.cloud/i);
 	});

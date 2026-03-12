@@ -1,4 +1,4 @@
-import { GetHosts200 } from 'api/generated/services/sigNoz.schemas';
+import { GetHosts200 } from 'api/generated/services/observe.schemas';
 import { rest, server } from 'mocks-server/server';
 import { render, screen, userEvent, waitFor } from 'tests/test-utils';
 
@@ -12,7 +12,7 @@ jest.mock('components/LaunchChatSupport/LaunchChatSupport', () => ({
 }));
 
 const mockToastCustom = jest.fn();
-jest.mock('@signozhq/sonner', () => ({
+jest.mock('@hanzo/o11y-sonner', () => ({
 	toast: {
 		custom: (...args: unknown[]): unknown => mockToastCustom(...args),
 		dismiss: jest.fn(),

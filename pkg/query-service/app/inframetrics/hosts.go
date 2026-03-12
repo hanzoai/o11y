@@ -9,16 +9,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/query-service/app/metrics/v4/helpers"
-	"github.com/SigNoz/signoz/pkg/query-service/common"
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	"github.com/SigNoz/signoz/pkg/query-service/interfaces"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/postprocess"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	"github.com/SigNoz/signoz/pkg/types/instrumentationtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4/helpers"
+	"github.com/hanzoai/o11y/pkg/query-service/common"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/postprocess"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"go.uber.org/zap"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
@@ -340,7 +340,7 @@ func (h *HostsRepo) IsSendingK8SAgentMetrics(ctx context.Context, req model.Host
 	FROM %s.%s
 	WHERE metric_name IN (%s)
 		AND unix_milli >= toUnixTimestamp(now() - INTERVAL 5 MINUTE) * 1000`,
-		constants.SIGNOZ_METRIC_DBNAME, constants.SIGNOZ_SAMPLES_V4_TABLENAME, namesStr)
+		constants.HANZO_METRIC_DBNAME, constants.HANZO_SAMPLES_V4_TABLENAME, namesStr)
 
 	query := fmt.Sprintf(`
 	SELECT DISTINCT JSONExtractString(labels, '%s') as k8s_cluster_name, JSONExtractString(labels, '%s') as k8s_node_name
@@ -350,7 +350,7 @@ func (h *HostsRepo) IsSendingK8SAgentMetrics(ctx context.Context, req model.Host
 		AND JSONExtractString(labels, '%s') LIKE '%%-otel-agent%%'
 		AND fingerprint GLOBAL IN (%s)`,
 		GetDotMetrics("k8s_cluster_name"), GetDotMetrics("k8s_node_name"),
-		constants.SIGNOZ_METRIC_DBNAME, constants.SIGNOZ_TIMESERIES_V4_TABLENAME, namesStr, GetDotMetrics("host_name"), queryForRecentFingerprints)
+		constants.HANZO_METRIC_DBNAME, constants.HANZO_TIMESERIES_V4_TABLENAME, namesStr, GetDotMetrics("host_name"), queryForRecentFingerprints)
 
 	result, err := h.reader.GetListResultV3(ctx, query)
 	if err != nil {

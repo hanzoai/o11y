@@ -12,4 +12,4 @@ Restart the OTel collector when you’re in the `otel-contirb` folder
 ./otelcol-contrib --config ./config.yaml &> otelcol-output.log & echo "$!" > otel-pid
 ```
 
-Now you should be able to see the Logs on your SigNoz Cloud UI
+Now you should be able to see the Logs on your Hanzo O11y Cloud UI

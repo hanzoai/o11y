@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type Getter interface {

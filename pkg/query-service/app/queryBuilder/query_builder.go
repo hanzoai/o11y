@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SigNoz/govaluate"
-	"github.com/SigNoz/signoz/pkg/cache"
-	metricsV3 "github.com/SigNoz/signoz/pkg/query-service/app/metrics/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	"github.com/Hanzo O11y/govaluate"
+	"github.com/hanzoai/o11y/pkg/cache"
+	metricsV3 "github.com/hanzoai/o11y/pkg/query-service/app/metrics/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"go.uber.org/zap"
 )
 

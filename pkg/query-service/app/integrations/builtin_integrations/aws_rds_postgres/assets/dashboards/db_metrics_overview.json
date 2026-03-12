@@ -287,7 +287,7 @@
             "multiSelect": true,
             "name": "table_name",
             "order": 0,
-            "queryValue": "SELECT JSONExtractString(labels, 'postgresql_table_name') AS table_name\nFROM signoz_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'postgresql_operations' AND JSONExtractString(labels, 'postgresql_database_name') IN {{.db_name}}\nGROUP BY table_name",
+            "queryValue": "SELECT JSONExtractString(labels, 'postgresql_table_name') AS table_name\nFROM o11y_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'postgresql_operations' AND JSONExtractString(labels, 'postgresql_database_name') IN {{.db_name}}\nGROUP BY table_name",
             "selectedValue": [
                 "public.pgbench_accounts",
                 "public.pgbench_branches",
@@ -309,7 +309,7 @@
             "multiSelect": true,
             "name": "db_name",
             "order": 0,
-            "queryValue": "SELECT JSONExtractString(labels, 'postgresql_database_name') AS db_name\nFROM signoz_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'postgresql_operations'\nGROUP BY db_name",
+            "queryValue": "SELECT JSONExtractString(labels, 'postgresql_database_name') AS db_name\nFROM o11y_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'postgresql_operations'\nGROUP BY db_name",
             "selectedValue": [
                 "pgtestdb"
             ],

@@ -10,14 +10,14 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/SigNoz/signoz/pkg/modules/dashboard"
-	"github.com/SigNoz/signoz/pkg/query-service/interfaces"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	"github.com/SigNoz/signoz/pkg/query-service/model/metrics_explorer"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/rules"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/modules/dashboard"
+	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/query-service/model/metrics_explorer"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/rules"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"golang.org/x/sync/errgroup"
 )
 

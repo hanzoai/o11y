@@ -57,22 +57,22 @@ function WorkspaceAccessRestricted(): JSX.Element {
 										>
 											{activeLicense.state === LicenseState.TERMINATED && (
 												<>
-													Your SigNoz license is terminated, please contact support at{' '}
-													<a href="mailto:cloud-support@signoz.io">
-														cloud-support@signoz.io
+													Your Hanzo O11y license is terminated, please contact support at{' '}
+													<a href="mailto:cloud-support@o11y.hanzo.ai">
+														cloud-support@o11y.hanzo.ai
 													</a>{' '}
 													for a new deployment
 												</>
 											)}
 											{activeLicense.state === LicenseState.EXPIRED && (
 												<>
-													Your SigNoz license is expired, please contact support at{' '}
-													<a href="mailto:cloud-support@signoz.io">
-														cloud-support@signoz.io
+													Your Hanzo O11y license is expired, please contact support at{' '}
+													<a href="mailto:cloud-support@o11y.hanzo.ai">
+														cloud-support@o11y.hanzo.ai
 													</a>{' '}
 													for renewal to avoid termination of license as per our{' '}
 													<a
-														href="https://signoz.io/terms-of-service"
+														href="https://o11y.hanzo.ai/terms-of-service"
 														target="_blank"
 														rel="noopener noreferrer"
 													>
@@ -83,13 +83,13 @@ function WorkspaceAccessRestricted(): JSX.Element {
 											)}
 											{activeLicense.state === LicenseState.CANCELLED && (
 												<>
-													Your SigNoz license is cancelled, please contact support at{' '}
-													<a href="mailto:cloud-support@signoz.io">
-														cloud-support@signoz.io
+													Your Hanzo O11y license is cancelled, please contact support at{' '}
+													<a href="mailto:cloud-support@o11y.hanzo.ai">
+														cloud-support@o11y.hanzo.ai
 													</a>{' '}
 													for reactivation to avoid termination of license as per our{' '}
 													<a
-														href="https://signoz.io/terms-of-service"
+														href="https://o11y.hanzo.ai/terms-of-service"
 														target="_blank"
 														rel="noopener noreferrer"
 													>
@@ -104,7 +104,7 @@ function WorkspaceAccessRestricted(): JSX.Element {
 											type="default"
 											shape="round"
 											size="middle"
-											href="mailto:cloud-support@signoz.io"
+											href="mailto:cloud-support@o11y.hanzo.ai"
 											role="button"
 										>
 											Contact Us

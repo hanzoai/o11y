@@ -13,7 +13,7 @@ import {
 } from '@codemirror/autocomplete';
 import { javascript } from '@codemirror/lang-javascript';
 import { EditorState, RangeSetBuilder, Transaction } from '@codemirror/state';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { copilot } from '@uiw/codemirror-theme-copilot';
 import { githubLight } from '@uiw/codemirror-theme-github';
 import CodeMirror, {
@@ -676,7 +676,7 @@ function QueryAggregationSelect({
 						</span>
 						<br />
 						<a
-							href="https://signoz.io/docs/userguide/query-builder-v5/#core-aggregation-functions"
+							href="https://o11y.hanzo.ai/docs/userguide/query-builder-v5/#core-aggregation-functions"
 							target="_blank"
 							rel="noopener noreferrer"
 							style={{ color: '#1890ff', textDecoration: 'underline' }}

@@ -8,7 +8,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/prometheus/alertmanager/notify"
 	"github.com/prometheus/alertmanager/template"
 	"gopkg.in/yaml.v2"

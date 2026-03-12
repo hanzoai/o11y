@@ -14,7 +14,7 @@ import { ModulesMap } from 'container/OnboardingContainer/OnboardingContainer';
 import useUrlQuery from 'hooks/useUrlQuery';
 
 export interface IngestionInfoProps {
-	SIGNOZ_INGESTION_KEY?: string;
+	HANZO_INGESTION_KEY?: string;
 	REGION?: string;
 }
 
@@ -97,8 +97,8 @@ export default function MarkdownStep(): JSX.Element {
 
 	const variables = {
 		MYAPP: serviceName || '<service-name>',
-		SIGNOZ_INGESTION_KEY:
-			ingestionData?.SIGNOZ_INGESTION_KEY || '<SIGNOZ_INGESTION_KEY>',
+		HANZO_INGESTION_KEY:
+			ingestionData?.HANZO_INGESTION_KEY || '<HANZO_INGESTION_KEY>',
 		REGION: ingestionData?.REGION || 'region',
 		OTEL_VERSION: '0.88.0',
 	};

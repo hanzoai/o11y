@@ -149,7 +149,7 @@ export default function ServiceTraces({
 										source: 'Service Traces',
 									});
 									window.open(
-										'https://signoz.io/docs/instrumentation/overview/',
+										'https://o11y.hanzo.ai/docs/instrumentation/overview/',
 										'_blank',
 									);
 								}}

@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import { Button } from '@signozhq/button';
+import { Button } from '@hanzo/o11y-button';
 import { Typography } from 'antd';
 import cx from 'classnames';
 import RawLogView from 'components/Logs/RawLogView';

@@ -8,13 +8,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SigNoz/signoz/ee/query-service/constants"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/http/render"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/featuretypes"
-	"github.com/SigNoz/signoz/pkg/types/licensetypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/ee/query-service/constants"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
+	"github.com/hanzoai/o11y/pkg/types/licensetypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"go.uber.org/zap"
 )
 
@@ -28,7 +28,7 @@ func (ah *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	featureSet, err := ah.Signoz.Licensing.GetFeatureFlags(r.Context(), orgID)
+	featureSet, err := ah.O11y.Licensing.GetFeatureFlags(r.Context(), orgID)
 	if err != nil {
 		ah.HandleError(w, err, http.StatusInternalServerError)
 		return
@@ -36,7 +36,7 @@ func (ah *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 
 	if constants.FetchFeatures == "true" {
 		zap.L().Debug("fetching license")
-		license, err := ah.Signoz.Licensing.GetActive(ctx, orgID)
+		license, err := ah.O11y.Licensing.GetActive(ctx, orgID)
 		if err != nil {
 			zap.L().Error("failed to fetch license", zap.Error(err))
 		} else if license == nil {
@@ -57,7 +57,7 @@ func (ah *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	useSpanMetrics := ah.Signoz.Flagger.BooleanOrEmpty(ctx, flagger.FeatureUseSpanMetrics, evalCtx)
+	useSpanMetrics := ah.O11y.Flagger.BooleanOrEmpty(ctx, flagger.FeatureUseSpanMetrics, evalCtx)
 
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseSpanMetrics.String()),
@@ -102,7 +102,7 @@ func fetchZeusFeatures(url, licenseKey string) ([]*licensetypes.Feature, error) 
 	}
 
 	// Setting the custom header
-	req.Header.Set("X-Signoz-Cloud-Api-Key", licenseKey)
+	req.Header.Set("X-O11y-Cloud-Api-Key", licenseKey)
 
 	// Making the GET request
 	resp, err := client.Do(req)

@@ -1,5 +1,5 @@
 import { Divider } from 'antd';
-import SignozRadioGroup from 'components/SignozRadioGroup/SignozRadioGroup';
+import O11yRadioGroup from 'components/O11yRadioGroup/O11yRadioGroup';
 import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 import { useAppContext } from 'providers/App/App';
 import { FunnelStepData, LatencyOptions } from 'types/api/traceFunnels';
@@ -27,7 +27,7 @@ function InterStepConfig({
 				<Divider dashed />
 			</div>
 			<div className="inter-step-config__latency-options">
-				<SignozRadioGroup
+				<O11yRadioGroup
 					value={step.latency_type ?? LatencyOptions.P99}
 					options={options}
 					disabled={!hasEditPermission}

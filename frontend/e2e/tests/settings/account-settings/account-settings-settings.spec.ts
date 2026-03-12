@@ -27,7 +27,7 @@ test('Account Settings - View and Assert Static Controls', async ({ page }) => {
 	// Assert User Preferences section and controls (confirmed by DOM)
 	await expect(page.getByText('User Preferences')).toBeVisible();
 	await expect(
-		page.getByText('Tailor the SigNoz console to work according to your needs.'),
+		page.getByText('Tailor the Hanzo O11y console to work according to your needs.'),
 	).toBeVisible();
 	await expect(page.getByText('Select your theme')).toBeVisible();
 

@@ -3,7 +3,7 @@ import type { RouteComponentProps } from 'react-router-dom';
 import {
 	AuthtypesGettableTransactionDTO,
 	AuthtypesTransactionDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/observe.schemas';
 import { ENVIRONMENT } from 'constants/env';
 import { server } from 'mocks-server/server';
 import { rest } from 'msw';
@@ -223,7 +223,7 @@ describe('createGuardedRoute', () => {
 
 		render(<GuardedComponent {...props} />);
 
-		expect(screen.getByText('SigNoz')).toBeInTheDocument();
+		expect(screen.getByText('Hanzo O11y')).toBeInTheDocument();
 		expect(
 			screen.queryByText('Test Component: test-value'),
 		).not.toBeInTheDocument();

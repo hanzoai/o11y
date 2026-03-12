@@ -3,12 +3,12 @@ package telemetrymeter
 import (
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 )
 
 const (
-	DBName                     = "signoz_meter"
+	DBName                     = "o11y_meter"
 	SamplesTableName           = "distributed_samples"
 	SamplesLocalTableName      = "samples"
 	SamplesAgg1dTableName      = "distributed_samples_agg_1d"

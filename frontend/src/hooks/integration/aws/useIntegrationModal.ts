@@ -142,8 +142,8 @@ export function useIntegrationModal({
 					region: values.region,
 					ingestion_url: connectionParams?.ingestion_url || values.ingestion_url,
 					ingestion_key: connectionParams?.ingestion_key || values.ingestion_key,
-					signoz_api_url: connectionParams?.signoz_api_url || values.signoz_api_url,
-					signoz_api_key: connectionParams?.signoz_api_key || values.signoz_api_key,
+					observe_api_url: connectionParams?.observe_api_url || values.observe_api_url,
+					observe_api_key: connectionParams?.observe_api_key || values.observe_api_key,
 				},
 				account_config: {
 					regions: includeAllRegions ? ['all'] : selectedRegions,

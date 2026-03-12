@@ -14,7 +14,7 @@ npm install --save @opentelemetry/semantic-conventions@^1.21.0
 &nbsp;
 
 **Step 2.** Create `instrument.ts` file<br></br>
-You need to configure the endpoint for SigNoz cloud in this file.
+You need to configure the endpoint for Hanzo O11y cloud in this file.
 
 ```bash
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
@@ -44,9 +44,9 @@ provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.addSpanProcessor(
   new BatchSpanProcessor(
     new OTLPTraceExporter({
-      url: 'https://ingest.{{REGION}}.signoz.cloud:443/v1/traces',
+      url: 'https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces',
       headers: {
-        'signoz-ingestion-key': '{{SIGNOZ_INGESTION_KEY}}',
+        'signoz-ingestion-key': '{{HANZO_INGESTION_KEY}}',
       },
     })
   )

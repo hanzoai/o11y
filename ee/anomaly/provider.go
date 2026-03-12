@@ -3,7 +3,7 @@ package anomaly
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type Provider interface {

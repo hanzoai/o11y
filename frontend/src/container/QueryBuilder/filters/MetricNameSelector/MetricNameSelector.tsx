@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { AutoComplete, Spin, Typography } from 'antd';
 import { useListMetrics } from 'api/generated/services/metrics';
-import { MetricsexplorertypesListMetricDTO } from 'api/generated/services/sigNoz.schemas';
+import { MetricsexplorertypesListMetricDTO } from 'api/generated/services/observe.schemas';
 import { ATTRIBUTE_TYPES, toAttributeType } from 'constants/queryBuilder';
 import { DEBOUNCE_DELAY } from 'constants/queryBuilderFilterConfig';
 import useDebounce from 'hooks/useDebounce';

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	schema "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
-	"github.com/SigNoz/signoz/pkg/errors"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	schema "github.com/hanzoai/o11y-otel-collector/cmd/o11yschemamigrator/schema_migrator"
+	"github.com/hanzoai/o11y/pkg/errors"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/huandu/go-sqlbuilder"
 	"golang.org/x/exp/maps"
 )
@@ -191,7 +191,7 @@ func (m *defaultFieldMapper) getColumn(
 		/*
 			TODO: This is incorrect, we cannot assume all unspecified context fields are span context.
 			User could be referring to attributes, but we cannot fix this until we fix where_clause vistior
-			https://github.com/SigNoz/signoz/pull/10102
+			https://github.com/hanzoai/o11y/pull/10102
 		*/
 		// Check if this is a span scope field
 		if strings.ToLower(key.Name) == SpanSearchScopeRoot || strings.ToLower(key.Name) == SpanSearchScopeEntryPoint {

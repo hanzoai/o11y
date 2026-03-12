@@ -7,18 +7,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	grammar "github.com/SigNoz/signoz/pkg/parser/grammar"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	grammar "github.com/hanzoai/o11y/pkg/parser/grammar"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/antlr4-go/antlr/v4"
 
 	sqlbuilder "github.com/huandu/go-sqlbuilder"
 )
 
-var searchTroubleshootingGuideURL = "https://signoz.io/docs/userguide/search-troubleshooting/"
+var searchTroubleshootingGuideURL = "https://observe.hanzo.ai/docs/userguide/search-troubleshooting/"
 
-const stringMatchingOperatorDocURL = "https://signoz.io/docs/userguide/operators-reference/#string-matching-operators"
+const stringMatchingOperatorDocURL = "https://observe.hanzo.ai/docs/userguide/operators-reference/#string-matching-operators"
 
 // filterExpressionVisitor implements the FilterQueryVisitor interface
 // to convert the parsed filter expressions into ClickHouse WHERE clause
@@ -731,7 +731,7 @@ func (v *filterExpressionVisitor) VisitFunctionCall(ctx *grammar.FunctionCallCon
 
 			if key.Name != "body" {
 				if v.mainErrorURL == "" {
-					v.mainErrorURL = "https://signoz.io/docs/userguide/functions-reference/#hastoken-function"
+					v.mainErrorURL = "https://observe.hanzo.ai/docs/userguide/functions-reference/#hastoken-function"
 				}
 				v.errors = append(v.errors, fmt.Sprintf("function `%s` only supports body field as first parameter", functionName))
 			}
@@ -739,7 +739,7 @@ func (v *filterExpressionVisitor) VisitFunctionCall(ctx *grammar.FunctionCallCon
 			// this will only work with string.
 			if _, ok := value[0].(string); !ok {
 				if v.mainErrorURL == "" {
-					v.mainErrorURL = "https://signoz.io/docs/userguide/functions-reference/#hastoken-function"
+					v.mainErrorURL = "https://observe.hanzo.ai/docs/userguide/functions-reference/#hastoken-function"
 				}
 				v.errors = append(v.errors, fmt.Sprintf("function `%s` expects value parameter to be a string", functionName))
 				return ""
@@ -761,7 +761,7 @@ func (v *filterExpressionVisitor) VisitFunctionCall(ctx *grammar.FunctionCallCon
 			} else {
 				// TODO(add docs for json body search)
 				if v.mainErrorURL == "" {
-					v.mainErrorURL = "https://signoz.io/docs/userguide/search-troubleshooting/#function-supports-only-body-json-search"
+					v.mainErrorURL = "https://observe.hanzo.ai/docs/userguide/search-troubleshooting/#function-supports-only-body-json-search"
 				}
 				v.errors = append(v.errors, fmt.Sprintf("function `%s` supports only body JSON search", functionName))
 				return ""
@@ -903,7 +903,7 @@ func (v *filterExpressionVisitor) VisitKey(ctx *grammar.KeyContext) any {
 			// TODO(srikanthccv): do we want to return an error here?
 			// should we infer the type and auto-magically build a key for expression?
 			v.errors = append(v.errors, fmt.Sprintf("key `%s` not found", fieldKey.Name))
-			v.mainErrorURL = "https://signoz.io/docs/userguide/search-troubleshooting/#key-fieldname-not-found"
+			v.mainErrorURL = "https://observe.hanzo.ai/docs/userguide/search-troubleshooting/#key-fieldname-not-found"
 		}
 	}
 
@@ -935,7 +935,7 @@ func (v *filterExpressionVisitor) VisitKey(ctx *grammar.KeyContext) any {
 		}
 
 		if !v.keysWithWarnings[keyName] {
-			v.mainWarnURL = "https://signoz.io/docs/userguide/field-context-data-types/"
+			v.mainWarnURL = "https://observe.hanzo.ai/docs/userguide/field-context-data-types/"
 			// this is warning state, we must have a unambiguous key
 			v.warnings = append(v.warnings, warnMsg)
 		}

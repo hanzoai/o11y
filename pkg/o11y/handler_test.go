@@ -1,4 +1,4 @@
-package signoz
+package o11y
 
 import (
 	"context"
@@ -6,23 +6,23 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/SigNoz/signoz/pkg/alertmanager"
-	"github.com/SigNoz/signoz/pkg/alertmanager/nfmanager/nfmanagertest"
-	"github.com/SigNoz/signoz/pkg/alertmanager/signozalertmanager"
-	"github.com/SigNoz/signoz/pkg/emailing/emailingtest"
-	"github.com/SigNoz/signoz/pkg/factory/factorytest"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/instrumentation/instrumentationtest"
-	"github.com/SigNoz/signoz/pkg/modules/dashboard/impldashboard"
-	"github.com/SigNoz/signoz/pkg/modules/organization/implorganization"
-	"github.com/SigNoz/signoz/pkg/modules/user/impluser"
-	"github.com/SigNoz/signoz/pkg/querier"
-	"github.com/SigNoz/signoz/pkg/queryparser"
-	"github.com/SigNoz/signoz/pkg/sharder"
-	"github.com/SigNoz/signoz/pkg/sharder/noopsharder"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/sqlstore/sqlstoretest"
-	"github.com/SigNoz/signoz/pkg/tokenizer/tokenizertest"
+	"github.com/hanzoai/o11y/pkg/alertmanager"
+	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager/nfmanagertest"
+	"github.com/hanzoai/o11y/pkg/alertmanager/o11yalertmanager"
+	"github.com/hanzoai/o11y/pkg/emailing/emailingtest"
+	"github.com/hanzoai/o11y/pkg/factory/factorytest"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard"
+	"github.com/hanzoai/o11y/pkg/modules/organization/implorganization"
+	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
+	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/queryparser"
+	"github.com/hanzoai/o11y/pkg/sharder"
+	"github.com/hanzoai/o11y/pkg/sharder/noopsharder"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstoretest"
+	"github.com/hanzoai/o11y/pkg/tokenizer/tokenizertest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -37,7 +37,7 @@ func TestNewHandlers(t *testing.T) {
 	orgGetter := implorganization.NewGetter(implorganization.NewStore(sqlstore), sharder)
 	notificationManager := nfmanagertest.NewMock()
 	require.NoError(t, err)
-	alertmanager, err := signozalertmanager.New(context.TODO(), providerSettings, alertmanager.Config{}, sqlstore, orgGetter, notificationManager)
+	alertmanager, err := o11yalertmanager.New(context.TODO(), providerSettings, alertmanager.Config{}, sqlstore, orgGetter, notificationManager)
 	require.NoError(t, err)
 	tokenizer := tokenizertest.NewMockTokenizer(t)
 	emailing := emailingtest.New()

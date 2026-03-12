@@ -89,7 +89,7 @@ function WorkspaceSuspended(): JSX.Element {
 								type="default"
 								shape="round"
 								size="middle"
-								href="mailto:cloud-support@signoz.io"
+								href="mailto:cloud-support@o11y.hanzo.ai"
 								role="button"
 							>
 								Contact Us

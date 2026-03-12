@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from 'react-query';
 import { useCopyToClipboard } from 'react-use';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import {
 	Avatar,
 	Button,
@@ -522,7 +522,7 @@ function APIKeys(): JSX.Element {
 				<header>
 					<Typography.Title className="title">API Keys</Typography.Title>
 					<Typography.Text className="subtitle">
-						Create and manage API keys for the SigNoz API
+						Create and manage API keys for the Hanzo O11y API
 					</Typography.Text>
 				</header>
 

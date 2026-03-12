@@ -8,9 +8,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/tokenizer"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/tokenizer"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	mock "github.com/stretchr/testify/mock"
 )
 

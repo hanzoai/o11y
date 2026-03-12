@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/stretchr/testify/require"
 )
 

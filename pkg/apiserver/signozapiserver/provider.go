@@ -1,30 +1,30 @@
-package signozapiserver
+package o11yapiserver
 
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/apiserver"
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/gateway"
-	"github.com/SigNoz/signoz/pkg/global"
-	"github.com/SigNoz/signoz/pkg/http/handler"
-	"github.com/SigNoz/signoz/pkg/http/middleware"
-	"github.com/SigNoz/signoz/pkg/modules/authdomain"
-	"github.com/SigNoz/signoz/pkg/modules/dashboard"
-	"github.com/SigNoz/signoz/pkg/modules/fields"
-	"github.com/SigNoz/signoz/pkg/modules/metricsexplorer"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/modules/preference"
-	"github.com/SigNoz/signoz/pkg/modules/promote"
-	"github.com/SigNoz/signoz/pkg/modules/serviceaccount"
-	"github.com/SigNoz/signoz/pkg/modules/session"
-	"github.com/SigNoz/signoz/pkg/modules/user"
-	"github.com/SigNoz/signoz/pkg/querier"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/pkg/apiserver"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/gateway"
+	"github.com/hanzoai/o11y/pkg/global"
+	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/modules/authdomain"
+	"github.com/hanzoai/o11y/pkg/modules/dashboard"
+	"github.com/hanzoai/o11y/pkg/modules/fields"
+	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/modules/preference"
+	"github.com/hanzoai/o11y/pkg/modules/promote"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
+	"github.com/hanzoai/o11y/pkg/modules/session"
+	"github.com/hanzoai/o11y/pkg/modules/user"
+	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/zeus"
 	"github.com/gorilla/mux"
 )
 
@@ -73,7 +73,7 @@ func NewFactory(
 	querierHandler querier.Handler,
 	serviceAccountHandler serviceaccount.Handler,
 ) factory.ProviderFactory[apiserver.APIServer, apiserver.Config] {
-	return factory.NewProviderFactory(factory.MustNewName("signoz"), func(ctx context.Context, providerSettings factory.ProviderSettings, config apiserver.Config) (apiserver.APIServer, error) {
+	return factory.NewProviderFactory(factory.MustNewName("observe"), func(ctx context.Context, providerSettings factory.ProviderSettings, config apiserver.Config) (apiserver.APIServer, error) {
 		return newProvider(
 			ctx,
 			providerSettings,
@@ -125,7 +125,7 @@ func newProvider(
 	querierHandler querier.Handler,
 	serviceAccountHandler serviceaccount.Handler,
 ) (apiserver.APIServer, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/apiserver/signozapiserver")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver")
 	router := mux.NewRouter().UseEncodedPath()
 
 	provider := &provider{

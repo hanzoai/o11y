@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 
 export const ALERT_STATUS: { [key: string]: number } = {
 	firing: 0,

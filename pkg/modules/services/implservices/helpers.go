@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/servicetypes/servicetypesv1"
+	"github.com/hanzoai/o11y/pkg/errors"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/servicetypes/servicetypesv1"
 )
 
 // validateTagFilterItems validates the tag filter items. This should be used before using

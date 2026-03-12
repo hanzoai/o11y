@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { PANEL_TYPES, PanelDisplay } from 'constants/queryBuilder';
 import {
 	BarChart3,

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SigNoz/signoz/pkg/querybuilder"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/huandu/go-sqlbuilder"
 )
 

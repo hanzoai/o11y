@@ -3,7 +3,7 @@ package prometheus
 import (
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/factory"
 )
 
 type ActiveQueryTrackerConfig struct {

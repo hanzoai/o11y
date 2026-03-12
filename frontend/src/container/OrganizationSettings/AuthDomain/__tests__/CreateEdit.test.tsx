@@ -80,7 +80,7 @@ describe('CreateEdit Modal', () => {
 				/>,
 			);
 
-			expect(screen.getByDisplayValue('signoz.io')).toBeInTheDocument();
+			expect(screen.getByDisplayValue('o11y.hanzo.ai')).toBeInTheDocument();
 			expect(screen.getByDisplayValue('test-client-id')).toBeInTheDocument();
 		});
 
@@ -93,7 +93,7 @@ describe('CreateEdit Modal', () => {
 				/>,
 			);
 
-			const domainInput = screen.getByDisplayValue('signoz.io');
+			const domainInput = screen.getByDisplayValue('o11y.hanzo.ai');
 			expect(domainInput).toBeDisabled();
 		});
 

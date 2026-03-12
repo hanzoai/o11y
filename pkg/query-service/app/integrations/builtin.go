@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
 
 	"encoding/base64"
 	"encoding/json"
@@ -15,7 +15,7 @@ import (
 	"io/fs"
 	"path"
 
-	"github.com/SigNoz/signoz/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
 	koanfJson "github.com/knadh/koanf/parsers/json"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
@@ -268,7 +268,7 @@ func readFileIfUri(fs embed.FS, maybeFileUri string, basedir string) (interface{
 	return nil, fmt.Errorf("unsupported file type %s", maybeFileUri)
 }
 
-// copied from signoz clickhouse exporter's `sanitize` which
+// copied from o11y clickhouse exporter's `sanitize` which
 // in turn is copied from prometheus-go-metric-exporter
 //
 // replaces non-alphanumeric characters with underscores in s.

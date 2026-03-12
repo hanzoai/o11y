@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"regexp"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 var _ slog.LogValuer = (Name{})

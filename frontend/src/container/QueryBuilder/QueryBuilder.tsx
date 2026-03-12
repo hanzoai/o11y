@@ -147,7 +147,7 @@ export const QueryBuilder = memo(function QueryBuilder({
 								<div style={{ textAlign: 'center' }}>
 									Add New Query
 									<Typography.Link
-										href="https://signoz.io/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#multiple-queries-and-functions"
+										href="https://o11y.hanzo.ai/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#multiple-queries-and-functions"
 										target="_blank"
 										style={{ textDecoration: 'underline' }}
 									>
@@ -168,7 +168,7 @@ export const QueryBuilder = memo(function QueryBuilder({
 								<div style={{ textAlign: 'center' }}>
 									Add New Formula
 									<Typography.Link
-										href="https://signoz.io/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#multiple-queries-and-functions"
+										href="https://o11y.hanzo.ai/docs/userguide/query-builder/?utm_source=product&utm_medium=query-builder#multiple-queries-and-functions"
 										target="_blank"
 										style={{ textDecoration: 'underline' }}
 									>

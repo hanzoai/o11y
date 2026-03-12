@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
 // ApplyMetricLimit applies limit to the metrics query results
@@ -27,11 +27,11 @@ func ApplyMetricLimit(results []*v3.Result, queryRangeParams *v3.QueryRangeParam
 			{
 				if len(orderByList) == 0 {
 					// If no orderBy is specified, sort by value in descending order
-					orderByList = []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "desc"}}
+					orderByList = []v3.OrderBy{{ColumnName: constants.Hanzo O11yOrderByValue, Order: "desc"}}
 				}
 				sort.SliceStable(result.Series, func(i, j int) bool {
 					for _, orderBy := range orderByList {
-						if orderBy.ColumnName == constants.SigNozOrderByValue {
+						if orderBy.ColumnName == constants.Hanzo O11yOrderByValue {
 
 							// For table type queries (we rely on the fact that one value for row), sort
 							// based on final aggregation value

@@ -1,6 +1,6 @@
 ## Payload Structure
 
-To send logs to SigNoz over HTTP, we have a payload structure which is an array of JSON logs which adheres to the [OTEL Logs Data Model](https://opentelemetry.io/docs/specs/otel/logs/data-model/).
+To send logs to Hanzo O11y over HTTP, we have a payload structure which is an array of JSON logs which adheres to the [OTEL Logs Data Model](https://opentelemetry.io/docs/specs/otel/logs/data-model/).
 
 &nbsp;
 
@@ -60,9 +60,9 @@ This is a **sample cURL request** which can be used as a template:
 &nbsp;
 
 ```bash
-curl --location 'https://ingest.{{REGION}}.signoz.cloud:443/logs/json' \
+curl --location 'https://ingest.{{REGION}}.o11y.hanzo.ai:443/logs/json' \
 --header 'Content-Type: application/json' \
---header 'signoz-ingestion-key: {{SIGNOZ_INGESTION_KEY}}' \
+--header 'signoz-ingestion-key: {{HANZO_INGESTION_KEY}}' \
 --data '[
     {
         "trace_id": "000000000000000018c51935df0b93b9",

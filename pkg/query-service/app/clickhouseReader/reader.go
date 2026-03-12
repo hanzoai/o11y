@@ -15,18 +15,18 @@ import (
 	"sync"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/prometheus"
-	"github.com/SigNoz/signoz/pkg/query-service/model/metrics_explorer"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	"github.com/SigNoz/signoz/pkg/types/instrumentationtypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/query-service/model/metrics_explorer"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/uptrace/bun"
 
-	errorsV2 "github.com/SigNoz/signoz/pkg/errors"
+	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
@@ -35,71 +35,71 @@ import (
 
 	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
-	"github.com/SigNoz/signoz/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/cache"
 
 	"go.uber.org/zap"
 
-	queryprogress "github.com/SigNoz/signoz/pkg/query-service/app/clickhouseReader/query_progress"
-	"github.com/SigNoz/signoz/pkg/query-service/app/resource"
-	"github.com/SigNoz/signoz/pkg/query-service/app/services"
-	"github.com/SigNoz/signoz/pkg/query-service/app/traces/smart"
-	"github.com/SigNoz/signoz/pkg/query-service/app/traces/tracedetail"
-	"github.com/SigNoz/signoz/pkg/query-service/common"
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
+	queryprogress "github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader/query_progress"
+	"github.com/hanzoai/o11y/pkg/query-service/app/resource"
+	"github.com/hanzoai/o11y/pkg/query-service/app/services"
+	"github.com/hanzoai/o11y/pkg/query-service/app/traces/smart"
+	"github.com/hanzoai/o11y/pkg/query-service/app/traces/tracedetail"
+	"github.com/hanzoai/o11y/pkg/query-service/common"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
 
-	chErrors "github.com/SigNoz/signoz/pkg/query-service/errors"
-	"github.com/SigNoz/signoz/pkg/query-service/metrics"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
+	chErrors "github.com/hanzoai/o11y/pkg/query-service/errors"
+	"github.com/hanzoai/o11y/pkg/query-service/metrics"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
 )
 
 const (
 	primaryNamespace          = "clickhouse"
 	archiveNamespace          = "clickhouse-archive"
-	signozTraceDBName         = "signoz_traces"
-	signozHistoryDBName       = "signoz_analytics"
+	o11yTraceDBName         = "observe_traces"
+	observeHistoryDBName       = "o11y_analytics"
 	ruleStateHistoryTableName = "distributed_rule_state_history_v0"
-	signozDurationMVTable     = "distributed_durationSort"
-	signozUsageExplorerTable  = "distributed_usage_explorer"
-	signozSpansTable          = "distributed_signoz_spans"
-	signozErrorIndexTable     = "distributed_signoz_error_index_v2"
-	signozTraceTableName      = "distributed_signoz_index_v2"
-	signozTraceLocalTableName = "signoz_index_v2"
-	signozMetricDBName        = "signoz_metrics"
-	signozMetadataDbName      = "signoz_metadata"
-	signozMeterDBName         = "signoz_meter"
-	signozMeterSamplesName    = "samples_agg_1d"
+	o11yDurationMVTable     = "distributed_durationSort"
+	o11yUsageExplorerTable  = "distributed_usage_explorer"
+	o11ySpansTable          = "distributed_o11y_spans"
+	o11yErrorIndexTable     = "distributed_o11y_error_index_v2"
+	o11yTraceTableName      = "distributed_observe_index_v2"
+	o11yTraceLocalTableName = "observe_index_v2"
+	observeMetricDBName        = "observe_metrics"
+	o11yMetadataDbName      = "observe_metadata"
+	o11yMeterDBName         = "o11y_meter"
+	o11yMeterSamplesName    = "samples_agg_1d"
 
-	signozSampleLocalTableName = "samples_v4"
-	signozSampleTableName      = "distributed_samples_v4"
+	o11ySampleLocalTableName = "samples_v4"
+	o11ySampleTableName      = "distributed_samples_v4"
 
-	signozSamplesAgg5mLocalTableName = "samples_v4_agg_5m"
-	signozSamplesAgg5mTableName      = "distributed_samples_v4_agg_5m"
+	o11ySamplesAgg5mLocalTableName = "samples_v4_agg_5m"
+	o11ySamplesAgg5mTableName      = "distributed_samples_v4_agg_5m"
 
-	signozSamplesAgg30mLocalTableName = "samples_v4_agg_30m"
-	signozSamplesAgg30mTableName      = "distributed_samples_v4_agg_30m"
+	o11ySamplesAgg30mLocalTableName = "samples_v4_agg_30m"
+	o11ySamplesAgg30mTableName      = "distributed_samples_v4_agg_30m"
 
-	signozExpHistLocalTableName = "exp_hist"
-	signozExpHistTableName      = "distributed_exp_hist"
+	o11yExpHistLocalTableName = "exp_hist"
+	o11yExpHistTableName      = "distributed_exp_hist"
 
-	signozTSLocalTableNameV4 = "time_series_v4"
-	signozTSTableNameV4      = "distributed_time_series_v4"
+	observeTSLocalTableNameV4 = "time_series_v4"
+	observeTSTableNameV4      = "distributed_time_series_v4"
 
-	signozTSLocalTableNameV46Hrs = "time_series_v4_6hrs"
-	signozTSTableNameV46Hrs      = "distributed_time_series_v4_6hrs"
+	observeTSLocalTableNameV46Hrs = "time_series_v4_6hrs"
+	observeTSTableNameV46Hrs      = "distributed_time_series_v4_6hrs"
 
-	signozTSLocalTableNameV41Day = "time_series_v4_1day"
-	signozTSTableNameV41Day      = "distributed_time_series_v4_1day"
+	observeTSLocalTableNameV41Day = "time_series_v4_1day"
+	observeTSTableNameV41Day      = "distributed_time_series_v4_1day"
 
-	signozTSLocalTableNameV41Week = "time_series_v4_1week"
-	signozTSTableNameV41Week      = "distributed_time_series_v4_1week"
+	observeTSLocalTableNameV41Week = "time_series_v4_1week"
+	observeTSTableNameV41Week      = "distributed_time_series_v4_1week"
 
-	signozTableAttributesMetadata      = "distributed_attributes_metadata"
-	signozLocalTableAttributesMetadata = "attributes_metadata"
+	o11yTableAttributesMetadata      = "distributed_attributes_metadata"
+	o11yLocalTableAttributesMetadata = "attributes_metadata"
 
-	signozUpdatedMetricsMetadataLocalTable = "updated_metadata"
-	signozUpdatedMetricsMetadataTable      = "distributed_updated_metadata"
+	o11yUpdatedMetricsMetadataLocalTable = "updated_metadata"
+	o11yUpdatedMetricsMetadataTable      = "distributed_updated_metadata"
 	minTimespanForProgressiveSearch        = time.Hour
 	minTimespanForProgressiveSearchMargin  = time.Minute
 	maxProgressiveSteps                    = 4
@@ -343,7 +343,7 @@ func (r *ClickHouseReader) buildResourceSubQuery(tags []model.TagQueryParam, svc
 	filterSet := v3.FilterSet{}
 	for _, tag := range tags {
 		// skip the collector id as we don't add it to traces
-		if tag.Key == "signoz.collector.id" {
+		if tag.Key == "o11y.collector.id" {
 			continue
 		}
 		key := v3.AttributeKey{
@@ -1402,7 +1402,7 @@ func (r *ClickHouseReader) setTTLLogs(ctx context.Context, orgID string, params 
 	// set the ttl if nothing is pending/ no errors
 	go func(ttlPayload map[string]string) {
 		for tableName, query := range ttlPayload {
-			// https://github.com/SigNoz/signoz/issues/5470
+			// https://github.com/hanzoai/o11y/issues/5470
 			// we will change ttl for only the new parts and not the old ones
 			query += " SETTINGS materialize_ttl_after_modify=0"
 
@@ -1503,8 +1503,8 @@ func (r *ClickHouseReader) setTTLTraces(ctx context.Context, orgID string, param
 	tableNames := []string{
 		r.TraceDB + "." + r.traceTableName,
 		r.TraceDB + "." + r.traceResourceTableV3,
-		r.TraceDB + "." + signozErrorIndexTable,
-		r.TraceDB + "." + signozUsageExplorerTable,
+		r.TraceDB + "." + o11yErrorIndexTable,
+		r.TraceDB + "." + o11yUsageExplorerTable,
 		r.TraceDB + "." + defaultDependencyGraphTable,
 		r.TraceDB + "." + r.traceSummaryTable,
 		r.TraceDB + "." + r.spanAttributesKeysTable,
@@ -2198,14 +2198,14 @@ func (r *ClickHouseReader) setTTLMetrics(ctx context.Context, orgID string, para
 		coldStorageDuration = int(params.ToColdStorageDuration)
 	}
 	tableNames := []string{
-		signozMetricDBName + "." + signozSampleLocalTableName,
-		signozMetricDBName + "." + signozSamplesAgg5mLocalTableName,
-		signozMetricDBName + "." + signozSamplesAgg30mLocalTableName,
-		signozMetricDBName + "." + signozExpHistLocalTableName,
-		signozMetricDBName + "." + signozTSLocalTableNameV4,
-		signozMetricDBName + "." + signozTSLocalTableNameV46Hrs,
-		signozMetricDBName + "." + signozTSLocalTableNameV41Day,
-		signozMetricDBName + "." + signozTSLocalTableNameV41Week,
+		observeMetricDBName + "." + o11ySampleLocalTableName,
+		observeMetricDBName + "." + o11ySamplesAgg5mLocalTableName,
+		observeMetricDBName + "." + o11ySamplesAgg30mLocalTableName,
+		observeMetricDBName + "." + o11yExpHistLocalTableName,
+		observeMetricDBName + "." + observeTSLocalTableNameV4,
+		observeMetricDBName + "." + observeTSLocalTableNameV46Hrs,
+		observeMetricDBName + "." + observeTSLocalTableNameV41Day,
+		observeMetricDBName + "." + observeTSLocalTableNameV41Week,
 	}
 	for _, tableName := range tableNames {
 		statusItem, apiErr := r.checkTTLStatusItem(ctx, orgID, tableName)
@@ -2480,7 +2480,7 @@ func (r *ClickHouseReader) GetTTL(ctx context.Context, orgID string, ttlParams *
 	getMetricsTTL := func() (*model.DBResponseTTL, *model.ApiError) {
 		var dbResp []model.DBResponseTTL
 
-		query := fmt.Sprintf("SELECT engine_full FROM system.tables WHERE name='%v'", signozSampleLocalTableName)
+		query := fmt.Sprintf("SELECT engine_full FROM system.tables WHERE name='%v'", o11ySampleLocalTableName)
 
 		err := r.db.Select(ctx, &dbResp, query)
 
@@ -2498,7 +2498,7 @@ func (r *ClickHouseReader) GetTTL(ctx context.Context, orgID string, ttlParams *
 	getTracesTTL := func() (*model.DBResponseTTL, *model.ApiError) {
 		var dbResp []model.DBResponseTTL
 
-		query := fmt.Sprintf("SELECT engine_full FROM system.tables WHERE name='%v' AND database='%v'", r.traceLocalTableName, signozTraceDBName)
+		query := fmt.Sprintf("SELECT engine_full FROM system.tables WHERE name='%v' AND database='%v'", r.traceLocalTableName, o11yTraceDBName)
 
 		err := r.db.Select(ctx, &dbResp, query)
 
@@ -2536,8 +2536,8 @@ func (r *ClickHouseReader) GetTTL(ctx context.Context, orgID string, ttlParams *
 		tableNameArray := []string{
 			r.TraceDB + "." + r.traceTableName,
 			r.TraceDB + "." + r.traceResourceTableV3,
-			r.TraceDB + "." + signozErrorIndexTable,
-			r.TraceDB + "." + signozUsageExplorerTable,
+			r.TraceDB + "." + o11yErrorIndexTable,
+			r.TraceDB + "." + o11yUsageExplorerTable,
 			r.TraceDB + "." + defaultDependencyGraphTable,
 			r.TraceDB + "." + r.traceSummaryTable,
 		}
@@ -2563,7 +2563,7 @@ func (r *ClickHouseReader) GetTTL(ctx context.Context, orgID string, ttlParams *
 		return &model.GetTTLResponseItem{TracesTime: delTTL, TracesMoveTime: moveTTL, ExpectedTracesTime: ttlQuery.TTL, ExpectedTracesMoveTime: ttlQuery.ColdStorageTTL, Status: status}, nil
 
 	case constants.MetricsTTL:
-		tableNameArray := []string{signozMetricDBName + "." + signozSampleTableName}
+		tableNameArray := []string{observeMetricDBName + "." + o11ySampleTableName}
 		tableNameArray = getLocalTableNameArray(tableNameArray)
 		status, apiErr := r.getTTLQueryStatus(ctx, orgID, tableNameArray)
 		if apiErr != nil {
@@ -3352,7 +3352,7 @@ func (r *ClickHouseReader) QueryDashboardVars(ctx context.Context, query string)
 	return &result, nil
 }
 
-func (r *ClickHouseReader) GetMetricAggregateAttributes(ctx context.Context, orgID valuer.UUID, req *v3.AggregateAttributeRequest, skipSignozMetrics bool) (*v3.AggregateAttributeResponse, error) {
+func (r *ClickHouseReader) GetMetricAggregateAttributes(ctx context.Context, orgID valuer.UUID, req *v3.AggregateAttributeRequest, skipO11yMetrics bool) (*v3.AggregateAttributeResponse, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
 		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
@@ -3369,7 +3369,7 @@ func (r *ClickHouseReader) GetMetricAggregateAttributes(ctx context.Context, org
 		`SELECT DISTINCT metric_name 
 		 FROM %s.%s 
 		 WHERE metric_name ILIKE $1 AND __normalized = $2`,
-		signozMetricDBName, signozTSTableNameV41Day)
+		observeMetricDBName, observeTSTableNameV41Day)
 
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
@@ -3388,7 +3388,7 @@ func (r *ClickHouseReader) GetMetricAggregateAttributes(ctx context.Context, org
 		if err := rows.Scan(&name); err != nil {
 			return nil, fmt.Errorf("error while scanning metric name: %s", err.Error())
 		}
-		if skipSignozMetrics && strings.HasPrefix(name, "signoz") {
+		if skipO11yMetrics && strings.HasPrefix(name, "observe") {
 			continue
 		}
 		metricNames = append(metricNames, name)
@@ -3448,7 +3448,7 @@ func (r *ClickHouseReader) GetMeterAggregateAttributes(ctx context.Context, orgI
 		 FROM %s.%s 
 		 WHERE metric_name ILIKE $1
 		 GROUP BY metric_name,type,temporality,is_monotonic`,
-		signozMeterDBName, signozMeterSamplesName)
+		o11yMeterDBName, o11yMeterSamplesName)
 
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
@@ -3505,7 +3505,7 @@ func (r *ClickHouseReader) GetMetricAttributeKeys(ctx context.Context, req *v3.F
 	}
 
 	// skips the internal attributes i.e attributes starting with __
-	query = fmt.Sprintf("SELECT arrayJoin(tagKeys) AS distinctTagKey FROM (SELECT JSONExtractKeys(labels) AS tagKeys FROM %s.%s WHERE metric_name=$1 AND unix_milli >= $2 AND __normalized = $3 GROUP BY tagKeys) WHERE distinctTagKey ILIKE $4 AND distinctTagKey NOT LIKE '\\_\\_%%' GROUP BY distinctTagKey", signozMetricDBName, signozTSTableNameV41Day)
+	query = fmt.Sprintf("SELECT arrayJoin(tagKeys) AS distinctTagKey FROM (SELECT JSONExtractKeys(labels) AS tagKeys FROM %s.%s WHERE metric_name=$1 AND unix_milli >= $2 AND __normalized = $3 GROUP BY tagKeys) WHERE distinctTagKey ILIKE $4 AND distinctTagKey NOT LIKE '\\_\\_%%' GROUP BY distinctTagKey", observeMetricDBName, observeTSTableNameV41Day)
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
@@ -3545,7 +3545,7 @@ func (r *ClickHouseReader) GetMeterAttributeKeys(ctx context.Context, req *v3.Fi
 	var response v3.FilterAttributeKeyResponse
 
 	// skips the internal attributes i.e attributes starting with __
-	query = fmt.Sprintf("SELECT DISTINCT arrayJoin(JSONExtractKeys(labels)) as attr_name FROM %s.%s WHERE metric_name=$1 AND attr_name ILIKE $2 AND attr_name NOT LIKE '\\_\\_%%'", signozMeterDBName, signozMeterSamplesName)
+	query = fmt.Sprintf("SELECT DISTINCT arrayJoin(JSONExtractKeys(labels)) as attr_name FROM %s.%s WHERE metric_name=$1 AND attr_name ILIKE $2 AND attr_name NOT LIKE '\\_\\_%%'", o11yMeterDBName, o11yMeterSamplesName)
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
@@ -3590,7 +3590,7 @@ func (r *ClickHouseReader) GetMetricAttributeValues(ctx context.Context, req *v3
 		normalized = false
 	}
 
-	query = fmt.Sprintf("SELECT JSONExtractString(labels, $1) AS tagValue FROM %s.%s WHERE metric_name IN $2 AND JSONExtractString(labels, $3) ILIKE $4 AND unix_milli >= $5 AND __normalized=$6 GROUP BY tagValue", signozMetricDBName, signozTSTableNameV41Day)
+	query = fmt.Sprintf("SELECT JSONExtractString(labels, $1) AS tagValue FROM %s.%s WHERE metric_name IN $2 AND JSONExtractString(labels, $3) ILIKE $4 AND unix_milli >= $5 AND __normalized=$6 GROUP BY tagValue", observeMetricDBName, observeTSTableNameV41Day)
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
@@ -3669,7 +3669,7 @@ func (r *ClickHouseReader) GetMetricMetadata(ctx context.Context, orgID valuer.U
 				AND type = 'Histogram'
 				AND (JSONExtractString(labels, 'service_name') = $3 OR JSONExtractString(labels, 'service.name') = $4)
 			GROUP BY le
-			ORDER BY le`, signozMetricDBName, signozTSTableNameV41Day)
+			ORDER BY le`, observeMetricDBName, observeTSTableNameV41Day)
 
 		rows, err := r.db.Query(ctx, query, metricName, unixMilli, serviceName, serviceName)
 		if err != nil {
@@ -3727,8 +3727,8 @@ func (r *ClickHouseReader) GetActiveHostsFromMetricMetadata(ctx context.Context,
 		WHERE metric_name IN @metricNames
 		  AND attr_name = @attrName
 		  AND last_reported_unix_milli >= @sinceUnixMilli`,
-		signozMetricDBName,
-		constants.SIGNOZ_METADATA_TABLENAME,
+		observeMetricDBName,
+		constants.HANZO_METADATA_TABLENAME,
 	)
 
 	rows, err := r.db.Query(ctx, query,
@@ -3802,7 +3802,7 @@ func (r *ClickHouseReader) GetLatestReceivedMetric(
 		where %s
 		group by metric_name
 		limit 1
-		`, signozMetricDBName, signozTSTableNameV4, whereClause,
+		`, observeMetricDBName, observeTSTableNameV4, whereClause,
 	)
 
 	rows, err := r.db.Query(ctx, query)
@@ -4572,7 +4572,7 @@ func (r *ClickHouseReader) GetMetricsExistenceAndEarliestTime(ctx context.Contex
 		`SELECT count(*) AS cnt, min(first_reported_unix_milli) AS min_first_reported
 		FROM %s.%s
 		WHERE metric_name IN @metric_names`,
-		constants.SIGNOZ_METRIC_DBNAME, constants.SIGNOZ_METADATA_TABLENAME)
+		constants.HANZO_METRIC_DBNAME, constants.HANZO_METADATA_TABLENAME)
 
 	var count, minFirstReported uint64
 	err := r.db.QueryRow(ctx, query, clickhouse.Named("metric_names", metricNames)).Scan(&count, &minFirstReported)
@@ -4949,7 +4949,7 @@ func (r *ClickHouseReader) AddRuleStateHistory(ctx context.Context, ruleStateHis
 	}()
 
 	statement, err = r.db.PrepareBatch(ctx, fmt.Sprintf("INSERT INTO %s.%s (rule_id, rule_name, overall_state, overall_state_changed, state, state_changed, unix_milli, labels, fingerprint, value) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-		signozHistoryDBName, ruleStateHistoryTableName))
+		observeHistoryDBName, ruleStateHistoryTableName))
 
 	if err != nil {
 		return err
@@ -4975,7 +4975,7 @@ func (r *ClickHouseReader) GetLastSavedRuleStateHistory(ctx context.Context, rul
 		instrumentationtypes.CodeFunctionName: "GetLastSavedRuleStateHistory",
 	})
 	query := fmt.Sprintf("SELECT * FROM %s.%s WHERE rule_id = '%s' AND state_changed = true ORDER BY unix_milli DESC LIMIT 1 BY fingerprint",
-		signozHistoryDBName, ruleStateHistoryTableName, ruleID)
+		observeHistoryDBName, ruleStateHistoryTableName, ruleID)
 
 	history := []model.RuleStateHistory{}
 	err := r.db.Select(ctx, &history, query)
@@ -5051,7 +5051,7 @@ func (r *ClickHouseReader) ReadRuleStateHistoryByRuleID(
 	whereClause := strings.Join(conditions, " AND ")
 
 	query := fmt.Sprintf("SELECT * FROM %s.%s WHERE %s ORDER BY unix_milli %s LIMIT %d OFFSET %d",
-		signozHistoryDBName, ruleStateHistoryTableName, whereClause, params.Order, params.Limit, params.Offset)
+		observeHistoryDBName, ruleStateHistoryTableName, whereClause, params.Order, params.Limit, params.Offset)
 
 	history := []model.RuleStateHistory{}
 	zap.L().Debug("rule state history query", zap.String("query", query))
@@ -5063,15 +5063,15 @@ func (r *ClickHouseReader) ReadRuleStateHistoryByRuleID(
 
 	var total uint64
 	zap.L().Debug("rule state history total query", zap.String("query", fmt.Sprintf("SELECT count(*) FROM %s.%s WHERE %s",
-		signozHistoryDBName, ruleStateHistoryTableName, whereClause)))
+		observeHistoryDBName, ruleStateHistoryTableName, whereClause)))
 	err = r.db.QueryRow(ctx, fmt.Sprintf("SELECT count(*) FROM %s.%s WHERE %s",
-		signozHistoryDBName, ruleStateHistoryTableName, whereClause)).Scan(&total)
+		observeHistoryDBName, ruleStateHistoryTableName, whereClause)).Scan(&total)
 	if err != nil {
 		return nil, err
 	}
 
 	labelsQuery := fmt.Sprintf("SELECT DISTINCT labels FROM %s.%s WHERE rule_id = $1",
-		signozHistoryDBName, ruleStateHistoryTableName)
+		observeHistoryDBName, ruleStateHistoryTableName)
 	rows, err := r.db.Query(ctx, labelsQuery, ruleID)
 	if err != nil {
 		return nil, err
@@ -5119,7 +5119,7 @@ func (r *ClickHouseReader) ReadRuleStateHistoryTopContributorsByRuleID(
 	GROUP BY fingerprint
 	HAVING labels != '{}'
 	ORDER BY count DESC`,
-		signozHistoryDBName, ruleStateHistoryTableName, ruleID, model.StateFiring.String(), params.Start, params.End)
+		observeHistoryDBName, ruleStateHistoryTableName, ruleID, model.StateFiring.String(), params.Start, params.End)
 
 	zap.L().Debug("rule state history top contributors query", zap.String("query", query))
 	contributors := []model.RuleStateHistoryContributor{}
@@ -5177,8 +5177,8 @@ FROM matched_events
 ORDER BY firing_time ASC;`
 
 	query := fmt.Sprintf(tmpl,
-		signozHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End,
-		signozHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End)
+		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End,
+		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End)
 
 	zap.L().Debug("overall state transitions query", zap.String("query", query))
 
@@ -5213,7 +5213,7 @@ ORDER BY firing_time ASC;`
 	// fetch the most recent overall_state from the table
 	var state model.AlertState
 	stateQuery := fmt.Sprintf("SELECT state FROM %s.%s WHERE rule_id = '%s' AND unix_milli <= %d ORDER BY unix_milli DESC LIMIT 1",
-		signozHistoryDBName, ruleStateHistoryTableName, ruleID, params.End)
+		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.End)
 	if err := r.db.QueryRow(ctx, stateQuery).Scan(&state); err != nil {
 		if err != sql.ErrNoRows {
 			return nil, err
@@ -5244,7 +5244,7 @@ ORDER BY firing_time ASC;`
 				unix_milli
 			FROM %s.%s
 			WHERE rule_id = '%s' AND overall_state_changed = true AND overall_state = '%s' AND unix_milli <= %d
-			ORDER BY unix_milli DESC LIMIT 1`, signozHistoryDBName, ruleStateHistoryTableName, ruleID, model.StateFiring.String(), params.End)
+			ORDER BY unix_milli DESC LIMIT 1`, observeHistoryDBName, ruleStateHistoryTableName, ruleID, model.StateFiring.String(), params.End)
 			if err := r.db.QueryRow(ctx, firingQuery).Scan(&firingTime); err != nil {
 				return nil, err
 			}
@@ -5309,8 +5309,8 @@ FROM matched_events;
 `
 
 	query := fmt.Sprintf(tmpl,
-		signozHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End,
-		signozHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End)
+		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End,
+		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End)
 
 	zap.L().Debug("avg resolution time query", zap.String("query", query))
 	var avgResolutionTime float64
@@ -5367,8 +5367,8 @@ GROUP BY ts
 ORDER BY ts ASC;`
 
 	query := fmt.Sprintf(tmpl,
-		signozHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End,
-		signozHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End, step)
+		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End,
+		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End, step)
 
 	zap.L().Debug("avg resolution time by interval query", zap.String("query", query))
 	result, err := r.GetTimeSeriesResultV3(ctx, query)
@@ -5385,7 +5385,7 @@ func (r *ClickHouseReader) GetTotalTriggers(ctx context.Context, ruleID string, 
 		instrumentationtypes.CodeFunctionName: "GetTotalTriggers",
 	})
 	query := fmt.Sprintf("SELECT count(*) FROM %s.%s WHERE rule_id = '%s' AND (state_changed = true) AND (state = '%s') AND unix_milli >= %d AND unix_milli <= %d",
-		signozHistoryDBName, ruleStateHistoryTableName, ruleID, model.StateFiring.String(), params.Start, params.End)
+		observeHistoryDBName, ruleStateHistoryTableName, ruleID, model.StateFiring.String(), params.Start, params.End)
 
 	var totalTriggers uint64
 
@@ -5401,7 +5401,7 @@ func (r *ClickHouseReader) GetTriggersByInterval(ctx context.Context, ruleID str
 	step := common.MinAllowedStepInterval(params.Start, params.End)
 
 	query := fmt.Sprintf("SELECT count(*), toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts FROM %s.%s WHERE rule_id = '%s' AND (state_changed = true) AND (state = '%s') AND unix_milli >= %d AND unix_milli <= %d GROUP BY ts ORDER BY ts ASC",
-		step, signozHistoryDBName, ruleStateHistoryTableName, ruleID, model.StateFiring.String(), params.Start, params.End)
+		step, observeHistoryDBName, ruleStateHistoryTableName, ruleID, model.StateFiring.String(), params.Start, params.End)
 
 	result, err := r.GetTimeSeriesResultV3(ctx, query)
 	if err != nil || len(result) == 0 {
@@ -5465,7 +5465,7 @@ func (r *ClickHouseReader) GetAllMetricFilterAttributeKeys(ctx context.Context, 
 	if constants.IsDotMetricsEnabled {
 		normalized = false
 	}
-	query := fmt.Sprintf("SELECT arrayJoin(tagKeys) AS distinctTagKey FROM (SELECT JSONExtractKeys(labels) AS tagKeys FROM %s.%s WHERE unix_milli >= $1 and __normalized = $2 GROUP BY tagKeys) WHERE distinctTagKey ILIKE $3 AND distinctTagKey NOT LIKE '\\_\\_%%' GROUP BY distinctTagKey", signozMetricDBName, signozTSTableNameV41Day)
+	query := fmt.Sprintf("SELECT arrayJoin(tagKeys) AS distinctTagKey FROM (SELECT JSONExtractKeys(labels) AS tagKeys FROM %s.%s WHERE unix_milli >= $1 and __normalized = $2 GROUP BY tagKeys) WHERE distinctTagKey ILIKE $3 AND distinctTagKey NOT LIKE '\\_\\_%%' GROUP BY distinctTagKey", observeMetricDBName, observeTSTableNameV41Day)
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
@@ -5510,7 +5510,7 @@ func (r *ClickHouseReader) GetAllMetricFilterAttributeValues(ctx context.Context
 		normalized = false
 	}
 
-	query = fmt.Sprintf("SELECT JSONExtractString(labels, $1) AS tagValue FROM %s.%s WHERE JSONExtractString(labels, $2) ILIKE $3 AND unix_milli >= $4 AND __normalized = $5 GROUP BY tagValue", signozMetricDBName, signozTSTableNameV41Day)
+	query = fmt.Sprintf("SELECT JSONExtractString(labels, $1) AS tagValue FROM %s.%s WHERE JSONExtractString(labels, $2) ILIKE $3 AND unix_milli >= $4 AND __normalized = $5 GROUP BY tagValue", observeMetricDBName, observeTSTableNameV41Day)
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
@@ -5544,7 +5544,7 @@ func (r *ClickHouseReader) GetAllMetricFilterUnits(ctx context.Context, req *met
 	})
 	var rows driver.Rows
 	var response []string
-	query := fmt.Sprintf("SELECT DISTINCT unit FROM %s.%s WHERE unit ILIKE $1 AND unit IS NOT NULL ORDER BY unit", signozMetricDBName, signozTSTableNameV41Day)
+	query := fmt.Sprintf("SELECT DISTINCT unit FROM %s.%s WHERE unit ILIKE $1 AND unit IS NOT NULL ORDER BY unit", observeMetricDBName, observeTSTableNameV41Day)
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
@@ -5576,7 +5576,7 @@ func (r *ClickHouseReader) GetAllMetricFilterTypes(ctx context.Context, req *met
 	})
 	var rows driver.Rows
 	var response []string
-	query := fmt.Sprintf("SELECT DISTINCT type FROM %s.%s WHERE type ILIKE $1 AND type IS NOT NULL ORDER BY type", signozMetricDBName, signozTSTableNameV41Day)
+	query := fmt.Sprintf("SELECT DISTINCT type FROM %s.%s WHERE type ILIKE $1 AND type IS NOT NULL ORDER BY type", observeMetricDBName, observeTSTableNameV41Day)
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
@@ -5610,7 +5610,7 @@ func (r *ClickHouseReader) GetMetricsDataPoints(ctx context.Context, metricName 
     sum(count) as data_points
 FROM %s.%s
 WHERE metric_name = ?
-`, signozMetricDBName, constants.SIGNOZ_SAMPLES_V4_AGG_30M_TABLENAME)
+`, observeMetricDBName, constants.HANZO_SAMPLES_V4_AGG_30M_TABLENAME)
 	var dataPoints uint64
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.QueryRow(valueCtx, query, metricName).Scan(&dataPoints)
@@ -5630,7 +5630,7 @@ func (r *ClickHouseReader) GetMetricsLastReceived(ctx context.Context, metricNam
     MAX(unix_milli) AS last_received_time
 FROM %s.%s
 WHERE metric_name = ?
-`, signozMetricDBName, signozSamplesAgg30mLocalTableName)
+`, observeMetricDBName, o11ySamplesAgg30mLocalTableName)
 	var lastReceived int64
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.QueryRow(valueCtx, query, metricName).Scan(&lastReceived)
@@ -5641,7 +5641,7 @@ WHERE metric_name = ?
     MAX(unix_milli) AS last_received_time
 FROM %s.%s
 WHERE metric_name = ? and unix_milli > ?
-`, signozMetricDBName, signozSampleTableName)
+`, observeMetricDBName, o11ySampleTableName)
 	var finalLastReceived int64
 	err = r.db.QueryRow(valueCtx, query, metricName, lastReceived).Scan(&finalLastReceived)
 	if err != nil {
@@ -5659,7 +5659,7 @@ func (r *ClickHouseReader) GetTotalTimeSeriesForMetricName(ctx context.Context, 
 	query := fmt.Sprintf(`SELECT 
     uniq(fingerprint) AS timeSeriesCount
 FROM %s.%s
-WHERE metric_name = ?;`, signozMetricDBName, signozTSTableNameV41Week)
+WHERE metric_name = ?;`, observeMetricDBName, observeTSTableNameV41Week)
 	var timeSeriesCount uint64
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.QueryRow(valueCtx, query, metricName).Scan(&timeSeriesCount)
@@ -5698,7 +5698,7 @@ WHERE metric_name = ? AND __normalized=? %s`
 
 	var args []interface{}
 	args = append(args, metricName)
-	tableName := signozTSTableNameV41Week
+	tableName := observeTSTableNameV41Week
 
 	args = append(args, normalized)
 
@@ -5707,10 +5707,10 @@ WHERE metric_name = ? AND __normalized=? %s`
 		*start, *end, tableName = st, en, tsTable
 		args = append(args, *start, *end)
 	} else if start == nil && end == nil {
-		tableName = signozTSTableNameV41Week
+		tableName = observeTSTableNameV41Week
 	}
 
-	query := fmt.Sprintf(baseQueryTemplate, signozMetricDBName, tableName, whereClause)
+	query := fmt.Sprintf(baseQueryTemplate, observeMetricDBName, tableName, whereClause)
 
 	if start != nil && end != nil {
 		query += " AND unix_milli BETWEEN ? AND ?"
@@ -5748,7 +5748,7 @@ func (r *ClickHouseReader) GetActiveTimeSeriesForMetricName(ctx context.Context,
 		instrumentationtypes.CodeFunctionName: "GetActiveTimeSeriesForMetricName",
 	})
 	milli := time.Now().Add(-duration).UnixMilli()
-	query := fmt.Sprintf("SELECT uniq(fingerprint) FROM %s.%s WHERE metric_name = '%s' and unix_milli >= ?", signozMetricDBName, signozTSTableNameV4, metricName)
+	query := fmt.Sprintf("SELECT uniq(fingerprint) FROM %s.%s WHERE metric_name = '%s' and unix_milli >= ?", observeMetricDBName, observeTSTableNameV4, metricName)
 	var timeSeries uint64
 	// Using QueryRow instead of Select since we're only expecting a single value
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
@@ -5806,13 +5806,13 @@ func (r *ClickHouseReader) ListSummaryMetrics(ctx context.Context, orgID valuer.
 			uniq(metric_name) OVER() AS total
 		FROM %s.%s AS t
 		WHERE unix_milli BETWEEN ? AND ?
-		AND NOT startsWith(metric_name, 'signoz')
+		AND NOT startsWith(metric_name, 'o11y')
 		AND __normalized = ?
 		%s
 		GROUP BY t.metric_name
 		%s
 		LIMIT %d OFFSET %d;`,
-		signozMetricDBName, tsTable, whereClause, orderByClauseFirstQuery, firstQueryLimit, req.Offset)
+		observeMetricDBName, tsTable, whereClause, orderByClauseFirstQuery, firstQueryLimit, req.Offset)
 
 	args = append(args, start, end)
 	args = append(args, normalized)
@@ -5884,9 +5884,9 @@ func (r *ClickHouseReader) ListSummaryMetrics(ctx context.Context, orgID valuer.
 				GROUP BY dm.metric_name
 			) AS s `,
 			countExp,
-			signozMetricDBName, sampleTable,
+			observeMetricDBName, sampleTable,
 			metricsList,
-			signozMetricDBName, localTsTable,
+			observeMetricDBName, localTsTable,
 			metricsList,
 			whereClause,
 		))
@@ -5909,7 +5909,7 @@ func (r *ClickHouseReader) ListSummaryMetrics(ctx context.Context, orgID valuer.
         GROUP BY metric_name
     ) AS s `,
 			countExp,
-			signozMetricDBName, sampleTable,
+			observeMetricDBName, sampleTable,
 			metricsList))
 		args = append(args, req.Start, req.End)
 	}
@@ -6017,14 +6017,14 @@ func (r *ClickHouseReader) GetMetricsTimeSeriesPercentage(ctx context.Context, r
 					 FROM %s.%s 
 					 WHERE unix_milli BETWEEN ? AND ? AND __normalized = ?) AS total_time_series
 				FROM %s.%s
-				WHERE unix_milli BETWEEN ? AND ? AND NOT startsWith(metric_name, 'signoz') AND __normalized = ? %s
+				WHERE unix_milli BETWEEN ? AND ? AND NOT startsWith(metric_name, 'o11y') AND __normalized = ? %s
 				GROUP BY metric_name
 			)
 			ORDER BY percentage DESC
 			LIMIT %d;`,
-		signozMetricDBName,
+		observeMetricDBName,
 		tsTable,
-		signozMetricDBName,
+		observeMetricDBName,
 		tsTable,
 		whereClause,
 		req.Limit,
@@ -6094,14 +6094,14 @@ func (r *ClickHouseReader) GetMetricsSamplesPercentage(ctx context.Context, req 
 		    ts.metric_name AS metric_name,
 		    uniq(ts.fingerprint) AS timeSeries
 		FROM %s.%s AS ts
-		WHERE NOT startsWith(ts.metric_name, 'signoz_')
+		WHERE NOT startsWith(ts.metric_name, 'o11y_')
 		AND __normalized = ?
 		AND unix_milli BETWEEN ? AND ?
 		%s
 		GROUP BY ts.metric_name
 		ORDER BY timeSeries DESC
 		LIMIT %d;`,
-		signozMetricDBName, tsTable, whereClause, queryLimit,
+		observeMetricDBName, tsTable, whereClause, queryLimit,
 	)
 
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
@@ -6157,8 +6157,8 @@ func (r *ClickHouseReader) GetMetricsSamplesPercentage(ctx context.Context, req 
 				dm.metric_name,
 				%s AS samples
 			FROM %s.%s AS dm`,
-		countExp, signozMetricDBName, sampleTable, // Total samples
-		countExp, signozMetricDBName, sampleTable, // Inner select samples
+		countExp, observeMetricDBName, sampleTable, // Total samples
+		countExp, observeMetricDBName, sampleTable, // Inner select samples
 	))
 
 	var args []interface{}
@@ -6182,7 +6182,7 @@ func (r *ClickHouseReader) GetMetricsSamplesPercentage(ctx context.Context, req 
 				%s
 				GROUP BY ts.fingerprint
 			)`,
-			signozMetricDBName, localTsTable, metricsList, whereClause,
+			observeMetricDBName, localTsTable, metricsList, whereClause,
 		))
 		args = append(args, start, end, normalized)
 	}
@@ -6254,12 +6254,12 @@ func (r *ClickHouseReader) GetNameSimilarity(ctx context.Context, req *metrics_e
 		FROM %s.%s
 		WHERE metric_name != ?
 		  AND unix_milli BETWEEN ? AND ?
-		 AND NOT startsWith(metric_name, 'signoz')
+		 AND NOT startsWith(metric_name, 'o11y')
 		AND __normalized = ?
 		GROUP BY metric_name
 		ORDER BY name_similarity DESC
 		LIMIT 30;`,
-		signozMetricDBName, tsTable)
+		observeMetricDBName, tsTable)
 
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query, req.CurrentMetricName, req.CurrentMetricName, req.CurrentMetricName, start, end, normalized)
@@ -6312,10 +6312,10 @@ func (r *ClickHouseReader) GetAttributeSimilarity(ctx context.Context, req *metr
 		WHERE metric_name = ?
 		  AND unix_milli between ? and ?
 		  AND NOT startsWith(kv.1, '__')
-		AND NOT startsWith(metric_name, 'signoz_')
+		AND NOT startsWith(metric_name, 'o11y_')
 		AND __normalized = ?
 		GROUP BY label_key
-		LIMIT 50`, signozMetricDBName, tsTable)
+		LIMIT 50`, observeMetricDBName, tsTable)
 
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, extractedLabelsQuery, req.CurrentMetricName, start, end, normalized)
@@ -6390,14 +6390,14 @@ func (r *ClickHouseReader) GetAttributeSimilarity(ctx context.Context, req *metr
 		FROM %s.%s
 		WHERE rand() %% 100 < 10
 		AND unix_milli between ? and ?
-		AND NOT startsWith(metric_name, 'signoz_')
+		AND NOT startsWith(metric_name, 'o11y_')
 		AND __normalized = ?
 		GROUP BY metric_name
 		ORDER BY weighted_match_count DESC, raw_match_count DESC
 		LIMIT 30
 		`,
 		targetKeysList, targetValuesList, priorityListString, 2,
-		signozMetricDBName, tsTable)
+		observeMetricDBName, tsTable)
 
 	rows, err = r.db.Query(valueCtx, candidateLabelsQuery, start, end, normalized)
 	if err != nil {
@@ -6471,7 +6471,7 @@ FROM (
     WHERE unix_milli between ? and ?
 ) 
 GROUP BY key
-ORDER BY distinct_value_count DESC;`, signozMetadataDbName, attTable)
+ORDER BY distinct_value_count DESC;`, o11yMetadataDbName, attTable)
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query, start, end)
 	if err != nil {
@@ -6507,7 +6507,7 @@ func (r *ClickHouseReader) GetInspectMetrics(ctx context.Context, req *metrics_e
                 unix_milli,
                 value as per_series_value
         FROM
-                signoz_metrics.distributed_samples_v4
+                observe_metrics.distributed_samples_v4
         INNER JOIN (
                 SELECT DISTINCT
                         fingerprint,
@@ -6523,7 +6523,7 @@ func (r *ClickHouseReader) GetInspectMetrics(ctx context.Context, req *metrics_e
                 metric_name  = ?
                 AND unix_milli >= ?
                 AND unix_milli < ?
-                ORDER BY fingerprint DESC, unix_milli DESC`, signozMetricDBName, localTsTable, fingerprintsString)
+                ORDER BY fingerprint DESC, unix_milli DESC`, observeMetricDBName, localTsTable, fingerprintsString)
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query, start, end, req.MetricName, start, end)
 	if err != nil {
@@ -6632,7 +6632,7 @@ GROUP BY %s
 ORDER BY length(fingerprints) DESC, rand()
 LIMIT 40`, // added rand to get diff value every time we run this query
 		strings.Join(jsonExtracts, ", "),
-		signozMetricDBName, tsTable,
+		observeMetricDBName, tsTable,
 		whereClause,
 		strings.Join(groupBys, ", "))
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
@@ -6714,7 +6714,7 @@ func (r *ClickHouseReader) UpdateMetricsMetadata(ctx context.Context, orgID valu
 
 	// Insert new metadata (keeping history of all updates)
 	insertQuery := fmt.Sprintf(`INSERT INTO %s.%s (metric_name, temporality, is_monotonic, type, description, unit, created_at)
-VALUES ( ?, ?, ?, ?, ?, ?, ?);`, signozMetricDBName, signozUpdatedMetricsMetadataTable)
+VALUES ( ?, ?, ?, ?, ?, ?, ?);`, observeMetricDBName, o11yUpdatedMetricsMetadataTable)
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.Exec(valueCtx, insertQuery, req.MetricName, req.Temporality, req.IsMonotonic, req.MetricType, req.Description, req.Unit, req.CreatedAt.UnixMilli())
 	if err != nil {
@@ -6746,7 +6746,7 @@ func (r *ClickHouseReader) CheckForLabelsInMetric(ctx context.Context, metricNam
         SELECT count(*) > 0 as has_le
         FROM %s.%s
         WHERE %s
-        LIMIT 1`, signozMetricDBName, signozTSTableNameV41Day, conditions)
+        LIMIT 1`, observeMetricDBName, observeTSTableNameV41Day, conditions)
 
 	args := make([]interface{}, 0, len(labels)+1)
 	args = append(args, metricName)
@@ -6801,8 +6801,8 @@ func (r *ClickHouseReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID 
 					FROM %s.%s 
 					WHERE metric_name IN (%s)
 					GROUP BY metric_name;`,
-			signozMetricDBName,
-			signozUpdatedMetricsMetadataTable,
+			observeMetricDBName,
+			o11yUpdatedMetricsMetadataTable,
 			metricList)
 
 		valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
@@ -6847,7 +6847,7 @@ func (r *ClickHouseReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID 
 		metricList := "'" + strings.Join(stillMissing, "', '") + "'"
 		query := fmt.Sprintf(`SELECT DISTINCT metric_name, type, description, temporality, is_monotonic, unit
 			FROM %s.%s 
-			WHERE metric_name IN (%s)`, signozMetricDBName, signozTSTableNameV4, metricList)
+			WHERE metric_name IN (%s)`, observeMetricDBName, observeTSTableNameV4, metricList)
 		valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
 		rows, err := r.db.Query(valueCtx, query)
 		if err != nil {
@@ -7031,7 +7031,7 @@ func (r *ClickHouseReader) GetNormalizedStatus(
            FROM %s.%s
           WHERE metric_name IN (%s)
           GROUP BY metric_name, __normalized`,
-		signozMetricDBName, signozTSTableNameV41Day, placeholders,
+		observeMetricDBName, observeTSTableNameV41Day, placeholders,
 	)
 
 	rows, err := r.db.Query(ctx, q)

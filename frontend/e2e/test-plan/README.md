@@ -1,6 +1,6 @@
-# SigNoz E2E Test Plan
+# Hanzo O11y E2E Test Plan
 
-This directory contains the structured test plan for the SigNoz application. Each subfolder corresponds to a main module or feature area, and contains scenario files for all user journeys, edge cases, and cross-module flows. These documents serve as the basis for generating Playwright MCP-driven E2E tests.
+This directory contains the structured test plan for the Hanzo O11y application. Each subfolder corresponds to a main module or feature area, and contains scenario files for all user journeys, edge cases, and cross-module flows. These documents serve as the basis for generating Playwright MCP-driven E2E tests.
 
 ## Structure
 

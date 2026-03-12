@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 
 function FlamegraphImg(): JSX.Element {

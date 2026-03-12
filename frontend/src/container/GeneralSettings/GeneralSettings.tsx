@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { UseQueryResult } from 'react-query';
 import { useInterval } from 'react-use';
 import { LoadingOutlined } from '@ant-design/icons';
-import { Button } from '@signozhq/button';
-import { Compass, ScrollText } from '@signozhq/icons';
+import { Button } from '@hanzo/o11y-button';
+import { Compass, ScrollText } from '@hanzo/o11y-icons';
 import { Modal, Spin } from 'antd';
 import setRetentionApi from 'api/settings/setRetention';
 import setRetentionApiV2 from 'api/settings/setRetentionV2';
@@ -695,7 +695,7 @@ function GeneralSettings({
 						<TextToolTip
 							{...{
 								text: `More details on how to set retention period`,
-								url: 'https://signoz.io/docs/userguide/retention-period/',
+								url: 'https://o11y.hanzo.ai/docs/userguide/retention-period/',
 							}}
 						/>
 					)}

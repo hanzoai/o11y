@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/web"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/web"
 	"github.com/gorilla/mux"
 )
 

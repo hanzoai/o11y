@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for SigNoz
+ * * The file has been auto-generated using Orval for Hanzo O11y
  * * regenerate with 'yarn generate:api'
- * SigNoz
+ * Hanzo O11y
  */
 import type {
 	InvalidateOptions,
@@ -16,7 +16,7 @@ import { useQuery } from 'react-query';
 
 import type { ErrorType } from '../../../generatedAPIInstance';
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
-import type { GetFeatures200, RenderErrorResponseDTO } from '../sigNoz.schemas';
+import type { GetFeatures200, RenderErrorResponseDTO } from '../observe.schemas';
 
 /**
  * This endpoint returns the supported features and their details

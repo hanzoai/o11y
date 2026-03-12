@@ -5,4 +5,4 @@
 
 &nbsp;
 
-Once you have setup the Central Collector, it will automatically start sending your Metrics to SigNoz.
+Once you have setup the Central Collector, it will automatically start sending your Metrics to Hanzo O11y.

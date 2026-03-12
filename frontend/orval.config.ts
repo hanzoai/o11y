@@ -7,7 +7,7 @@
 import { defineConfig } from 'orval';
 
 export default defineConfig({
-	signoz: {
+	o11y: {
 		input: {
 			target: '../docs/api/openapi.yml',
 		},
@@ -79,7 +79,7 @@ export default defineConfig({
 				// info is of type InfoObject from openapi spec
 				header: (info: { title: string; version: string }): string[] => [
 					`! Do not edit manually`,
-					`* The file has been auto-generated using Orval for SigNoz`,
+					`* The file has been auto-generated using Orval for Hanzo O11y`,
 					`* regenerate with 'yarn generate:api'`,
 					...(info.title ? [info.title] : []),
 					...(info.version ? [`OpenAPI spec version: ${info.version}`] : []),

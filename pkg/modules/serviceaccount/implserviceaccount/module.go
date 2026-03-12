@@ -3,14 +3,14 @@ package implserviceaccount
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/emailing"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/modules/serviceaccount"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/emailtypes"
-	"github.com/SigNoz/signoz/pkg/types/serviceaccounttypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/emailing"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/emailtypes"
+	"github.com/hanzoai/o11y/pkg/types/serviceaccounttypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type module struct {
@@ -21,7 +21,7 @@ type module struct {
 }
 
 func NewModule(store serviceaccounttypes.Store, authz authz.AuthZ, emailing emailing.Emailing, providerSettings factory.ProviderSettings) serviceaccount.Module {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/modules/serviceaccount/implserviceaccount")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/modules/serviceaccount/implserviceaccount")
 	return &module{store: store, authz: authz, emailing: emailing, settings: settings}
 }
 
@@ -246,7 +246,7 @@ func (module *module) CreateFactorAPIKey(ctx context.Context, factorAPIKey *serv
 		return err
 	}
 
-	if err := module.emailing.SendHTML(ctx, serviceAccount.Email, "New API Key created for your SigNoz account", emailtypes.TemplateNameAPIKeyEvent, map[string]any{
+	if err := module.emailing.SendHTML(ctx, serviceAccount.Email, "New API Key created for your Hanzo O11y account", emailtypes.TemplateNameAPIKeyEvent, map[string]any{
 		"Name":         serviceAccount.Name,
 		"KeyName":      factorAPIKey.Name,
 		"KeyID":        factorAPIKey.ID.String(),
@@ -296,7 +296,7 @@ func (module *module) RevokeFactorAPIKey(ctx context.Context, serviceAccountID v
 		return err
 	}
 
-	if err := module.emailing.SendHTML(ctx, serviceAccount.Email, "API Key revoked for your SigNoz account", emailtypes.TemplateNameAPIKeyEvent, map[string]any{
+	if err := module.emailing.SendHTML(ctx, serviceAccount.Email, "API Key revoked for your Hanzo O11y account", emailtypes.TemplateNameAPIKeyEvent, map[string]any{
 		"Name":         serviceAccount.Name,
 		"KeyName":      factorAPIKey.Name,
 		"KeyID":        factorAPIKey.ID.String(),

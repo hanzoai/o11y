@@ -140,7 +140,7 @@ export default function ConnectionStatus(): JSX.Element {
 						entity="java"
 						heading="Java OpenTelemetry Instrumentation"
 						imgURL="/Logos/java.png"
-						docsURL="https://signoz.io/docs/instrumentation/java/"
+						docsURL="https://o11y.hanzo.ai/docs/instrumentation/java/"
 						imgClassName="supported-language-img"
 					/>
 				);
@@ -151,7 +151,7 @@ export default function ConnectionStatus(): JSX.Element {
 						entity="python"
 						heading="Python OpenTelemetry Instrumentation"
 						imgURL="/Logos/python.png"
-						docsURL="https://signoz.io/docs/instrumentation/python/"
+						docsURL="https://o11y.hanzo.ai/docs/instrumentation/python/"
 						imgClassName="supported-language-img"
 					/>
 				);
@@ -162,7 +162,7 @@ export default function ConnectionStatus(): JSX.Element {
 						entity="javascript"
 						heading="Javascript OpenTelemetry Instrumentation"
 						imgURL="/Logos/javascript.png"
-						docsURL="https://signoz.io/docs/instrumentation/javascript/"
+						docsURL="https://o11y.hanzo.ai/docs/instrumentation/javascript/"
 						imgClassName="supported-language-img"
 					/>
 				);
@@ -172,7 +172,7 @@ export default function ConnectionStatus(): JSX.Element {
 						entity="go"
 						heading="Go OpenTelemetry Instrumentation"
 						imgURL="/Logos/go.png"
-						docsURL="https://signoz.io/docs/instrumentation/golang/"
+						docsURL="https://o11y.hanzo.ai/docs/instrumentation/golang/"
 						imgClassName="supported-language-img"
 					/>
 				);
@@ -182,7 +182,7 @@ export default function ConnectionStatus(): JSX.Element {
 						entity="rails"
 						heading="Ruby on Rails OpenTelemetry Instrumentation"
 						imgURL="/Logos/rails.png"
-						docsURL="https://signoz.io/docs/instrumentation/ruby-on-rails/"
+						docsURL="https://o11y.hanzo.ai/docs/instrumentation/ruby-on-rails/"
 						imgClassName="supported-language-img"
 					/>
 				);
@@ -192,7 +192,7 @@ export default function ConnectionStatus(): JSX.Element {
 						entity="rust"
 						heading="Rust OpenTelemetry Instrumentation"
 						imgURL="/Logos/rust.png"
-						docsURL="https://signoz.io/docs/instrumentation/rust/"
+						docsURL="https://o11y.hanzo.ai/docs/instrumentation/rust/"
 						imgClassName="supported-language-img"
 					/>
 				);
@@ -202,7 +202,7 @@ export default function ConnectionStatus(): JSX.Element {
 						entity="rust"
 						heading="Elixir OpenTelemetry Instrumentation"
 						imgURL="/Logos/elixir.png"
-						docsURL="https://signoz.io/docs/instrumentation/elixir/"
+						docsURL="https://o11y.hanzo.ai/docs/instrumentation/elixir/"
 						imgClassName="supported-language-img"
 					/>
 				);
@@ -212,7 +212,7 @@ export default function ConnectionStatus(): JSX.Element {
 						entity="swift"
 						heading="Swift OpenTelemetry Instrumentation"
 						imgURL="/Logos/swift.png"
-						docsURL="https://signoz.io/docs/instrumentation/swift/"
+						docsURL="https://o11y.hanzo.ai/docs/instrumentation/swift/"
 						imgClassName="supported-language-img"
 					/>
 				);

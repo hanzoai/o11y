@@ -1,52 +1,52 @@
-package signoz
+package o11y
 
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/alertmanager"
-	"github.com/SigNoz/signoz/pkg/alertmanager/nfmanager"
-	"github.com/SigNoz/signoz/pkg/alertmanager/nfmanager/nfroutingstore/sqlroutingstore"
-	"github.com/SigNoz/signoz/pkg/analytics"
-	"github.com/SigNoz/signoz/pkg/apiserver"
-	"github.com/SigNoz/signoz/pkg/authn"
-	"github.com/SigNoz/signoz/pkg/authn/authnstore/sqlauthnstore"
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/emailing"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/gateway"
-	"github.com/SigNoz/signoz/pkg/instrumentation"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/modules/dashboard"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/modules/organization/implorganization"
-	"github.com/SigNoz/signoz/pkg/modules/user/impluser"
-	"github.com/SigNoz/signoz/pkg/prometheus"
-	"github.com/SigNoz/signoz/pkg/querier"
-	"github.com/SigNoz/signoz/pkg/queryparser"
-	"github.com/SigNoz/signoz/pkg/sharder"
-	"github.com/SigNoz/signoz/pkg/sqlmigration"
-	"github.com/SigNoz/signoz/pkg/sqlmigrator"
-	"github.com/SigNoz/signoz/pkg/sqlschema"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/statsreporter"
-	"github.com/SigNoz/signoz/pkg/telemetrylogs"
-	"github.com/SigNoz/signoz/pkg/telemetrymetadata"
-	"github.com/SigNoz/signoz/pkg/telemetrymeter"
-	"github.com/SigNoz/signoz/pkg/telemetrymetrics"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/telemetrytraces"
-	pkgtokenizer "github.com/SigNoz/signoz/pkg/tokenizer"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
-	"github.com/SigNoz/signoz/pkg/version"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/pkg/alertmanager"
+	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
+	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager/nfroutingstore/sqlroutingstore"
+	"github.com/hanzoai/o11y/pkg/analytics"
+	"github.com/hanzoai/o11y/pkg/apiserver"
+	"github.com/hanzoai/o11y/pkg/authn"
+	"github.com/hanzoai/o11y/pkg/authn/authnstore/sqlauthnstore"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/emailing"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/gateway"
+	"github.com/hanzoai/o11y/pkg/instrumentation"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/modules/dashboard"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/modules/organization/implorganization"
+	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/queryparser"
+	"github.com/hanzoai/o11y/pkg/sharder"
+	"github.com/hanzoai/o11y/pkg/sqlmigration"
+	"github.com/hanzoai/o11y/pkg/sqlmigrator"
+	"github.com/hanzoai/o11y/pkg/sqlschema"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/statsreporter"
+	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/telemetrymetadata"
+	"github.com/hanzoai/o11y/pkg/telemetrymeter"
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
+	pkgtokenizer "github.com/hanzoai/o11y/pkg/tokenizer"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/version"
+	"github.com/hanzoai/o11y/pkg/zeus"
 
-	"github.com/SigNoz/signoz/pkg/web"
+	"github.com/hanzoai/o11y/pkg/web"
 )
 
-type SigNoz struct {
+type Hanzo O11y struct {
 	*factory.Registry
 	Instrumentation        instrumentation.Instrumentation
 	Analytics              analytics.Analytics
@@ -91,15 +91,15 @@ func New(
 	dashboardModuleCallback func(sqlstore.SQLStore, factory.ProviderSettings, analytics.Analytics, organization.Getter, queryparser.QueryParser, querier.Querier, licensing.Licensing) dashboard.Module,
 	gatewayProviderFactory func(licensing.Licensing) factory.ProviderFactory[gateway.Gateway, gateway.Config],
 	querierHandlerCallback func(factory.ProviderSettings, querier.Querier, analytics.Analytics) querier.Handler,
-) (*SigNoz, error) {
+) (*Hanzo O11y, error) {
 	// Initialize instrumentation
-	instrumentation, err := instrumentation.New(ctx, config.Instrumentation, version.Info, "signoz")
+	instrumentation, err := instrumentation.New(ctx, config.Instrumentation, version.Info, "observe")
 	if err != nil {
 		return nil, err
 	}
 
-	instrumentation.Logger().InfoContext(ctx, "starting signoz", "version", version.Info.Version(), "variant", version.Info.Variant(), "commit", version.Info.Hash(), "branch", version.Info.Branch(), "go", version.Info.GoVersion(), "time", version.Info.Time())
-	instrumentation.Logger().DebugContext(ctx, "loaded signoz config", "config", config)
+	instrumentation.Logger().InfoContext(ctx, "starting o11y", "version", version.Info.Version(), "variant", version.Info.Variant(), "commit", version.Info.Hash(), "branch", version.Info.Branch(), "go", version.Info.GoVersion(), "time", version.Info.Time())
+	instrumentation.Logger().DebugContext(ctx, "loaded o11y config", "config", config)
 
 	// Get the provider settings from instrumentation
 	providerSettings := instrumentation.ToProviderSettings()
@@ -335,7 +335,7 @@ func New(
 		providerSettings,
 		config.Ruler,
 		NewRulerProviderFactories(sqlstore, queryParser),
-		"signoz",
+		"observe",
 	)
 	if err != nil {
 		return nil, err
@@ -381,7 +381,7 @@ func New(
 		providerSettings,
 		config.Global,
 		NewGlobalProviderFactories(),
-		"signoz",
+		"observe",
 	)
 	if err != nil {
 		return nil, err
@@ -404,7 +404,7 @@ func New(
 		providerSettings,
 		config.APIServer,
 		NewAPIServerProviderFactories(orgGetter, authz, global, modules, handlers),
-		"signoz",
+		"observe",
 	)
 	if err != nil {
 		return nil, err
@@ -450,7 +450,7 @@ func New(
 		return nil, err
 	}
 
-	return &SigNoz{
+	return &Hanzo O11y{
 		Registry:               registry,
 		Analytics:              analytics,
 		Instrumentation:        instrumentation,

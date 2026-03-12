@@ -1,5 +1,5 @@
 import { useCopyToClipboard } from 'react-use';
-import { toast } from '@signozhq/sonner';
+import { toast } from '@hanzo/o11y-sonner';
 import { fireEvent, within } from '@testing-library/react';
 import { StatusCodes } from 'http-status-codes';
 import {
@@ -19,7 +19,7 @@ jest.mock('react-use', () => ({
 	...jest.requireActual('react-use'),
 	useCopyToClipboard: jest.fn(),
 }));
-jest.mock('@signozhq/sonner', () => ({
+jest.mock('@hanzo/o11y-sonner', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),

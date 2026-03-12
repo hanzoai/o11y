@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SigNoz/signoz/pkg/query-service/agentConf"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types/dashboardtypes"
-	"github.com/SigNoz/signoz/pkg/types/pipelinetypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
+	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type Controller struct {

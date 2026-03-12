@@ -1,5 +1,5 @@
 import React from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Button, Modal, Tag } from 'antd';
 import { CircleAlert, X } from 'lucide-react';
 import KeyValueLabel from 'periscope/components/KeyValueLabel';

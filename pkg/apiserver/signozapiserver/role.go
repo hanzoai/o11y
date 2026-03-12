@@ -1,12 +1,12 @@
-package signozapiserver
+package o11yapiserver
 
 import (
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/http/handler"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/roletypes"
 	"github.com/gorilla/mux"
 )
 

@@ -1,5 +1,5 @@
 import { RocketOutlined } from '@ant-design/icons';
-import { Style } from '@signozhq/design-tokens';
+import { Style } from '@hanzo/o11y-design-tokens';
 import { MenuProps } from 'antd';
 import ROUTES from 'constants/routes';
 import {
@@ -92,9 +92,9 @@ export const slackSupportMenuItem = {
 	icon: <Slack size={16} />,
 };
 
-export const trySignozCloudMenuItem: SidebarItem = {
-	key: 'trySignozCloud',
-	label: 'Try Signoz Cloud',
+export const tryO11yCloudMenuItem: SidebarItem = {
+	key: 'tryO11yCloud',
+	label: 'Try O11y Cloud',
 	icon: <Cloudy size={16} />,
 };
 
@@ -413,7 +413,7 @@ export const helpSupportDropdownMenuItems: SidebarItem[] = [
 		),
 		icon: <Book size={14} />,
 		isExternal: true,
-		url: 'https://signoz.io/docs',
+		url: 'https://o11y.hanzo.ai/docs',
 		itemKey: 'documentation',
 	},
 	{
@@ -427,7 +427,7 @@ export const helpSupportDropdownMenuItems: SidebarItem[] = [
 
 		icon: <Github size={14} />,
 		isExternal: true,
-		url: 'https://github.com/signoz/signoz',
+		url: 'https://github.com/o11y/o11y',
 		itemKey: 'github',
 	},
 	{
@@ -440,7 +440,7 @@ export const helpSupportDropdownMenuItems: SidebarItem[] = [
 		),
 		icon: <Slack size={14} />,
 		isExternal: true,
-		url: 'https://signoz.io/slack',
+		url: 'https://o11y.hanzo.ai/slack',
 		itemKey: 'community-slack',
 	},
 	{

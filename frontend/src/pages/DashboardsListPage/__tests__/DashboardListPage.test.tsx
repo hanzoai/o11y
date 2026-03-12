@@ -213,7 +213,7 @@ describe('dashboard list page', () => {
 		// test the correct link to be added for the dashboards empty state
 		await waitFor(() =>
 			expect(mockWindowOpen).toHaveBeenCalledWith(
-				'https://signoz.io/docs/userguide/manage-dashboards?utm_source=product&utm_medium=dashboard-list-empty-state',
+				'https://o11y.hanzo.ai/docs/userguide/manage-dashboards?utm_source=product&utm_medium=dashboard-list-empty-state',
 				'_blank',
 			),
 		);

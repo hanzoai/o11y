@@ -14,7 +14,7 @@ const SESSIONS_CONTEXT_ENDPOINT = '*/api/v2/sessions/context';
 const CALLBACK_AUTHN_ORG = 'callback_authn_org';
 const CALLBACK_AUTHN_URL = 'https://sso.example.com/auth';
 const PASSWORD_AUTHN_ORG = 'password_authn_org';
-const PASSWORD_AUTHN_EMAIL = 'jest.test@signoz.io';
+const PASSWORD_AUTHN_EMAIL = 'jest.test@o11y.hanzo.ai';
 
 jest.mock('lib/history', () => ({
 	__esModule: true,
@@ -145,7 +145,7 @@ describe('Login Component', () => {
 			).toBeInTheDocument();
 			expect(getByTestId('email')).toBeInTheDocument();
 			expect(getByTestId('initiate_login')).toBeInTheDocument();
-			expect(getByPlaceholderText('e.g. john@signoz.io')).toBeInTheDocument();
+			expect(getByPlaceholderText('e.g. john@o11y.hanzo.ai')).toBeInTheDocument();
 		});
 
 		it('shows loading state when version data is being fetched', () => {

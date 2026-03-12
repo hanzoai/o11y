@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Button } from 'antd';
 import EmptyQuickFilterIcon from 'assets/CustomIcons/EmptyQuickFilterIcon';
 import { ArrowUpRight } from 'lucide-react';
@@ -23,7 +23,7 @@ function LogsQuickFilterEmptyState({
 		const section = QUICK_FILTER_DOC_PATHS[attributeKey];
 
 		window.open(
-			`https://signoz.io/docs/logs-management/features/logs-quick-filters#${section}`,
+			`https://o11y.hanzo.ai/docs/logs-management/features/logs-quick-filters#${section}`,
 			'_blank',
 		);
 	};

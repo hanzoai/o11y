@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
-import { toast } from '@signozhq/sonner';
+import { toast } from '@hanzo/o11y-sonner';
 import type { NotificationInstance } from 'antd/es/notification/interface';
 import logEvent from 'api/common/logEvent';
-import { RenderErrorResponseDTO } from 'api/generated/services/sigNoz.schemas';
+import { RenderErrorResponseDTO } from 'api/generated/services/observe.schemas';
 import { usePutProfile } from 'api/generated/services/zeus';
 import listOrgPreferences from 'api/v1/org/preferences/list';
 import updateOrgPreferenceAPI from 'api/v1/org/preferences/name/update';
@@ -18,13 +18,13 @@ import history from 'lib/history';
 import { useAppContext } from 'providers/App/App';
 
 import {
-	AboutSigNozQuestions,
-	SignozDetails,
-} from './AboutSigNozQuestions/AboutSigNozQuestions';
+	AboutHanzo O11yQuestions,
+	O11yDetails,
+} from './AboutHanzo O11yQuestions/AboutHanzo O11yQuestions';
 import InviteTeamMembers from './InviteTeamMembers/InviteTeamMembers';
-import OptimiseSignozNeeds, {
-	OptimiseSignozDetails,
-} from './OptimiseSignozNeeds/OptimiseSignozNeeds';
+import OptimiseO11yNeeds, {
+	OptimiseO11yDetails,
+} from './OptimiseO11yNeeds/OptimiseO11yNeeds';
 import OrgQuestions, { OrgDetails } from './OrgQuestions/OrgQuestions';
 
 import './OnboardingQuestionaire.styles.scss';
@@ -46,13 +46,13 @@ const INITIAL_ORG_DETAILS: OrgDetails = {
 	migrationTimeline: null,
 };
 
-const INITIAL_SIGNOZ_DETAILS: SignozDetails = {
-	interestInSignoz: [],
-	otherInterestInSignoz: '',
-	discoverSignoz: '',
+const INITIAL_HANZO_DETAILS: O11yDetails = {
+	interestInO11y: [],
+	otherInterestInO11y: '',
+	discoverO11y: '',
 };
 
-const INITIAL_OPTIMISE_SIGNOZ_DETAILS: OptimiseSignozDetails = {
+const INITIAL_OPTIMISE_HANZO_DETAILS: OptimiseO11yDetails = {
 	logsPerDay: 0,
 	hostsPerDay: 0,
 	services: 0,
@@ -69,14 +69,14 @@ function OnboardingQuestionaire(): JSX.Element {
 	)?.active;
 	const [currentStep, setCurrentStep] = useState<number>(1);
 	const [orgDetails, setOrgDetails] = useState<OrgDetails>(INITIAL_ORG_DETAILS);
-	const [signozDetails, setSignozDetails] = useState<SignozDetails>(
-		INITIAL_SIGNOZ_DETAILS,
+	const [o11yDetails, setO11yDetails] = useState<O11yDetails>(
+		INITIAL_HANZO_DETAILS,
 	);
 
 	const [
-		optimiseSignozDetails,
-		setOptimiseSignozDetails,
-	] = useState<OptimiseSignozDetails>(INITIAL_OPTIMISE_SIGNOZ_DETAILS);
+		optimiseO11yDetails,
+		setOptimiseO11yDetails,
+	] = useState<OptimiseO11yDetails>(INITIAL_OPTIMISE_HANZO_DETAILS);
 	const [teamMembers, setTeamMembers] = useState<
 		InviteTeamMembersProps[] | null
 	>(null);
@@ -119,9 +119,9 @@ function OnboardingQuestionaire(): JSX.Element {
 	});
 
 	const isNextDisabled =
-		optimiseSignozDetails.logsPerDay === 0 &&
-		optimiseSignozDetails.hostsPerDay === 0 &&
-		optimiseSignozDetails.services === 0;
+		optimiseO11yDetails.logsPerDay === 0 &&
+		optimiseO11yDetails.hostsPerDay === 0 &&
+		optimiseO11yDetails.services === 0;
 
 	const { mutate: updateProfile, isLoading: isUpdatingProfile } = usePutProfile<
 		AxiosError<RenderErrorResponseDTO>
@@ -153,21 +153,21 @@ function OnboardingQuestionaire(): JSX.Element {
 						orgDetails?.observabilityTool === 'Others'
 							? (orgDetails?.otherTool as string)
 							: (orgDetails?.observabilityTool as string),
-					where_did_you_discover_signoz: signozDetails?.discoverSignoz as string,
-					timeline_for_migrating_to_signoz: orgDetails?.migrationTimeline as string,
-					reasons_for_interest_in_signoz: signozDetails?.interestInSignoz?.includes(
+					where_did_you_discover_o11y: o11yDetails?.discoverO11y as string,
+					timeline_for_migrating_to_o11y: orgDetails?.migrationTimeline as string,
+					reasons_for_interest_in_o11y: o11yDetails?.interestInO11y?.includes(
 						'Others',
 					)
 						? ([
-								...(signozDetails?.interestInSignoz?.filter(
+								...(o11yDetails?.interestInO11y?.filter(
 									(item) => item !== 'Others',
 								) || []),
-								signozDetails?.otherInterestInSignoz,
+								o11yDetails?.otherInterestInO11y,
 						  ] as string[])
-						: (signozDetails?.interestInSignoz as string[]),
-					logs_scale_per_day_in_gb: optimiseSignozDetails?.logsPerDay as number,
-					number_of_hosts: optimiseSignozDetails?.hostsPerDay as number,
-					number_of_services: optimiseSignozDetails?.services as number,
+						: (o11yDetails?.interestInO11y as string[]),
+					logs_scale_per_day_in_gb: optimiseO11yDetails?.logsPerDay as number,
+					number_of_hosts: optimiseO11yDetails?.hostsPerDay as number,
+					number_of_services: optimiseO11yDetails?.services as number,
 				},
 			},
 			{
@@ -218,9 +218,9 @@ function OnboardingQuestionaire(): JSX.Element {
 				)}
 
 				{currentStep === 2 && (
-					<AboutSigNozQuestions
-						signozDetails={signozDetails}
-						setSignozDetails={setSignozDetails}
+					<AboutHanzo O11yQuestions
+						o11yDetails={o11yDetails}
+						setO11yDetails={setO11yDetails}
 						onNext={(): void => {
 							logEvent(NEXT_BUTTON_EVENT_NAME, {
 								currentPageID: 2,
@@ -232,11 +232,11 @@ function OnboardingQuestionaire(): JSX.Element {
 				)}
 
 				{currentStep === 3 && (
-					<OptimiseSignozNeeds
+					<OptimiseO11yNeeds
 						isNextDisabled={isNextDisabled}
 						isUpdatingProfile={isUpdatingProfile}
-						optimiseSignozDetails={optimiseSignozDetails}
-						setOptimiseSignozDetails={setOptimiseSignozDetails}
+						optimiseO11yDetails={optimiseO11yDetails}
+						setOptimiseO11yDetails={setOptimiseO11yDetails}
 						onNext={handleUpdateProfile}
 						onWillDoLater={handleUpdateProfile}
 					/>

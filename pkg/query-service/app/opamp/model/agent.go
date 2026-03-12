@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types/opamptypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types/opamptypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 

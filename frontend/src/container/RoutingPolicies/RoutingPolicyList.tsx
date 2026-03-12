@@ -59,7 +59,7 @@ function RoutingPolicyList({
 					<Typography.Text>
 						No routing policies yet,{' '}
 						<a
-							href="https://signoz.io/docs/alerts-management/routing-policy"
+							href="https://o11y.hanzo.ai/docs/alerts-management/routing-policy"
 							target="_blank"
 							rel="noopener noreferrer"
 						>

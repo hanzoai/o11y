@@ -92,8 +92,8 @@ export const getTimeRangeFromUplotAxis = (
 };
 
 export const isApmMetric = (metric = ''): boolean =>
-	// if metric starts with 'signoz_', then it is an apm metric
-	metric.startsWith('signoz_');
+	// if metric starts with 'o11y_', then it is an apm metric
+	metric.startsWith('o11y_');
 
 export const getTimeRangeFromStepInterval = (
 	stepInterval: number,

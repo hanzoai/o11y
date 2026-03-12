@@ -17,7 +17,7 @@ aws_secret_access_key=je7MtGbClwBF/2Zp9Utk/h3yCo8nvbEXAMPLEKEY
 
 &nbsp;
 
-The account corresponding to these credentials should have the **below-mentioned AWS Identity and Access Management (IAM)** policy. This allows describing and filtering log events across all log groups of that particular AWS account, a crucial step for forwarding CloudWatch logs to SigNoz.
+The account corresponding to these credentials should have the **below-mentioned AWS Identity and Access Management (IAM)** policy. This allows describing and filtering log events across all log groups of that particular AWS account, a crucial step for forwarding CloudWatch logs to Hanzo O11y.
 
 ```bash
 {

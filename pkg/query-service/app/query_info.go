@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
 // TODO(srikanthccv): Move to the querier layer
@@ -56,25 +56,25 @@ func NewQueryInfoResult(postData *v3.QueryRangeParamsV3, version string) QueryIn
 				queryInfoResult.GroupByApplied = true
 			}
 			queryInfoResult.AggregateOperator = query.AggregateOperator
-			if len(query.AggregateAttribute.Key) > 0 && !strings.Contains(query.AggregateAttribute.Key, "signoz_") {
+			if len(query.AggregateAttribute.Key) > 0 && !strings.Contains(query.AggregateAttribute.Key, "o11y_") {
 				queryInfoResult.AggregateAttributeKey = query.AggregateAttribute.Key
 			}
 		}
 	} else if postData.CompositeQuery.QueryType == v3.QueryTypePromQL {
 		for _, query := range postData.CompositeQuery.PromQueries {
-			if !strings.Contains(query.Query, "signoz_") && len(query.Query) > 0 {
+			if !strings.Contains(query.Query, "o11y_") && len(query.Query) > 0 {
 				queryInfoResult.MetricsUsed = true
 			}
 		}
 	} else if postData.CompositeQuery.QueryType == v3.QueryTypeClickHouseSQL {
 		for _, query := range postData.CompositeQuery.ClickHouseQueries {
-			if strings.Contains(query.Query, "signoz_metrics") && len(query.Query) > 0 {
+			if strings.Contains(query.Query, "observe_metrics") && len(query.Query) > 0 {
 				queryInfoResult.MetricsUsed = true
 			}
-			if strings.Contains(query.Query, "signoz_logs") && len(query.Query) > 0 {
+			if strings.Contains(query.Query, "observe_logs") && len(query.Query) > 0 {
 				queryInfoResult.LogsUsed = true
 			}
-			if strings.Contains(query.Query, "signoz_traces") && len(query.Query) > 0 {
+			if strings.Contains(query.Query, "observe_traces") && len(query.Query) > 0 {
 				queryInfoResult.TracesUsed = true
 			}
 		}

@@ -3,9 +3,9 @@
   "title": "AWS RDS (PostgreSQL)",
   "description": "Monitor AWS RDS (PostgreSQL) with metrics and logs",
   "author": {
-    "name": "SigNoz",
-    "email": "integrations@signoz.io",
-    "homepage": "https://signoz.io"
+    "name": "Hanzo O11y",
+    "email": "integrations@o11y.hanzo.ai",
+    "homepage": "https://o11y.hanzo.ai"
   },
   "icon": "file://icon.svg",
   "categories": [

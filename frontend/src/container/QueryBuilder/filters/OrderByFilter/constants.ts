@@ -1,1 +1,1 @@
-export const SIGNOZ_VALUE = '#SIGNOZ_VALUE';
+export const HANZO_VALUE = '#HANZO_VALUE';

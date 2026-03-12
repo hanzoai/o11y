@@ -3,8 +3,8 @@ package alertmanagernotify
 import (
 	"log/slog"
 
-	"github.com/SigNoz/signoz/pkg/alertmanager/alertmanagernotify/msteamsv2"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify/msteamsv2"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/prometheus/alertmanager/config/receiver"
 	"github.com/prometheus/alertmanager/notify"
 	"github.com/prometheus/alertmanager/template"

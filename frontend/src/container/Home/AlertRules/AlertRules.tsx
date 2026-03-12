@@ -104,7 +104,7 @@ export default function AlertRules({
 								});
 
 								window.open(
-									'https://signoz.io/docs/alerts/',
+									'https://o11y.hanzo.ai/docs/alerts/',
 									'_blank',
 									'noreferrer noopener',
 								);

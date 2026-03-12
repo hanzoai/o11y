@@ -6,19 +6,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SigNoz/signoz-otel-collector/pkg/collectorsimulator"
-	_ "github.com/SigNoz/signoz-otel-collector/pkg/parser/grok"
-	"github.com/SigNoz/signoz-otel-collector/processor/signozlogspipelineprocessor"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	"github.com/SigNoz/signoz/pkg/types/pipelinetypes"
+	"github.com/hanzoai/o11y-otel-collector/pkg/collectorsimulator"
+	_ "github.com/hanzoai/o11y-otel-collector/pkg/parser/grok"
+	"github.com/hanzoai/o11y-otel-collector/processor/o11ylogspipelineprocessor"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	"go.opentelemetry.io/collector/otelcol"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
 )
 
-func SimulatePipelinesProcessing(ctx context.Context, pipelines []pipelinetypes.GettablePipeline, logs []model.SignozLog) (
-	[]model.SignozLog, []string, error) {
+func SimulatePipelinesProcessing(ctx context.Context, pipelines []pipelinetypes.GettablePipeline, logs []model.O11yLog) (
+	[]model.O11yLog, []string, error) {
 	if len(pipelines) < 1 {
 		return logs, nil, nil
 	}
@@ -27,16 +27,16 @@ func SimulatePipelinesProcessing(ctx context.Context, pipelines []pipelinetypes.
 	// out in the same order as in the input.
 	//
 	// Add a temp attribute for sorting logs in simulation output
-	inputOrderAttribute := "__signoz_input_idx__"
+	inputOrderAttribute := "__o11y_input_idx__"
 	for i := 0; i < len(logs); i++ {
 		if logs[i].Attributes_int64 == nil {
 			logs[i].Attributes_int64 = map[string]int64{}
 		}
 		logs[i].Attributes_int64[inputOrderAttribute] = int64(i)
 	}
-	simulatorInputPLogs := SignozLogsToPLogs(logs)
+	simulatorInputPLogs := O11yLogsToPLogs(logs)
 
-	processorFactories, err := otelcol.MakeFactoryMap(signozlogspipelineprocessor.NewFactory())
+	processorFactories, err := otelcol.MakeFactoryMap(o11ylogspipelineprocessor.NewFactory())
 	if err != nil {
 		return nil, nil, errors.WrapInternalf(err, CodeProcessorFactoryMapFailed, "could not construct processor factory map")
 	}
@@ -71,15 +71,15 @@ func SimulatePipelinesProcessing(ctx context.Context, pipelines []pipelinetypes.
 		return nil, nil, errors.WrapInternalf(simulationErr, errors.CodeInternal, "could not simulate log pipelines processing")
 	}
 
-	outputSignozLogs := PLogsToSignozLogs(outputPLogs)
+	outputO11yLogs := PLogsToO11yLogs(outputPLogs)
 
 	// Sort output logs by their order in the input and remove the temp ordering attribute
-	sort.Slice(outputSignozLogs, func(i, j int) bool {
-		iIdx := outputSignozLogs[i].Attributes_int64[inputOrderAttribute]
-		jIdx := outputSignozLogs[j].Attributes_int64[inputOrderAttribute]
+	sort.Slice(outputO11yLogs, func(i, j int) bool {
+		iIdx := outputO11yLogs[i].Attributes_int64[inputOrderAttribute]
+		jIdx := outputO11yLogs[j].Attributes_int64[inputOrderAttribute]
 		return iIdx < jIdx
 	})
-	for _, sigLog := range outputSignozLogs {
+	for _, sigLog := range outputO11yLogs {
 		delete(sigLog.Attributes_int64, inputOrderAttribute)
 	}
 
@@ -92,15 +92,15 @@ func SimulatePipelinesProcessing(ctx context.Context, pipelines []pipelinetypes.
 		collectorWarnAndErrorLogs = append(collectorWarnAndErrorLogs, log)
 	}
 
-	return outputSignozLogs, collectorWarnAndErrorLogs, nil
+	return outputO11yLogs, collectorWarnAndErrorLogs, nil
 }
 
 // plog doesn't contain an ID field.
-// SignozLog.ID is stored as a log attribute in plogs for processing
+// O11yLog.ID is stored as a log attribute in plogs for processing
 // and gets hydrated back later.
-const SignozLogIdAttr = "__signoz_log_id__"
+const O11yLogIdAttr = "__o11y_log_id__"
 
-func SignozLogsToPLogs(logs []model.SignozLog) []plog.Logs {
+func O11yLogsToPLogs(logs []model.O11yLog) []plog.Logs {
 	result := []plog.Logs{}
 
 	for _, log := range logs {
@@ -144,7 +144,7 @@ func SignozLogsToPLogs(logs []model.SignozLog) []plog.Logs {
 		for k, v := range log.Attributes_string {
 			slAttribs.PutStr(k, v)
 		}
-		slAttribs.PutStr(SignozLogIdAttr, log.ID)
+		slAttribs.PutStr(O11yLogIdAttr, log.ID)
 
 		result = append(result, pl)
 	}
@@ -152,8 +152,8 @@ func SignozLogsToPLogs(logs []model.SignozLog) []plog.Logs {
 	return result
 }
 
-func PLogsToSignozLogs(plogs []plog.Logs) []model.SignozLog {
-	result := []model.SignozLog{}
+func PLogsToO11yLogs(plogs []plog.Logs) []model.O11yLog {
+	result := []model.O11yLog{}
 
 	for _, pl := range plogs {
 
@@ -170,16 +170,16 @@ func PLogsToSignozLogs(plogs []plog.Logs) []model.SignozLog {
 					lr := lrSlice.At(k)
 
 					// Recover ID for the log and remove temp attrib used for storing it
-					signozLogId := ""
-					logIdVal, exists := lr.Attributes().Get(SignozLogIdAttr)
+					o11yLogId := ""
+					logIdVal, exists := lr.Attributes().Get(O11yLogIdAttr)
 					if exists {
-						signozLogId = logIdVal.Str()
+						o11yLogId = logIdVal.Str()
 					}
-					lr.Attributes().Remove(SignozLogIdAttr)
+					lr.Attributes().Remove(O11yLogIdAttr)
 
-					signozLog := model.SignozLog{
+					o11yLog := model.O11yLog{
 						Timestamp:          uint64(lr.Timestamp()),
-						ID:                 signozLogId,
+						ID:                 o11yLogId,
 						TraceID:            lr.TraceID().String(),
 						SpanID:             lr.SpanID().String(),
 						TraceFlags:         uint32(lr.Flags()),
@@ -192,19 +192,19 @@ func PLogsToSignozLogs(plogs []plog.Logs) []model.SignozLog {
 						Attributes_float64: map[string]float64{},
 					}
 
-					// Populate signozLog.Attributes_...
+					// Populate o11yLog.Attributes_...
 					lr.Attributes().Range(func(k string, v pcommon.Value) bool {
 						if v.Type() == pcommon.ValueTypeDouble {
-							signozLog.Attributes_float64[k] = v.Double()
+							o11yLog.Attributes_float64[k] = v.Double()
 						} else if v.Type() == pcommon.ValueTypeInt {
-							signozLog.Attributes_int64[k] = v.Int()
+							o11yLog.Attributes_int64[k] = v.Int()
 						} else {
-							signozLog.Attributes_string[k] = v.AsString()
+							o11yLog.Attributes_string[k] = v.AsString()
 						}
 						return true
 					})
 
-					result = append(result, signozLog)
+					result = append(result, o11yLog)
 				}
 			}
 		}

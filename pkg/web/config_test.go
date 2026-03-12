@@ -4,16 +4,16 @@ import (
 	"context"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/config"
-	"github.com/SigNoz/signoz/pkg/config/envprovider"
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/config"
+	"github.com/hanzoai/o11y/pkg/config/envprovider"
+	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestNewWithEnvProvider(t *testing.T) {
-	t.Setenv("SIGNOZ_WEB_PREFIX", "/web")
-	t.Setenv("SIGNOZ_WEB_ENABLED", "false")
+	t.Setenv("HANZO_WEB_PREFIX", "/web")
+	t.Setenv("HANZO_WEB_ENABLED", "false")
 
 	conf, err := config.New(
 		context.Background(),

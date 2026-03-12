@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/cache"
-	"github.com/SigNoz/signoz/pkg/cache/cachetest"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/querycache"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/cache/cachetest"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/querycache"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

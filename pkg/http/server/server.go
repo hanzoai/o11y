@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
 )
 
 var _ factory.Service = (*Server)(nil)
@@ -38,7 +38,7 @@ func New(logger *slog.Logger, cfg Config, handler http.Handler) (*Server, error)
 
 	return &Server{
 		srv:     srv,
-		logger:  logger.With("pkg", "go.signoz.io/pkg/http/server"),
+		logger:  logger.With("pkg", "go.observe.hanzo.ai/pkg/http/server"),
 		handler: handler,
 		cfg:     cfg,
 	}, nil

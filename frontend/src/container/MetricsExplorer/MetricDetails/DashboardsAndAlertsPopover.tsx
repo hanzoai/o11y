@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { generatePath } from 'react-router-dom';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Dropdown, Skeleton, Typography } from 'antd';
 import {
 	useGetMetricAlerts,

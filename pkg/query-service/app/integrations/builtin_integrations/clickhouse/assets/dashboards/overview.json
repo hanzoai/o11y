@@ -126,7 +126,7 @@
             "multiSelect": false,
             "name": "host_name",
             "order": 0,
-            "queryValue": "SELECT JSONExtractString(labels, 'host_name') AS host_name\nFROM signoz_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'ClickHouseMetrics_VersionInteger'\nGROUP BY host_name",
+            "queryValue": "SELECT JSONExtractString(labels, 'host_name') AS host_name\nFROM o11y_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'ClickHouseMetrics_VersionInteger'\nGROUP BY host_name",
             "selectedValue": "",
             "showALLOption": false,
             "sort": "DISABLED",

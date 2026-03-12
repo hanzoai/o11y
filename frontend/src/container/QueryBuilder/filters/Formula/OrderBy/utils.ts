@@ -1,7 +1,7 @@
 import { IOption } from 'hooks/useResourceAttribute/types';
 import { IBuilderFormula } from 'types/api/queryBuilder/queryBuilderData';
 
-import { SIGNOZ_VALUE } from '../../OrderByFilter/constants';
+import { HANZO_VALUE } from '../../OrderByFilter/constants';
 import { orderByValueDelimiter } from '../../OrderByFilter/utils';
 
 export const transformToOrderByStringValuesByFormula = (
@@ -9,7 +9,7 @@ export const transformToOrderByStringValuesByFormula = (
 ): IOption[] => {
 	const prepareSelectedValue: IOption[] =
 		formula?.orderBy?.map((item) => {
-			if (item.columnName === SIGNOZ_VALUE) {
+			if (item.columnName === HANZO_VALUE) {
 				return {
 					label: `${formula.expression} ${item.order}`,
 					value: `${item.columnName}${orderByValueDelimiter}${item.order}`,

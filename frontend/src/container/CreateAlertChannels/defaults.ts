@@ -13,8 +13,8 @@ export const PagerInitialConfig: Partial<PagerChannel> = {
 	  )
 	{{- end }}`,
 	severity: '{{ (index .Alerts 0).Labels.severity }}',
-	client: 'SigNoz Alert Manager',
-	client_url: 'https://enter-signoz-host-n-port-here/alerts',
+	client: 'Hanzo O11y Alert Manager',
+	client_url: 'https://enter-o11y-host-n-port-here/alerts',
 	details: JSON.stringify({
 		firing: `{{ .Alerts.Firing | toJson }}`,
 		resolved: `{{ .Alerts.Resolved | toJson }}`,

@@ -1229,7 +1229,7 @@ components:
             $ref: '#/components/schemas/Querybuildertypesv5OrderBy'
           type: array
       type: object
-    Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation:
+    Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation:
       properties:
         aggregations:
           items:
@@ -1280,7 +1280,7 @@ components:
         stepInterval:
           $ref: '#/components/schemas/Querybuildertypesv5Step'
       type: object
-    Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation:
+    Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation:
       properties:
         aggregations:
           items:
@@ -1331,7 +1331,7 @@ components:
         stepInterval:
           $ref: '#/components/schemas/Querybuildertypesv5Step'
       type: object
-    Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation:
+    Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation:
       properties:
         aggregations:
           items:
@@ -1455,21 +1455,21 @@ components:
     Querybuildertypesv5QueryEnvelopeBuilderLog:
       properties:
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation'
+          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation'
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object
     Querybuildertypesv5QueryEnvelopeBuilderMetric:
       properties:
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation'
+          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation'
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object
     Querybuildertypesv5QueryEnvelopeBuilderTrace:
       properties:
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation'
+          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation'
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object
@@ -2267,33 +2267,33 @@ components:
         number_of_services:
           format: int64
           type: integer
-        reasons_for_interest_in_signoz:
+        reasons_for_interest_in_observe:
           items:
             type: string
           nullable: true
           type: array
-        timeline_for_migrating_to_signoz:
+        timeline_for_migrating_to_observe:
           type: string
         uses_otel:
           type: boolean
-        where_did_you_discover_signoz:
+        where_did_you_discover_observe:
           type: string
       required:
       - uses_otel
       - has_existing_observability_tool
       - existing_observability_tool
-      - reasons_for_interest_in_signoz
+      - reasons_for_interest_in_observe
       - logs_scale_per_day_in_gb
       - number_of_services
       - number_of_hosts
-      - where_did_you_discover_signoz
-      - timeline_for_migrating_to_signoz
+      - where_did_you_discover_observe
+      - timeline_for_migrating_to_observe
       type: object
   securitySchemes:
     api_key:
       description: API Keys
       in: header
-      name: SigNoz-Api-Key
+      name: Hanzo O11y-Api-Key
       type: apiKey
     tokenizer:
       bearerFormat: Tokenizer
@@ -2302,7 +2302,7 @@ components:
       type: http
 info:
   description: OpenTelemetry-Native Logs, Metrics and Traces in a single pane
-  title: SigNoz
+  title: Hanzo O11y
   version: ""
 openapi: 3.0.3
 paths:
@@ -7175,9 +7175,9 @@ paths:
                     - spec:
                         name: recent_errors
                         query: WITH __resource_filter AS ( SELECT fingerprint FROM
-                          signoz_logs.distributed_logs_v2_resource WHERE seen_at_ts_bucket_start
+                          observe_logs.distributed_logs_v2_resource WHERE seen_at_ts_bucket_start
                           >= $start_timestamp - 1800 AND seen_at_ts_bucket_start <=
-                          $end_timestamp ) SELECT timestamp, body FROM signoz_logs.distributed_logs_v2
+                          $end_timestamp ) SELECT timestamp, body FROM observe_logs.distributed_logs_v2
                           WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint
                           FROM __resource_filter) AND timestamp >= $start_timestamp_nano
                           AND timestamp <= $end_timestamp_nano AND ts_bucket_start
@@ -7197,9 +7197,9 @@ paths:
                     - spec:
                         name: total_spans
                         query: WITH __resource_filter AS ( SELECT fingerprint FROM
-                          signoz_traces.distributed_traces_v3_resource WHERE seen_at_ts_bucket_start
+                          observe_traces.distributed_traces_v3_resource WHERE seen_at_ts_bucket_start
                           >= $start_timestamp - 1800 AND seen_at_ts_bucket_start <=
-                          $end_timestamp ) SELECT count() AS value FROM signoz_traces.distributed_signoz_index_v3
+                          $end_timestamp ) SELECT count() AS value FROM observe_traces.distributed_observe_index_v3
                           WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint
                           FROM __resource_filter) AND timestamp >= $start_datetime
                           AND timestamp <= $end_datetime AND ts_bucket_start >= $start_timestamp
@@ -7217,10 +7217,10 @@ paths:
                     - spec:
                         name: span_rate
                         query: WITH __resource_filter AS ( SELECT fingerprint FROM
-                          signoz_traces.distributed_traces_v3_resource WHERE seen_at_ts_bucket_start
+                          observe_traces.distributed_traces_v3_resource WHERE seen_at_ts_bucket_start
                           >= $start_timestamp - 1800 AND seen_at_ts_bucket_start <=
                           $end_timestamp ) SELECT toStartOfInterval(timestamp, INTERVAL
-                          60 SECOND) AS ts, count() AS value FROM signoz_traces.distributed_signoz_index_v3
+                          60 SECOND) AS ts, count() AS value FROM observe_traces.distributed_observe_index_v3
                           WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint
                           FROM __resource_filter) AND timestamp >= $start_datetime
                           AND timestamp <= $end_datetime AND ts_bucket_start >= $start_timestamp

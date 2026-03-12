@@ -5,15 +5,15 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/instrumentation/instrumentationtest"
-	"github.com/SigNoz/signoz/pkg/telemetrylogs"
-	"github.com/SigNoz/signoz/pkg/telemetrymeter"
-	"github.com/SigNoz/signoz/pkg/telemetrymetrics"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/telemetrystore/telemetrystoretest"
-	"github.com/SigNoz/signoz/pkg/telemetrytraces"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/telemetrymeter"
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	cmock "github.com/srikanthccv/ClickHouse-go-mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -63,10 +63,10 @@ func TestGetKeys(t *testing.T) {
 
 	rows := cmock.NewRows([]cmock.ColumnType{
 		{Name: "statement", Type: "String"},
-	}, [][]any{{"CREATE TABLE signoz_traces.signoz_index_v3"}})
+	}, [][]any{{"CREATE TABLE observe_traces.observe_index_v3"}})
 
 	mock.
-		ExpectSelect("SHOW CREATE TABLE signoz_traces.distributed_signoz_index_v3").
+		ExpectSelect("SHOW CREATE TABLE observe_traces.distributed_observe_index_v3").
 		WillReturnRows(rows)
 
 	query := `SELECT.*`
@@ -182,10 +182,10 @@ func TestApplyBackwardCompatibleKeys(t *testing.T) {
 			}
 
 			if hasTraces {
-				mock.ExpectSelect("SHOW CREATE TABLE signoz_traces.distributed_signoz_index_v3").
+				mock.ExpectSelect("SHOW CREATE TABLE observe_traces.distributed_observe_index_v3").
 					WillReturnRows(cmock.NewRows([]cmock.ColumnType{
 						{Name: "statement", Type: "String"},
-					}, [][]any{{"CREATE TABLE signoz_traces.signoz_index_v3"}}))
+					}, [][]any{{"CREATE TABLE observe_traces.observe_index_v3"}}))
 
 				var args []interface{}
 				var rows [][]any
@@ -334,7 +334,7 @@ func TestGetMetricFieldValuesIntrinsicMetricName(t *testing.T) {
 		{Name: "attr_string_value", Type: "String"},
 	}, [][]any{})
 
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT DISTINCT attr_string_value FROM signoz_metrics.distributed_metadata WHERE attr_name = ? LIMIT ?")).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT DISTINCT attr_string_value FROM observe_metrics.distributed_metadata WHERE attr_name = ? LIMIT ?")).
 		WithArgs("metric_name", 49).
 		WillReturnRows(metadataRows)
 
@@ -363,7 +363,7 @@ func TestGetMetricFieldValuesIntrinsicBoolReturnsEmpty(t *testing.T) {
 		{Name: "attr_string_value", Type: "String"},
 	}, [][]any{})
 
-	mock.ExpectQuery(regexp.QuoteMeta("SELECT DISTINCT attr_string_value FROM signoz_metrics.distributed_metadata WHERE attr_name = ? AND attr_datatype = ? AND attr_string_value = ? LIMIT ?")).
+	mock.ExpectQuery(regexp.QuoteMeta("SELECT DISTINCT attr_string_value FROM observe_metrics.distributed_metadata WHERE attr_name = ? AND attr_datatype = ? AND attr_string_value = ? LIMIT ?")).
 		WithArgs("is_monotonic", telemetrytypes.FieldDataTypeBool.TagDataType(), "true", 11).
 		WillReturnRows(metadataRows)
 

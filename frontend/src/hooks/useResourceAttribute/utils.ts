@@ -158,7 +158,7 @@ export const GetTagKeys = async (
 ): Promise<IOption[]> => {
 	const resourceDeploymentKey = getResourceDeploymentKeys(dotMetricsEnabled);
 	const { payload } = await getResourceAttributesTagKeys({
-		metricName: 'signoz_calls_total',
+		metricName: 'observe_calls_total',
 		match: 'resource_',
 	});
 	if (!payload || !payload?.data) {
@@ -180,7 +180,7 @@ export const getEnvironmentTagKeys = async (
 	dotMetricsEnabled: boolean,
 ): Promise<IOption[]> => {
 	const { payload } = await getResourceAttributesTagKeys({
-		metricName: 'signoz_calls_total',
+		metricName: 'observe_calls_total',
 		match: getResourceDeploymentKeys(dotMetricsEnabled),
 	});
 	if (!payload || !payload?.data) {
@@ -199,7 +199,7 @@ export const getEnvironmentTagValues = async (
 ): Promise<IOption[]> => {
 	const { payload } = await getResourceAttributesTagValues({
 		tagKey: getResourceDeploymentKeys(dotMetricsEnabled),
-		metricName: 'signoz_calls_total',
+		metricName: 'observe_calls_total',
 	});
 
 	if (!payload || !payload?.data) {
@@ -217,7 +217,7 @@ export const getEnvironmentTagValues = async (
 export const GetTagValues = async (tagKey: string): Promise<IOption[]> => {
 	const { payload } = await getResourceAttributesTagValues({
 		tagKey,
-		metricName: 'signoz_calls_total',
+		metricName: 'observe_calls_total',
 	});
 
 	if (!payload || !payload?.data) {

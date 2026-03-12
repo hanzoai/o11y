@@ -5,19 +5,19 @@ Thank you for your interest in contributing to our project! We greatly value fee
 ## How can I contribute?
 
 ### Finding Issues to Work On
-- Check our [existing open issues](https://github.com/SigNoz/signoz/issues?q=is%3Aopen+is%3Aissue)
-- Look for [good first issues](https://github.com/SigNoz/signoz/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to start with
-- Review [recently closed issues](https://github.com/SigNoz/signoz/issues?q=is%3Aissue+is%3Aclosed) to avoid duplicates
+- Check our [existing open issues](https://github.com/Hanzo O11y/signoz/issues?q=is%3Aopen+is%3Aissue)
+- Look for [good first issues](https://github.com/Hanzo O11y/signoz/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to start with
+- Review [recently closed issues](https://github.com/Hanzo O11y/signoz/issues?q=is%3Aissue+is%3Aclosed) to avoid duplicates
 
 ### Types of Contributions
 
-1. **Report Bugs**: Use our [Bug Report template](https://github.com/SigNoz/signoz/issues/new?assignees=&labels=&template=bug_report.md&title=)
-2. **Request Features**: Submit using [Feature Request template](https://github.com/SigNoz/signoz/issues/new?assignees=&labels=&template=feature_request.md&title=)
+1. **Report Bugs**: Use our [Bug Report template](https://github.com/Hanzo O11y/signoz/issues/new?assignees=&labels=&template=bug_report.md&title=)
+2. **Request Features**: Submit using [Feature Request template](https://github.com/Hanzo O11y/signoz/issues/new?assignees=&labels=&template=feature_request.md&title=)
 3. **Improve Documentation**: Create an issue with the `documentation` label
-4. **Report Performance Issues**: Use our [Performance Issue template](https://github.com/SigNoz/signoz/issues/new?assignees=&labels=&template=performance-issue-report.md&title=)
-5. **Request Dashboards**: Submit using [Dashboard Request template](https://github.com/SigNoz/signoz/issues/new?assignees=&labels=dashboard-template&projects=&template=request_dashboard.md&title=%5BDashboard+Request%5D+)
-6. **Report Security Issues**: Follow our [Security Policy](https://github.com/SigNoz/signoz/security/policy)
-7. **Join Discussions**: Participate in [project discussions](https://github.com/SigNoz/signoz/discussions)
+4. **Report Performance Issues**: Use our [Performance Issue template](https://github.com/Hanzo O11y/signoz/issues/new?assignees=&labels=&template=performance-issue-report.md&title=)
+5. **Request Dashboards**: Submit using [Dashboard Request template](https://github.com/Hanzo O11y/signoz/issues/new?assignees=&labels=dashboard-template&projects=&template=request_dashboard.md&title=%5BDashboard+Request%5D+)
+6. **Report Security Issues**: Follow our [Security Policy](https://github.com/Hanzo O11y/signoz/security/policy)
+7. **Join Discussions**: Participate in [project discussions](https://github.com/Hanzo O11y/signoz/discussions)
 
 ### Creating Helpful Issues
 
@@ -61,10 +61,10 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
 ## How can I contribute to other repositories?
 
-You can find other repositories in the [SigNoz](https://github.com/SigNoz) organization to contribute to. Here is a list of **highlighted** repositories:
+You can find other repositories in the [Hanzo O11y](https://github.com/Hanzo O11y) organization to contribute to. Here is a list of **highlighted** repositories:
 
-- [charts](https://github.com/SigNoz/charts)
-- [dashboards](https://github.com/SigNoz/dashboards)
+- [charts](https://github.com/Hanzo O11y/charts)
+- [dashboards](https://github.com/Hanzo O11y/dashboards)
 
 Each repository has its own contributing guidelines. Please refer to the guidelines of the repository you want to contribute to.
 
@@ -77,6 +77,6 @@ Need assistance? Join our Slack community:
 ## Where do I go from here?
 
 - Set up your [development environment](docs/contributing/development.md)
-- Deploy and observe [SigNoz in action with OpenTelemetry Demo Application](docs/otel-demo-docs.md)
-- Explore the [SigNoz Community Advocate Program](ADVOCATE.md), which recognises contributors who support the community, share their expertise, and help shape SigNoz's future.
+- Deploy and observe [Hanzo O11y in action with OpenTelemetry Demo Application](docs/otel-demo-docs.md)
+- Explore the [Hanzo O11y Community Advocate Program](ADVOCATE.md), which recognises contributors who support the community, share their expertise, and help shape Hanzo O11y's future.
 - Write [integration tests](docs/contributing/go/integration.md)

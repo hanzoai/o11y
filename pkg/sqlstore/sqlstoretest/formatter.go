@@ -1,7 +1,7 @@
 package sqlstoretest
 
 import (
-	"github.com/SigNoz/signoz/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/uptrace/bun/schema"
 )
 

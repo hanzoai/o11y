@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/labels"
-	ruletypes "github.com/SigNoz/signoz/pkg/types/ruletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
+	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 // A Rule encapsulates a vector expression which is evaluated at a specified

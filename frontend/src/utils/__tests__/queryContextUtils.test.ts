@@ -211,7 +211,7 @@ describe('extractQueryPairs', () => {
 
 	test('should extract query pairs from complex query with IN operator and multiple conditions', () => {
 		const input =
-			"service.name IN ['adservice', 'consumer-svc-1'] AND cloud.account.id = 'signoz-staging' code.lineno < 172";
+			"service.name IN ['adservice', 'consumer-svc-1'] AND cloud.account.id = 'o11y-staging' code.lineno < 172";
 
 		const result = extractQueryPairs(input);
 
@@ -248,7 +248,7 @@ describe('extractQueryPairs', () => {
 			{
 				key: 'cloud.account.id',
 				operator: '=',
-				value: "'signoz-staging'",
+				value: "'o11y-staging'",
 				valueList: [],
 				valuesPosition: [],
 				hasNegation: false,
@@ -290,7 +290,7 @@ describe('extractQueryPairs', () => {
 
 	test('should extract query pairs from complex query with IN operator without brackets', () => {
 		const input =
-			"service.name IN 'adservice' AND cloud.account.id = 'signoz-staging' code.lineno < 172";
+			"service.name IN 'adservice' AND cloud.account.id = 'o11y-staging' code.lineno < 172";
 
 		const result = extractQueryPairs(input);
 		expect(result).toEqual([
@@ -322,7 +322,7 @@ describe('extractQueryPairs', () => {
 			{
 				key: 'cloud.account.id',
 				operator: '=',
-				value: "'signoz-staging'",
+				value: "'o11y-staging'",
 				valueList: [],
 				valuesPosition: [],
 				hasNegation: false,

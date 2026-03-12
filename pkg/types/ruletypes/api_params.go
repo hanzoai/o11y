@@ -10,13 +10,13 @@ import (
 
 	"github.com/prometheus/alertmanager/config"
 
-	signozError "github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/times"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/timestamp"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	o11yError "github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/times"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/timestamp"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type AlertType string
@@ -175,7 +175,7 @@ func (ns *NotificationSettings) UnmarshalJSON(data []byte) error {
 	// Validate states after unmarshaling
 	for _, state := range ns.Renotify.AlertStates {
 		if state != model.StateFiring && state != model.StateNoData {
-			return signozError.NewInvalidInputf(signozError.CodeInvalidInput, "invalid alert state: %s", state)
+			return o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "invalid alert state: %s", state)
 
 		}
 	}
@@ -282,7 +282,7 @@ func (r *PostableRule) UnmarshalJSON(bytes []byte) error {
 	type Alias PostableRule
 	aux := (*Alias)(r)
 	if err := json.Unmarshal(bytes, aux); err != nil {
-		return signozError.NewInvalidInputf(signozError.CodeInvalidInput, "failed to parse json: %v", err)
+		return o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "failed to parse json: %v", err)
 	}
 	r.processRuleDefaults()
 	return r.validate()
@@ -349,38 +349,38 @@ func (r *PostableRule) validate() error {
 
 	if r.RuleCondition == nil {
 		// will get panic if we try to access CompositeQuery, so return here
-		return signozError.NewInvalidInputf(signozError.CodeInvalidInput, "rule condition is required")
+		return o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "rule condition is required")
 	}
 	if r.RuleCondition.CompositeQuery == nil {
-		errs = append(errs, signozError.NewInvalidInputf(signozError.CodeInvalidInput, "composite query is required"))
+		errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "composite query is required"))
 	}
 
 	if r.Version != "v5" {
-		errs = append(errs, signozError.NewInvalidInputf(signozError.CodeInvalidInput, "only version v5 is supported, got %q", r.Version))
+		errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "only version v5 is supported, got %q", r.Version))
 	}
 
 	if isAllQueriesDisabled(r.RuleCondition.CompositeQuery) {
-		errs = append(errs, signozError.NewInvalidInputf(signozError.CodeInvalidInput, "all queries are disabled in rule condition"))
+		errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "all queries are disabled in rule condition"))
 	}
 
 	for k, v := range r.Labels {
 		if !isValidLabelName(k) {
-			errs = append(errs, signozError.NewInvalidInputf(signozError.CodeInvalidInput, "invalid label name: %s", k))
+			errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "invalid label name: %s", k))
 		}
 
 		if !isValidLabelValue(v) {
-			errs = append(errs, signozError.NewInvalidInputf(signozError.CodeInvalidInput, "invalid label value: %s", v))
+			errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "invalid label value: %s", v))
 		}
 	}
 
 	for k := range r.Annotations {
 		if !isValidLabelName(k) {
-			errs = append(errs, signozError.NewInvalidInputf(signozError.CodeInvalidInput, "invalid annotation name: %s", k))
+			errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "invalid annotation name: %s", k))
 		}
 	}
 
 	errs = append(errs, testTemplateParsing(r)...)
-	return signozError.Join(errs...)
+	return o11yError.Join(errs...)
 }
 
 func testTemplateParsing(rl *PostableRule) (errs []error) {
@@ -408,7 +408,7 @@ func testTemplateParsing(rl *PostableRule) (errs []error) {
 	for _, val := range rl.Labels {
 		err := parseTest(val)
 		if err != nil {
-			errs = append(errs, signozError.NewInvalidInputf(signozError.CodeInvalidInput, "template parsing error: %s", err.Error()))
+			errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "template parsing error: %s", err.Error()))
 		}
 	}
 
@@ -416,7 +416,7 @@ func testTemplateParsing(rl *PostableRule) (errs []error) {
 	for _, val := range rl.Annotations {
 		err := parseTest(val)
 		if err != nil {
-			errs = append(errs, signozError.NewInvalidInputf(signozError.CodeInvalidInput, "template parsing error: %s", err.Error()))
+			errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "template parsing error: %s", err.Error()))
 		}
 	}
 

@@ -173,7 +173,7 @@ describe('SpanLogs', () => {
 			screen.getByText('Logs are not linked to Traces.'),
 		).toBeInTheDocument();
 		expect(
-			screen.getByText('Logs are not being sent to SigNoz.'),
+			screen.getByText('Logs are not being sent to Hanzo O11y.'),
 		).toBeInTheDocument();
 		expect(
 			screen.getByText('No logs are associated with this particular trace/span.'),
@@ -181,7 +181,7 @@ describe('SpanLogs', () => {
 
 		// Should show documentation links
 		expect(screen.getByText('RESOURCES')).toBeInTheDocument();
-		expect(screen.getByText('Sending logs to SigNoz')).toBeInTheDocument();
+		expect(screen.getByText('Sending logs to Hanzo O11y')).toBeInTheDocument();
 		expect(screen.getByText('Correlate traces and logs')).toBeInTheDocument();
 
 		// Should NOT show simple empty state

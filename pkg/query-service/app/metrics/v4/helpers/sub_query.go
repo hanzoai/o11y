@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/query-service/constants"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/query-service/utils"
 )
 
 var (
@@ -29,16 +29,16 @@ func whichTSTableToUse(start, end int64, mq *v3.BuilderQuery) (int64, int64, str
 	if mq.MetricTableHints != nil {
 		if mq.MetricTableHints.TimeSeriesTableName != "" {
 			switch mq.MetricTableHints.TimeSeriesTableName {
-			case constants.SIGNOZ_TIMESERIES_v4_LOCAL_TABLENAME:
+			case constants.HANZO_TIMESERIES_v4_LOCAL_TABLENAME:
 				// adjust the start time to nearest 1 hour
 				start = start - (start % (time.Hour.Milliseconds() * 1))
-			case constants.SIGNOZ_TIMESERIES_v4_6HRS_LOCAL_TABLENAME:
+			case constants.HANZO_TIMESERIES_v4_6HRS_LOCAL_TABLENAME:
 				// adjust the start time to nearest 6 hours
 				start = start - (start % (time.Hour.Milliseconds() * 6))
-			case constants.SIGNOZ_TIMESERIES_v4_1DAY_LOCAL_TABLENAME:
+			case constants.HANZO_TIMESERIES_v4_1DAY_LOCAL_TABLENAME:
 				// adjust the start time to nearest 1 day
 				start = start - (start % (time.Hour.Milliseconds() * 24))
-			case constants.SIGNOZ_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME:
+			case constants.HANZO_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME:
 				// adjust the start time to nearest 1 week
 				start = start - (start % (time.Hour.Milliseconds() * 24 * 7))
 			}
@@ -54,19 +54,19 @@ func whichTSTableToUse(start, end int64, mq *v3.BuilderQuery) (int64, int64, str
 	if end-start < sixHoursInMilliseconds {
 		// adjust the start time to nearest 1 hour
 		start = start - (start % (time.Hour.Milliseconds() * 1))
-		tableName = constants.SIGNOZ_TIMESERIES_v4_LOCAL_TABLENAME
+		tableName = constants.HANZO_TIMESERIES_v4_LOCAL_TABLENAME
 	} else if end-start < oneDayInMilliseconds {
 		// adjust the start time to nearest 6 hours
 		start = start - (start % (time.Hour.Milliseconds() * 6))
-		tableName = constants.SIGNOZ_TIMESERIES_v4_6HRS_LOCAL_TABLENAME
+		tableName = constants.HANZO_TIMESERIES_v4_6HRS_LOCAL_TABLENAME
 	} else if end-start < oneWeekInMilliseconds {
 		// adjust the start time to nearest 1 day
 		start = start - (start % (time.Hour.Milliseconds() * 24))
-		tableName = constants.SIGNOZ_TIMESERIES_v4_1DAY_LOCAL_TABLENAME
+		tableName = constants.HANZO_TIMESERIES_v4_1DAY_LOCAL_TABLENAME
 	} else {
 		// adjust the start time to nearest 1 week
 		start = start - (start % (time.Hour.Milliseconds() * 24 * 7))
-		tableName = constants.SIGNOZ_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME
+		tableName = constants.HANZO_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME
 	}
 
 	return start, end, tableName
@@ -90,13 +90,13 @@ func WhichSamplesTableToUse(start, end int64, mq *v3.BuilderQuery) string {
 
 	// we don't have any aggregated table for sketches (yet)
 	if mq.AggregateAttribute.Type == v3.AttributeKeyType(v3.MetricTypeExponentialHistogram) {
-		return constants.SIGNOZ_EXP_HISTOGRAM_TABLENAME
+		return constants.HANZO_EXP_HISTOGRAM_TABLENAME
 	}
 
 	// if the time aggregation is count_distinct, we need to use the distributed_samples_v4 table
 	// because the aggregated tables don't support count_distinct
 	if mq.TimeAggregation == v3.TimeAggregationCountDistinct {
-		return constants.SIGNOZ_SAMPLES_V4_TABLENAME
+		return constants.HANZO_SAMPLES_V4_TABLENAME
 	}
 
 	if end-start < oneDayInMilliseconds+offsetBucket {
@@ -104,16 +104,16 @@ func WhichSamplesTableToUse(start, end int64, mq *v3.BuilderQuery) string {
 		// why would interval be greater than 5 minutes?
 		// we allow people to configure the step interval so we can make use of this
 		if mq.Temporality == v3.Delta && mq.TimeAggregation == v3.TimeAggregationIncrease && mq.StepInterval >= 300 && mq.StepInterval < 1800 {
-			return constants.SIGNOZ_SAMPLES_V4_AGG_5M_TABLENAME
+			return constants.HANZO_SAMPLES_V4_AGG_5M_TABLENAME
 		} else if mq.Temporality == v3.Delta && mq.TimeAggregation == v3.TimeAggregationIncrease && mq.StepInterval >= 1800 {
 			// if we are dealing with delta metrics and interval is greater than 30 minutes, we can use the 30m aggregated table
-			return constants.SIGNOZ_SAMPLES_V4_AGG_30M_TABLENAME
+			return constants.HANZO_SAMPLES_V4_AGG_30M_TABLENAME
 		}
-		return constants.SIGNOZ_SAMPLES_V4_TABLENAME
+		return constants.HANZO_SAMPLES_V4_TABLENAME
 	} else if end-start < oneWeekInMilliseconds+offsetBucket {
-		return constants.SIGNOZ_SAMPLES_V4_AGG_5M_TABLENAME
+		return constants.HANZO_SAMPLES_V4_AGG_5M_TABLENAME
 	} else {
-		return constants.SIGNOZ_SAMPLES_V4_AGG_30M_TABLENAME
+		return constants.HANZO_SAMPLES_V4_AGG_30M_TABLENAME
 	}
 }
 
@@ -126,7 +126,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 		// although it doesn't make sense to use anyLast, avg, min, max, count on delta metrics,
 		// we are keeping it here to make sure that query will not be invalid
 		switch tableName {
-		case constants.SIGNOZ_SAMPLES_V4_TABLENAME:
+		case constants.HANZO_SAMPLES_V4_TABLENAME:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(value)"
@@ -145,7 +145,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 			case v3.TimeAggregationRate, v3.TimeAggregationIncrease: // only these two options give meaningful results
 				aggregationColumn = "sum(value)"
 			}
-		case constants.SIGNOZ_SAMPLES_V4_AGG_5M_TABLENAME, constants.SIGNOZ_SAMPLES_V4_AGG_30M_TABLENAME:
+		case constants.HANZO_SAMPLES_V4_AGG_5M_TABLENAME, constants.HANZO_SAMPLES_V4_AGG_30M_TABLENAME:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(last)"
@@ -168,7 +168,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 		// for cumulative metrics, we only support `RATE`/`INCREASE`. The max value in window is
 		// used to calculate the sum which is then divided by the window size to get the rate
 		switch tableName {
-		case constants.SIGNOZ_SAMPLES_V4_TABLENAME:
+		case constants.HANZO_SAMPLES_V4_TABLENAME:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(value)"
@@ -187,7 +187,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 			case v3.TimeAggregationRate, v3.TimeAggregationIncrease: // only these two options give meaningful results
 				aggregationColumn = "max(value)"
 			}
-		case constants.SIGNOZ_SAMPLES_V4_AGG_5M_TABLENAME, constants.SIGNOZ_SAMPLES_V4_AGG_30M_TABLENAME:
+		case constants.HANZO_SAMPLES_V4_AGG_5M_TABLENAME, constants.HANZO_SAMPLES_V4_AGG_30M_TABLENAME:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(last)"
@@ -208,7 +208,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 		}
 	case v3.Unspecified:
 		switch tableName {
-		case constants.SIGNOZ_SAMPLES_V4_TABLENAME:
+		case constants.HANZO_SAMPLES_V4_TABLENAME:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(value)"
@@ -227,7 +227,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 			case v3.TimeAggregationRate, v3.TimeAggregationIncrease: // ideally, this should never happen
 				aggregationColumn = "sum(value)"
 			}
-		case constants.SIGNOZ_SAMPLES_V4_AGG_5M_TABLENAME, constants.SIGNOZ_SAMPLES_V4_AGG_30M_TABLENAME:
+		case constants.HANZO_SAMPLES_V4_AGG_5M_TABLENAME, constants.HANZO_SAMPLES_V4_AGG_30M_TABLENAME:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(last)"
@@ -338,7 +338,7 @@ func PrepareTimeseriesFilterQuery(start, end int64, mq *v3.BuilderQuery) (string
 	filterSubQuery := fmt.Sprintf(
 		"SELECT DISTINCT %s FROM %s.%s WHERE %s",
 		selectLabels,
-		constants.SIGNOZ_METRIC_DBNAME,
+		constants.HANZO_METRIC_DBNAME,
 		tableName,
 		whereClause,
 	)
@@ -428,7 +428,7 @@ func PrepareTimeseriesFilterQueryV3(start, end int64, mq *v3.BuilderQuery) (stri
 	filterSubQuery := fmt.Sprintf(
 		"SELECT DISTINCT %s FROM %s.%s WHERE %s",
 		selectLabels,
-		constants.SIGNOZ_METRIC_DBNAME,
+		constants.HANZO_METRIC_DBNAME,
 		tableName,
 		whereClause,
 	)
@@ -437,7 +437,7 @@ func PrepareTimeseriesFilterQueryV3(start, end int64, mq *v3.BuilderQuery) (stri
 }
 
 func AddFlagsFilters(samplesTableFilter string, tableName string) string {
-	if tableName == constants.SIGNOZ_SAMPLES_V4_TABLENAME || tableName == constants.SIGNOZ_SAMPLES_V4_LOCAL_TABLENAME || tableName == constants.SIGNOZ_EXP_HISTOGRAM_TABLENAME || tableName == constants.SIGNOZ_EXP_HISTOGRAM_LOCAL_TABLENAME {
+	if tableName == constants.HANZO_SAMPLES_V4_TABLENAME || tableName == constants.HANZO_SAMPLES_V4_LOCAL_TABLENAME || tableName == constants.HANZO_EXP_HISTOGRAM_TABLENAME || tableName == constants.HANZO_EXP_HISTOGRAM_LOCAL_TABLENAME {
 		samplesTableFilter = fmt.Sprintf("%s AND %s", samplesTableFilter, "bitAnd(flags, 1) = 0")
 	}
 	return samplesTableFilter

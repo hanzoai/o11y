@@ -27,7 +27,7 @@ const createMockStore = (): ReturnType<typeof mockStore> =>
 			role: 'ADMIN',
 			user: {
 				userId: 'test-user-id',
-				email: 'test@signoz.io',
+				email: 'test@o11y.hanzo.ai',
 				name: 'TestUser',
 			},
 			isLoggedIn: true,

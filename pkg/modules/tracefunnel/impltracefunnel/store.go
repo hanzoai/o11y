@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	traceFunnels "github.com/SigNoz/signoz/pkg/types/tracefunneltypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	traceFunnels "github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type store struct {

@@ -8,7 +8,7 @@ const mockActiveMembers: MemberRow[] = [
 	{
 		id: 'user-1',
 		name: 'Alice Smith',
-		email: 'alice@signoz.io',
+		email: 'alice@o11y.hanzo.ai',
 		role: 'ADMIN' as ROLES,
 		status: MemberStatus.Active,
 		joinedOn: '1700000000000',
@@ -16,7 +16,7 @@ const mockActiveMembers: MemberRow[] = [
 	{
 		id: 'user-2',
 		name: 'Bob Jones',
-		email: 'bob@signoz.io',
+		email: 'bob@o11y.hanzo.ai',
 		role: 'VIEWER' as ROLES,
 		status: MemberStatus.Active,
 		joinedOn: null,
@@ -26,7 +26,7 @@ const mockActiveMembers: MemberRow[] = [
 const mockInvitedMember: MemberRow = {
 	id: 'invite-abc',
 	name: '',
-	email: 'charlie@signoz.io',
+	email: 'charlie@o11y.hanzo.ai',
 	role: 'EDITOR' as ROLES,
 	status: MemberStatus.Invited,
 	joinedOn: null,
@@ -52,7 +52,7 @@ describe('MembersTable', () => {
 		render(<MembersTable {...defaultProps} data={mockActiveMembers} />);
 
 		expect(screen.getByText('Alice Smith')).toBeInTheDocument();
-		expect(screen.getByText('alice@signoz.io')).toBeInTheDocument();
+		expect(screen.getByText('alice@o11y.hanzo.ai')).toBeInTheDocument();
 		expect(screen.getByText('Admin')).toBeInTheDocument();
 		expect(screen.getAllByText('ACTIVE')).toHaveLength(2);
 	});
@@ -67,7 +67,7 @@ describe('MembersTable', () => {
 		);
 
 		expect(screen.getByText('INVITED')).toBeInTheDocument();
-		expect(screen.getByText('charlie@signoz.io')).toBeInTheDocument();
+		expect(screen.getByText('charlie@o11y.hanzo.ai')).toBeInTheDocument();
 		expect(screen.getByText('Editor')).toBeInTheDocument();
 	});
 
@@ -89,7 +89,7 @@ describe('MembersTable', () => {
 
 		expect(onRowClick).toHaveBeenCalledTimes(1);
 		expect(onRowClick).toHaveBeenCalledWith(
-			expect.objectContaining({ id: 'user-1', email: 'alice@signoz.io' }),
+			expect.objectContaining({ id: 'user-1', email: 'alice@o11y.hanzo.ai' }),
 		);
 	});
 

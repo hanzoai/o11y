@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from '@hanzo/o11y-design-tokens';
 import { Tooltip } from 'antd';
 import type { DefaultOptionType } from 'antd/es/select';
 import { Info } from 'lucide-react';
@@ -12,12 +12,12 @@ export function ComingSoon(): JSX.Element {
 				<div>
 					Join our Slack community for more details:{' '}
 					<a
-						href="https://signoz.io/slack"
+						href="https://o11y.hanzo.ai/slack"
 						rel="noopener noreferrer"
 						target="_blank"
 						onClick={(e): void => e.stopPropagation()}
 					>
-						SigNoz Community
+						Hanzo O11y Community
 					</a>
 				</div>
 			}

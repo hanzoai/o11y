@@ -1,4 +1,4 @@
-### Monitor MongoDB with SigNoz
+### Monitor MongoDB with Hanzo O11y
 
 Collect key MongoDB metrics and view them with an out of the box dashboard.
 
