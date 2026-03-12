@@ -36,7 +36,7 @@ func SimulatePipelinesProcessing(ctx context.Context, pipelines []pipelinetypes.
 	}
 	simulatorInputPLogs := O11yLogsToPLogs(logs)
 
-	processorFactories, err := otelcol.MakeFactoryMap(o11ylogspipelineprocessor.NewFactory())
+	processorFactories, err := otelcol.MakeFactoryMap(signozlogspipelineprocessor.NewFactory())
 	if err != nil {
 		return nil, nil, errors.WrapInternalf(err, CodeProcessorFactoryMapFailed, "could not construct processor factory map")
 	}
