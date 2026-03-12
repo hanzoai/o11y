@@ -1,6 +1,6 @@
 import { useQueryClient } from 'react-query';
 import { useHistory } from 'react-router-dom';
-import O11yModal from 'components/O11yModal/O11yModal';
+import O11yModal from 'components/SignozModal/SignozModal';
 import { LOCALSTORAGE } from 'constants/localStorage';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import ROUTES from 'constants/routes';

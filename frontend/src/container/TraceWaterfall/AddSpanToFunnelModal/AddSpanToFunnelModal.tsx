@@ -3,7 +3,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { Button, Input, Spin } from 'antd';
 import cx from 'classnames';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
-import O11yModal from 'components/O11yModal/O11yModal';
+import O11yModal from 'components/SignozModal/SignozModal';
 import {
 	useFunnelDetails,
 	useFunnelsList,
