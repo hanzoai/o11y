@@ -17,7 +17,7 @@ function AuthHeader(): JSX.Element {
 					alt="Hanzo"
 					className="auth-header-logo-icon"
 				/>
-				<span className="auth-header-logo-text">Hanzo Observability</span>
+				<span className="auth-header-logo-text">Hanzo O11y</span>
 			</div>
 			<Button
 				className="auth-header-help-button"
