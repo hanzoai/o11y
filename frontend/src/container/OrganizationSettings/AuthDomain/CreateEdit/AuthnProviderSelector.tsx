@@ -55,7 +55,7 @@ function AuthnProviderSelector({
 					Configure Authentication Method
 				</Typography.Title>
 				<Typography.Paragraph italic>
-					HanzoO11y supports the following single sign-on services (SSO). Get started
+					Hanzo supports the following single sign-on services (SSO). Get started
 					with setting your project’s SSO below
 				</Typography.Paragraph>
 			</section>

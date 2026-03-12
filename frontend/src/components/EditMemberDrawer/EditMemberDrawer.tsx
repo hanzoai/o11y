@@ -444,7 +444,7 @@ function EditMemberDrawer({
 				<div className="reset-link-dialog__content">
 					<p className="reset-link-dialog__description">
 						This creates a one-time link the team member can use to set a new password
-						for their HanzoO11y account.
+						for their Hanzo account.
 					</p>
 					<div className="reset-link-dialog__link-row">
 						<div className="reset-link-dialog__link-text-wrap">

@@ -277,7 +277,7 @@ function IntegrationDetailHeader(
 							<div className="last-data">
 								We have not received data from your {title} Instance yet. You need to
 								manually configure your {title} instance to start sending data to
-								HanzoO11y.
+								Hanzo.
 							</div>
 							<div className="last-data">
 								If you have already configured your resources to send data, sit tight
@@ -289,7 +289,7 @@ function IntegrationDetailHeader(
 						<div className="data-test-connection">
 							<div className="last-data">
 								You would need to manually configure your {title} instance to start
-								sending data to HanzoO11y.
+								sending data to Hanzo.
 							</div>
 							<div className="last-data">
 								If you have already configured your resources to send data, sit tight

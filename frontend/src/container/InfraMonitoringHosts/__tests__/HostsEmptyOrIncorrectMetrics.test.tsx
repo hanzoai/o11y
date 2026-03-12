@@ -17,7 +17,7 @@ describe('HostsEmptyOrIncorrectMetrics', () => {
 		render(<HostsEmptyOrIncorrectMetrics noData={false} incorrectData />);
 		expect(
 			screen.getByText(
-				'To see host metrics, upgrade to the latest version of HanzoO11y k8s-infra chart. Please contact support if you need help.',
+				'To see host metrics, upgrade to the latest version of Hanzo k8s-infra chart. Please contact support if you need help.',
 			),
 		).toBeInTheDocument();
 	});
@@ -36,7 +36,7 @@ describe('HostsEmptyOrIncorrectMetrics', () => {
 		render(<HostsEmptyOrIncorrectMetrics noData={false} incorrectData={false} />);
 		expect(
 			screen.queryByText(
-				'To see host metrics, upgrade to the latest version of HanzoO11y k8s-infra chart. Please contact support if you need help.',
+				'To see host metrics, upgrade to the latest version of Hanzo k8s-infra chart. Please contact support if you need help.',
 			),
 		).not.toBeInTheDocument();
 	});

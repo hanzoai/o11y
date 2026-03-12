@@ -13,11 +13,11 @@ function AuthHeader(): JSX.Element {
 		<header className="auth-header">
 			<div className="auth-header-logo">
 				<img
-					src="/Logos/observe-brand-logo.svg"
-					alt="HanzoO11y"
+					src="/Logos/hanzo-icon.svg"
+					alt="Hanzo"
 					className="auth-header-logo-icon"
 				/>
-				<span className="auth-header-logo-text">HanzoO11y</span>
+				<span className="auth-header-logo-text">Hanzo Observability</span>
 			</div>
 			<Button
 				className="auth-header-help-button"

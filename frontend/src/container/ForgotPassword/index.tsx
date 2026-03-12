@@ -131,7 +131,7 @@ function ForgotPassword({
 			>
 				<div className="login-form-header">
 					<div className="login-form-emoji">
-						<img src="/svgs/tv.svg" alt="TV" width="32" height="32" />
+						<img src="/Logos/hanzo-icon.svg" alt="Hanzo" width="32" height="32" />
 					</div>
 					<h4 className="forgot-password-title">Forgot your password?</h4>
 					<p className="forgot-password-description">

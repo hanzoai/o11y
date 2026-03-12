@@ -57,7 +57,7 @@ function WorkspaceAccessRestricted(): JSX.Element {
 										>
 											{activeLicense.state === LicenseState.TERMINATED && (
 												<>
-													Your HanzoO11y license is terminated, please contact support at{' '}
+													Your Hanzo license is terminated, please contact support at{' '}
 													<a href="mailto:cloud-support@o11y.hanzo.ai">
 														cloud-support@o11y.hanzo.ai
 													</a>{' '}
@@ -66,7 +66,7 @@ function WorkspaceAccessRestricted(): JSX.Element {
 											)}
 											{activeLicense.state === LicenseState.EXPIRED && (
 												<>
-													Your HanzoO11y license is expired, please contact support at{' '}
+													Your Hanzo license is expired, please contact support at{' '}
 													<a href="mailto:cloud-support@o11y.hanzo.ai">
 														cloud-support@o11y.hanzo.ai
 													</a>{' '}
@@ -83,7 +83,7 @@ function WorkspaceAccessRestricted(): JSX.Element {
 											)}
 											{activeLicense.state === LicenseState.CANCELLED && (
 												<>
-													Your HanzoO11y license is cancelled, please contact support at{' '}
+													Your Hanzo license is cancelled, please contact support at{' '}
 													<a href="mailto:cloud-support@o11y.hanzo.ai">
 														cloud-support@o11y.hanzo.ai
 													</a>{' '}

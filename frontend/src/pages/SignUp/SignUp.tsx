@@ -78,7 +78,7 @@ function SignUp(): JSX.Element {
 				email: responseDetails.email,
 				name: responseDetails.name,
 				company_name: responseDetails.organization,
-				source: 'HanzoO11y Cloud',
+				source: 'Hanzo Observability',
 			});
 		}
 	}, [
@@ -219,14 +219,14 @@ function SignUp(): JSX.Element {
 			<div className="signup-card">
 				<div className="signup-form-header">
 					<div className="signup-header-icon">
-						<img src="/svgs/tv.svg" alt="TV" width="32" height="32" />
+						<img src="/Logos/hanzo-icon.svg" alt="Hanzo" width="32" height="32" />
 					</div>
 					<Typography.Title level={4} className="signup-header-title">
 						Create your account
 					</Typography.Title>
 					<Typography.Paragraph className="signup-header-subtitle">
 						You&apos;re almost in. Create a password to start monitoring your
-						applications with HanzoO11y.
+						applications with Hanzo Observability.
 					</Typography.Paragraph>
 				</div>
 

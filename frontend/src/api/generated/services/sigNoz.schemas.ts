@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for HanzoO11y
+ * * The file has been auto-generated using Orval for Hanzo Observability
  * * regenerate with 'yarn generate:api'
- * HanzoO11y
+ * Hanzo Observability
  */
 export interface AuthtypesAttributeMappingDTO {
 	/**
@@ -1473,7 +1473,7 @@ export interface Querybuildertypesv5QueryBuilderFormulaDTO {
 	order?: Querybuildertypesv5OrderByDTO[];
 }
 
-export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregationDTO {
+export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregationDTO {
 	/**
 	 * @type array
 	 */
@@ -1530,7 +1530,7 @@ export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoO11yO11yPkgTy
 	stepInterval?: Querybuildertypesv5StepDTO;
 }
 
-export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregationDTO {
+export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregationDTO {
 	/**
 	 * @type array
 	 */
@@ -1587,7 +1587,7 @@ export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoO11yO11yPkgTy
 	stepInterval?: Querybuildertypesv5StepDTO;
 }
 
-export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregationDTO {
+export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregationDTO {
 	/**
 	 * @type array
 	 */
@@ -1756,17 +1756,17 @@ export type Querybuildertypesv5QueryEnvelopeDTO =
 	  });
 
 export interface Querybuildertypesv5QueryEnvelopeBuilderLogDTO {
-	spec?: Querybuildertypesv5QueryBuilderQueryGithubComHanzoO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregationDTO;
+	spec?: Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregationDTO;
 	type?: Querybuildertypesv5QueryTypeDTO;
 }
 
 export interface Querybuildertypesv5QueryEnvelopeBuilderMetricDTO {
-	spec?: Querybuildertypesv5QueryBuilderQueryGithubComHanzoO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregationDTO;
+	spec?: Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregationDTO;
 	type?: Querybuildertypesv5QueryTypeDTO;
 }
 
 export interface Querybuildertypesv5QueryEnvelopeBuilderTraceDTO {
-	spec?: Querybuildertypesv5QueryBuilderQueryGithubComHanzoO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregationDTO;
+	spec?: Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregationDTO;
 	type?: Querybuildertypesv5QueryTypeDTO;
 }
 

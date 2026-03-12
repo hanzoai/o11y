@@ -16,15 +16,15 @@ function WelcomeLeftContainer({
 		<Container>
 			<LeftContainer direction="vertical">
 				<Space align="center">
-					<Logo src="/Logos/observe-brand-logo.svg" alt="logo" />
-					<Title style={{ fontSize: '46px', margin: 0 }}>HanzoO11y</Title>
+					<Logo src="/Logos/hanzo-icon.svg" alt="logo" />
+					<Title style={{ fontSize: '46px', margin: 0 }}>Hanzo</Title>
 				</Space>
 				<Typography>{t('monitor_signup')}</Typography>
 				<Card
 					style={{ width: 'max-content' }}
 					bodyStyle={{ padding: '1px 8px', width: '100%' }}
 				>
-					HanzoO11y {version}
+					Hanzo {version}
 				</Card>
 			</LeftContainer>
 			{children}
