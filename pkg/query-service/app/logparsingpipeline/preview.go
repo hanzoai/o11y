@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hanzoai/otel-collector/pkg/collectorsimulator"
-	_ "github.com/hanzoai/otel-collector/pkg/parser/grok"
-	"github.com/hanzoai/otel-collector/processor/o11ylogspipelineprocessor"
+	"github.com/SigNoz/signoz-otel-collector/pkg/collectorsimulator"
+	_ "github.com/SigNoz/signoz-otel-collector/pkg/parser/grok"
+	"github.com/SigNoz/signoz-otel-collector/processor/signozlogspipelineprocessor"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"

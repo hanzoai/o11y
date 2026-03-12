@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	schemamigrator "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
+	schemamigrator "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/modules/promote"
 	"github.com/hanzoai/o11y/pkg/telemetrylogs"

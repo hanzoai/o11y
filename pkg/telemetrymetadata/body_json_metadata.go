@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go/v2/lib/chcol"
-	schemamigrator "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/hanzoai/otel-collector/constants"
+	schemamigrator "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
+	"github.com/SigNoz/signoz-otel-collector/constants"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrylogs"

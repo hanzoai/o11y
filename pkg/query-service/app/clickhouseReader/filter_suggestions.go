@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/hanzoai/otel-collector/utils/fingerprint"
+	"github.com/SigNoz/signoz-otel-collector/utils/fingerprint"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"go.uber.org/zap"
