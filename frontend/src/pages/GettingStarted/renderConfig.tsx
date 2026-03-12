@@ -18,7 +18,7 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 	} = store.getState();
 	return [
 		{
-			heading: 'Send data from your applications to HanzoO11y',
+			heading: 'Send data from your applications to Hanzo',
 			items: [
 				{
 					title: 'Instrument your Java Application',
@@ -95,7 +95,7 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 			heading: 'Send Metrics from your Infrastructure & create Dashboards',
 			items: [
 				{
-					title: 'Send metrics to HanzoO11y',
+					title: 'Send metrics to Hanzo',
 					icon: <BarChartOutlined style={{ fontSize: '3.5rem' }} />,
 					url: 'https://o11y.hanzo.ai/docs/userguide/send-metrics/',
 				},
@@ -107,15 +107,15 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 			],
 		},
 		{
-			heading: 'Send your logs to HanzoO11y',
+			heading: 'Send your logs to Hanzo',
 			items: [
 				{
-					title: 'Send your logs to HanzoO11y',
+					title: 'Send your logs to Hanzo',
 					icon: <AlignLeftOutlined style={{ fontSize: '3.5rem' }} />,
 					url: 'https://o11y.hanzo.ai/docs/userguide/logs/',
 				},
 				{
-					title: 'Existing log collectors to HanzoO11y',
+					title: 'Existing log collectors to Hanzo',
 					icon: <ApiFilled style={{ fontSize: '3.5rem' }} />,
 					url: 'https://o11y.hanzo.ai/docs/userguide/fluentbit_to_o11y/',
 				},
@@ -160,7 +160,7 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 
 			items: [
 				{
-					title: 'Join HanzoO11y slack community ',
+					title: 'Join Hanzo slack community ',
 					icon: (
 						<div style={{ padding: '0.7rem' }}>
 							<Slack width={30} height={30} />

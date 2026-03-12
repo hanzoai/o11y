@@ -37,7 +37,7 @@ describe('DataSourceInfo', () => {
 			),
 		);
 
-		render(<DataSourceInfo dataSentToHanzoO11y={false} isLoading={false} />);
+		render(<DataSourceInfo dataSentToHanzo={false} isLoading={false} />);
 
 		await screen.findByText(/custom-host\.test\.cloud/i);
 	});
@@ -49,7 +49,7 @@ describe('DataSourceInfo', () => {
 			),
 		);
 
-		render(<DataSourceInfo dataSentToHanzoO11y={false} isLoading={false} />);
+		render(<DataSourceInfo dataSentToHanzo={false} isLoading={false} />);
 
 		await screen.findByText(/Your workspace is ready/i);
 		expect(screen.queryByText(/o11y\.cloud/i)).not.toBeInTheDocument();
@@ -62,7 +62,7 @@ describe('DataSourceInfo', () => {
 			),
 		);
 
-		render(<DataSourceInfo dataSentToHanzoO11y={true} isLoading={false} />);
+		render(<DataSourceInfo dataSentToHanzo={true} isLoading={false} />);
 
 		await screen.findByText(/custom-host\.test\.cloud/i);
 	});
