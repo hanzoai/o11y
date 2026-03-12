@@ -58,7 +58,7 @@ const supportChannels = [
 		name: 'Github',
 		icon: <Github size={16} />,
 		title: 'Create an issue on GitHub to report bugs or request new features.',
-		url: 'https://github.com/Hanzo O11y/o11y/issues',
+		url: 'https://github.com/HanzoO11y/o11y/issues',
 		btnText: 'Create issue',
 		isExternal: true,
 	},
@@ -66,7 +66,7 @@ const supportChannels = [
 		key: 'slack_community',
 		name: 'Slack Community',
 		icon: <Slack size={16} />,
-		title: 'Get support from the Hanzo O11y community on Slack.',
+		title: 'Get support from the HanzoO11y community on Slack.',
 		url: 'https://o11y.hanzo.ai/slack',
 		btnText: 'Join Slack',
 		isExternal: true,
@@ -260,7 +260,7 @@ export default function Support(): JSX.Element {
 			>
 				<Typography.Text className="add-credit-card-text">
 					You&apos;re currently on <span className="highlight-text">Trial plan</span>
-					. Add a credit card to access Hanzo O11y chat support to your workspace.
+					. Add a credit card to access HanzoO11y chat support to your workspace.
 				</Typography.Text>
 			</Modal>
 		</div>

@@ -40,12 +40,12 @@ function PublicDashboardPage(): JSX.Element {
 						<div className="brand">
 							<img
 								src="/Logos/observe-brand-logo.svg"
-								alt="Hanzo O11y"
+								alt="HanzoO11y"
 								className="brand-logo"
 							/>
 
 							<Typography.Title level={2} className="brand-title">
-								Hanzo O11y
+								HanzoO11y
 							</Typography.Title>
 						</div>
 

@@ -614,14 +614,14 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 		<div className="workspace-restricted-banner">
 			{activeLicense?.state === LicenseState.TERMINATED && (
 				<>
-					Your Hanzo O11y license is terminated, enterprise features have been disabled.
+					Your HanzoO11y license is terminated, enterprise features have been disabled.
 					Please contact support at{' '}
 					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for new license
 				</>
 			)}
 			{activeLicense?.state === LicenseState.EXPIRED && (
 				<>
-					Your Hanzo O11y license has expired. Please contact support at{' '}
+					Your HanzoO11y license has expired. Please contact support at{' '}
 					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for renewal to
 					avoid termination of license as per our{' '}
 					<a
@@ -635,7 +635,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 			)}
 			{activeLicense?.state === LicenseState.CANCELLED && (
 				<>
-					Your Hanzo O11y license is cancelled. Please contact support at{' '}
+					Your HanzoO11y license is cancelled. Please contact support at{' '}
 					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for reactivation
 					to avoid termination of license as per our{' '}
 					<a
@@ -650,7 +650,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 
 			{activeLicense?.state === LicenseState.DEFAULTED && (
 				<>
-					Your Hanzo O11y license is defaulted. Please clear the bill to continue using
+					Your HanzoO11y license is defaulted. Please clear the bill to continue using
 					the enterprise features. Contact support at{' '}
 					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> to avoid
 					termination of license as per our{' '}
@@ -666,7 +666,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 
 			{activeLicense?.state === LicenseState.EVALUATION_EXPIRED && (
 				<>
-					Your Hanzo O11y trial has ended. Please contact support at{' '}
+					Your HanzoO11y trial has ended. Please contact support at{' '}
 					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for next steps to
 					avoid termination of license as per our{' '}
 					<a
@@ -785,7 +785,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 									<a className="upgrade-link" onClick={handleUpgrade}>
 										upgrade
 									</a>
-									to continue using Hanzo O11y features.
+									to continue using HanzoO11y features.
 									<span className="refresh-payment-status">
 										{' '}
 										| Already upgraded? <RefreshPaymentStatus type="text" />
@@ -815,7 +815,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 									<a className="upgrade-link" onClick={handleFailedPayment}>
 										pay the bill
 									</a>
-									to continue using Hanzo O11y features.
+									to continue using HanzoO11y features.
 									<span className="refresh-payment-status">
 										{' '}
 										| Already paid? <RefreshPaymentStatus type="text" />

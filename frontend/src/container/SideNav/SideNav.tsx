@@ -920,7 +920,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 									onClickHandler(ROUTES.HOME, event);
 								}}
 							>
-								<img src="/Logos/observe-brand-logo.svg" alt="Hanzo O11y" />
+								<img src="/Logos/observe-brand-logo.svg" alt="HanzoO11y" />
 							</div>
 
 							{licenseTag && (

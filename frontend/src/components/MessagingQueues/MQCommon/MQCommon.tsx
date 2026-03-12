@@ -17,7 +17,7 @@ export function ComingSoon(): JSX.Element {
 						target="_blank"
 						onClick={(e): void => e.stopPropagation()}
 					>
-						Hanzo O11y Community
+						HanzoO11y Community
 					</a>
 				</div>
 			}
