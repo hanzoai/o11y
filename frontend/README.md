@@ -15,7 +15,7 @@ or
 **Tag to remote url- Introduce versinoing later on**
 
 ```
-docker tag signoz/frontend:latest 7296823551/signoz:latest
+docker tag hanzoai/o11y-frontend:latest ghcr.io/hanzoai/o11y-frontend:latest
 ```
 
 ```
@@ -25,7 +25,7 @@ docker compose up
 ## Without Docker
 Follow the steps below
 
-1. ```git clone https://github.com/Hanzo O11y/signoz.git && cd signoz/frontend```
+1. ```git clone https://github.com/hanzoai/o11y.git && cd o11y/frontend```
 1. change baseURL to ```<test environment URL>``` in file ```src/constants/env.ts```
 
 1. ```yarn install```

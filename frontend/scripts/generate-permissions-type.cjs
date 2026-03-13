@@ -10,7 +10,7 @@ const PERMISSIONS_TYPE_FILE = path.join(
 	'../src/hooks/useAuthZ/permissions.type.ts',
 );
 
-const SIGNOZ_INTEGRATION_IMAGE = 'signoz:integration';
+const O11Y_INTEGRATION_IMAGE = 'o11y:integration';
 const LOCAL_BACKEND_URL = 'http://localhost:8080';
 
 function log(message) {
@@ -20,7 +20,7 @@ function log(message) {
 function getBackendUrlFromDocker() {
 	try {
 		const output = execSync(
-			`docker ps --filter "ancestor=${SIGNOZ_INTEGRATION_IMAGE}" --format "{{.Ports}}"`,
+			`docker ps --filter "ancestor=${O11Y_INTEGRATION_IMAGE}" --format "{{.Ports}}"`,
 			{ encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] },
 		).trim();
 
@@ -63,7 +63,7 @@ async function checkBackendHealth(url, maxAttempts = 3, delayMs = 1000) {
 async function discoverBackendUrl() {
 	const dockerUrl = getBackendUrlFromDocker();
 	if (dockerUrl) {
-		log(`Found ${SIGNOZ_INTEGRATION_IMAGE} container, trying ${dockerUrl}...`);
+		log(`Found ${O11Y_INTEGRATION_IMAGE} container, trying ${dockerUrl}...`);
 		if (await checkBackendHealth(dockerUrl)) {
 			log(`Backend found at ${dockerUrl} (from py-test-setup)`);
 			return dockerUrl;
@@ -143,10 +143,10 @@ async function main() {
 
 		if (!backendUrl) {
 			console.error('\n' + '='.repeat(80));
-			console.error('ERROR: No running SigNoz backend found!');
+			console.error('ERROR: No running O11y backend found!');
 			console.error('='.repeat(80));
 			console.error(
-				'\nThe permissions type generator requires a running SigNoz backend.',
+				'\nThe permissions type generator requires a running O11y backend.',
 			);
 			console.error('\nFor local development, start the backend with:');
 			console.error('  make go-run-enterprise');

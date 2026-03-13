@@ -18,7 +18,7 @@ const allDeps = {
 	...packageJson.devDependencies,
 };
 
-// 4. Filter for @signozhq packages
+// 4. Filter for @signozhq packages (external component library)
 const signozPackages = Object.keys(allDeps).filter((dep) =>
 	dep.startsWith('@signozhq/'),
 );
@@ -33,7 +33,7 @@ const fileContent = `// --------------------------------------------------------
 // It forces VS Code to index these specific packages to fix auto-import
 // performance issues in TypeScript 4.x.
 //
-// PR for reference: https://github.com/SigNoz/signoz/pull/9694
+// PR for reference: https://github.com/hanzoai/o11y/pull/9694
 // -------------------------------------------------------------------------
 
 ${signozPackages.map((pkg) => `import '${pkg}';`).join('\n')}
