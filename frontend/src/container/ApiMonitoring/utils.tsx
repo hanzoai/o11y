@@ -3055,7 +3055,7 @@ export const getAllEndpointsWidgetData = (
 				gap: '10px',
 				padding: '12px',
 				color: 'var(--Vanilla-100, #fff)',
-				fontFamily: 'Inter',
+				fontFamily: 'Geist Sans',
 				fontSize: '14px',
 				fontStyle: 'normal',
 				fontWeight: 400,

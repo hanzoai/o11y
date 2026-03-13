@@ -1,5 +1,5 @@
 /**
- * Signoz Theme Tokens
+ * Hanzo O11y Theme Tokens
  * DO NOT EDIT DIRECTLY - This file is auto-generated
  * Generated on Fri, 27 Feb 2026 14:32:24 GMT
  */
@@ -38,7 +38,7 @@
 	--sidebar-accent-foreground: var(--text-slate-400);
 	--sidebar-border: var(--bg-slate-400);
 	--sidebar-ring: var(--bg-robin-500);
-	--font-sans: 'Inter';
+	--font-sans: 'Geist Sans';
 	--font-serif: 'Open Sans';
 	--font-mono: 'Geist Mono';
 	--base-white: var(--text-base-white);
@@ -223,7 +223,7 @@
 	--sidebar-accent-foreground: var(--text-vanilla-400);
 	--sidebar-border: var(--bg-slate-500);
 	--sidebar-ring: var(--bg-robin-500);
-	--font-sans: 'Inter';
+	--font-sans: 'Geist Sans';
 	--font-serif: 'Open Sans';
 	--font-mono: 'Geist Mono';
 	--base-white: var(--text-base-white);
