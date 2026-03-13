@@ -111,17 +111,8 @@ func (module *module) GetSessionContext(ctx context.Context, email valuer.Email,
 }
 
 func (module *module) CreatePasswordAuthNSession(ctx context.Context, authNProvider authtypes.AuthNProvider, email valuer.Email, password string, orgID valuer.UUID) (*authtypes.Token, error) {
-	passwordAuthN, err := getProvider[authn.PasswordAuthN](authNProvider, module.authNs)
-	if err != nil {
-		return nil, err
-	}
-
-	identity, err := passwordAuthN.Authenticate(ctx, email.String(), password, orgID)
-	if err != nil {
-		return nil, err
-	}
-
-	return module.tokenizer.CreateToken(ctx, identity, map[string]string{})
+	// Password authentication is disabled — all auth must go through IAM OIDC (hanzo.id)
+	return nil, errors.New(errors.TypeUnsupported, errors.CodeUnsupported, "password authentication is disabled, use SSO via hanzo.id")
 }
 
 func (module *module) CreateCallbackAuthNSession(ctx context.Context, authNProvider authtypes.AuthNProvider, values url.Values) (string, error) {
