@@ -27,7 +27,7 @@ import type {
 	ListAuthDomains200,
 	RenderErrorResponseDTO,
 	UpdateAuthDomainPathParameters,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 /**
  * This endpoint lists all auth domains

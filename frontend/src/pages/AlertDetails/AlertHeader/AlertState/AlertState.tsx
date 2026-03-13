@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { BellOff, CircleCheck, CircleOff, Flame } from 'lucide-react';
 

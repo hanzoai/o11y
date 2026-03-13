@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { toast } from '@signozhq/sonner';
+import { Button } from '@hanzo/ui';
+import { toast } from '@hanzo/ui';
 import { Form, Modal } from 'antd';
 import { ErrorResponseHandlerV2 } from 'api/ErrorResponseHandlerV2';
 import {
@@ -12,7 +12,7 @@ import {
 	AuthtypesGoogleConfigDTO,
 	AuthtypesRoleMappingDTO,
 	RenderErrorResponseDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import { FeatureKeys } from 'constants/features';
 import { defaultTo } from 'lodash-es';

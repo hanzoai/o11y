@@ -1,5 +1,5 @@
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { MetricType } from 'api/metricsExplorer/getMetricsList';
 import {
 	BarChart,

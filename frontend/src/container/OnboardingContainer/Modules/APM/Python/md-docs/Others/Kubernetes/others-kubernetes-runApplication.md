@@ -17,4 +17,4 @@ OTEL_EXPORTER_OTLP_PROTOCOL=grpc opentelemetry-instrument <your_run_command>
 
 &nbsp;
 
-If you encounter any difficulties, please consult the [troubleshooting section](https://o11y.hanzo.ai/docs/instrumentation/python/#troubleshooting-your-signoz-installation) for assistance.
+If you encounter any difficulties, please consult the [troubleshooting section](https://o11y.hanzo.ai/docs/instrumentation/python/#troubleshooting-your-o11y-installation) for assistance.

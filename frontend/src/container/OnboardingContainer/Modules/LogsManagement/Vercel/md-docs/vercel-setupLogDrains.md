@@ -32,9 +32,9 @@ https://ingest.{{REGION}}.o11y.hanzo.ai:443/logs/json
 ```
 &nbsp;
 
-* Enable **Custom Headers** and add the headers `signoz-ingestion-key` and `x-vercel-verify`
+* Enable **Custom Headers** and add the headers `hanzo-ingestion-key` and `x-vercel-verify`
 ```bash
-signoz-ingestion-key: {{HANZO_INGESTION_KEY}}
+hanzo-ingestion-key: {{HANZO_INGESTION_KEY}}
 ```
 ```bash
 x-vercel-verify: <YOUR_VERCEL_VERIFY_TOKEN>

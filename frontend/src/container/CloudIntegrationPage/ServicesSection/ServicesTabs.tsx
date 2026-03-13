@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import type { SelectProps, TabsProps } from 'antd';
 import { Select, Tabs } from 'antd';
 import { getAwsServices } from 'api/integration/aws';

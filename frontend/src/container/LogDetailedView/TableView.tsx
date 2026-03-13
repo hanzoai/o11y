@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
 import { LinkOutlined } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import {
 	Button,
 	Space,

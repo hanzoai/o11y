@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Tag, Tooltip } from 'antd';
 import { TableColumnType as ColumnType } from 'antd';
 import get from 'api/browser/localstorage/get';

@@ -52,7 +52,7 @@ Step 4. Run your application
 ```bash
 OTEL_RESOURCE_ATTRIBUTES=service.name={{MYAPP}} \
 OTEL_EXPORTER_OTLP_ENDPOINT="https://ingest.{{REGION}}.o11y.hanzo.ai:443" \
-OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}" \
+OTEL_EXPORTER_OTLP_HEADERS="hanzo-ingestion-key={{HANZO_INGESTION_KEY}}" \
 OTEL_EXPORTER_OTLP_PROTOCOL=grpc \
 opentelemetry-instrument <your_run_command>
 ```

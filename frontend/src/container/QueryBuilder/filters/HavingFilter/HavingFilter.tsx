@@ -1,6 +1,6 @@
 // ** Helpers
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Select } from 'antd';
 import { ENTITY_VERSION_V4 } from 'constants/app';
 // ** Constants

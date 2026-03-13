@@ -38,7 +38,7 @@ export function textContainsVariableReference(
  * references. Covers:
  * - QUERY_BUILDER: filter items' string values + filter.expression
  * - PROM: each promql[].query
- * - CLICKHOUSE: each clickhouse_sql[].query
+ * - DATASTORE: each datastore_sql[].query
  */
 function extractQueryBuilderTexts(query: Query): string[] {
 	const texts: string[] = [];
@@ -79,12 +79,12 @@ function extractPromQLTexts(query: Query): string[] {
 	return texts;
 }
 
-function extractClickhouseSQLTexts(query: Query): string[] {
+function extractDatastoreSQLTexts(query: Query): string[] {
 	const texts: string[] = [];
-	if (isArray(query.clickhouse_sql)) {
-		query.clickhouse_sql.forEach((clickhouseQuery) => {
-			if (clickhouseQuery.query) {
-				texts.push(clickhouseQuery.query);
+	if (isArray(query.datastore_sql)) {
+		query.datastore_sql.forEach((datastoreQuery) => {
+			if (datastoreQuery.query) {
+				texts.push(datastoreQuery.query);
 			}
 		});
 	}
@@ -96,7 +96,7 @@ function extractClickhouseSQLTexts(query: Query): string[] {
  * references. Covers:
  * - QUERY_BUILDER: filter items' string values + filter.expression
  * - PROM: each promql[].query
- * - CLICKHOUSE: each clickhouse_sql[].query
+ * - DATASTORE: each datastore_sql[].query
  */
 export function extractQueryTextStrings(query: Query): string[] {
 	if (query.queryType === EQueryType.QUERY_BUILDER) {
@@ -107,8 +107,8 @@ export function extractQueryTextStrings(query: Query): string[] {
 		return extractPromQLTexts(query);
 	}
 
-	if (query.queryType === EQueryType.CLICKHOUSE) {
-		return extractClickhouseSQLTexts(query);
+	if (query.queryType === EQueryType.DATASTORE) {
+		return extractDatastoreSQLTexts(query);
 	}
 
 	return [];

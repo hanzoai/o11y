@@ -1,9 +1,9 @@
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { ICompositeMetricQuery } from 'types/api/alerts/compositeQuery';
 import {
-	BuilderClickHouseResource,
+	BuilderDatastoreResource,
 	BuilderPromQLResource,
-	IClickHouseQuery,
+	IDatastoreQuery,
 	Query,
 } from 'types/api/queryBuilder/queryBuilderData';
 import { EQueryType } from 'types/common/dashboard';
@@ -46,12 +46,12 @@ const buildBuilderQuery = (
 	return compositeQuery;
 };
 
-const buildClickHouseQuery = (
+const buildDatastoreQuery = (
 	query: Query,
 	panelType: PANEL_TYPES | null,
 ): ICompositeMetricQuery => {
-	const chQueries: BuilderClickHouseResource = {};
-	query.clickhouse_sql.forEach((query: IClickHouseQuery) => {
+	const chQueries: BuilderDatastoreResource = {};
+	query.datastore_sql.forEach((query: IDatastoreQuery) => {
 		if (!query.query) {
 			return;
 		}
@@ -93,7 +93,7 @@ const buildPromQuery = (
 
 const queryTypeMethodMapping = {
 	[EQueryType.QUERY_BUILDER]: buildBuilderQuery,
-	[EQueryType.CLICKHOUSE]: buildClickHouseQuery,
+	[EQueryType.DATASTORE]: buildDatastoreQuery,
 	[EQueryType.PROM]: buildPromQuery,
 };
 

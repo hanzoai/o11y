@@ -94,7 +94,7 @@ export const isQueryUpdatedInView = ({
 
 	if (
 		updatedCurrentQuery?.builder === undefined ||
-		updatedCurrentQuery.clickhouse_sql === undefined ||
+		updatedCurrentQuery.datastore_sql === undefined ||
 		updatedCurrentQuery.promql === undefined
 	) {
 		return false;
@@ -102,7 +102,7 @@ export const isQueryUpdatedInView = ({
 	return (
 		panelType !== currentPanelType ||
 		!isEqual(query.builder, updatedCurrentQuery?.builder) ||
-		!isEqual(query.clickhouse_sql, updatedCurrentQuery?.clickhouse_sql) ||
+		!isEqual(query.datastore_sql, updatedCurrentQuery?.datastore_sql) ||
 		!isEqual(query.promql, updatedCurrentQuery?.promql) ||
 		!isEqual(
 			options?.selectColumns,

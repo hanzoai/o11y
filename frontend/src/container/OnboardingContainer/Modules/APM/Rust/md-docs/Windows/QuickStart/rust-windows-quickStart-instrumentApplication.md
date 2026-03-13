@@ -38,11 +38,11 @@ Add this function in main.rs file, `init_tracer` is initializing an OpenTelemetr
 
 ```bash
 fn init_tracer() -> Result<sdktrace::Tracer, TraceError> {
-    let signoz_access_token = std::env::var("HANZO_ACCESS_TOKEN").expect("HANZO_ACCESS_TOKEN not set");
+    let hanzo_access_token = std::env::var("HANZO_ACCESS_TOKEN").expect("HANZO_ACCESS_TOKEN not set");
     let mut metadata = MetadataMap::new();
     metadata.insert(
-        "signoz-ingestion-key",
-        MetadataValue::from_str(&signoz_access_token).unwrap(),
+        "hanzo-ingestion-key",
+        MetadataValue::from_str(&hanzo_access_token).unwrap(),
     );
     opentelemetry_otlp::new_pipeline()
         .tracing()

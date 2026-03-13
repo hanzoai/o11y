@@ -13,7 +13,7 @@ import {
 } from '@codemirror/autocomplete';
 import { javascript } from '@codemirror/lang-javascript';
 import { EditorState, RangeSetBuilder, Transaction } from '@codemirror/state';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { copilot } from '@uiw/codemirror-theme-copilot';
 import { githubLight } from '@uiw/codemirror-theme-github';
 import CodeMirror, {

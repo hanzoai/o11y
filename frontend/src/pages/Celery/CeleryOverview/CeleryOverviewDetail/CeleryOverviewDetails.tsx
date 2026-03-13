@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Color, Spacing } from '@signozhq/design-tokens';
+import { Color, Spacing } from 'constants/designTokens';
 import { Divider, Drawer, Typography } from 'antd';
 import { RowData } from 'components/CeleryOverview/CeleryOverviewTable/CeleryOverviewTable';
 import { useIsDarkMode } from 'hooks/useDarkMode';

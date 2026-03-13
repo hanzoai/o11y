@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Progress, TabsProps, Tag, Tooltip, Typography } from 'antd';
 import { TableColumnType as ColumnType } from 'antd';
 import {

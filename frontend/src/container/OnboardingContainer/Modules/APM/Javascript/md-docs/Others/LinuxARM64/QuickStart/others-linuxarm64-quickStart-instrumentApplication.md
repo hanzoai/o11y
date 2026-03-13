@@ -34,7 +34,7 @@ const provider = new WebTracerProvider({
 const exporter = new OTLPTraceExporter({
     url: 'https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces',
     headers: {
-        "signoz-ingestion-key": "{{HANZO_INGESTION_KEY}}",
+        "hanzo-ingestion-key": "{{HANZO_INGESTION_KEY}}",
     },
 });
 provider.addSpanProcessor(new BatchSpanProcessor(exporter));

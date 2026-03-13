@@ -18,10 +18,10 @@ import type {
 	QueryRangeV5200,
 	RenderErrorResponseDTO,
 	ReplaceVariables200,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 /**
- * Execute a composite query over a time range. Supports builder queries (traces, logs, metrics), formulas, trace operators, PromQL, and ClickHouse SQL.
+ * Execute a composite query over a time range. Supports builder queries (traces, logs, metrics), formulas, trace operators, PromQL, and Datastore SQL.
  * @summary Query range
  */
 export const queryRangeV5 = (

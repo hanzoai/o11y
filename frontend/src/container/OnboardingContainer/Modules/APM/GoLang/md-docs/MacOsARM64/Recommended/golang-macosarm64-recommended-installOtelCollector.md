@@ -64,7 +64,7 @@ exporters:
     tls:
       insecure: false
     headers:
-      "signoz-ingestion-key": "{{HANZO_INGESTION_KEY}}"
+      "hanzo-ingestion-key": "{{HANZO_INGESTION_KEY}}"
   logging:
     verbosity: normal
 service:

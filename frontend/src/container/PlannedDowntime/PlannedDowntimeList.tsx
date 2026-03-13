@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from 'react';
 import { UseQueryResult } from 'react-query';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import {
 	Collapse,
 	Flex,

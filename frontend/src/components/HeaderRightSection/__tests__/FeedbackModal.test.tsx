@@ -1,6 +1,6 @@
 // Mock dependencies before imports
 import { useLocation } from 'react-router-dom';
-import { toast } from '@signozhq/sonner';
+import { toast } from '@hanzo/ui';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import logEvent from 'api/common/logEvent';
@@ -19,7 +19,7 @@ jest.mock('react-router-dom', () => ({
 	useLocation: jest.fn(),
 }));
 
-jest.mock('@signozhq/sonner', () => ({
+jest.mock('@hanzo/ui', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),

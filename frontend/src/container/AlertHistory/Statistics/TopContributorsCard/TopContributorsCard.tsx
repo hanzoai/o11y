@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button } from 'antd';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import history from 'lib/history';

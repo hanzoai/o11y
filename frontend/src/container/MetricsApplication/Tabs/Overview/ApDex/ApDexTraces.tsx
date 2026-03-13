@@ -36,7 +36,7 @@ function ApDexTraces({
 						topLevelOperationsRoute,
 						threashold: thresholdValue || 0,
 					}),
-					clickhouse_sql: [],
+					datastore_sql: [],
 					id: uuid(),
 				},
 				title: GraphTitle.APDEX,

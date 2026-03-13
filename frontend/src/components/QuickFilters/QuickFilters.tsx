@@ -11,7 +11,7 @@ import {
 	ComboboxItem,
 	ComboboxList,
 	ComboboxTrigger,
-} from '@signozhq/combobox';
+} from '@hanzo/ui';
 import { Skeleton, Switch, Tooltip, Typography } from 'antd';
 import getLocalStorageKey from 'api/browser/localstorage/get';
 import setLocalStorageKey from 'api/browser/localstorage/set';

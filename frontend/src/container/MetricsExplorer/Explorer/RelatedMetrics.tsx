@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Card, Col, Empty, Input, Row, Select, Skeleton } from 'antd';
 import { Gauge } from 'lucide-react';
 import { AppState } from 'store/reducers';

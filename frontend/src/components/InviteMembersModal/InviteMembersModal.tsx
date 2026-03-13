@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { Callout } from '@signozhq/callout';
-import { Style } from '@signozhq/design-tokens';
-import { DialogFooter, DialogWrapper } from '@signozhq/dialog';
-import { ChevronDown, CircleAlert, Plus, Trash2, X } from '@signozhq/icons';
-import { Input } from '@signozhq/input';
-import { toast } from '@signozhq/sonner';
+import { Button } from '@hanzo/ui';
+import { Callout } from 'components/ui/callout';
+import { Style } from 'constants/designTokens';
+import { DialogFooter, DialogWrapper } from 'components/ui/dialog';
+import { ChevronDown, CircleAlert, Plus, Trash2, X } from 'lucide-react';
+import { Input } from 'components/ui/input';
+import { toast } from '@hanzo/ui';
 import { Select } from 'antd';
 import inviteUsers from 'api/v1/invite/bulk/create';
 import sendInvite from 'api/v1/invite/create';

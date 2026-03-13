@@ -133,7 +133,7 @@ describe('GridCardLayout Utils', () => {
 				queryFormulas: [],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [],
+			datastore_sql: [],
 			promql: [],
 			id: 'test-query',
 		};

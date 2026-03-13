@@ -342,7 +342,7 @@ export const getNodeMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -649,7 +649,7 @@ export const getNodeMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -813,7 +813,7 @@ export const getNodeMetricsQueryPayload = (
 					],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -977,7 +977,7 @@ export const getNodeMetricsQueryPayload = (
 					],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1057,7 +1057,7 @@ export const getNodeMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1137,7 +1137,7 @@ export const getNodeMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1223,7 +1223,7 @@ export const getNodeMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1309,7 +1309,7 @@ export const getNodeMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1460,7 +1460,7 @@ export const getNodeMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1579,7 +1579,7 @@ export const getNodeMetricsQueryPayload = (
 					],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',

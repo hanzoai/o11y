@@ -170,18 +170,18 @@ export const createDynamicVariableToWidgetsMap = (
 						}
 					});
 				});
-			} else if (widget.query?.queryType === EQueryType.CLICKHOUSE) {
-				if (!Array.isArray(widget.query.clickhouse_sql)) {
+			} else if (widget.query?.queryType === EQueryType.DATASTORE) {
+				if (!Array.isArray(widget.query.datastore_sql)) {
 					return;
 				}
 
-				widget.query.clickhouse_sql.forEach((clickhouseQuery) => {
+				widget.query.datastore_sql.forEach((datastoreQuery) => {
 					dynamicVariables.forEach((variable) => {
 						if (
 							variable.dynamicVariablesAttribute &&
 							variable.name &&
-							clickhouseQuery.query &&
-							textContainsVariableReference(clickhouseQuery.query, variable.name) &&
+							datastoreQuery.query &&
+							textContainsVariableReference(datastoreQuery.query, variable.name) &&
 							!dynamicVariableToWidgetsMap[variable.id].includes(widget.id)
 						) {
 							dynamicVariableToWidgetsMap[variable.id].push(widget.id);

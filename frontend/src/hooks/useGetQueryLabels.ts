@@ -19,8 +19,8 @@ export const useGetQueryLabels = (
 			);
 			return [...queryLabels, ...formulaLabels];
 		}
-		if (currentQuery?.queryType === EQueryType.CLICKHOUSE) {
-			return (currentQuery?.clickhouse_sql ?? []).map((q) => ({
+		if (currentQuery?.queryType === EQueryType.DATASTORE) {
+			return (currentQuery?.datastore_sql ?? []).map((q) => ({
 				label: q.name,
 				value: q.name,
 			}));

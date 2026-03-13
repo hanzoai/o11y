@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-use';
-import { Button } from '@signozhq/button';
-import { Callout } from '@signozhq/callout';
+import { Button } from '@hanzo/ui';
+import { Callout } from 'components/ui/callout';
 import { Form, Input as AntdInput, Typography } from 'antd';
 import { Logout } from 'api/utils';
 import resetPasswordApi from 'api/v1/factor_password/resetPassword';
@@ -158,7 +158,7 @@ function ResetPassword({ version }: ResetPasswordProps): JSX.Element {
 						Monitor your applications. Find what is causing issues.
 					</Typography.Paragraph>
 					{version && (
-						<div className="reset-password-version-badge">Hanzo {version}</div>
+						<div className="reset-password-version-badge">v{version}</div>
 					)}
 				</div>
 

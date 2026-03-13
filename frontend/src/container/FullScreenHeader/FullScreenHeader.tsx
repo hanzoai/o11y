@@ -1,3 +1,4 @@
+import BrandMark from 'components/BrandMark';
 import history from 'lib/history';
 
 import './FullScreenHeader.styles.scss';
@@ -13,9 +14,7 @@ export default function FullScreenHeader({
 	return (
 		<div className="full-screen-header-container">
 			<div className="brand-logo" onClick={handleLogoClick}>
-				<img src="/Logos/hanzo-icon.svg" alt="Hanzo" />
-
-				<div className="brand-logo-name">Hanzo</div>
+				<BrandMark size={24} />
 			</div>
 		</div>
 	);

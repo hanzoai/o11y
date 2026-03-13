@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { Button } from '@signozhq/button';
-import { ArrowLeft, ArrowRight } from '@signozhq/icons';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/ui';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { Input } from 'components/ui/input';
 import { Form, Select } from 'antd';
 import { ErrorResponseHandlerForGeneratedAPIs } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import { useForgotPassword } from 'api/generated/services/users';
 import AuthError from 'components/AuthError/AuthError';
+import BrandMark from 'components/BrandMark';
 import ROUTES from 'constants/routes';
 import history from 'lib/history';
 import APIError from 'types/api/error';
@@ -131,7 +132,7 @@ function ForgotPassword({
 			>
 				<div className="login-form-header">
 					<div className="login-form-emoji">
-						<img src="/Logos/hanzo-icon.svg" alt="Hanzo" width="32" height="32" />
+						<BrandMark size={32} showProduct />
 					</div>
 					<h4 className="forgot-password-title">Forgot your password?</h4>
 					<p className="forgot-password-description">

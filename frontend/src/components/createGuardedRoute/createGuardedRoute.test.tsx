@@ -3,7 +3,7 @@ import type { RouteComponentProps } from 'react-router-dom';
 import {
 	AuthtypesGettableTransactionDTO,
 	AuthtypesTransactionDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { ENVIRONMENT } from 'constants/env';
 import { server } from 'mocks-server/server';
 import { rest } from 'msw';

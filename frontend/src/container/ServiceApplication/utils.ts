@@ -35,7 +35,7 @@ export const getQueryRangeRequestData = ({
 				queryType: EQueryType.QUERY_BUILDER,
 				promql: [],
 				builder: serviceMetricsQuery(operation, dotMetricsEnabled),
-				clickhouse_sql: [],
+				datastore_sql: [],
 				id: uuid(),
 			},
 			panelTypes: PANEL_TYPES.TABLE,

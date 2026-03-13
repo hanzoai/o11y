@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import MEditor, { EditorProps, Monaco } from '@monaco-editor/react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Switch, Typography } from 'antd';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 

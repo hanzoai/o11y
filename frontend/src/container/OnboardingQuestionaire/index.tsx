@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
-import { toast } from '@signozhq/sonner';
+import { toast } from '@hanzo/ui';
 import type { NotificationInstance } from 'antd/es/notification/interface';
 import logEvent from 'api/common/logEvent';
-import { RenderErrorResponseDTO } from 'api/generated/services/sigNoz.schemas';
+import { RenderErrorResponseDTO } from 'api/generated/services/o11y.schemas';
 import { usePutProfile } from 'api/generated/services/zeus';
 import listOrgPreferences from 'api/v1/org/preferences/list';
 import updateOrgPreferenceAPI from 'api/v1/org/preferences/name/update';
@@ -20,11 +20,11 @@ import { useAppContext } from 'providers/App/App';
 import {
 	AboutHanzoQuestions,
 	O11yDetails,
-} from './AboutSigNozQuestions/AboutSigNozQuestions';
+} from './AboutO11yQuestions/AboutO11yQuestions';
 import InviteTeamMembers from './InviteTeamMembers/InviteTeamMembers';
 import OptimiseO11yNeeds, {
 	OptimiseO11yDetails,
-} from './OptimiseSignozNeeds/OptimiseSignozNeeds';
+} from './OptimiseO11yNeeds/OptimiseO11yNeeds';
 import OrgQuestions, { OrgDetails } from './OrgQuestions/OrgQuestions';
 
 import './OnboardingQuestionaire.styles.scss';

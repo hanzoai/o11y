@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import { Button, Space, Steps, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
+import BrandMark from 'components/BrandMark';
 import LaunchChatSupport from 'components/LaunchChatSupport/LaunchChatSupport';
 import { onboardingHelpMessage } from 'components/LaunchChatSupport/util';
 import ROUTES from 'constants/routes';
@@ -377,9 +378,7 @@ export default function ModuleStepsContainer({
 				<div>
 					<div className="steps-container-header">
 						<div className="brand-logo" onClick={handleLogoClick}>
-							<img src="/Logos/hanzo-icon.svg" alt="Hanzo" />
-
-							<div className="brand-logo-name">Hanzo</div>
+							<BrandMark size={24} />
 						</div>
 					</div>
 
@@ -470,13 +469,13 @@ export default function ModuleStepsContainer({
 							step: activeStep?.step?.id,
 							screen: 'Onboarding',
 						}}
-						eventName="Onboarding V2: Facing Issues Sending Data to Hanzo"
+						eventName="Onboarding V2: Facing Issues Sending Data"
 						message={onboardingHelpMessage(
 							selectedDataSource?.name || '',
 							activeStep?.module?.id,
 						)}
-						buttonText="Facing issues sending data to Hanzo?"
-						onHoverText="Click here to get help with sending data to Hanzo"
+						buttonText="Facing issues sending data?"
+						onHoverText="Click here to get help with sending data"
 					/>
 				</div>
 			</div>

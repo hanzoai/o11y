@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { UniversalYAxisUnit } from 'components/YAxisUnitSelector/types';
 import { TIMEZONE_DATA } from 'container/CreateAlertV2/EvaluationSettings/constants';
 import dayjs from 'dayjs';

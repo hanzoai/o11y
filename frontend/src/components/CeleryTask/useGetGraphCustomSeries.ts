@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { themeColors } from 'constants/theme';
 import getLabelName from 'lib/getLabelName';
 import { drawStyles } from 'lib/uPlotLib/utils/constants';

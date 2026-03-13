@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/ui';
+import { Input } from 'components/ui/input';
 import {
 	RadioGroup,
 	RadioGroupItem,
 	RadioGroupLabel,
-} from '@signozhq/radio-group';
+} from '@hanzo/ui';
 import { Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { ArrowRight } from 'lucide-react';

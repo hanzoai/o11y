@@ -2,7 +2,7 @@
 
 Add the Hanzo O11y Helm Chart repository
 ```bash
-helm repo add signoz https://charts.o11y.hanzo.ai
+helm repo add hanzo https://charts.o11y.hanzo.ai
 ```
 
 &nbsp;
@@ -23,7 +23,7 @@ global:
   deploymentEnvironment: <DEPLOYMENT_ENVIRONMENT>
 otelCollectorEndpoint: ingest.{region}.o11y.hanzo.ai:443
 otelInsecure: false
-signozApiKey: <HANZO_INGESTION_KEY>
+hanzoApiKey: <HANZO_INGESTION_KEY>
 presets:
   otlpExporter:
     enabled: true
@@ -43,5 +43,5 @@ presets:
 To install the k8s-infra chart with the above configuration, run the following command:
 
 ```bash
-helm install my-release signoz/k8s-infra -f override-values.yaml
+helm install my-release hanzo/k8s-infra -f override-values.yaml
 ```

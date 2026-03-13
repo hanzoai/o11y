@@ -4686,23 +4686,23 @@
 		"internalRedirect": true
 	},
 	{
-		"dataSource": "clickhouse",
-		"label": "ClickHouse",
+		"dataSource": "datastore",
+		"label": "Datastore",
 		"tags": [
 			"database"
 		],
 		"module": "dashboards",
 		"relatedSearchKeywords": [
-			"clickhouse",
-			"clickhouse logs",
-			"clickhouse metrics",
+			"datastore",
+			"datastore logs",
+			"datastore metrics",
 			"columnar database",
 			"database",
 			"integrations",
 			"olap database"
 		],
-		"imgUrl": "/Logos/clickhouse.svg",
-		"link": "/integrations?integration=builtin-clickhouse",
+		"imgUrl": "/Logos/datastore.svg",
+		"link": "/integrations?integration=builtin-datastore",
 		"internalRedirect": true
 	},
 	{

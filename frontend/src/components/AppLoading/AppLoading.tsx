@@ -24,14 +24,8 @@ function AppLoading(): JSX.Element {
 			<div className="perilin-bg" />
 			<div className="app-loading-content">
 				<div className="brand">
-					<img
-						src="/Logos/hanzo-icon.svg"
-						alt="Hanzo"
-						className="brand-logo"
-					/>
-
 					<Typography.Title level={2} className="brand-title">
-						Hanzo
+						O11y
 					</Typography.Title>
 				</div>
 

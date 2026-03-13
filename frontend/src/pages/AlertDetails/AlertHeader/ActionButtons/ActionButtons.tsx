@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Divider, Dropdown, MenuProps, Switch, Tooltip } from 'antd';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { Copy, Ellipsis, PenLine, Trash2 } from 'lucide-react';

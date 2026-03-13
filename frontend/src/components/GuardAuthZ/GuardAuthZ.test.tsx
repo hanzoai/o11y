@@ -2,7 +2,7 @@ import { ReactElement } from 'react';
 import {
 	AuthtypesGettableTransactionDTO,
 	AuthtypesTransactionDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { ENVIRONMENT } from 'constants/env';
 import { BrandedPermission } from 'hooks/useAuthZ/types';
 import { buildPermission } from 'hooks/useAuthZ/utils';

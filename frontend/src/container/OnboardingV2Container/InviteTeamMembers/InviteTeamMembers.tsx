@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Input, Select, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import inviteUsers from 'api/v1/invite/bulk/create';

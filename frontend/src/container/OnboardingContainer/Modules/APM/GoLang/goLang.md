@@ -134,7 +134,7 @@ From VMs, there are two ways to send data to Hanzo O11y Cloud.
    The run command must have some environment variables to send data to Hanzo O11y cloud. The run command:
     
     ```bash
-    SERVICE_NAME={{MYAPP}} INSECURE_MODE=false OTEL_EXPORTER_OTLP_HEADERS=signoz-ingestion-key={{HANZO_INGESTION_KEY}} OTEL_EXPORTER_OTLP_ENDPOINT=ingest.{{REGION}}.o11y.hanzo.ai:443 go run main.go
+    SERVICE_NAME={{MYAPP}} INSECURE_MODE=false OTEL_EXPORTER_OTLP_HEADERS=hanzo-ingestion-key={{HANZO_INGESTION_KEY}} OTEL_EXPORTER_OTLP_ENDPOINT=ingest.{{REGION}}.o11y.hanzo.ai:443 go run main.go
     ```  
     
     If you want to update your `service_name`, you can modify the `SERVICE_NAME` variable.

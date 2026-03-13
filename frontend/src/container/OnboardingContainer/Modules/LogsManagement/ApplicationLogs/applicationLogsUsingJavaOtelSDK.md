@@ -28,6 +28,6 @@ In the below example we will configure a java application to send logs to Hanzo 
   ```
 
   You will have to replace your the value of `host` as `0.0.0.0` if Hanzo O11y is running in the same host, for other configurations please check the
-  [troubleshooting](../install/troubleshooting.md#signoz-otel-collector-address-grid) guide.
+  [troubleshooting](../install/troubleshooting.md#hanzo-otel-collector-address-grid) guide.
 
 - Now if the application starts successfully the logs will be visible on Hanzo O11y UI.

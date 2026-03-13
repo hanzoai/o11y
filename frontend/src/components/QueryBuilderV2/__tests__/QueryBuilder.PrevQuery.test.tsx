@@ -95,9 +95,9 @@ describe('MetricsSelect - signal source switching (standalone)', () => {
 		const currentQueryObj: Query = {
 			id: 'test',
 			unit: undefined,
-			queryType: EQueryType.CLICKHOUSE,
+			queryType: EQueryType.DATASTORE,
 			promql: [],
-			clickhouse_sql: [],
+			datastore_sql: [],
 			builder: {
 				queryData: [metricsQuery],
 				queryFormulas: [],
@@ -251,9 +251,9 @@ describe('DataSource change - Logs to Traces', () => {
 		const logsCurrentQuery: Query = {
 			id: 'test-logs',
 			unit: undefined,
-			queryType: EQueryType.CLICKHOUSE,
+			queryType: EQueryType.DATASTORE,
 			promql: [],
-			clickhouse_sql: [],
+			datastore_sql: [],
 			builder: {
 				queryData: [logsQuery],
 				queryFormulas: [],

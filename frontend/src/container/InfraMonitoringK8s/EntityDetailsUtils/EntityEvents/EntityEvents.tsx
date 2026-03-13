@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Table, TableColumnsType } from 'antd';
 import { VIEWS } from 'components/HostMetricsDetail/constants';
 import { DEFAULT_ENTITY_VERSION } from 'constants/app';

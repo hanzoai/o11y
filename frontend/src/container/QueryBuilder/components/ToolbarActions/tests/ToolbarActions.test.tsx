@@ -24,12 +24,12 @@ describe('ToolbarActions', () => {
 			show: true,
 			key: ExplorerViews.TIMESERIES,
 		},
-		clickhouse: {
-			name: 'clickhouse',
-			label: 'Clickhouse',
+		datastore: {
+			name: 'datastore',
+			label: 'Datastore',
 			disabled: false,
 			show: false,
-			key: 'clickhouse',
+			key: 'datastore',
 		},
 	};
 
@@ -47,8 +47,8 @@ describe('ToolbarActions', () => {
 		expect(screen.getByTestId('search-view')).toBeInTheDocument();
 		expect(screen.getByTestId('query-builder-view')).toBeInTheDocument();
 
-		// clickhouse should not be present as its show: false
-		expect(queryByTestId('clickhouse-view')).not.toBeInTheDocument();
+		// datastore should not be present as its show: false
+		expect(queryByTestId('datastore-view')).not.toBeInTheDocument();
 
 		await userEvent.click(screen.getByTestId('search-view'));
 		expect(handleChangeSelectedView).toHaveBeenCalled();
@@ -57,16 +57,16 @@ describe('ToolbarActions', () => {
 		expect(handleChangeSelectedView).toHaveBeenCalled();
 	});
 
-	it('renders - clickhouse view and test view switching', async () => {
+	it('renders - datastore view and test view switching', async () => {
 		const handleChangeSelectedView = jest.fn();
-		const clickhouseItems = {
+		const datastoreItems = {
 			...defaultItems,
 			list: { ...defaultItems.list, show: false },
-			clickhouse: { ...defaultItems.clickhouse, show: true },
+			datastore: { ...defaultItems.datastore, show: true },
 		};
 		const { queryByTestId } = render(
 			<LeftToolbarActions
-				items={clickhouseItems}
+				items={datastoreItems}
 				selectedView={ExplorerViews.TIMESERIES}
 				onChangeSelectedView={handleChangeSelectedView}
 				showFilter
@@ -74,10 +74,10 @@ describe('ToolbarActions', () => {
 			/>,
 		);
 
-		const clickHouseView = queryByTestId('clickhouse-view');
-		expect(clickHouseView).toBeInTheDocument();
+		const datastoreView = queryByTestId('datastore-view');
+		expect(datastoreView).toBeInTheDocument();
 
-		await userEvent.click(clickHouseView as HTMLElement);
+		await userEvent.click(datastoreView as HTMLElement);
 		expect(handleChangeSelectedView).toHaveBeenCalled();
 
 		// Test that timeseries view is also present and clickable

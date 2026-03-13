@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
-import { Button } from '@signozhq/button';
-import { Callout } from '@signozhq/callout';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/ui';
+import { Callout } from 'components/ui/callout';
+import { Input } from 'components/ui/input';
 import { Select, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import inviteUsers from 'api/v1/invite/bulk/create';

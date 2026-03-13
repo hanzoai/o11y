@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { Typography } from 'antd';
+import BrandMark from 'components/BrandMark';
 import { useGetPublicDashboardData } from 'hooks/dashboard/useGetPublicDashboardData';
 import { FrownIcon } from 'lucide-react';
 
@@ -38,15 +39,7 @@ function PublicDashboardPage(): JSX.Element {
 
 					<div className="public-dashboard-error-content-header">
 						<div className="brand">
-							<img
-								src="/Logos/hanzo-icon.svg"
-								alt="Hanzo"
-								className="brand-logo"
-							/>
-
-							<Typography.Title level={2} className="brand-title">
-								Hanzo
-							</Typography.Title>
+							<BrandMark size={32} />
 						</div>
 
 						<div className="brand-tagline">

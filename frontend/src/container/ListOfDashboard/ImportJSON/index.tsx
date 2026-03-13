@@ -6,7 +6,7 @@ import { generatePath } from 'react-router-dom';
 import { red } from '@ant-design/colors';
 import { ExclamationCircleTwoTone } from '@ant-design/icons';
 import MEditor, { Monaco } from '@monaco-editor/react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import {
 	Button,
 	Flex,

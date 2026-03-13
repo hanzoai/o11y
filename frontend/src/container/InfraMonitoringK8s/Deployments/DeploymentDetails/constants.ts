@@ -197,7 +197,7 @@ export const getDeploymentMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -348,7 +348,7 @@ export const getDeploymentMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -434,7 +434,7 @@ export const getDeploymentMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -520,7 +520,7 @@ export const getDeploymentMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',

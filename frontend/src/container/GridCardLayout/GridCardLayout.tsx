@@ -5,7 +5,7 @@ import { ItemCallback, Layout } from 'react-grid-layout';
 import { useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Form, Input, Modal, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import cx from 'classnames';

@@ -64,7 +64,7 @@ const compositeQueryParam = {
 			disabled: false,
 		},
 	],
-	clickhouse_sql: [
+	datastore_sql: [
 		{
 			name: 'A',
 			legend: '',

@@ -185,7 +185,7 @@ function LogsExplorerViewsContainer({
 		listQueryKeyRef,
 		{
 			...(!isEmpty(queryId) &&
-				selectedPanelType !== PANEL_TYPES.LIST && { 'X-SIGNOZ-QUERY-ID': queryId }),
+				selectedPanelType !== PANEL_TYPES.LIST && { 'X-O11Y-QUERY-ID': queryId }),
 		},
 		// custom selected time interval to prevent recalculating the start and end timestamps before fetching next pages
 		'custom',

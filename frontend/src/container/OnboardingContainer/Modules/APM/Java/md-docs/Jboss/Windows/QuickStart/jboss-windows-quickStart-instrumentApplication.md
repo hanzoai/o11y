@@ -17,7 +17,7 @@ Update `JAVA_OPTS` environment variable with configurations required to send dat
 ```bash
 set JAVA_OPTS=-javaagent:C:\path\to\opentelemetry-javaagent.jar
 set JAVA_OPTS=%JAVA_OPTS% -Dotel.exporter.otlp.endpoint=https://ingest.{{REGION}}.o11y.hanzo.ai:443
-set JAVA_OPTS=%JAVA_OPTS% -Dotel.exporter.otlp.headers="signoz-ingestion-key={{HANZO_INGESTION_KEY}}"
+set JAVA_OPTS=%JAVA_OPTS% -Dotel.exporter.otlp.headers="hanzo-ingestion-key={{HANZO_INGESTION_KEY}}"
 set JAVA_OPTS=%JAVA_OPTS% -Dotel.resource.attributes="service.name={{MYAPP}}"
 ```
 &nbsp;
