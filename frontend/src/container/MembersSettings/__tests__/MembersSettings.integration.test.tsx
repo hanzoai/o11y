@@ -5,7 +5,7 @@ import { UserResponse } from 'types/api/user/getUser';
 
 import MembersSettings from '../MembersSettings';
 
-jest.mock('@signozhq/sonner', () => ({
+jest.mock('@hanzo/ui', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),

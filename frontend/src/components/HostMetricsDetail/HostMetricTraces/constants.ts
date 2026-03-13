@@ -91,7 +91,7 @@ export const getHostTracesQueryPayload = (
 ): GetQueryResultsProps => ({
 	query: {
 		promql: [],
-		clickhouse_sql: [],
+		datastore_sql: [],
 		builder: {
 			queryData: [
 				{

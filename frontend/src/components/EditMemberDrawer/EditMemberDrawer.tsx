@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Badge } from '@signozhq/badge';
-import { Button } from '@signozhq/button';
-import { DialogFooter, DialogWrapper } from '@signozhq/dialog';
-import { DrawerWrapper } from '@signozhq/drawer';
+import { Badge } from '@hanzo/ui';
+import { Button } from '@hanzo/ui';
+import { DialogFooter, DialogWrapper } from 'components/ui/dialog';
+import { DrawerWrapper } from 'components/ui/drawer';
 import {
 	Check,
 	ChevronDown,
@@ -12,9 +12,9 @@ import {
 	RefreshCw,
 	Trash2,
 	X,
-} from '@signozhq/icons';
-import { Input } from '@signozhq/input';
-import { toast } from '@signozhq/sonner';
+} from 'lucide-react';
+import { Input } from 'components/ui/input';
+import { toast } from '@hanzo/ui';
 import { Select } from 'antd';
 import getResetPasswordToken from 'api/v1/factor_password/getResetPasswordToken';
 import sendInvite from 'api/v1/invite/create';

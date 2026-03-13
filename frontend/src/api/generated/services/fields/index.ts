@@ -22,7 +22,7 @@ import type {
 	GetFieldsValues200,
 	GetFieldsValuesParams,
 	RenderErrorResponseDTO,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 /**
  * This endpoint returns field keys

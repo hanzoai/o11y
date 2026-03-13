@@ -84,9 +84,9 @@ describe('QueryBuilderV2 + QueryV2 - base render', () => {
 		const currentQueryObj: Query = {
 			id: 'test',
 			unit: undefined,
-			queryType: EQueryType.CLICKHOUSE,
+			queryType: EQueryType.DATASTORE,
 			promql: [],
-			clickhouse_sql: [],
+			datastore_sql: [],
 			builder: {
 				queryData: [baseQuery],
 				queryFormulas: [],

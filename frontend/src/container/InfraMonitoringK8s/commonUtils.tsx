@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
 import { useMemo } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Progress, Table, Tooltip, Typography } from 'antd';
 import type { ColumnsType } from 'antd/lib/table';
 import { ResizeTable } from 'components/ResizeTable';

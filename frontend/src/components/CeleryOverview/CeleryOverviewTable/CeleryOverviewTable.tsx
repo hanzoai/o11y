@@ -3,7 +3,7 @@ import { useMutation } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { LoadingOutlined, SearchOutlined } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import {
 	Button,
 	Input,

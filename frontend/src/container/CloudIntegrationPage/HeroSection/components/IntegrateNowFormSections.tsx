@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Form, Select, Switch } from 'antd';
 import { ChevronDown } from 'lucide-react';
 import { Region } from 'utils/regions';

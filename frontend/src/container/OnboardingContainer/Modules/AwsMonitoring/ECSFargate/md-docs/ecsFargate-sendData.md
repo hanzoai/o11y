@@ -28,7 +28,7 @@ For **Bridge** network mode, ECS task definition will be:
             "environment": [
                 {
                     "name": "OTEL_EXPORTER_OTLP_ENDPOINT",
-                    "value": "http://signoz-collector:4317"
+                    "value": "http://hanzo-collector:4317"
                 },
                 {
                     "name": "OTEL_RESOURCE_ATTRIBUTES",
@@ -36,7 +36,7 @@ For **Bridge** network mode, ECS task definition will be:
                 }
             ],
             "links": [
-                "signoz-collector"
+                "hanzo-collector"
             ],
             ...
         }

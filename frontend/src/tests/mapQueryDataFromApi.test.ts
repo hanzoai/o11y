@@ -74,7 +74,7 @@ describe('mapQueryDataFromApi', (): void => {
 
 		expect(result.queryType).toBe(EQueryType.QUERY_BUILDER);
 		expect(result.promql).toEqual([]);
-		expect(result.clickhouse_sql).toEqual([]);
+		expect(result.datastore_sql).toEqual([]);
 
 		// Expect one builder query mapped and merged using base query fields
 		expect(result.builder.queryData).toHaveLength(1);
@@ -169,7 +169,7 @@ describe('mapQueryDataFromApi', (): void => {
 				queryFormulas: [],
 			},
 			promql: [],
-			clickhouse_sql: [],
+			datastore_sql: [],
 			id: 'b5f4b7db-799c-47d2-bf32-090340995e20',
 		};
 
@@ -205,7 +205,7 @@ describe('mapQueryDataFromApi', (): void => {
 				queryFormulas: [],
 			},
 			promql: [],
-			clickhouse_sql: [],
+			datastore_sql: [],
 			id: 'b5f4b7db-799c-47d2-bf32-090340995e20',
 		});
 	});

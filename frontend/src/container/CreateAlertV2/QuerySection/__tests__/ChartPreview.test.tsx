@@ -220,15 +220,15 @@ describe('ChartPreview', () => {
 		);
 	});
 
-	it('renders ClickHouse chart preview when query type is CLICKHOUSE', () => {
+	it('renders Datastore chart preview when query type is DATASTORE', () => {
 		useQueryBuilder.mockReturnValue({
 			...mockUseQueryBuilder,
 			currentQuery: {
 				...mockUseQueryBuilder.currentQuery,
-				queryType: EQueryType.CLICKHOUSE,
+				queryType: EQueryType.DATASTORE,
 			},
 			stagedQuery: {
-				queryType: EQueryType.CLICKHOUSE,
+				queryType: EQueryType.DATASTORE,
 				unit: REQUESTS_PER_SEC,
 			},
 		});
@@ -240,7 +240,7 @@ describe('ChartPreview', () => {
 		).toBeInTheDocument();
 		expect(screen.getByTestId('name')).toHaveTextContent(CHART_PREVIEW_NAME);
 		expect(screen.getByTestId(QUERY_TYPE_TEST_ID)).toHaveTextContent(
-			EQueryType.CLICKHOUSE,
+			EQueryType.DATASTORE,
 		);
 	});
 

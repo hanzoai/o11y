@@ -485,20 +485,20 @@ export function convertPromQueriesToV5(
 }
 
 /**
- * Converts ClickHouse queries to V5 format
+ * Converts Datastore queries to V5 format
  */
-export function convertClickHouseQueriesToV5(
+export function convertDatastoreQueriesToV5(
 	chQueries: Record<string, any>,
 ): QueryEnvelope[] {
 	return Object.entries(chQueries).map(
 		([queryName, queryData]): QueryEnvelope => ({
-			type: 'clickhouse_sql' as QueryType,
+			type: 'datastore_sql' as QueryType,
 			spec: {
 				name: queryName,
 				query: queryData.query,
 				disabled: queryData.disabled || false,
 				legend: isEmpty(queryData.legend) ? undefined : queryData.legend,
-				// ClickHouse doesn't have step or stats like PromQL
+				// Datastore doesn't have step or stats like PromQL
 			},
 		}),
 	);
@@ -615,9 +615,9 @@ export const prepareQueryRangePayloadV5 = ({
 			legendMap = promQueries.legends;
 			break;
 		}
-		case EQueryType.CLICKHOUSE: {
+		case EQueryType.DATASTORE: {
 			const chQueries = reduceQueriesToObject(query[query.queryType]);
-			queries = convertClickHouseQueriesToV5(chQueries.queries);
+			queries = convertDatastoreQueriesToV5(chQueries.queries);
 			legendMap = chQueries.legends;
 			break;
 		}

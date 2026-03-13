@@ -1,5 +1,5 @@
 import { ReactNode, useMemo } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Popover, PopoverProps } from 'antd';
 import ErrorIcon from 'assets/Error';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';

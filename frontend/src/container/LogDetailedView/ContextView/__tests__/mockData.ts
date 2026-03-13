@@ -60,7 +60,7 @@ export const mockQuery: Query = {
 		queryFormulas: [],
 		queryTraceOperator: [],
 	},
-	clickhouse_sql: [],
+	datastore_sql: [],
 	id: 'test-query-id',
 	promql: [],
 };

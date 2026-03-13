@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Progress, TableColumnType as ColumnType, Tag, Tooltip } from 'antd';
 import { convertFiltersToExpressionWithExistingQuery } from 'components/QueryBuilderV2/utils';
 import {
@@ -477,7 +477,7 @@ export const getDomainMetricsQueryPayload = (
 				],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [
+			datastore_sql: [
 				{
 					disabled: false,
 					legend: '',
@@ -793,7 +793,7 @@ export const getEndPointsQueryPayload = (
 					],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1539,7 +1539,7 @@ export const getEndPointDetailsQueryPayload = (
 				],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [
+			datastore_sql: [
 				{
 					disabled: false,
 					legend: '',
@@ -1683,7 +1683,7 @@ export const getEndPointDetailsQueryPayload = (
 				queryFormulas: [],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [
+			datastore_sql: [
 				{
 					disabled: false,
 					legend: '',
@@ -1754,7 +1754,7 @@ export const getEndPointDetailsQueryPayload = (
 				queryFormulas: [],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [
+			datastore_sql: [
 				{
 					disabled: false,
 					legend: '',
@@ -1944,7 +1944,7 @@ export const getEndPointDetailsQueryPayload = (
 				],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [
+			datastore_sql: [
 				{
 					disabled: false,
 					legend: '',
@@ -2015,7 +2015,7 @@ export const getEndPointDetailsQueryPayload = (
 				queryFormulas: [],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [
+			datastore_sql: [
 				{
 					disabled: false,
 					legend: '',
@@ -2086,7 +2086,7 @@ export const getEndPointDetailsQueryPayload = (
 				queryFormulas: [],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [
+			datastore_sql: [
 				{
 					disabled: false,
 					legend: '',
@@ -2181,7 +2181,7 @@ export const getEndPointZeroStateQueryPayload = (
 				queryFormulas: [],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [
+			datastore_sql: [
 				{
 					disabled: false,
 					legend: '',
@@ -2756,7 +2756,7 @@ export const getStatusCodeBarChartWidgetData = (
 			queryFormulas: [],
 			queryTraceOperator: [],
 		},
-		clickhouse_sql: [
+		datastore_sql: [
 			{
 				disabled: false,
 				legend: '',

@@ -1,4 +1,4 @@
-import O11yModal from 'components/SignozModal/SignozModal';
+import O11yModal from 'components/O11yModal/O11yModal';
 import { Trash2, X } from 'lucide-react';
 import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 

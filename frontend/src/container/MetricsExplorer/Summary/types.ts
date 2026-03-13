@@ -3,7 +3,7 @@ import {
 	MetricsexplorertypesTreemapModeDTO,
 	MetricsexplorertypesTreemapResponseDTO,
 	Querybuildertypesv5OrderByDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { Filter } from 'api/v5/v5';
 import APIError from 'types/api/error';
 import { IBuilderQuery } from 'types/api/queryBuilder/queryBuilderData';

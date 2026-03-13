@@ -139,7 +139,7 @@ export const QueryTableProps: any = {
 			],
 			queryFormulas: [],
 		},
-		clickhouse_sql: [
+		datastore_sql: [
 			{
 				disabled: false,
 				legend: '',
@@ -293,7 +293,7 @@ export const WidgetHeaderProps: any = {
 				],
 				queryFormulas: [],
 			},
-			clickhouse_sql: [
+			datastore_sql: [
 				{
 					disabled: false,
 					legend: '',

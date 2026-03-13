@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import {
 	Button,
 	ColorPicker,

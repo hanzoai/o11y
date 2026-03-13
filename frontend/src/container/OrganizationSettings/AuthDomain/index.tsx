@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button } from '@signozhq/button';
-import { Trash2, X } from '@signozhq/icons';
-import { toast } from '@signozhq/sonner';
+import { Button } from '@hanzo/ui';
+import { Trash2, X } from 'lucide-react';
+import { toast } from '@hanzo/ui';
 import { Modal, Table, TableColumnsType as ColumnsType } from 'antd';
 import { ErrorResponseHandlerForGeneratedAPIs } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {
@@ -12,7 +12,7 @@ import {
 import {
 	AuthtypesGettableAuthDomainDTO,
 	RenderErrorResponseDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import ErrorContent from 'components/ErrorModal/components/ErrorContent';
 import CopyToClipboard from 'periscope/components/CopyToClipboard';

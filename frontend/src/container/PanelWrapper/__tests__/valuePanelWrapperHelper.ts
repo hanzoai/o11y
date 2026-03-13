@@ -8,7 +8,7 @@ export const valuePanelWidget = {
 	opacity: '1',
 	panelTypes: 'value',
 	query: {
-		clickhouse_sql: [
+		datastore_sql: [
 			{
 				name: 'A',
 				legend: '',

@@ -1,7 +1,7 @@
 After your instrumentation is done, start your application
 
 ```bash
-OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}" nest start
+OTEL_EXPORTER_OTLP_HEADERS="hanzo-ingestion-key={{HANZO_INGESTION_KEY}}" nest start
 ```
 
 &nbsp;

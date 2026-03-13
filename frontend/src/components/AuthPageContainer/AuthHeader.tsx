@@ -1,23 +1,19 @@
 import { useCallback } from 'react';
-import { Button } from '@signozhq/button';
+import { Button } from '@hanzo/ui';
+import BrandMark from 'components/BrandMark';
 import { LifeBuoy } from 'lucide-react';
 
 import './AuthHeader.styles.scss';
 
 function AuthHeader(): JSX.Element {
 	const handleGetHelp = useCallback((): void => {
-		window.open('https://o11y.hanzo.ai/support/', '_blank');
+		window.open('/support/', '_blank');
 	}, []);
 
 	return (
 		<header className="auth-header">
 			<div className="auth-header-logo">
-				<img
-					src="/Logos/hanzo-icon.svg"
-					alt="Hanzo"
-					className="auth-header-logo-icon"
-				/>
-				<span className="auth-header-logo-text">Hanzo O11y</span>
+				<BrandMark size={20} showProduct />
 			</div>
 			<Button
 				className="auth-header-help-button"

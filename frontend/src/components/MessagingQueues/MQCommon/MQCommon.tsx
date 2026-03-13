@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Tooltip } from 'antd';
 import type { DefaultOptionType } from 'antd/es/select';
 import { Info } from 'lucide-react';

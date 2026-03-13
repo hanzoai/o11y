@@ -15,7 +15,7 @@ Integrate Hanzo O11y with Azure Event Hubs for a robust log management solution,
 1. In the [Azure portal](https://portal.azure.com), create an Event Hubs namespace.
 2. Fill in the required details:
     - **Resource group**: Choose or create a new one.
-    - **Namespace name**: Enter a unique name, e.g., `<orgName>-obs-signoz`.
+    - **Namespace name**: Enter a unique name, e.g., `<orgName>-obs-hanzo`.
     - **Pricing tier**: Based on your logging requirements.
     - **Region**: Should match the region of the resources you want to monitor.
     - **Throughput units**: Choose based on logging needs.
@@ -31,7 +31,7 @@ Integrate Hanzo O11y with Azure Event Hubs for a robust log management solution,
 
 1. Navigate to the Event Hub in the Azure portal.
 2. Click "Shared access policies" in the left menu.
-3. Click "Add" to create a new policy named `signozListen`.
+3. Click "Add" to create a new policy named `hanzoListen`.
 4. Select the "Listen" permission and set the expiration time.
 5. Click "Save".
 6. Copy the *Connection string–primary key*.

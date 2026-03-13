@@ -31,7 +31,7 @@ import type {
 	GetSessionContext200,
 	RenderErrorResponseDTO,
 	RotateSession200,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 /**
  * This endpoint creates a session for a user using google callback

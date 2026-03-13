@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search } from '@signozhq/icons';
+import { Search } from 'lucide-react';
 
 function MembersTab(): JSX.Element {
 	const [searchQuery, setSearchQuery] = useState('');

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, TableColumnsType as ColumnsType } from 'antd';
 import ClientSideQBSearch, {
 	AttributeKey,

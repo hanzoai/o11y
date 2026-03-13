@@ -80,7 +80,7 @@ describe('Footer', () => {
 					queryFormulas: [],
 				},
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				queryType: 'builder',
 			},
 		});

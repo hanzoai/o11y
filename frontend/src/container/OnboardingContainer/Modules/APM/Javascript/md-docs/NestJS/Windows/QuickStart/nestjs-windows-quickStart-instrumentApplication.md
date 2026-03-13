@@ -24,7 +24,7 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 const exporterOptions = {
   //highlight-start
   url: 'https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces',
-  headers: { 'signoz-ingestion-key': '{{HANZO_INGESTION_KEY}}' },
+  headers: { 'hanzo-ingestion-key': '{{HANZO_INGESTION_KEY}}' },
   //highlight-end
 };
 

@@ -12,7 +12,7 @@ import {
 	LoadingOutlined,
 	ReloadOutlined,
 } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Checkbox, Select, Typography } from 'antd';
 import cx from 'classnames';
 import TextToolTip from 'components/TextToolTip/TextToolTip';

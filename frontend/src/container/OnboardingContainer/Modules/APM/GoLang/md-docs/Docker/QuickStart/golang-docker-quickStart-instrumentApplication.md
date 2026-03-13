@@ -128,7 +128,7 @@ Set the environment variables in your Dockerfile.
 # Set environment variables
 ENV SERVICE_NAME={{MYAPP}} \
     INSECURE_MODE=false \
-    OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key=b{{HANZO_INGESTION_KEY}}" \
+    OTEL_EXPORTER_OTLP_HEADERS="hanzo-ingestion-key=b{{HANZO_INGESTION_KEY}}" \
     OTEL_EXPORTER_OTLP_ENDPOINT=ingest.{{REGION}}.o11y.hanzo.ai:443
 ...
 ```

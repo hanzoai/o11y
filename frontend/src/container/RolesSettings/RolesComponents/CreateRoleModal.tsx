@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useQueryClient } from 'react-query';
 import { generatePath, useHistory } from 'react-router-dom';
-import { Button } from '@signozhq/button';
-import { X } from '@signozhq/icons';
-import { Input, inputVariants } from '@signozhq/input';
-import { toast } from '@signozhq/sonner';
+import { Button } from '@hanzo/ui';
+import { X } from 'lucide-react';
+import { Input, inputVariants } from 'components/ui/input';
+import { toast } from '@hanzo/ui';
 import { Form, Modal } from 'antd';
 import {
 	invalidateGetRole,
@@ -15,7 +15,7 @@ import {
 import {
 	RenderErrorResponseDTO,
 	RoletypesPostableRoleDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { ErrorType } from 'api/generatedAPIInstance';
 import ROUTES from 'constants/routes';
 import { useErrorModal } from 'providers/ErrorModalProvider';

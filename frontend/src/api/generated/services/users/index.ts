@@ -50,7 +50,7 @@ import type {
 	UpdateAPIKeyPathParameters,
 	UpdateUser200,
 	UpdateUserPathParameters,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 /**
  * This endpoint changes the password by id

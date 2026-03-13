@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Tag } from 'antd';
 import { TableColumnType as ColumnType } from 'antd';
 import {

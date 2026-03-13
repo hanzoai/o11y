@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Tooltip } from 'antd';
 import { Disc3, X } from 'lucide-react';
 import { DataSource } from 'types/common/queryBuilder';

@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { Checkbox } from '@signozhq/checkbox';
-import { Color, Style } from '@signozhq/design-tokens';
+import { Button } from '@hanzo/ui';
+import { Checkbox } from '@hanzo/ui';
+import { Color, Style } from 'constants/designTokens';
 import {
 	ChevronDown,
 	ChevronRight,
@@ -9,8 +9,8 @@ import {
 	Plus,
 	Trash2,
 	TriangleAlert,
-} from '@signozhq/icons';
-import { Input } from '@signozhq/input';
+} from 'lucide-react';
+import { Input } from 'components/ui/input';
 import { Collapse, Form, Select, Tooltip } from 'antd';
 import { useCollapseSectionErrors } from 'hooks/useCollapseSectionErrors';
 

@@ -55,7 +55,7 @@ function ApDexMetrics({
 						metricsBuckets: metricsBuckets || [],
 						dotMetricsEnabled,
 					}),
-					clickhouse_sql: [],
+					datastore_sql: [],
 					id: uuid(),
 				},
 				title: (

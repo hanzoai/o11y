@@ -156,10 +156,10 @@ function ChartPreview({
 		switch (query?.queryType) {
 			case EQueryType.PROM:
 				return query.promql?.length > 0 && query.promql[0].query !== '';
-			case EQueryType.CLICKHOUSE:
+			case EQueryType.DATASTORE:
 				return (
-					query.clickhouse_sql?.length > 0 &&
-					query.clickhouse_sql[0].query?.length > 0
+					query.datastore_sql?.length > 0 &&
+					query.datastore_sql[0].query?.length > 0
 				);
 			case EQueryType.QUERY_BUILDER:
 				return (

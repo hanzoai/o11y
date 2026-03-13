@@ -3,7 +3,7 @@
 To setup the Hanzo O11y OTel Collector config, follow these two steps:
 
 ### Step 1: 
-Navigate to the AWS Parameter store and create a new parameter named **/ecs/signoz/otelcol-daemon.yaml**
+Navigate to the AWS Parameter store and create a new parameter named **/ecs/hanzo/otelcol-daemon.yaml**
 
 ### Step 2:
 Download the otelcol-daemon YAML configuration file:
@@ -20,7 +20,7 @@ HANZO_INGESTION_KEY : `{{HANZO_INGESTION_KEY}}`
 
 &nbsp;
 
-Once you update these values, copy the updated content of the `otelcol-sidecar.yaml` file and paste it in the value field of the **/ecs/signoz/otelcol-daemon.yaml** parameter that you created in Step 1.
+Once you update these values, copy the updated content of the `otelcol-sidecar.yaml` file and paste it in the value field of the **/ecs/hanzo/otelcol-daemon.yaml** parameter that you created in Step 1.
 
 &nbsp;
 

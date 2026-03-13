@@ -5,9 +5,11 @@ import getVersion from 'api/v1/version/get';
 import get from 'api/v2/sessions/context/get';
 import afterLogin from 'AppRoutes/utils';
 import AuthError from 'components/AuthError/AuthError';
+import BrandMark from 'components/BrandMark';
 import ROUTES from 'constants/routes';
 import useUrlQuery from 'hooks/useUrlQuery';
 import history from 'lib/history';
+import { useTenant } from 'providers/Tenant';
 import APIError from 'types/api/error';
 
 import './Login.styles.scss';
@@ -23,6 +25,7 @@ function parseErrors(errors: string): { message: string }[] {
 }
 
 function Login(): JSX.Element {
+	const tenant = useTenant();
 	const urlQueryParams = useUrlQuery();
 
 	// Tokens returned from IAM OIDC callback
@@ -106,8 +109,9 @@ function Login(): JSX.Element {
 
 		setRedirecting(true);
 
-		// Ask backend for the OIDC redirect URL using a probe email on hanzo.ai domain
-		get({ email: 'login@hanzo.ai', ref: window.location.origin })
+		// Use the tenant's org slug domain for OIDC probe
+		const probeDomain = tenant.orgSlug ? `login@${tenant.orgSlug}.ai` : 'login@o11y.local';
+		get({ email: probeDomain, ref: window.location.origin })
 			.then((response) => {
 				const orgs = response.data.orgs;
 				if (orgs.length > 0) {
@@ -135,8 +139,6 @@ function Login(): JSX.Element {
 				setRedirecting(false);
 			})
 			.catch(() => {
-				// If probe email fails (user doesn't exist), try without email
-				// The backend may still return the OIDC URL for the default org
 				setErrorMessage(
 					new APIError({
 						httpStatusCode: 500,
@@ -157,6 +159,7 @@ function Login(): JSX.Element {
 		versionLoading,
 		versionData,
 		redirecting,
+		tenant.orgSlug,
 	]);
 
 	// Error state — show error with retry link
@@ -165,16 +168,8 @@ function Login(): JSX.Element {
 			<div className="login-form-container">
 				<div className="login-form-header">
 					<div className="login-form-emoji">
-						<img
-							src="/Logos/hanzo-icon.svg"
-							alt="Hanzo"
-							width="32"
-							height="32"
-						/>
+						<BrandMark size={32} showProduct />
 					</div>
-					<Typography.Title level={4} className="login-form-title">
-						Hanzo O11y
-					</Typography.Title>
 				</div>
 				<AuthError error={errorMessage} />
 				<div className="login-form-actions" style={{ marginTop: 16 }}>
@@ -198,18 +193,10 @@ function Login(): JSX.Element {
 		<div className="login-form-container">
 			<div className="login-form-header">
 				<div className="login-form-emoji">
-					<img
-						src="/Logos/hanzo-icon.svg"
-						alt="Hanzo"
-						width="32"
-						height="32"
-					/>
+					<BrandMark size={32} showProduct />
 				</div>
-				<Typography.Title level={4} className="login-form-title">
-					Hanzo O11y
-				</Typography.Title>
 				<Typography.Paragraph className="login-form-description">
-					Redirecting to Hanzo login...
+					Redirecting to login...
 				</Typography.Paragraph>
 			</div>
 		</div>

@@ -4,7 +4,7 @@ import {
 	TableColumnType as ColumnType,
 } from 'antd';
 import {
-	initialClickHouseData,
+	initialDatastoreData,
 	initialFormulaBuilderFormValues,
 	initialQueryBuilderFormValues,
 	initialQueryPromQLData,
@@ -16,7 +16,7 @@ import { get, isEqual, isNaN, isObject } from 'lodash-es';
 import {
 	IBuilderFormula,
 	IBuilderQuery,
-	IClickHouseQuery,
+	IDatastoreQuery,
 	IPromQLQuery,
 	Query,
 } from 'types/api/queryBuilder/queryBuilderData';
@@ -37,7 +37,7 @@ export type RowData = {
 };
 
 export type DynamicColumn = {
-	query: IBuilderQuery | IBuilderFormula | IClickHouseQuery | IPromQLQuery;
+	query: IBuilderQuery | IBuilderFormula | IDatastoreQuery | IPromQLQuery;
 	field: string;
 	dataIndex: string;
 	title: string;
@@ -86,10 +86,10 @@ const getQueryByName = <T extends keyof QueryBuilderData>(
 	query: Query,
 	currentQueryName: string,
 	type: T,
-): IBuilderQuery | IBuilderFormula | IClickHouseQuery | IPromQLQuery => {
-	if (query.queryType === EQueryType.CLICKHOUSE) {
-		const queryArray = query.clickhouse_sql;
-		const defaultQueryValue = initialClickHouseData;
+): IBuilderQuery | IBuilderFormula | IDatastoreQuery | IPromQLQuery => {
+	if (query.queryType === EQueryType.DATASTORE) {
+		const queryArray = query.datastore_sql;
+		const defaultQueryValue = initialDatastoreData;
 
 		return (
 			queryArray.find((q) => q.name === currentQueryName) || defaultQueryValue
@@ -122,7 +122,7 @@ const getQueryByName = <T extends keyof QueryBuilderData>(
 };
 
 const addLabels = (
-	query: IBuilderQuery | IBuilderFormula | IClickHouseQuery | IPromQLQuery,
+	query: IBuilderQuery | IBuilderFormula | IDatastoreQuery | IPromQLQuery,
 	label: string,
 	dynamicColumns: DynamicColumns,
 	columnId?: string,
@@ -145,7 +145,7 @@ const addLabels = (
 };
 
 const addOperatorFormulaColumns = (
-	query: IBuilderFormula | IBuilderQuery | IClickHouseQuery | IPromQLQuery,
+	query: IBuilderFormula | IBuilderQuery | IDatastoreQuery | IPromQLQuery,
 	dynamicColumns: DynamicColumns,
 	queryType: EQueryType,
 	customLabel?: string,
@@ -199,8 +199,8 @@ const addOperatorFormulaColumns = (
 		dynamicColumns.push(operatorColumn);
 	}
 
-	if (queryType === EQueryType.CLICKHOUSE) {
-		const currentQueryData = query as IClickHouseQuery;
+	if (queryType === EQueryType.DATASTORE) {
+		const currentQueryData = query as IDatastoreQuery;
 		let operatorLabel = `${currentQueryData.name}`;
 
 		if (currentQueryData.legend) {
@@ -246,7 +246,7 @@ const processTableColumns = (
 	currentStagedQuery:
 		| IBuilderQuery
 		| IBuilderFormula
-		| IClickHouseQuery
+		| IDatastoreQuery
 		| IPromQLQuery,
 	dynamicColumns: DynamicColumns,
 	queryType: EQueryType,
@@ -273,7 +273,7 @@ const processSeriesColumns = (
 	currentStagedQuery:
 		| IBuilderQuery
 		| IBuilderFormula
-		| IClickHouseQuery
+		| IDatastoreQuery
 		| IPromQLQuery,
 	dynamicColumns: DynamicColumns,
 	queryType: EQueryType,

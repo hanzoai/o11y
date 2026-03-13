@@ -1,4 +1,4 @@
-import { GatewaytypesGettableIngestionKeysDTO } from 'api/generated/services/sigNoz.schemas';
+import { GatewaytypesGettableIngestionKeysDTO } from 'api/generated/services/o11y.schemas';
 import { QueryParams } from 'constants/query';
 import { rest, server } from 'mocks-server/server';
 import { render, screen, userEvent, waitFor } from 'tests/test-utils';

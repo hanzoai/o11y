@@ -203,7 +203,7 @@ const createMockQuery = (): Widgets['query'] => ({
 		queryFormulas: [],
 		queryTraceOperator: [],
 	},
-	clickhouse_sql: [],
+	datastore_sql: [],
 	promql: [],
 	id: 'query-1',
 	queryType: EQueryType.QUERY_BUILDER,

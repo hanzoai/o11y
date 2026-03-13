@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import cx from 'classnames';
 import { ArrowDown, ArrowUp } from 'lucide-react';
 

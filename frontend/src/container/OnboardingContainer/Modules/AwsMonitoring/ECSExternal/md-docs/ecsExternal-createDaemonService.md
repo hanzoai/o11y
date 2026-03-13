@@ -10,7 +10,7 @@ Set the environment variable by running the below command uisng your AWS CLI:
 export CLUSTER_NAME=<YOUR-ECS-CLUSTER-NAME>
 export REGION=<YOUR-ECS-REGION>
 export COMMAND=--config=env:HANZO_CONFIG_CONTENT
-export HANZO_CONFIG_PATH=/ecs/signoz/otelcol-daemon.yaml
+export HANZO_CONFIG_PATH=/ecs/hanzo/otelcol-daemon.yaml
 ```
 
 `<YOUR-ECS-CLUSTER-NAME>` - Name of your ECS cluster. For example, **my-test-cluster** 

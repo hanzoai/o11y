@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Tag } from 'antd';
 import { TimelineFilter } from 'container/AlertHistory/types';
 import { Undo } from 'lucide-react';

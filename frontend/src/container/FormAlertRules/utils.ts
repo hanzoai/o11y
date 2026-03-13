@@ -6,7 +6,7 @@ import {
 	IBuilderFormula,
 	IBuilderQuery,
 	IBuilderTraceOperator,
-	IClickHouseQuery,
+	IDatastoreQuery,
 	IPromQLQuery,
 } from 'types/api/queryBuilder/queryBuilderData';
 
@@ -57,7 +57,7 @@ export const getSelectedQueryOptions = (
 		| IBuilderQuery
 		| IBuilderTraceOperator
 		| IBuilderFormula
-		| IClickHouseQuery
+		| IDatastoreQuery
 		| IPromQLQuery
 	>,
 ): SelectProps['options'] =>

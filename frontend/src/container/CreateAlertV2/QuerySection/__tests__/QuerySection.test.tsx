@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryParams } from 'constants/query';
 import {
-	initialClickHouseData,
+	initialDatastoreData,
 	initialQueryPromQLData,
 } from 'constants/queryBuilder';
 import { AlertDetectionTypes } from 'container/FormAlertRules';
@@ -348,7 +348,7 @@ describe('QuerySection', () => {
 				queryTraceOperator: [],
 			},
 			promql: [initialQueryPromQLData],
-			clickhouse_sql: [initialClickHouseData],
+			datastore_sql: [initialDatastoreData],
 		});
 
 		expect(result[1]).toEqual({
@@ -437,12 +437,12 @@ describe('QuerySection', () => {
 		);
 	});
 
-	it('updates the query data when switching from clickhouse_sql to query_builder for traces', async () => {
+	it('updates the query data when switching from datastore_sql to query_builder for traces', async () => {
 		const user = userEvent.setup();
 
-		const mockCurrentQueryWithClickhouseSQL = {
+		const mockCurrentQueryWithDatastoreSQL = {
 			...mockUseQueryBuilder.currentQuery,
-			queryType: EQueryType.CLICKHOUSE,
+			queryType: EQueryType.DATASTORE,
 			builder: {
 				queryData: [
 					{
@@ -454,7 +454,7 @@ describe('QuerySection', () => {
 
 		useQueryBuilder.mockReturnValue({
 			...mockUseQueryBuilder,
-			currentQuery: mockCurrentQueryWithClickhouseSQL,
+			currentQuery: mockCurrentQueryWithDatastoreSQL,
 		});
 
 		render(
@@ -483,7 +483,7 @@ describe('QuerySection', () => {
 		] = mockUseQueryBuilder.redirectWithQueryBuilderData.mock.calls[0];
 
 		expect(queryArg).toEqual({
-			...mockCurrentQueryWithClickhouseSQL,
+			...mockCurrentQueryWithDatastoreSQL,
 			queryType: EQueryType.QUERY_BUILDER,
 		});
 

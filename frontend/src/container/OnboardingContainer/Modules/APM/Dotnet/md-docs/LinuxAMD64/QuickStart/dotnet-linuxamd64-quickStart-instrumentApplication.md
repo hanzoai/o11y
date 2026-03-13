@@ -42,13 +42,13 @@ builder.Services.AddOpenTelemetry()
         .AddAspNetCoreInstrumentation()
         .AddOtlpExporter(otlpOptions =>
         {
-                        //sigNoz Cloud Endpoint 
+                        //Hanzo O11y Cloud Endpoint 
             otlpOptions.Endpoint = new Uri("https://ingest.{{REGION}}.o11y.hanzo.ai:443");
 
             otlpOptions.Protocol = OtlpExportProtocol.Grpc;
                         
                         //Hanzo O11y Cloud account Ingestion key
-            string headerKey = "signoz-ingestion-key";
+            string headerKey = "hanzo-ingestion-key";
             string headerValue = "{{HANZO_INGESTION_KEY}}";
 
             string formattedHeader = $"{headerKey}={headerValue}";

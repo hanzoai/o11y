@@ -44,7 +44,7 @@ OpenTelemetry::SDK.configure do |c|
     OpenTelemetry::SDK::Trace::Export::BatchSpanProcessor.new(
       OpenTelemetry::Exporter::OTLP::Exporter.new(
         endpoint: '<HANZO_URL>',
-        headers: { 'signoz-ingestion-key' => '{{HANZO_INGESTION_KEY}}' } 
+        headers: { 'hanzo-ingestion-key' => '{{HANZO_INGESTION_KEY}}' } 
       )
     )
   )

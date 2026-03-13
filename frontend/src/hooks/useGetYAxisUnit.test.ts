@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { MetricsexplorertypesMetricMetadataDTO } from 'api/generated/services/sigNoz.schemas';
+import { MetricsexplorertypesMetricMetadataDTO } from 'api/generated/services/o11y.schemas';
 import { UniversalYAxisUnit } from 'components/YAxisUnitSelector/types';
 import { useGetMetrics } from 'container/MetricsExplorer/Explorer/utils';
 import { Query } from 'types/api/queryBuilder/queryBuilderData';
@@ -44,7 +44,7 @@ function createMockCurrentQuery(
 			queryFormulas: [],
 			queryTraceOperator: [],
 		},
-		clickhouse_sql: [],
+		datastore_sql: [],
 		id: 'test-id',
 	};
 }
@@ -83,8 +83,8 @@ describe('useGetYAxisUnit', () => {
 		expect(mockUseGetMetrics).toHaveBeenCalledWith([], false);
 	});
 
-	it('should return undefined yAxisUnit when queryType is CLICKHOUSE', async () => {
-		const mockCurrentQuery = createMockCurrentQuery(EQueryType.CLICKHOUSE);
+	it('should return undefined yAxisUnit when queryType is DATASTORE', async () => {
+		const mockCurrentQuery = createMockCurrentQuery(EQueryType.DATASTORE);
 		mockUseQueryBuilder.mockReturnValueOnce(({
 			currentQuery: mockCurrentQuery,
 		} as Partial<QueryBuilderContextType>) as QueryBuilderContextType);

@@ -107,7 +107,7 @@ const baseQuery: Query = {
 	queryType: EQueryType.QUERY_BUILDER,
 	promql: [],
 	builder: { queryData: [], queryFormulas: [], queryTraceOperator: [] },
-	clickhouse_sql: [],
+	datastore_sql: [],
 };
 
 describe('extractQueryTextStrings', () => {
@@ -197,11 +197,11 @@ describe('extractQueryTextStrings', () => {
 		]);
 	});
 
-	it('extracts clickhouse sql query strings', () => {
+	it('extracts datastore sql query strings', () => {
 		const query: Query = {
 			...baseQuery,
-			queryType: EQueryType.CLICKHOUSE,
-			clickhouse_sql: [
+			queryType: EQueryType.DATASTORE,
+			datastore_sql: [
 				{
 					name: 'A',
 					query: 'SELECT * WHERE env = {{.env}}',
@@ -281,11 +281,11 @@ describe('extractQueryTextStrings', () => {
 		expect(extractQueryTextStrings(query)).toEqual(['up{env="$env"}']);
 	});
 
-	it('skips clickhouse entries with empty query strings', () => {
+	it('skips datastore entries with empty query strings', () => {
 		const query: Query = {
 			...baseQuery,
-			queryType: EQueryType.CLICKHOUSE,
-			clickhouse_sql: [
+			queryType: EQueryType.DATASTORE,
+			datastore_sql: [
 				{ name: 'A', query: '', legend: '', disabled: false },
 				{
 					name: 'B',
@@ -366,11 +366,11 @@ describe('getVariableReferencesInQuery', () => {
 		expect(result).toEqual(['deployment_environment', 'endpoint']);
 	});
 
-	it('detects variables in clickhouse sql queries', () => {
+	it('detects variables in datastore sql queries', () => {
 		const query: Query = {
 			...baseQuery,
-			queryType: EQueryType.CLICKHOUSE,
-			clickhouse_sql: [
+			queryType: EQueryType.DATASTORE,
+			datastore_sql: [
 				{
 					name: 'A',
 					query: 'SELECT * FROM table WHERE service = [[service_name]]',

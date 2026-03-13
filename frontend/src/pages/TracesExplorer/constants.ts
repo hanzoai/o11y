@@ -26,11 +26,11 @@ export const TOOLBAR_VIEWS = {
 		show: true,
 		key: 'table',
 	},
-	clickhouse: {
-		name: 'clickhouse',
-		label: 'Clickhouse',
+	datastore: {
+		name: 'datastore',
+		label: 'Datastore',
 		disabled: false,
 		show: false,
-		key: 'clickhouse',
+		key: 'datastore',
 	},
 };

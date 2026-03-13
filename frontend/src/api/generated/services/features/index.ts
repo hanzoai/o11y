@@ -16,7 +16,7 @@ import { useQuery } from 'react-query';
 
 import type { ErrorType } from '../../../generatedAPIInstance';
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
-import type { GetFeatures200, RenderErrorResponseDTO } from '../sigNoz.schemas';
+import type { GetFeatures200, RenderErrorResponseDTO } from '../o11y.schemas';
 
 /**
  * This endpoint returns the supported features and their details

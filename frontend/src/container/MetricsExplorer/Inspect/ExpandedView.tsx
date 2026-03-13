@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-identical-functions */
 import { useEffect, useMemo, useState } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import type { TableColumnsType as ColumnsType } from 'antd';
 import { Card, Tooltip, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';

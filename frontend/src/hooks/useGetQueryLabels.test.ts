@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import {
 	IBuilderFormula,
-	IClickHouseQuery,
+	IDatastoreQuery,
 	IPromQLQuery,
 	Query,
 } from 'types/api/queryBuilder/queryBuilderData';
@@ -23,7 +23,7 @@ function buildQuery(overrides: Partial<Query> = {}): Query {
 			queryTraceOperator: [],
 		},
 		promql: [],
-		clickhouse_sql: [],
+		datastore_sql: [],
 		...overrides,
 	};
 }
@@ -67,11 +67,11 @@ describe('useGetQueryLabels', () => {
 		});
 	});
 
-	describe('CLICKHOUSE type', () => {
-		it('returns empty array when clickhouse_sql is undefined', () => {
+	describe('DATASTORE type', () => {
+		it('returns empty array when datastore_sql is undefined', () => {
 			const query = buildQuery({
-				queryType: EQueryType.CLICKHOUSE,
-				clickhouse_sql: (undefined as unknown) as IClickHouseQuery[],
+				queryType: EQueryType.DATASTORE,
+				datastore_sql: (undefined as unknown) as IDatastoreQuery[],
 			});
 
 			const { result } = renderHook(() => useGetQueryLabels(query));
@@ -79,12 +79,12 @@ describe('useGetQueryLabels', () => {
 			expect(result.current).toEqual([]);
 		});
 
-		it('returns labels from clickhouse_sql when populated', () => {
+		it('returns labels from datastore_sql when populated', () => {
 			const query = buildQuery({
-				queryType: EQueryType.CLICKHOUSE,
-				clickhouse_sql: [
-					({ name: 'query_a' } as unknown) as IClickHouseQuery,
-					({ name: 'query_b' } as unknown) as IClickHouseQuery,
+				queryType: EQueryType.DATASTORE,
+				datastore_sql: [
+					({ name: 'query_a' } as unknown) as IDatastoreQuery,
+					({ name: 'query_b' } as unknown) as IDatastoreQuery,
 				],
 			});
 

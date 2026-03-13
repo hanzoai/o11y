@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { toast } from '@signozhq/sonner';
+import { toast } from '@hanzo/ui';
 import getResetPasswordToken from 'api/v1/factor_password/getResetPasswordToken';
 import cancelInvite from 'api/v1/invite/id/delete';
 import deleteUser from 'api/v1/user/id/delete';
@@ -16,7 +16,7 @@ import { ROLES } from 'types/roles';
 
 import EditMemberDrawer, { EditMemberDrawerProps } from '../EditMemberDrawer';
 
-jest.mock('@signozhq/drawer', () => ({
+jest.mock('components/ui/drawer', () => ({
 	DrawerWrapper: ({
 		content,
 		open,
@@ -26,7 +26,7 @@ jest.mock('@signozhq/drawer', () => ({
 	}): JSX.Element | null => (open ? <div>{content}</div> : null),
 }));
 
-jest.mock('@signozhq/dialog', () => ({
+jest.mock('components/ui/dialog', () => ({
 	DialogWrapper: ({
 		children,
 		open,
@@ -51,7 +51,7 @@ jest.mock('api/v1/user/id/delete');
 jest.mock('api/v1/invite/id/delete');
 jest.mock('api/v1/invite/create');
 jest.mock('api/v1/factor_password/getResetPasswordToken');
-jest.mock('@signozhq/sonner', () => ({
+jest.mock('@hanzo/ui', () => ({
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),

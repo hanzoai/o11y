@@ -73,7 +73,7 @@ function ServiceOverview({
 						topLevelOperationsRoute,
 						dotMetricsEnabled,
 					}),
-					clickhouse_sql: [],
+					datastore_sql: [],
 					id: uuid(),
 				},
 				title: GraphTitle.LATENCY,

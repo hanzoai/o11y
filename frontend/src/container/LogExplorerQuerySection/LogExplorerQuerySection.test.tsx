@@ -177,7 +177,7 @@ const createMockQuery = (filterExpression?: string): Query => ({
 		queryFormulas: [],
 		queryTraceOperator: [],
 	},
-	clickhouse_sql: [],
+	datastore_sql: [],
 	promql: [],
 });
 

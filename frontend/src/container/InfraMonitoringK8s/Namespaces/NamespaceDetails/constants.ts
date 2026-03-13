@@ -310,7 +310,7 @@ export const getNamespaceMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -578,7 +578,7 @@ export const getNamespaceMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -658,7 +658,7 @@ export const getNamespaceMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -738,7 +738,7 @@ export const getNamespaceMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -824,7 +824,7 @@ export const getNamespaceMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -910,7 +910,7 @@ export const getNamespaceMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1082,7 +1082,7 @@ export const getNamespaceMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1220,7 +1220,7 @@ export const getNamespaceMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1438,7 +1438,7 @@ export const getNamespaceMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1571,7 +1571,7 @@ export const getNamespaceMetricsQueryPayload = (
 					],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',

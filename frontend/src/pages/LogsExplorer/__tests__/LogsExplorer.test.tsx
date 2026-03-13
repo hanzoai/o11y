@@ -112,13 +112,13 @@ describe('Logs Explorer Tests', () => {
 		fireEvent.click(histogramToggle);
 		expect(queryByText(frequencyChartContent)).toBeInTheDocument();
 
-		// check the presence of search bar and query builder and absence of clickhouse
+		// check the presence of search bar and query builder and absence of datastore
 		const searchView = getByTestId('search-view');
 		expect(searchView).toBeInTheDocument();
 		const queryBuilderView = getByTestId('query-builder-view');
 		expect(queryBuilderView).toBeInTheDocument();
-		const clickhouseView = queryByTestId('clickhouse-view');
-		expect(clickhouseView).not.toBeInTheDocument();
+		const datastoreView = queryByTestId('datastore-view');
+		expect(datastoreView).not.toBeInTheDocument();
 
 		// check the presence of List View / Time Series View / Table View using class names
 		const listViewTab = container.querySelector(

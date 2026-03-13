@@ -1,5 +1,5 @@
-import { Button } from '@signozhq/button';
-import { ArrowLeft, Mail } from '@signozhq/icons';
+import { Button } from '@hanzo/ui';
+import { ArrowLeft, Mail } from 'lucide-react';
 
 interface SuccessScreenProps {
 	onBackToLogin: () => void;

@@ -4,7 +4,7 @@ import { authzCheck } from 'api/generated/services/authz';
 import type {
 	AuthtypesObjectDTO,
 	AuthtypesTransactionDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 
 import { AuthZCheckResponse, BrandedPermission, UseAuthZResult } from './types';
 import {

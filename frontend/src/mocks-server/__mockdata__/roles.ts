@@ -1,4 +1,4 @@
-import { RoletypesRoleDTO } from 'api/generated/services/sigNoz.schemas';
+import { RoletypesRoleDTO } from 'api/generated/services/o11y.schemas';
 
 const orgId = '019ba2bb-2fa1-7b24-8159-cfca08617ef9';
 

@@ -1,5 +1,5 @@
-import { Button } from '@signozhq/button';
-import { Trash2, X } from '@signozhq/icons';
+import { Button } from '@hanzo/ui';
+import { Trash2, X } from 'lucide-react';
 import { Modal } from 'antd';
 
 interface DeleteRoleModalProps {

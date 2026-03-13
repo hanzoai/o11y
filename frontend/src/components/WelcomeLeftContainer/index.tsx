@@ -1,30 +1,30 @@
 import { ReactChild } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Space, Typography } from 'antd';
+import BrandMark from 'components/BrandMark';
+import { useTenant } from 'providers/Tenant';
 
-import { Container, LeftContainer, Logo } from './styles';
-
-const { Title } = Typography;
+import { Container, LeftContainer } from './styles';
 
 function WelcomeLeftContainer({
 	version,
 	children,
 }: WelcomeLeftContainerProps): JSX.Element {
 	const { t } = useTranslation();
+	const tenant = useTenant();
 
 	return (
 		<Container>
 			<LeftContainer direction="vertical">
 				<Space align="center">
-					<Logo src="/Logos/hanzo-icon.svg" alt="logo" />
-					<Title style={{ fontSize: '46px', margin: 0 }}>Hanzo</Title>
+					<BrandMark size={46} />
 				</Space>
 				<Typography>{t('monitor_signup')}</Typography>
 				<Card
 					style={{ width: 'max-content' }}
 					bodyStyle={{ padding: '1px 8px', width: '100%' }}
 				>
-					Hanzo {version}
+					{tenant.name} {version}
 				</Card>
 			</LeftContainer>
 			{children}

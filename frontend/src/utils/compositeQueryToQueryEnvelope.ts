@@ -1,6 +1,6 @@
 import {
 	convertBuilderQueriesToV5,
-	convertClickHouseQueriesToV5,
+	convertDatastoreQueriesToV5,
 	convertPromQueriesToV5,
 	convertTraceOperatorToV5,
 	mapPanelTypeToRequestType,
@@ -79,7 +79,7 @@ export function compositeQueryToQueryEnvelope(
 	);
 
 	const promQueriesV5 = convertPromQueriesToV5(promQueries || {});
-	const chQueriesV5 = convertClickHouseQueriesToV5(chQueries || {});
+	const chQueriesV5 = convertDatastoreQueriesToV5(chQueries || {});
 
 	// Conditionally include queries based on queryType
 	let queries: QueryEnvelope[] = [];
@@ -95,7 +95,7 @@ export function compositeQueryToQueryEnvelope(
 		case 'promql':
 			queries = [...promQueriesV5];
 			break;
-		case 'clickhouse_sql':
+		case 'datastore_sql':
 			queries = [...chQueriesV5];
 			break;
 		default:

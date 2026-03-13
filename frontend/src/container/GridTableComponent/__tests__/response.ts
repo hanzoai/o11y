@@ -82,7 +82,7 @@ export const tableDataMultipleQueriesSuccessResponse = {
 };
 
 export const widgetQueryWithLegend = {
-	clickhouse_sql: [
+	datastore_sql: [
 		{
 			name: 'A',
 			legend: '',
@@ -295,7 +295,7 @@ export const tableDataQBv5MultiAggregations = {
 };
 
 export const widgetQueryQBv5MultiAggregations = {
-	clickhouse_sql: [
+	datastore_sql: [
 		{
 			name: 'A',
 			legend: 'p99',

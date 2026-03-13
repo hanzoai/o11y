@@ -6,7 +6,7 @@ import {
 	useMemo,
 	useState,
 } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Select, Typography } from 'antd';
 import CustomSelect from 'components/NewSelect/CustomSelect';
 import TextToolTip from 'components/TextToolTip';

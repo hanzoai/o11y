@@ -4,7 +4,7 @@ import { generatePath, matchPath, useLocation } from 'react-router-dom';
 import { Input } from 'antd';
 import logEvent from 'api/common/logEvent';
 import axios from 'axios';
-import O11yModal from 'components/SignozModal/SignozModal';
+import O11yModal from 'components/O11yModal/O11yModal';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import ROUTES from 'constants/routes';
 import { useCreateFunnel } from 'hooks/TracesFunnels/useFunnels';

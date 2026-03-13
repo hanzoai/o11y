@@ -2,7 +2,7 @@ import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import { useCopyToClipboard } from 'react-use';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import {
 	Button,
 	Col,
@@ -37,7 +37,7 @@ import {
 import {
 	GatewaytypesIngestionKeyDTO,
 	RenderErrorResponseDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import { getYAxisFormattedValue } from 'components/Graph/yAxisConfig';
 import Tags from 'components/Tags/Tags';
