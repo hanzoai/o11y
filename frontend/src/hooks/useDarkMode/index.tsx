@@ -141,7 +141,7 @@ export const useThemeConfig = (): ThemeConfig => {
 			borderRadiusLG: 2,
 			borderRadiusSM: 2,
 			borderRadiusXS: 2,
-			fontFamily: 'Inter',
+			fontFamily: 'Geist Sans',
 			fontSize: 13,
 			colorPrimary: '#4E74F8',
 			colorBgBase: isDarkMode ? '#0B0C0E' : '#fff',
