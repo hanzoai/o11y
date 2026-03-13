@@ -75,6 +75,7 @@ func Error(rw http.ResponseWriter, cause error) {
 		return
 	}
 
+	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(httpCode)
 	_, _ = rw.Write(body)
 }
