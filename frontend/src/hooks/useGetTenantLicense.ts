@@ -19,6 +19,7 @@ export const useGetTenantLicense = (): {
 
 	if (
 		activeLicenseFetchError &&
+		typeof activeLicenseFetchError.getHttpStatusCode === 'function' &&
 		activeLicenseFetchError.getHttpStatusCode() === 404
 	) {
 		responsePayload.isCommunityEnterpriseUser = true;
@@ -26,6 +27,7 @@ export const useGetTenantLicense = (): {
 
 	if (
 		activeLicenseFetchError &&
+		typeof activeLicenseFetchError.getHttpStatusCode === 'function' &&
 		activeLicenseFetchError.getHttpStatusCode() === 501
 	) {
 		responsePayload.isCommunityUser = true;
