@@ -23,7 +23,7 @@ import type {
 	GetMyOrganization200,
 	RenderErrorResponseDTO,
 	TypesOrganizationDTO,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 /**
  * This endpoint returns the organization I belong to

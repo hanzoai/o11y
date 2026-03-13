@@ -1,6 +1,6 @@
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import {
-	BuilderClickHouseResource,
+	BuilderDatastoreResource,
 	BuilderPromQLResource,
 	BuilderQueryDataResourse,
 	Query,
@@ -12,7 +12,7 @@ import { QueryEnvelope } from '../v5/queryRange';
 export interface ICompositeMetricQuery {
 	builderQueries?: BuilderQueryDataResourse;
 	promQueries?: BuilderPromQLResource;
-	chQueries?: BuilderClickHouseResource;
+	chQueries?: BuilderDatastoreResource;
 	queryType: EQueryType;
 	panelType: PANEL_TYPES;
 	unit: Query['unit'];

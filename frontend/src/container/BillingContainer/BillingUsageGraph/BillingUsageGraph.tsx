@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Card, Flex, Typography } from 'antd';
 import Uplot from 'components/Uplot';
 import { useIsDarkMode } from 'hooks/useDarkMode';

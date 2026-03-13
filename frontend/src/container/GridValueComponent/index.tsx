@@ -48,7 +48,7 @@ function GridValueComponent({
 				queryData: [],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [],
+			datastore_sql: [],
 			id: '',
 		},
 		graphData: clickedData,

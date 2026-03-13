@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button } from '@signozhq/button';
-import { Plus } from '@signozhq/icons';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/ui';
+import { Plus } from 'lucide-react';
+import { Input } from 'components/ui/input';
 
 import { IS_ROLE_DETAILS_AND_CRUD_ENABLED } from './config';
 import CreateRoleModal from './RolesComponents/CreateRoleModal';

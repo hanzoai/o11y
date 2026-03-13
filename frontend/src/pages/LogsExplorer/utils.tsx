@@ -21,7 +21,7 @@ export enum ExplorerViews {
 	TIMESERIES = 'timeseries',
 	TRACE = 'trace',
 	TABLE = 'table',
-	CLICKHOUSE = 'clickhouse',
+	DATASTORE = 'datastore',
 }
 
 export const LogsQuickFiltersConfig: IQuickFiltersConfig[] = [

@@ -5,7 +5,7 @@ import { SuccessResponse, Warning } from '..';
 import {
 	IBuilderFormula,
 	IBuilderQuery,
-	IClickHouseQuery,
+	IDatastoreQuery,
 	IPromQLQuery,
 } from '../queryBuilder/queryBuilderData';
 import { ExecStats } from '../v5/queryRange';
@@ -16,7 +16,7 @@ export type QueryRangePayload = {
 		builderQueries?: {
 			[x: string]: IBuilderQuery | IBuilderFormula;
 		};
-		chQueries?: Record<string, IClickHouseQuery>;
+		chQueries?: Record<string, IDatastoreQuery>;
 		promQueries?: Record<string, IPromQLQuery>;
 		queryType: EQueryType;
 		panelType: PANEL_TYPES;

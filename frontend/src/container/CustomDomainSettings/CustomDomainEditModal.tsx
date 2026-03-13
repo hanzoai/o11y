@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { Color } from '@signozhq/design-tokens';
-import { DialogWrapper } from '@signozhq/dialog';
-import { CircleAlert, CircleCheck, LoaderCircle } from '@signozhq/icons';
-import { Input } from '@signozhq/input';
-import { RenderErrorResponseDTO } from 'api/generated/services/sigNoz.schemas';
+import { Button } from '@hanzo/ui';
+import { Color } from 'constants/designTokens';
+import { DialogWrapper } from 'components/ui/dialog';
+import { CircleAlert, CircleCheck, LoaderCircle } from 'lucide-react';
+import { Input } from 'components/ui/input';
+import { RenderErrorResponseDTO } from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import LaunchChatSupport from 'components/LaunchChatSupport/LaunchChatSupport';
 

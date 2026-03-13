@@ -74,7 +74,7 @@ export const useGetRelatedMetricsGraphs = ({
 										queryFormulas: [],
 										queryTraceOperator: [],
 									},
-									clickhouse_sql: [],
+									datastore_sql: [],
 									id: uuidv4(),
 								},
 								graphType: PANEL_TYPES.TIME_SERIES,

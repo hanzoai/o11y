@@ -1,5 +1,5 @@
 export enum EQueryType {
 	QUERY_BUILDER = 'builder',
-	CLICKHOUSE = 'clickhouse_sql',
+	DATASTORE = 'datastore_sql',
 	PROM = 'promql',
 }

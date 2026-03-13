@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
-import { Button } from '@signozhq/button';
-import { Callout } from '@signozhq/callout';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/ui';
+import { Callout } from 'components/ui/callout';
+import { Input } from 'components/ui/input';
 import { Form, Input as AntdInput, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import accept from 'api/v1/invite/id/accept';
@@ -13,6 +13,7 @@ import passwordAuthNContext from 'api/v2/sessions/email_password/post';
 import afterLogin from 'AppRoutes/utils';
 import AuthError from 'components/AuthError/AuthError';
 import AuthPageContainer from 'components/AuthPageContainer';
+import BrandMark from 'components/BrandMark';
 import { useNotifications } from 'hooks/useNotifications';
 import { ArrowRight, CircleAlert } from 'lucide-react';
 import { SuccessResponseV2 } from 'types/api';
@@ -78,7 +79,7 @@ function SignUp(): JSX.Element {
 				email: responseDetails.email,
 				name: responseDetails.name,
 				company_name: responseDetails.organization,
-				source: 'Hanzo O11y',
+				source: 'O11y',
 			});
 		}
 	}, [
@@ -219,14 +220,14 @@ function SignUp(): JSX.Element {
 			<div className="signup-card">
 				<div className="signup-form-header">
 					<div className="signup-header-icon">
-						<img src="/Logos/hanzo-icon.svg" alt="Hanzo" width="32" height="32" />
+						<BrandMark size={32} showProduct />
 					</div>
 					<Typography.Title level={4} className="signup-header-title">
 						Create your account
 					</Typography.Title>
 					<Typography.Paragraph className="signup-header-subtitle">
 						You&apos;re almost in. Create a password to start monitoring your
-						applications with Hanzo O11y.
+						applications.
 					</Typography.Paragraph>
 				</div>
 

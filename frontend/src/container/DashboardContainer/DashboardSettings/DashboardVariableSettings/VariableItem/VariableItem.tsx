@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { orange } from '@ant-design/colors';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Collapse, Input, Select, Switch, Tag, Typography } from 'antd';
 import dashboardVariablesQuery from 'api/dashboard/variables/dashboardVariablesQuery';
 import cx from 'classnames';
@@ -611,7 +611,7 @@ function VariableItem({
 								<div onClick={(e): void => e.stopPropagation()}>
 									<TextToolTip
 										text="Learn why we don't recommend"
-										url="https://o11y.hanzo.ai/docs/userguide/manage-variables/#why-avoid-clickhouse-query-variables"
+										url="https://o11y.hanzo.ai/docs/userguide/manage-variables/#why-avoid-datastore-query-variables"
 										urlText="here"
 										useFilledIcon={false}
 										outlinedIcon={

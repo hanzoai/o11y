@@ -32,8 +32,8 @@ export function getQueryNames(currentQuery: Query): BaseOptionType[] {
 			...(getSelectedQueryOptions(currentQuery.builder.queryTraceOperator) || []),
 		],
 		[EQueryType.PROM]: () => getSelectedQueryOptions(currentQuery.promql),
-		[EQueryType.CLICKHOUSE]: () =>
-			getSelectedQueryOptions(currentQuery.clickhouse_sql),
+		[EQueryType.DATASTORE]: () =>
+			getSelectedQueryOptions(currentQuery.datastore_sql),
 	};
 
 	return queryConfig[currentQuery.queryType]?.() || [];

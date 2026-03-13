@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 
 function GroupByIcon(): JSX.Element {

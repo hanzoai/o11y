@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import { QueryKey } from 'react-query';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Tabs, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import PromQLIcon from 'assets/Dashboard/PromQl';
@@ -32,7 +32,7 @@ import { Widgets } from 'types/api/dashboard/getAll';
 import { Query } from 'types/api/queryBuilder/queryBuilderData';
 import { EQueryType } from 'types/common/dashboard';
 
-import ClickHouseQueryContainer from './QueryBuilder/clickHouse';
+import DatastoreQueryContainer from './QueryBuilder/datastore';
 import PromQLQueryContainer from './QueryBuilder/promQL';
 
 import './QuerySection.styles.scss';
@@ -173,10 +173,10 @@ function QuerySection({
 					</div>
 				),
 			},
-			[EQueryType.CLICKHOUSE]: {
+			[EQueryType.DATASTORE]: {
 				icon: <Terminal size={14} />,
-				label: 'ClickHouse Query',
-				component: <ClickHouseQueryContainer />,
+				label: 'Datastore Query',
+				component: <DatastoreQueryContainer />,
 			},
 			[EQueryType.PROM]: {
 				icon: (

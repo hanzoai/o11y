@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
-import { Color, Style } from '@signozhq/design-tokens';
+import { Color, Style } from 'constants/designTokens';
 import {
 	ChevronDown,
 	ChevronRight,
 	CircleHelp,
 	TriangleAlert,
-} from '@signozhq/icons';
-import { Input } from '@signozhq/input';
+} from 'lucide-react';
+import { Input } from 'components/ui/input';
 import { Collapse, Form, Tooltip } from 'antd';
 import { useCollapseSectionErrors } from 'hooks/useCollapseSectionErrors';
 

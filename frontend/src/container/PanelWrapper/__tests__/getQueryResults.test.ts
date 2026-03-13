@@ -11,11 +11,11 @@ const mockQuery = getMockQuery();
 const MOCK_LABEL_NAME = 'mock-label-name';
 
 describe('getLegend', () => {
-	it('should directly return the label name for clickhouse query', () => {
+	it('should directly return the label name for datastore query', () => {
 		const legendsData = getLegend(
 			mockQueryData,
 			getMockQuery({
-				queryType: EQueryType.CLICKHOUSE,
+				queryType: EQueryType.DATASTORE,
 			}),
 			MOCK_LABEL_NAME,
 		);

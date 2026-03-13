@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Typography } from 'antd';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { GetQueryResultsProps } from 'lib/dashboard/getQueryResults';
@@ -42,7 +42,7 @@ export const getEntityEventsOrLogsQueryPayload = (
 	graphType: PANEL_TYPES.LIST,
 	selectedTime: 'GLOBAL_TIME',
 	query: {
-		clickhouse_sql: [],
+		datastore_sql: [],
 		promql: [],
 		builder: {
 			queryData: [
@@ -193,7 +193,7 @@ export const getEntityTracesQueryPayload = (
 ): GetQueryResultsProps => ({
 	query: {
 		promql: [],
-		clickhouse_sql: [],
+		datastore_sql: [],
 		builder: {
 			queryData: [
 				{

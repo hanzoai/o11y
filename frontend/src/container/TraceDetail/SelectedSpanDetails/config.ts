@@ -42,7 +42,7 @@ export const getTraceToLogsQuery = (
 	const query: Query = {
 		id: uuid(),
 		queryType: EQueryType.QUERY_BUILDER,
-		clickhouse_sql: [],
+		datastore_sql: [],
 		promql: [],
 		builder: {
 			queryData: [

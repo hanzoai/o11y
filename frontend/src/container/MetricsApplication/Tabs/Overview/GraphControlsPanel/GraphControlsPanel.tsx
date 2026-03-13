@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button } from 'antd';
 import { Binoculars, DraftingCompass, ScrollText } from 'lucide-react';
 

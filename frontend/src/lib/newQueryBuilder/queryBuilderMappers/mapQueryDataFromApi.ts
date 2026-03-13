@@ -5,13 +5,13 @@ import {
 	IBuilderFormula,
 	IBuilderQuery,
 	IBuilderTraceOperator,
-	IClickHouseQuery,
+	IDatastoreQuery,
 	IPromQLQuery,
 	Query,
 } from 'types/api/queryBuilder/queryBuilderData';
 import {
 	BuilderQuery,
-	ClickHouseQuery,
+	DatastoreQuery,
 	PromQuery,
 	QueryBuilderFormula,
 } from 'types/api/v5/queryRange';
@@ -33,10 +33,10 @@ const mapQueryFromV5 = (compositeQuery: ICompositeMetricQuery): Query => {
 		'builder_query' | 'builder_formula' | 'builder_trace_operator'
 	> = {};
 	const promQueries: IPromQLQuery[] = [];
-	const clickhouseQueries: IClickHouseQuery[] = [];
+	const datastoreQueries: IDatastoreQuery[] = [];
 
 	compositeQuery.queries?.forEach((q) => {
-		const spec = q.spec as BuilderQuery | PromQuery | ClickHouseQuery;
+		const spec = q.spec as BuilderQuery | PromQuery | DatastoreQuery;
 		if (q.type === 'builder_query') {
 			if (spec.name) {
 				builderQueries[spec.name] = convertBuilderQueryToIBuilderQuery(
@@ -64,9 +64,9 @@ const mapQueryFromV5 = (compositeQuery: ICompositeMetricQuery): Query => {
 				legend: promSpec.legend || '',
 				disabled: promSpec.disabled || false,
 			});
-		} else if (q.type === 'clickhouse_sql') {
-			const chSpec = spec as ClickHouseQuery;
-			clickhouseQueries.push({
+		} else if (q.type === 'datastore_sql') {
+			const chSpec = spec as DatastoreQuery;
+			datastoreQueries.push({
 				name: chSpec.name,
 				query: chSpec.query,
 				legend: chSpec.legend || '',
@@ -77,7 +77,7 @@ const mapQueryFromV5 = (compositeQuery: ICompositeMetricQuery): Query => {
 	return {
 		builder: transformQueryBuilderDataModel(builderQueries, builderQueryTypes),
 		promql: promQueries,
-		clickhouse_sql: clickhouseQueries,
+		datastore_sql: datastoreQueries,
 		queryType: compositeQuery.queryType,
 		id: uuid(),
 		unit: compositeQuery.unit,
@@ -96,18 +96,18 @@ const mapQueryFromV3 = (compositeQuery: ICompositeMetricQuery): Query => {
 		  }))
 		: initialQueryState.promql;
 
-	const clickhouseSql = compositeQuery.chQueries
+	const datastoreSql = compositeQuery.chQueries
 		? Object.keys(compositeQuery.chQueries).map((key) => ({
 				...compositeQuery.chQueries?.[key],
 				name: key,
 				query: compositeQuery.chQueries?.[key]?.query || '',
 		  }))
-		: initialQueryState.clickhouse_sql;
+		: initialQueryState.datastore_sql;
 
 	return {
 		builder,
 		promql: promql as IPromQLQuery[],
-		clickhouse_sql: clickhouseSql as IClickHouseQuery[],
+		datastore_sql: datastoreSql as IDatastoreQuery[],
 		queryType: compositeQuery.queryType,
 		id: uuid(),
 		unit: compositeQuery.unit,

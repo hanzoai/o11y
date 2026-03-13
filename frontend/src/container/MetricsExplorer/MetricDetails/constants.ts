@@ -1,7 +1,7 @@
 import {
 	MetrictypesTemporalityDTO,
 	MetrictypesTypeDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 
 export const METRIC_METADATA_KEYS = {
 	description: 'Description',

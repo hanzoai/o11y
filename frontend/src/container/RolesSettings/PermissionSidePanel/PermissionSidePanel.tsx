@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from '@signozhq/button';
-import { ChevronDown, ChevronRight, X } from '@signozhq/icons';
+import { Button } from '@hanzo/ui';
+import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import {
 	RadioGroup,
 	RadioGroupItem,
 	RadioGroupLabel,
-} from '@signozhq/radio-group';
+} from '@hanzo/ui';
 import { Select, Skeleton } from 'antd';
 
 import {

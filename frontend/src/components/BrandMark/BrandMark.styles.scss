@@ -1,0 +1,32 @@
+.brand-mark {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	user-select: none;
+
+	.brand-mark-logo {
+		width: var(--brand-mark-size, 24px);
+		height: var(--brand-mark-size, 24px);
+		object-fit: contain;
+		flex-shrink: 0;
+	}
+
+	.brand-mark-name {
+		font-weight: 600;
+		font-size: calc(var(--brand-mark-size, 24px) * 0.7);
+		line-height: 1;
+		color: var(--bg-vanilla-100, #fff);
+		letter-spacing: -0.02em;
+		white-space: nowrap;
+	}
+
+	.brand-mark-product {
+		font-weight: 400;
+		font-size: calc(var(--brand-mark-size, 24px) * 0.55);
+		line-height: 1;
+		color: var(--bg-vanilla-400, #aaa);
+		letter-spacing: -0.01em;
+		white-space: nowrap;
+		opacity: 0.7;
+	}
+}

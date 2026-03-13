@@ -22,7 +22,7 @@
     var (
         serviceName  = "{{MYAPP}}")
         collectorURL = "https://ingest.{{REGION}}.o11y.hanzo.ai:443"
-        headers="signoz-ingestion-key={{HANZO_INGESTION_KEY}}"
+        headers="hanzo-ingestion-key={{HANZO_INGESTION_KEY}}"
         insecure = os.Getenv("INSECURE_MODE")
     )
     ```

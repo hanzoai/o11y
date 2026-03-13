@@ -5,8 +5,8 @@ function QueryTypeTag({ queryType }: IQueryTypeTagProps): JSX.Element {
 		case EQueryType.QUERY_BUILDER:
 			return <span>Query Builder</span>;
 
-		case EQueryType.CLICKHOUSE:
-			return <span>ClickHouse Query</span>;
+		case EQueryType.DATASTORE:
+			return <span>Datastore Query</span>;
 		case EQueryType.PROM:
 			return <span>PromQL</span>;
 		default:

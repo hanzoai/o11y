@@ -1,5 +1,5 @@
 import {
-	initialClickHouseData,
+	initialDatastoreData,
 	initialQueryBuilderFormValuesMap,
 	initialQueryPromQLData,
 	PANEL_TYPES,
@@ -66,14 +66,14 @@ const createMockPromQLWidget = (
 			queryFormulas: [],
 			queryTraceOperator: [],
 		},
-		clickhouse_sql: [],
+		datastore_sql: [],
 		id: 'query-1',
 	};
 
 	return createBaseWidget(id, query);
 };
 
-const createMockClickHouseWidget = (
+const createMockDatastoreWidget = (
 	id: string,
 	queries: {
 		query: string;
@@ -82,8 +82,8 @@ const createMockClickHouseWidget = (
 		disabled?: boolean;
 	}[],
 ): Widgets => {
-	const clickhouseQueries = queries.map((q) => ({
-		...initialClickHouseData,
+	const datastoreQueries = queries.map((q) => ({
+		...initialDatastoreData,
 		query: q.query,
 		name: q.name || 'A',
 		legend: q.legend || '',
@@ -91,14 +91,14 @@ const createMockClickHouseWidget = (
 	}));
 
 	const query: Query = {
-		queryType: EQueryType.CLICKHOUSE,
+		queryType: EQueryType.DATASTORE,
 		promql: [],
 		builder: {
 			queryData: [],
 			queryFormulas: [],
 			queryTraceOperator: [],
 		},
-		clickhouse_sql: clickhouseQueries,
+		datastore_sql: datastoreQueries,
 		id: 'query-1',
 	};
 
@@ -131,7 +131,7 @@ const createMockQueryBuilderWidget = (
 			queryFormulas: [],
 			queryTraceOperator: [],
 		},
-		clickhouse_sql: [],
+		datastore_sql: [],
 		id: 'query-1',
 	};
 
@@ -155,10 +155,10 @@ describe('createDynamicVariableToWidgetsMap', () => {
 			createMockPromQLWidget('widget-promql-fail', [
 				{ query: 'up{service="$service.name"}' },
 			]),
-			createMockClickHouseWidget('widget-clickhouse-pass', [
+			createMockDatastoreWidget('widget-datastore-pass', [
 				{ query: "SELECT * FROM logs WHERE service_name = '$service.name123'" },
 			]),
-			createMockClickHouseWidget('widget-clickhouse-fail', [
+			createMockDatastoreWidget('widget-datastore-fail', [
 				{ query: "SELECT * FROM logs WHERE service_name = '$service.name'" },
 			]),
 			createMockQueryBuilderWidget('widget-builder-pass', [
@@ -172,11 +172,11 @@ describe('createDynamicVariableToWidgetsMap', () => {
 		const result = createDynamicVariableToWidgetsMap(dynamicVariables, widgets);
 
 		expect(result['var-1']).toContain('widget-promql-pass');
-		expect(result['var-1']).toContain('widget-clickhouse-pass');
+		expect(result['var-1']).toContain('widget-datastore-pass');
 		expect(result['var-1']).toContain('widget-builder-pass');
 
 		expect(result['var-1']).not.toContain('widget-promql-fail');
-		expect(result['var-1']).not.toContain('widget-clickhouse-fail');
+		expect(result['var-1']).not.toContain('widget-datastore-fail');
 		expect(result['var-1']).not.toContain('widget-builder-fail');
 	});
 });

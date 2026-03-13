@@ -10,6 +10,7 @@ import { useMutation } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
+import BrandMark from 'components/BrandMark';
 import {
 	closestCenter,
 	DndContext,
@@ -920,7 +921,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 									onClickHandler(ROUTES.HOME, event);
 								}}
 							>
-								<img src="/Logos/hanzo-icon.svg" alt="Hanzo" />
+								<BrandMark size={20} />
 							</div>
 
 							{licenseTag && (

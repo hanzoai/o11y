@@ -25,7 +25,7 @@ import { ResourceProvider } from 'hooks/useResourceAttribute';
 import { StatusCodes } from 'http-status-codes';
 import history from 'lib/history';
 import ErrorBoundaryFallback from 'pages/ErrorBoundaryFallback/ErrorBoundaryFallback';
-import posthog from 'posthog-js';
+import insights from '@hanzo/insights';
 import { useAppContext } from 'providers/App/App';
 import { IUser } from 'providers/App/types';
 import { CmdKProvider } from 'providers/cmdKProvider';
@@ -121,7 +121,7 @@ function App(): JSX.Element {
 					});
 				}
 
-				posthog?.identify(id, {
+				insights?.identify(id, {
 					email,
 					name: displayName,
 					orgName,
@@ -133,7 +133,7 @@ function App(): JSX.Element {
 					isPaidUser: !!trialInfo?.trialConvertedToSubscription,
 				});
 
-				posthog?.group('company', orgId, {
+				insights?.group('company', orgId, {
 					name: orgName,
 					deployment_name: hostNameParts[0],
 					data_region: hostNameParts[1],
@@ -295,9 +295,9 @@ function App(): JSX.Element {
 
 	useEffect(() => {
 		if (isCloudUser || isEnterpriseSelfHostedUser) {
-			if (process.env.POSTHOG_KEY) {
-				posthog.init(process.env.POSTHOG_KEY, {
-					api_host: 'https://us.i.posthog.com',
+			if (process.env.INSIGHTS_KEY) {
+				insights.init(process.env.INSIGHTS_KEY, {
+					api_host: 'https://insights.hanzo.ai',
 					person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
 				});
 			}
@@ -326,7 +326,7 @@ function App(): JSX.Element {
 				setIsSentryInitialized(true);
 			}
 		} else {
-			posthog.reset();
+			insights.reset();
 			Sentry.close();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps

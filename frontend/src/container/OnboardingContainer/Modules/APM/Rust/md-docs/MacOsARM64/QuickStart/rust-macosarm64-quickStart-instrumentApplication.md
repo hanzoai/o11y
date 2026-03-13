@@ -36,11 +36,11 @@ Add `init_tracer` function to your `main.rs` file. It initializes an OpenTelemet
 
 ```rust
 fn init_tracer() -> Result<sdktrace::Tracer, TraceError> {
-    let signoz_access_token = std::env::var("HANZO_ACCESS_TOKEN").expect("HANZO_ACCESS_TOKEN not set");
+    let hanzo_access_token = std::env::var("HANZO_ACCESS_TOKEN").expect("HANZO_ACCESS_TOKEN not set");
     let mut metadata = MetadataMap::new();
     metadata.insert(
-        "signoz-ingestion-key",
-        MetadataValue::from_str(&signoz_access_token).unwrap(),
+        "hanzo-ingestion-key",
+        MetadataValue::from_str(&hanzo_access_token).unwrap(),
     );
     opentelemetry_otlp::new_pipeline()
         .tracing()

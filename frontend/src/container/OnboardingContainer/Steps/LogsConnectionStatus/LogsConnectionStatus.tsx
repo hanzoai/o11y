@@ -79,7 +79,7 @@ export default function LogsConnectionStatus(): JSX.Element {
 			queryFormulas: [],
 			queryTraceOperator: [],
 		},
-		clickhouse_sql: [],
+		datastore_sql: [],
 		id: '',
 		promql: [],
 	};

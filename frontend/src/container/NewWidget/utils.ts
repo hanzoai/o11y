@@ -569,35 +569,35 @@ export const getDefaultWidgetData = (
 export const PANEL_TYPE_TO_QUERY_TYPES: Record<PANEL_TYPES, EQueryType[]> = {
 	[PANEL_TYPES.TIME_SERIES]: [
 		EQueryType.QUERY_BUILDER,
-		EQueryType.CLICKHOUSE,
+		EQueryType.DATASTORE,
 		EQueryType.PROM,
 	],
-	[PANEL_TYPES.TABLE]: [EQueryType.QUERY_BUILDER, EQueryType.CLICKHOUSE],
+	[PANEL_TYPES.TABLE]: [EQueryType.QUERY_BUILDER, EQueryType.DATASTORE],
 	[PANEL_TYPES.VALUE]: [
 		EQueryType.QUERY_BUILDER,
-		EQueryType.CLICKHOUSE,
+		EQueryType.DATASTORE,
 		EQueryType.PROM,
 	],
 	[PANEL_TYPES.LIST]: [EQueryType.QUERY_BUILDER],
 	[PANEL_TYPES.TRACE]: [
 		EQueryType.QUERY_BUILDER,
-		EQueryType.CLICKHOUSE,
+		EQueryType.DATASTORE,
 		EQueryType.PROM,
 	],
 	[PANEL_TYPES.BAR]: [
 		EQueryType.QUERY_BUILDER,
-		EQueryType.CLICKHOUSE,
+		EQueryType.DATASTORE,
 		EQueryType.PROM,
 	],
-	[PANEL_TYPES.PIE]: [EQueryType.QUERY_BUILDER, EQueryType.CLICKHOUSE],
+	[PANEL_TYPES.PIE]: [EQueryType.QUERY_BUILDER, EQueryType.DATASTORE],
 	[PANEL_TYPES.HISTOGRAM]: [
 		EQueryType.QUERY_BUILDER,
-		EQueryType.CLICKHOUSE,
+		EQueryType.DATASTORE,
 		EQueryType.PROM,
 	],
 	[PANEL_TYPES.EMPTY_WIDGET]: [
 		EQueryType.QUERY_BUILDER,
-		EQueryType.CLICKHOUSE,
+		EQueryType.DATASTORE,
 		EQueryType.PROM,
 	],
 };

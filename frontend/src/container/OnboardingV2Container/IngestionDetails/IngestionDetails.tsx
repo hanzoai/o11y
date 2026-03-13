@@ -3,7 +3,7 @@ import { useCopyToClipboard } from 'react-use';
 import { Button, Skeleton, Tooltip, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { useGetIngestionKeys } from 'api/generated/services/gateway';
-import { GatewaytypesIngestionKeyDTO } from 'api/generated/services/sigNoz.schemas';
+import { GatewaytypesIngestionKeyDTO } from 'api/generated/services/o11y.schemas';
 import { DOCS_BASE_URL } from 'constants/app';
 import { useGetGlobalConfig } from 'hooks/globalConfig/useGetGlobalConfig';
 import { useNotifications } from 'hooks/useNotifications';

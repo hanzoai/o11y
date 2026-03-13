@@ -14,7 +14,7 @@ logger.add(new winston.transports.Console(options));
 
 ## Collecting Nodejs logs when application is deployed on a Host
 
-When you run your application directly on the host, you will be required to add a intermediary medium ex:- a file, where you can export your logs and the otel-collector can read them and push to signoz.
+When you run your application directly on the host, you will be required to add a intermediary medium ex:- a file, where you can export your logs and the otel-collector can read them and push to hanzo.
 
 You can add a file transport very easily as stated <a href="https://github.com/winstonjs/winston/blob/master/docs/transports.md#file-transport" rel="noopener noreferrer nofollow" target="_blank">here</a>.
 

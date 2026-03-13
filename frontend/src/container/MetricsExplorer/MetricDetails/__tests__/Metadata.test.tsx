@@ -4,7 +4,7 @@ import {
 	GetMetricMetadata200,
 	MetrictypesTemporalityDTO,
 	MetrictypesTypeDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { Temporality } from 'api/metricsExplorer/getMetricDetails';
 import {
 	UniversalYAxisUnit,

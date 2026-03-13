@@ -1,6 +1,6 @@
 import { ChangeEvent, useMemo } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Flex, Input, Tooltip, Typography } from 'antd';
 import { Search } from 'lucide-react';
 import { useAppContext } from 'providers/App/App';

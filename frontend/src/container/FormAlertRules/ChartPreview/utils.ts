@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { Threshold } from 'container/CreateAlertV2/context/types';
 import { ThresholdProps } from 'container/NewWidget/RightContainer/Threshold/types';

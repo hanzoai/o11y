@@ -78,7 +78,7 @@ const mockProps: WidgetGraphComponentProps = {
 				queryFormulas: [],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [
+			datastore_sql: [
 				{
 					disabled: false,
 					legend: '',

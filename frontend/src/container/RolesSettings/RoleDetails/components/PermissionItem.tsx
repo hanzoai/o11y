@@ -1,4 +1,4 @@
-import { ChevronRight } from '@signozhq/icons';
+import { ChevronRight } from 'lucide-react';
 
 import { PermissionType } from '../../utils';
 

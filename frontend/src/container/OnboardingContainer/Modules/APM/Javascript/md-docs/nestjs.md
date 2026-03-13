@@ -99,7 +99,7 @@ async function bootstrap() {
 Step 5. Run the application
 
 ```bash
-OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}" nest start
+OTEL_EXPORTER_OTLP_HEADERS="hanzo-ingestion-key={{HANZO_INGESTION_KEY}}" nest start
 ```
 
 You can now run your Nestjs application. The data captured with OpenTelemetry from your application should start showing on the Hanzo O11y dashboard.

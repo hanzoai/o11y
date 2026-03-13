@@ -92,7 +92,7 @@ export type IBuilderQuery = {
 	source?: 'meter' | '';
 };
 
-export interface IClickHouseQuery {
+export interface IDatastoreQuery {
 	name: string;
 	legend: string;
 	disabled: boolean;
@@ -109,14 +109,14 @@ export interface Query {
 	queryType: EQueryType;
 	promql: IPromQLQuery[];
 	builder: QueryBuilderData;
-	clickhouse_sql: IClickHouseQuery[];
+	datastore_sql: IDatastoreQuery[];
 	id: string;
 	unit?: Format['id'];
 }
 
 export type QueryState = Omit<Query, 'queryType'>;
 
-export type BuilderClickHouseResource = Record<string, IClickHouseQuery>;
+export type BuilderDatastoreResource = Record<string, IDatastoreQuery>;
 export type BuilderPromQLResource = Record<string, IPromQLQuery>;
 export type BuilderQueryDataResourse = Record<
 	string,
@@ -127,7 +127,7 @@ export type MapData =
 	| IBuilderQuery
 	| IBuilderFormula
 	| IBuilderTraceOperator
-	| IClickHouseQuery
+	| IDatastoreQuery
 	| IPromQLQuery;
 
 export type MapQueryDataToApiResult<T> = {

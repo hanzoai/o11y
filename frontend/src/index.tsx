@@ -8,6 +8,7 @@ import { AxiosError } from 'axios';
 import { ThemeProvider } from 'hooks/useDarkMode';
 import { NuqsAdapter } from 'nuqs/adapters/react';
 import { AppProvider } from 'providers/App/App';
+import { TenantProvider } from 'providers/Tenant';
 import TimezoneProvider from 'providers/Timezone';
 import store from 'store';
 import APIError from 'types/api/error';
@@ -47,17 +48,19 @@ if (container) {
 	root.render(
 		<HelmetProvider>
 			<NuqsAdapter>
-				<ThemeProvider>
-					<TimezoneProvider>
-						<QueryClientProvider client={queryClient}>
-							<Provider store={store}>
-								<AppProvider>
-									<AppRoutes />
-								</AppProvider>
-							</Provider>
-						</QueryClientProvider>
-					</TimezoneProvider>
-				</ThemeProvider>
+				<TenantProvider>
+					<ThemeProvider>
+						<TimezoneProvider>
+							<QueryClientProvider client={queryClient}>
+								<Provider store={store}>
+									<AppProvider>
+										<AppRoutes />
+									</AppProvider>
+								</Provider>
+							</QueryClientProvider>
+						</TimezoneProvider>
+					</ThemeProvider>
+				</TenantProvider>
 			</NuqsAdapter>
 		</HelmetProvider>,
 	);

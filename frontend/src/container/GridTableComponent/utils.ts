@@ -131,8 +131,8 @@ export function getQueryLegend(
 				)?.legend;
 			}
 			break;
-		case EQueryType.CLICKHOUSE:
-			legend = currentQuery?.clickhouse_sql?.find(
+		case EQueryType.DATASTORE:
+			legend = currentQuery?.datastore_sql?.find(
 				(query) => query.name === queryName,
 			)?.legend;
 			break;

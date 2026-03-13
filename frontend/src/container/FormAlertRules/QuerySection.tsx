@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Tabs, Tooltip, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import PromQLIcon from 'assets/Dashboard/PromQl';
@@ -18,7 +18,7 @@ import { AlertTypes } from 'types/api/alerts/alertTypes';
 import { AlertDef } from 'types/api/alerts/def';
 import { EQueryType } from 'types/common/dashboard';
 
-import ChQuerySection from './ChQuerySection';
+import DsQuerySection from './DsQuerySection';
 import PromqlSection from './PromqlSection';
 import { FormContainer, StepHeading } from './styles';
 
@@ -46,7 +46,7 @@ function QuerySection({
 
 	const renderPromqlUI = (): JSX.Element => <PromqlSection />;
 
-	const renderChQueryUI = (): JSX.Element => <ChQuerySection />;
+	const renderDsQueryUI = (): JSX.Element => <DsQuerySection />;
 
 	const isDarkMode = useIsDarkMode();
 
@@ -88,14 +88,14 @@ function QuerySection({
 		},
 		{
 			label: (
-				<Tooltip title="ClickHouse">
+				<Tooltip title="Datastore">
 					<Button className="nav-btns">
 						<Terminal size={14} />
-						<Typography.Text>ClickHouse Query</Typography.Text>
+						<Typography.Text>Datastore Query</Typography.Text>
 					</Button>
 				</Tooltip>
 			),
-			key: EQueryType.CLICKHOUSE,
+			key: EQueryType.DATASTORE,
 		},
 	];
 
@@ -114,14 +114,14 @@ function QuerySection({
 			},
 			{
 				label: (
-					<Tooltip title="ClickHouse">
+					<Tooltip title="Datastore">
 						<Button className="nav-btns">
 							<Terminal size={14} />
-							<Typography.Text>ClickHouse Query</Typography.Text>
+							<Typography.Text>Datastore Query</Typography.Text>
 						</Button>
 					</Tooltip>
 				),
-				key: EQueryType.CLICKHOUSE,
+				key: EQueryType.DATASTORE,
 			},
 			{
 				label: (
@@ -208,8 +208,8 @@ function QuerySection({
 		switch (c) {
 			case EQueryType.PROM:
 				return renderPromqlUI();
-			case EQueryType.CLICKHOUSE:
-				return renderChQueryUI();
+			case EQueryType.DATASTORE:
+				return renderDsQueryUI();
 			case EQueryType.QUERY_BUILDER:
 				return renderMetricUI();
 			default:

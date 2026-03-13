@@ -1,5 +1,5 @@
 // ** Helpers
-import { MetrictypesTypeDTO } from 'api/generated/services/sigNoz.schemas';
+import { MetrictypesTypeDTO } from 'api/generated/services/o11y.schemas';
 import { createIdFromObjectFields } from 'lib/createIdFromObjectFields';
 import { createNewBuilderItemName } from 'lib/newQueryBuilder/createNewBuilderItemName';
 import { IAttributeValuesResponse } from 'types/api/queryBuilder/getAttributesValues';
@@ -14,7 +14,7 @@ import {
 	IBuilderFormula,
 	IBuilderQuery,
 	IBuilderTraceOperator,
-	IClickHouseQuery,
+	IDatastoreQuery,
 	IPromQLQuery,
 	Query,
 	QueryState,
@@ -278,7 +278,7 @@ export const initialQueryPromQLData: IPromQLQuery = {
 	disabled: false,
 };
 
-export const initialClickHouseData: IClickHouseQuery = {
+export const initialDatastoreData: IDatastoreQuery = {
 	name: createNewBuilderItemName({ existNames: [], sourceNames: alphabet }),
 	legend: '',
 	disabled: false,
@@ -292,14 +292,14 @@ export const initialQueryBuilderData: QueryBuilderData = {
 };
 
 export const initialSingleQueryMap: Record<
-	EQueryType.PROM | EQueryType.CLICKHOUSE,
-	IClickHouseQuery | IPromQLQuery
-> = { clickhouse_sql: initialClickHouseData, promql: initialQueryPromQLData };
+	EQueryType.PROM | EQueryType.DATASTORE,
+	IDatastoreQuery | IPromQLQuery
+> = { datastore_sql: initialDatastoreData, promql: initialQueryPromQLData };
 
 export const initialQueryState: QueryState = {
 	id: uuid(),
 	builder: initialQueryBuilderData,
-	clickhouse_sql: [initialClickHouseData],
+	datastore_sql: [initialDatastoreData],
 	promql: [initialQueryPromQLData],
 	unit: '',
 };

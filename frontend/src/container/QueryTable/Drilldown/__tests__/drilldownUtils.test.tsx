@@ -48,7 +48,7 @@ describe('drilldownUtils', () => {
 					queryTraceOperator: [],
 				},
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 			};
 
 			const result = getQueryData(mockQuery, 'query2');
@@ -80,7 +80,7 @@ describe('drilldownUtils', () => {
 					queryTraceOperator: [],
 				},
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 			};
 
 			const result = getQueryData(mockQuery, 'nonexistent');
@@ -135,7 +135,7 @@ describe('drilldownUtils', () => {
 				queryTraceOperator: [],
 			},
 			promql: [],
-			clickhouse_sql: [],
+			datastore_sql: [],
 		};
 
 		const mockFilters = [

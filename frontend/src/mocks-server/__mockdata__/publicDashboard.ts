@@ -89,7 +89,7 @@ export const publicDashboardResponse = {
 								queryFormulas: [],
 								queryTraceOperator: [],
 							},
-							clickhouse_sql: [
+							datastore_sql: [
 								{
 									legend: '',
 									name: 'A',

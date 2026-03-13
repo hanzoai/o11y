@@ -1,9 +1,9 @@
 import React from 'react';
-import { Badge } from '@signozhq/badge';
+import { Badge } from '@hanzo/ui';
 import type {
 	AuthtypesGettableObjectsDTO,
 	AuthtypesGettableResourcesDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import { capitalize } from 'lodash-es';
 import { useTimezone } from 'providers/Timezone';

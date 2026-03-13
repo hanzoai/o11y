@@ -234,7 +234,7 @@ export const getDaemonSetMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -418,7 +418,7 @@ export const getDaemonSetMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -515,7 +515,7 @@ export const getDaemonSetMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -612,7 +612,7 @@ export const getDaemonSetMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',

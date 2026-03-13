@@ -101,7 +101,7 @@ function UserGuide({ queryType }: UserGuideProps): JSX.Element {
 							<a
 								key={1}
 								target="_blank"
-								href=" https://o11y.hanzo.ai/docs/tutorial/writing-clickhouse-queries-in-dashboard/?utm_source=frontend&utm_medium=product&utm_id=alerts</>"
+								href=" https://o11y.hanzo.ai/docs/tutorial/writing-datastore-queries-in-dashboard/?utm_source=frontend&utm_medium=product&utm_id=alerts</>"
 							/>,
 						]}
 					/>
@@ -152,7 +152,7 @@ function UserGuide({ queryType }: UserGuideProps): JSX.Element {
 			</Row>
 			{queryType === EQueryType.QUERY_BUILDER && renderGuideForQB()}
 			{queryType === EQueryType.PROM && renderGuideForPQL()}
-			{queryType === EQueryType.CLICKHOUSE && renderGuideForCH()}
+			{queryType === EQueryType.DATASTORE && renderGuideForCH()}
 		</StyledMainContainer>
 	);
 }

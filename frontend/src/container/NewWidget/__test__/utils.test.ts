@@ -12,7 +12,7 @@ import { handleQueryChange } from '../utils';
 const buildSupersetQuery = (extras?: Record<string, unknown>): Query => ({
 	queryType: EQueryType.QUERY_BUILDER,
 	promql: [],
-	clickhouse_sql: [],
+	datastore_sql: [],
 	id: '1',
 	unit: '1',
 	builder: {
