@@ -3,7 +3,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
-	font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+	font-family: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
 		'Helvetica Neue', sans-serif;
 
 	.query-where-clause-editor-container {
@@ -91,14 +91,14 @@
 			) !important;
 			backdrop-filter: blur(20px);
 			box-sizing: border-box;
-			font-family: 'Space Mono', monospace !important;
+			font-family: 'Geist Mono', monospace !important;
 			border: 1px solid var(--bg-slate-200);
 			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
 
 			ul {
 				width: 100% !important;
 				max-width: 100% !important;
-				font-family: 'Space Mono', monospace !important;
+				font-family: 'Geist Mono', monospace !important;
 				min-height: 200px !important;
 
 				&::-webkit-scrollbar {
@@ -128,7 +128,7 @@
 					box-sizing: border-box;
 					overflow: hidden;
 
-					font-family: 'Space Mono', monospace !important;
+					font-family: 'Geist Mono', monospace !important;
 
 					&:hover {
 						background: var(--bg-ink-100) !important;
@@ -152,7 +152,7 @@
 
 		.cm-line {
 			line-height: 34px !important;
-			font-family: 'Space Mono', monospace !important;
+			font-family: 'Geist Mono', monospace !important;
 			background-color: #121317 !important;
 
 			::-moz-selection {
@@ -228,7 +228,7 @@
 				gap: 16px;
 
 				font-size: 12px;
-				font-family: 'Space Mono', monospace !important;
+				font-family: 'Geist Mono', monospace !important;
 				color: var(--bg-cherry-500);
 				padding: 8px;
 			}
@@ -279,7 +279,7 @@
 	}
 
 	.query-text-preview {
-		font-family: 'Space Mono', monospace;
+		font-family: 'Geist Mono', monospace;
 		font-size: 13px;
 		color: var(--bg-vanilla-200);
 		padding: 2px 6px;
@@ -347,7 +347,7 @@
 				}
 
 				.query-example-query {
-					font-family: 'Space Mono', monospace;
+					font-family: 'Geist Mono', monospace;
 					font-size: 12px;
 					color: var(--bg-vanilla-200);
 					background-color: var(--bg-ink-300);

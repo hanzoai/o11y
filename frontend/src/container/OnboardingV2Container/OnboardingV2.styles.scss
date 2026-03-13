@@ -139,7 +139,7 @@
 	&__category {
 		width: 100%;
 		color: var(--greyscale-vanilla-opacity-40060, rgba(192, 193, 195, 0.6));
-		font-family: Inter;
+		font-family: 'Geist Sans';
 		font-size: 13px;
 		font-style: normal;
 		font-weight: 500;
@@ -581,7 +581,7 @@
 		display: block;
 		margin-top: 8px;
 		color: var(--text-vanilla-400);
-		font-family: Inter;
+		font-family: 'Geist Sans';
 		font-size: 13px;
 		font-style: normal;
 		font-weight: 400;
@@ -611,7 +611,7 @@
 
 	.onboarding-question {
 		color: var(--text-vanilla-100);
-		font-family: Inter;
+		font-family: 'Geist Sans';
 		font-size: 24px;
 		font-style: normal;
 		font-weight: 600;
@@ -620,7 +620,7 @@
 
 	.question-title {
 		color: var(--text-vanilla-100);
-		font-family: Inter;
+		font-family: 'Geist Sans';
 		font-size: 24px;
 		font-style: normal;
 		font-weight: 600;
@@ -630,7 +630,7 @@
 
 	.question-sub-title {
 		color: var(--text-vanilla-400);
-		font-family: Inter;
+		font-family: 'Geist Sans';
 		font-size: 13px;
 		font-style: normal;
 		font-weight: 400;
@@ -679,7 +679,7 @@
 
 				.onboarding-filters-item-count {
 					color: var(--text-vanilla-400);
-					font-family: Inter;
+					font-family: 'Geist Sans';
 					font-size: 10px;
 					font-style: normal;
 					font-weight: 400;
@@ -878,7 +878,7 @@
 					.ingestion-endpoint-section-text {
 						margin-bottom: 16px;
 
-						font-family: Inter;
+						font-family: 'Geist Sans';
 						font-size: 12px;
 						font-style: normal;
 						font-weight: 500;
@@ -926,7 +926,7 @@
 				.ingestion-key-details-section-text {
 					&.ant-typography {
 						color: var(--bg-robin-400);
-						font-family: Inter;
+						font-family: 'Geist Sans';
 						font-size: 13px;
 						font-weight: 400;
 						line-height: 24px; /* 171.429% */
@@ -954,7 +954,7 @@
 
 						&.ant-typography {
 							color: var(--bg-robin-400);
-							font-family: Inter;
+							font-family: 'Geist Sans';
 							font-size: 13px;
 							font-weight: 400;
 							line-height: 24px; /* 171.429% */
@@ -986,7 +986,7 @@
 
 							&.ant-typography {
 								color: var(--bg-robin-400);
-								font-family: Inter;
+								font-family: 'Geist Sans';
 								font-size: 13px;
 								font-weight: 400;
 								line-height: 24px; /* 171.429% */
@@ -1011,7 +1011,7 @@
 
 							&.ant-typography {
 								color: var(--bg-robin-400);
-								font-family: Inter;
+								font-family: 'Geist Sans';
 								font-size: 13px;
 								font-weight: 400;
 								line-height: 24px; /* 171.429% */
@@ -1059,7 +1059,7 @@
 .no-results-found-container {
 	.ant-typography {
 		color: rgba(192, 193, 195, 0.6);
-		font-family: Inter;
+		font-family: 'Geist Sans';
 		font-size: 11px;
 		font-style: normal;
 		line-height: 18px; /* 150% */

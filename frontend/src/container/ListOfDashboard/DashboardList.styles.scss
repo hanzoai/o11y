@@ -151,7 +151,7 @@
 								background: rgba(173, 127, 88, 0.1);
 								color: var(--bg-sienna-400);
 								text-align: center;
-								font-family: Inter;
+								font-family: 'Geist Sans';
 								font-size: 14px;
 								font-style: normal;
 								font-weight: 400;
@@ -225,7 +225,7 @@
 							font-variant-numeric: lining-nums tabular-nums stacked-fractions
 								slashed-zero;
 							font-feature-settings: 'dlig' on, 'salt' on, 'cpsp' on, 'case' on;
-							font-family: Inter;
+							font-family: 'Geist Sans';
 							font-size: 12px;
 							font-style: normal;
 							font-weight: 400;
@@ -250,7 +250,7 @@
 							font-variant-numeric: lining-nums tabular-nums stacked-fractions
 								slashed-zero;
 							font-feature-settings: 'dlig' on, 'salt' on, 'cpsp' on, 'case' on;
-							font-family: Inter;
+							font-family: 'Geist Sans';
 							font-size: 12px;
 							font-style: normal;
 							font-weight: 400;
@@ -274,7 +274,7 @@
 							font-variant-numeric: lining-nums tabular-nums stacked-fractions
 								slashed-zero;
 							font-feature-settings: 'dlig' on, 'salt' on, 'cpsp' on, 'case' on;
-							font-family: Inter;
+							font-family: 'Geist Sans';
 							font-size: 12px;
 							font-style: normal;
 							font-weight: 400;
@@ -308,7 +308,7 @@
 							font-variant-numeric: lining-nums tabular-nums stacked-fractions
 								slashed-zero;
 							font-feature-settings: 'dlig' on, 'salt' on, 'cpsp' on, 'case' on;
-							font-family: Inter;
+							font-family: 'Geist Sans';
 							font-size: 12px;
 							font-style: normal;
 							font-weight: 400;
@@ -374,11 +374,11 @@
 		align-items: center;
 
 		.numbers {
-			font-family: 'Space Mono';
+			font-family: 'Geist Mono';
 		}
 
 		.total {
-			font-family: 'Space Mono';
+			font-family: 'Geist Mono';
 			color: var(--bg-vanilla-300);
 		}
 	}
@@ -397,7 +397,7 @@
 
 		.error-text {
 			color: var(--bg-vanilla-100);
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 14px;
 			font-style: normal;
 			font-weight: 500;
@@ -429,7 +429,7 @@
 
 			.learn-more {
 				color: var(--bg-robin-400);
-				font-family: Inter;
+				font-family: 'Geist Sans';
 				font-size: 14px;
 				font-style: normal;
 				font-weight: 500;
@@ -471,7 +471,7 @@
 			margin-top: 4px;
 			.no-dashboard {
 				color: var(--bg-vanilla-100);
-				font-family: Inter;
+				font-family: 'Geist Sans';
 				font-size: 14px;
 				font-style: normal;
 				font-weight: 500;
@@ -480,7 +480,7 @@
 			}
 			.info {
 				color: var(--bg-vanilla-400);
-				font-family: Inter;
+				font-family: 'Geist Sans';
 				font-size: 14px;
 				font-style: normal;
 				font-weight: 400;
@@ -513,7 +513,7 @@
 			}
 			.learn-more {
 				color: var(--bg-robin-400);
-				font-family: Inter;
+				font-family: 'Geist Sans';
 				font-size: 14px;
 				font-style: normal;
 				font-weight: 500;
@@ -566,7 +566,7 @@
 
 		.text {
 			color: var(--bg-vanilla-100);
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 14px;
 			font-style: normal;
 			font-weight: 500;
@@ -589,7 +589,7 @@
 
 		.typography {
 			color: var(--bg-vanilla-400);
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 14px;
 			font-style: normal;
 			font-weight: 400;
@@ -738,7 +738,7 @@
 					align-items: center;
 					gap: 6px;
 					color: var(--bg-vanilla-400);
-					font-family: Inter;
+					font-family: 'Geist Sans';
 					font-size: 12px;
 					font-style: normal;
 					font-weight: 400;
@@ -762,7 +762,7 @@
 					align-items: center;
 					gap: 6px;
 					color: var(--bg-cherry-400) !important;
-					font-family: Inter;
+					font-family: 'Geist Sans';
 					font-size: 12px;
 					font-style: normal;
 					font-weight: 400;
@@ -798,7 +798,7 @@
 
 			.sort-heading {
 				color: var(--bg-slate-200);
-				font-family: Inter;
+				font-family: 'Geist Sans';
 				font-size: 11px;
 				font-style: normal;
 				font-weight: 600;
@@ -815,7 +815,7 @@
 				align-items: center;
 				width: 100%;
 				color: var(--bg-vanilla-400);
-				font-family: Inter;
+				font-family: 'Geist Sans';
 				font-size: 14px;
 				font-style: normal;
 				font-weight: 400;
@@ -853,7 +853,7 @@
 				align-items: center;
 				width: 100%;
 				color: var(--Vanilla-400, #c0c1c3);
-				font-family: Inter;
+				font-family: 'Geist Sans';
 				font-size: 14px;
 				font-style: normal;
 				font-weight: 400;
@@ -906,7 +906,7 @@
 
 						.title {
 							color: var(--bg-vanilla-100);
-							font-family: Inter;
+							font-family: 'Geist Sans';
 							font-size: 12.805px;
 							font-style: normal;
 							font-weight: 500;
@@ -933,7 +933,7 @@
 								font-variant-numeric: lining-nums tabular-nums stacked-fractions
 									slashed-zero;
 								font-feature-settings: 'dlig' on, 'salt' on, 'cpsp' on, 'case' on;
-								font-family: Inter;
+								font-family: 'Geist Sans';
 								font-size: 12.805px;
 								font-style: normal;
 								font-weight: 400;
@@ -967,7 +967,7 @@
 									font-variant-numeric: lining-nums tabular-nums stacked-fractions
 										slashed-zero;
 									font-feature-settings: 'dlig' on, 'salt' on, 'cpsp' on, 'case' on;
-									font-family: Inter;
+									font-family: 'Geist Sans';
 									font-size: 12.805px;
 									font-style: normal;
 									font-weight: 400;
@@ -989,7 +989,7 @@
 								font-variant-numeric: lining-nums tabular-nums stacked-fractions
 									slashed-zero;
 								font-feature-settings: 'dlig' on, 'salt' on, 'cpsp' on, 'case' on;
-								font-family: Inter;
+								font-family: 'Geist Sans';
 								font-size: 12.805px;
 								font-style: normal;
 								font-weight: 400;
@@ -1023,7 +1023,7 @@
 									font-variant-numeric: lining-nums tabular-nums stacked-fractions
 										slashed-zero;
 									font-feature-settings: 'dlig' on, 'salt' on, 'cpsp' on, 'case' on;
-									font-family: Inter;
+									font-family: 'Geist Sans';
 									font-size: 12.805px;
 									font-style: normal;
 									font-weight: 400;
