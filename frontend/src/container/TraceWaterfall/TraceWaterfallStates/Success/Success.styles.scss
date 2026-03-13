@@ -18,7 +18,7 @@
 			align-items: center;
 			gap: 8px;
 			color: var(--bg-robin-400);
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 14px;
 			font-style: normal;
 			font-weight: 400;
@@ -27,7 +27,7 @@
 
 			.text {
 				color: var(--bg-robin-400);
-				font-family: Inter;
+				font-family: 'Geist Sans';
 				font-size: 14px;
 				font-style: normal;
 				font-weight: 400;
@@ -43,7 +43,7 @@
 			flex-direction: row-reverse;
 			gap: 8px;
 			color: var(--bg-robin-400);
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 14px;
 			font-style: normal;
 			font-weight: 400;
@@ -182,7 +182,7 @@
 
 								.children-count {
 									color: var(--bg-vanilla-400);
-									font-family: 'Space Mono';
+									font-family: 'Geist Mono';
 									font-size: 14px;
 									font-style: normal;
 									font-weight: 400;
@@ -234,7 +234,7 @@
 						width: 100%;
 						.service-name {
 							color: var(--bg-vanilla-400);
-							font-family: Inter;
+							font-family: 'Geist Sans';
 							font-size: 14px;
 							font-style: normal;
 							font-weight: 400;
@@ -306,7 +306,7 @@
 					font-variant-numeric: lining-nums tabular-nums stacked-fractions
 						slashed-zero;
 					font-feature-settings: 'case' on, 'cpsp' on, 'dlig' on, 'salt' on;
-					font-family: Inter;
+					font-family: 'Geist Sans';
 					font-size: 14px;
 					font-style: normal;
 					font-weight: 400;

@@ -1,4 +1,4 @@
-.signoz-radio-group.ant-radio-group {
+.o11y-radio-group.ant-radio-group {
 	color: var(--text-vanilla-400);
 
 	&.ant-radio-group-disabled {
@@ -55,7 +55,7 @@
 
 // Light mode styles
 .lightMode {
-	.signoz-radio-group {
+	.o11y-radio-group {
 		&.ant-radio-group-disabled {
 			.tab,
 			.selected_view {

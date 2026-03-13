@@ -115,7 +115,7 @@ function DatastoreQueryBuilder({
 						enabled: false,
 					},
 					fontSize: 14,
-					fontFamily: 'Space Mono',
+					fontFamily: 'Geist Mono',
 				}}
 				theme={isDarkMode ? 'my-theme' : 'light'}
 				beforeMount={setEditorTheme}

@@ -115,13 +115,13 @@
 		border: 1px solid var(--l3-border) !important;
 		border-radius: 2px;
 		color: var(--l1-foreground) !important;
-		font-family: 'SF Mono', monospace;
+		font-family: 'Geist Mono', monospace;
 		font-size: 12px;
 		line-height: 18px;
 
 		&::placeholder {
 			color: var(--l3-foreground) !important;
-			font-family: Inter, sans-serif;
+			font-family: 'Geist Sans', sans-serif;
 		}
 
 		&:hover {

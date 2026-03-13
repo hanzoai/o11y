@@ -44,7 +44,7 @@
 			}
 
 			.onboarding-header-title {
-				font-family: Inter, sans-serif;
+				font-family: 'Geist Sans', sans-serif;
 				font-size: 18px;
 				font-weight: 600;
 				line-height: 1;
@@ -55,7 +55,7 @@
 			}
 
 			.onboarding-header-subtitle {
-				font-family: Inter, sans-serif;
+				font-family: 'Geist Sans', sans-serif;
 				font-size: 13px;
 				font-weight: 400;
 				line-height: 20px;
@@ -123,7 +123,7 @@
 				background: var(--l3-background);
 				color: var(--l1-foreground);
 				border-radius: 2px;
-				font-family: Inter, sans-serif;
+				font-family: 'Geist Sans', sans-serif;
 				font-size: 13px;
 				font-weight: 400;
 				line-height: 20px;
@@ -184,7 +184,7 @@
 		.question-label {
 			color: var(--l1-foreground);
 			font-variant-numeric: slashed-zero;
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 13px;
 			font-style: normal;
 			font-weight: 600;
@@ -210,7 +210,7 @@
 			background: transparent;
 			border: 1px solid var(--l2-border);
 			color: var(--l2-foreground);
-			font-family: Inter, sans-serif;
+			font-family: 'Geist Sans', sans-serif;
 			font-size: 11px;
 			font-weight: 500;
 			line-height: 1;
@@ -239,7 +239,7 @@
 			background: var(--bg-robin-500);
 			border: none;
 			color: var(--bg-neutral-dark-50);
-			font-family: Inter, sans-serif;
+			font-family: 'Geist Sans', sans-serif;
 			font-size: 11px;
 			font-weight: 500;
 			line-height: 1;
@@ -268,7 +268,7 @@
 			background: transparent;
 			border: none;
 			color: var(--l2-foreground);
-			font-family: Inter, sans-serif;
+			font-family: 'Geist Sans', sans-serif;
 			font-size: 11px;
 			font-weight: 500;
 			line-height: 1;
@@ -304,7 +304,7 @@
 					font-variant-numeric: lining-nums tabular-nums stacked-fractions
 						slashed-zero;
 					font-feature-settings: 'dlig' on, 'salt' on, 'cpsp' on, 'case' on;
-					font-family: Inter;
+					font-family: 'Geist Sans';
 					font-size: 11px;
 					font-style: normal;
 					font-weight: 400;
@@ -342,7 +342,7 @@
 		}
 
 		.question {
-			font-family: Inter, sans-serif;
+			font-family: 'Geist Sans', sans-serif;
 			color: var(--l1-foreground);
 			font-variant-numeric: slashed-zero;
 			font-size: 13px;
@@ -360,7 +360,7 @@
 		.question-slider {
 			color: var(--l1-foreground);
 			font-variant-numeric: slashed-zero;
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 13px;
 			font-style: normal;
 			font-weight: 400;
@@ -576,7 +576,7 @@
 					border: 1px solid var(--l3-border);
 					background: var(--l3-background);
 					color: var(--l1-foreground);
-					font-family: Inter, sans-serif;
+					font-family: 'Geist Sans', sans-serif;
 					font-size: 13px;
 					font-style: normal;
 					font-weight: 400;
@@ -598,7 +598,7 @@
 
 			.ant-checkbox-wrapper {
 				color: var(--l1-foreground);
-				font-family: Inter, sans-serif;
+				font-family: 'Geist Sans', sans-serif;
 				font-size: 13px;
 				font-weight: 400;
 				line-height: 1;
@@ -669,7 +669,7 @@
 			color: var(--l2-foreground);
 			text-align: center;
 			font-variant-numeric: slashed-zero;
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 11px;
 			font-style: normal;
 			font-weight: 500;
