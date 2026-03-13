@@ -96,7 +96,7 @@
 					background-color: var(--bg-ink-300);
 					border: 1px solid var(--bg-slate-400);
 					color: var(--text-vanilla-400);
-					font-family: 'Space Mono';
+					font-family: 'Geist Mono';
 
 					&:hover {
 						border-color: var(--bg-vanilla-300);
@@ -157,7 +157,7 @@
 						height: 32px;
 
 						&::placeholder {
-							font-family: 'Space Mono';
+							font-family: 'Geist Mono';
 						}
 
 						&:hover {
@@ -187,7 +187,7 @@
 							}
 
 							.ant-select-selection-placeholder {
-								font-family: 'Space Mono';
+								font-family: 'Geist Mono';
 							}
 						}
 
@@ -241,7 +241,7 @@
 					height: 32px;
 
 					&::placeholder {
-						font-family: 'Space Mono';
+						font-family: 'Geist Mono';
 					}
 
 					&:hover {

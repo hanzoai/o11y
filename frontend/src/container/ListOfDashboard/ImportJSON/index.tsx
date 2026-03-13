@@ -241,7 +241,7 @@ function ImportJSON({
 							enabled: false,
 						},
 						fontSize: 14,
-						fontFamily: 'Space Mono',
+						fontFamily: 'Geist Mono',
 					}}
 					theme={isDarkMode ? 'my-theme' : 'light'}
 					onMount={(_, monaco): void => {

@@ -57,7 +57,7 @@ function JSONView({ logData }: JSONViewProps): JSX.Element {
 				'editor.background': Color.BG_INK_400,
 			},
 			// fontFamily: 'SF Mono',
-			fontFamily: 'Space Mono',
+			fontFamily: 'Geist Mono',
 			fontSize: 12,
 			fontWeight: 'normal',
 			lineHeight: 18,

@@ -88,7 +88,7 @@
 		color: var(--l1-foreground);
 		font-variant-numeric: lining-nums tabular-nums slashed-zero;
 		font-feature-settings: 'dlig' on, 'salt' on;
-		font-family: Inter;
+		font-family: 'Geist Sans';
 		font-size: var(--paragraph-small-400-font-size);
 		font-style: normal;
 		font-weight: var(--paragraph-small-400-font-weight);
@@ -139,7 +139,7 @@
 		border-radius: 2px;
 		background: var(--l2-background);
 		color: var(--l2-foreground);
-		font-family: 'SF Mono', 'Fira Code', monospace;
+		font-family: 'Geist Mono', 'Geist Mono', monospace;
 		font-size: var(--paragraph-base-400-font-size);
 		line-height: var(--line-height-20);
 	}

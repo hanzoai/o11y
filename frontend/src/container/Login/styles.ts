@@ -2,7 +2,7 @@ import { Form } from 'antd';
 import styled from 'styled-components';
 
 export const Label = styled.label`
-	font-family: var(--font-family-geist, Inter), sans-serif;
+	font-family: var(--font-family-geist, 'Geist Sans'), sans-serif;
 	font-size: 13px;
 	font-weight: 600;
 	line-height: 1;
