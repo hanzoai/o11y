@@ -9,7 +9,7 @@
 
 		.roles-settings-header-title {
 			color: var(--text-base-white);
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-style: normal;
 			font-size: 18px;
 			font-weight: 500;
@@ -19,7 +19,7 @@
 
 		.roles-settings-header-description {
 			color: var(--foreground);
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-style: normal;
 			font-size: 14px;
 			font-weight: 400;
@@ -60,7 +60,7 @@
 			border: 1px solid var(--l3-border);
 			border-radius: 2px;
 			padding: 6px 6px 6px 8px;
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 14px;
 			font-weight: 400;
 			line-height: 18px;
@@ -107,7 +107,7 @@
 }
 
 .roles-table-header-cell {
-	font-family: Inter;
+	font-family: 'Geist Sans';
 	font-size: 11px;
 	font-weight: 600;
 	text-transform: uppercase;
@@ -144,7 +144,7 @@
 	background: rgba(171, 189, 255, 0.04);
 	border-top: 1px solid var(--secondary);
 	border-bottom: 1px solid var(--secondary);
-	font-family: Inter;
+	font-family: 'Geist Sans';
 	font-size: 12px;
 	font-weight: 400;
 	color: var(--foreground);
@@ -185,7 +185,7 @@
 }
 
 .roles-table-cell {
-	font-family: Inter;
+	font-family: 'Geist Sans';
 	font-size: 14px;
 	font-weight: 400;
 	color: var(--foreground);
@@ -219,7 +219,7 @@
 	padding: 24px 16px;
 	text-align: center;
 	color: var(--foreground);
-	font-family: Inter;
+	font-family: 'Geist Sans';
 	font-size: 14px;
 	font-weight: 400;
 }
@@ -234,13 +234,13 @@
 		margin-right: auto;
 
 		.numbers {
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 12px;
 			color: var(--foreground);
 		}
 
 		.total {
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 12px;
 			color: var(--foreground);
 			opacity: 0.5;
@@ -304,7 +304,7 @@
 
 	.ant-modal-title {
 		color: var(--text-base-white);
-		font-family: Inter;
+		font-family: 'Geist Sans';
 		font-size: 13px;
 		font-weight: 400;
 		line-height: 1;
@@ -329,7 +329,7 @@
 
 			label {
 				color: var(--foreground);
-				font-family: Inter;
+				font-family: 'Geist Sans';
 				font-size: 14px;
 				font-weight: 400;
 				line-height: 20px;
@@ -344,7 +344,7 @@
 			border: 1px solid var(--l3-border);
 			border-radius: 2px;
 			padding: 6px 8px;
-			font-family: Inter;
+			font-family: 'Geist Sans';
 			font-size: 14px;
 			font-weight: 400;
 			line-height: 18px;

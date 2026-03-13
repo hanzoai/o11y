@@ -26,7 +26,7 @@
 }
 
 .auth-header-logo-text {
-	font-family: Satoshi, var(--font-family-geist, Inter), sans-serif;
+	font-family: var(--font-family-geist, 'Geist Sans'), sans-serif;
 	font-size: 15.4px;
 	font-weight: 500;
 	line-height: 17.5px;
@@ -48,7 +48,7 @@
 	transition: opacity 0.2s ease;
 
 	span {
-		font-family: var(--font-family-geist, Inter, sans-serif);
+		font-family: var(--font-family-geist, 'Geist Sans', sans-serif);
 		font-size: 11px;
 		font-weight: 500;
 		line-height: 1;
