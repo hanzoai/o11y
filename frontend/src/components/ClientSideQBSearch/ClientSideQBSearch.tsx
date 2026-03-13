@@ -8,7 +8,7 @@ import {
 	useRef,
 	useState,
 } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Select, Tag, Tooltip } from 'antd';
 import {
 	OPERATORS,

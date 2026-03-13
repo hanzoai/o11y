@@ -18,7 +18,7 @@ RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/re
 # Open and update the configuration file
 RUN sed -i 's/\(JAVA_OPTS=".*\)/\1 -javaagent:\/opt\/jboss-eap-7.1\/opentelemetry-javaagent.jar \
 -Dotel.exporter.otlp.endpoint=https:\/\/ingest.{{REGION}}.o11y.hanzo.ai:443 \
--Dotel.exporter.otlp.headers="signoz-ingestion-key={{HANZO_INGESTION_KEY}}" \
+-Dotel.exporter.otlp.headers="hanzo-ingestion-key={{HANZO_INGESTION_KEY}}" \
 -Dotel.resource.attributes="service.name={{MYAPP}}"/' /opt/jboss-eap-7.1/bin/standalone.conf
 ...
 ```

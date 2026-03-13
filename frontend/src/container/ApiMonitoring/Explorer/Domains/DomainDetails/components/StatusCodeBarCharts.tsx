@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { UseQueryResult } from 'react-query';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Card, Skeleton, Typography } from 'antd';
 import cx from 'classnames';
 import { useGetGraphCustomSeries } from 'components/CeleryTask/useGetGraphCustomSeries';

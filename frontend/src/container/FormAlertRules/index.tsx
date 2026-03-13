@@ -166,8 +166,8 @@ function FormAlertRules({
 				...(getSelectedQueryOptions(currentQuery.builder.queryTraceOperator) || []),
 			],
 			[EQueryType.PROM]: () => getSelectedQueryOptions(currentQuery.promql),
-			[EQueryType.CLICKHOUSE]: () =>
-				getSelectedQueryOptions(currentQuery.clickhouse_sql),
+			[EQueryType.DATASTORE]: () =>
+				getSelectedQueryOptions(currentQuery.datastore_sql),
 		};
 
 		return queryConfig[currentQuery.queryType]?.() || [];
@@ -390,15 +390,15 @@ function FormAlertRules({
 		return retval;
 	}, [t, currentQuery, notifications]);
 
-	const validateChQueryParams = useCallback((): boolean => {
+	const validateDsQueryParams = useCallback((): boolean => {
 		let retval = true;
-		if (currentQuery.queryType !== EQueryType.CLICKHOUSE) {
+		if (currentQuery.queryType !== EQueryType.DATASTORE) {
 			return retval;
 		}
 
 		if (
-			!currentQuery.clickhouse_sql ||
-			currentQuery.clickhouse_sql.length === 0
+			!currentQuery.datastore_sql ||
+			currentQuery.datastore_sql.length === 0
 		) {
 			notifications.error({
 				message: 'Error',
@@ -407,7 +407,7 @@ function FormAlertRules({
 			return false;
 		}
 
-		currentQuery.clickhouse_sql.forEach((item) => {
+		currentQuery.datastore_sql.forEach((item) => {
 			if (item.query === '') {
 				notifications.error({
 					message: 'Error',
@@ -460,12 +460,12 @@ function FormAlertRules({
 			return false;
 		}
 
-		if (!validateChQueryParams()) {
+		if (!validateDsQueryParams()) {
 			return false;
 		}
 
 		return validateQBParams();
-	}, [validateQBParams, validateChQueryParams, alertDef, validatePromParams]);
+	}, [validateQBParams, validateDsQueryParams, alertDef, validatePromParams]);
 
 	const preparePostData = (): AlertDef => {
 		const postableAlert: AlertDef = {
@@ -489,7 +489,7 @@ function FormAlertRules({
 							.data,
 					},
 					promQueries: mapQueryDataToApi(currentQuery.promql, 'name').data,
-					chQueries: mapQueryDataToApi(currentQuery.clickhouse_sql, 'name').data,
+					chQueries: mapQueryDataToApi(currentQuery.datastore_sql, 'name').data,
 					queryType: currentQuery.queryType,
 					panelType: panelType || initQuery.panelType,
 					unit: yAxisUnit,
@@ -710,7 +710,7 @@ function FormAlertRules({
 		/>
 	);
 
-	const renderPromAndChQueryChartPreview = (): JSX.Element => (
+	const renderPromAndDsQueryChartPreview = (): JSX.Element => (
 		<ChartPreview
 			headline={
 				<PlotTag
@@ -869,9 +869,9 @@ function FormAlertRules({
 						{currentQuery.queryType === EQueryType.QUERY_BUILDER &&
 							renderQBChartPreview()}
 						{currentQuery.queryType === EQueryType.PROM &&
-							renderPromAndChQueryChartPreview()}
-						{currentQuery.queryType === EQueryType.CLICKHOUSE &&
-							renderPromAndChQueryChartPreview()}
+							renderPromAndDsQueryChartPreview()}
+						{currentQuery.queryType === EQueryType.DATASTORE &&
+							renderPromAndDsQueryChartPreview()}
 					</div>
 
 					<StepContainer>

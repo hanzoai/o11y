@@ -91,7 +91,7 @@ function ChartPreview({ alertDef, source }: ChartPreviewProps): JSX.Element {
 		/>
 	);
 
-	const renderPromAndChQueryChartPreview = (): JSX.Element => (
+	const renderPromAndDsQueryChartPreview = (): JSX.Element => (
 		<ChartPreviewComponent
 			headline={headline}
 			name="Chart Preview"
@@ -110,9 +110,9 @@ function ChartPreview({ alertDef, source }: ChartPreviewProps): JSX.Element {
 			{currentQuery.queryType === EQueryType.QUERY_BUILDER &&
 				renderQBChartPreview()}
 			{currentQuery.queryType === EQueryType.PROM &&
-				renderPromAndChQueryChartPreview()}
-			{currentQuery.queryType === EQueryType.CLICKHOUSE &&
-				renderPromAndChQueryChartPreview()}
+				renderPromAndDsQueryChartPreview()}
+			{currentQuery.queryType === EQueryType.DATASTORE &&
+				renderPromAndDsQueryChartPreview()}
 		</div>
 	);
 }

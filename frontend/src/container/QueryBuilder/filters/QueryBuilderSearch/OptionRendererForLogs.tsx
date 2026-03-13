@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Tooltip, Typography } from 'antd';
 import cx from 'classnames';
 import { Zap } from 'lucide-react';

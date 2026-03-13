@@ -336,7 +336,7 @@ export const getPodMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -670,7 +670,7 @@ export const getPodMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -854,7 +854,7 @@ export const getPodMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1188,7 +1188,7 @@ export const getPodMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1329,7 +1329,7 @@ export const getPodMetricsQueryPayload = (
 					],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1413,7 +1413,7 @@ export const getPodMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1504,7 +1504,7 @@ export const getPodMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1722,7 +1722,7 @@ export const getPodMetricsQueryPayload = (
 					],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -1927,7 +1927,7 @@ export const getPodMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -2145,7 +2145,7 @@ export const getPodMetricsQueryPayload = (
 					],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -2242,7 +2242,7 @@ export const getPodMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -2339,7 +2339,7 @@ export const getPodMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',
@@ -2523,7 +2523,7 @@ export const getPodMetricsQueryPayload = (
 					queryFormulas: [],
 					queryTraceOperator: [],
 				},
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						disabled: false,
 						legend: '',

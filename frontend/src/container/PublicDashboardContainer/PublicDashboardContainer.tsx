@@ -13,6 +13,7 @@ import {
 import dayjs from 'dayjs';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import GetMinMax from 'lib/getMinMax';
+import BrandMark from 'components/BrandMark';
 import { SuccessResponseV2 } from 'types/api';
 import { Widgets } from 'types/api/dashboard/getAll';
 import { PublicDashboardDataProps } from 'types/api/dashboard/public/get';
@@ -129,13 +130,7 @@ function PublicDashboardContainer({
 			<div className="public-dashboard-header">
 				<div className="public-dashboard-header-left">
 					<div className="brand-logo">
-						<img
-							src="/Logos/hanzo-icon.svg"
-							alt="Hanzo"
-							className="brand-logo-img"
-						/>
-
-						<Typography className="brand-logo-name">Hanzo</Typography>
+						<BrandMark size={24} />
 					</div>
 
 					<div className="public-dashboard-header-title">

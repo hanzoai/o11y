@@ -20,7 +20,7 @@ export type QueryType =
 	| 'builder_formula'
 	| 'builder_sub_query'
 	| 'builder_join'
-	| 'clickhouse_sql'
+	| 'datastore_sql'
 	| 'promql';
 
 export type OrderDirection = 'asc' | 'desc';
@@ -290,7 +290,7 @@ export interface PromQuery {
 	legend?: string;
 }
 
-export interface ClickHouseQuery {
+export interface DatastoreQuery {
 	name: string;
 	query: string;
 	disabled?: boolean;
@@ -306,7 +306,7 @@ export interface QueryEnvelope {
 		| QueryBuilderFormula
 		| QueryBuilderJoin
 		| PromQuery
-		| ClickHouseQuery;
+		| DatastoreQuery;
 }
 
 export interface CompositeQuery {

@@ -9,7 +9,7 @@ Download/Copy the `hostmetrics.json` from [here](https://github.com/Hanzo O11y/d
 
 Once you click on the **`Done`** button at the bottom right corner, you'll be taken to the Hanzo O11y UI.
 
-In SigNoZ UI, go to dashboards section and click New Dashboard button and select the import JSON option and upload/paste the `hostmetrics-with-variables.json` file data that you downloaded/copied in last step.
+In O11y UI, go to dashboards section and click New Dashboard button and select the import JSON option and upload/paste the `hostmetrics-with-variables.json` file data that you downloaded/copied in last step.
 
 
 To know more detailed instructions, checkout the link [here](https://o11y.hanzo.ai/docs/userguide/hostmetrics/)

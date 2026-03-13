@@ -12,14 +12,14 @@ Add a new container definition in your ECS task definition for the Fluent Bit lo
 {
     ...
     {
-        "name": "signoz-log-router",
+        "name": "hanzo-log-router",
         "image": "906394416424.dkr.ecr.us-west-2.amazonaws.com/aws-for-fluent-bit:stable",
         "cpu": 250,
         "memory": 512,
         "essential": true,
         "dependsOn": [
             {
-                "containerName": "signoz-collector",
+                "containerName": "hanzo-collector",
                 "condition": "HEALTHY"
             }
         ],
@@ -27,7 +27,7 @@ Add a new container definition in your ECS task definition for the Fluent Bit lo
             "logDriver": "awslogs",
             "options": {
                 "awslogs-create-group": "True",
-                "awslogs-group": "/ecs/ecs-signoz-log-router",
+                "awslogs-group": "/ecs/ecs-hanzo-log-router",
                 "awslogs-region": "us-east-1",
                 "awslogs-stream-prefix": "ecs"
             }
@@ -42,7 +42,7 @@ Add a new container definition in your ECS task definition for the Fluent Bit lo
 }
 ```
 
-**NOTE:** When collecting logs from multiple applications, it is recommended to use `<application-name>-log-router` pattern instead of `signoz-log-router` for container name and `awslogs-group`. It helps to separate log router of different application.
+**NOTE:** When collecting logs from multiple applications, it is recommended to use `<application-name>-log-router` pattern instead of `hanzo-log-router` for container name and `awslogs-group`. It helps to separate log router of different application.
 
 &nbsp;
 
@@ -62,7 +62,7 @@ For **Bridge** network mode:
             "name": "<your-container-name>",
             "dependsOn": [
                 {
-                    "containerName": "signoz-log-router",
+                    "containerName": "hanzo-log-router",
                     "condition": "START"
                 }
             ],
@@ -71,14 +71,14 @@ For **Bridge** network mode:
                 "options": {
                     "Name": "forward",
                     "Match": "*",
-                    "Host": "signoz-collector",
+                    "Host": "hanzo-collector",
                     "Port": "8006",
                     "tls": "off",
                     "tls.verify": "off"
                 }
             },
             "links": [
-                "signoz-collector"
+                "hanzo-collector"
             ],
             ...
         }
@@ -98,7 +98,7 @@ For **AWS VCP** network mode:
             "name": "<your-container-name>",
             "dependsOn": [
                 {
-                    "containerName": "signoz-log-router",
+                    "containerName": "hanzo-log-router",
                     "condition": "START"
                 }
             ],

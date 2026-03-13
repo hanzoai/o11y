@@ -72,7 +72,7 @@ export function getWidgetQuery(
 				queryFormulas: (props.queryFormulas as IBuilderFormula[]) || [],
 				queryTraceOperator: [],
 			},
-			clickhouse_sql: [],
+			datastore_sql: [],
 			id: uuid(),
 		},
 	};

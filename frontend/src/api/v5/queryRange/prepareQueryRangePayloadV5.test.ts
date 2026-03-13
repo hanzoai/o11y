@@ -6,7 +6,7 @@ import {
 	IBuilderQuery,
 } from 'types/api/queryBuilder/queryBuilderData';
 import {
-	ClickHouseQuery,
+	DatastoreQuery,
 	LogAggregation,
 	LogBuilderQuery,
 	MetricBuilderQuery,
@@ -87,7 +87,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'q1',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: {
 					queryData: [baseBuilderQuery()],
 					queryFormulas: [baseFormula()],
@@ -214,7 +214,7 @@ describe('prepareQueryRangePayloadV5', () => {
 						legend: 'LP',
 					},
 				],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: { queryData: [], queryFormulas: [], queryTraceOperator: [] },
 			},
 			graphType: PANEL_TYPES.TIME_SERIES,
@@ -271,14 +271,14 @@ describe('prepareQueryRangePayloadV5', () => {
 		expect(promSpec.stats).toBe(false);
 	});
 
-	it('builds payload for ClickHouse queries and maps requestType from panel', () => {
+	it('builds payload for Datastore queries and maps requestType from panel', () => {
 		const props: GetQueryResultsProps = {
 			query: {
-				queryType: EQueryType.CLICKHOUSE,
+				queryType: EQueryType.DATASTORE,
 				id: 'q3',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [
+				datastore_sql: [
 					{
 						name: 'Q',
 						query: 'SELECT 1',
@@ -303,7 +303,7 @@ describe('prepareQueryRangePayloadV5', () => {
 					compositeQuery: expect.objectContaining({
 						queries: [
 							{
-								type: 'clickhouse_sql',
+								type: 'datastore_sql',
 								spec: expect.objectContaining({
 									name: 'Q',
 									query: 'SELECT 1',
@@ -330,8 +330,8 @@ describe('prepareQueryRangePayloadV5', () => {
 		expect(payload.requestType).toBe('scalar');
 		expect(payload.compositeQuery.queries).toHaveLength(1);
 		const ch = payload.compositeQuery.queries[0];
-		expect(ch.type).toBe('clickhouse_sql');
-		const chSpec = ch.spec as ClickHouseQuery;
+		expect(ch.type).toBe('datastore_sql');
+		const chSpec = ch.spec as DatastoreQuery;
 		expect(chSpec.name).toBe('Q');
 		expect(chSpec.query).toBe('SELECT 1');
 		expect(chSpec.legend).toBe('LC');
@@ -344,7 +344,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'q4',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: { queryData: [], queryFormulas: [], queryTraceOperator: [] },
 			},
 			graphType: PANEL_TYPES.TIME_SERIES,
@@ -382,7 +382,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'q5',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: {
 					queryData: [baseBuilderQuery()],
 					queryFormulas: [],
@@ -456,7 +456,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'q6',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: {
 					queryData: [logsQuery],
 					queryFormulas: [],
@@ -525,7 +525,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'e643e387-1996-4449-97b6-9ef4498a0573',
 				unit: undefined,
 				promql: [{ name: 'A', query: '', legend: '', disabled: false }],
-				clickhouse_sql: [{ name: 'A', legend: '', disabled: false, query: '' }],
+				datastore_sql: [{ name: 'A', legend: '', disabled: false, query: '' }],
 				builder: {
 					queryData: [
 						{
@@ -641,7 +641,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'q8',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: {
 					queryData: [
 						baseBuilderQuery({
@@ -707,7 +707,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'q9',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: {
 					queryData: [
 						baseBuilderQuery({
@@ -741,7 +741,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'q10',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: {
 					queryData: [
 						baseBuilderQuery({
@@ -785,7 +785,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'q11',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: {
 					queryData: [
 						baseBuilderQuery({
@@ -829,7 +829,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'q12',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: {
 					queryData: [
 						baseBuilderQuery({
@@ -863,7 +863,7 @@ describe('prepareQueryRangePayloadV5', () => {
 				id: 'q13',
 				unit: undefined,
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 				builder: {
 					queryData: [
 						baseBuilderQuery({

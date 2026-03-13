@@ -1,9 +1,9 @@
 import { useCallback, useState } from 'react';
-import { Callout } from '@signozhq/callout';
-import { Checkbox } from '@signozhq/checkbox';
-import { Style } from '@signozhq/design-tokens';
-import { CircleHelp } from '@signozhq/icons';
-import { Input } from '@signozhq/input';
+import { Callout } from 'components/ui/callout';
+import { Checkbox } from '@hanzo/ui';
+import { Style } from 'constants/designTokens';
+import { CircleHelp } from 'lucide-react';
+import { Input } from 'components/ui/input';
 import { Form, Input as AntdInput, Tooltip } from 'antd';
 
 import AttributeMappingSection from './components/AttributeMappingSection';

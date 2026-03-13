@@ -30,7 +30,7 @@ import type {
 	RenderErrorResponseDTO,
 	UpdateOrgPreferencePathParameters,
 	UpdateUserPreferencePathParameters,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 /**
  * This endpoint lists all org preferences

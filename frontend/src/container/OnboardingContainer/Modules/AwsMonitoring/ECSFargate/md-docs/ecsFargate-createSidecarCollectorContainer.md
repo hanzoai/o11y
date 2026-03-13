@@ -12,8 +12,8 @@ In your ECS task definition, include a new container definition specifically for
     "containerDefinitions": [
         ...,
         {
-            "name": "signoz-collector",
-            "image": "signoz/signoz-otel-collector:0.88.13",
+            "name": "hanzo-collector",
+            "image": "hanzo/hanzo-otel-collector:0.88.13",
             "user": "root",
             "command": [
                 "--config=env:HANZO_CONFIG_CONTENT"
@@ -21,7 +21,7 @@ In your ECS task definition, include a new container definition specifically for
             "secrets": [
                 {
                 "name": "HANZO_CONFIG_CONTENT",
-                "valueFrom": "/ecs/signoz/otelcol-sidecar.yaml"
+                "valueFrom": "/ecs/hanzo/otelcol-sidecar.yaml"
                 }
             ],
             "memory": 1024,
@@ -54,7 +54,7 @@ In your ECS task definition, include a new container definition specifically for
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                "awslogs-group": "/ecs/signoz-otel-EC2-sidcar",
+                "awslogs-group": "/ecs/hanzo-otel-EC2-sidcar",
                 "awslogs-region": "<aws-region>",
                 "awslogs-stream-prefix": "ecs",
                 "awslogs-create-group": "True"
@@ -97,7 +97,7 @@ There are two ways to grant access to the Parameter store:
                 "ssm:GetParameter"
             ],
             "Resource": [
-                "arn:aws:ssm:<aws-region>:<aws-account-id>:parameter/ecs/signoz/otelcol-sidecar.yaml"
+                "arn:aws:ssm:<aws-region>:<aws-account-id>:parameter/ecs/hanzo/otelcol-sidecar.yaml"
             ],
             "Effect": "Allow"
         }
@@ -134,7 +134,7 @@ There are two ways to grant access to the Parameter store:
                 "ssm:GetParameter"
             ],
             "Resource": [
-                "arn:aws:ssm:<aws-region>:<aws-account-id>:parameter/ecs/signoz/otelcol-sidecar.yaml"
+                "arn:aws:ssm:<aws-region>:<aws-account-id>:parameter/ecs/hanzo/otelcol-sidecar.yaml"
             ],
             "Effect": "Allow"
         }

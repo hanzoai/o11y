@@ -8,7 +8,7 @@ export const tablePanelWidgetQuery = {
 	opacity: '1',
 	panelTypes: 'table',
 	query: {
-		clickhouse_sql: [
+		datastore_sql: [
 			{
 				name: 'A',
 				legend: '',

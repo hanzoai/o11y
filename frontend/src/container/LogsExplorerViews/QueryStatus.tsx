@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Spin } from 'antd';
 import { CircleCheck } from 'lucide-react';
 

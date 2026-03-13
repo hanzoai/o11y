@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Alert, Spin } from 'antd';
 import { LoaderCircle, TriangleAlert } from 'lucide-react';
 

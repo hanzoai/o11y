@@ -31,7 +31,7 @@ If you run your `.war` package by putting in `webapps` folder, just add `setenv.
 
 ```bash
 export CATALINA_OPTS="$CATALINA_OPTS -javaagent:/<path>/opentelemetry-javaagent.jar"
-export OTEL_EXPORTER_OTLP_HEADERS="signoz-ingestion-key={{HANZO_INGESTION_KEY}}"
+export OTEL_EXPORTER_OTLP_HEADERS="hanzo-ingestion-key={{HANZO_INGESTION_KEY}}"
 export OTEL_EXPORTER_OTLP_ENDPOINT=https://ingest.{{REGION}}.o11y.hanzo.ai:443
 export OTEL_RESOURCE_ATTRIBUTES=service.name={{MYAPP}}
 ```

@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { useQueries, useQueryClient } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
-import { Color } from '@signozhq/design-tokens';
-import { toast } from '@signozhq/sonner';
+import { Color } from 'constants/designTokens';
+import { toast } from '@hanzo/ui';
 import { Button, Tooltip, Typography } from 'antd';
 import {
 	invalidateGetMetricMetadata,

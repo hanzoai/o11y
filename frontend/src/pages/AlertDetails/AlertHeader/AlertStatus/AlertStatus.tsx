@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { CircleCheck, Siren } from 'lucide-react';
 import { getDurationFromNow } from 'utils/timeUtils';
 

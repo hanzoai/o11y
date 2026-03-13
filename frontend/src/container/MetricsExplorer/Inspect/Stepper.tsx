@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'constants/designTokens';
 import { Button, Typography } from 'antd';
 import classNames from 'classnames';
 import { ArrowUpRightFromSquare, RefreshCcw } from 'lucide-react';

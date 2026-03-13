@@ -227,7 +227,7 @@ describe('TableViewActions', () => {
 				queryTraceOperator: [],
 			},
 			promql: [],
-			clickhouse_sql: [],
+			datastore_sql: [],
 		};
 
 		const mockUpdateQueriesData = jest.fn((query, type, callback) => {

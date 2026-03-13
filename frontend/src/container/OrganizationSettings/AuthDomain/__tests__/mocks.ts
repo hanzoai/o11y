@@ -1,4 +1,4 @@
-import { AuthtypesGettableAuthDomainDTO } from 'api/generated/services/sigNoz.schemas';
+import { AuthtypesGettableAuthDomainDTO } from 'api/generated/services/o11y.schemas';
 
 // API Endpoints
 export const AUTH_DOMAINS_LIST_ENDPOINT = '*/api/v1/domains';

@@ -1,4 +1,4 @@
-import { Callout } from '@signozhq/callout';
+import { Callout } from 'components/ui/callout';
 
 import { PermissionType, TimestampBadge } from '../../utils';
 import PermissionItem from './PermissionItem';

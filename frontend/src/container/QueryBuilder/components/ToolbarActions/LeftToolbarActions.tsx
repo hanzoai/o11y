@@ -23,7 +23,7 @@ export default function LeftToolbarActions({
 	showFilter,
 	handleFilterVisibilityChange,
 }: LeftToolbarActionsProps): JSX.Element {
-	const { clickhouse, list, timeseries, table, trace } = items;
+	const { datastore, list, timeseries, table, trace } = items;
 
 	return (
 		<div className="left-toolbar">
@@ -87,19 +87,19 @@ export default function LeftToolbarActions({
 					</Tooltip>
 				)}
 
-				{clickhouse?.show && (
-					<Tooltip title="Clickhouse">
+				{datastore?.show && (
+					<Tooltip title="Datastore">
 						<Button
-							disabled={clickhouse.disabled}
+							disabled={datastore.disabled}
 							className={cx(
-								'clickhouse-view-tab',
+								'datastore-view-tab',
 								'explorer-view-option',
-								selectedView === clickhouse.key ? activeTab : '',
+								selectedView === datastore.key ? activeTab : '',
 							)}
-							onClick={(): void => onChangeSelectedView(clickhouse.key)}
+							onClick={(): void => onChangeSelectedView(datastore.key)}
 						>
-							<Terminal size={14} data-testid="clickhouse-view" />
-							Clickhouse
+							<Terminal size={14} data-testid="datastore-view" />
+							Datastore
 						</Button>
 					</Tooltip>
 				)}

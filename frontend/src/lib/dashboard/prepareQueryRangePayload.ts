@@ -52,7 +52,7 @@ export const prepareQueryRangePayload = ({
 			compositeQuery.builderQueries = builderQueries;
 			break;
 		}
-		case EQueryType.CLICKHOUSE: {
+		case EQueryType.DATASTORE: {
 			const chQueries = query[query.queryType].reduce((acc, query) => {
 				if (!query.query) {
 					return acc;

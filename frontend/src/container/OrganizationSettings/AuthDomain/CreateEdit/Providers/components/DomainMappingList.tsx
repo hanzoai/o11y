@@ -1,6 +1,6 @@
-import { Button } from '@signozhq/button';
-import { Plus, Trash2 } from '@signozhq/icons';
-import { Input } from '@signozhq/input';
+import { Button } from '@hanzo/ui';
+import { Plus, Trash2 } from 'lucide-react';
+import { Input } from 'components/ui/input';
 import { Form } from 'antd';
 
 import './DomainMappingList.styles.scss';

@@ -41,7 +41,7 @@ In case you are using custom docker networking, you would have to use `ExtraHost
     ...
     "extraHosts": [
       {
-        "hostname": "signoz-collector",
+        "hostname": "hanzo-collector",
         "ipAddress": "host-gateway"
       }
       ...

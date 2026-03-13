@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Color, Spacing } from '@signozhq/design-tokens';
+import { Color, Spacing } from 'constants/designTokens';
 import { Button, Divider, Drawer, RadioChangeEvent, Typography } from 'antd';
 import LogsIcon from 'assets/AlertHistory/LogsIcon';
-import O11yRadioGroup from 'components/SignozRadioGroup/SignozRadioGroup';
+import O11yRadioGroup from 'components/O11yRadioGroup/O11yRadioGroup';
 import { QueryParams } from 'constants/query';
 import {
 	initialQueryBuilderFormValuesMap,
