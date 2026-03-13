@@ -1,5 +1,5 @@
 /**
- * ESLint Configuration for SigNoz Frontend
+ * ESLint Configuration for Hanzo O11y Frontend
  */
 module.exports = {
 	ignorePatterns: [
