@@ -47,6 +47,8 @@
     "@sentry/react": "8.41.0",
     "@sentry/vite-plugin": "2.22.6",
     "@hanzo/ui": "^5.3.41",
+    "react-resizable-panels": "^4.0.0",
+    "react-day-picker": "^9.0.0",
     "@tanstack/react-table": "8.20.6",
     "@tanstack/react-virtual": "3.11.2",
     "@uiw/codemirror-theme-copilot": "4.23.11",

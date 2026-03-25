@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@hanzo/ui';
+import { Button, Label, RadioGroup, RadioGroupItem } from '@hanzo/ui';
 import { Input } from 'components/ui/input';
-import {
-	RadioGroup,
-	RadioGroupItem,
-	RadioGroupLabel,
-} from '@hanzo/ui';
 import { Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { ArrowRight } from 'lucide-react';
@@ -167,7 +162,7 @@ function OrgQuestions({ orgDetails, onNext }: OrgQuestionsProps): JSX.Element {
 													onChange={(e): void => setOtherTool(e.target.value)}
 												/>
 											) : (
-												<RadioGroupLabel htmlFor={`radio-${tool}`}>{label}</RadioGroupLabel>
+												<Label htmlFor={`radio-${tool}`}>{label}</Label>
 											)}
 										</div>
 									);
@@ -175,7 +170,7 @@ function OrgQuestions({ orgDetails, onNext }: OrgQuestionsProps): JSX.Element {
 								return (
 									<div key={tool} className="radio-item observability-tool-radio-item">
 										<RadioGroupItem value={tool} id={`radio-${tool}`} />
-										<RadioGroupLabel htmlFor={`radio-${tool}`}>{label}</RadioGroupLabel>
+										<Label htmlFor={`radio-${tool}`}>{label}</Label>
 									</div>
 								);
 							})}
@@ -195,9 +190,9 @@ function OrgQuestions({ orgDetails, onNext }: OrgQuestionsProps): JSX.Element {
 								{Object.entries(migrationTimelineOptions).map(([key, label]) => (
 									<div key={key} className="radio-item migration-timeline-radio-item">
 										<RadioGroupItem value={key} id={`radio-migration-${key}`} />
-										<RadioGroupLabel htmlFor={`radio-migration-${key}`}>
+										<Label htmlFor={`radio-migration-${key}`}>
 											{label}
-										</RadioGroupLabel>
+										</Label>
 									</div>
 								))}
 							</RadioGroup>
@@ -213,11 +208,11 @@ function OrgQuestions({ orgDetails, onNext }: OrgQuestionsProps): JSX.Element {
 						>
 							<div className="radio-item opentelemetry-radio-item">
 								<RadioGroupItem value="yes" id="radio-otel-yes" />
-								<RadioGroupLabel htmlFor="radio-otel-yes">Yes</RadioGroupLabel>
+								<Label htmlFor="radio-otel-yes">Yes</Label>
 							</div>
 							<div className="radio-item opentelemetry-radio-item">
 								<RadioGroupItem value="no" id="radio-otel-no" />
-								<RadioGroupLabel htmlFor="radio-otel-no">No</RadioGroupLabel>
+								<Label htmlFor="radio-otel-no">No</Label>
 							</div>
 						</RadioGroup>
 					</div>

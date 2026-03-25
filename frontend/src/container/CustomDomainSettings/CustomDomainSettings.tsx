@@ -8,7 +8,7 @@ import {
 	ExternalLink,
 	FilePenLine,
 	Link2,
-	SolidAlertCircle,
+	CircleAlert,
 	X,
 } from 'lucide-react';
 import { toast } from '@hanzo/ui';
@@ -275,7 +275,7 @@ export default function CustomDomainSettings(): JSX.Element {
 						showIcon
 						className="custom-domain-callout"
 						size="small"
-						icon={<SolidAlertCircle size={13} color="primary" />}
+						icon={<CircleAlert size={13} color="primary" />}
 						message={`Updating your URL to ⎯ ${customDomainSubdomain}.${dnsSuffix}. This may take a few mins.`}
 					/>
 				)}
