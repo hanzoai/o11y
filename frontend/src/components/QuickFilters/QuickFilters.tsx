@@ -4,15 +4,7 @@ import {
 	SyncOutlined,
 	VerticalAlignTopOutlined,
 } from '@ant-design/icons';
-import {
-	Combobox,
-	ComboboxCommand,
-	ComboboxContent,
-	ComboboxItem,
-	ComboboxList,
-	ComboboxTrigger,
-} from '@hanzo/ui';
-import { Skeleton, Switch, Tooltip, Typography } from 'antd';
+import { Select, Skeleton, Switch, Tooltip, Typography } from 'antd';
 import getLocalStorageKey from 'api/browser/localstorage/get';
 import setLocalStorageKey from 'api/browser/localstorage/set';
 import logEvent from 'api/common/logEvent';
@@ -70,7 +62,6 @@ export default function QuickFilters(props: IQuickFiltersProps): JSX.Element {
 		redirectWithQueryBuilderData,
 		panelType,
 	} = useQueryBuilder();
-	const [open, setOpen] = useState(false);
 
 	// Sync lastUsedQuery when queries change (e.g., after deletion)
 	const validQueryIndex = useMemo(
@@ -181,35 +172,16 @@ export default function QuickFilters(props: IQuickFiltersProps): JSX.Element {
 				{displayedQueryName ? 'Filters for' : 'Filters'}
 			</Typography.Text>
 			{queryOptions.length > 1 && (!isListView || shouldShowDropdownInListView) ? (
-				<Combobox open={open} onOpenChange={setOpen}>
-					<ComboboxTrigger
-						placeholder="Select a query"
-						value={queryOptions.find((f) => f.value === validQueryIndex)?.label || ''}
-						className="select-box"
-					/>
-					{open && (
-						<ComboboxContent>
-							<ComboboxCommand>
-								<ComboboxList>
-									{queryOptions.map((option) => (
-										<ComboboxItem
-											key={option.value}
-											value={String(option.value)}
-											onSelect={(): void => {
-												handleQueryChange(option.value);
-												setOpen(false);
-											}}
-											isSelected={validQueryIndex === option.value}
-											showCheck={false}
-										>
-											{option.label}
-										</ComboboxItem>
-									))}
-								</ComboboxList>
-							</ComboboxCommand>
-						</ComboboxContent>
-					)}
-				</Combobox>
+				<Select
+					size="small"
+					className="select-box"
+					placeholder="Select a query"
+					value={validQueryIndex}
+					onChange={(value: number): void => {
+						handleQueryChange(value);
+					}}
+					options={queryOptions}
+				/>
 			) : (
 				displayedQueryName && (
 					<Tooltip

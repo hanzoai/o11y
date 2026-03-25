@@ -1,9 +1,9 @@
 @use './periscope.scss';
 
-@import 'styles/tokens/style.css';
+@import './styles/tokens/style.css';
 @import 'overlayscrollbars/overlayscrollbars.css';
 
-@import 'styles/tokens/themes/tokens.css';
+@import './styles/tokens/themes/tokens.css';
 
 /* Geist Sans + Geist Mono loaded via CDN in index.html */
 
