@@ -1,10 +1,11 @@
 # Stage 1: Build frontend
 FROM node:22-alpine AS frontend
+RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app/frontend
-COPY frontend/package.json frontend/yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 COPY frontend/ .
-RUN yarn build
+RUN pnpm build
 
 # Stage 2: Build Go binary
 FROM golang:1.26-alpine AS backend
