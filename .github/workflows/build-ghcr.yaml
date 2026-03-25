@@ -11,6 +11,4 @@ jobs:
     uses: hanzoai/.github/.github/workflows/docker-build.yml@main
     with:
       image: ghcr.io/hanzoai/o11y
-      # arm64 runner offline — build amd64 only until runner is restored
-      platforms: linux/amd64
     secrets: inherit
