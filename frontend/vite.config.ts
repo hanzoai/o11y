@@ -123,6 +123,28 @@ export default defineConfig(
 				sourcemap: true,
 				outDir: 'build',
 				cssMinify: 'esbuild',
+				rollupOptions: {
+					// @hanzo/ui eagerly imports all optional peer deps at the
+					// module level.  Externalize the ones this o11y app does not
+					// use so the bundler does not error on missing resolution.
+					external: [
+						/^next($|\/)/,
+						'next-themes',
+						'react-hook-form',
+						/^@hookform\//,
+						'chrono-node',
+						'mermaid',
+						'recharts',
+						'sql.js',
+						'react-qrcode-logo',
+						'@rainbow-me/rainbowkit',
+						'wagmi',
+						/^@tanstack\/react-query/,
+						'@modelcontextprotocol/sdk',
+						'@hanzo/docs-core',
+						/^@o11yhq\//,
+					],
+				},
 			},
 			server: {
 				open: true,
