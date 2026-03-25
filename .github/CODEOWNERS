@@ -4,15 +4,15 @@
 
 # that they own.
 
-/frontend/ @SigNoz/frontend-maintainers
+/frontend/ @hanzoai/frontend-maintainers
 
 # Onboarding
 
 /frontend/src/container/OnboardingV2Container/onboarding-configs/onboarding-config-with-links.json @makeavish
 /frontend/src/container/OnboardingV2Container/AddDataSource/AddDataSource.tsx @makeavish
 
-/deploy/ @SigNoz/devops
-.github @SigNoz/devops
+/deploy/ @hanzoai/devops
+.github @hanzoai/devops
 
 # Scaffold Owners
 
@@ -111,36 +111,36 @@
 
 # OpenAPI types generator
 
-/frontend/src/api @SigNoz/frontend-maintainers
+/frontend/src/api @hanzoai/frontend-maintainers
 
 # Dashboard Owners
 
-/frontend/src/hooks/dashboard/ @SigNoz/pulse-frontend
-/frontend/src/providers/Dashboard/ @SigNoz/pulse-frontend
+/frontend/src/hooks/dashboard/ @hanzoai/pulse-frontend
+/frontend/src/providers/Dashboard/ @hanzoai/pulse-frontend
 
 ## Dashboard Types
 
-/frontend/src/api/types/dashboard/ @SigNoz/pulse-frontend
+/frontend/src/api/types/dashboard/ @hanzoai/pulse-frontend
 
 ## Dashboard List
 
-/frontend/src/pages/DashboardsListPage/ @SigNoz/pulse-frontend
-/frontend/src/container/ListOfDashboard/ @SigNoz/pulse-frontend
+/frontend/src/pages/DashboardsListPage/ @hanzoai/pulse-frontend
+/frontend/src/container/ListOfDashboard/ @hanzoai/pulse-frontend
 
 ## Dashboard Page
 
-/frontend/src/pages/DashboardPage/ @SigNoz/pulse-frontend
-/frontend/src/container/DashboardContainer/ @SigNoz/pulse-frontend
-/frontend/src/container/GridCardLayout/ @SigNoz/pulse-frontend
-/frontend/src/container/NewWidget/ @SigNoz/pulse-frontend
+/frontend/src/pages/DashboardPage/ @hanzoai/pulse-frontend
+/frontend/src/container/DashboardContainer/ @hanzoai/pulse-frontend
+/frontend/src/container/GridCardLayout/ @hanzoai/pulse-frontend
+/frontend/src/container/NewWidget/ @hanzoai/pulse-frontend
 
 ## Public Dashboard Page
 
-/frontend/src/pages/PublicDashboard/ @SigNoz/pulse-frontend
-/frontend/src/container/PublicDashboardContainer/ @SigNoz/pulse-frontend
+/frontend/src/pages/PublicDashboard/ @hanzoai/pulse-frontend
+/frontend/src/container/PublicDashboardContainer/ @hanzoai/pulse-frontend
 
 ## Dashboard Libs + Components
-/frontend/src/lib/uPlotV2/ @SigNoz/pulse-frontend
-/frontend/src/lib/dashboard/ @SigNoz/pulse-frontend
-/frontend/src/lib/dashboardVariables/ @SigNoz/pulse-frontend
-/frontend/src/components/NewSelect/ @SigNoz/pulse-frontend
+/frontend/src/lib/uPlotV2/ @hanzoai/pulse-frontend
+/frontend/src/lib/dashboard/ @hanzoai/pulse-frontend
+/frontend/src/lib/dashboardVariables/ @hanzoai/pulse-frontend
+/frontend/src/components/NewSelect/ @hanzoai/pulse-frontend
