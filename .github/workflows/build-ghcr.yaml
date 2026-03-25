@@ -2,14 +2,13 @@ name: Build & Push to GHCR
 
 on:
   push:
-    branches: [main, rebrand/hanzo-o11y]
+    branches: [main, test, dev]
     tags: [v*]
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME_ENTERPRISE: hanzoai/o11y
-  IMAGE_NAME_COMMUNITY: hanzoai/o11y-community
+  IMAGE_NAME: hanzoai/o11y
 
 jobs:
   build-frontend:
@@ -35,9 +34,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    strategy:
-      matrix:
-        variant: [enterprise, community]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -46,7 +42,7 @@ jobs:
           path: frontend/build/
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.26'
       - name: Build Go binary
         run: |
           VERSION=$(git describe --tags --always)
@@ -57,33 +53,19 @@ jobs:
           LDFLAGS="$LDFLAGS -X github.com/hanzoai/o11y/pkg/version.hash=$HASH"
           LDFLAGS="$LDFLAGS -X github.com/hanzoai/o11y/pkg/version.time=$TIMESTAMP"
           LDFLAGS="$LDFLAGS -X github.com/hanzoai/o11y/pkg/version.branch=$BRANCH"
-          LDFLAGS="$LDFLAGS -X github.com/hanzoai/o11y/pkg/version.variant=${{ matrix.variant }}"
           mkdir -p target/linux-amd64
-          if [ "${{ matrix.variant }}" = "community" ]; then
-            BINARY_NAME="o11y-community"
-          else
-            BINARY_NAME="signoz"
-          fi
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "$LDFLAGS" -o target/linux-amd64/$BINARY_NAME ./cmd/${{ matrix.variant }}/
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "$LDFLAGS" -o target/linux-amd64/o11y ./cmd/server/
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set image name
-        id: image
-        run: |
-          if [ "${{ matrix.variant }}" = "enterprise" ]; then
-            echo "name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME_ENTERPRISE }}" >> $GITHUB_OUTPUT
-          else
-            echo "name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME_COMMUNITY }}" >> $GITHUB_OUTPUT
-          fi
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ steps.image.outputs.name }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
@@ -93,7 +75,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: cmd/${{ matrix.variant }}/Dockerfile
+          file: cmd/server/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
