@@ -21,8 +21,8 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: |
-          yarn install --frozen-lockfile
-          yarn build
+          pnpm install --frozen-lockfile
+          pnpm run build
       - uses: actions/upload-artifact@v4
         with:
           name: frontend-build
