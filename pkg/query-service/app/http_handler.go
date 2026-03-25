@@ -73,7 +73,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	traceFunnels "github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
 
-	"go.uber.org/zap"
+	"log/slog"
 
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/kafka"
 	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
@@ -251,13 +251,13 @@ func NewAPIHandler(opts APIHandlerOpts, config o11y.Config) (*APIHandler, error)
 	// TODO(nitya): remote this in later for multitenancy.
 	orgs, err := opts.O11y.Modules.OrgGetter.ListByOwnedKeyRange(context.Background())
 	if err != nil {
-		zap.L().Warn("unexpected error while fetching orgs  while initializing base api handler", zap.Error(err))
+		slog.Warn("unexpected error while fetching orgs  while initializing base api handler", "error", err)
 	}
 	// if the first org with the first user is created then the setup is complete.
 	if len(orgs) == 1 {
 		count, err := opts.O11y.Modules.UserGetter.CountByOrgID(context.Background(), orgs[0].ID)
 		if err != nil {
-			zap.L().Warn("unexpected error while fetch user count while initializing base api handler", zap.Error(err))
+			slog.Warn("unexpected error while fetch user count while initializing base api handler", "error", err)
 		}
 
 		if count > 0 {
@@ -312,7 +312,7 @@ func RespondError(w http.ResponseWriter, apiErr model.BaseApiError, data interfa
 		Data:      data,
 	})
 	if err != nil {
-		zap.L().Error("error marshalling json response", zap.Error(err))
+		slog.Error("error marshalling json response", "error", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -344,7 +344,7 @@ func RespondError(w http.ResponseWriter, apiErr model.BaseApiError, data interfa
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	if n, err := w.Write(b); err != nil {
-		zap.L().Error("error writing response", zap.Int("bytesWritten", n), zap.Error(err))
+		slog.Error("error writing response", "bytesWritten", n, "error", err)
 	}
 }
 
@@ -356,7 +356,7 @@ func writeHttpResponse(w http.ResponseWriter, data interface{}) {
 		Data:   data,
 	})
 	if err != nil {
-		zap.L().Error("error marshalling json response", zap.Error(err))
+		slog.Error("error marshalling json response", "error", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -364,7 +364,7 @@ func writeHttpResponse(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if n, err := w.Write(b); err != nil {
-		zap.L().Error("error writing response", zap.Int("bytesWritten", n), zap.Error(err))
+		slog.Error("error writing response", "bytesWritten", n, "error", err)
 	}
 }
 
@@ -936,14 +936,14 @@ func (aH *APIHandler) metaForLinks(ctx context.Context, rule *ruletypes.Gettable
 			}
 			keys = model.GetLogFieldsV3(ctx, params, logFields)
 		} else {
-			zap.L().Error("failed to get log fields using empty keys; the link might not work as expected", zap.Error(apiErr))
+			slog.Error("failed to get log fields using empty keys; the link might not work as expected", "error", apiErr)
 		}
 	} else if rule.AlertType == ruletypes.AlertTypeTraces {
 		traceFields, err := aH.reader.GetSpanAttributeKeysByNames(ctx, logsv3.GetFieldNames(rule.PostableRule.RuleCondition.CompositeQuery))
 		if err == nil {
 			keys = traceFields
 		} else {
-			zap.L().Error("failed to get span attributes using empty keys; the link might not work as expected", zap.Error(err))
+			slog.Error("failed to get span attributes using empty keys; the link might not work as expected", "error", err)
 		}
 	}
 
@@ -1276,14 +1276,14 @@ func (aH *APIHandler) List(rw http.ResponseWriter, r *http.Request) {
 
 	installedIntegrationDashboards, apiErr := aH.IntegrationsController.GetDashboardsForInstalledIntegrations(ctx, orgID)
 	if apiErr != nil {
-		zap.L().Error("failed to get dashboards for installed integrations", zap.Error(apiErr))
+		slog.Error("failed to get dashboards for installed integrations", "error", apiErr)
 	} else {
 		dashboards = append(dashboards, installedIntegrationDashboards...)
 	}
 
 	cloudIntegrationDashboards, apiErr := aH.CloudIntegrationsController.AvailableDashboards(ctx, orgID)
 	if apiErr != nil {
-		zap.L().Error("failed to get dashboards for cloud integrations", zap.Error(apiErr))
+		slog.Error("failed to get dashboards for cloud integrations", "error", apiErr)
 	} else {
 		dashboards = append(dashboards, cloudIntegrationDashboards...)
 	}
@@ -1325,7 +1325,7 @@ func (aH *APIHandler) testRule(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		zap.L().Error("Error in getting req body in test rule API", zap.Error(err))
+		slog.Error("Error in getting req body in test rule API", "error", err)
 		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
 		return
 	}
@@ -1377,7 +1377,7 @@ func (aH *APIHandler) patchRule(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		zap.L().Error("error in getting req body of patch rule API\n", zap.Error(err))
+		slog.Error("error in getting req body of patch rule API\n", "error", err)
 		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
 		return
 	}
@@ -1407,7 +1407,7 @@ func (aH *APIHandler) editRule(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		zap.L().Error("error in getting req body of edit rule API", zap.Error(err))
+		slog.Error("error in getting req body of edit rule API", "error", err)
 		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
 		return
 	}
@@ -1432,7 +1432,7 @@ func (aH *APIHandler) createRule(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		zap.L().Error("Error in getting req body for create rule API", zap.Error(err))
+		slog.Error("Error in getting req body for create rule API", "error", err)
 		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
 		return
 	}
@@ -1456,7 +1456,7 @@ func (aH *APIHandler) queryRangeMetrics(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// zap.L().Info(query, apiError)
+	// slog.Info(query, apiError)
 
 	ctx := r.Context()
 	if to := r.FormValue("timeout"); to != "" {
@@ -1478,7 +1478,7 @@ func (aH *APIHandler) queryRangeMetrics(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if res.Err != nil {
-		zap.L().Error("error in query range metrics", zap.Error(res.Err))
+		slog.Error("error in query range metrics", "error", res.Err)
 	}
 
 	if res.Err != nil {
@@ -1511,7 +1511,7 @@ func (aH *APIHandler) queryMetrics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// zap.L().Info(query, apiError)
+	// slog.Info(query, apiError)
 
 	ctx := r.Context()
 	if to := r.FormValue("timeout"); to != "" {
@@ -1533,7 +1533,7 @@ func (aH *APIHandler) queryMetrics(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if res.Err != nil {
-		zap.L().Error("error in query range metrics", zap.Error(res.Err))
+		slog.Error("error in query range metrics", "error", res.Err)
 	}
 
 	if res.Err != nil {
@@ -1636,7 +1636,7 @@ func (aH *APIHandler) getServicesTopLevelOps(w http.ResponseWriter, r *http.Requ
 	var params topLevelOpsParams
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
-		zap.L().Error("Error in getting req body for get top operations API", zap.Error(err))
+		slog.Error("Error in getting req body for get top operations API", "error", err)
 	}
 
 	if params.Service != "" {
@@ -2058,7 +2058,7 @@ func (aH *APIHandler) HandleError(w http.ResponseWriter, err error, statusCode i
 		return false
 	}
 	if statusCode == http.StatusInternalServerError {
-		zap.L().Error("HTTP handler, Internal Server Error", zap.Error(err))
+		slog.Error("HTTP handler, Internal Server Error", "error", err)
 	}
 	structuredResp := structuredResponse{
 		Errors: []structuredError{
@@ -2152,7 +2152,7 @@ func (aH *APIHandler) onboardProducers(
 ) {
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2160,7 +2160,7 @@ func (aH *APIHandler) onboardProducers(
 	chq, err := kafka.BuildClickHouseQuery(messagingQueue, kafka.KafkaQueue, "onboard_producers")
 
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2254,7 +2254,7 @@ func (aH *APIHandler) onboardConsumers(
 ) {
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2262,7 +2262,7 @@ func (aH *APIHandler) onboardConsumers(
 	chq, err := kafka.BuildClickHouseQuery(messagingQueue, kafka.KafkaQueue, "onboard_consumers")
 
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2401,7 +2401,7 @@ func (aH *APIHandler) onboardKafka(w http.ResponseWriter, r *http.Request) {
 
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2409,7 +2409,7 @@ func (aH *APIHandler) onboardKafka(w http.ResponseWriter, r *http.Request) {
 	queryRangeParams, err := kafka.BuildBuilderQueriesKafkaOnboarding(messagingQueue)
 
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2511,19 +2511,19 @@ func (aH *APIHandler) getNetworkData(w http.ResponseWriter, r *http.Request) {
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 
 	queryRangeParams, err := kafka.BuildQRParamsWithCache(messagingQueue, "throughput", attributeCache)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2562,12 +2562,12 @@ func (aH *APIHandler) getNetworkData(w http.ResponseWriter, r *http.Request) {
 
 	queryRangeParams, err = kafka.BuildQRParamsWithCache(messagingQueue, "fetch-latency", attributeCache)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2622,7 +2622,7 @@ func (aH *APIHandler) getProducerData(w http.ResponseWriter, r *http.Request) {
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2636,13 +2636,13 @@ func (aH *APIHandler) getProducerData(w http.ResponseWriter, r *http.Request) {
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "producer", kafkaSpanEval)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2679,7 +2679,7 @@ func (aH *APIHandler) getConsumerData(w http.ResponseWriter, r *http.Request) {
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2689,13 +2689,13 @@ func (aH *APIHandler) getConsumerData(w http.ResponseWriter, r *http.Request) {
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "consumer", kafkaSpanEval)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2737,7 +2737,7 @@ func (aH *APIHandler) getPartitionOverviewLatencyData(w http.ResponseWriter, r *
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2747,13 +2747,13 @@ func (aH *APIHandler) getPartitionOverviewLatencyData(w http.ResponseWriter, r *
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "producer-topic-throughput", kafkaSpanEval)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2795,7 +2795,7 @@ func (aH *APIHandler) getConsumerPartitionLatencyData(w http.ResponseWriter, r *
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2805,13 +2805,13 @@ func (aH *APIHandler) getConsumerPartitionLatencyData(w http.ResponseWriter, r *
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "consumer_partition_latency", kafkaSpanEval)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2855,7 +2855,7 @@ func (aH *APIHandler) getProducerThroughputOverview(w http.ResponseWriter, r *ht
 
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2866,13 +2866,13 @@ func (aH *APIHandler) getProducerThroughputOverview(w http.ResponseWriter, r *ht
 
 	producerQueryRangeParams, err := kafka.BuildQRParamsWithCache(messagingQueue, "producer-throughput-overview", attributeCache)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 
 	if err := validateQueryRangeParamsV3(producerQueryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2908,12 +2908,12 @@ func (aH *APIHandler) getProducerThroughputOverview(w http.ResponseWriter, r *ht
 
 	queryRangeParams, err := kafka.BuildQRParamsWithCache(messagingQueue, "producer-throughput-overview-byte-rate", attributeCache)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2971,7 +2971,7 @@ func (aH *APIHandler) getProducerThroughputDetails(w http.ResponseWriter, r *htt
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -2981,13 +2981,13 @@ func (aH *APIHandler) getProducerThroughputDetails(w http.ResponseWriter, r *htt
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "producer-throughput-details", kafkaSpanEval)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -3029,7 +3029,7 @@ func (aH *APIHandler) getConsumerThroughputOverview(w http.ResponseWriter, r *ht
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -3039,13 +3039,13 @@ func (aH *APIHandler) getConsumerThroughputOverview(w http.ResponseWriter, r *ht
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "consumer-throughput-overview", kafkaSpanEval)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -3087,7 +3087,7 @@ func (aH *APIHandler) getConsumerThroughputDetails(w http.ResponseWriter, r *htt
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -3097,13 +3097,13 @@ func (aH *APIHandler) getConsumerThroughputDetails(w http.ResponseWriter, r *htt
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "consumer-throughput-details", kafkaSpanEval)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
 
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -3148,7 +3148,7 @@ func (aH *APIHandler) getProducerConsumerEval(w http.ResponseWriter, r *http.Req
 	messagingQueue, apiErr := ParseKafkaQueueBody(r)
 
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -3158,7 +3158,7 @@ func (aH *APIHandler) getProducerConsumerEval(w http.ResponseWriter, r *http.Req
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "producer-consumer-eval", kafkaSpanEval)
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, &model.ApiError{
 			Typ: model.ErrorBadData,
 			Err: err,
@@ -3167,7 +3167,7 @@ func (aH *APIHandler) getProducerConsumerEval(w http.ResponseWriter, r *http.Req
 	}
 
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -4255,7 +4255,7 @@ func (aH *APIHandler) CreateLogsPipeline(w http.ResponseWriter, r *http.Request)
 		postable []pipelinetypes.PostablePipeline,
 	) (*logparsingpipeline.PipelinesResponse, error) {
 		if len(postable) == 0 {
-			zap.L().Warn("found no pipelines in the http request, this will delete all the pipelines")
+			slog.Warn("found no pipelines in the http request, this will delete all the pipelines")
 		}
 
 		err := aH.LogsParsingPipelineController.ValidatePipelines(ctx, postable)
@@ -4453,7 +4453,7 @@ func (aH *APIHandler) QueryRangeV3Format(w http.ResponseWriter, r *http.Request)
 	queryRangeParams, apiErrorObj := ParseQueryRangeParams(r)
 
 	if apiErrorObj != nil {
-		zap.L().Error(apiErrorObj.Err.Error())
+		slog.Error(apiErrorObj.Err.Error())
 		RespondError(w, apiErrorObj, nil)
 		return
 	}
@@ -4515,27 +4515,25 @@ func (aH *APIHandler) queryRangeV3(ctx context.Context, queryRangeParams *v3.Que
 		// check if traceID is used as filter (with equal/similar operator) in traces query if yes add timestamp filter to queryRange params
 		isUsed, traceIDs := tracesV3.TraceIdFilterUsedWithEqual(queryRangeParams)
 		if isUsed && len(traceIDs) > 0 {
-			zap.L().Debug("traceID used as filter in traces query")
+			slog.Debug("traceID used as filter in traces query")
 			// query signoz_spans table with traceID to get min and max timestamp
 			min, max, err := aH.reader.GetMinAndMaxTimestampForTraceID(ctx, traceIDs)
 			if err == nil {
 				// add timestamp filter to queryRange params
 				tracesV3.AddTimestampFilters(min, max, queryRangeParams)
-				zap.L().Debug("post adding timestamp filter in traces query", zap.Any("queryRangeParams", queryRangeParams))
+				slog.Debug("post adding timestamp filter in traces query", "queryRangeParams", queryRangeParams)
 			}
 		}
 	}
 
 	// Hook up query progress tracking if requested
-	queryIdHeader := r.Header.Get("X-HANZO-QUERY-ID")
+	queryIdHeader := r.Header.Get("X-O11Y-QUERY-ID")
 	if len(queryIdHeader) > 0 {
 		onQueryFinished, apiErr := aH.reader.ReportQueryStartForProgressTracking(queryIdHeader)
 
 		if apiErr != nil {
-			zap.L().Error(
-				"couldn't report query start for progress tracking",
-				zap.String("queryId", queryIdHeader), zap.Error(apiErr),
-			)
+			slog.Error("couldn't report query start for progress tracking",
+				"queryId", queryIdHeader, "error", apiErr)
 
 		} else {
 			// Adding queryId to the context signals clickhouse queries to report progress
@@ -4709,7 +4707,7 @@ func (aH *APIHandler) QueryRangeV3(w http.ResponseWriter, r *http.Request) {
 	queryRangeParams, apiErrorObj := ParseQueryRangeParams(r)
 
 	if apiErrorObj != nil {
-		zap.L().Error("error parsing metric query range params", zap.Error(apiErrorObj.Err))
+		slog.Error("error parsing metric query range params", "error", apiErrorObj.Err)
 		RespondError(w, apiErrorObj, nil)
 		return
 	}
@@ -4717,7 +4715,7 @@ func (aH *APIHandler) QueryRangeV3(w http.ResponseWriter, r *http.Request) {
 	// add temporality for each metric
 	temporalityErr := aH.PopulateTemporality(r.Context(), orgID, queryRangeParams)
 	if temporalityErr != nil {
-		zap.L().Error("Error while adding temporality for metrics", zap.Error(temporalityErr))
+		slog.Error("Error while adding temporality for metrics", "error", temporalityErr)
 		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: temporalityErr}, nil)
 		return
 	}
@@ -4761,10 +4759,8 @@ func (aH *APIHandler) GetQueryProgressUpdates(w http.ResponseWriter, r *http.Req
 	progressCh, unsubscribe, apiErr := aH.reader.SubscribeToQueryProgress(queryId)
 	if apiErr != nil {
 		// Shouldn't happen unless query progress requested after query finished
-		zap.L().Warn(
-			"couldn't subscribe to query progress",
-			zap.String("queryId", queryId), zap.Any("error", apiErr),
-		)
+		slog.Warn("couldn't subscribe to query progress",
+			"queryId", queryId, "error", apiErr)
 		return
 	}
 	defer func() { go unsubscribe() }()
@@ -4772,26 +4768,20 @@ func (aH *APIHandler) GetQueryProgressUpdates(w http.ResponseWriter, r *http.Req
 	for queryProgress := range progressCh {
 		msg, err := json.Marshal(queryProgress)
 		if err != nil {
-			zap.L().Error(
-				"failed to serialize progress message",
-				zap.String("queryId", queryId), zap.Any("progress", queryProgress), zap.Error(err),
-			)
+			slog.Error("failed to serialize progress message",
+				"queryId", queryId, "progress", queryProgress, "error", err)
 			continue
 		}
 
 		err = c.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {
-			zap.L().Error(
-				"failed to write progress msg to websocket",
-				zap.String("queryId", queryId), zap.String("msg", string(msg)), zap.Error(err),
-			)
+			slog.Error("failed to write progress msg to websocket",
+				"queryId", queryId, "msg", string(msg), "error", err)
 			break
 
 		} else {
-			zap.L().Debug(
-				"wrote progress msg to websocket",
-				zap.String("queryId", queryId), zap.String("msg", string(msg)), zap.Error(err),
-			)
+			slog.Debug("wrote progress msg to websocket",
+				"queryId", queryId, "msg", string(msg), "error", err)
 		}
 	}
 }
@@ -4874,13 +4864,13 @@ func (aH *APIHandler) queryRangeV4(ctx context.Context, queryRangeParams *v3.Que
 		// check if traceID is used as filter (with equal/similar operator) in traces query if yes add timestamp filter to queryRange params
 		isUsed, traceIDs := tracesV3.TraceIdFilterUsedWithEqual(queryRangeParams)
 		if isUsed && len(traceIDs) > 0 {
-			zap.L().Debug("traceID used as filter in traces query")
+			slog.Debug("traceID used as filter in traces query")
 			// query signoz_spans table with traceID to get min and max timestamp
 			min, max, err := aH.reader.GetMinAndMaxTimestampForTraceID(ctx, traceIDs)
 			if err == nil {
 				// add timestamp filter to queryRange params
 				tracesV3.AddTimestampFilters(min, max, queryRangeParams)
-				zap.L().Debug("post adding timestamp filter in traces query", zap.Any("queryRangeParams", queryRangeParams))
+				slog.Debug("post adding timestamp filter in traces query", "queryRangeParams", queryRangeParams)
 			}
 		}
 	}
@@ -4932,7 +4922,7 @@ func (aH *APIHandler) QueryRangeV4(w http.ResponseWriter, r *http.Request) {
 	queryRangeParams, apiErrorObj := ParseQueryRangeParams(r)
 
 	if apiErrorObj != nil {
-		zap.L().Error("error parsing metric query range params", zap.Error(apiErrorObj.Err))
+		slog.Error("error parsing metric query range params", "error", apiErrorObj.Err)
 		RespondError(w, apiErrorObj, nil)
 		return
 	}
@@ -4941,7 +4931,7 @@ func (aH *APIHandler) QueryRangeV4(w http.ResponseWriter, r *http.Request) {
 	// add temporality for each metric
 	temporalityErr := aH.PopulateTemporality(r.Context(), orgID, queryRangeParams)
 	if temporalityErr != nil {
-		zap.L().Error("Error while adding temporality for metrics", zap.Error(temporalityErr))
+		slog.Error("Error while adding temporality for metrics", "error", temporalityErr)
 		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: temporalityErr}, nil)
 		return
 	}
@@ -4990,7 +4980,7 @@ func (aH *APIHandler) getQueueOverview(w http.ResponseWriter, r *http.Request) {
 	queueListRequest, apiErr := ParseQueueBody(r)
 
 	if apiErr != nil {
-		zap.L().Error(apiErr.Err.Error())
+		slog.Error(apiErr.Err.Error())
 		RespondError(w, apiErr, nil)
 		return
 	}
@@ -4998,7 +4988,7 @@ func (aH *APIHandler) getQueueOverview(w http.ResponseWriter, r *http.Request) {
 	chq, err := queues2.BuildOverviewQuery(queueListRequest)
 
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
 		return
 	}
@@ -5029,7 +5019,7 @@ func (aH *APIHandler) getDomainList(w http.ResponseWriter, r *http.Request) {
 	// Parse the request body to get third-party query parameters
 	thirdPartyQueryRequest, apiErr := ParseRequestBody(r)
 	if apiErr != nil {
-		zap.L().Error("Failed to parse request body", zap.Error(apiErr))
+		slog.Error("Failed to parse request body", "error", apiErr)
 		render.Error(w, errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, apiErr.Error()))
 		return
 	}
@@ -5037,7 +5027,7 @@ func (aH *APIHandler) getDomainList(w http.ResponseWriter, r *http.Request) {
 	// Build the v5 query range request for domain listing
 	queryRangeRequest, err := thirdpartyapi.BuildDomainList(thirdPartyQueryRequest)
 	if err != nil {
-		zap.L().Error("Failed to build domain list query", zap.Error(err))
+		slog.Error("Failed to build domain list query", "error", err)
 		apiErrObj := errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, err.Error())
 		render.Error(w, apiErrObj)
 		return
@@ -5050,7 +5040,7 @@ func (aH *APIHandler) getDomainList(w http.ResponseWriter, r *http.Request) {
 	// Execute the query using the v5 querier
 	result, err := aH.O11y.Querier.QueryRange(ctx, orgID, queryRangeRequest)
 	if err != nil {
-		zap.L().Error("Query execution failed", zap.Error(err))
+		slog.Error("Query execution failed", "error", err)
 		apiErrObj := errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, err.Error())
 		render.Error(w, apiErrObj)
 		return
@@ -5089,7 +5079,7 @@ func (aH *APIHandler) getDomainInfo(w http.ResponseWriter, r *http.Request) {
 	// Parse the request body to get third-party query parameters
 	thirdPartyQueryRequest, apiErr := ParseRequestBody(r)
 	if apiErr != nil {
-		zap.L().Error("Failed to parse request body", zap.Error(apiErr))
+		slog.Error("Failed to parse request body", "error", apiErr)
 		render.Error(w, errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, apiErr.Error()))
 		return
 	}
@@ -5097,7 +5087,7 @@ func (aH *APIHandler) getDomainInfo(w http.ResponseWriter, r *http.Request) {
 	// Build the v5 query range request for domain info
 	queryRangeRequest, err := thirdpartyapi.BuildDomainInfo(thirdPartyQueryRequest)
 	if err != nil {
-		zap.L().Error("Failed to build domain info query", zap.Error(err))
+		slog.Error("Failed to build domain info query", "error", err)
 		apiErrObj := errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, err.Error())
 		render.Error(w, apiErrObj)
 		return
@@ -5110,7 +5100,7 @@ func (aH *APIHandler) getDomainInfo(w http.ResponseWriter, r *http.Request) {
 	// Execute the query using the v5 querier
 	result, err := aH.O11y.Querier.QueryRange(ctx, orgID, queryRangeRequest)
 	if err != nil {
-		zap.L().Error("Query execution failed", zap.Error(err))
+		slog.Error("Query execution failed", "error", err)
 		apiErrObj := errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, err.Error())
 		render.Error(w, apiErrObj)
 		return
