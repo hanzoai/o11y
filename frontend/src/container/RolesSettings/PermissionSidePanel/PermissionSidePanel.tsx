@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from '@hanzo/ui';
+import { Button, Label, RadioGroup, RadioGroupItem } from '@hanzo/ui';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
-import {
-	RadioGroup,
-	RadioGroupItem,
-	RadioGroupLabel,
-} from '@hanzo/ui';
 import { Select, Skeleton } from 'antd';
 
 import {
@@ -80,7 +75,7 @@ function ResourceRow({
 								id={`${resource.id}-all`}
 								color="robin"
 							/>
-							<RadioGroupLabel htmlFor={`${resource.id}-all`}>All</RadioGroupLabel>
+							<Label htmlFor={`${resource.id}-all`}>All</Label>
 						</div>
 
 						<div className="psp-resource__radio-item">
@@ -89,9 +84,9 @@ function ResourceRow({
 								id={`${resource.id}-only-selected`}
 								color="robin"
 							/>
-							<RadioGroupLabel htmlFor={`${resource.id}-only-selected`}>
+							<Label htmlFor={`${resource.id}-only-selected`}>
 								Only selected
-							</RadioGroupLabel>
+							</Label>
 						</div>
 					</RadioGroup>
 
