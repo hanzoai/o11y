@@ -398,3 +398,10 @@ auditor:
       max_interval: 30s
       # The total maximum time spent retrying.
       max_elapsed_time: 60s
+
+##################### Cloud Integration #####################
+cloudintegration:
+  # cloud integration agent configuration
+  agent:
+    # The version of the cloud integration agent.
+    version: v0.0.8
