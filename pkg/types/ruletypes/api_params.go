@@ -25,6 +25,16 @@ const (
 	AlertTypeExceptions AlertType = "EXCEPTIONS_BASED_ALERT"
 )
 
+// Enum implements jsonschema.Enum; returns the acceptable values for AlertType.
+func (AlertType) Enum() []any {
+	return []any{
+		AlertTypeMetric,
+		AlertTypeTraces,
+		AlertTypeLogs,
+		AlertTypeExceptions,
+	}
+}
+
 const (
 	DefaultSchemaVersion  = "v1"
 	SchemaVersionV2Alpha1 = "v2alpha1"
@@ -597,13 +607,13 @@ type GettableRules struct {
 
 // GettableRule has info for an alerting rules.
 type GettableRule struct {
-	Id    string     `json:"id"`
-	State AlertState `json:"state"`
+	Id    string     `json:"id" required:"true"`
+	State AlertState `json:"state" required:"true"`
 	PostableRule
-	CreatedAt *time.Time `json:"createAt"`
-	CreatedBy *string    `json:"createBy"`
-	UpdatedAt *time.Time `json:"updateAt"`
-	UpdatedBy *string    `json:"updateBy"`
+	CreatedAt time.Time `json:"createAt" required:"true"`
+	CreatedBy *string   `json:"createBy" nullable:"true"`
+	UpdatedAt time.Time `json:"updateAt" required:"true"`
+	UpdatedBy *string   `json:"updateBy" nullable:"true"`
 }
 
 func (g *GettableRule) MarshalJSON() ([]byte, error) {
