@@ -577,7 +577,7 @@ func (m *Manager) CreateRule(ctx context.Context, ruleStr string) (*ruletypes.Ge
 		return nil, err
 	}
 	now := time.Now()
-	storedRule := &ruletypes.Rule{
+	storedRule := &ruletypes.StorableRule{
 		Identifiable: types.Identifiable{
 			ID: valuer.GenerateUUID(),
 		},

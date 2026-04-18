@@ -3755,71 +3755,6 @@ components:
         spec:
           $ref: '#/components/schemas/RuletypesRollingWindow'
       type: object
-    RuletypesGettableRule:
-      properties:
-        alert:
-          type: string
-        alertType:
-          $ref: '#/components/schemas/RuletypesAlertType'
-        annotations:
-          additionalProperties:
-            type: string
-          type: object
-        condition:
-          $ref: '#/components/schemas/RuletypesRuleCondition'
-        createAt:
-          format: date-time
-          type: string
-        createBy:
-          nullable: true
-          type: string
-        description:
-          type: string
-        disabled:
-          type: boolean
-        evalWindow:
-          type: string
-        evaluation:
-          $ref: '#/components/schemas/RuletypesEvaluationEnvelope'
-        frequency:
-          type: string
-        id:
-          type: string
-        labels:
-          additionalProperties:
-            type: string
-          type: object
-        notificationSettings:
-          $ref: '#/components/schemas/RuletypesNotificationSettings'
-        preferredChannels:
-          items:
-            type: string
-          type: array
-        ruleType:
-          $ref: '#/components/schemas/RuletypesRuleType'
-        schemaVersion:
-          type: string
-        source:
-          type: string
-        state:
-          $ref: '#/components/schemas/RuletypesAlertState'
-        updateAt:
-          format: date-time
-          type: string
-        updateBy:
-          nullable: true
-          type: string
-        version:
-          type: string
-      required:
-      - id
-      - state
-      - alert
-      - ruleType
-      - condition
-      - createAt
-      - updateAt
-      type: object
     RuletypesGettableTestRule:
       properties:
         alertCount:
@@ -4028,6 +3963,67 @@ components:
       required:
       - evalWindow
       - frequency
+      type: object
+    RuletypesRule:
+      properties:
+        alert:
+          type: string
+        alertType:
+          $ref: '#/components/schemas/RuletypesAlertType'
+        annotations:
+          additionalProperties:
+            type: string
+          type: object
+        condition:
+          $ref: '#/components/schemas/RuletypesRuleCondition'
+        createdAt:
+          format: date-time
+          type: string
+        createdBy:
+          type: string
+        description:
+          type: string
+        disabled:
+          type: boolean
+        evalWindow:
+          type: string
+        evaluation:
+          $ref: '#/components/schemas/RuletypesEvaluationEnvelope'
+        frequency:
+          type: string
+        id:
+          type: string
+        labels:
+          additionalProperties:
+            type: string
+          type: object
+        notificationSettings:
+          $ref: '#/components/schemas/RuletypesNotificationSettings'
+        preferredChannels:
+          items:
+            type: string
+          type: array
+        ruleType:
+          $ref: '#/components/schemas/RuletypesRuleType'
+        schemaVersion:
+          type: string
+        source:
+          type: string
+        state:
+          $ref: '#/components/schemas/RuletypesAlertState'
+        updatedAt:
+          format: date-time
+          type: string
+        updatedBy:
+          type: string
+        version:
+          type: string
+      required:
+      - id
+      - state
+      - alert
+      - ruleType
+      - condition
       type: object
     RuletypesRuleCondition:
       properties:
@@ -10776,7 +10772,7 @@ paths:
                 properties:
                   data:
                     items:
-                      $ref: '#/components/schemas/RuletypesGettableRule'
+                      $ref: '#/components/schemas/RuletypesRule'
                     type: array
                   status:
                     type: string
@@ -10827,7 +10823,7 @@ paths:
               schema:
                 properties:
                   data:
-                    $ref: '#/components/schemas/RuletypesGettableRule'
+                    $ref: '#/components/schemas/RuletypesRule'
                   status:
                     type: string
                 required:
@@ -10930,7 +10926,7 @@ paths:
               schema:
                 properties:
                   data:
-                    $ref: '#/components/schemas/RuletypesGettableRule'
+                    $ref: '#/components/schemas/RuletypesRule'
                   status:
                     type: string
                 required:
@@ -10992,7 +10988,7 @@ paths:
               schema:
                 properties:
                   data:
-                    $ref: '#/components/schemas/RuletypesGettableRule'
+                    $ref: '#/components/schemas/RuletypesRule'
                   status:
                     type: string
                 required:

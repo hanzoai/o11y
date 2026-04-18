@@ -11,6 +11,7 @@ import (
 	"github.com/prometheus/alertmanager/config"
 
 	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/SigNoz/signoz/pkg/types"
 	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
 	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/SigNoz/signoz/pkg/valuer"
@@ -636,6 +637,60 @@ func (g *GettableRule) MarshalJSON() ([]byte, error) {
 		return json.Marshal(aux)
 	default:
 		copyStruct := *g
+		aux := Alias(copyStruct)
+		return json.Marshal(aux)
+	}
+}
+
+// Rule is the v2 API read model for an alerting rule. It aligns audit fields
+// with the canonical types.TimeAuditable / types.UserAuditable shape used by
+// PlannedMaintenance and other entities. v1 handlers keep serializing
+// GettableRule directly for back-compat with existing SDK / Terraform clients.
+type Rule struct {
+	Id    string     `json:"id" required:"true"`
+	State AlertState `json:"state" required:"true"`
+	PostableRule
+	types.TimeAuditable
+	types.UserAuditable
+}
+
+func NewRule(g *GettableRule) *Rule {
+	r := &Rule{
+		Id:           g.Id,
+		State:        g.State,
+		PostableRule: g.PostableRule,
+	}
+	r.CreatedAt = g.CreatedAt
+	r.UpdatedAt = g.UpdatedAt
+	if g.CreatedBy != nil {
+		r.CreatedBy = *g.CreatedBy
+	}
+	if g.UpdatedBy != nil {
+		r.UpdatedBy = *g.UpdatedBy
+	}
+	return r
+}
+
+func (r *Rule) MarshalJSON() ([]byte, error) {
+	type Alias Rule
+
+	switch r.SchemaVersion {
+	case DefaultSchemaVersion:
+		copyStruct := *r
+		aux := Alias(copyStruct)
+		if aux.RuleCondition != nil {
+			aux.RuleCondition.Thresholds = nil
+		}
+		aux.Evaluation = nil
+		aux.SchemaVersion = ""
+		aux.NotificationSettings = nil
+		return json.Marshal(aux)
+	case SchemaVersionV2Alpha1:
+		copyStruct := *r
+		aux := Alias(copyStruct)
+		return json.Marshal(aux)
+	default:
+		copyStruct := *r
 		aux := Alias(copyStruct)
 		return json.Marshal(aux)
 	}

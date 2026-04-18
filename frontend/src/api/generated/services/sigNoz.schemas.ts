@@ -4659,87 +4659,6 @@ export interface RuletypesEvaluationRollingDTO {
 	spec?: RuletypesRollingWindowDTO;
 }
 
-export type RuletypesGettableRuleDTOAnnotations = { [key: string]: string };
-
-export type RuletypesGettableRuleDTOLabels = { [key: string]: string };
-
-export interface RuletypesGettableRuleDTO {
-	/**
-	 * @type string
-	 */
-	alert: string;
-	alertType?: RuletypesAlertTypeDTO;
-	/**
-	 * @type object
-	 */
-	annotations?: RuletypesGettableRuleDTOAnnotations;
-	condition: RuletypesRuleConditionDTO;
-	/**
-	 * @type string
-	 * @format date-time
-	 */
-	createAt: Date;
-	/**
-	 * @type string
-	 * @nullable true
-	 */
-	createBy?: string | null;
-	/**
-	 * @type string
-	 */
-	description?: string;
-	/**
-	 * @type boolean
-	 */
-	disabled?: boolean;
-	/**
-	 * @type string
-	 */
-	evalWindow?: string;
-	evaluation?: RuletypesEvaluationEnvelopeDTO;
-	/**
-	 * @type string
-	 */
-	frequency?: string;
-	/**
-	 * @type string
-	 */
-	id: string;
-	/**
-	 * @type object
-	 */
-	labels?: RuletypesGettableRuleDTOLabels;
-	notificationSettings?: RuletypesNotificationSettingsDTO;
-	/**
-	 * @type array
-	 */
-	preferredChannels?: string[];
-	ruleType: RuletypesRuleTypeDTO;
-	/**
-	 * @type string
-	 */
-	schemaVersion?: string;
-	/**
-	 * @type string
-	 */
-	source?: string;
-	state: RuletypesAlertStateDTO;
-	/**
-	 * @type string
-	 * @format date-time
-	 */
-	updateAt: Date;
-	/**
-	 * @type string
-	 * @nullable true
-	 */
-	updateBy?: string | null;
-	/**
-	 * @type string
-	 */
-	version?: string;
-}
-
 export interface RuletypesGettableTestRuleDTO {
 	/**
 	 * @type integer
@@ -4969,6 +4888,85 @@ export interface RuletypesRollingWindowDTO {
 	 * @type string
 	 */
 	frequency: string;
+}
+
+export type RuletypesRuleDTOAnnotations = { [key: string]: string };
+
+export type RuletypesRuleDTOLabels = { [key: string]: string };
+
+export interface RuletypesRuleDTO {
+	/**
+	 * @type string
+	 */
+	alert: string;
+	alertType?: RuletypesAlertTypeDTO;
+	/**
+	 * @type object
+	 */
+	annotations?: RuletypesRuleDTOAnnotations;
+	condition: RuletypesRuleConditionDTO;
+	/**
+	 * @type string
+	 * @format date-time
+	 */
+	createdAt?: Date;
+	/**
+	 * @type string
+	 */
+	createdBy?: string;
+	/**
+	 * @type string
+	 */
+	description?: string;
+	/**
+	 * @type boolean
+	 */
+	disabled?: boolean;
+	/**
+	 * @type string
+	 */
+	evalWindow?: string;
+	evaluation?: RuletypesEvaluationEnvelopeDTO;
+	/**
+	 * @type string
+	 */
+	frequency?: string;
+	/**
+	 * @type string
+	 */
+	id: string;
+	/**
+	 * @type object
+	 */
+	labels?: RuletypesRuleDTOLabels;
+	notificationSettings?: RuletypesNotificationSettingsDTO;
+	/**
+	 * @type array
+	 */
+	preferredChannels?: string[];
+	ruleType: RuletypesRuleTypeDTO;
+	/**
+	 * @type string
+	 */
+	schemaVersion?: string;
+	/**
+	 * @type string
+	 */
+	source?: string;
+	state: RuletypesAlertStateDTO;
+	/**
+	 * @type string
+	 * @format date-time
+	 */
+	updatedAt?: Date;
+	/**
+	 * @type string
+	 */
+	updatedBy?: string;
+	/**
+	 * @type string
+	 */
+	version?: string;
 }
 
 export interface RuletypesRuleConditionDTO {
@@ -6831,7 +6829,7 @@ export type ListRules200 = {
 	/**
 	 * @type array
 	 */
-	data: RuletypesGettableRuleDTO[];
+	data: RuletypesRuleDTO[];
 	/**
 	 * @type string
 	 */
@@ -6839,7 +6837,7 @@ export type ListRules200 = {
 };
 
 export type CreateRule201 = {
-	data: RuletypesGettableRuleDTO;
+	data: RuletypesRuleDTO;
 	/**
 	 * @type string
 	 */
@@ -6853,7 +6851,7 @@ export type GetRuleByIDPathParameters = {
 	id: string;
 };
 export type GetRuleByID200 = {
-	data: RuletypesGettableRuleDTO;
+	data: RuletypesRuleDTO;
 	/**
 	 * @type string
 	 */
@@ -6864,7 +6862,7 @@ export type PatchRuleByIDPathParameters = {
 	id: string;
 };
 export type PatchRuleByID200 = {
-	data: RuletypesGettableRuleDTO;
+	data: RuletypesRuleDTO;
 	/**
 	 * @type string
 	 */
