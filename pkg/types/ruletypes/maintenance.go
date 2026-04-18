@@ -28,9 +28,9 @@ type StorablePlannedMaintenance struct {
 
 type GettablePlannedMaintenance struct {
 	Id          string    `json:"id"`
-	Name        string    `json:"name"`
+	Name        string    `json:"name" required:"true"`
 	Description string    `json:"description"`
-	Schedule    *Schedule `json:"schedule"`
+	Schedule    *Schedule `json:"schedule" required:"true"`
 	RuleIDs     []string  `json:"alertIds"`
 	CreatedAt   time.Time `json:"createdAt"`
 	CreatedBy   string    `json:"createdBy"`
@@ -329,6 +329,11 @@ func (m *GettablePlannedMaintenanceRule) ConvertGettableMaintenanceRuleToGettabl
 		CreatedBy:   m.CreatedBy,
 		UpdatedBy:   m.UpdatedBy,
 	}
+}
+
+type ListPlannedMaintenanceParams struct {
+	Active    *bool `query:"active"`
+	Recurring *bool `query:"recurring"`
 }
 
 type MaintenanceStore interface {
