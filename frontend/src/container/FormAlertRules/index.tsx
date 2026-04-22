@@ -907,6 +907,9 @@ function FormAlertRules({
 							panelType={panelType || PANEL_TYPES.TIME_SERIES}
 							key={currentQuery.queryType}
 							ruleId={ruleId}
+							isAnomalyDetection={
+								alertDef.ruleType === AlertDetectionTypes.ANOMALY_DETECTION_ALERT
+							}
 						/>
 
 						<RuleOptions
