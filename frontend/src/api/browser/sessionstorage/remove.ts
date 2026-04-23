@@ -1,13 +1,13 @@
 /* oxlint-disable no-restricted-globals */
 import { getScopedKey } from 'utils/storage';
 
-const set = (key: string, value: string): boolean => {
+const remove = (key: string): boolean => {
 	try {
-		localStorage.setItem(getScopedKey(key), value);
+		sessionStorage.removeItem(getScopedKey(key));
 		return true;
 	} catch {
 		return false;
 	}
 };
 
-export default set;
+export default remove;

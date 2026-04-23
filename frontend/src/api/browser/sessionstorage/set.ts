@@ -3,7 +3,7 @@ import { getScopedKey } from 'utils/storage';
 
 const set = (key: string, value: string): boolean => {
 	try {
-		localStorage.setItem(getScopedKey(key), value);
+		sessionStorage.setItem(getScopedKey(key), value);
 		return true;
 	} catch {
 		return false;
