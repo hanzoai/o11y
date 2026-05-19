@@ -1,3 +1,44 @@
+# o11y
+
+Metrics, traces, logs — the unified observability spine for the Hanzo platform. OpenTelemetry-native, OLAP-backed via Hanzo Datastore.
+
+[![Status](https://img.shields.io/badge/status-stable-green)]()
+[![License](https://img.shields.io/badge/license-MIT-blue)]()
+
+## Quick start
+
+```bash
+docker compose -f compose.yml up -d
+```
+
+Open `http://localhost:3301`.
+
+## What this is
+
+`o11y` is the unified APM / logs / traces / metrics surface every Hanzo service emits to. OpenTelemetry on the wire, Hanzo Datastore (OLAP column store) on disk. Multi-tenant by design — 309 `X-Org-Id` call sites — every panel scopes by org from the JWT. Sits behind `gateway` like every other Hanzo subsystem; eventually mounts under `hanzoai/cloud` per HIP-0106.
+
+## Specs
+
+Implements:
+- HIP-0106 Unified Cloud Binary (o11y subsystem)
+
+## Architecture
+
+```
+   instrumented app  ->  OTLP  ->  o11y collector
+                                       |
+                                Hanzo Datastore (OLAP column store)
+                                       |
+                                  APM | logs | traces | metrics
+                                       |
+                                queries scoped by X-Org-Id from JWT
+                                       |
+                                  dashboards | alerting | exceptions
+```
+
+
+---
+
 <h1 align="center" style="border-bottom: none">
     <a href="https://o11y.hanzo.ai" target="_blank">
         <img alt="Hanzo O11y" src="https://github.com/user-attachments/assets/ef9a33f7-12d7-4c94-8908-0a02b22f0c18" width="100" height="100">
