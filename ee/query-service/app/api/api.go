@@ -17,7 +17,7 @@ import (
 	basemodel "github.com/hanzoai/o11y/pkg/query-service/model"
 	rules "github.com/hanzoai/o11y/pkg/query-service/rules"
 	"github.com/hanzoai/o11y/pkg/queryparser"
-	"github.com/hanzoai/o11y/pkg/o11y"
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/gorilla/mux"
 )

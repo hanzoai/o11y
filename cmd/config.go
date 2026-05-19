@@ -7,7 +7,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/config"
 	"github.com/hanzoai/o11y/pkg/config/envprovider"
 	"github.com/hanzoai/o11y/pkg/config/fileprovider"
-	"github.com/hanzoai/o11y/pkg/o11y"
+	"github.com/hanzoai/o11y"
 )
 
 func NewHanzoO11yConfig(ctx context.Context, logger *slog.Logger, flags o11y.DeprecatedFlags) (o11y.Config, error) {

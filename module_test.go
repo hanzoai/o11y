@@ -8,7 +8,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager/nfmanagertest"
-	"github.com/hanzoai/o11y/pkg/alertmanager/signozalertmanager"
+	"github.com/hanzoai/o11y/pkg/alertmanager/o11yalertmanager"
 	"github.com/hanzoai/o11y/pkg/emailing/emailingtest"
 	"github.com/hanzoai/o11y/pkg/factory/factorytest"
 	"github.com/hanzoai/o11y/pkg/flagger"
@@ -16,7 +16,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard"
 	"github.com/hanzoai/o11y/pkg/modules/organization/implorganization"
 	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
-	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/sharder"
 	"github.com/hanzoai/o11y/pkg/sharder/noopsharder"
@@ -27,9 +26,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// This is a test to ensure that all fields of the handlers are initialized.
+// This is a test to ensure that all fields of the modules are initialized.
 // It also helps us catch these errors at compile time instead of runtime.
-func TestNewHandlers(t *testing.T) {
+func TestNewModules(t *testing.T) {
 	sqlstore := sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual)
 	providerSettings := factorytest.NewSettings()
 	sharder, err := noopsharder.New(context.TODO(), providerSettings, sharder.Config{})
@@ -52,11 +51,9 @@ func TestNewHandlers(t *testing.T) {
 
 	modules := NewModules(sqlstore, tokenizer, emailing, providerSettings, orgGetter, alertmanager, nil, nil, nil, nil, nil, nil, nil, queryParser, Config{}, dashboardModule, userGetter)
 
-	querierHandler := querier.NewHandler(providerSettings, nil, nil)
-	handlers := NewHandlers(modules, providerSettings, nil, querierHandler, nil, nil, nil, nil, nil, nil, nil)
-	reflectVal := reflect.ValueOf(handlers)
+	reflectVal := reflect.ValueOf(modules)
 	for i := 0; i < reflectVal.NumField(); i++ {
 		f := reflectVal.Field(i)
-		assert.False(t, f.IsZero(), "%s handler has not been initialized", reflectVal.Type().Field(i).Name)
+		assert.False(t, f.IsZero(), "%s module has not been initialized", reflectVal.Type().Field(i).Name)
 	}
 }
