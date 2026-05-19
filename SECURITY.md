@@ -1,18 +1,17 @@
 # Security Policy
 
-Hanzo O11y is looking forward to working with security researchers across the world to keep Hanzo O11y and our users safe. If you have found an issue in our systems/applications, please reach out to us.
+## Reporting a vulnerability
 
-## Supported Versions
-We always recommend using the latest version of Hanzo O11y to ensure you get all security updates
+Email security@hanzo.ai with details. Encrypt with our PGP key (fingerprint TBD).
 
-## Reporting a Vulnerability
+We respond within 48 hours. Critical issues receive same-day acknowledgment.
 
-If you believe you have found a security vulnerability within Hanzo O11y, please let us know right away. We'll try and fix the problem as soon as possible.
+## Scope
 
-**Do not report vulnerabilities using public GitHub issues**. Instead, email <security@o11y.hanzo.ai> with a detailed account of the issue. Please submit one issue per email, this helps us triage vulnerabilities.
+This policy covers code in this repository. For the broader Hanzo platform threat model, see [hanzoai/HIPs](https://github.com/hanzoai/HIPs).
 
-Once we've received your email we'll keep you updated as we fix the vulnerability.
+## Sandbox boundary
 
-## Thanks
+`o11y` ingests telemetry from every Hanzo service, so every query path is scoped by the JWT-validated `X-Org-Id` header — no panel, alert, or query can cross an org boundary. Logs, traces, and metrics are stored on Hanzo Datastore with per-tenant retention, and sensitive headers / payload fields are redacted at ingest time.
 
-Thank you for keeping Hanzo O11y and our users safe. 🙇
+For runtime sandbox guarantees, see HIP-0105 (in-process extension runtimes).
