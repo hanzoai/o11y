@@ -31,7 +31,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/app/opamp"
 	opAmpModel "github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
 	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
-	"github.com/hanzoai/o11y/pkg/o11y"
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/web"
