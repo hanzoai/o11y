@@ -32,7 +32,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/app/cloudintegrations/services"
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/metricsexplorer"
-	"github.com/hanzoai/o11y/pkg/o11y"
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/prometheus/prometheus/promql"
 

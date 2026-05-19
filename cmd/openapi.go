@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/hanzoai/o11y/pkg/instrumentation"
-	"github.com/hanzoai/o11y/pkg/o11y"
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/spf13/cobra"
 )
