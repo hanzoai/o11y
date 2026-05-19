@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/hanzoai/cloud/pkg/cloud"
+	"github.com/hanzoai/cloud"
 	"github.com/hanzoai/zip"
 	luxlog "github.com/luxfi/log"
 )

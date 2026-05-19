@@ -401,3 +401,5 @@ require (
 )
 
 replace github.com/expr-lang/expr => github.com/SigNoz/expr v1.17.7-beta
+
+replace github.com/hanzoai/cloud => ../cloud
