@@ -579,8 +579,6 @@ github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgf
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.7 h1:X+2YciYSxvMQK0UZ7sg45ZVabVZBeBuvMkmuI2V3Fak=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.7/go.mod h1:lW34nIZuQ8UDPdkon5fmfp2l3+ZkQ2me/+oecHYLOII=
-github.com/hanzoai/cloud v0.0.0-20260519044114-66d5d2a6312c h1:+NR9n+tIaVY1whsIpZ2eU+N+Sg+Gr9jYDFN+/YziBUg=
-github.com/hanzoai/cloud v0.0.0-20260519044114-66d5d2a6312c/go.mod h1:d9Nw4Nr1iLc5UbDJugzOrYpylEWLBbjixE5mhOhGXnk=
 github.com/hanzoai/zip v0.1.0 h1:rsGLHl0cr7EBvp2EQk6KoEizBpOvgU7Uv0JP9GJ7cnw=
 github.com/hanzoai/zip v0.1.0/go.mod h1:3G+k2wy5bQ1wld66m0OPH8/LJ0kgIeNi1KPymMmlbf4=
 github.com/hashicorp/consul/api v1.12.0/go.mod h1:6pVBMo0ebnYdt2S3H87XhekM/HHrUoTD2XXb/VrZVy0=

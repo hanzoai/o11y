@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/hanzoai/cloud/pkg/cloud"
-	"github.com/hanzoai/o11y/pkg/o11y"
+	"github.com/hanzoai/cloud"
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/zip"
 )
 
