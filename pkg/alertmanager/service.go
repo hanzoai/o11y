@@ -6,6 +6,7 @@ import (
 
 	"github.com/prometheus/alertmanager/featurecontrol"
 	"github.com/prometheus/alertmanager/matcher/compat"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerserver"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
@@ -31,6 +32,13 @@ type Service struct {
 	// settings is the settings for the alertmanager service
 	settings factory.ScopedProviderSettings
 
+	// promRegistry is the alertmanager-library boundary: prometheus/alertmanager
+	// (dispatch, silence, notify, mem) requires a prometheus.Registerer. The
+	// rest of o11y emits through luxfi/metric — this registry lives here only
+	// because the upstream alertmanager library is hard-bound to prometheus.
+	// Replace when the alertmanager rip ships.
+	promRegistry *prometheus.Registry
+
 	// Map of organization id to alertmanager server
 	servers map[string]*alertmanagerserver.Server
 
@@ -55,6 +63,7 @@ func New(
 		configStore:         configStore,
 		orgGetter:           orgGetter,
 		settings:            settings,
+		promRegistry:        prometheus.NewRegistry(),
 		servers:             make(map[string]*alertmanagerserver.Server),
 		serversMtx:          sync.RWMutex{},
 		notificationManager: nfManager,
@@ -176,7 +185,7 @@ func (service *Service) newServer(ctx context.Context, orgID string) (*alertmana
 		return nil, err
 	}
 
-	server, err := alertmanagerserver.New(ctx, service.settings.Logger(), service.settings.PrometheusRegisterer(), service.config, orgID, service.stateStore, service.notificationManager)
+	server, err := alertmanagerserver.New(ctx, service.settings.Logger(), service.promRegistry, service.config, orgID, service.stateStore, service.notificationManager)
 	if err != nil {
 		return nil, err
 	}
