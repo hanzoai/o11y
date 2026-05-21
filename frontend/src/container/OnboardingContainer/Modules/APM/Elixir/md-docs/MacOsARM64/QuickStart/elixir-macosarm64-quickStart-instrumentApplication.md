@@ -53,7 +53,7 @@ config :opentelemetry, :processors,
       %{
         endpoints: ["https://ingest.{{REGION}}.o11y.hanzo.ai:443"],
         headers: [
-          {"hanzo-ingestion-key", {{HANZO_ACCESS_TOKEN}} }
+          {"hanzo-ingestion-key", {{O11Y_ACCESS_TOKEN}} }
         ]
       }
     }

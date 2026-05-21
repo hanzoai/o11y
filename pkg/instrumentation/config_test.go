@@ -13,9 +13,9 @@ import (
 )
 
 func TestNewWithEnvProvider(t *testing.T) {
-	t.Setenv("HANZO_INSTRUMENTATION_LOGS_LEVEL", "debug")
-	t.Setenv("HANZO_INSTRUMENTATION_METRICS_READERS_PULL_EXPORTER_PROMETHEUS_PORT", "1111")
-	t.Setenv("HANZO_INSTRUMENTATION_TRACES_ENABLED", "true")
+	t.Setenv("O11Y_INSTRUMENTATION_LOGS_LEVEL", "debug")
+	t.Setenv("O11Y_INSTRUMENTATION_METRICS_PORT", "1111")
+	t.Setenv("O11Y_INSTRUMENTATION_TRACES_ENABLED", "true")
 
 	conf, err := config.New(
 		context.Background(),
@@ -35,11 +35,10 @@ func TestNewWithEnvProvider(t *testing.T) {
 	err = conf.Unmarshal("instrumentation", &actual)
 	require.NoError(t, err)
 
-	port := 1111
 	expected := NewConfigFactory().New().(Config)
 	expected.Logs.Level = slog.LevelDebug
 	expected.Traces.Enabled = true
-	expected.Metrics.Readers.Pull.Exporter.Prometheus.Port = &port
+	expected.Metrics.Port = 1111
 
 	assert.Equal(t, expected, actual)
 }

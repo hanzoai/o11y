@@ -8,7 +8,7 @@ You can stream logs from Heroku to Hanzo O11y using [httpsdrain](https://devcent
 
 
 ```bash
-heroku drains:add https://<TENANT_NAME>:{{HANZO_INGESTION_KEY}}@ingest.{{REGION}}.o11y.hanzo.ai:443/logs/heroku -a <YOUR_APP_NAME>
+heroku drains:add https://<TENANT_NAME>:{{O11Y_INGESTION_KEY}}@ingest.{{REGION}}.o11y.hanzo.ai:443/logs/heroku -a <YOUR_APP_NAME>
 ```
 
 &nbsp;

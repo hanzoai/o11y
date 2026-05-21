@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"log/slog"
+	"os"
 
 	"github.com/hanzoai/o11y/cmd"
 	"github.com/hanzoai/o11y/pkg/analytics"
 	"github.com/hanzoai/o11y/pkg/authn"
 	"github.com/hanzoai/o11y/pkg/authz"
-	"github.com/hanzoai/o11y/pkg/authz/openfgaauthz"
-	"github.com/hanzoai/o11y/pkg/authz/openfgaschema"
+	"github.com/hanzoai/o11y/pkg/authz/iamauthz"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/gateway"
 	"github.com/hanzoai/o11y/pkg/gateway/noopgateway"
@@ -26,6 +26,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/version"
+	"github.com/hanzoai/o11y/pkg/zapreceiver"
 	"github.com/hanzoai/o11y/pkg/zeus"
 	"github.com/hanzoai/o11y/pkg/zeus/noopzeus"
 	"github.com/spf13/cobra"
@@ -76,8 +77,8 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 		func(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
 			return o11y.NewAuthNs(ctx, providerSettings, store, licensing)
 		},
-		func(ctx context.Context, sqlstore sqlstore.SQLStore, _ licensing.Licensing, _ dashboard.Module) factory.ProviderFactory[authz.AuthZ, authz.Config] {
-			return openfgaauthz.NewProviderFactory(sqlstore, openfgaschema.NewSchema().Get(ctx))
+		func(_ context.Context, sqlstore sqlstore.SQLStore, _ licensing.Licensing, _ dashboard.Module) factory.ProviderFactory[authz.AuthZ, authz.Config] {
+			return iamauthz.NewProviderFactory(sqlstore)
 		},
 		func(store sqlstore.SQLStore, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser, _ querier.Querier, _ licensing.Licensing) dashboard.Module {
 			return impldashboard.NewModule(impldashboard.NewStore(store), settings, analytics, orgGetter, queryParser)
@@ -105,6 +106,32 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 		return err
 	}
 
+	// ZAP-native trace ingestion. Spans shipped by luxfi/trace's
+	// Type=ZAP exporter land here and (TODO) get written to the
+	// telemetry store. Defaults to :4317; O11Y_ZAP_LISTEN overrides.
+	// This is the OTel-on-ZAP path that replaces OTLP-gRPC ingestion
+	// — no protobuf, no grpc, just zap envelopes.
+	zapRcv, err := zapreceiver.New(zapreceiver.Config{
+		Listen: zapReceiverAddr(),
+		Logger: logger,
+		OnBatch: func(_ context.Context, b *zapreceiver.SpanBatch) error {
+			logger.DebugContext(ctx, "zap span batch received",
+				"appName", b.AppName,
+				"version", b.Version,
+				"spans", len(b.Spans),
+			)
+			// TODO(zap-ingest): write batch.Spans into telemetrystore.TelemetryStore
+			// once the SpanBatch → ClickHouse adapter lands.
+			return nil
+		},
+	})
+	if err != nil {
+		logger.WarnContext(ctx, "zap-native receiver disabled", "error", err)
+	} else {
+		defer zapRcv.Stop()
+		logger.InfoContext(ctx, "zap-native trace receiver listening", "addr", zapReceiverAddr())
+	}
+
 	o11y.Start(ctx)
 
 	if err := o11y.Wait(ctx); err != nil {
@@ -125,4 +152,13 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 	}
 
 	return nil
+}
+
+// zapReceiverAddr returns the bind address for the ZAP span receiver.
+// O11Y_ZAP_LISTEN overrides; default is :4317 (canonical o11y ZAP port).
+func zapReceiverAddr() string {
+	if v := os.Getenv("O11Y_ZAP_LISTEN"); v != "" {
+		return v
+	}
+	return ":4317"
 }

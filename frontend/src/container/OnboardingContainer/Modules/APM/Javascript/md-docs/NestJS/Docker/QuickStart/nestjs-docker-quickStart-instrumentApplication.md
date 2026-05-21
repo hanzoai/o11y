@@ -92,7 +92,7 @@ Set the Hanzo O11y ingestion key Environment variable and expose port 3001 in Do
 ```bash
 ...
 # Use an environment variable for the Hanzo Ingestion Key
-ENV OTEL_EXPORTER_OTLP_HEADERS="hanzo-ingestion-key={{HANZO_INGESTION_KEY}}"
+ENV OTEL_EXPORTER_OTLP_HEADERS="hanzo-ingestion-key={{O11Y_INGESTION_KEY}}"
 
 # In step 4 above, you are configuring your NestJS application to listen on port 3001
 EXPOSE 3001

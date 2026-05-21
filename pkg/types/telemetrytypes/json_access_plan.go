@@ -6,7 +6,6 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/SigNoz/signoz-otel-collector/exporter/jsontypeexporter"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
@@ -78,7 +77,7 @@ func (n *JSONAccessNode) Alias() string {
 	parentAlias := strings.TrimLeft(n.Parent.Alias(), "`")
 	parentAlias = strings.TrimRight(parentAlias, "`")
 
-	sep := jsontypeexporter.ArraySeparator
+	sep := ArraySep
 	if n.Parent.isRoot {
 		sep = "."
 	}

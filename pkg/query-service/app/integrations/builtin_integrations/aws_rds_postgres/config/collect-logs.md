@@ -37,7 +37,7 @@ exporters:
     tls:
       insecure: false
     headers:
-      "signoz-access-token": "${env:HANZO_INGESTION_KEY}"
+      "signoz-access-token": "${env:O11Y_INGESTION_KEY}"
 
   # export to local collector
   otlp/local:
@@ -63,7 +63,7 @@ Set the following environment variables in your otel-collector environment:
 export OTLP_DESTINATION_ENDPOINT="ingest.us.o11y.hanzo.ai:443"
 
 # your Hanzo O11y ingestion key
-export HANZO_INGESTION_KEY="signoz-ingestion-key"
+export O11Y_INGESTION_KEY="signoz-ingestion-key"
 
 ```
 

@@ -3728,7 +3728,7 @@ func (r *ClickHouseReader) GetActiveHostsFromMetricMetadata(ctx context.Context,
 		  AND attr_name = @attrName
 		  AND last_reported_unix_milli >= @sinceUnixMilli`,
 		observeMetricDBName,
-		constants.HANZO_METADATA_TABLENAME,
+		constants.O11Y_METADATA_TABLENAME,
 	)
 
 	rows, err := r.db.Query(ctx, query,
@@ -4572,7 +4572,7 @@ func (r *ClickHouseReader) GetMetricsExistenceAndEarliestTime(ctx context.Contex
 		`SELECT count(*) AS cnt, min(first_reported_unix_milli) AS min_first_reported
 		FROM %s.%s
 		WHERE metric_name IN @metric_names`,
-		constants.HANZO_METRIC_DBNAME, constants.HANZO_METADATA_TABLENAME)
+		constants.O11Y_METRIC_DBNAME, constants.O11Y_METADATA_TABLENAME)
 
 	var count, minFirstReported uint64
 	err := r.db.QueryRow(ctx, query, clickhouse.Named("metric_names", metricNames)).Scan(&count, &minFirstReported)
@@ -5610,7 +5610,7 @@ func (r *ClickHouseReader) GetMetricsDataPoints(ctx context.Context, metricName 
     sum(count) as data_points
 FROM %s.%s
 WHERE metric_name = ?
-`, observeMetricDBName, constants.HANZO_SAMPLES_V4_AGG_30M_TABLENAME)
+`, observeMetricDBName, constants.O11Y_SAMPLES_V4_AGG_30M_TABLENAME)
 	var dataPoints uint64
 	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.QueryRow(valueCtx, query, metricName).Scan(&dataPoints)

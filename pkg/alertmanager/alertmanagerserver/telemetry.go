@@ -1,5 +1,16 @@
 package alertmanagerserver
 
+// DispatcherMetrics is the alertmanager dispatcher's instrumentation.
+//
+// NOTE: This file is the prometheus/alertmanager-library boundary —
+// dispatch.NewDispatcher, silence.New, notify.NewIntegration etc. all
+// require prometheus.Registerer from prometheus/client_golang. We
+// haven't replaced prometheus/alertmanager yet, so this single file
+// still pulls prometheus/client_golang.
+//
+// Everything else in o11y (instrumentation/factory/test) uses luxfi/metric.
+// The alertmanager rip is its own workstream — see project notes.
+
 import "github.com/prometheus/client_golang/prometheus"
 
 type DispatcherMetrics struct {
@@ -9,7 +20,6 @@ type DispatcherMetrics struct {
 }
 
 // NewDispatcherMetrics returns a new registered DispatchMetrics.
-// todo(aniketio-ctrl): change prom metrics to otel metrics
 func NewDispatcherMetrics(registerLimitMetrics bool, r prometheus.Registerer) *DispatcherMetrics {
 	m := DispatcherMetrics{
 		aggrGroups: prometheus.NewGauge(

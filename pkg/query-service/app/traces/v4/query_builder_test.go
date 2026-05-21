@@ -758,7 +758,7 @@ func Test_buildTracesQuery(t *testing.T) {
 					AggregateOperator:  v3.AggregateOperatorCountDistinct,
 					Filters:            &v3.FilterSet{},
 					AggregateAttribute: v3.AttributeKey{Key: "name", IsColumn: true, DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag},
-					OrderBy:            []v3.OrderBy{{ColumnName: "#HANZO_VALUE", Order: "ASC"}},
+					OrderBy:            []v3.OrderBy{{ColumnName: "#O11Y_VALUE", Order: "ASC"}},
 					Having: []v3.Having{
 						{
 							ColumnName: "name",
@@ -860,7 +860,7 @@ func TestPrepareTracesQuery(t *testing.T) {
 					AggregateAttribute: v3.AttributeKey{Key: "name", DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag},
 					GroupBy:            []v3.AttributeKey{{Key: "function", DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag}},
 					Limit:              10,
-					OrderBy:            []v3.OrderBy{{ColumnName: "#HANZO_VALUE", Order: "DESC"}},
+					OrderBy:            []v3.OrderBy{{ColumnName: "#O11Y_VALUE", Order: "DESC"}},
 				},
 				options: v3.QBOptions{
 					GraphLimitQtype: constants.FirstQueryGraphLimit,
@@ -881,7 +881,7 @@ func TestPrepareTracesQuery(t *testing.T) {
 					Filters:            &v3.FilterSet{},
 					AggregateAttribute: v3.AttributeKey{Key: "name", DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag},
 					GroupBy:            []v3.AttributeKey{{Key: "function", DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag}},
-					OrderBy:            []v3.OrderBy{{ColumnName: "#HANZO_VALUE", Order: "DESC"}},
+					OrderBy:            []v3.OrderBy{{ColumnName: "#O11Y_VALUE", Order: "DESC"}},
 					Limit:              10,
 				},
 				options: v3.QBOptions{
@@ -921,7 +921,7 @@ func TestPrepareTracesQuery(t *testing.T) {
 						{Key: "service.name", IsColumn: true, DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeResource},
 					},
 					Limit:   10,
-					OrderBy: []v3.OrderBy{{ColumnName: "#HANZO_VALUE", Order: "DESC"}},
+					OrderBy: []v3.OrderBy{{ColumnName: "#O11Y_VALUE", Order: "DESC"}},
 				},
 				options: v3.QBOptions{
 					GraphLimitQtype: constants.FirstQueryGraphLimit,
@@ -962,7 +962,7 @@ func TestPrepareTracesQuery(t *testing.T) {
 						{Key: "function", IsColumn: true, DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag},
 						{Key: "serviceName", IsColumn: true, DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag},
 					},
-					OrderBy: []v3.OrderBy{{ColumnName: "#HANZO_VALUE", Order: "DESC"}},
+					OrderBy: []v3.OrderBy{{ColumnName: "#O11Y_VALUE", Order: "DESC"}},
 					Limit:   10,
 				},
 				options: v3.QBOptions{

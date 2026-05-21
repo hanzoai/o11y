@@ -10,11 +10,11 @@ import (
 )
 
 func TestGetWithStrings(t *testing.T) {
-	t.Setenv("HANZO_K1_K2", "string")
-	t.Setenv("HANZO_K3__K4", "string")
-	t.Setenv("HANZO_K5__K6_K7__K8", "string")
-	t.Setenv("HANZO_K9___K10", "string")
-	t.Setenv("HANZO_K11____K12", "string")
+	t.Setenv("O11Y_K1_K2", "string")
+	t.Setenv("O11Y_K3__K4", "string")
+	t.Setenv("O11Y_K5__K6_K7__K8", "string")
+	t.Setenv("O11Y_K9___K10", "string")
+	t.Setenv("O11Y_K11____K12", "string")
 	expected := map[string]any{
 		"k1::k2":       "string",
 		"k3_k4":        "string",
@@ -43,10 +43,10 @@ func TestGetWithNoPrefix(t *testing.T) {
 }
 
 func TestGetWithGoTypes(t *testing.T) {
-	t.Setenv("HANZO_BOOL", "true")
-	t.Setenv("HANZO_STRING", "string")
-	t.Setenv("HANZO_INT", "1")
-	t.Setenv("HANZO_SLICE", "[1,2]")
+	t.Setenv("O11Y_BOOL", "true")
+	t.Setenv("O11Y_STRING", "string")
+	t.Setenv("O11Y_INT", "1")
+	t.Setenv("O11Y_SLICE", "[1,2]")
 	expected := map[string]any{
 		"bool":   "true",
 		"int":    "1",
@@ -62,9 +62,9 @@ func TestGetWithGoTypes(t *testing.T) {
 }
 
 func TestGetWithGoTypesWithUnmarshal(t *testing.T) {
-	t.Setenv("HANZO_BOOL", "true")
-	t.Setenv("HANZO_STRING", "string")
-	t.Setenv("HANZO_INT", "1")
+	t.Setenv("O11Y_BOOL", "true")
+	t.Setenv("O11Y_STRING", "string")
+	t.Setenv("O11Y_INT", "1")
 
 	type test struct {
 		Bool   bool   `mapstructure:"bool"`

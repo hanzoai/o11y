@@ -126,7 +126,7 @@ func prepareTimeAggregationSubQuery(start, end, step int64, mq *v3.BuilderQuery)
 		"SELECT fingerprint, %s" +
 			" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 			" %s as per_series_value" +
-			" FROM " + constants.HANZO_METRIC_DBNAME + "." + tableName +
+			" FROM " + constants.O11Y_METRIC_DBNAME + "." + tableName +
 			" INNER JOIN" +
 			" (%s) as filtered_time_series" +
 			" USING fingerprint" +
