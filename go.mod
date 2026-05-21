@@ -377,3 +377,12 @@ replace github.com/expr-lang/expr => github.com/SigNoz/expr v1.17.7-beta
 // ~/work/hanzo/alertmanager that replaces tracing/tracing.go with a
 // noop. Same upstream version, same exported surface, no grpc.
 replace github.com/prometheus/alertmanager => /Users/z/work/hanzo/alertmanager
+
+// Hanzo-local forks of the three ClickHouse Go modules. Module paths
+// are preserved inside each fork so consumers do not change their
+// imports; the forks exist so we can patch upstream for ZAP-native
+// integration with hanzoai/o11y without waiting on upstream.
+// Do not push these to GitHub — local-only workspace forks.
+replace github.com/ClickHouse/clickhouse-go/v2 => /Users/z/work/hanzo/datastore-go
+replace github.com/AfterShip/clickhouse-sql-parser => /Users/z/work/hanzo/datastore-sql-parser
+replace github.com/srikanthccv/ClickHouse-go-mock => /Users/z/work/hanzo/datastore-go-mock
