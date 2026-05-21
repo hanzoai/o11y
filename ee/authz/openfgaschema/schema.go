@@ -1,10 +1,12 @@
+//go:build openfga
+
 package openfgaschema
 
 import (
 	"context"
 	_ "embed"
 
-	"github.com/hanzoai/o11y/pkg/authz"
+	pkgopenfgaschema "github.com/hanzoai/o11y/pkg/authz/openfgaschema"
 	openfgapkgtransformer "github.com/openfga/language/pkg/go/transformer"
 )
 
@@ -15,7 +17,7 @@ var (
 
 type schema struct{}
 
-func NewSchema() authz.Schema {
+func NewSchema() pkgopenfgaschema.Schema {
 	return &schema{}
 }
 

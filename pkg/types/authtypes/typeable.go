@@ -5,7 +5,6 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 )
 
 var (
@@ -34,7 +33,7 @@ type Typeable interface {
 	Type() Type
 	Name() Name
 	Prefix(orgId valuer.UUID) string
-	Tuples(subject string, relation Relation, selector []Selector, orgID valuer.UUID) ([]*openfgav1.TupleKey, error)
+	Tuples(subject string, relation Relation, selector []Selector, orgID valuer.UUID) ([]*TupleKey, error)
 	Scope(relation Relation) string
 }
 
