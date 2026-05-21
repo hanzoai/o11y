@@ -216,7 +216,7 @@ func DataTypeCollisionHandledFieldName(key *telemetrytypes.TelemetryFieldKey, va
 				_, value = castString(tblFieldName), toStrings(v)
 			}
 		case bool:
-			// we don't have a toBoolOrNull in ClickHouse, so we need to convert the bool to a string
+			// we don't have a toBoolOrNull in Datastore, so we need to convert the bool to a string
 			value = fmt.Sprintf("%t", v)
 		}
 

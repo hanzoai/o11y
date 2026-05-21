@@ -1069,7 +1069,7 @@ func (m *Manager) GetAlertDetailsForMetricNames(ctx context.Context, metricNames
 			}
 		}
 
-		for _, query := range rule.RuleCondition.CompositeQuery.ClickHouseQueries {
+		for _, query := range rule.RuleCondition.CompositeQuery.DatastoreQueries {
 			if query.Query != "" {
 				for _, metricName := range metricNames {
 					if strings.Contains(query.Query, metricName) {

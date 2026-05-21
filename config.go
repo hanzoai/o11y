@@ -146,7 +146,7 @@ func (df *DeprecatedFlags) RegisterFlags(cmd *cobra.Command) {
 	_ = cmd.Flags().MarkDeprecated("config", "use O11Y_PROMETHEUS_CONFIG instead")
 	_ = cmd.Flags().MarkDeprecated("flux-interval", "use O11Y_QUERIER_FLUX__INTERVAL instead")
 	_ = cmd.Flags().MarkDeprecated("flux-interval-for-trace-detail", "use O11Y_QUERIER_FLUX__INTERVAL instead")
-	_ = cmd.Flags().MarkDeprecated("cluster", "use O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER instead")
+	_ = cmd.Flags().MarkDeprecated("cluster", "use O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER instead")
 	_ = cmd.Flags().MarkDeprecated("prefer-span-metrics", "use O11Y_FLAGGER_CONFIG_BOOLEAN_USE__SPAN__METRICS instead")
 	_ = cmd.Flags().MarkDeprecated("gateway-url", "use O11Y_GATEWAY_URL instead")
 }
@@ -245,9 +245,9 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 		config.TelemetryStore.Provider = os.Getenv("STORAGE")
 	}
 
-	if os.Getenv("ClickHouseUrl") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env ClickHouseUrl is deprecated and scheduled for removal. Please use O11Y_TELEMETRYSTORE_CLICKHOUSE_DSN instead.")
-		config.TelemetryStore.Clickhouse.DSN = os.Getenv("ClickHouseUrl")
+	if os.Getenv("DatastoreUrl") != "" {
+		logger.WarnContext(ctx, "[Deprecated] env DatastoreUrl is deprecated and scheduled for removal. Please use O11Y_TELEMETRYSTORE_DATASTORE_DSN instead.")
+		config.TelemetryStore.Clickhouse.DSN = os.Getenv("DatastoreUrl")
 	}
 
 	if deprecatedFlags.MaxIdleConns != 50 {
@@ -332,7 +332,7 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 	}
 
 	if deprecatedFlags.Cluster != "" {
-		logger.WarnContext(ctx, "[Deprecated] flag --cluster is deprecated and scheduled for removal. Please use O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER instead.")
+		logger.WarnContext(ctx, "[Deprecated] flag --cluster is deprecated and scheduled for removal. Please use O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER instead.")
 		config.TelemetryStore.Clickhouse.Cluster = deprecatedFlags.Cluster
 	}
 

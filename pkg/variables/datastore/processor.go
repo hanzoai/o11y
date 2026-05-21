@@ -1,4 +1,4 @@
-package clickhouse
+package datastore
 
 import (
 	"strings"
@@ -23,7 +23,7 @@ const (
 // what to do with a filter containing a variable
 type FilterTransformer func(variableName string, expr parser.Expr) FilterAction
 
-// QueryProcessor handles ClickHouse query modifications
+// QueryProcessor handles Datastore query modifications
 type QueryProcessor struct {
 }
 

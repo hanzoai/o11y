@@ -247,9 +247,9 @@ func (q *querier) QueryRange(ctx context.Context, orgID valuer.UUID, req *qbtype
 				}
 				req.CompositeQuery.Queries[idx].Spec = spec
 			}
-		} else if query.Type == qbtypes.QueryTypeClickHouseSQL {
+		} else if query.Type == qbtypes.QueryTypeDatastoreSQL {
 			switch spec := query.Spec.(type) {
-			case qbtypes.ClickHouseQuery:
+			case qbtypes.DatastoreQuery:
 				if strings.TrimSpace(spec.Query) != "" {
 					event.MetricsUsed = strings.Contains(spec.Query, "observe_metrics")
 					event.LogsUsed = strings.Contains(spec.Query, "observe_logs")
@@ -308,8 +308,8 @@ func (q *querier) QueryRange(ctx context.Context, orgID valuer.UUID, req *qbtype
 			if spec, ok := query.Spec.(qbtypes.PromQuery); ok {
 				queryName = spec.Name
 			}
-		case qbtypes.QueryTypeClickHouseSQL:
-			if spec, ok := query.Spec.(qbtypes.ClickHouseQuery); ok {
+		case qbtypes.QueryTypeDatastoreSQL:
+			if spec, ok := query.Spec.(qbtypes.DatastoreQuery); ok {
 				queryName = spec.Name
 			}
 		case qbtypes.QueryTypeBuilder:
@@ -336,10 +336,10 @@ func (q *querier) QueryRange(ctx context.Context, orgID valuer.UUID, req *qbtype
 			promqlQuery := newPromqlQuery(q.logger, q.promEngine, promQuery, qbtypes.TimeRange{From: req.Start, To: req.End}, req.RequestType, tmplVars)
 			queries[promQuery.Name] = promqlQuery
 			steps[promQuery.Name] = promQuery.Step
-		case qbtypes.QueryTypeClickHouseSQL:
-			chQuery, ok := query.Spec.(qbtypes.ClickHouseQuery)
+		case qbtypes.QueryTypeDatastoreSQL:
+			chQuery, ok := query.Spec.(qbtypes.DatastoreQuery)
 			if !ok {
-				return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid clickhouse query spec %T", query.Spec)
+				return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid datastore query spec %T", query.Spec)
 			}
 			chSQLQuery := newchSQLQuery(q.logger, q.telemetryStore, chQuery, nil, qbtypes.TimeRange{From: req.Start, To: req.End}, req.RequestType, tmplVars)
 			queries[chQuery.Name] = chSQLQuery

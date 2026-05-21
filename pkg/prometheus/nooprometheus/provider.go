@@ -3,14 +3,14 @@
 
 // Package nooprometheus is the default prometheus.Prometheus provider.
 //
-// o11y's canonical query path goes through ClickHouse SQL directly —
+// o11y's canonical query path goes through Datastore SQL directly —
 // PromQL support is signoz-inherited and not part of the default stack.
 // This noop returns a working (empty) Engine + Queryable so o11y boots
 // without the prometheus/prometheus/storage/remote chain (which pulls
 // google api → s2a-go → google.golang.org/grpc).
 //
 // Real PromQL support is gated behind -tags signoz via
-// pkg/prometheus/clickhouseprometheus.
+// pkg/prometheus/datastoreprometheus.
 package nooprometheus
 
 import (

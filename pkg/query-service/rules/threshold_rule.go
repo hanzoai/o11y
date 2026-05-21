@@ -130,7 +130,7 @@ func (r *ThresholdRule) prepareQueryRange(ctx context.Context, ts time.Time) (*v
 	startTs, endTs := r.Timestamps(ts)
 	start, end := startTs.UnixMilli(), endTs.UnixMilli()
 
-	if r.ruleCondition.QueryType() == v3.QueryTypeClickHouseSQL {
+	if r.ruleCondition.QueryType() == v3.QueryTypeDatastoreSQL {
 		params := &v3.QueryRangeParamsV3{
 			Start: start,
 			End:   end,
@@ -139,7 +139,7 @@ func (r *ThresholdRule) prepareQueryRange(ctx context.Context, ts time.Time) (*v
 				QueryType:         r.ruleCondition.CompositeQuery.QueryType,
 				PanelType:         r.ruleCondition.CompositeQuery.PanelType,
 				BuilderQueries:    make(map[string]*v3.BuilderQuery),
-				ClickHouseQueries: make(map[string]*v3.ClickHouseQuery),
+				DatastoreQueries: make(map[string]*v3.DatastoreQuery),
 				PromQueries:       make(map[string]*v3.PromQuery),
 				Unit:              r.ruleCondition.CompositeQuery.Unit,
 			},
@@ -147,11 +147,11 @@ func (r *ThresholdRule) prepareQueryRange(ctx context.Context, ts time.Time) (*v
 			NoCache:   true,
 		}
 		querytemplate.AssignReservedVarsV3(params)
-		for name, chQuery := range r.ruleCondition.CompositeQuery.ClickHouseQueries {
+		for name, chQuery := range r.ruleCondition.CompositeQuery.DatastoreQueries {
 			if chQuery.Disabled {
 				continue
 			}
-			tmpl := template.New("clickhouse-query")
+			tmpl := template.New("datastore-query")
 			tmpl, err := tmpl.Parse(chQuery.Query)
 			if err != nil {
 				return nil, err
@@ -161,7 +161,7 @@ func (r *ThresholdRule) prepareQueryRange(ctx context.Context, ts time.Time) (*v
 			if err != nil {
 				return nil, err
 			}
-			params.CompositeQuery.ClickHouseQueries[name] = &v3.ClickHouseQuery{
+			params.CompositeQuery.DatastoreQueries[name] = &v3.DatastoreQuery{
 				Query:    query.String(),
 				Disabled: chQuery.Disabled,
 				Legend:   chQuery.Legend,

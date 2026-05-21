@@ -58,19 +58,19 @@ func TestIsAllQueriesDisabled(t *testing.T) {
 			},
 		},
 		{
-			QueryType: v3.QueryTypeClickHouseSQL,
+			QueryType: v3.QueryTypeDatastoreSQL,
 		},
 		{
-			QueryType: v3.QueryTypeClickHouseSQL,
-			ClickHouseQueries: map[string]*v3.ClickHouseQuery{
+			QueryType: v3.QueryTypeDatastoreSQL,
+			DatastoreQueries: map[string]*v3.DatastoreQuery{
 				"query4": {
 					Disabled: false,
 				},
 			},
 		},
 		{
-			QueryType: v3.QueryTypeClickHouseSQL,
-			ClickHouseQueries: map[string]*v3.ClickHouseQuery{
+			QueryType: v3.QueryTypeDatastoreSQL,
+			DatastoreQueries: map[string]*v3.DatastoreQuery{
 				"query4": {
 					Disabled: true,
 				},

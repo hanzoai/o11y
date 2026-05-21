@@ -103,7 +103,7 @@ func (q *querier) runBuilderQuery(
 				ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 				return
 			}
-			series, err := q.execClickHouseQuery(ctx, query)
+			series, err := q.execDatastoreQuery(ctx, query)
 			ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 			return
 		}
@@ -118,7 +118,7 @@ func (q *querier) runBuilderQuery(
 				ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 				return
 			}
-			series, err := q.execClickHouseQuery(ctx, query)
+			series, err := q.execDatastoreQuery(ctx, query)
 			if err != nil {
 				ch <- channelResult{
 					Err:    err,
@@ -208,7 +208,7 @@ func (q *querier) runBuilderQuery(
 			}
 		}
 
-		series, err := q.execClickHouseQuery(ctx, query)
+		series, err := q.execDatastoreQuery(ctx, query)
 		ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 		return
 	}
@@ -223,7 +223,7 @@ func (q *querier) runBuilderQuery(
 			ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 			return
 		}
-		series, err := q.execClickHouseQuery(ctx, query)
+		series, err := q.execDatastoreQuery(ctx, query)
 		ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 		return
 	}
@@ -250,7 +250,7 @@ func (q *querier) runBuilderQuery(
 			}
 			return
 		}
-		series, err := q.execClickHouseQuery(ctx, query)
+		series, err := q.execDatastoreQuery(ctx, query)
 		if err != nil {
 			ch <- channelResult{
 				Err:    err,
@@ -299,7 +299,7 @@ func (q *querier) runBuilderExpression(
 	if _, ok := cacheKeys[queryName]; !ok || params.NoCache {
 		zap.L().Info("skipping cache for expression query", zap.String("queryName", queryName), zap.Int64("start", params.Start), zap.Int64("end", params.End), zap.Int64("step", params.Step), zap.Bool("noCache", params.NoCache), zap.String("cacheKey", cacheKeys[queryName]))
 		query := queries[queryName]
-		series, err := q.execClickHouseQuery(ctx, query)
+		series, err := q.execDatastoreQuery(ctx, query)
 		ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 		return
 	}
@@ -319,7 +319,7 @@ func (q *querier) runBuilderExpression(
 			Variables:      params.Variables,
 		})
 		query := missQueries[queryName]
-		series, err := q.execClickHouseQuery(ctx, query)
+		series, err := q.execDatastoreQuery(ctx, query)
 		if err != nil {
 			ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 			return

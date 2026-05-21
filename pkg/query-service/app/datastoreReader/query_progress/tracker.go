@@ -1,7 +1,7 @@
 package queryprogress
 
 import (
-	"github.com/ClickHouse/clickhouse-go/v2"
+	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 )
 
@@ -11,8 +11,8 @@ type QueryProgressTracker interface {
 	// Returns a cleanup function that must be called after the query finishes.
 	ReportQueryStarted(queryId string) (postQueryCleanup func(), apiErr *model.ApiError)
 
-	// Report progress stats received from clickhouse for `queryId`
-	ReportQueryProgress(queryId string, chProgress *clickhouse.Progress) *model.ApiError
+	// Report progress stats received from datastore for `queryId`
+	ReportQueryProgress(queryId string, chProgress *datastore.Progress) *model.ApiError
 
 	// Subscribe to progress updates for `queryId`
 	// The returned channel will produce `QueryProgress` instances representing

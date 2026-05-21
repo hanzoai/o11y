@@ -66,7 +66,7 @@ func (t *telemetryMetaStore) fetchBodyJSONPaths(ctx context.Context,
 	rowCount := 0
 	for rows.Next() {
 		var path string
-		var typesArray []string // ClickHouse returns array as []string
+		var typesArray []string // Datastore returns array as []string
 		var lastSeen uint64
 
 		err = rows.Scan(&path, &typesArray, &lastSeen)

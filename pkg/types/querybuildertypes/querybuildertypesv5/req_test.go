@@ -722,7 +722,7 @@ func TestQueryRangeRequest_UnmarshalJSON(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "valid ClickHouse SQL query",
+			name: "valid Datastore SQL query",
 			jsonData: `{
 				"schemaVersion": "v1",
 				"start": 1640995200000,
@@ -730,7 +730,7 @@ func TestQueryRangeRequest_UnmarshalJSON(t *testing.T) {
 				"requestType": "raw",
 				"compositeQuery": {
 					"queries": [{
-						"type": "clickhouse_sql",
+						"type": "datastore_sql",
 						"spec": {
 							"name": "custom_query",
 							"query": "SELECT count(*) FROM logs WHERE timestamp >= ? AND timestamp <= ?",
@@ -746,8 +746,8 @@ func TestQueryRangeRequest_UnmarshalJSON(t *testing.T) {
 				RequestType:   RequestTypeRaw,
 				CompositeQuery: CompositeQuery{
 					Queries: []QueryEnvelope{{
-						Type: QueryTypeClickHouseSQL,
-						Spec: ClickHouseQuery{
+						Type: QueryTypeDatastoreSQL,
+						Spec: DatastoreQuery{
 							Name:     "custom_query",
 							Query:    "SELECT count(*) FROM logs WHERE timestamp >= ? AND timestamp <= ?",
 							Disabled: false,
@@ -1010,10 +1010,10 @@ func TestQueryRangeRequest_UnmarshalJSON(t *testing.T) {
 					assert.Equal(t, expectedSpec.Name, actualSpec.Name)
 					assert.Equal(t, expectedSpec.Query, actualSpec.Query)
 					assert.Equal(t, expectedSpec.Disabled, actualSpec.Disabled)
-				case QueryTypeClickHouseSQL:
-					expectedSpec := expectedQuery.Spec.(ClickHouseQuery)
-					actualSpec, ok := actualQuery.Spec.(ClickHouseQuery)
-					require.True(t, ok, "Expected ClickHouseQuery but got %T", actualQuery.Spec)
+				case QueryTypeDatastoreSQL:
+					expectedSpec := expectedQuery.Spec.(DatastoreQuery)
+					actualSpec, ok := actualQuery.Spec.(DatastoreQuery)
+					require.True(t, ok, "Expected DatastoreQuery but got %T", actualQuery.Spec)
 					assert.Equal(t, expectedSpec.Name, actualSpec.Name)
 					assert.Equal(t, expectedSpec.Query, actualSpec.Query)
 					assert.Equal(t, expectedSpec.Disabled, actualSpec.Disabled)

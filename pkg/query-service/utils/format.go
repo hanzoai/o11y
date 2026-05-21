@@ -153,17 +153,17 @@ func ValidateAndCastValue(v interface{}, dataType v3.AttributeKeyDataType) (inte
 }
 
 func QuoteEscapedString(str string) string {
-	// https://clickhouse.com/docs/en/sql-reference/syntax#string
+	// https://datastore.com/docs/en/sql-reference/syntax#string
 	str = strings.ReplaceAll(str, `\`, `\\`)
 	str = strings.ReplaceAll(str, `'`, `\'`)
 	return str
 }
 
 func QuoteEscapedStringForContains(str string, isIndex bool) string {
-	// https: //clickhouse.com/docs/en/sql-reference/functions/string-search-functions#like
+	// https: //datastore.com/docs/en/sql-reference/functions/string-search-functions#like
 	str = QuoteEscapedString(str)
 
-	// we are adding this because if a string contains quote `"` it will be stored as \" in clickhouse
+	// we are adding this because if a string contains quote `"` it will be stored as \" in datastore
 	// to query that using like our query should be \\\\"
 	if isIndex {
 		// isIndex is true means that the extra slash is present
@@ -176,8 +176,8 @@ func QuoteEscapedStringForContains(str string, isIndex bool) string {
 	return str
 }
 
-// ClickHouseFormattedValue formats the value to be used in clickhouse query
-func ClickHouseFormattedValue(v interface{}) string {
+// DatastoreFormattedValue formats the value to be used in datastore query
+func DatastoreFormattedValue(v interface{}) string {
 	// if it's pointer convert it to a value
 	v = getPointerValue(v)
 
@@ -231,17 +231,17 @@ func ClickHouseFormattedValue(v interface{}) string {
 	}
 }
 
-func ClickHouseFormattedMetricNames(v interface{}) string {
+func DatastoreFormattedMetricNames(v interface{}) string {
 	if name, ok := v.(string); ok {
 		transitionedMetrics := metrics.GetTransitionedMetric(name, !constants.IsDotMetricsEnabled)
 		if transitionedMetrics != name {
-			return ClickHouseFormattedValue([]interface{}{transitionedMetrics})
+			return DatastoreFormattedValue([]interface{}{transitionedMetrics})
 		} else {
-			return ClickHouseFormattedValue([]interface{}{name})
+			return DatastoreFormattedValue([]interface{}{name})
 		}
 	}
 
-	return ClickHouseFormattedValue(v)
+	return DatastoreFormattedValue(v)
 }
 
 func AddBackTickToFormatTag(str string) string {

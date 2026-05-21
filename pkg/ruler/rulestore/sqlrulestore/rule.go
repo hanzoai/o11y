@@ -174,11 +174,11 @@ func (r *rule) GetStoredRulesByMetricName(ctx context.Context, orgID string, met
 						break
 					}
 				}
-			case qbtypes.QueryTypeClickHouseSQL:
-				if spec, ok := queryEnvelope.Spec.(qbtypes.ClickHouseQuery); ok {
-					result, err := r.queryParser.AnalyzeQueryFilter(ctx, qbtypes.QueryTypeClickHouseSQL, spec.Query)
+			case qbtypes.QueryTypeDatastoreSQL:
+				if spec, ok := queryEnvelope.Spec.(qbtypes.DatastoreQuery); ok {
+					result, err := r.queryParser.AnalyzeQueryFilter(ctx, qbtypes.QueryTypeDatastoreSQL, spec.Query)
 					if err != nil {
-						r.logger.WarnContext(ctx, "failed to parse ClickHouse query", "query", spec.Query, "error", err)
+						r.logger.WarnContext(ctx, "failed to parse Datastore query", "query", spec.Query, "error", err)
 						continue
 					}
 					if slices.Contains(result.MetricNames, metricName) {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 )
 
@@ -31,28 +31,28 @@ func BuildServiceMapQuery(tags []model.TagQuery) (string, []interface{}) {
 		switch operator {
 		case model.InOperator:
 			filterQuery += fmt.Sprintf(" AND %s IN @%s", key, key)
-			namedArgs = append(namedArgs, clickhouse.Named(key, value))
+			namedArgs = append(namedArgs, datastore.Named(key, value))
 		case model.NotInOperator:
 			filterQuery += fmt.Sprintf(" AND %s NOT IN @%s", key, key)
-			namedArgs = append(namedArgs, clickhouse.Named(key, value))
+			namedArgs = append(namedArgs, datastore.Named(key, value))
 		case model.EqualOperator:
 			filterQuery += fmt.Sprintf(" AND %s = @%s", key, key)
-			namedArgs = append(namedArgs, clickhouse.Named(key, value))
+			namedArgs = append(namedArgs, datastore.Named(key, value))
 		case model.NotEqualOperator:
 			filterQuery += fmt.Sprintf(" AND %s != @%s", key, key)
-			namedArgs = append(namedArgs, clickhouse.Named(key, value))
+			namedArgs = append(namedArgs, datastore.Named(key, value))
 		case model.ContainsOperator:
 			filterQuery += fmt.Sprintf(" AND %s LIKE @%s", key, key)
-			namedArgs = append(namedArgs, clickhouse.Named(key, fmt.Sprintf("%%%s%%", value)))
+			namedArgs = append(namedArgs, datastore.Named(key, fmt.Sprintf("%%%s%%", value)))
 		case model.NotContainsOperator:
 			filterQuery += fmt.Sprintf(" AND %s NOT LIKE @%s", key, key)
-			namedArgs = append(namedArgs, clickhouse.Named(key, fmt.Sprintf("%%%s%%", value)))
+			namedArgs = append(namedArgs, datastore.Named(key, fmt.Sprintf("%%%s%%", value)))
 		case model.StartsWithOperator:
 			filterQuery += fmt.Sprintf(" AND %s LIKE @%s", key, key)
-			namedArgs = append(namedArgs, clickhouse.Named(key, fmt.Sprintf("%s%%", value)))
+			namedArgs = append(namedArgs, datastore.Named(key, fmt.Sprintf("%s%%", value)))
 		case model.NotStartsWithOperator:
 			filterQuery += fmt.Sprintf(" AND %s NOT LIKE @%s", key, key)
-			namedArgs = append(namedArgs, clickhouse.Named(key, fmt.Sprintf("%s%%", value)))
+			namedArgs = append(namedArgs, datastore.Named(key, fmt.Sprintf("%s%%", value)))
 		case model.ExistsOperator:
 			filterQuery += fmt.Sprintf(" AND %s IS NOT NULL", key)
 		case model.NotExistsOperator:

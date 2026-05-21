@@ -147,14 +147,14 @@ func (rc *RuleCondition) GetSelectedQueryName() string {
 						queryNames[spec.Name] = struct{}{}
 					}
 				}
-			} else if rc.QueryType() == v3.QueryTypeClickHouseSQL {
-				for name := range rc.CompositeQuery.ClickHouseQueries {
+			} else if rc.QueryType() == v3.QueryTypeDatastoreSQL {
+				for name := range rc.CompositeQuery.DatastoreQueries {
 					queryNames[name] = struct{}{}
 				}
 
 				for _, query := range rc.CompositeQuery.Queries {
 					switch spec := query.Spec.(type) {
-					case qbtypes.ClickHouseQuery:
+					case qbtypes.DatastoreQuery:
 						queryNames[spec.Name] = struct{}{}
 					}
 				}

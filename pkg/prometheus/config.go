@@ -41,5 +41,5 @@ func (c Config) Validate() error {
 }
 
 func (c Config) Provider() string {
-	return "clickhouse"
+	return "datastore"
 }

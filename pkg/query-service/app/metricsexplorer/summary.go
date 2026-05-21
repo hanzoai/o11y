@@ -93,7 +93,7 @@ func (receiver *SummaryService) GetMetricsSummary(ctx context.Context, orgID val
 	g.Go(func() error {
 		metadata, err := receiver.reader.GetMetricMetadata(ctx, orgID, metricName, metricName)
 		if err != nil {
-			return &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		metricDetailsDTO.Name = metricName
 		metricDetailsDTO.Unit = metadata.Unit

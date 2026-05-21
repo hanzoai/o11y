@@ -31,7 +31,7 @@ const OrderBySpanCount = "span_count"
 // Deprecated: Use the new emailing service instead
 var InviteEmailTemplate = GetOrDefaultEnv("INVITE_EMAIL_TEMPLATE", "/root/templates/invitation_email.gotmpl")
 
-var MetricsExplorerClickhouseThreads = GetOrDefaultEnvInt("METRICS_EXPLORER_CLICKHOUSE_THREADS", 8)
+var MetricsExplorerClickhouseThreads = GetOrDefaultEnvInt("METRICS_EXPLORER_DATASTORE_THREADS", 8)
 var UpdatedMetricsMetadataCachePrefix = GetOrDefaultEnv("METRICS_UPDATED_METADATA_CACHE_KEY", "UPDATED_METRICS_METADATA")
 
 const NormalizedMetricsMapCacheKey = "NORMALIZED_METRICS_MAP_CACHE_KEY"
@@ -232,7 +232,7 @@ const (
 )
 
 // ReservedColumnTargetAliases identifies result value from a user
-// written clickhouse query. The column alias indcate which value is
+// written datastore query. The column alias indcate which value is
 // to be considered as final result (or target)
 var ReservedColumnTargetAliases = map[string]struct{}{
 	"__result": {},
