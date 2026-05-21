@@ -10,7 +10,7 @@ git clone https://github.com/Hanzo O11y/docker-container-logs.git
 
 **Step 2. Update your `.env` file**
 
-In the repository that you cloned above, update `.env` file by putting the values of `<HANZO_INGESTION_KEY>` and `{region}`.
+In the repository that you cloned above, update `.env` file by putting the values of `<O11Y_INGESTION_KEY>` and `{region}`.
 
 Depending on the choice of your region for Hanzo O11y cloud, the ingest endpoint will vary accordingly.
 

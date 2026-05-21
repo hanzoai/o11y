@@ -5,7 +5,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/instrumentation"
-	"github.com/prometheus/client_golang/prometheus"
+	luxmetric "github.com/luxfi/metric"
 	sdkmetric "go.opentelemetry.io/otel/metric"
 	noopmetric "go.opentelemetry.io/otel/metric/noop"
 	sdktrace "go.opentelemetry.io/otel/trace"
@@ -13,18 +13,18 @@ import (
 )
 
 type noopInstrumentation struct {
-	logger             *slog.Logger
-	meterProvider      sdkmetric.MeterProvider
-	tracerProvider     sdktrace.TracerProvider
-	prometheusRegistry *prometheus.Registry
+	logger         *slog.Logger
+	meterProvider  sdkmetric.MeterProvider
+	tracerProvider sdktrace.TracerProvider
+	metricsReg     luxmetric.Registry
 }
 
 func New() instrumentation.Instrumentation {
 	return &noopInstrumentation{
-		logger:             slog.New(slog.DiscardHandler),
-		meterProvider:      noopmetric.NewMeterProvider(),
-		tracerProvider:     nooptrace.NewTracerProvider(),
-		prometheusRegistry: prometheus.NewRegistry(),
+		logger:         slog.New(slog.DiscardHandler),
+		meterProvider:  noopmetric.NewMeterProvider(),
+		tracerProvider: nooptrace.NewTracerProvider(),
+		metricsReg:     luxmetric.NewRegistry(),
 	}
 }
 
@@ -40,15 +40,15 @@ func (i *noopInstrumentation) TracerProvider() sdktrace.TracerProvider {
 	return i.tracerProvider
 }
 
-func (i *noopInstrumentation) PrometheusRegisterer() prometheus.Registerer {
-	return i.prometheusRegistry
+func (i *noopInstrumentation) MetricsRegisterer() luxmetric.Registerer {
+	return i.metricsReg
 }
 
 func (i *noopInstrumentation) ToProviderSettings() factory.ProviderSettings {
 	return factory.ProviderSettings{
-		Logger:               i.Logger(),
-		MeterProvider:        i.MeterProvider(),
-		TracerProvider:       i.TracerProvider(),
-		PrometheusRegisterer: i.PrometheusRegisterer(),
+		Logger:            i.Logger(),
+		MeterProvider:     i.MeterProvider(),
+		TracerProvider:    i.TracerProvider(),
+		MetricsRegisterer: i.MetricsRegisterer(),
 	}
 }

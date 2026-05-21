@@ -218,8 +218,8 @@ func TestBuildQueryWithThreeOrMoreQueriesRefAndFormula(t *testing.T) {
 			End:   1735637901000,
 			Step:  60,
 			Variables: map[string]interface{}{
-				"HANZO_START_TIME": 1735034992000,
-				"HANZO_END_TIME":   1735036792000,
+				"O11Y_START_TIME": 1735034992000,
+				"O11Y_END_TIME":   1735036792000,
 			},
 			FormatForWeb: false,
 			CompositeQuery: &v3.CompositeQuery{
@@ -259,7 +259,7 @@ func TestBuildQueryWithThreeOrMoreQueriesRefAndFormula(t *testing.T) {
 						StepInterval: 60,
 						OrderBy: []v3.OrderBy{
 							{
-								ColumnName: "#HANZO_VALUE",
+								ColumnName: "#O11Y_VALUE",
 								Order:      v3.DirectionAsc,
 							},
 						},
@@ -1511,7 +1511,7 @@ func TestGenerateCacheKeysLogs(t *testing.T) {
 				},
 			},
 			expectedCacheKeys: map[string]string{
-				"A": "source=logs&step=60&aggregate=count&limit=0&aggregateAttribute=log_level---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=log_level---false&orderBy-0=#HANZO_VALUE-desc&having-0=column:value,op:>,value:100",
+				"A": "source=logs&step=60&aggregate=count&limit=0&aggregateAttribute=log_level---false&filter-0=key:service_name---false,op:=,value:A&groupBy-0=service_name---false&groupBy-1=log_level---false&orderBy-0=#O11Y_VALUE-desc&having-0=column:value,op:>,value:100",
 			},
 		},
 		{
