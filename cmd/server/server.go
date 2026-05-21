@@ -108,7 +108,7 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 
 	// ZAP-native trace ingestion. Spans shipped by luxfi/trace's
 	// Type=ZAP exporter land here and (TODO) get written to the
-	// telemetry store. Defaults to :4317; HANZO_ZAP_LISTEN overrides.
+	// telemetry store. Defaults to :4317; O11Y_ZAP_LISTEN overrides.
 	// This is the OTel-on-ZAP path that replaces OTLP-gRPC ingestion
 	// — no protobuf, no grpc, just zap envelopes.
 	zapRcv, err := zapreceiver.New(zapreceiver.Config{
@@ -155,9 +155,9 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 }
 
 // zapReceiverAddr returns the bind address for the ZAP span receiver.
-// HANZO_ZAP_LISTEN overrides; default is :4317 (canonical o11y ZAP port).
+// O11Y_ZAP_LISTEN overrides; default is :4317 (canonical o11y ZAP port).
 func zapReceiverAddr() string {
-	if v := os.Getenv("HANZO_ZAP_LISTEN"); v != "" {
+	if v := os.Getenv("O11Y_ZAP_LISTEN"); v != "" {
 		return v
 	}
 	return ":4317"

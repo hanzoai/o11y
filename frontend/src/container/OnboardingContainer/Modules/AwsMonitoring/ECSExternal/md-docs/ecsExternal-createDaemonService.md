@@ -9,8 +9,8 @@ Set the environment variable by running the below command uisng your AWS CLI:
 ```bash
 export CLUSTER_NAME=<YOUR-ECS-CLUSTER-NAME>
 export REGION=<YOUR-ECS-REGION>
-export COMMAND=--config=env:HANZO_CONFIG_CONTENT
-export HANZO_CONFIG_PATH=/ecs/hanzo/otelcol-daemon.yaml
+export COMMAND=--config=env:O11Y_CONFIG_CONTENT
+export O11Y_CONFIG_PATH=/ecs/hanzo/otelcol-daemon.yaml
 ```
 
 `<YOUR-ECS-CLUSTER-NAME>` - Name of your ECS cluster. For example, **my-test-cluster** 
@@ -29,7 +29,7 @@ aws cloudformation create-stack --stack-name AOCECS-daemon-${CLUSTER_NAME}-${REG
     --parameters ParameterKey=ClusterName,ParameterValue=${CLUSTER_NAME} \
     ParameterKey=CreateIAMRoles,ParameterValue=True \
         ParameterKey=command,ParameterValue=${COMMAND} \
-        ParameterKey=Hanzo O11yConfigPath,ParameterValue=${HANZO_CONFIG_PATH} \
+        ParameterKey=Hanzo O11yConfigPath,ParameterValue=${O11Y_CONFIG_PATH} \
     --capabilities CAPABILITY_NAMED_IAM \
     --region ${REGION}
 ```

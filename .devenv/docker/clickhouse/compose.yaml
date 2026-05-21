@@ -67,10 +67,10 @@ services:
     image: observe/observe-otel-collector:v0.142.0
     container_name: telemetrystore-migrator
     environment:
-      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
-      - HANZO_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
-      - HANZO_OTEL_COLLECTOR_TIMEOUT=10m
+      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
+      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - O11Y_OTEL_COLLECTOR_TIMEOUT=10m
     entrypoint:
       - /bin/sh
     command:

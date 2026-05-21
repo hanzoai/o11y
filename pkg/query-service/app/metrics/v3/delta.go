@@ -43,7 +43,7 @@ func buildDeltaMetricQuery(start, end, step int64, mq *v3.BuilderQuery) (string,
 		"SELECT %s" +
 			" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 			" %s as value" +
-			" FROM " + constants.HANZO_METRIC_DBNAME + "." + constants.HANZO_SAMPLES_V4_TABLENAME +
+			" FROM " + constants.O11Y_METRIC_DBNAME + "." + constants.O11Y_SAMPLES_V4_TABLENAME +
 			" INNER JOIN" +
 			" (%s) as filtered_time_series" +
 			" USING fingerprint" +
@@ -143,7 +143,7 @@ func buildDeltaMetricQuery(start, end, step int64, mq *v3.BuilderQuery) (string,
 			"SELECT fingerprint, labels as fullLabels," +
 				" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 				" any(value) as value" +
-				" FROM " + constants.HANZO_METRIC_DBNAME + "." + constants.HANZO_SAMPLES_V4_TABLENAME +
+				" FROM " + constants.O11Y_METRIC_DBNAME + "." + constants.O11Y_SAMPLES_V4_TABLENAME +
 				" INNER JOIN" +
 				" (%s) as filtered_time_series" +
 				" USING fingerprint" +

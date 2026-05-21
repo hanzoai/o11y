@@ -15,11 +15,11 @@ import (
 )
 
 func TestNewWithEnvProvider(t *testing.T) {
-	t.Setenv("HANZO_ALERTMANAGER_PROVIDER", "observe")
-	t.Setenv("HANZO_ALERTMANAGER_LEGACY_API__URL", "http://localhost:9093/api")
-	t.Setenv("HANZO_ALERTMANAGER_HANZO_ROUTE_REPEAT__INTERVAL", "5m")
-	t.Setenv("HANZO_ALERTMANAGER_HANZO_EXTERNAL__URL", "https://example.com/test")
-	t.Setenv("HANZO_ALERTMANAGER_HANZO_GLOBAL_RESOLVE__TIMEOUT", "10s")
+	t.Setenv("O11Y_ALERTMANAGER_PROVIDER", "observe")
+	t.Setenv("O11Y_ALERTMANAGER_LEGACY_API__URL", "http://localhost:9093/api")
+	t.Setenv("O11Y_ALERTMANAGER_O11Y_ROUTE_REPEAT__INTERVAL", "5m")
+	t.Setenv("O11Y_ALERTMANAGER_O11Y_EXTERNAL__URL", "https://example.com/test")
+	t.Setenv("O11Y_ALERTMANAGER_O11Y_GLOBAL_RESOLVE__TIMEOUT", "10s")
 
 	conf, err := config.New(
 		context.Background(),

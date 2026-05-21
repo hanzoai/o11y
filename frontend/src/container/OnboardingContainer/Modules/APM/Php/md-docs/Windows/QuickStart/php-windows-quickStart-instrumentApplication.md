@@ -102,7 +102,7 @@ function initOpenTelemetry()
 
 
  $headers = [
- 'hanzo-ingestion-key' => "{{HANZO_INGESTION_KEY}}",
+ 'hanzo-ingestion-key' => "{{O11Y_INGESTION_KEY}}",
  ];
  $transport = (new GrpcTransportFactory())->create('https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces"' . OtlpUtil::method(Signals::TRACE), 'application/x-protobuf', $headers);
  $spanExporter = new SpanExporter($transport);

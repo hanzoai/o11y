@@ -101,32 +101,32 @@ var GroupByColMap = map[string]struct{}{
 }
 
 const (
-	HANZO_METRIC_DBNAME                       = "observe_metrics"
-	HANZO_SAMPLES_V4_LOCAL_TABLENAME          = "samples_v4"
-	HANZO_SAMPLES_V4_TABLENAME                = "distributed_samples_v4"
-	HANZO_SAMPLES_V4_AGG_5M_TABLENAME         = "distributed_samples_v4_agg_5m"
-	HANZO_SAMPLES_V4_AGG_30M_TABLENAME        = "distributed_samples_v4_agg_30m"
-	HANZO_EXP_HISTOGRAM_TABLENAME             = "distributed_exp_hist"
-	HANZO_EXP_HISTOGRAM_LOCAL_TABLENAME       = "exp_hist"
-	HANZO_TRACE_DBNAME                        = "observe_traces"
-	HANZO_SPAN_INDEX_TABLENAME                = "distributed_observe_index_v2"
-	HANZO_SPAN_INDEX_V3                       = "distributed_observe_index_v3"
-	HANZO_SPAN_INDEX_LOCAL_TABLENAME          = "observe_index_v2"
-	HANZO_SPAN_INDEX_V3_LOCAL_TABLENAME       = "observe_index_v3"
-	HANZO_TIMESERIES_v4_LOCAL_TABLENAME       = "time_series_v4"
-	HANZO_TIMESERIES_V4_TABLENAME             = "distributed_time_series_v4"
-	HANZO_TIMESERIES_v4_6HRS_LOCAL_TABLENAME  = "time_series_v4_6hrs"
-	HANZO_TIMESERIES_v4_1DAY_LOCAL_TABLENAME  = "time_series_v4_1day"
-	HANZO_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME = "time_series_v4_1week"
-	HANZO_TIMESERIES_v4_1DAY_TABLENAME        = "distributed_time_series_v4_1day"
-	HANZO_TOP_LEVEL_OPERATIONS_TABLENAME      = "distributed_top_level_operations"
-	HANZO_TIMESERIES_v4_TABLENAME             = "distributed_time_series_v4"
-	HANZO_TIMESERIES_v4_1WEEK_TABLENAME       = "distributed_time_series_v4_1week"
-	HANZO_TIMESERIES_v4_6HRS_TABLENAME        = "distributed_time_series_v4_6hrs"
-	HANZO_ATTRIBUTES_METADATA_TABLENAME       = "distributed_attributes_metadata"
-	HANZO_ATTRIBUTES_METADATA_LOCAL_TABLENAME = "attributes_metadata"
-	HANZO_METADATA_TABLENAME                  = "distributed_metadata"
-	HANZO_METADATA_LOCAL_TABLENAME            = "metadata"
+	O11Y_METRIC_DBNAME                       = "observe_metrics"
+	O11Y_SAMPLES_V4_LOCAL_TABLENAME          = "samples_v4"
+	O11Y_SAMPLES_V4_TABLENAME                = "distributed_samples_v4"
+	O11Y_SAMPLES_V4_AGG_5M_TABLENAME         = "distributed_samples_v4_agg_5m"
+	O11Y_SAMPLES_V4_AGG_30M_TABLENAME        = "distributed_samples_v4_agg_30m"
+	O11Y_EXP_HISTOGRAM_TABLENAME             = "distributed_exp_hist"
+	O11Y_EXP_HISTOGRAM_LOCAL_TABLENAME       = "exp_hist"
+	O11Y_TRACE_DBNAME                        = "observe_traces"
+	O11Y_SPAN_INDEX_TABLENAME                = "distributed_observe_index_v2"
+	O11Y_SPAN_INDEX_V3                       = "distributed_observe_index_v3"
+	O11Y_SPAN_INDEX_LOCAL_TABLENAME          = "observe_index_v2"
+	O11Y_SPAN_INDEX_V3_LOCAL_TABLENAME       = "observe_index_v3"
+	O11Y_TIMESERIES_v4_LOCAL_TABLENAME       = "time_series_v4"
+	O11Y_TIMESERIES_V4_TABLENAME             = "distributed_time_series_v4"
+	O11Y_TIMESERIES_v4_6HRS_LOCAL_TABLENAME  = "time_series_v4_6hrs"
+	O11Y_TIMESERIES_v4_1DAY_LOCAL_TABLENAME  = "time_series_v4_1day"
+	O11Y_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME = "time_series_v4_1week"
+	O11Y_TIMESERIES_v4_1DAY_TABLENAME        = "distributed_time_series_v4_1day"
+	O11Y_TOP_LEVEL_OPERATIONS_TABLENAME      = "distributed_top_level_operations"
+	O11Y_TIMESERIES_v4_TABLENAME             = "distributed_time_series_v4"
+	O11Y_TIMESERIES_v4_1WEEK_TABLENAME       = "distributed_time_series_v4_1week"
+	O11Y_TIMESERIES_v4_6HRS_TABLENAME        = "distributed_time_series_v4_6hrs"
+	O11Y_ATTRIBUTES_METADATA_TABLENAME       = "distributed_attributes_metadata"
+	O11Y_ATTRIBUTES_METADATA_LOCAL_TABLENAME = "attributes_metadata"
+	O11Y_METADATA_TABLENAME                  = "distributed_metadata"
+	O11Y_METADATA_LOCAL_TABLENAME            = "metadata"
 )
 
 // alert related constants
@@ -310,7 +310,7 @@ var StaticFieldsLogsV3 = map[string]v3.AttributeKey{
 	},
 }
 
-const HanzoO11yOrderByValue = "#HANZO_VALUE"
+const HanzoO11yOrderByValue = "#O11Y_VALUE"
 
 const TIMESTAMP = "timestamp"
 
