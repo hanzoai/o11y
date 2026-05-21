@@ -340,7 +340,7 @@ func (h *HostsRepo) IsSendingK8SAgentMetrics(ctx context.Context, req model.Host
 	FROM %s.%s
 	WHERE metric_name IN (%s)
 		AND unix_milli >= toUnixTimestamp(now() - INTERVAL 5 MINUTE) * 1000`,
-		constants.HANZO_METRIC_DBNAME, constants.HANZO_SAMPLES_V4_TABLENAME, namesStr)
+		constants.O11Y_METRIC_DBNAME, constants.O11Y_SAMPLES_V4_TABLENAME, namesStr)
 
 	query := fmt.Sprintf(`
 	SELECT DISTINCT JSONExtractString(labels, '%s') as k8s_cluster_name, JSONExtractString(labels, '%s') as k8s_node_name
@@ -350,7 +350,7 @@ func (h *HostsRepo) IsSendingK8SAgentMetrics(ctx context.Context, req model.Host
 		AND JSONExtractString(labels, '%s') LIKE '%%-otel-agent%%'
 		AND fingerprint GLOBAL IN (%s)`,
 		GetDotMetrics("k8s_cluster_name"), GetDotMetrics("k8s_node_name"),
-		constants.HANZO_METRIC_DBNAME, constants.HANZO_TIMESERIES_V4_TABLENAME, namesStr, GetDotMetrics("host_name"), queryForRecentFingerprints)
+		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_V4_TABLENAME, namesStr, GetDotMetrics("host_name"), queryForRecentFingerprints)
 
 	result, err := h.reader.GetListResultV3(ctx, query)
 	if err != nil {

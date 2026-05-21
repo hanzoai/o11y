@@ -20,9 +20,9 @@ services:
       - /:/hostfs:ro
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - HANZO_COLLECTOR_ENDPOINT=http://host.docker.internal:4317    # In case of external Hanzo O11y or cloud, update the endpoint and access token
+      - O11Y_COLLECTOR_ENDPOINT=http://host.docker.internal:4317    # In case of external Hanzo O11y or cloud, update the endpoint and access token
       - OTEL_RESOURCE_ATTRIBUTES=host.name=observe-host,os.type=linux  # Replace observe-host with the actual hostname
-      # - HANZO_ACCESS_TOKEN="<your-access-token>"
+      # - O11Y_ACCESS_TOKEN="<your-access-token>"
     # Before exposing the ports, make sure the ports are not used by other services
     # ports:
     #   - "4317:4317"

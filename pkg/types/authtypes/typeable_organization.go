@@ -4,19 +4,18 @@ import (
 	"strings"
 
 	"github.com/hanzoai/o11y/pkg/valuer"
-	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 )
 
 var _ Typeable = new(typeableOrganization)
 
 type typeableOrganization struct{}
 
-func (typeableOrganization *typeableOrganization) Tuples(subject string, relation Relation, selectors []Selector, _ valuer.UUID) ([]*openfgav1.TupleKey, error) {
-	tuples := make([]*openfgav1.TupleKey, 0)
+func (typeableOrganization *typeableOrganization) Tuples(subject string, relation Relation, selectors []Selector, _ valuer.UUID) ([]*TupleKey, error) {
+	tuples := make([]*TupleKey, 0)
 
 	for _, selector := range selectors {
 		object := strings.Join([]string{typeableOrganization.Type().StringValue(), selector.String()}, ":")
-		tuples = append(tuples, &openfgav1.TupleKey{User: subject, Relation: relation.StringValue(), Object: object})
+		tuples = append(tuples, &TupleKey{User: subject, Relation: relation.StringValue(), Object: object})
 	}
 
 	return tuples, nil
