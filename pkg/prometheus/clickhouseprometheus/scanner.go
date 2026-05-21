@@ -1,3 +1,5 @@
+//go:build signoz
+
 package clickhouseprometheus
 
 import (
