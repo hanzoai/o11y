@@ -1,10 +1,11 @@
+//go:build openfga
+
 package openfgaschema
 
 import (
 	"context"
 	_ "embed"
 
-	"github.com/hanzoai/o11y/pkg/authz"
 	openfgapkgtransformer "github.com/openfga/language/pkg/go/transformer"
 )
 
@@ -13,9 +14,16 @@ var (
 	baseDSL string
 )
 
+// Schema is the OpenFGA-specific schema interface. Lives here (not in
+// pkg/authz) so the authz API stays transport-agnostic — IAM-backed
+// authz has no schema concept.
+type Schema interface {
+	Get(context.Context) []openfgapkgtransformer.ModuleFile
+}
+
 type schema struct{}
 
-func NewSchema() authz.Schema {
+func NewSchema() Schema {
 	return &schema{}
 }
 
