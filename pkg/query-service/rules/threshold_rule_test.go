@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	cmock "github.com/srikanthccv/Datastore-go-mock"
+	cmock "github.com/srikanthccv/ClickHouse-go-mock"
 
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/cache/cachetest"

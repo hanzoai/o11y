@@ -7,9 +7,9 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/google/uuid"
-	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/rawbytes"
+	koanf "github.com/knadh/koanf/v2"
 	"github.com/open-telemetry/opamp-go/protobufs"
 	"github.com/pkg/errors"
 )
