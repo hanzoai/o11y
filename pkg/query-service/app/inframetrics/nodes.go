@@ -72,7 +72,7 @@ func (n *NodesRepo) DidSendNodeMetrics(ctx context.Context) (bool, error) {
 	namesStr := "'" + strings.Join(nodeMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(didSendNodeMetricsQuery,
-		constants.HANZO_METRIC_DBNAME, constants.HANZO_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
+		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
 
 	count, err := n.reader.GetCountOfThings(ctx, query)
 	if err != nil {

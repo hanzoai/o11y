@@ -49,7 +49,7 @@ builder.Services.AddOpenTelemetry()
                         
                         //Hanzo O11y Cloud account Ingestion key
             string headerKey = "hanzo-ingestion-key";
-            string headerValue = "{{HANZO_INGESTION_KEY}}";
+            string headerValue = "{{O11Y_INGESTION_KEY}}";
 
             string formattedHeader = $"{headerKey}={headerValue}";
             otlpOptions.Headers = formattedHeader;
