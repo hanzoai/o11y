@@ -12,8 +12,8 @@ import (
 )
 
 func TestNewWithEnvProvider(t *testing.T) {
-	t.Setenv("HANZO_WEB_PREFIX", "/web")
-	t.Setenv("HANZO_WEB_ENABLED", "false")
+	t.Setenv("O11Y_WEB_PREFIX", "/web")
+	t.Setenv("O11Y_WEB_ENABLED", "false")
 
 	conf, err := config.New(
 		context.Background(),

@@ -16,11 +16,11 @@ In your ECS task definition, include a new container definition specifically for
             "image": "hanzo/hanzo-otel-collector:0.88.13",
             "user": "root",
             "command": [
-                "--config=env:HANZO_CONFIG_CONTENT"
+                "--config=env:O11Y_CONFIG_CONTENT"
             ],
             "secrets": [
                 {
-                "name": "HANZO_CONFIG_CONTENT",
+                "name": "O11Y_CONFIG_CONTENT",
                 "valueFrom": "/ecs/hanzo/otelcol-sidecar.yaml"
                 }
             ],

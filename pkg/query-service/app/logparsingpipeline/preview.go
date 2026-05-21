@@ -1,3 +1,12 @@
+//go:build signoz
+
+// Log pipeline preview runs each candidate log through the configured
+// signoz-otel-collector pipeline to show how it'd be transformed. The
+// collector simulator pulls google.golang.org/grpc via the OTel
+// collector framework, so this whole feature is opt-in via -tags signoz.
+//
+// Default builds use the noop in preview_noop.go.
+
 package logparsingpipeline
 
 import (
