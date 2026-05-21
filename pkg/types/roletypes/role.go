@@ -9,7 +9,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 	"github.com/uptrace/bun"
 )
 
@@ -194,8 +193,8 @@ func (role *PatchableRole) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func GetAdditionTuples(name string, orgID valuer.UUID, relation authtypes.Relation, additions []*authtypes.Object) ([]*openfgav1.TupleKey, error) {
-	tuples := make([]*openfgav1.TupleKey, 0)
+func GetAdditionTuples(name string, orgID valuer.UUID, relation authtypes.Relation, additions []*authtypes.Object) ([]*authtypes.TupleKey, error) {
+	tuples := make([]*authtypes.TupleKey, 0)
 
 	for _, object := range additions {
 		typeable := authtypes.MustNewTypeableFromType(object.Resource.Type, object.Resource.Name)
@@ -220,8 +219,8 @@ func GetAdditionTuples(name string, orgID valuer.UUID, relation authtypes.Relati
 	return tuples, nil
 }
 
-func GetDeletionTuples(name string, orgID valuer.UUID, relation authtypes.Relation, deletions []*authtypes.Object) ([]*openfgav1.TupleKey, error) {
-	tuples := make([]*openfgav1.TupleKey, 0)
+func GetDeletionTuples(name string, orgID valuer.UUID, relation authtypes.Relation, deletions []*authtypes.Object) ([]*authtypes.TupleKey, error) {
+	tuples := make([]*authtypes.TupleKey, 0)
 
 	for _, object := range deletions {
 		typeable := authtypes.MustNewTypeableFromType(object.Resource.Type, object.Resource.Name)

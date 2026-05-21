@@ -8,9 +8,8 @@ import (
 	"github.com/hanzoai/o11y/cmd"
 	"github.com/hanzoai/o11y/ee/authn/callbackauthn/oidccallbackauthn"
 	"github.com/hanzoai/o11y/ee/authn/callbackauthn/samlcallbackauthn"
-	"github.com/hanzoai/o11y/ee/authz/openfgaauthz"
 	eequerier "github.com/hanzoai/o11y/ee/querier"
-	"github.com/hanzoai/o11y/ee/authz/openfgaschema"
+	"github.com/hanzoai/o11y/pkg/authz/iamauthz"
 	"github.com/hanzoai/o11y/ee/gateway/httpgateway"
 	enterpriselicensing "github.com/hanzoai/o11y/ee/licensing"
 	"github.com/hanzoai/o11y/ee/licensing/httplicensing"
@@ -116,8 +115,8 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 
 			return authNs, nil
 		},
-		func(ctx context.Context, sqlstore sqlstore.SQLStore, licensing licensing.Licensing, dashboardModule dashboard.Module) factory.ProviderFactory[authz.AuthZ, authz.Config] {
-			return openfgaauthz.NewProviderFactory(sqlstore, openfgaschema.NewSchema().Get(ctx), licensing, dashboardModule)
+		func(_ context.Context, sqlstore sqlstore.SQLStore, _ licensing.Licensing, _ dashboard.Module) factory.ProviderFactory[authz.AuthZ, authz.Config] {
+			return iamauthz.NewProviderFactory(sqlstore)
 		},
 		func(store sqlstore.SQLStore, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser, querier querier.Querier, licensing licensing.Licensing) dashboard.Module {
 			return impldashboard.NewModule(pkgimpldashboard.NewStore(store), settings, analytics, orgGetter, queryParser, querier, licensing)

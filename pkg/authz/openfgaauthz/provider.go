@@ -1,3 +1,5 @@
+//go:build openfga
+
 package openfgaauthz
 
 import (
