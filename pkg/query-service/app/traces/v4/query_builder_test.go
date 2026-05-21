@@ -7,7 +7,7 @@ import (
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
-func Test_getClickHouseTracesColumnType(t *testing.T) {
+func Test_getDatastoreTracesColumnType(t *testing.T) {
 	type args struct {
 		columnType v3.AttributeKeyType
 	}
@@ -33,14 +33,14 @@ func Test_getClickHouseTracesColumnType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getClickHouseTracesColumnType(tt.args.columnType); got != tt.want {
+			if got := getDatastoreTracesColumnType(tt.args.columnType); got != tt.want {
 				t.Errorf("GetClickhouseTracesColumnType() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_getClickHouseTracesColumnDataType(t *testing.T) {
+func Test_getDatastoreTracesColumnDataType(t *testing.T) {
 	type args struct {
 		columnDataType v3.AttributeKeyDataType
 	}
@@ -80,7 +80,7 @@ func Test_getClickHouseTracesColumnDataType(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getClickHouseTracesColumnDataType(tt.args.columnDataType); got != tt.want {
+			if got := getDatastoreTracesColumnDataType(tt.args.columnDataType); got != tt.want {
 				t.Errorf("getClickhouseTracesColumnDataType() = %v, want %v", got, tt.want)
 			}
 		})

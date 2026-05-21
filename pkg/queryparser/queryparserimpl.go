@@ -28,10 +28,10 @@ func (p *queryParserImpl) AnalyzeQueryFilter(ctx context.Context, queryType qbty
 	switch queryType {
 	case qbtypes.QueryTypePromQL:
 		extractorType = queryfilterextractor.ExtractorTypePromQL
-	case qbtypes.QueryTypeClickHouseSQL:
-		extractorType = queryfilterextractor.ExtractorTypeClickHouseSQL
+	case qbtypes.QueryTypeDatastoreSQL:
+		extractorType = queryfilterextractor.ExtractorTypeDatastoreSQL
 	default:
-		return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "unsupported queryType: %s. Supported values are '%s' and '%s'", queryType, qbtypes.QueryTypePromQL, qbtypes.QueryTypeClickHouseSQL)
+		return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "unsupported queryType: %s. Supported values are '%s' and '%s'", queryType, qbtypes.QueryTypePromQL, qbtypes.QueryTypeDatastoreSQL)
 	}
 
 	// Create extractor
@@ -92,14 +92,14 @@ func (p *queryParserImpl) AnalyzeQueryEnvelopes(ctx context.Context, queries []q
 			}
 			result.MetricNames = append(result.MetricNames, res.MetricNames...)
 			result.GroupByColumns = append(result.GroupByColumns, res.GroupByColumns...)
-		case qbtypes.QueryTypeClickHouseSQL:
-			spec, ok := query.Spec.(qbtypes.ClickHouseQuery)
+		case qbtypes.QueryTypeDatastoreSQL:
+			spec, ok := query.Spec.(qbtypes.DatastoreQuery)
 			if !ok || spec.Query == "" {
 				// Skip result for this query
 				continue
 			}
 			queryName = spec.Name
-			res, err := p.AnalyzeQueryFilter(ctx, qbtypes.QueryTypeClickHouseSQL, spec.Query)
+			res, err := p.AnalyzeQueryFilter(ctx, qbtypes.QueryTypeDatastoreSQL, spec.Query)
 			if err != nil {
 				return nil, err
 			}

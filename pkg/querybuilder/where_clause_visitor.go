@@ -21,7 +21,7 @@ var searchTroubleshootingGuideURL = "https://observe.hanzo.ai/docs/userguide/sea
 const stringMatchingOperatorDocURL = "https://observe.hanzo.ai/docs/userguide/operators-reference/#string-matching-operators"
 
 // filterExpressionVisitor implements the FilterQueryVisitor interface
-// to convert the parsed filter expressions into ClickHouse WHERE clause
+// to convert the parsed filter expressions into Datastore WHERE clause
 type filterExpressionVisitor struct {
 	logger             *slog.Logger
 	fieldMapper        qbtypes.FieldMapper
@@ -89,7 +89,7 @@ type PreparedWhereClause struct {
 	WarningsDocURL string
 }
 
-// PrepareWhereClause generates a ClickHouse compatible WHERE clause from the filter query
+// PrepareWhereClause generates a Datastore compatible WHERE clause from the filter query
 func PrepareWhereClause(query string, opts FilterExprVisitorOpts, startNs uint64, endNs uint64) (*PreparedWhereClause, error) {
 
 	// Setup the ANTLR parsing pipeline
@@ -146,7 +146,7 @@ func PrepareWhereClause(query string, opts FilterExprVisitorOpts, startNs uint64
 		return nil, combinedErrors.WithAdditional(additionals...).WithUrl(searchTroubleshootingGuideURL)
 	}
 
-	// Visit the parse tree with our ClickHouse visitor
+	// Visit the parse tree with our Datastore visitor
 	cond := visitor.Visit(tree).(string)
 
 	if len(visitor.errors) > 0 {
@@ -768,7 +768,7 @@ func (v *filterExpressionVisitor) VisitFunctionCall(ctx *grammar.FunctionCallCon
 			}
 
 			var cond string
-			// Map our functions to ClickHouse equivalents
+			// Map our functions to Datastore equivalents
 			switch functionName {
 			case "has":
 				cond = fmt.Sprintf("has(%s, %s)", fieldName, v.builder.Var(value[0]))
@@ -831,7 +831,7 @@ func (v *filterExpressionVisitor) VisitValue(ctx *grammar.ValueContext) any {
 		}
 		return number
 	} else if ctx.BOOL() != nil {
-		// Convert to ClickHouse boolean literal
+		// Convert to Datastore boolean literal
 		boolText := strings.ToLower(ctx.BOOL().GetText())
 		return boolText == "true"
 	} else if ctx.KEY() != nil {
@@ -963,7 +963,7 @@ func trimQuotes(txt string) string {
 		}
 	}
 
-	// unescape so clickhouse-go can escape it
+	// unescape so datastore-go can escape it
 	// https://github.com/ClickHouse/clickhouse-go/blob/6c5ddb38dd2edc841a3b927711b841014759bede/bind.go#L278
 	txt = strings.ReplaceAll(txt, `\\`, `\`)
 	txt = strings.ReplaceAll(txt, `\'`, `'`)

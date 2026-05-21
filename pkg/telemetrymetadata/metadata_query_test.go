@@ -54,7 +54,7 @@ func TestGetFirstSeenFromMetricMetadata(t *testing.T) {
 		},
 	}
 
-	// ClickHouse tuple syntax is (x, y, z)
+	// Datastore tuple syntax is (x, y, z)
 	// the structure should lead to:
 	// SELECT ... WHERE (metric_name, attr_name, attr_string_value) IN ((?, ?, ?), (?, ?, ?)) ...
 

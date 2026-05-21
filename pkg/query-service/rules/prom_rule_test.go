@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	pql "github.com/prometheus/prometheus/promql"
-	cmock "github.com/srikanthccv/ClickHouse-go-mock"
+	cmock "github.com/srikanthccv/Datastore-go-mock"
 
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
-	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	qslabels "github.com/hanzoai/o11y/pkg/query-service/utils/labels"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -963,8 +963,8 @@ func TestPromRuleUnitCombinations(t *testing.T) {
 			"summary":     "The rule threshold is set to {{$threshold}}, and the observed metric value is {{$value}}",
 		}
 
-		options := clickhouseReader.NewOptions("", "", "archiveNamespace")
-		reader := clickhouseReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
+		options := datastoreReader.NewOptions("", "", "archiveNamespace")
+		reader := datastoreReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
 		rule, err := NewPromRule("69", valuer.GenerateUUID(), &postableRule, logger, reader, promProvider)
 		if err != nil {
 			assert.NoError(t, err)
@@ -1079,8 +1079,8 @@ func _Enable_this_after_9146_issue_fix_is_merged_TestPromRuleNoData(t *testing.T
 			"summary":     "The rule threshold is set to {{$threshold}}, and the observed metric value is {{$value}}",
 		}
 
-		options := clickhouseReader.NewOptions("", "", "archiveNamespace")
-		reader := clickhouseReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
+		options := datastoreReader.NewOptions("", "", "archiveNamespace")
+		reader := datastoreReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
 		rule, err := NewPromRule("69", valuer.GenerateUUID(), &postableRule, logger, reader, promProvider)
 		if err != nil {
 			assert.NoError(t, err)
@@ -1311,8 +1311,8 @@ func TestMultipleThresholdPromRule(t *testing.T) {
 			"summary":     "The rule threshold is set to {{$threshold}}, and the observed metric value is {{$value}}",
 		}
 
-		options := clickhouseReader.NewOptions("", "", "archiveNamespace")
-		reader := clickhouseReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
+		options := datastoreReader.NewOptions("", "", "archiveNamespace")
+		reader := datastoreReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
 		rule, err := NewPromRule("69", valuer.GenerateUUID(), &postableRule, logger, reader, promProvider)
 		if err != nil {
 			assert.NoError(t, err)
@@ -1447,8 +1447,8 @@ func TestPromRule_NoData(t *testing.T) {
 				_ = promProvider.Close()
 			}()
 
-			options := clickhouseReader.NewOptions("primaryNamespace")
-			reader := clickhouseReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
+			options := datastoreReader.NewOptions("primaryNamespace")
+			reader := datastoreReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
 			rule, err := NewPromRule("some-id", valuer.GenerateUUID(), &postableRule, logger, reader, promProvider)
 			require.NoError(t, err)
 
@@ -1596,8 +1596,8 @@ func TestPromRule_NoData_AbsentFor(t *testing.T) {
 				_ = promProvider.Close()
 			}()
 
-			options := clickhouseReader.NewOptions("primaryNamespace")
-			reader := clickhouseReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
+			options := datastoreReader.NewOptions("primaryNamespace")
+			reader := datastoreReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
 			rule, err := NewPromRule("some-id", valuer.GenerateUUID(), &postableRule, logger, reader, promProvider)
 			require.NoError(t, err)
 
@@ -1754,8 +1754,8 @@ func TestPromRuleEval_RequireMinPoints(t *testing.T) {
 				_ = promProvider.Close()
 			}()
 
-			options := clickhouseReader.NewOptions("primaryNamespace")
-			reader := clickhouseReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
+			options := datastoreReader.NewOptions("primaryNamespace")
+			reader := datastoreReader.NewReader(nil, telemetryStore, promProvider, "", time.Second, nil, nil, options)
 			rule, err := NewPromRule("some-id", valuer.GenerateUUID(), &postableRule, logger, reader, promProvider)
 			require.NoError(t, err)
 

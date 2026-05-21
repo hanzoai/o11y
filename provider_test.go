@@ -48,13 +48,13 @@ func TestNewProviderFactories(t *testing.T) {
 		NewSQLMigrationProviderFactories(
 			sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual),
 			sqlschematest.New(map[string]*sqlschema.Table{}, map[string][]*sqlschema.UniqueConstraint{}, map[string]sqlschema.Index{}),
-			telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherEqual),
+			telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherEqual),
 			instrumentationtest.New().ToProviderSettings(),
 		)
 	})
 
 	assert.NotPanics(t, func() {
-		NewPrometheusProviderFactories(telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherEqual))
+		NewPrometheusProviderFactories(telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherEqual))
 	})
 
 	assert.NotPanics(t, func() {
@@ -84,7 +84,7 @@ func TestNewProviderFactories(t *testing.T) {
 
 		userGetter := impluser.NewGetter(impluser.NewStore(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual), instrumentationtest.New().ToProviderSettings()), flagger)
 		orgGetter := implorganization.NewGetter(implorganization.NewStore(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual)), nil)
-		telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherEqual)
+		telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherEqual)
 		NewStatsReporterProviderFactories(telemetryStore, []statsreporter.StatsCollector{}, orgGetter, userGetter, tokenizertest.NewMockTokenizer(t), version.Build{}, analytics.Config{Enabled: true})
 	})
 

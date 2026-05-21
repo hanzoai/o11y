@@ -330,7 +330,7 @@ func (dashboard *Dashboard) GetWidgetQuery(startTime, endTime, widgetIndex uint6
 					QueryFormulas      []map[string]any `json:"queryFormulas"`
 					QueryTraceOperator []map[string]any `json:"queryTraceOperator"`
 				} `json:"builder"`
-				ClickhouseSQL []map[string]any `json:"clickhouse_sql"`
+				ClickhouseSQL []map[string]any `json:"datastore_sql"`
 				PromQL        []map[string]any `json:"promql"`
 				QueryType     string           `json:"queryType"`
 			} `json:"query"`
@@ -379,10 +379,10 @@ func (dashboard *Dashboard) GetWidgetQuery(startTime, endTime, widgetIndex uint6
 			}
 			compositeQueries = append(compositeQueries, migrate.WrapInV5Envelope(queryName, query, "builder_trace_operator"))
 		}
-	case "clickhouse_sql":
+	case "datastore_sql":
 		for _, query := range widgetData.Query.ClickhouseSQL {
 			envelope := map[string]any{
-				"type": "clickhouse_sql",
+				"type": "datastore_sql",
 				"spec": map[string]any{
 					"name":     query["name"],
 					"query":    query["query"],

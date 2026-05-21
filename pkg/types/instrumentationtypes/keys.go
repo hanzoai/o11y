@@ -16,6 +16,6 @@ const (
 	QueryDuration = "query.duration"
 	// PanelType is the panel type: "timeseries", "list", "value"
 	PanelType = "panel.type"
-	// QueryType is the query type: "promql", "clickhouse_sql", "builder_query".
+	// QueryType is the query type: "promql", "datastore_sql", "builder_query".
 	QueryType = "query.type"
 )

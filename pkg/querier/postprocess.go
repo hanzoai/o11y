@@ -35,7 +35,7 @@ func getqueryInfo(spec any) queryInfo {
 		return queryInfo{Name: s.Name, Disabled: s.Disabled}
 	case qbtypes.PromQuery:
 		return queryInfo{Name: s.Name, Disabled: s.Disabled, Step: s.Step}
-	case qbtypes.ClickHouseQuery:
+	case qbtypes.DatastoreQuery:
 		return queryInfo{Name: s.Name, Disabled: s.Disabled}
 	}
 	return queryInfo{}
@@ -91,7 +91,7 @@ func (q *querier) postProcessResults(ctx context.Context, results map[string]any
 
 		// merge result only needed for non-CH query
 		if len(req.CompositeQuery.Queries) == 1 {
-			if req.CompositeQuery.Queries[0].Type == qbtypes.QueryTypeClickHouseSQL {
+			if req.CompositeQuery.Queries[0].Type == qbtypes.QueryTypeDatastoreSQL {
 				retResult := map[string]any{}
 				for name, v := range typedResults {
 					retResult[name] = v.Value

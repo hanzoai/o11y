@@ -1,7 +1,7 @@
 package telemetrystoretest
 
 import (
-	"github.com/ClickHouse/clickhouse-go/v2"
+	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	cmock "github.com/srikanthccv/ClickHouse-go-mock"
@@ -11,24 +11,24 @@ var _ telemetrystore.TelemetryStore = (*Provider)(nil)
 
 // Provider represents a mock telemetry store provider for testing
 type Provider struct {
-	clickhouseDB cmock.ClickConnMockCommon
+	datastoreDB cmock.ClickConnMockCommon
 }
 
 // New creates a new mock telemetry store provider
 func New(_ telemetrystore.Config, matcher sqlmock.QueryMatcher) *Provider {
-	clickhouseDB, err := cmock.NewClickHouseWithQueryMatcher(&clickhouse.Options{}, matcher)
+	datastoreDB, err := cmock.NewClickHouseWithQueryMatcher(&datastore.Options{}, matcher)
 	if err != nil {
 		panic(err)
 	}
 
 	return &Provider{
-		clickhouseDB: clickhouseDB,
+		datastoreDB: datastoreDB,
 	}
 }
 
 // ClickhouseDB returns the mock Clickhouse connection
-func (p *Provider) ClickhouseDB() clickhouse.Conn {
-	return p.clickhouseDB.(clickhouse.Conn)
+func (p *Provider) ClickhouseDB() datastore.Conn {
+	return p.datastoreDB.(datastore.Conn)
 }
 
 // Cluster returns the cluster name
@@ -38,5 +38,5 @@ func (p *Provider) Cluster() string {
 
 // Mock returns the underlying Clickhouse mock instance for setting expectations
 func (p *Provider) Mock() cmock.ClickConnMockCommon {
-	return p.clickhouseDB
+	return p.datastoreDB
 }

@@ -151,7 +151,7 @@ type APIHandler struct {
 }
 
 type APIHandlerOpts struct {
-	// business data reader e.g. clickhouse
+	// business data reader e.g. datastore
 	Reader interfaces.Reader
 
 	// rule manager handles rule crud operations
@@ -2017,7 +2017,7 @@ func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 func (aH *APIHandler) getHealth(w http.ResponseWriter, r *http.Request) {
 	_, ok := r.URL.Query()["live"]
 	if ok {
-		err := aH.reader.CheckClickHouse(r.Context())
+		err := aH.reader.CheckDatastore(r.Context())
 		if err != nil {
 			RespondError(w, &model.ApiError{Err: err, Typ: model.ErrorStatusServiceUnavailable}, nil)
 			return
@@ -2157,7 +2157,7 @@ func (aH *APIHandler) onboardProducers(
 		return
 	}
 
-	chq, err := kafka.BuildClickHouseQuery(messagingQueue, kafka.KafkaQueue, "onboard_producers")
+	chq, err := kafka.BuildDatastoreQuery(messagingQueue, kafka.KafkaQueue, "onboard_producers")
 
 	if err != nil {
 		slog.Error(err.Error())
@@ -2259,7 +2259,7 @@ func (aH *APIHandler) onboardConsumers(
 		return
 	}
 
-	chq, err := kafka.BuildClickHouseQuery(messagingQueue, kafka.KafkaQueue, "onboard_consumers")
+	chq, err := kafka.BuildDatastoreQuery(messagingQueue, kafka.KafkaQueue, "onboard_consumers")
 
 	if err != nil {
 		slog.Error(err.Error())
@@ -2656,7 +2656,7 @@ func (aH *APIHandler) getProducerData(w http.ResponseWriter, r *http.Request) {
 		RespondError(w, apiErrObj, errQueriesByName)
 		return
 	}
-	result = postprocess.TransformToTableForClickHouseQueries(result)
+	result = postprocess.TransformToTableForDatastoreQueries(result)
 
 	resp := v3.QueryRangeResponse{
 		Result: result,
@@ -2713,7 +2713,7 @@ func (aH *APIHandler) getConsumerData(w http.ResponseWriter, r *http.Request) {
 		RespondError(w, apiErrObj, errQueriesByName)
 		return
 	}
-	result = postprocess.TransformToTableForClickHouseQueries(result)
+	result = postprocess.TransformToTableForDatastoreQueries(result)
 
 	resp := v3.QueryRangeResponse{
 		Result: result,
@@ -2771,7 +2771,7 @@ func (aH *APIHandler) getPartitionOverviewLatencyData(w http.ResponseWriter, r *
 		RespondError(w, apiErrObj, errQueriesByName)
 		return
 	}
-	result = postprocess.TransformToTableForClickHouseQueries(result)
+	result = postprocess.TransformToTableForDatastoreQueries(result)
 
 	resp := v3.QueryRangeResponse{
 		Result: result,
@@ -2829,7 +2829,7 @@ func (aH *APIHandler) getConsumerPartitionLatencyData(w http.ResponseWriter, r *
 		RespondError(w, apiErrObj, errQueriesByName)
 		return
 	}
-	result = postprocess.TransformToTableForClickHouseQueries(result)
+	result = postprocess.TransformToTableForDatastoreQueries(result)
 
 	resp := v3.QueryRangeResponse{
 		Result: result,
@@ -2946,7 +2946,7 @@ func (aH *APIHandler) getProducerThroughputOverview(w http.ResponseWriter, r *ht
 
 	resultFetchLatency = postprocess.TransformToTableForBuilderQueries(latencyColumnResult, queryRangeParams)
 
-	result = postprocess.TransformToTableForClickHouseQueries(result)
+	result = postprocess.TransformToTableForDatastoreQueries(result)
 
 	result = append(result, resultFetchLatency[0])
 	resp := v3.QueryRangeResponse{
@@ -3005,7 +3005,7 @@ func (aH *APIHandler) getProducerThroughputDetails(w http.ResponseWriter, r *htt
 		RespondError(w, apiErrObj, errQueriesByName)
 		return
 	}
-	result = postprocess.TransformToTableForClickHouseQueries(result)
+	result = postprocess.TransformToTableForDatastoreQueries(result)
 
 	resp := v3.QueryRangeResponse{
 		Result: result,
@@ -3063,7 +3063,7 @@ func (aH *APIHandler) getConsumerThroughputOverview(w http.ResponseWriter, r *ht
 		RespondError(w, apiErrObj, errQueriesByName)
 		return
 	}
-	result = postprocess.TransformToTableForClickHouseQueries(result)
+	result = postprocess.TransformToTableForDatastoreQueries(result)
 
 	resp := v3.QueryRangeResponse{
 		Result: result,
@@ -3121,7 +3121,7 @@ func (aH *APIHandler) getConsumerThroughputDetails(w http.ResponseWriter, r *htt
 		RespondError(w, apiErrObj, errQueriesByName)
 		return
 	}
-	result = postprocess.TransformToTableForClickHouseQueries(result)
+	result = postprocess.TransformToTableForDatastoreQueries(result)
 
 	resp := v3.QueryRangeResponse{
 		Result: result,
@@ -4536,7 +4536,7 @@ func (aH *APIHandler) queryRangeV3(ctx context.Context, queryRangeParams *v3.Que
 				"queryId", queryIdHeader, "error", apiErr)
 
 		} else {
-			// Adding queryId to the context signals clickhouse queries to report progress
+			// Adding queryId to the context signals datastore queries to report progress
 			//lint:ignore SA1029 ignore for now
 			ctx = context.WithValue(ctx, "queryId", queryIdHeader)
 
@@ -4567,7 +4567,7 @@ func (aH *APIHandler) queryRangeV3(ctx context.Context, queryRangeParams *v3.Que
 
 	aH.sendQueryResultEvents(r, result, queryRangeParams, "v3")
 	// only adding applyFunctions instead of postProcess since experssion are
-	// are executed in clickhouse directly and we wanted to add support for timeshift
+	// are executed in datastore directly and we wanted to add support for timeshift
 	if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeBuilder {
 		postprocess.ApplyFunctions(result, queryRangeParams)
 	}
@@ -4577,8 +4577,8 @@ func (aH *APIHandler) queryRangeV3(ctx context.Context, queryRangeParams *v3.Que
 	}
 
 	if queryRangeParams.CompositeQuery.PanelType == v3.PanelTypeTable && queryRangeParams.FormatForWeb {
-		if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeClickHouseSQL {
-			result = postprocess.TransformToTableForClickHouseQueries(result)
+		if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeDatastoreSQL {
+			result = postprocess.TransformToTableForDatastoreQueries(result)
 		} else if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeBuilder {
 			result = postprocess.TransformToTableForBuilderQueries(result, queryRangeParams)
 		}
@@ -4889,9 +4889,9 @@ func (aH *APIHandler) queryRangeV4(ctx context.Context, queryRangeParams *v3.Que
 
 	if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeBuilder {
 		result, err = postprocess.PostProcessResult(result, queryRangeParams)
-	} else if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeClickHouseSQL &&
+	} else if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeDatastoreSQL &&
 		queryRangeParams.CompositeQuery.PanelType == v3.PanelTypeTable && queryRangeParams.FormatForWeb {
-		result = postprocess.TransformToTableForClickHouseQueries(result)
+		result = postprocess.TransformToTableForDatastoreQueries(result)
 	}
 
 	if err != nil {
@@ -4989,7 +4989,7 @@ func (aH *APIHandler) getQueueOverview(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		slog.Error(err.Error())
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
@@ -5194,13 +5194,13 @@ func (aH *APIHandler) handleValidateTraces(w http.ResponseWriter, r *http.Reques
 
 	chq, err := traceFunnelsModule.ValidateTraces(funnel, timeRange)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5231,13 +5231,13 @@ func (aH *APIHandler) handleFunnelAnalytics(w http.ResponseWriter, r *http.Reque
 
 	chq, err := traceFunnelsModule.GetFunnelAnalytics(funnel, stepTransition.TimeRange)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5268,13 +5268,13 @@ func (aH *APIHandler) handleFunnelStepAnalytics(w http.ResponseWriter, r *http.R
 
 	chq, err := traceFunnelsModule.GetFunnelStepAnalytics(funnel, stepTransition.TimeRange, stepTransition.StepStart, stepTransition.StepEnd)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5305,13 +5305,13 @@ func (aH *APIHandler) handleStepAnalytics(w http.ResponseWriter, r *http.Request
 
 	chq, err := traceFunnelsModule.GetStepAnalytics(funnel, timeRange)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5342,13 +5342,13 @@ func (aH *APIHandler) handleFunnelSlowTraces(w http.ResponseWriter, r *http.Requ
 
 	chq, err := traceFunnelsModule.GetSlowestTraces(funnel, req.TimeRange, req.StepStart, req.StepEnd)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5379,13 +5379,13 @@ func (aH *APIHandler) handleFunnelErrorTraces(w http.ResponseWriter, r *http.Req
 
 	chq, err := traceFunnelsModule.GetErroredTraces(funnel, req.TimeRange, req.StepStart, req.StepEnd)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5413,13 +5413,13 @@ func (aH *APIHandler) handleValidateTracesWithPayload(w http.ResponseWriter, r *
 		EndTime:   req.EndTime,
 	})
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5441,13 +5441,13 @@ func (aH *APIHandler) handleFunnelAnalyticsWithPayload(w http.ResponseWriter, r 
 		EndTime:   req.EndTime,
 	})
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5469,13 +5469,13 @@ func (aH *APIHandler) handleStepAnalyticsWithPayload(w http.ResponseWriter, r *h
 		EndTime:   req.EndTime,
 	})
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5497,13 +5497,13 @@ func (aH *APIHandler) handleFunnelStepAnalyticsWithPayload(w http.ResponseWriter
 		EndTime:   req.EndTime,
 	}, req.StepStart, req.StepEnd)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5525,13 +5525,13 @@ func (aH *APIHandler) handleFunnelSlowTracesWithPayload(w http.ResponseWriter, r
 		EndTime:   req.EndTime,
 	}, req.StepStart, req.StepEnd)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
@@ -5553,13 +5553,13 @@ func (aH *APIHandler) handleFunnelErrorTracesWithPayload(w http.ResponseWriter, 
 		EndTime:   req.EndTime,
 	}, req.StepStart, req.StepEnd)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building clickhouse query: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error building datastore query: %v", err)}, nil)
 		return
 	}
 
 	results, err := aH.reader.GetListResultV3(r.Context(), chq.Query)
 	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting clickhouse results to list: %v", err)}, nil)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: fmt.Errorf("error converting datastore results to list: %v", err)}, nil)
 		return
 	}
 	aH.Respond(w, results)
