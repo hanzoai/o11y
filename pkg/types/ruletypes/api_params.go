@@ -308,7 +308,7 @@ func isAllQueriesDisabled(compositeQuery *v3.CompositeQuery) bool {
 	if compositeQuery == nil {
 		return false
 	}
-	if compositeQuery.BuilderQueries == nil && compositeQuery.PromQueries == nil && compositeQuery.ClickHouseQueries == nil {
+	if compositeQuery.BuilderQueries == nil && compositeQuery.PromQueries == nil && compositeQuery.DatastoreQueries == nil {
 		return false
 	}
 	switch compositeQuery.QueryType {
@@ -330,11 +330,11 @@ func isAllQueriesDisabled(compositeQuery *v3.CompositeQuery) bool {
 				return false
 			}
 		}
-	case v3.QueryTypeClickHouseSQL:
-		if len(compositeQuery.ClickHouseQueries) == 0 {
+	case v3.QueryTypeDatastoreSQL:
+		if len(compositeQuery.DatastoreQueries) == 0 {
 			return false
 		}
-		for _, query := range compositeQuery.ClickHouseQueries {
+		for _, query := range compositeQuery.DatastoreQueries {
 			if !query.Disabled {
 				return false
 			}

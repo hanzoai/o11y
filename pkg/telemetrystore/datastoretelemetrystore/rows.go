@@ -1,4 +1,4 @@
-package clickhousetelemetrystore
+package datastoretelemetrystore
 
 import (
 	"context"

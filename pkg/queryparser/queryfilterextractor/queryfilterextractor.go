@@ -14,7 +14,7 @@ type ExtractorType struct {
 }
 
 var (
-	ExtractorTypeClickHouseSQL = ExtractorType{valuer.NewString("qfe_ch")}
+	ExtractorTypeDatastoreSQL = ExtractorType{valuer.NewString("qfe_ch")}
 	ExtractorTypePromQL        = ExtractorType{valuer.NewString("qfe_promql")}
 )
 
@@ -55,8 +55,8 @@ type FilterExtractor interface {
 
 func NewExtractor(extractorType ExtractorType) (FilterExtractor, error) {
 	switch extractorType {
-	case ExtractorTypeClickHouseSQL:
-		return NewClickHouseFilterExtractor(), nil
+	case ExtractorTypeDatastoreSQL:
+		return NewDatastoreFilterExtractor(), nil
 	case ExtractorTypePromQL:
 		return NewPromQLFilterExtractor(), nil
 	default:

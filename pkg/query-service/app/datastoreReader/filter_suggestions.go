@@ -1,5 +1,5 @@
 // Clickhouse reader methods for powering QB filter suggestions
-package clickhouseReader
+package datastoreReader
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (r *ClickHouseReader) GetQBFilterSuggestionsForLogs(
+func (r *DatastoreReader) GetQBFilterSuggestionsForLogs(
 	ctx context.Context,
 	req *v3.QBFilterSuggestionsRequest,
 ) (*v3.QBFilterSuggestionsResponse, *model.ApiError) {
@@ -127,7 +127,7 @@ func (r *ClickHouseReader) GetQBFilterSuggestionsForLogs(
 
 // Get up to `limit` values seen for each attribute in `attributes`
 // Returns a slice of slices where the ith slice has values for ith entry in `attributes`
-func (r *ClickHouseReader) getValuesForLogAttributes(
+func (r *DatastoreReader) getValuesForLogAttributes(
 	ctx context.Context, attributes []v3.AttributeKey, limit uint64,
 ) ([][]any, *model.ApiError) {
 	/*

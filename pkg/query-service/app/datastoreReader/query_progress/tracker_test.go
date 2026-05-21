@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/stretchr/testify/require"
 )
@@ -16,7 +16,7 @@ func TestQueryProgressTracking(t *testing.T) {
 
 	testQueryId := "test-query"
 
-	testProgress := &clickhouse.Progress{}
+	testProgress := &datastore.Progress{}
 	err := tracker.ReportQueryProgress(testQueryId, testProgress)
 	require.NotNil(err, "shouldn't be able to report query progress before query has been started")
 	require.Equal(err.Type(), model.ErrorNotFound)
@@ -30,7 +30,7 @@ func TestQueryProgressTracking(t *testing.T) {
 	reportQueryFinished, err := tracker.ReportQueryStarted(testQueryId)
 	require.Nil(err, "should be able to report start of a query to be tracked")
 
-	testProgress1 := &clickhouse.Progress{
+	testProgress1 := &datastore.Progress{
 		Rows:      10,
 		Bytes:     20,
 		TotalRows: 100,
@@ -59,7 +59,7 @@ func TestQueryProgressTracking(t *testing.T) {
 	default:
 	}
 
-	testProgress2 := &clickhouse.Progress{
+	testProgress2 := &datastore.Progress{
 		Rows:      20,
 		Bytes:     40,
 		TotalRows: 100,

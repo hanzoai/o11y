@@ -192,7 +192,7 @@ type QueryDataDashboard struct {
 	Loading      bool   `json:"loading"`
 }
 
-type ClickHouseQueryDashboard struct {
+type DatastoreQueryDashboard struct {
 	Legend   string `json:"legend"`
 	Name     string `json:"name"`
 	Query    string `json:"rawQuery"`
@@ -223,7 +223,7 @@ type PromQueryDashboard struct {
 }
 
 type Query struct {
-	ClickHouse     []ClickHouseQueryDashboard `json:"clickHouse"`
+	Datastore     []DatastoreQueryDashboard `json:"clickHouse"`
 	PromQL         []PromQueryDashboard       `json:"promQL"`
 	MetricsBuilder MetricsBuilder             `json:"metricsBuilder"`
 	QueryType      int                        `json:"queryType"`

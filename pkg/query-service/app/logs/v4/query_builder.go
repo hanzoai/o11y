@@ -144,12 +144,12 @@ func buildAttributeFilter(item v3.FilterItem) (string, error) {
 		if (op != v3.FilterOperatorEqual && op != v3.FilterOperatorContains) || item.Key.DataType != v3.AttributeKeyDataTypeString {
 			return "", fmt.Errorf("only = operator and string data type is supported for __attrs")
 		}
-		val := utils.ClickHouseFormattedValue(item.Value)
+		val := utils.DatastoreFormattedValue(item.Value)
 		return fmt.Sprintf("has(mapValues(attributes_string), %s)", val), nil
 	}
 
 	keyName := getClickhouseKey(item.Key)
-	fmtVal := utils.ClickHouseFormattedValue(value)
+	fmtVal := utils.DatastoreFormattedValue(value)
 
 	if logsOp, ok := logOperators[op]; ok {
 		switch op {
@@ -221,7 +221,7 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 		op := v3.FilterOperator(strings.ToLower(string(item.Operator)))
 
 		// add extra condition for map contains
-		// by default clickhouse is not able to utilize indexes for keys with all operators.
+		// by default datastore is not able to utilize indexes for keys with all operators.
 		// mapContains forces the use of index.
 		// for mat column it's is not required as it will already use the dedicated index.
 		// skip the exists filter for operators such as !=, not like, not contains, not regex, not in

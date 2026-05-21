@@ -1,4 +1,4 @@
-package clickhouseReader
+package datastoreReader
 
 import (
 	"context"
@@ -33,13 +33,13 @@ import (
 	"github.com/prometheus/prometheus/promql"
 	"github.com/prometheus/prometheus/util/stats"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/hanzoai/o11y/pkg/cache"
 
 	"go.uber.org/zap"
 
-	queryprogress "github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader/query_progress"
+	queryprogress "github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader/query_progress"
 	"github.com/hanzoai/o11y/pkg/query-service/app/resource"
 	"github.com/hanzoai/o11y/pkg/query-service/app/services"
 	"github.com/hanzoai/o11y/pkg/query-service/app/traces/smart"
@@ -55,8 +55,8 @@ import (
 )
 
 const (
-	primaryNamespace          = "clickhouse"
-	archiveNamespace          = "clickhouse-archive"
+	primaryNamespace          = "datastore"
+	archiveNamespace          = "datastore-archive"
 	o11yTraceDBName         = "observe_traces"
 	observeHistoryDBName       = "signoz_analytics"
 	ruleStateHistoryTableName = "distributed_rule_state_history_v0"
@@ -116,9 +116,9 @@ var (
 		rand.NewSource(time.Now().UnixNano()))
 )
 
-// SpanWriter for reading spans from ClickHouse
-type ClickHouseReader struct {
-	db                      clickhouse.Conn
+// SpanWriter for reading spans from Datastore
+type DatastoreReader struct {
+	db                      datastore.Conn
 	prometheus              prometheus.Prometheus
 	sqlDB                   sqlstore.SQLStore
 	TraceDB                 string
@@ -173,7 +173,7 @@ func NewReader(
 	cacheForTraceDetail cache.Cache,
 	cache cache.Cache,
 	options *Options,
-) *ClickHouseReader {
+) *DatastoreReader {
 	if options == nil {
 		options = NewOptions(primaryNamespace, archiveNamespace)
 	}
@@ -183,7 +183,7 @@ func NewReader(
 	traceTableName := options.primary.TraceIndexTableV3
 	traceLocalTableName := options.primary.TraceLocalTableNameV3
 
-	return &ClickHouseReader{
+	return &DatastoreReader{
 		db:                         telemetryStore.ClickhouseDB(),
 		prometheus:                 prometheus,
 		sqlDB:                      sqlDB,
@@ -225,7 +225,7 @@ func NewReader(
 	}
 }
 
-func (r *ClickHouseReader) GetInstantQueryMetricsResult(ctx context.Context, queryParams *model.InstantQueryMetricsParams) (*promql.Result, *stats.QueryStats, *model.ApiError) {
+func (r *DatastoreReader) GetInstantQueryMetricsResult(ctx context.Context, queryParams *model.InstantQueryMetricsParams) (*promql.Result, *stats.QueryStats, *model.ApiError) {
 	qry, err := r.prometheus.Engine().NewInstantQuery(ctx, r.prometheus.Storage(), nil, queryParams.Query, queryParams.Time)
 	if err != nil {
 		return nil, nil, &model.ApiError{Typ: model.ErrorBadData, Err: err}
@@ -248,7 +248,7 @@ func (r *ClickHouseReader) GetInstantQueryMetricsResult(ctx context.Context, que
 
 }
 
-func (r *ClickHouseReader) GetQueryRangeResult(ctx context.Context, query *model.QueryRangeParams) (*promql.Result, *stats.QueryStats, *model.ApiError) {
+func (r *DatastoreReader) GetQueryRangeResult(ctx context.Context, query *model.QueryRangeParams) (*promql.Result, *stats.QueryStats, *model.ApiError) {
 	qry, err := r.prometheus.Engine().NewRangeQuery(ctx, r.prometheus.Storage(), nil, query.Query, query.Start, query.End, query.Step)
 
 	if err != nil {
@@ -271,10 +271,10 @@ func (r *ClickHouseReader) GetQueryRangeResult(ctx context.Context, query *model
 	return res, &qs, nil
 }
 
-func (r *ClickHouseReader) GetServicesList(ctx context.Context) (*[]string, error) {
+func (r *DatastoreReader) GetServicesList(ctx context.Context) (*[]string, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetServicesList",
 	})
 
@@ -296,10 +296,10 @@ func (r *ClickHouseReader) GetServicesList(ctx context.Context) (*[]string, erro
 	return &services, nil
 }
 
-func (r *ClickHouseReader) GetTopLevelOperations(ctx context.Context, start, end time.Time, services []string) (*map[string][]string, *model.ApiError) {
+func (r *DatastoreReader) GetTopLevelOperations(ctx context.Context, start, end time.Time, services []string) (*map[string][]string, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetTopLevelOperations",
 	})
 
@@ -315,7 +315,7 @@ func (r *ClickHouseReader) GetTopLevelOperations(ctx context.Context, start, end
 	}
 	query += ` GROUP BY name, serviceName ORDER BY ts DESC LIMIT 5000`
 
-	rows, err := r.db.Query(ctx, query, clickhouse.Named("start", start), clickhouse.Named("services", services))
+	rows, err := r.db.Query(ctx, query, datastore.Named("start", start), datastore.Named("services", services))
 
 	if err != nil {
 		zap.L().Error("Error in processing sql query", zap.Error(err))
@@ -337,7 +337,7 @@ func (r *ClickHouseReader) GetTopLevelOperations(ctx context.Context, start, end
 	return &operations, nil
 }
 
-func (r *ClickHouseReader) buildResourceSubQuery(tags []model.TagQueryParam, svc string, start, end time.Time) (string, error) {
+func (r *DatastoreReader) buildResourceSubQuery(tags []model.TagQueryParam, svc string, start, end time.Time) (string, error) {
 	// assuming all will be resource attributes.
 	// and resource attributes are string for traces
 	filterSet := v3.FilterSet{}
@@ -396,11 +396,11 @@ func (r *ClickHouseReader) buildResourceSubQuery(tags []model.TagQueryParam, svc
 	return resourceSubQuery, nil
 }
 
-func (r *ClickHouseReader) GetServices(ctx context.Context, queryParams *model.GetServicesParams) (*[]model.ServiceItem, *model.ApiError) {
+func (r *DatastoreReader) GetServices(ctx context.Context, queryParams *model.GetServicesParams) (*[]model.ServiceItem, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetServices",
 	})
 
@@ -415,7 +415,7 @@ func (r *ClickHouseReader) GetServices(ctx context.Context, queryParams *model.G
 
 	serviceItems := []model.ServiceItem{}
 	var wg sync.WaitGroup
-	// limit the number of concurrent queries to not overload the clickhouse server
+	// limit the number of concurrent queries to not overload the datastore server
 	sem := make(chan struct{}, 10)
 	var mtx sync.RWMutex
 
@@ -462,10 +462,10 @@ func (r *ClickHouseReader) GetServices(ctx context.Context, queryParams *model.G
 
 			args := []interface{}{}
 			args = append(args,
-				clickhouse.Named("start", strconv.FormatInt(queryParams.Start.UnixNano(), 10)),
-				clickhouse.Named("end", strconv.FormatInt(queryParams.End.UnixNano(), 10)),
-				clickhouse.Named("serviceName", svc),
-				clickhouse.Named("names", ops),
+				datastore.Named("start", strconv.FormatInt(queryParams.Start.UnixNano(), 10)),
+				datastore.Named("end", strconv.FormatInt(queryParams.End.UnixNano(), 10)),
+				datastore.Named("serviceName", svc),
+				datastore.Named("names", ops),
 			)
 
 			resourceSubQuery, err := r.buildResourceSubQuery(queryParams.Tags, svc, *queryParams.Start, *queryParams.End)
@@ -480,8 +480,8 @@ func (r *ClickHouseReader) GetServices(ctx context.Context, queryParams *model.G
 				`) AND ts_bucket_start >= @start_bucket AND ts_bucket_start <= @end_bucket`
 
 			args = append(args,
-				clickhouse.Named("start_bucket", strconv.FormatInt(queryParams.Start.Unix()-1800, 10)),
-				clickhouse.Named("end_bucket", strconv.FormatInt(queryParams.End.Unix(), 10)),
+				datastore.Named("start_bucket", strconv.FormatInt(queryParams.Start.Unix()-1800, 10)),
+				datastore.Named("end_bucket", strconv.FormatInt(queryParams.End.Unix(), 10)),
 			)
 
 			err = r.db.QueryRow(
@@ -632,8 +632,8 @@ func addInOperator(item model.TagQuery, tagMapType string, not bool) (string, []
 		tagKey := "inTagKey" + String(5)
 		tagValue := "inTagValue" + String(5)
 		tagValuePair = append(tagValuePair, fmt.Sprintf("%s[@%s] = @%s", tagMapType, tagKey, tagValue))
-		args = append(args, clickhouse.Named(tagKey, item.GetKey()))
-		args = append(args, clickhouse.Named(tagValue, value))
+		args = append(args, datastore.Named(tagKey, item.GetKey()))
+		args = append(args, datastore.Named(tagValue, value))
 	}
 	return fmt.Sprintf(" AND %s (%s)", notStr, strings.Join(tagValuePair, " OR ")), args
 }
@@ -650,8 +650,8 @@ func addContainsOperator(item model.TagQuery, tagMapType string, not bool) (stri
 		tagKey := "containsTagKey" + String(5)
 		tagValue := "containsTagValue" + String(5)
 		tagValuePair = append(tagValuePair, fmt.Sprintf("%s[@%s] ILIKE @%s", tagMapType, tagKey, tagValue))
-		args = append(args, clickhouse.Named(tagKey, item.GetKey()))
-		args = append(args, clickhouse.Named(tagValue, "%"+fmt.Sprintf("%v", value)+"%"))
+		args = append(args, datastore.Named(tagKey, item.GetKey()))
+		args = append(args, datastore.Named(tagValue, "%"+fmt.Sprintf("%v", value)+"%"))
 	}
 	return fmt.Sprintf(" AND %s (%s)", notStr, strings.Join(tagValuePair, " OR ")), args
 }
@@ -668,8 +668,8 @@ func addStartsWithOperator(item model.TagQuery, tagMapType string, not bool) (st
 		tagKey := "startsWithTagKey" + String(5)
 		tagValue := "startsWithTagValue" + String(5)
 		tagValuePair = append(tagValuePair, fmt.Sprintf("%s[@%s] ILIKE @%s", tagMapType, tagKey, tagValue))
-		args = append(args, clickhouse.Named(tagKey, item.GetKey()))
-		args = append(args, clickhouse.Named(tagValue, "%"+fmt.Sprintf("%v", value)+"%"))
+		args = append(args, datastore.Named(tagKey, item.GetKey()))
+		args = append(args, datastore.Named(tagValue, "%"+fmt.Sprintf("%v", value)+"%"))
 	}
 	return fmt.Sprintf(" AND %s (%s)", notStr, strings.Join(tagValuePair, " OR ")), args
 }
@@ -682,8 +682,8 @@ func addArithmeticOperator(item model.TagQuery, tagMapType string, operator stri
 		tagKey := "arithmeticTagKey" + String(5)
 		tagValue := "arithmeticTagValue" + String(5)
 		tagValuePair = append(tagValuePair, fmt.Sprintf("%s[@%s] %s @%s", tagMapType, tagKey, operator, tagValue))
-		args = append(args, clickhouse.Named(tagKey, item.GetKey()))
-		args = append(args, clickhouse.Named(tagValue, value))
+		args = append(args, datastore.Named(tagKey, item.GetKey()))
+		args = append(args, datastore.Named(tagValue, value))
 	}
 	return fmt.Sprintf(" AND (%s)", strings.Join(tagValuePair, " OR ")), args
 }
@@ -699,12 +699,12 @@ func addExistsOperator(item model.TagQuery, tagMapType string, not bool) (string
 	for range values {
 		tagKey := "existsTagKey" + String(5)
 		tagOperatorPair = append(tagOperatorPair, fmt.Sprintf("mapContains(%s, @%s)", tagMapType, tagKey))
-		args = append(args, clickhouse.Named(tagKey, item.GetKey()))
+		args = append(args, datastore.Named(tagKey, item.GetKey()))
 	}
 	return fmt.Sprintf(" AND %s (%s)", notStr, strings.Join(tagOperatorPair, " OR ")), args
 }
 
-func (r *ClickHouseReader) GetEntryPointOperations(ctx context.Context, queryParams *model.GetTopOperationsParams) (*[]model.TopOperationsItem, error) {
+func (r *DatastoreReader) GetEntryPointOperations(ctx context.Context, queryParams *model.GetTopOperationsParams) (*[]model.TopOperationsItem, error) {
 	// Step 1: Get top operations for the given service
 	topOps, err := r.GetTopOperations(ctx, queryParams)
 	if err != nil {
@@ -758,19 +758,19 @@ func (r *ClickHouseReader) GetEntryPointOperations(ctx context.Context, queryPar
 	return &filtered, nil
 }
 
-func (r *ClickHouseReader) GetTopOperations(ctx context.Context, queryParams *model.GetTopOperationsParams) (*[]model.TopOperationsItem, *model.ApiError) {
+func (r *DatastoreReader) GetTopOperations(ctx context.Context, queryParams *model.GetTopOperationsParams) (*[]model.TopOperationsItem, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetTopOperations",
 	})
 	namedArgs := []interface{}{
-		clickhouse.Named("start", strconv.FormatInt(queryParams.Start.UnixNano(), 10)),
-		clickhouse.Named("end", strconv.FormatInt(queryParams.End.UnixNano(), 10)),
-		clickhouse.Named("serviceName", queryParams.ServiceName),
-		clickhouse.Named("start_bucket", strconv.FormatInt(queryParams.Start.Unix()-1800, 10)),
-		clickhouse.Named("end_bucket", strconv.FormatInt(queryParams.End.Unix(), 10)),
+		datastore.Named("start", strconv.FormatInt(queryParams.Start.UnixNano(), 10)),
+		datastore.Named("end", strconv.FormatInt(queryParams.End.UnixNano(), 10)),
+		datastore.Named("serviceName", queryParams.ServiceName),
+		datastore.Named("start_bucket", strconv.FormatInt(queryParams.Start.Unix()-1800, 10)),
+		datastore.Named("end_bucket", strconv.FormatInt(queryParams.End.Unix(), 10)),
 	}
 
 	var topOperationsItems []model.TopOperationsItem
@@ -802,7 +802,7 @@ func (r *ClickHouseReader) GetTopOperations(ctx context.Context, queryParams *mo
 	query += " GROUP BY name ORDER BY p99 DESC"
 	if queryParams.Limit > 0 {
 		query += " LIMIT @limit"
-		namedArgs = append(namedArgs, clickhouse.Named("limit", queryParams.Limit))
+		namedArgs = append(namedArgs, datastore.Named("limit", queryParams.Limit))
 	}
 	err = r.db.Select(ctx, &topOperationsItems, query, namedArgs...)
 
@@ -818,22 +818,22 @@ func (r *ClickHouseReader) GetTopOperations(ctx context.Context, queryParams *mo
 	return &topOperationsItems, nil
 }
 
-func (r *ClickHouseReader) GetUsage(ctx context.Context, queryParams *model.GetUsageParams) (*[]model.UsageItem, error) {
+func (r *DatastoreReader) GetUsage(ctx context.Context, queryParams *model.GetUsageParams) (*[]model.UsageItem, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetUsage",
 	})
 	var usageItems []model.UsageItem
 	namedArgs := []interface{}{
-		clickhouse.Named("interval", queryParams.StepHour),
-		clickhouse.Named("start", strconv.FormatInt(queryParams.Start.UnixNano(), 10)),
-		clickhouse.Named("end", strconv.FormatInt(queryParams.End.UnixNano(), 10)),
+		datastore.Named("interval", queryParams.StepHour),
+		datastore.Named("start", strconv.FormatInt(queryParams.Start.UnixNano(), 10)),
+		datastore.Named("end", strconv.FormatInt(queryParams.End.UnixNano(), 10)),
 	}
 	var query string
 	if len(queryParams.ServiceName) != 0 {
-		namedArgs = append(namedArgs, clickhouse.Named("serviceName", queryParams.ServiceName))
+		namedArgs = append(namedArgs, datastore.Named("serviceName", queryParams.ServiceName))
 		query = fmt.Sprintf("SELECT toStartOfInterval(timestamp, INTERVAL @interval HOUR) as time, sum(count) as count FROM %s.%s WHERE service_name=@serviceName AND timestamp>=@start AND timestamp<=@end GROUP BY time ORDER BY time ASC", r.TraceDB, r.usageExplorerTable)
 	} else {
 		query = fmt.Sprintf("SELECT toStartOfInterval(timestamp, INTERVAL @interval HOUR) as time, sum(count) as count FROM %s.%s WHERE timestamp>=@start AND timestamp<=@end GROUP BY time ORDER BY time ASC", r.TraceDB, r.usageExplorerTable)
@@ -859,11 +859,11 @@ func (r *ClickHouseReader) GetUsage(ctx context.Context, queryParams *model.GetU
 	return &usageItems, nil
 }
 
-func (r *ClickHouseReader) GetSpansForTrace(ctx context.Context, traceID string, traceDetailsQuery string) ([]model.SpanItemV2, *model.ApiError) {
+func (r *DatastoreReader) GetSpansForTrace(ctx context.Context, traceID string, traceDetailsQuery string) ([]model.SpanItemV2, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetSpansForTrace",
 	})
 
@@ -891,7 +891,7 @@ func (r *ClickHouseReader) GetSpansForTrace(ctx context.Context, traceID string,
 	return searchScanResponses, nil
 }
 
-func (r *ClickHouseReader) GetWaterfallSpansForTraceWithMetadataCache(ctx context.Context, orgID valuer.UUID, traceID string) (*model.GetWaterfallSpansForTraceWithMetadataCache, error) {
+func (r *DatastoreReader) GetWaterfallSpansForTraceWithMetadataCache(ctx context.Context, orgID valuer.UUID, traceID string) (*model.GetWaterfallSpansForTraceWithMetadataCache, error) {
 	cachedTraceData := new(model.GetWaterfallSpansForTraceWithMetadataCache)
 	err := r.cacheForTraceDetail.Get(ctx, orgID, strings.Join([]string{"getWaterfallSpansForTraceWithMetadata", traceID}, "-"), cachedTraceData)
 	if err != nil {
@@ -908,7 +908,7 @@ func (r *ClickHouseReader) GetWaterfallSpansForTraceWithMetadataCache(ctx contex
 	return cachedTraceData, nil
 }
 
-func (r *ClickHouseReader) GetWaterfallSpansForTraceWithMetadata(ctx context.Context, orgID valuer.UUID, traceID string, req *model.GetWaterfallSpansForTraceWithMetadataParams) (*model.GetWaterfallSpansForTraceWithMetadataResponse, error) {
+func (r *DatastoreReader) GetWaterfallSpansForTraceWithMetadata(ctx context.Context, orgID valuer.UUID, traceID string, req *model.GetWaterfallSpansForTraceWithMetadataParams) (*model.GetWaterfallSpansForTraceWithMetadataResponse, error) {
 	response := new(model.GetWaterfallSpansForTraceWithMetadataResponse)
 	var startTime, endTime, durationNano, totalErrorSpans, totalSpans uint64
 	var spanIdToSpanNodeMap = map[string]*model.Span{}
@@ -1109,7 +1109,7 @@ func (r *ClickHouseReader) GetWaterfallSpansForTraceWithMetadata(ctx context.Con
 	return response, nil
 }
 
-func (r *ClickHouseReader) GetFlamegraphSpansForTraceCache(ctx context.Context, orgID valuer.UUID, traceID string) (*model.GetFlamegraphSpansForTraceCache, error) {
+func (r *DatastoreReader) GetFlamegraphSpansForTraceCache(ctx context.Context, orgID valuer.UUID, traceID string) (*model.GetFlamegraphSpansForTraceCache, error) {
 	cachedTraceData := new(model.GetFlamegraphSpansForTraceCache)
 	err := r.cacheForTraceDetail.Get(ctx, orgID, strings.Join([]string{"getFlamegraphSpansForTrace", traceID}, "-"), cachedTraceData)
 	if err != nil {
@@ -1126,7 +1126,7 @@ func (r *ClickHouseReader) GetFlamegraphSpansForTraceCache(ctx context.Context, 
 	return cachedTraceData, nil
 }
 
-func (r *ClickHouseReader) GetFlamegraphSpansForTrace(ctx context.Context, orgID valuer.UUID, traceID string, req *model.GetFlamegraphSpansForTraceParams) (*model.GetFlamegraphSpansForTraceResponse, error) {
+func (r *DatastoreReader) GetFlamegraphSpansForTrace(ctx context.Context, orgID valuer.UUID, traceID string, req *model.GetFlamegraphSpansForTraceParams) (*model.GetFlamegraphSpansForTraceResponse, error) {
 	trace := new(model.GetFlamegraphSpansForTraceResponse)
 	var startTime, endTime, durationNano uint64
 	var spanIdToSpanNodeMap = map[string]*model.FlamegraphSpan{}
@@ -1263,20 +1263,20 @@ func (r *ClickHouseReader) GetFlamegraphSpansForTrace(ctx context.Context, orgID
 	return trace, nil
 }
 
-func (r *ClickHouseReader) GetDependencyGraph(ctx context.Context, queryParams *model.GetServicesParams) (*[]model.ServiceMapDependencyResponseItem, error) {
+func (r *DatastoreReader) GetDependencyGraph(ctx context.Context, queryParams *model.GetServicesParams) (*[]model.ServiceMapDependencyResponseItem, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetDependencyGraph",
 	})
 	response := []model.ServiceMapDependencyResponseItem{}
 
 	args := []interface{}{}
 	args = append(args,
-		clickhouse.Named("start", uint64(queryParams.Start.Unix())),
-		clickhouse.Named("end", uint64(queryParams.End.Unix())),
-		clickhouse.Named("duration", uint64(queryParams.End.Unix()-queryParams.Start.Unix())),
+		datastore.Named("start", uint64(queryParams.Start.Unix())),
+		datastore.Named("end", uint64(queryParams.End.Unix())),
+		datastore.Named("duration", uint64(queryParams.End.Unix()-queryParams.Start.Unix())),
 	)
 
 	query := fmt.Sprintf(`
@@ -1323,10 +1323,10 @@ func getLocalTableName(tableName string) string {
 
 }
 
-func (r *ClickHouseReader) setTTLLogs(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
+func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalLogs.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "setTTLLogs",
 	})
 	hasCustomRetention, err := r.hasCustomRetentionColumn(ctx)
@@ -1491,10 +1491,10 @@ func (r *ClickHouseReader) setTTLLogs(ctx context.Context, orgID string, params 
 	return &model.SetTTLResponseItem{Message: "move ttl has been successfully set up"}, nil
 }
 
-func (r *ClickHouseReader) setTTLTraces(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
+func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "setTTLTraces",
 	})
 	// uuid is used as transaction id
@@ -1641,17 +1641,17 @@ func (r *ClickHouseReader) setTTLTraces(ctx context.Context, orgID string, param
 	return &model.SetTTLResponseItem{Message: "move ttl has been successfully set up"}, nil
 }
 
-func (r *ClickHouseReader) hasCustomRetentionColumn(ctx context.Context) (bool, error) {
+func (r *DatastoreReader) hasCustomRetentionColumn(ctx context.Context) (bool, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "hasCustomRetentionColumn",
 	})
 
 	// Directly query for the _retention_days column existence
 	query := fmt.Sprintf("SELECT 1 FROM system.columns WHERE database = '%s' AND table = '%s' AND name = '_retention_days' LIMIT 1", r.logsDB, r.logsLocalTableV2)
 
-	var exists uint8 // Changed from int to uint8 to match ClickHouse's UInt8 type
+	var exists uint8 // Changed from int to uint8 to match Datastore's UInt8 type
 	err := r.db.QueryRow(ctx, query).Scan(&exists)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -1667,11 +1667,11 @@ func (r *ClickHouseReader) hasCustomRetentionColumn(ctx context.Context) (bool, 
 	return true, nil
 }
 
-func (r *ClickHouseReader) SetTTLV2(ctx context.Context, orgID string, params *model.CustomRetentionTTLParams) (*model.CustomRetentionTTLResponse, error) {
+func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *model.CustomRetentionTTLParams) (*model.CustomRetentionTTLResponse, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalLogs.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "SetTTLV2",
 	})
 	hasCustomRetention, err := r.hasCustomRetentionColumn(ctx)
@@ -1871,7 +1871,7 @@ func (r *ClickHouseReader) SetTTLV2(ctx context.Context, orgID string, params *m
 }
 
 // New method to build multiIf expressions with support for multiple AND conditions
-func (r *ClickHouseReader) buildMultiIfExpression(ttlConditions []model.CustomRetentionRule, defaultTTLDays int, isResourceTable bool) string {
+func (r *DatastoreReader) buildMultiIfExpression(ttlConditions []model.CustomRetentionRule, defaultTTLDays int, isResourceTable bool) string {
 	var conditions []string
 
 	for i, rule := range ttlConditions {
@@ -1943,7 +1943,7 @@ func (r *ClickHouseReader) buildMultiIfExpression(ttlConditions []model.CustomRe
 	return result
 }
 
-func (r *ClickHouseReader) GetCustomRetentionTTL(ctx context.Context, orgID string) (*model.GetCustomRetentionTTLResponse, error) {
+func (r *DatastoreReader) GetCustomRetentionTTL(ctx context.Context, orgID string) (*model.GetCustomRetentionTTLResponse, error) {
 	// Check if V2 (custom retention) is supported
 	hasCustomRetention, err := r.hasCustomRetentionColumn(ctx)
 	if err != nil {
@@ -2028,7 +2028,7 @@ func (r *ClickHouseReader) GetCustomRetentionTTL(ctx context.Context, orgID stri
 	return response, nil
 }
 
-func (r *ClickHouseReader) checkCustomRetentionTTLStatusItem(ctx context.Context, orgID string, tableName string) (*types.TTLSetting, error) {
+func (r *DatastoreReader) checkCustomRetentionTTLStatusItem(ctx context.Context, orgID string, tableName string) (*types.TTLSetting, error) {
 	ttl := new(types.TTLSetting)
 	err := r.sqlDB.BunDB().NewSelect().
 		Model(ttl).
@@ -2046,7 +2046,7 @@ func (r *ClickHouseReader) checkCustomRetentionTTLStatusItem(ctx context.Context
 	return ttl, nil
 }
 
-func (r *ClickHouseReader) updateCustomRetentionTTLStatus(ctx context.Context, orgID, tableName, status string) {
+func (r *DatastoreReader) updateCustomRetentionTTLStatus(ctx context.Context, orgID, tableName, status string) {
 	statusItem, apiErr := r.checkCustomRetentionTTLStatusItem(ctx, orgID, tableName)
 	if apiErr == nil && statusItem != nil {
 		_, dbErr := r.sqlDB.BunDB().NewUpdate().
@@ -2062,9 +2062,9 @@ func (r *ClickHouseReader) updateCustomRetentionTTLStatus(ctx context.Context, o
 }
 
 // Enhanced validation function with duplicate detection and efficient key validation
-func (r *ClickHouseReader) validateTTLConditions(ctx context.Context, ttlConditions []model.CustomRetentionRule) error {
+func (r *DatastoreReader) validateTTLConditions(ctx context.Context, ttlConditions []model.CustomRetentionRule) error {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "validateTTLConditions",
 	})
 	if len(ttlConditions) == 0 {
@@ -2166,7 +2166,7 @@ func (r *ClickHouseReader) validateTTLConditions(ctx context.Context, ttlConditi
 // SetTTL sets the TTL for traces or metrics or logs tables.
 // This is an async API which creates goroutines to set TTL.
 // Status of TTL update is tracked with ttl_status table in sqlite db.
-func (r *ClickHouseReader) SetTTL(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
+func (r *DatastoreReader) SetTTL(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
 	// Keep only latest 100 transactions/requests
 	r.deleteTtlTransactions(ctx, orgID, 100)
 
@@ -2183,10 +2183,10 @@ func (r *ClickHouseReader) SetTTL(ctx context.Context, orgID string, params *mod
 
 }
 
-func (r *ClickHouseReader) setTTLMetrics(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
+func (r *DatastoreReader) setTTLMetrics(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "setTTLMetrics",
 	})
 	// uuid is used as transaction id
@@ -2316,7 +2316,7 @@ func (r *ClickHouseReader) setTTLMetrics(ctx context.Context, orgID string, para
 	return &model.SetTTLResponseItem{Message: "move ttl has been successfully set up"}, nil
 }
 
-func (r *ClickHouseReader) deleteTtlTransactions(ctx context.Context, orgID string, numberOfTransactionsStore int) {
+func (r *DatastoreReader) deleteTtlTransactions(ctx context.Context, orgID string, numberOfTransactionsStore int) {
 	limitTransactions := []string{}
 	err := r.
 		sqlDB.
@@ -2347,7 +2347,7 @@ func (r *ClickHouseReader) deleteTtlTransactions(ctx context.Context, orgID stri
 }
 
 // checkTTLStatusItem checks if ttl_status table has an entry for the given table name
-func (r *ClickHouseReader) checkTTLStatusItem(ctx context.Context, orgID string, tableName string) (*types.TTLSetting, *model.ApiError) {
+func (r *DatastoreReader) checkTTLStatusItem(ctx context.Context, orgID string, tableName string) (*types.TTLSetting, *model.ApiError) {
 	zap.L().Info("checkTTLStatusItem query", zap.String("tableName", tableName))
 	ttl := new(types.TTLSetting)
 	err := r.
@@ -2368,7 +2368,7 @@ func (r *ClickHouseReader) checkTTLStatusItem(ctx context.Context, orgID string,
 }
 
 // getTTLQueryStatus fetches ttl_status table status from DB
-func (r *ClickHouseReader) getTTLQueryStatus(ctx context.Context, orgID string, tableNameArray []string) (string, *model.ApiError) {
+func (r *DatastoreReader) getTTLQueryStatus(ctx context.Context, orgID string, tableNameArray []string) (string, *model.ApiError) {
 	failFlag := false
 	status := constants.StatusSuccess
 	for _, tableName := range tableNameArray {
@@ -2395,10 +2395,10 @@ func (r *ClickHouseReader) getTTLQueryStatus(ctx context.Context, orgID string, 
 	return status, nil
 }
 
-func (r *ClickHouseReader) setColdStorage(ctx context.Context, tableName string, coldStorageVolume string) *model.ApiError {
+func (r *DatastoreReader) setColdStorage(ctx context.Context, tableName string, coldStorageVolume string) *model.ApiError {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "setColdStorage",
 	})
 	// Set the storage policy for the required table. If it is already set, then setting it again
@@ -2415,10 +2415,10 @@ func (r *ClickHouseReader) setColdStorage(ctx context.Context, tableName string,
 	return nil
 }
 
-// GetDisks returns a list of disks {name, type} configured in clickhouse DB.
-func (r *ClickHouseReader) GetDisks(ctx context.Context) (*[]model.DiskItem, *model.ApiError) {
+// GetDisks returns a list of disks {name, type} configured in datastore DB.
+func (r *DatastoreReader) GetDisks(ctx context.Context) (*[]model.DiskItem, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetDisks",
 	})
 	diskItems := []model.DiskItem{}
@@ -2442,10 +2442,10 @@ func getLocalTableNameArray(tableNames []string) []string {
 }
 
 // GetTTL returns current ttl, expected ttl and past setTTL status for metrics/traces.
-func (r *ClickHouseReader) GetTTL(ctx context.Context, orgID string, ttlParams *model.GetTTLParams) (*model.GetTTLResponseItem, *model.ApiError) {
+func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *model.GetTTLParams) (*model.GetTTLResponseItem, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetTTL",
 	})
 	parseTTL := func(queryResp string) (int, int) {
@@ -2615,11 +2615,11 @@ func (r *ClickHouseReader) GetTTL(ctx context.Context, orgID string, ttlParams *
 
 }
 
-func (r *ClickHouseReader) ListErrors(ctx context.Context, queryParams *model.ListErrorsParams) (*[]model.Error, *model.ApiError) {
+func (r *DatastoreReader) ListErrors(ctx context.Context, queryParams *model.ListErrorsParams) (*[]model.Error, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "ListErrors",
 	})
 	var getErrorResponses []model.Error
@@ -2636,15 +2636,15 @@ func (r *ClickHouseReader) ListErrors(ctx context.Context, queryParams *model.Li
 		query = query + ", any(exceptionType) as exceptionType"
 	}
 	query += fmt.Sprintf(" FROM %s.%s WHERE timestamp >= @timestampL AND timestamp <= @timestampU", r.TraceDB, r.errorTable)
-	args := []interface{}{clickhouse.Named("timestampL", strconv.FormatInt(queryParams.Start.UnixNano(), 10)), clickhouse.Named("timestampU", strconv.FormatInt(queryParams.End.UnixNano(), 10))}
+	args := []interface{}{datastore.Named("timestampL", strconv.FormatInt(queryParams.Start.UnixNano(), 10)), datastore.Named("timestampU", strconv.FormatInt(queryParams.End.UnixNano(), 10))}
 
 	if len(queryParams.ServiceName) != 0 {
 		query = query + " AND serviceName ilike @serviceName"
-		args = append(args, clickhouse.Named("serviceName", "%"+queryParams.ServiceName+"%"))
+		args = append(args, datastore.Named("serviceName", "%"+queryParams.ServiceName+"%"))
 	}
 	if len(queryParams.ExceptionType) != 0 {
 		query = query + " AND exceptionType ilike @exceptionType"
-		args = append(args, clickhouse.Named("exceptionType", "%"+queryParams.ExceptionType+"%"))
+		args = append(args, datastore.Named("exceptionType", "%"+queryParams.ExceptionType+"%"))
 	}
 
 	// create TagQuery from TagQueryParams
@@ -2673,12 +2673,12 @@ func (r *ClickHouseReader) ListErrors(ctx context.Context, queryParams *model.Li
 	}
 	if queryParams.Limit > 0 {
 		query = query + " LIMIT @limit"
-		args = append(args, clickhouse.Named("limit", queryParams.Limit))
+		args = append(args, datastore.Named("limit", queryParams.Limit))
 	}
 
 	if queryParams.Offset > 0 {
 		query = query + " OFFSET @offset"
-		args = append(args, clickhouse.Named("offset", queryParams.Offset))
+		args = append(args, datastore.Named("offset", queryParams.Offset))
 	}
 
 	err := r.db.Select(ctx, &getErrorResponses, query, args...)
@@ -2692,25 +2692,25 @@ func (r *ClickHouseReader) ListErrors(ctx context.Context, queryParams *model.Li
 	return &getErrorResponses, nil
 }
 
-func (r *ClickHouseReader) CountErrors(ctx context.Context, queryParams *model.CountErrorsParams) (uint64, *model.ApiError) {
+func (r *DatastoreReader) CountErrors(ctx context.Context, queryParams *model.CountErrorsParams) (uint64, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "CountErrors",
 	})
 
 	var errorCount uint64
 
 	query := fmt.Sprintf("SELECT count(distinct(groupID)) FROM %s.%s WHERE timestamp >= @timestampL AND timestamp <= @timestampU", r.TraceDB, r.errorTable)
-	args := []interface{}{clickhouse.Named("timestampL", strconv.FormatInt(queryParams.Start.UnixNano(), 10)), clickhouse.Named("timestampU", strconv.FormatInt(queryParams.End.UnixNano(), 10))}
+	args := []interface{}{datastore.Named("timestampL", strconv.FormatInt(queryParams.Start.UnixNano(), 10)), datastore.Named("timestampU", strconv.FormatInt(queryParams.End.UnixNano(), 10))}
 	if len(queryParams.ServiceName) != 0 {
 		query = query + " AND serviceName ilike @serviceName"
-		args = append(args, clickhouse.Named("serviceName", "%"+queryParams.ServiceName+"%"))
+		args = append(args, datastore.Named("serviceName", "%"+queryParams.ServiceName+"%"))
 	}
 	if len(queryParams.ExceptionType) != 0 {
 		query = query + " AND exceptionType ilike @exceptionType"
-		args = append(args, clickhouse.Named("exceptionType", "%"+queryParams.ExceptionType+"%"))
+		args = append(args, datastore.Named("exceptionType", "%"+queryParams.ExceptionType+"%"))
 	}
 
 	// create TagQuery from TagQueryParams
@@ -2735,11 +2735,11 @@ func (r *ClickHouseReader) CountErrors(ctx context.Context, queryParams *model.C
 	return errorCount, nil
 }
 
-func (r *ClickHouseReader) GetErrorFromErrorID(ctx context.Context, queryParams *model.GetErrorParams) (*model.ErrorWithSpan, *model.ApiError) {
+func (r *DatastoreReader) GetErrorFromErrorID(ctx context.Context, queryParams *model.GetErrorParams) (*model.ErrorWithSpan, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetErrorFromErrorID",
 	})
 	if queryParams.ErrorID == "" {
@@ -2749,7 +2749,7 @@ func (r *ClickHouseReader) GetErrorFromErrorID(ctx context.Context, queryParams 
 	var getErrorWithSpanReponse []model.ErrorWithSpan
 
 	query := fmt.Sprintf("SELECT errorID, exceptionType, exceptionStacktrace, exceptionEscaped, exceptionMessage, timestamp, spanID, traceID, serviceName, groupID FROM %s.%s WHERE timestamp = @timestamp AND groupID = @groupID AND errorID = @errorID LIMIT 1", r.TraceDB, r.errorTable)
-	args := []interface{}{clickhouse.Named("errorID", queryParams.ErrorID), clickhouse.Named("groupID", queryParams.GroupID), clickhouse.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
+	args := []interface{}{datastore.Named("errorID", queryParams.ErrorID), datastore.Named("groupID", queryParams.GroupID), datastore.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
 
 	err := r.db.Select(ctx, &getErrorWithSpanReponse, query, args...)
 	zap.L().Info(query)
@@ -2767,17 +2767,17 @@ func (r *ClickHouseReader) GetErrorFromErrorID(ctx context.Context, queryParams 
 
 }
 
-func (r *ClickHouseReader) GetErrorFromGroupID(ctx context.Context, queryParams *model.GetErrorParams) (*model.ErrorWithSpan, *model.ApiError) {
+func (r *DatastoreReader) GetErrorFromGroupID(ctx context.Context, queryParams *model.GetErrorParams) (*model.ErrorWithSpan, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetErrorFromGroupID",
 	})
 	var getErrorWithSpanReponse []model.ErrorWithSpan
 
 	query := fmt.Sprintf("SELECT errorID, exceptionType, exceptionStacktrace, exceptionEscaped, exceptionMessage, timestamp, spanID, traceID, serviceName, groupID FROM %s.%s WHERE timestamp = @timestamp AND groupID = @groupID LIMIT 1", r.TraceDB, r.errorTable)
-	args := []interface{}{clickhouse.Named("groupID", queryParams.GroupID), clickhouse.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
+	args := []interface{}{datastore.Named("groupID", queryParams.GroupID), datastore.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
 
 	err := r.db.Select(ctx, &getErrorWithSpanReponse, query, args...)
 
@@ -2796,7 +2796,7 @@ func (r *ClickHouseReader) GetErrorFromGroupID(ctx context.Context, queryParams 
 
 }
 
-func (r *ClickHouseReader) GetNextPrevErrorIDs(ctx context.Context, queryParams *model.GetErrorParams) (*model.NextPrevErrorIDs, *model.ApiError) {
+func (r *DatastoreReader) GetNextPrevErrorIDs(ctx context.Context, queryParams *model.GetErrorParams) (*model.NextPrevErrorIDs, *model.ApiError) {
 
 	if queryParams.ErrorID == "" {
 		zap.L().Error("errorId missing from params")
@@ -2820,17 +2820,17 @@ func (r *ClickHouseReader) GetNextPrevErrorIDs(ctx context.Context, queryParams 
 
 }
 
-func (r *ClickHouseReader) getNextErrorID(ctx context.Context, queryParams *model.GetErrorParams) (string, time.Time, *model.ApiError) {
+func (r *DatastoreReader) getNextErrorID(ctx context.Context, queryParams *model.GetErrorParams) (string, time.Time, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "getNextErrorID",
 	})
 	var getNextErrorIDReponse []model.NextPrevErrorIDsDBResponse
 
 	query := fmt.Sprintf("SELECT errorID as nextErrorID, timestamp as nextTimestamp FROM %s.%s WHERE groupID = @groupID AND timestamp >= @timestamp AND errorID != @errorID ORDER BY timestamp ASC LIMIT 2", r.TraceDB, r.errorTable)
-	args := []interface{}{clickhouse.Named("errorID", queryParams.ErrorID), clickhouse.Named("groupID", queryParams.GroupID), clickhouse.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
+	args := []interface{}{datastore.Named("errorID", queryParams.ErrorID), datastore.Named("groupID", queryParams.GroupID), datastore.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
 
 	err := r.db.Select(ctx, &getNextErrorIDReponse, query, args...)
 
@@ -2851,7 +2851,7 @@ func (r *ClickHouseReader) getNextErrorID(ctx context.Context, queryParams *mode
 			var getNextErrorIDReponse []model.NextPrevErrorIDsDBResponse
 
 			query := fmt.Sprintf("SELECT errorID as nextErrorID, timestamp as nextTimestamp FROM %s.%s WHERE groupID = @groupID AND timestamp = @timestamp AND errorID > @errorID ORDER BY errorID ASC LIMIT 1", r.TraceDB, r.errorTable)
-			args := []interface{}{clickhouse.Named("errorID", queryParams.ErrorID), clickhouse.Named("groupID", queryParams.GroupID), clickhouse.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
+			args := []interface{}{datastore.Named("errorID", queryParams.ErrorID), datastore.Named("groupID", queryParams.GroupID), datastore.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
 
 			err := r.db.Select(ctx, &getNextErrorIDReponse, query, args...)
 
@@ -2865,7 +2865,7 @@ func (r *ClickHouseReader) getNextErrorID(ctx context.Context, queryParams *mode
 				var getNextErrorIDReponse []model.NextPrevErrorIDsDBResponse
 
 				query := fmt.Sprintf("SELECT errorID as nextErrorID, timestamp as nextTimestamp FROM %s.%s WHERE groupID = @groupID AND timestamp > @timestamp ORDER BY timestamp ASC LIMIT 1", r.TraceDB, r.errorTable)
-				args := []interface{}{clickhouse.Named("errorID", queryParams.ErrorID), clickhouse.Named("groupID", queryParams.GroupID), clickhouse.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
+				args := []interface{}{datastore.Named("errorID", queryParams.ErrorID), datastore.Named("groupID", queryParams.GroupID), datastore.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
 
 				err := r.db.Select(ctx, &getNextErrorIDReponse, query, args...)
 
@@ -2894,17 +2894,17 @@ func (r *ClickHouseReader) getNextErrorID(ctx context.Context, queryParams *mode
 	}
 }
 
-func (r *ClickHouseReader) getPrevErrorID(ctx context.Context, queryParams *model.GetErrorParams) (string, time.Time, *model.ApiError) {
+func (r *DatastoreReader) getPrevErrorID(ctx context.Context, queryParams *model.GetErrorParams) (string, time.Time, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "getPrevErrorID",
 	})
 	var getPrevErrorIDReponse []model.NextPrevErrorIDsDBResponse
 
 	query := fmt.Sprintf("SELECT errorID as prevErrorID, timestamp as prevTimestamp FROM %s.%s WHERE groupID = @groupID AND timestamp <= @timestamp AND errorID != @errorID ORDER BY timestamp DESC LIMIT 2", r.TraceDB, r.errorTable)
-	args := []interface{}{clickhouse.Named("errorID", queryParams.ErrorID), clickhouse.Named("groupID", queryParams.GroupID), clickhouse.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
+	args := []interface{}{datastore.Named("errorID", queryParams.ErrorID), datastore.Named("groupID", queryParams.GroupID), datastore.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
 
 	err := r.db.Select(ctx, &getPrevErrorIDReponse, query, args...)
 
@@ -2925,7 +2925,7 @@ func (r *ClickHouseReader) getPrevErrorID(ctx context.Context, queryParams *mode
 			var getPrevErrorIDReponse []model.NextPrevErrorIDsDBResponse
 
 			query := fmt.Sprintf("SELECT errorID as prevErrorID, timestamp as prevTimestamp FROM %s.%s WHERE groupID = @groupID AND timestamp = @timestamp AND errorID < @errorID ORDER BY errorID DESC LIMIT 1", r.TraceDB, r.errorTable)
-			args := []interface{}{clickhouse.Named("errorID", queryParams.ErrorID), clickhouse.Named("groupID", queryParams.GroupID), clickhouse.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
+			args := []interface{}{datastore.Named("errorID", queryParams.ErrorID), datastore.Named("groupID", queryParams.GroupID), datastore.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
 
 			err := r.db.Select(ctx, &getPrevErrorIDReponse, query, args...)
 
@@ -2939,7 +2939,7 @@ func (r *ClickHouseReader) getPrevErrorID(ctx context.Context, queryParams *mode
 				var getPrevErrorIDReponse []model.NextPrevErrorIDsDBResponse
 
 				query := fmt.Sprintf("SELECT errorID as prevErrorID, timestamp as prevTimestamp FROM %s.%s WHERE groupID = @groupID AND timestamp < @timestamp ORDER BY timestamp DESC LIMIT 1", r.TraceDB, r.errorTable)
-				args := []interface{}{clickhouse.Named("errorID", queryParams.ErrorID), clickhouse.Named("groupID", queryParams.GroupID), clickhouse.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
+				args := []interface{}{datastore.Named("errorID", queryParams.ErrorID), datastore.Named("groupID", queryParams.GroupID), datastore.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
 
 				err := r.db.Select(ctx, &getPrevErrorIDReponse, query, args...)
 
@@ -2968,7 +2968,7 @@ func (r *ClickHouseReader) getPrevErrorID(ctx context.Context, queryParams *mode
 	}
 }
 
-func (r *ClickHouseReader) FetchTemporality(ctx context.Context, orgID valuer.UUID, metricNames []string) (map[string]map[v3.Temporality]bool, error) {
+func (r *DatastoreReader) FetchTemporality(ctx context.Context, orgID valuer.UUID, metricNames []string) (map[string]map[v3.Temporality]bool, error) {
 	metricNameToTemporality := make(map[string]map[v3.Temporality]bool)
 
 	// Batch fetch all metadata at once
@@ -2991,10 +2991,10 @@ func (r *ClickHouseReader) FetchTemporality(ctx context.Context, orgID valuer.UU
 	return metricNameToTemporality, nil
 }
 
-func (r *ClickHouseReader) GetLogFields(ctx context.Context) (*model.GetFieldsResponse, *model.ApiError) {
+func (r *DatastoreReader) GetLogFields(ctx context.Context) (*model.GetFieldsResponse, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalLogs.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetLogFields",
 	})
 	// response will contain top level fields from the otel log model
@@ -3032,10 +3032,10 @@ func (r *ClickHouseReader) GetLogFields(ctx context.Context) (*model.GetFieldsRe
 	return &response, nil
 }
 
-func (r *ClickHouseReader) GetLogFieldsFromNames(ctx context.Context, fieldNames []string) (*model.GetFieldsResponse, *model.ApiError) {
+func (r *DatastoreReader) GetLogFieldsFromNames(ctx context.Context, fieldNames []string) (*model.GetFieldsResponse, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalLogs.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetLogFieldsFromNames",
 	})
 	// response will contain top level fields from the otel log model
@@ -3073,7 +3073,7 @@ func (r *ClickHouseReader) GetLogFieldsFromNames(ctx context.Context, fieldNames
 	return &response, nil
 }
 
-func (r *ClickHouseReader) extractSelectedAndInterestingFields(tableStatement string, overrideFieldType string, fields *[]model.Field, response *model.GetFieldsResponse) {
+func (r *DatastoreReader) extractSelectedAndInterestingFields(tableStatement string, overrideFieldType string, fields *[]model.Field, response *model.GetFieldsResponse) {
 	for _, field := range *fields {
 		if overrideFieldType != "" {
 			field.Type = overrideFieldType
@@ -3087,9 +3087,9 @@ func (r *ClickHouseReader) extractSelectedAndInterestingFields(tableStatement st
 	}
 }
 
-func (r *ClickHouseReader) UpdateLogField(ctx context.Context, field *model.UpdateField) *model.ApiError {
+func (r *DatastoreReader) UpdateLogField(ctx context.Context, field *model.UpdateField) *model.ApiError {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "UpdateLogField",
 	})
 	if !field.Selected {
@@ -3157,9 +3157,9 @@ func (r *ClickHouseReader) UpdateLogField(ctx context.Context, field *model.Upda
 	return nil
 }
 
-func (r *ClickHouseReader) GetTraceFields(ctx context.Context) (*model.GetFieldsResponse, *model.ApiError) {
+func (r *DatastoreReader) GetTraceFields(ctx context.Context) (*model.GetFieldsResponse, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetTraceFields",
 	})
 	// response will contain top level fields from the otel trace model
@@ -3216,10 +3216,10 @@ func (r *ClickHouseReader) GetTraceFields(ctx context.Context) (*model.GetFields
 
 }
 
-func (r *ClickHouseReader) UpdateTraceField(ctx context.Context, field *model.UpdateField) *model.ApiError {
+func (r *DatastoreReader) UpdateTraceField(ctx context.Context, field *model.UpdateField) *model.ApiError {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "UpdateTraceField",
 	})
 	if !field.Selected {
@@ -3312,9 +3312,9 @@ func (r *ClickHouseReader) UpdateTraceField(ctx context.Context, field *model.Up
 
 	return nil
 }
-func (r *ClickHouseReader) QueryDashboardVars(ctx context.Context, query string) (*model.DashboardVar, error) {
+func (r *DatastoreReader) QueryDashboardVars(ctx context.Context, query string) (*model.DashboardVar, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "QueryDashboardVars",
 	})
 	var result = model.DashboardVar{VariableValues: make([]interface{}, 0)}
@@ -3352,10 +3352,10 @@ func (r *ClickHouseReader) QueryDashboardVars(ctx context.Context, query string)
 	return &result, nil
 }
 
-func (r *ClickHouseReader) GetMetricAggregateAttributes(ctx context.Context, orgID valuer.UUID, req *v3.AggregateAttributeRequest, skipO11yMetrics bool) (*v3.AggregateAttributeResponse, error) {
+func (r *DatastoreReader) GetMetricAggregateAttributes(ctx context.Context, orgID valuer.UUID, req *v3.AggregateAttributeRequest, skipO11yMetrics bool) (*v3.AggregateAttributeResponse, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMetricAggregateAttributes",
 	})
 	var response v3.AggregateAttributeResponse
@@ -3435,10 +3435,10 @@ func (r *ClickHouseReader) GetMetricAggregateAttributes(ctx context.Context, org
 	return &response, nil
 }
 
-func (r *ClickHouseReader) GetMeterAggregateAttributes(ctx context.Context, orgID valuer.UUID, req *v3.AggregateAttributeRequest) (*v3.AggregateAttributeResponse, error) {
+func (r *DatastoreReader) GetMeterAggregateAttributes(ctx context.Context, orgID valuer.UUID, req *v3.AggregateAttributeRequest) (*v3.AggregateAttributeResponse, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMeterAggregateAttributes",
 	})
 	var response v3.AggregateAttributeResponse
@@ -3488,10 +3488,10 @@ func (r *ClickHouseReader) GetMeterAggregateAttributes(ctx context.Context, orgI
 	return &response, nil
 }
 
-func (r *ClickHouseReader) GetMetricAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error) {
+func (r *DatastoreReader) GetMetricAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMetricAttributeKeys",
 	})
 	var query string
@@ -3533,10 +3533,10 @@ func (r *ClickHouseReader) GetMetricAttributeKeys(ctx context.Context, req *v3.F
 	return &response, nil
 }
 
-func (r *ClickHouseReader) GetMeterAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error) {
+func (r *DatastoreReader) GetMeterAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMeterAttributeKeys",
 	})
 	var query string
@@ -3573,11 +3573,11 @@ func (r *ClickHouseReader) GetMeterAttributeKeys(ctx context.Context, req *v3.Fi
 	return &response, nil
 }
 
-func (r *ClickHouseReader) GetMetricAttributeValues(ctx context.Context, req *v3.FilterAttributeValueRequest) (*v3.FilterAttributeValueResponse, error) {
+func (r *DatastoreReader) GetMetricAttributeValues(ctx context.Context, req *v3.FilterAttributeValueRequest) (*v3.FilterAttributeValueResponse, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMetricAttributeValues",
 	})
 	var query string
@@ -3618,11 +3618,11 @@ func (r *ClickHouseReader) GetMetricAttributeValues(ctx context.Context, req *v3
 	return &attributeValues, nil
 }
 
-func (r *ClickHouseReader) GetMetricMetadata(ctx context.Context, orgID valuer.UUID, metricName, serviceName string) (*v3.MetricMetadataResponse, error) {
+func (r *DatastoreReader) GetMetricMetadata(ctx context.Context, orgID valuer.UUID, metricName, serviceName string) (*v3.MetricMetadataResponse, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMetricMetadata",
 	})
 	unixMilli := common.PastDayRoundOff()
@@ -3705,9 +3705,9 @@ func (r *ClickHouseReader) GetMetricMetadata(ctx context.Context, orgID valuer.U
 
 // GetCountOfThings returns the count of things in the query
 // This is a generic function that can be used to check if any data exists for a given query
-func (r *ClickHouseReader) GetCountOfThings(ctx context.Context, query string) (uint64, error) {
+func (r *DatastoreReader) GetCountOfThings(ctx context.Context, query string) (uint64, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetCountOfThings",
 	})
 	var count uint64
@@ -3718,7 +3718,7 @@ func (r *ClickHouseReader) GetCountOfThings(ctx context.Context, query string) (
 	return count, nil
 }
 
-func (r *ClickHouseReader) GetActiveHostsFromMetricMetadata(ctx context.Context, metricNames []string, hostNameAttr string, sinceUnixMilli int64) (map[string]bool, error) {
+func (r *DatastoreReader) GetActiveHostsFromMetricMetadata(ctx context.Context, metricNames []string, hostNameAttr string, sinceUnixMilli int64) (map[string]bool, error) {
 	activeHosts := map[string]bool{}
 
 	query := fmt.Sprintf(
@@ -3732,9 +3732,9 @@ func (r *ClickHouseReader) GetActiveHostsFromMetricMetadata(ctx context.Context,
 	)
 
 	rows, err := r.db.Query(ctx, query,
-		clickhouse.Named("metricNames", metricNames),
-		clickhouse.Named("attrName", hostNameAttr),
-		clickhouse.Named("sinceUnixMilli", sinceUnixMilli),
+		datastore.Named("metricNames", metricNames),
+		datastore.Named("attrName", hostNameAttr),
+		datastore.Named("sinceUnixMilli", sinceUnixMilli),
 	)
 	if err != nil {
 		return nil, errorsV2.WrapInternalf(err, errorsV2.CodeInternal, "error querying active hosts")
@@ -3757,12 +3757,12 @@ func (r *ClickHouseReader) GetActiveHostsFromMetricMetadata(ctx context.Context,
 	return activeHosts, nil
 }
 
-func (r *ClickHouseReader) GetLatestReceivedMetric(
+func (r *DatastoreReader) GetLatestReceivedMetric(
 	ctx context.Context, metricNames []string, labelValues map[string]string,
 ) (*model.MetricStatus, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetLatestReceivedMetric",
 	})
 	// at least 1 metric name must be specified.
@@ -3773,7 +3773,7 @@ func (r *ClickHouseReader) GetLatestReceivedMetric(
 
 	quotedMetricNames := []string{}
 	for _, m := range metricNames {
-		quotedMetricNames = append(quotedMetricNames, utils.ClickHouseFormattedValue(m))
+		quotedMetricNames = append(quotedMetricNames, utils.DatastoreFormattedValue(m))
 	}
 	commaSeparatedMetricNames := strings.Join(quotedMetricNames, ", ")
 
@@ -3808,7 +3808,7 @@ func (r *ClickHouseReader) GetLatestReceivedMetric(
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
 		return nil, model.InternalError(fmt.Errorf(
-			"couldn't query clickhouse for received metrics status: %w", err,
+			"couldn't query datastore for received metrics status: %w", err,
 		))
 	}
 	defer rows.Close()
@@ -3847,11 +3847,11 @@ func isColumn(tableStatement, attrType, field, datType string) bool {
 	return strings.Contains(tableStatement, fmt.Sprintf("%s ", name))
 }
 
-func (r *ClickHouseReader) GetLogAggregateAttributes(ctx context.Context, req *v3.AggregateAttributeRequest) (*v3.AggregateAttributeResponse, error) {
+func (r *DatastoreReader) GetLogAggregateAttributes(ctx context.Context, req *v3.AggregateAttributeRequest) (*v3.AggregateAttributeResponse, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalLogs.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetLogAggregateAttributes",
 	})
 	var query string
@@ -3937,10 +3937,10 @@ func (r *ClickHouseReader) GetLogAggregateAttributes(ctx context.Context, req *v
 	return &response, nil
 }
 
-func (r *ClickHouseReader) GetLogAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error) {
+func (r *DatastoreReader) GetLogAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalLogs.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetLogAttributeKeys",
 	})
 	var query string
@@ -4008,9 +4008,9 @@ func (r *ClickHouseReader) GetLogAttributeKeys(ctx context.Context, req *v3.Filt
 	return &response, nil
 }
 
-func (r *ClickHouseReader) FetchRelatedValues(ctx context.Context, req *v3.FilterAttributeValueRequest) ([]string, error) {
+func (r *DatastoreReader) FetchRelatedValues(ctx context.Context, req *v3.FilterAttributeValueRequest) ([]string, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "FetchRelatedValues",
 	})
 	var andConditions []string
@@ -4047,16 +4047,16 @@ func (r *ClickHouseReader) FetchRelatedValues(ctx context.Context, req *v3.Filte
 			}
 			switch v := item.Value.(type) {
 			case string:
-				fmtVal := utils.ClickHouseFormattedValue(v)
+				fmtVal := utils.DatastoreFormattedValue(v)
 				addCondition(fmtVal)
 			case []string:
 				for _, val := range v {
-					fmtVal := utils.ClickHouseFormattedValue(val)
+					fmtVal := utils.DatastoreFormattedValue(val)
 					addCondition(fmtVal)
 				}
 			case []interface{}:
 				for _, val := range v {
-					fmtVal := utils.ClickHouseFormattedValue(val)
+					fmtVal := utils.DatastoreFormattedValue(val)
 					addCondition(fmtVal)
 				}
 			}
@@ -4103,10 +4103,10 @@ func (r *ClickHouseReader) FetchRelatedValues(ctx context.Context, req *v3.Filte
 	return attributeValues, nil
 }
 
-func (r *ClickHouseReader) GetLogAttributeValues(ctx context.Context, req *v3.FilterAttributeValueRequest) (*v3.FilterAttributeValueResponse, error) {
+func (r *DatastoreReader) GetLogAttributeValues(ctx context.Context, req *v3.FilterAttributeValueRequest) (*v3.FilterAttributeValueResponse, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalLogs.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetLogAttributeValues",
 	})
 	var err error
@@ -4425,9 +4425,9 @@ func readRowsForTimeSeriesResult(rows driver.Rows, vars []interface{}, columnNam
 }
 
 // GetTimeSeriesResultV3 runs the query and returns list of time series
-func (r *ClickHouseReader) GetTimeSeriesResultV3(ctx context.Context, query string) ([]*v3.Series, error) {
+func (r *DatastoreReader) GetTimeSeriesResultV3(ctx context.Context, query string) ([]*v3.Series, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetTimeSeriesResultV3",
 	})
 	// Hook up query progress reporting if requested.
@@ -4438,8 +4438,8 @@ func (r *ClickHouseReader) GetTimeSeriesResultV3(ctx context.Context, query stri
 			zap.L().Error("GetTimeSeriesResultV3: queryId in ctx not a string as expected", zap.Any("queryId", queryId))
 
 		} else {
-			ctx = clickhouse.Context(ctx, clickhouse.WithProgress(
-				func(p *clickhouse.Progress) {
+			ctx = datastore.Context(ctx, datastore.WithProgress(
+				func(p *datastore.Progress) {
 					go func() {
 						err := r.queryProgressTracker.ReportQueryProgress(qid, p)
 						if err != nil {
@@ -4492,9 +4492,9 @@ func (r *ClickHouseReader) GetTimeSeriesResultV3(ctx context.Context, query stri
 }
 
 // GetListResultV3 runs the query and returns list of rows
-func (r *ClickHouseReader) GetListResultV3(ctx context.Context, query string) ([]*v3.Row, error) {
+func (r *DatastoreReader) GetListResultV3(ctx context.Context, query string) ([]*v3.Row, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetListResultV3",
 	})
 	rows, err := r.db.Query(ctx, query)
@@ -4558,10 +4558,10 @@ func (r *ClickHouseReader) GetListResultV3(ctx context.Context, query string) ([
 
 // GetHostMetricsExistenceAndEarliestTime returns (count, minFirstReportedUnixMilli, error) for the given host metric names
 // from distributed_metadata. When count is 0, minFirstReportedUnixMilli is 0.
-func (r *ClickHouseReader) GetMetricsExistenceAndEarliestTime(ctx context.Context, metricNames []string) (uint64, uint64, error) {
+func (r *DatastoreReader) GetMetricsExistenceAndEarliestTime(ctx context.Context, metricNames []string) (uint64, uint64, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMetricsExistenceAndEarliestTime",
 	})
 	if len(metricNames) == 0 {
@@ -4575,7 +4575,7 @@ func (r *ClickHouseReader) GetMetricsExistenceAndEarliestTime(ctx context.Contex
 		constants.O11Y_METRIC_DBNAME, constants.O11Y_METADATA_TABLENAME)
 
 	var count, minFirstReported uint64
-	err := r.db.QueryRow(ctx, query, clickhouse.Named("metric_names", metricNames)).Scan(&count, &minFirstReported)
+	err := r.db.QueryRow(ctx, query, datastore.Named("metric_names", metricNames)).Scan(&count, &minFirstReported)
 	if err != nil {
 		zap.L().Error("error getting host metrics existence and earliest time", zap.Error(err))
 		return 0, 0, err
@@ -4598,10 +4598,10 @@ func getPersonalisedError(err error) error {
 	return err
 }
 
-func (r *ClickHouseReader) CheckClickHouse(ctx context.Context) error {
+func (r *DatastoreReader) CheckDatastore(ctx context.Context) error {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
-		instrumentationtypes.CodeFunctionName: "CheckClickHouse",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
+		instrumentationtypes.CodeFunctionName: "CheckDatastore",
 	})
 	rows, err := r.db.Query(ctx, "SELECT 1")
 	if err != nil {
@@ -4612,10 +4612,10 @@ func (r *ClickHouseReader) CheckClickHouse(ctx context.Context) error {
 	return nil
 }
 
-func (r *ClickHouseReader) GetTraceAggregateAttributes(ctx context.Context, req *v3.AggregateAttributeRequest) (*v3.AggregateAttributeResponse, error) {
+func (r *DatastoreReader) GetTraceAggregateAttributes(ctx context.Context, req *v3.AggregateAttributeRequest) (*v3.AggregateAttributeResponse, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetTraceAggregateAttributes",
 	})
 	var query string
@@ -4709,11 +4709,11 @@ func (r *ClickHouseReader) GetTraceAggregateAttributes(ctx context.Context, req 
 	return &response, nil
 }
 
-func (r *ClickHouseReader) GetTraceAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error) {
+func (r *DatastoreReader) GetTraceAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetTraceAttributeKeys",
 	})
 	var query string
@@ -4783,10 +4783,10 @@ func (r *ClickHouseReader) GetTraceAttributeKeys(ctx context.Context, req *v3.Fi
 	return &response, nil
 }
 
-func (r *ClickHouseReader) GetTraceAttributeValues(ctx context.Context, req *v3.FilterAttributeValueRequest) (*v3.FilterAttributeValueResponse, error) {
+func (r *DatastoreReader) GetTraceAttributeValues(ctx context.Context, req *v3.FilterAttributeValueRequest) (*v3.FilterAttributeValueResponse, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetTraceAttributeValues",
 	})
 	var query string
@@ -4881,10 +4881,10 @@ func (r *ClickHouseReader) GetTraceAttributeValues(ctx context.Context, req *v3.
 	return &attributeValues, nil
 }
 
-func (r *ClickHouseReader) GetSpanAttributeKeysByNames(ctx context.Context, names []string) (map[string]v3.AttributeKey, error) {
+func (r *DatastoreReader) GetSpanAttributeKeysByNames(ctx context.Context, names []string) (map[string]v3.AttributeKey, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetSpanAttributeKeysByNames",
 	})
 	var query string
@@ -4934,9 +4934,9 @@ func (r *ClickHouseReader) GetSpanAttributeKeysByNames(ctx context.Context, name
 	return response, nil
 }
 
-func (r *ClickHouseReader) AddRuleStateHistory(ctx context.Context, ruleStateHistory []model.RuleStateHistory) error {
+func (r *DatastoreReader) AddRuleStateHistory(ctx context.Context, ruleStateHistory []model.RuleStateHistory) error {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "AddRuleStateHistory",
 	})
 	var statement driver.Batch
@@ -4969,9 +4969,9 @@ func (r *ClickHouseReader) AddRuleStateHistory(ctx context.Context, ruleStateHis
 	return nil
 }
 
-func (r *ClickHouseReader) GetLastSavedRuleStateHistory(ctx context.Context, ruleID string) ([]model.RuleStateHistory, error) {
+func (r *DatastoreReader) GetLastSavedRuleStateHistory(ctx context.Context, ruleID string) ([]model.RuleStateHistory, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetLastSavedRuleStateHistory",
 	})
 	query := fmt.Sprintf("SELECT * FROM %s.%s WHERE rule_id = '%s' AND state_changed = true ORDER BY unix_milli DESC LIMIT 1 BY fingerprint",
@@ -4985,11 +4985,11 @@ func (r *ClickHouseReader) GetLastSavedRuleStateHistory(ctx context.Context, rul
 	return history, nil
 }
 
-func (r *ClickHouseReader) ReadRuleStateHistoryByRuleID(
+func (r *DatastoreReader) ReadRuleStateHistoryByRuleID(
 	ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) (*model.RuleStateTimeline, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "ReadRuleStateHistoryByRuleID",
 	})
 	var conditions []string
@@ -5009,7 +5009,7 @@ func (r *ClickHouseReader) ReadRuleStateHistoryByRuleID(
 			if op == v3.FilterOperatorContains || op == v3.FilterOperatorNotContains {
 				toFormat = fmt.Sprintf("%%%s%%", toFormat)
 			}
-			fmtVal := utils.ClickHouseFormattedValue(toFormat)
+			fmtVal := utils.DatastoreFormattedValue(toFormat)
 			switch op {
 			case v3.FilterOperatorEqual:
 				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') = %s", item.Key.Key, fmtVal))
@@ -5104,10 +5104,10 @@ func (r *ClickHouseReader) ReadRuleStateHistoryByRuleID(
 	return timeline, nil
 }
 
-func (r *ClickHouseReader) ReadRuleStateHistoryTopContributorsByRuleID(
+func (r *DatastoreReader) ReadRuleStateHistoryTopContributorsByRuleID(
 	ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) ([]model.RuleStateHistoryContributor, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "ReadRuleStateHistoryTopContributorsByRuleID",
 	})
 	query := fmt.Sprintf(`SELECT
@@ -5132,10 +5132,10 @@ func (r *ClickHouseReader) ReadRuleStateHistoryTopContributorsByRuleID(
 	return contributors, nil
 }
 
-func (r *ClickHouseReader) GetOverallStateTransitions(ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) ([]model.ReleStateItem, error) {
+func (r *DatastoreReader) GetOverallStateTransitions(ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) ([]model.ReleStateItem, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetOverallStateTransitions",
 	})
 	tmpl := `WITH firing_events AS (
@@ -5263,10 +5263,10 @@ ORDER BY firing_time ASC;`
 	return stateItems, nil
 }
 
-func (r *ClickHouseReader) GetAvgResolutionTime(ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) (float64, error) {
+func (r *DatastoreReader) GetAvgResolutionTime(ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) (float64, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetAvgResolutionTime",
 	})
 	tmpl := `
@@ -5322,7 +5322,7 @@ FROM matched_events;
 	return avgResolutionTime, nil
 }
 
-func (r *ClickHouseReader) GetAvgResolutionTimeByInterval(ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) (*v3.Series, error) {
+func (r *DatastoreReader) GetAvgResolutionTimeByInterval(ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) (*v3.Series, error) {
 
 	step := common.MinAllowedStepInterval(params.Start, params.End)
 
@@ -5379,9 +5379,9 @@ ORDER BY ts ASC;`
 	return result[0], nil
 }
 
-func (r *ClickHouseReader) GetTotalTriggers(ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) (uint64, error) {
+func (r *DatastoreReader) GetTotalTriggers(ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) (uint64, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetTotalTriggers",
 	})
 	query := fmt.Sprintf("SELECT count(*) FROM %s.%s WHERE rule_id = '%s' AND (state_changed = true) AND (state = '%s') AND unix_milli >= %d AND unix_milli <= %d",
@@ -5397,7 +5397,7 @@ func (r *ClickHouseReader) GetTotalTriggers(ctx context.Context, ruleID string, 
 	return totalTriggers, nil
 }
 
-func (r *ClickHouseReader) GetTriggersByInterval(ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) (*v3.Series, error) {
+func (r *DatastoreReader) GetTriggersByInterval(ctx context.Context, ruleID string, params *model.QueryRuleStateHistory) (*v3.Series, error) {
 	step := common.MinAllowedStepInterval(params.Start, params.End)
 
 	query := fmt.Sprintf("SELECT count(*), toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts FROM %s.%s WHERE rule_id = '%s' AND (state_changed = true) AND (state = '%s') AND unix_milli >= %d AND unix_milli <= %d GROUP BY ts ORDER BY ts ASC",
@@ -5411,10 +5411,10 @@ func (r *ClickHouseReader) GetTriggersByInterval(ctx context.Context, ruleID str
 	return result[0], nil
 }
 
-func (r *ClickHouseReader) GetMinAndMaxTimestampForTraceID(ctx context.Context, traceID []string) (int64, int64, error) {
+func (r *DatastoreReader) GetMinAndMaxTimestampForTraceID(ctx context.Context, traceID []string) (int64, int64, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMinAndMaxTimestampForTraceID",
 	})
 	var minTime, maxTime time.Time
@@ -5441,22 +5441,22 @@ func (r *ClickHouseReader) GetMinAndMaxTimestampForTraceID(ctx context.Context, 
 	return minTime.UnixNano(), maxTime.UnixNano(), nil
 }
 
-func (r *ClickHouseReader) ReportQueryStartForProgressTracking(
+func (r *DatastoreReader) ReportQueryStartForProgressTracking(
 	queryId string,
 ) (func(), *model.ApiError) {
 	return r.queryProgressTracker.ReportQueryStarted(queryId)
 }
 
-func (r *ClickHouseReader) SubscribeToQueryProgress(
+func (r *DatastoreReader) SubscribeToQueryProgress(
 	queryId string,
 ) (<-chan model.QueryProgress, func(), *model.ApiError) {
 	return r.queryProgressTracker.SubscribeToQueryProgress(queryId)
 }
 
-func (r *ClickHouseReader) GetAllMetricFilterAttributeKeys(ctx context.Context, req *metrics_explorer.FilterKeyRequest) (*[]v3.AttributeKey, *model.ApiError) {
+func (r *DatastoreReader) GetAllMetricFilterAttributeKeys(ctx context.Context, req *metrics_explorer.FilterKeyRequest) (*[]v3.AttributeKey, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetAllMetricFilterAttributeKeys",
 	})
 	var rows driver.Rows
@@ -5469,17 +5469,17 @@ func (r *ClickHouseReader) GetAllMetricFilterAttributeKeys(ctx context.Context, 
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query, common.PastDayRoundOff(), normalized, fmt.Sprintf("%%%s%%", req.SearchText)) //only showing past day data
 	if err != nil {
 		zap.L().Error("Error while executing query", zap.Error(err))
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 
 	var attributeKey string
 	for rows.Next() {
 		if err := rows.Scan(&attributeKey); err != nil {
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		key := v3.AttributeKey{
 			Key:      attributeKey,
@@ -5490,15 +5490,15 @@ func (r *ClickHouseReader) GetAllMetricFilterAttributeKeys(ctx context.Context, 
 		response = append(response, key)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	return &response, nil
 }
 
-func (r *ClickHouseReader) GetAllMetricFilterAttributeValues(ctx context.Context, req *metrics_explorer.FilterValueRequest) ([]string, *model.ApiError) {
+func (r *DatastoreReader) GetAllMetricFilterAttributeValues(ctx context.Context, req *metrics_explorer.FilterValueRequest) ([]string, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetAllMetricFilterAttributeValues",
 	})
 	var query string
@@ -5514,32 +5514,32 @@ func (r *ClickHouseReader) GetAllMetricFilterAttributeValues(ctx context.Context
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err = r.db.Query(valueCtx, query, req.FilterKey, req.FilterKey, fmt.Sprintf("%%%s%%", req.SearchText), common.PastDayRoundOff(), normalized) //only showing past day data
 
 	if err != nil {
 		zap.L().Error("Error while executing query", zap.Error(err))
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
 	var atrributeValue string
 	for rows.Next() {
 		if err := rows.Scan(&atrributeValue); err != nil {
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		attributeValues = append(attributeValues, atrributeValue)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	return attributeValues, nil
 }
 
-func (r *ClickHouseReader) GetAllMetricFilterUnits(ctx context.Context, req *metrics_explorer.FilterValueRequest) ([]string, *model.ApiError) {
+func (r *DatastoreReader) GetAllMetricFilterUnits(ctx context.Context, req *metrics_explorer.FilterValueRequest) ([]string, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetAllMetricFilterUnits",
 	})
 	var rows driver.Rows
@@ -5549,29 +5549,29 @@ func (r *ClickHouseReader) GetAllMetricFilterUnits(ctx context.Context, req *met
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
 
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query, fmt.Sprintf("%%%s%%", req.SearchText))
 	if err != nil {
 		zap.L().Error("Error while executing query", zap.Error(err))
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 
 	var attributeKey string
 	for rows.Next() {
 		if err := rows.Scan(&attributeKey); err != nil {
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		response = append(response, attributeKey)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	return response, nil
 }
-func (r *ClickHouseReader) GetAllMetricFilterTypes(ctx context.Context, req *metrics_explorer.FilterValueRequest) ([]string, *model.ApiError) {
+func (r *DatastoreReader) GetAllMetricFilterTypes(ctx context.Context, req *metrics_explorer.FilterValueRequest) ([]string, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetAllMetricFilterTypes",
 	})
 	var rows driver.Rows
@@ -5580,30 +5580,30 @@ func (r *ClickHouseReader) GetAllMetricFilterTypes(ctx context.Context, req *met
 	if req.Limit != 0 {
 		query = query + fmt.Sprintf(" LIMIT %d;", req.Limit)
 	}
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query, fmt.Sprintf("%%%s%%", req.SearchText))
 	if err != nil {
 		zap.L().Error("Error while executing query", zap.Error(err))
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 
 	var attributeKey string
 	for rows.Next() {
 		if err := rows.Scan(&attributeKey); err != nil {
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		response = append(response, attributeKey)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	return response, nil
 }
 
-func (r *ClickHouseReader) GetMetricsDataPoints(ctx context.Context, metricName string) (uint64, *model.ApiError) {
+func (r *DatastoreReader) GetMetricsDataPoints(ctx context.Context, metricName string) (uint64, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMetricsDataPoints",
 	})
 	query := fmt.Sprintf(`SELECT 
@@ -5612,18 +5612,18 @@ FROM %s.%s
 WHERE metric_name = ?
 `, observeMetricDBName, constants.O11Y_SAMPLES_V4_AGG_30M_TABLENAME)
 	var dataPoints uint64
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.QueryRow(valueCtx, query, metricName).Scan(&dataPoints)
 	if err != nil {
-		return 0, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return 0, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	return dataPoints, nil // Convert to uint64 before returning
 }
 
-func (r *ClickHouseReader) GetMetricsLastReceived(ctx context.Context, metricName string) (int64, *model.ApiError) {
+func (r *DatastoreReader) GetMetricsLastReceived(ctx context.Context, metricName string) (int64, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMetricsLastReceived",
 	})
 	query := fmt.Sprintf(`SELECT 
@@ -5632,10 +5632,10 @@ FROM %s.%s
 WHERE metric_name = ?
 `, observeMetricDBName, o11ySamplesAgg30mLocalTableName)
 	var lastReceived int64
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.QueryRow(valueCtx, query, metricName).Scan(&lastReceived)
 	if err != nil {
-		return 0, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return 0, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	query = fmt.Sprintf(`SELECT 
     MAX(unix_milli) AS last_received_time
@@ -5645,15 +5645,15 @@ WHERE metric_name = ? and unix_milli > ?
 	var finalLastReceived int64
 	err = r.db.QueryRow(valueCtx, query, metricName, lastReceived).Scan(&finalLastReceived)
 	if err != nil {
-		return 0, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return 0, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	return finalLastReceived, nil // Convert to uint64 before returning
 }
 
-func (r *ClickHouseReader) GetTotalTimeSeriesForMetricName(ctx context.Context, metricName string) (uint64, *model.ApiError) {
+func (r *DatastoreReader) GetTotalTimeSeriesForMetricName(ctx context.Context, metricName string) (uint64, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetTotalTimeSeriesForMetricName",
 	})
 	query := fmt.Sprintf(`SELECT 
@@ -5661,18 +5661,18 @@ func (r *ClickHouseReader) GetTotalTimeSeriesForMetricName(ctx context.Context, 
 FROM %s.%s
 WHERE metric_name = ?;`, observeMetricDBName, observeTSTableNameV41Week)
 	var timeSeriesCount uint64
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.QueryRow(valueCtx, query, metricName).Scan(&timeSeriesCount)
 	if err != nil {
-		return 0, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return 0, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	return timeSeriesCount, nil
 }
 
-func (r *ClickHouseReader) GetAttributesForMetricName(ctx context.Context, metricName string, start, end *int64, filters *v3.FilterSet) (*[]metrics_explorer.Attribute, *model.ApiError) {
+func (r *DatastoreReader) GetAttributesForMetricName(ctx context.Context, metricName string, start, end *int64, filters *v3.FilterSet) (*[]metrics_explorer.Attribute, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetAttributesForMetricName",
 	})
 	whereClause := ""
@@ -5718,10 +5718,10 @@ WHERE metric_name = ? AND __normalized=? %s`
 
 	query += "\nGROUP BY kv.1\nORDER BY valueCount DESC;"
 
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query, args...)
 	if err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
@@ -5729,40 +5729,40 @@ WHERE metric_name = ? AND __normalized=? %s`
 	for rows.Next() {
 		var attr metrics_explorer.Attribute
 		if err := rows.Scan(&attr.Key, &attr.Value, &attr.ValueCount); err != nil {
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		attributesList = append(attributesList, attr)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 
 	return &attributesList, nil
 }
 
-func (r *ClickHouseReader) GetActiveTimeSeriesForMetricName(ctx context.Context, metricName string, duration time.Duration) (uint64, *model.ApiError) {
+func (r *DatastoreReader) GetActiveTimeSeriesForMetricName(ctx context.Context, metricName string, duration time.Duration) (uint64, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetActiveTimeSeriesForMetricName",
 	})
 	milli := time.Now().Add(-duration).UnixMilli()
 	query := fmt.Sprintf("SELECT uniq(fingerprint) FROM %s.%s WHERE metric_name = '%s' and unix_milli >= ?", observeMetricDBName, observeTSTableNameV4, metricName)
 	var timeSeries uint64
 	// Using QueryRow instead of Select since we're only expecting a single value
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.QueryRow(valueCtx, query, milli).Scan(&timeSeries)
 	if err != nil {
-		return 0, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return 0, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	return timeSeries, nil
 }
 
-func (r *ClickHouseReader) ListSummaryMetrics(ctx context.Context, orgID valuer.UUID, req *metrics_explorer.SummaryListMetricsRequest) (*metrics_explorer.SummaryListMetricsResponse, *model.ApiError) {
+func (r *DatastoreReader) ListSummaryMetrics(ctx context.Context, orgID valuer.UUID, req *metrics_explorer.SummaryListMetricsRequest) (*metrics_explorer.SummaryListMetricsResponse, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "ListSummaryMetrics",
 	})
 	var args []interface{}
@@ -5816,14 +5816,14 @@ func (r *ClickHouseReader) ListSummaryMetrics(ctx context.Context, orgID valuer.
 
 	args = append(args, start, end)
 	args = append(args, normalized)
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	begin := time.Now()
 	rows, err := r.db.Query(valueCtx, metricsQuery, args...)
 	queryDuration := time.Since(begin)
 	zap.L().Info("Time taken to execute metrics query to fetch metrics with high time series", zap.String("query", metricsQuery), zap.Any("args", args), zap.Duration("duration", queryDuration))
 	if err != nil {
 		zap.L().Error("Error executing metrics query", zap.Error(err))
-		return &metrics_explorer.SummaryListMetricsResponse{}, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return &metrics_explorer.SummaryListMetricsResponse{}, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
@@ -5834,14 +5834,14 @@ func (r *ClickHouseReader) ListSummaryMetrics(ctx context.Context, orgID valuer.
 		var metric metrics_explorer.MetricDetail
 		if err := rows.Scan(&metric.MetricName, &metric.Description, &metric.MetricType, &metric.MetricUnit, &metric.TimeSeries, &response.Total); err != nil {
 			zap.L().Error("Error scanning metric row", zap.Error(err))
-			return &response, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return &response, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		metricNames = append(metricNames, metric.MetricName)
 		response.Metrics = append(response.Metrics, metric)
 	}
 	if err := rows.Err(); err != nil {
 		zap.L().Error("Error iterating over metric rows", zap.Error(err))
-		return &response, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return &response, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	// If no metrics were found, return early.
 	if len(metricNames) == 0 {
@@ -5928,7 +5928,7 @@ func (r *ClickHouseReader) ListSummaryMetrics(ctx context.Context, orgID valuer.
 	zap.L().Info("Time taken to execute list summary query", zap.String("query", sampleQuery), zap.Any("args", args), zap.Duration("duration", queryDuration))
 	if err != nil {
 		zap.L().Error("Error executing samples query", zap.Error(err))
-		return &response, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return &response, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
@@ -5939,13 +5939,13 @@ func (r *ClickHouseReader) ListSummaryMetrics(ctx context.Context, orgID valuer.
 		var metricName string
 		if err := rows.Scan(&samples, &metricName); err != nil {
 			zap.L().Error("Error scanning sample row", zap.Error(err))
-			return &response, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return &response, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		samplesMap[metricName] = samples
 	}
 	if err := rows.Err(); err != nil {
 		zap.L().Error("Error iterating over sample rows", zap.Error(err))
-		return &response, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return &response, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 
 	//get updated metrics data
@@ -5982,10 +5982,10 @@ func (r *ClickHouseReader) ListSummaryMetrics(ctx context.Context, orgID valuer.
 	return &response, nil
 }
 
-func (r *ClickHouseReader) GetMetricsTimeSeriesPercentage(ctx context.Context, req *metrics_explorer.TreeMapMetricsRequest) (*[]metrics_explorer.TreeMapResponseItem, *model.ApiError) {
+func (r *DatastoreReader) GetMetricsTimeSeriesPercentage(ctx context.Context, req *metrics_explorer.TreeMapMetricsRequest) (*[]metrics_explorer.TreeMapResponseItem, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMetricsTimeSeriesPercentage",
 	})
 	var args []interface{}
@@ -6037,14 +6037,14 @@ func (r *ClickHouseReader) GetMetricsTimeSeriesPercentage(ctx context.Context, r
 		normalized,
 	)
 
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	begin := time.Now()
 	rows, err := r.db.Query(valueCtx, query, args...)
 	duration := time.Since(begin)
 	zap.L().Info("Time taken to execute time series percentage query", zap.String("query", query), zap.Any("args", args), zap.Duration("duration", duration))
 	if err != nil {
 		zap.L().Error("Error executing time series percentage query", zap.Error(err), zap.String("query", query))
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
@@ -6053,24 +6053,24 @@ func (r *ClickHouseReader) GetMetricsTimeSeriesPercentage(ctx context.Context, r
 		var item metrics_explorer.TreeMapResponseItem
 		if err := rows.Scan(&item.MetricName, &item.TotalValue, &item.Percentage); err != nil {
 			zap.L().Error("Error scanning row", zap.Error(err))
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		treemap = append(treemap, item)
 	}
 
 	if err := rows.Err(); err != nil {
 		zap.L().Error("Error iterating over rows", zap.Error(err))
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 
 	return &treemap, nil
 }
 
-func (r *ClickHouseReader) GetMetricsSamplesPercentage(ctx context.Context, req *metrics_explorer.TreeMapMetricsRequest) (*[]metrics_explorer.TreeMapResponseItem, *model.ApiError) {
+func (r *DatastoreReader) GetMetricsSamplesPercentage(ctx context.Context, req *metrics_explorer.TreeMapMetricsRequest) (*[]metrics_explorer.TreeMapResponseItem, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMetricsSamplesPercentage",
 	})
 	conditions, _ := utils.BuildFilterConditions(&req.Filters, "ts")
@@ -6104,14 +6104,14 @@ func (r *ClickHouseReader) GetMetricsSamplesPercentage(ctx context.Context, req 
 		observeMetricDBName, tsTable, whereClause, queryLimit,
 	)
 
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	begin := time.Now()
 	rows, err := r.db.Query(valueCtx, metricsQuery, normalized, start, end)
 	duration := time.Since(begin)
 	zap.L().Info("Time taken to execute samples percentage metric name query to reduce search space", zap.String("query", metricsQuery), zap.Any("start", start), zap.Any("end", end), zap.Duration("duration", duration))
 	if err != nil {
 		zap.L().Error("Error executing samples percentage query", zap.Error(err))
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
@@ -6122,13 +6122,13 @@ func (r *ClickHouseReader) GetMetricsSamplesPercentage(ctx context.Context, req 
 		var timeSeries uint64
 		if err := rows.Scan(&metricName, &timeSeries); err != nil {
 			zap.L().Error("Error scanning metric row", zap.Error(err))
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		metricNames = append(metricNames, metricName)
 	}
 	if err := rows.Err(); err != nil {
 		zap.L().Error("Error iterating over metric rows", zap.Error(err))
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 
 	// If no metrics found, return early
@@ -6209,7 +6209,7 @@ func (r *ClickHouseReader) GetMetricsSamplesPercentage(ctx context.Context, req 
 	zap.L().Info("Time taken to execute samples percentage query", zap.String("query", sampleQuery), zap.Any("args", args), zap.Duration("duration", duration))
 	if err != nil {
 		zap.L().Error("Error executing samples query", zap.Error(err))
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
@@ -6219,22 +6219,22 @@ func (r *ClickHouseReader) GetMetricsSamplesPercentage(ctx context.Context, req 
 		var item metrics_explorer.TreeMapResponseItem
 		if err := rows.Scan(&item.TotalValue, &item.MetricName, &item.Percentage); err != nil {
 			zap.L().Error("Error scanning row", zap.Error(err))
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		treemap = append(treemap, item)
 	}
 	if err := rows.Err(); err != nil {
 		zap.L().Error("Error iterating over sample rows", zap.Error(err))
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 
 	return &treemap, nil
 }
 
-func (r *ClickHouseReader) GetNameSimilarity(ctx context.Context, req *metrics_explorer.RelatedMetricsRequest) (map[string]metrics_explorer.RelatedMetricsScore, *model.ApiError) {
+func (r *DatastoreReader) GetNameSimilarity(ctx context.Context, req *metrics_explorer.RelatedMetricsRequest) (map[string]metrics_explorer.RelatedMetricsScore, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetNameSimilarity",
 	})
 	start, end, tsTable, _ := utils.WhichTSTableToUse(req.Start, req.End)
@@ -6261,10 +6261,10 @@ func (r *ClickHouseReader) GetNameSimilarity(ctx context.Context, req *metrics_e
 		LIMIT 30;`,
 		observeMetricDBName, tsTable)
 
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query, req.CurrentMetricName, req.CurrentMetricName, req.CurrentMetricName, start, end, normalized)
 	if err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
@@ -6276,7 +6276,7 @@ func (r *ClickHouseReader) GetNameSimilarity(ctx context.Context, req *metrics_e
 		var temporality v3.Temporality
 		var isMonotonic bool
 		if err := rows.Scan(&metric, &metricType, &temporality, &isMonotonic, &sim); err != nil {
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		result[metric] = metrics_explorer.RelatedMetricsScore{
 			NameSimilarity: sim,
@@ -6289,10 +6289,10 @@ func (r *ClickHouseReader) GetNameSimilarity(ctx context.Context, req *metrics_e
 	return result, nil
 }
 
-func (r *ClickHouseReader) GetAttributeSimilarity(ctx context.Context, req *metrics_explorer.RelatedMetricsRequest) (map[string]metrics_explorer.RelatedMetricsScore, *model.ApiError) {
+func (r *DatastoreReader) GetAttributeSimilarity(ctx context.Context, req *metrics_explorer.RelatedMetricsRequest) (map[string]metrics_explorer.RelatedMetricsScore, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetAttributeSimilarity",
 	})
 	start, end, tsTable, _ := utils.WhichTSTableToUse(req.Start, req.End)
@@ -6317,10 +6317,10 @@ func (r *ClickHouseReader) GetAttributeSimilarity(ctx context.Context, req *metr
 		GROUP BY label_key
 		LIMIT 50`, observeMetricDBName, tsTable)
 
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, extractedLabelsQuery, req.CurrentMetricName, start, end, normalized)
 	if err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
@@ -6330,7 +6330,7 @@ func (r *ClickHouseReader) GetAttributeSimilarity(ctx context.Context, req *metr
 		var key string
 		var value []string
 		if err := rows.Scan(&key, &value); err != nil {
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		targetKeys = append(targetKeys, key)
 		targetValues = append(targetValues, value...)
@@ -6401,7 +6401,7 @@ func (r *ClickHouseReader) GetAttributeSimilarity(ctx context.Context, req *metr
 
 	rows, err = r.db.Query(valueCtx, candidateLabelsQuery, start, end, normalized)
 	if err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
@@ -6417,7 +6417,7 @@ func (r *ClickHouseReader) GetAttributeSimilarity(ctx context.Context, req *metr
 		var priorityPairsJSON string
 
 		if err := rows.Scan(&metric, &metricType, &temporality, &isMonotonic, &rawMatchCount, &weightedMatchCount, &priorityPairsJSON); err != nil {
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 
 		attributeMap[metric] = weightedMatchCount + (rawMatchCount)/10
@@ -6436,7 +6436,7 @@ func (r *ClickHouseReader) GetAttributeSimilarity(ctx context.Context, req *metr
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 
 	// Normalize the attribute similarity scores
@@ -6452,10 +6452,10 @@ func (r *ClickHouseReader) GetAttributeSimilarity(ctx context.Context, req *metr
 	return result, nil
 }
 
-func (r *ClickHouseReader) GetMetricsAllResourceAttributes(ctx context.Context, start int64, end int64) (map[string]uint64, *model.ApiError) {
+func (r *DatastoreReader) GetMetricsAllResourceAttributes(ctx context.Context, start int64, end int64) (map[string]uint64, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetMetricsAllResourceAttributes",
 	})
 	start, end, attTable, _ := utils.WhichAttributesTableToUse(start, end)
@@ -6472,10 +6472,10 @@ FROM (
 ) 
 GROUP BY key
 ORDER BY distinct_value_count DESC;`, o11yMetadataDbName, attTable)
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query, start, end)
 	if err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	attributes := make(map[string]uint64)
 	for rows.Next() {
@@ -6483,20 +6483,20 @@ ORDER BY distinct_value_count DESC;`, o11yMetadataDbName, attTable)
 		var uniqCount uint64
 
 		if err := rows.Scan(&attrs, &uniqCount); err != nil {
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 		attributes[attrs] = uniqCount
 	}
 	if err := rows.Err(); err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	return attributes, nil
 }
 
-func (r *ClickHouseReader) GetInspectMetrics(ctx context.Context, req *metrics_explorer.InspectMetricsRequest, fingerprints []string) (*metrics_explorer.InspectMetricsResponse, *model.ApiError) {
+func (r *DatastoreReader) GetInspectMetrics(ctx context.Context, req *metrics_explorer.InspectMetricsRequest, fingerprints []string) (*metrics_explorer.InspectMetricsResponse, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetInspectMetrics",
 	})
 	start, end, _, localTsTable := utils.WhichTSTableToUse(req.Start, req.End)
@@ -6524,10 +6524,10 @@ func (r *ClickHouseReader) GetInspectMetrics(ctx context.Context, req *metrics_e
                 AND unix_milli >= ?
                 AND unix_milli < ?
                 ORDER BY fingerprint DESC, unix_milli DESC`, observeMetricDBName, localTsTable, fingerprintsString)
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query, start, end, req.MetricName, start, end)
 	if err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	defer rows.Close()
 
@@ -6540,7 +6540,7 @@ func (r *ClickHouseReader) GetInspectMetrics(ctx context.Context, req *metrics_e
 		var perSeriesValue float64
 
 		if err := rows.Scan(&fingerprint, &labelsJSON, &unixMilli, &perSeriesValue); err != nil {
-			return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+			return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 		}
 
 		var labelsMap map[string]string
@@ -6579,7 +6579,7 @@ func (r *ClickHouseReader) GetInspectMetrics(ctx context.Context, req *metrics_e
 	}
 
 	if err = rows.Err(); err != nil {
-		return nil, &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return nil, &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 
 	var seriesList []v3.Series
@@ -6592,10 +6592,10 @@ func (r *ClickHouseReader) GetInspectMetrics(ctx context.Context, req *metrics_e
 	}, nil
 }
 
-func (r *ClickHouseReader) GetInspectMetricsFingerprints(ctx context.Context, attributes []string, req *metrics_explorer.InspectMetricsRequest) ([]string, *model.ApiError) {
+func (r *DatastoreReader) GetInspectMetricsFingerprints(ctx context.Context, attributes []string, req *metrics_explorer.InspectMetricsRequest) ([]string, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetInspectMetricsFingerprints",
 	})
 	// Build dynamic key selections and JSON extracts
@@ -6635,7 +6635,7 @@ LIMIT 40`, // added rand to get diff value every time we run this query
 		observeMetricDBName, tsTable,
 		whereClause,
 		strings.Join(groupBys, ", "))
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	rows, err := r.db.Query(valueCtx, query,
 		req.MetricName,
 		start,
@@ -6678,10 +6678,10 @@ LIMIT 40`, // added rand to get diff value every time we run this query
 	return fingerprints, nil
 }
 
-func (r *ClickHouseReader) UpdateMetricsMetadata(ctx context.Context, orgID valuer.UUID, req *model.UpdateMetricsMetadata) *model.ApiError {
+func (r *DatastoreReader) UpdateMetricsMetadata(ctx context.Context, orgID valuer.UUID, req *model.UpdateMetricsMetadata) *model.ApiError {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "UpdateMetricsMetadata",
 	})
 	if req.MetricType == v3.MetricTypeHistogram {
@@ -6715,10 +6715,10 @@ func (r *ClickHouseReader) UpdateMetricsMetadata(ctx context.Context, orgID valu
 	// Insert new metadata (keeping history of all updates)
 	insertQuery := fmt.Sprintf(`INSERT INTO %s.%s (metric_name, temporality, is_monotonic, type, description, unit, created_at)
 VALUES ( ?, ?, ?, ?, ?, ?, ?);`, observeMetricDBName, o11yUpdatedMetricsMetadataTable)
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.Exec(valueCtx, insertQuery, req.MetricName, req.Temporality, req.IsMonotonic, req.MetricType, req.Description, req.Unit, req.CreatedAt.UnixMilli())
 	if err != nil {
-		return &model.ApiError{Typ: "ClickHouseError", Err: err}
+		return &model.ApiError{Typ: "DatastoreError", Err: err}
 	}
 	err = r.cache.Set(ctx, orgID, constants.UpdatedMetricsMetadataCachePrefix+req.MetricName, req, 0)
 	if err != nil {
@@ -6727,10 +6727,10 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?);`, observeMetricDBName, o11yUpdatedMetricsMetadata
 	return nil
 }
 
-func (r *ClickHouseReader) CheckForLabelsInMetric(ctx context.Context, metricName string, labels []string) (bool, *model.ApiError) {
+func (r *DatastoreReader) CheckForLabelsInMetric(ctx context.Context, metricName string, labels []string) (bool, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "CheckForLabelsInMetric",
 	})
 	if len(labels) == 0 {
@@ -6755,21 +6755,21 @@ func (r *ClickHouseReader) CheckForLabelsInMetric(ctx context.Context, metricNam
 	}
 
 	var hasLE bool
-	valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+	valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 	err := r.db.QueryRow(valueCtx, query, args...).Scan(&hasLE)
 	if err != nil {
 		return false, &model.ApiError{
-			Typ: "ClickHouseError",
+			Typ: "DatastoreError",
 			Err: fmt.Errorf("error checking summary labels: %v", err),
 		}
 	}
 	return hasLE, nil
 }
 
-func (r *ClickHouseReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID valuer.UUID, metricNames ...string) (map[string]*model.UpdateMetricsMetadata, *model.ApiError) {
+func (r *DatastoreReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID valuer.UUID, metricNames ...string) (map[string]*model.UpdateMetricsMetadata, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetUpdatedMetricsMetadata",
 	})
 	cachedMetadata := make(map[string]*model.UpdateMetricsMetadata)
@@ -6805,7 +6805,7 @@ func (r *ClickHouseReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID 
 			o11yUpdatedMetricsMetadataTable,
 			metricList)
 
-		valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+		valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 		rows, err := r.db.Query(valueCtx, query)
 		if err != nil {
 			return cachedMetadata, &model.ApiError{Typ: "ClickhouseErr", Err: fmt.Errorf("error querying metrics metadata: %v", err)}
@@ -6848,7 +6848,7 @@ func (r *ClickHouseReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID 
 		query := fmt.Sprintf(`SELECT DISTINCT metric_name, type, description, temporality, is_monotonic, unit
 			FROM %s.%s 
 			WHERE metric_name IN (%s)`, observeMetricDBName, observeTSTableNameV4, metricList)
-		valueCtx := context.WithValue(ctx, "clickhouse_max_threads", constants.MetricsExplorerClickhouseThreads)
+		valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerClickhouseThreads)
 		rows, err := r.db.Query(valueCtx, query)
 		if err != nil {
 			return cachedMetadata, &model.ApiError{Typ: "ClickhouseErr", Err: fmt.Errorf("error querying time_series_v4 to get metrics metadata: %v", err)}
@@ -6880,10 +6880,10 @@ func (r *ClickHouseReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID 
 	return cachedMetadata, nil
 }
 
-func (r *ClickHouseReader) SearchTraces(ctx context.Context, params *model.SearchTracesParams) (*[]model.SearchSpansResult, error) {
+func (r *DatastoreReader) SearchTraces(ctx context.Context, params *model.SearchTracesParams) (*[]model.SearchSpansResult, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "SearchTraces",
 	})
 	searchSpansResult := []model.SearchSpansResult{
@@ -6991,7 +6991,7 @@ func (r *ClickHouseReader) SearchTraces(ctx context.Context, params *model.Searc
 	return &searchSpansResult, nil
 }
 
-func (r *ClickHouseReader) GetNormalizedStatus(
+func (r *DatastoreReader) GetNormalizedStatus(
 	ctx context.Context,
 	orgID valuer.UUID,
 	metricNames []string,
@@ -6999,7 +6999,7 @@ func (r *ClickHouseReader) GetNormalizedStatus(
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
-		instrumentationtypes.CodeNamespace:    "clickhouse-reader",
+		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetNormalizedStatus",
 	})
 	if len(metricNames) == 0 {
@@ -7064,7 +7064,7 @@ func (r *ClickHouseReader) GetNormalizedStatus(
 		set := tmp[m]
 		switch {
 		case len(set) == 0:
-			return nil, fmt.Errorf("metric %q not found in ClickHouse", m)
+			return nil, fmt.Errorf("metric %q not found in Datastore", m)
 
 		case len(set) == 2:
 			result[m] = true

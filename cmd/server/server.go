@@ -121,7 +121,7 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 				"spans", len(b.Spans),
 			)
 			// TODO(zap-ingest): write batch.Spans into telemetrystore.TelemetryStore
-			// once the SpanBatch → ClickHouse adapter lands.
+			// once the SpanBatch → Datastore adapter lands.
 			return nil
 		},
 	})

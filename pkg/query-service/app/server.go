@@ -24,7 +24,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
-	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader"
 	"github.com/hanzoai/o11y/pkg/query-service/app/cloudintegrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
@@ -87,7 +87,7 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 		return nil, err
 	}
 
-	reader := clickhouseReader.NewReader(
+	reader := datastoreReader.NewReader(
 		o11y.SQLStore,
 		o11y.TelemetryStore,
 		o11y.Prometheus,

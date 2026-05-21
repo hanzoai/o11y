@@ -106,12 +106,12 @@ func (m *alertMigrateV5) Migrate(ctx context.Context, ruleData map[string]any) b
 		}
 	}
 
-	// Migrate clickhouse queries
-	if chQueries, ok := compositeQuery["chQueries"].(map[string]any); ok && len(chQueries) > 0 && queryType == "clickhouse_sql" {
+	// Migrate datastore queries
+	if chQueries, ok := compositeQuery["chQueries"].(map[string]any); ok && len(chQueries) > 0 && queryType == "datastore_sql" {
 		for name, query := range chQueries {
 			if queryMap, ok := query.(map[string]any); ok {
 				envelope := map[string]any{
-					"type": "clickhouse_sql",
+					"type": "datastore_sql",
 					"spec": map[string]any{
 						"name":     name,
 						"query":    queryMap["query"],

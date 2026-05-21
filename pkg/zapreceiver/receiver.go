@@ -13,7 +13,7 @@
 //	rcv, err := zapreceiver.New(zapreceiver.Config{
 //	    Listen: ":4317",
 //	    OnBatch: func(ctx context.Context, b *SpanBatch) error {
-//	        return clickhouseWriter.WriteBatch(ctx, b)
+//	        return datastoreWriter.WriteBatch(ctx, b)
 //	    },
 //	})
 //	if err != nil { return err }

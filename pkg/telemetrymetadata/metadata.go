@@ -1849,7 +1849,7 @@ func (t *telemetryMetaStore) fetchMeterSourceMetricsTemporalityAndType(ctx conte
 //
 //  1. The Ceiling: 250 KB (256,000 bytes). A conservative safety limit set just below the common DB max_query_size (262KB)
 //     to guarantee the database does not reject the query.
-//     Reference: https://clickhouse.com/docs/operations/settings/settings#max_query_size
+//     Reference: https://datastore.com/docs/operations/settings/settings#max_query_size
 //
 //  2. Unit Cost: ~150 bytes per tuple. The estimated "weight" of a single lookup key, summing MetricName (40B),
 //     AttrName (30B), AttrValue (64B), and SQL syntax overhead (16B).

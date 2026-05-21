@@ -14,7 +14,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
-	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader"
 	logsV4 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v4"
 	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
 	tracesV3 "github.com/hanzoai/o11y/pkg/query-service/app/traces/v3"
@@ -1433,13 +1433,13 @@ func Test_querier_Traces_runWindowBasedListQueryDesc(t *testing.T) {
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastoreReader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup mock
-			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherRegexp)
+			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherRegexp)
 
 			// Configure mock responses
 			for _, response := range tc.queryResponses {
@@ -1454,7 +1454,7 @@ func Test_querier_Traces_runWindowBasedListQueryDesc(t *testing.T) {
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastoreReader.NewReader(
 				nil,
 				telemetryStore,
 				prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore),
@@ -1659,13 +1659,13 @@ func Test_querier_Traces_runWindowBasedListQueryAsc(t *testing.T) {
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastoreReader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup mock
-			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherRegexp)
+			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherRegexp)
 
 			// Configure mock responses
 			for _, response := range tc.queryResponses {
@@ -1679,7 +1679,7 @@ func Test_querier_Traces_runWindowBasedListQueryAsc(t *testing.T) {
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastoreReader.NewReader(
 				nil,
 				telemetryStore,
 				prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore),
@@ -1958,13 +1958,13 @@ func Test_querier_Logs_runWindowBasedListQueryDesc(t *testing.T) {
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastoreReader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup mock
-			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherRegexp)
+			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherRegexp)
 
 			// Configure mock responses
 			for _, response := range tc.queryResponses {
@@ -1978,7 +1978,7 @@ func Test_querier_Logs_runWindowBasedListQueryDesc(t *testing.T) {
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastoreReader.NewReader(
 				nil,
 				telemetryStore,
 				prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore),
@@ -2185,13 +2185,13 @@ func Test_querier_Logs_runWindowBasedListQueryAsc(t *testing.T) {
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastoreReader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup mock
-			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherRegexp)
+			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherRegexp)
 
 			// Configure mock responses
 			for _, response := range tc.queryResponses {
@@ -2205,7 +2205,7 @@ func Test_querier_Logs_runWindowBasedListQueryAsc(t *testing.T) {
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastoreReader.NewReader(
 				nil,
 				telemetryStore,
 				prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore),

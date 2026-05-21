@@ -208,7 +208,7 @@ func sortRows(rows []*v3.TableRow, builderQueries map[string]*v3.BuilderQuery, q
 	}
 }
 
-func TransformToTableForClickHouseQueries(results []*v3.Result) []*v3.Result {
+func TransformToTableForDatastoreQueries(results []*v3.Result) []*v3.Result {
 	if len(results) == 0 {
 		return []*v3.Result{}
 	}

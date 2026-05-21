@@ -90,7 +90,7 @@ func TestBaseRule_ExtractMetricAndGroupBys(t *testing.T) {
 			},
 		},
 		{
-			name:    "clickhouse multiple grouping",
+			name:    "datastore multiple grouping",
 			payload: clickHouseQueryWithGrouping,
 			wantResults: map[string]*queryfilterextractor.FilterResult{
 				"CH1": {
@@ -103,7 +103,7 @@ func TestBaseRule_ExtractMetricAndGroupBys(t *testing.T) {
 			},
 		},
 		{
-			name:    "clickhouse single grouping",
+			name:    "datastore single grouping",
 			payload: clickHouseQuerySingleGrouping,
 			wantResults: map[string]*queryfilterextractor.FilterResult{
 				"CH2": {
@@ -115,7 +115,7 @@ func TestBaseRule_ExtractMetricAndGroupBys(t *testing.T) {
 			},
 		},
 		{
-			name:    "clickhouse no grouping",
+			name:    "datastore no grouping",
 			payload: clickHouseQueryNoGrouping,
 			wantResults: map[string]*queryfilterextractor.FilterResult{
 				"CH3": {

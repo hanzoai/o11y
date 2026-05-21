@@ -21,7 +21,7 @@ func sanitizeClause(clause string) string {
 	return "AND " + clause
 }
 
-func ValidateTraces(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange) (*v3.ClickHouseQuery, error) {
+func ValidateTraces(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange) (*v3.DatastoreQuery, error) {
 	funnelSteps := funnel.Steps
 
 	// Build step data for the dynamic query builder
@@ -58,12 +58,12 @@ func ValidateTraces(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunn
 
 	query := BuildFunnelValidationQuery(steps, timeRange.StartTime, timeRange.EndTime)
 
-	return &v3.ClickHouseQuery{
+	return &v3.DatastoreQuery{
 		Query: query,
 	}, nil
 }
 
-func GetFunnelAnalytics(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange) (*v3.ClickHouseQuery, error) {
+func GetFunnelAnalytics(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange) (*v3.DatastoreQuery, error) {
 	funnelSteps := funnel.Steps
 
 	// Build step data for the dynamic query builder
@@ -108,10 +108,10 @@ func GetFunnelAnalytics(funnel *tracefunneltypes.StorableFunnel, timeRange trace
 
 	query := BuildFunnelOverviewQuery(steps, timeRange.StartTime, timeRange.EndTime)
 
-	return &v3.ClickHouseQuery{Query: query}, nil
+	return &v3.DatastoreQuery{Query: query}, nil
 }
 
-func GetFunnelStepAnalytics(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange, stepStart, stepEnd int64) (*v3.ClickHouseQuery, error) {
+func GetFunnelStepAnalytics(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange, stepStart, stepEnd int64) (*v3.DatastoreQuery, error) {
 	if stepStart == stepEnd {
 		return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "step start and end cannot be the same for /step/overview")
 	}
@@ -163,10 +163,10 @@ func GetFunnelStepAnalytics(funnel *tracefunneltypes.StorableFunnel, timeRange t
 
 	query := BuildFunnelStepOverviewQuery(steps, timeRange.StartTime, timeRange.EndTime, stepStart, stepEnd)
 
-	return &v3.ClickHouseQuery{Query: query}, nil
+	return &v3.DatastoreQuery{Query: query}, nil
 }
 
-func GetStepAnalytics(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange) (*v3.ClickHouseQuery, error) {
+func GetStepAnalytics(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange) (*v3.DatastoreQuery, error) {
 	funnelSteps := funnel.Steps
 
 	// Build step data for the dynamic query builder
@@ -203,12 +203,12 @@ func GetStepAnalytics(funnel *tracefunneltypes.StorableFunnel, timeRange tracefu
 
 	query := BuildFunnelCountQuery(steps, timeRange.StartTime, timeRange.EndTime)
 
-	return &v3.ClickHouseQuery{
+	return &v3.DatastoreQuery{
 		Query: query,
 	}, nil
 }
 
-func GetSlowestTraces(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange, stepStart, stepEnd int64) (*v3.ClickHouseQuery, error) {
+func GetSlowestTraces(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange, stepStart, stepEnd int64) (*v3.DatastoreQuery, error) {
 	funnelSteps := funnel.Steps
 	containsErrorT1 := 0
 	containsErrorT2 := 0
@@ -264,11 +264,11 @@ func GetSlowestTraces(funnel *tracefunneltypes.StorableFunnel, timeRange tracefu
 		latencyPointerT1,
 		latencyPointerT2,
 	)
-	return &v3.ClickHouseQuery{Query: query}, nil
+	return &v3.DatastoreQuery{Query: query}, nil
 }
 
 // TODO: Showing traces with error which are slow makes little sense as a product. We should show the error spans directly in the funnel chart. Rather showing traces which has drop between steps will be more relevant
-func GetErroredTraces(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange, stepStart, stepEnd int64) (*v3.ClickHouseQuery, error) {
+func GetErroredTraces(funnel *tracefunneltypes.StorableFunnel, timeRange tracefunneltypes.TimeRange, stepStart, stepEnd int64) (*v3.DatastoreQuery, error) {
 	funnelSteps := funnel.Steps
 	containsErrorT1 := 0
 	containsErrorT2 := 0
@@ -324,5 +324,5 @@ func GetErroredTraces(funnel *tracefunneltypes.StorableFunnel, timeRange tracefu
 		latencyPointerT1,
 		latencyPointerT2,
 	)
-	return &v3.ClickHouseQuery{Query: query}, nil
+	return &v3.DatastoreQuery{Query: query}, nil
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
-	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
 	"github.com/hanzoai/o11y/pkg/queryparser"
@@ -96,7 +96,7 @@ func createFirstSeenMap(metricName string, groupByFields []string, evalTime time
 
 // mergeFirstSeenMaps merges multiple first_seen maps into one
 // When the same key exists in multiple maps, it keeps the lowest value
-// which simulatest the behavior of the ClickHouse query
+// which simulatest the behavior of the Datastore query
 // finding the minimum first_seen timestamp across all groupBy attributes for a single series
 func mergeFirstSeenMaps(maps ...map[telemetrytypes.MetricMetadataLookupKey]int64) map[telemetrytypes.MetricMetadataLookupKey]int64 {
 	result := make(map[telemetrytypes.MetricMetadataLookupKey]int64)
@@ -240,13 +240,13 @@ func TestBaseRule_FilterNewSeries(t *testing.T) {
 			expectedFiltered:  []*v3.Series{}, // all should be filtered out (new series)
 		},
 		{
-			name: "all old series - ClickHouse query",
+			name: "all old series - Datastore query",
 			compositeQuery: &v3.CompositeQuery{
-				QueryType: v3.QueryTypeClickHouseSQL,
+				QueryType: v3.QueryTypeDatastoreSQL,
 				Queries: []qbtypes.QueryEnvelope{
 					{
-						Type: qbtypes.QueryTypeClickHouseSQL,
-						Spec: qbtypes.ClickHouseQuery{
+						Type: qbtypes.QueryTypeDatastoreSQL,
+						Spec: qbtypes.DatastoreQuery{
 							Name:     "CH1",
 							Query:    "SELECT service_name, env FROM metrics WHERE metric_name='request_total' GROUP BY service_name, env",
 							Disabled: false,
@@ -399,13 +399,13 @@ func TestBaseRule_FilterNewSeries(t *testing.T) {
 			}, // both should be included - svc-old is old, svc-no-metadata can't be decided
 		},
 		{
-			name: "series with partial metadata - ClickHouse",
+			name: "series with partial metadata - Datastore",
 			compositeQuery: &v3.CompositeQuery{
-				QueryType: v3.QueryTypeClickHouseSQL,
+				QueryType: v3.QueryTypeDatastoreSQL,
 				Queries: []qbtypes.QueryEnvelope{
 					{
-						Type: qbtypes.QueryTypeClickHouseSQL,
-						Spec: qbtypes.ClickHouseQuery{
+						Type: qbtypes.QueryTypeDatastoreSQL,
+						Spec: qbtypes.DatastoreQuery{
 							Name:     "CH1",
 							Query:    "SELECT service_name, env FROM metrics WHERE metric_name='request_total' GROUP BY service_name, env",
 							Disabled: false,
@@ -692,8 +692,8 @@ func TestBaseRule_FilterNewSeries(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			options := clickhouseReader.NewOptions("", "", "archiveNamespace")
-			reader := clickhouseReader.NewReader(
+			options := datastoreReader.NewOptions("", "", "archiveNamespace")
+			reader := datastoreReader.NewReader(
 				nil,
 				telemetryStore,
 				prometheustest.New(context.Background(), settings, prometheus.Config{}, telemetryStore),
