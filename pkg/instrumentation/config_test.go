@@ -13,9 +13,9 @@ import (
 )
 
 func TestNewWithEnvProvider(t *testing.T) {
-	t.Setenv("HANZO_INSTRUMENTATION_LOGS_LEVEL", "debug")
-	t.Setenv("HANZO_INSTRUMENTATION_METRICS_PORT", "1111")
-	t.Setenv("HANZO_INSTRUMENTATION_TRACES_ENABLED", "true")
+	t.Setenv("O11Y_INSTRUMENTATION_LOGS_LEVEL", "debug")
+	t.Setenv("O11Y_INSTRUMENTATION_METRICS_PORT", "1111")
+	t.Setenv("O11Y_INSTRUMENTATION_TRACES_ENABLED", "true")
 
 	conf, err := config.New(
 		context.Background(),

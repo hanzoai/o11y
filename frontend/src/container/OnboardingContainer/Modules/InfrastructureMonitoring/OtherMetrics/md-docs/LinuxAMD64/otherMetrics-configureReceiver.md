@@ -49,7 +49,7 @@ exporters:
   tls:
    insecure: false
   headers:
-   'hanzo-ingestion-key': '{{HANZO_INGESTION_KEY}}'
+   'hanzo-ingestion-key': '{{O11Y_INGESTION_KEY}}'
  logging:
   loglevel: debug
 service:

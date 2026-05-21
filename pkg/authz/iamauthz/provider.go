@@ -41,8 +41,8 @@ type provider struct {
 // IAM-backed AuthZ. Drop-in for openfgaauthz.NewProviderFactory.
 //
 // Configuration is via env:
-//   HANZO_IAM_URL  — base URL of the IAM API (default https://iam.hanzo.ai/v1).
-//   HANZO_IAM_TOKEN — bearer token used on every request (optional).
+//   O11Y_IAM_URL  — base URL of the IAM API (default https://iam.hanzo.ai/v1).
+//   O11Y_IAM_TOKEN — bearer token used on every request (optional).
 //
 // The factory does no I/O at construction time; failure modes show up
 // on the first Check call.
@@ -54,7 +54,7 @@ func NewProviderFactory(store sqlstore.SQLStore) factory.ProviderFactory[authz.A
 
 // New constructs an iamauthz provider.
 func New(store sqlstore.SQLStore) authz.AuthZ {
-	base := strings.TrimRight(os.Getenv("HANZO_IAM_URL"), "/")
+	base := strings.TrimRight(os.Getenv("O11Y_IAM_URL"), "/")
 	if base == "" {
 		base = "https://iam.hanzo.ai/v1"
 	}

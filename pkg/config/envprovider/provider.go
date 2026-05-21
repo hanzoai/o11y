@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	prefix string = "HANZO_"
+	prefix string = "O11Y_"
 	scheme string = "env"
 )
 

@@ -411,7 +411,7 @@ var testBuildLogsQueryData = []struct {
 			AggregateAttribute: v3.AttributeKey{Key: "name", DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag, IsColumn: true},
 			AggregateOperator:  v3.AggregateOperatorCountDistinct,
 			Expression:         "A",
-			OrderBy:            []v3.OrderBy{{ColumnName: "#HANZO_VALUE", Order: "ASC"}},
+			OrderBy:            []v3.OrderBy{{ColumnName: "#O11Y_VALUE", Order: "ASC"}},
 		},
 		TableName:     "logs",
 		ExpectedQuery: "SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, toFloat64(count(distinct(`attribute_string_name`))) as value from observe_logs.distributed_logs where (timestamp >= 1680066360726210000 AND timestamp <= 1680066458000000000) AND `attribute_string_name_exists`=true group by ts order by value ASC",

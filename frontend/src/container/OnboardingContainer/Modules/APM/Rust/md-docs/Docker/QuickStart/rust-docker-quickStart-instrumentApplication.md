@@ -36,7 +36,7 @@ Add `init_tracer` function to your `main.rs` file. It initializes an OpenTelemet
 
 ```rust
 fn init_tracer() -> Result<sdktrace::Tracer, TraceError> {
-    let hanzo_access_token = std::env::var("HANZO_ACCESS_TOKEN").expect("HANZO_ACCESS_TOKEN not set");
+    let hanzo_access_token = std::env::var("O11Y_ACCESS_TOKEN").expect("O11Y_ACCESS_TOKEN not set");
     let mut metadata = MetadataMap::new();
     metadata.insert(
         "hanzo-ingestion-key",
@@ -48,7 +48,7 @@ fn init_tracer() -> Result<sdktrace::Tracer, TraceError> {
             opentelemetry_otlp::new_exporter()
                 .tonic()
                 .with_metadata(metadata)
-                .with_endpoint(std::env::var("HANZO_ENDPOINT").expect("HANZO_ENDPOINT not set")),
+                .with_endpoint(std::env::var("O11Y_ENDPOINT").expect("O11Y_ENDPOINT not set")),
         )
         .with_trace_config(
             sdktrace::config().with_resource(Resource::new(vec![
@@ -77,8 +77,8 @@ In your environment file, paste the below variables which will be used in the ne
 ```rust
 PORT=3000 // If it is a web app pass port or else you can ignore this variable
 APP_NAME={{MYAPP}}
-HANZO_ENDPOINT=https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces
-HANZO_ACCESS_TOKEN={{HANZO_INGESTION_KEY}}
+O11Y_ENDPOINT=https://ingest.{{REGION}}.o11y.hanzo.ai:443/v1/traces
+O11Y_ACCESS_TOKEN={{O11Y_INGESTION_KEY}}
 ```
 
 ### Step 3: Add OpenTelemetry instrumentation

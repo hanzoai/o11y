@@ -49,7 +49,7 @@ builder.Services.AddOpenTelemetry()
                         
                         //Hanzo O11y Cloud account Ingestion key
             string headerKey = "hanzo-ingestion-key";
-            string headerValue = "{{HANZO_INGESTION_KEY}}";
+            string headerValue = "{{O11Y_INGESTION_KEY}}";
 
             string formattedHeader = $"{headerKey}={headerValue}";
             otlpOptions.Headers = formattedHeader;
@@ -73,7 +73,7 @@ This is done by configuring an OpenTelemetry [TracerProvider](https://github.com
 
 ### Step 3: Dockerize your application
 
-Since the environment variables like HANZO_INGESTION_KEY, Ingestion Endpoint and Service name are set in the `program.cs` file, you don't need to add any additional steps in your Dockerfile.
+Since the environment variables like O11Y_INGESTION_KEY, Ingestion Endpoint and Service name are set in the `program.cs` file, you don't need to add any additional steps in your Dockerfile.
 
 An **example** of a Dockerfile could look like this:
 

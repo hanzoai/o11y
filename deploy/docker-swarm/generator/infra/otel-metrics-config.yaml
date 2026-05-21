@@ -81,11 +81,11 @@ extensions:
     endpoint: 0.0.0.0:1777
 exporters:
   otlp:
-    endpoint: ${env:HANZO_COLLECTOR_ENDPOINT}
+    endpoint: ${env:O11Y_COLLECTOR_ENDPOINT}
     tls:
       insecure: true
     headers:
-      observe-access-token: ${env:HANZO_ACCESS_TOKEN}
+      observe-access-token: ${env:O11Y_ACCESS_TOKEN}
   # debug: {}
 service:
   telemetry:
