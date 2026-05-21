@@ -408,3 +408,10 @@ require (
 )
 
 replace github.com/expr-lang/expr => github.com/SigNoz/expr v1.17.7-beta
+
+// Decomplect prometheus/alertmanager from the grpc transitive. The
+// upstream tracing/ package imports otlptracegrpc which pulls
+// google.golang.org/grpc — we point at a local fork at
+// ~/work/hanzo/alertmanager that replaces tracing/tracing.go with a
+// noop. Same upstream version, same exported surface, no grpc.
+replace github.com/prometheus/alertmanager => /Users/z/work/hanzo/alertmanager

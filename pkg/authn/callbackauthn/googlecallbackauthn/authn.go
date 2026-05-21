@@ -1,3 +1,11 @@
+//go:build google
+
+// Gated behind -tags google because google.golang.org/api +
+// cloud.google.com/go/auth transitively pull github.com/google/s2a-go
+// which pulls google.golang.org/grpc. Per project rule "kill all grpc":
+// default builds use Hanzo IAM (pkg/authz/iamauthz), which handles
+// Google OIDC at the IAM layer.
+
 package googlecallbackauthn
 
 import (
