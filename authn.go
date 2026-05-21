@@ -12,23 +12,12 @@ import (
 
 // NewAuthNs returns the per-provider AuthN map for o11y.
 //
-// Default builds register only the email/password provider. Optional
-// external-identity providers (Google OIDC via googlecallbackauthn) sit
-// behind build tags because their SDKs (google.golang.org/api,
-// cloud.google.com/go/auth) transitively pull google.golang.org/grpc.
-// Hanzo IAM handles OIDC at the IAM layer for the canonical deployment.
-//
-// To re-enable Google OIDC inside o11y: build with -tags google. The
-// extra providers register in authn_google.go.
-func NewAuthNs(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
-	emailPasswordAuthN := emailpasswordauthn.New(store)
-
-	providers := map[authtypes.AuthNProvider]authn.AuthN{
-		authtypes.AuthNProviderEmailPassword: emailPasswordAuthN,
-	}
-
-	if err := registerOptionalAuthNs(ctx, providerSettings, store, providers); err != nil {
-		return nil, err
-	}
-	return providers, nil
+// Only the email/password provider is registered in o11y itself. All
+// external-identity providers (Google OIDC, SAML, OIDC discovery)
+// happen at the Hanzo IAM layer — o11y delegates via pkg/authz/iamauthz.
+// No Google SDK in the o11y dep graph.
+func NewAuthNs(_ context.Context, _ factory.ProviderSettings, store authtypes.AuthNStore, _ licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
+	return map[authtypes.AuthNProvider]authn.AuthN{
+		authtypes.AuthNProviderEmailPassword: emailpasswordauthn.New(store),
+	}, nil
 }
