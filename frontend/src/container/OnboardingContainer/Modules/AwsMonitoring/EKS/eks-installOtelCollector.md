@@ -23,7 +23,7 @@ global:
   deploymentEnvironment: <DEPLOYMENT_ENVIRONMENT>
 otelCollectorEndpoint: ingest.{region}.o11y.hanzo.ai:443
 otelInsecure: false
-hanzoApiKey: <HANZO_INGESTION_KEY>
+hanzoApiKey: <O11Y_INGESTION_KEY>
 presets:
   otlpExporter:
     enabled: true

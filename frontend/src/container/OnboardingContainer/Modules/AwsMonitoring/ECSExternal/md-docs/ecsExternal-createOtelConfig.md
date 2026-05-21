@@ -12,11 +12,11 @@ wget https://github.com/Hanzo O11y/benchmark/raw/main/ecs/otelcol-daemon.yaml
 ```
 &nbsp;
 
-Update `{region}` and `HANZO_INGESTION_KEY` values in your YAML configuration file with your Hanzo O11y cloud values mentioned below:
+Update `{region}` and `O11Y_INGESTION_KEY` values in your YAML configuration file with your Hanzo O11y cloud values mentioned below:
 
 {region} : `{{REGION}}`
 
-HANZO_INGESTION_KEY : `{{HANZO_INGESTION_KEY}}`
+O11Y_INGESTION_KEY : `{{O11Y_INGESTION_KEY}}`
 
 &nbsp;
 

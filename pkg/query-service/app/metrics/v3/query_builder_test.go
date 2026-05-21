@@ -341,8 +341,8 @@ func TestBuildQueryWithDotInMetricAndAttributes(t *testing.T) {
 				End:   1735637901000,
 				Step:  60,
 				Variables: map[string]interface{}{
-					"HANZO_START_TIME": 1735034992000,
-					"HANZO_END_TIME":   1735036792000,
+					"O11Y_START_TIME": 1735034992000,
+					"O11Y_END_TIME":   1735036792000,
 				},
 				FormatForWeb: false,
 				CompositeQuery: &v3.CompositeQuery{
@@ -412,8 +412,8 @@ func TestBuildQueryWithDotInMetricAndAttributes(t *testing.T) {
 				End:   1735637901000,
 				Step:  60,
 				Variables: map[string]interface{}{
-					"HANZO_START_TIME": 1735034992000,
-					"HANZO_END_TIME":   1735036792000,
+					"O11Y_START_TIME": 1735034992000,
+					"O11Y_END_TIME":   1735036792000,
 				},
 				FormatForWeb: false,
 				CompositeQuery: &v3.CompositeQuery{
