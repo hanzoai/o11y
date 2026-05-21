@@ -8,8 +8,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/analytics"
 	"github.com/hanzoai/o11y/pkg/authn"
 	"github.com/hanzoai/o11y/pkg/authz"
-	"github.com/hanzoai/o11y/pkg/authz/openfgaauthz"
-	"github.com/hanzoai/o11y/pkg/authz/openfgaschema"
+	"github.com/hanzoai/o11y/pkg/authz/iamauthz"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/gateway"
 	"github.com/hanzoai/o11y/pkg/gateway/noopgateway"
@@ -76,8 +75,8 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 		func(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
 			return o11y.NewAuthNs(ctx, providerSettings, store, licensing)
 		},
-		func(ctx context.Context, sqlstore sqlstore.SQLStore, _ licensing.Licensing, _ dashboard.Module) factory.ProviderFactory[authz.AuthZ, authz.Config] {
-			return openfgaauthz.NewProviderFactory(sqlstore, openfgaschema.NewSchema().Get(ctx))
+		func(_ context.Context, sqlstore sqlstore.SQLStore, _ licensing.Licensing, _ dashboard.Module) factory.ProviderFactory[authz.AuthZ, authz.Config] {
+			return iamauthz.NewProviderFactory(sqlstore)
 		},
 		func(store sqlstore.SQLStore, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser, _ querier.Querier, _ licensing.Licensing) dashboard.Module {
 			return impldashboard.NewModule(impldashboard.NewStore(store), settings, analytics, orgGetter, queryParser)
