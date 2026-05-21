@@ -1,9 +1,9 @@
-package clickhouseReader
+package datastoreReader
 
 import (
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	datastore "github.com/ClickHouse/clickhouse-go/v2"
 )
 
 type Encoding string
@@ -96,7 +96,7 @@ type namespaceConfig struct {
 }
 
 // Connecto defines how to connect to the database
-type Connector func(cfg *namespaceConfig) (clickhouse.Conn, error)
+type Connector func(cfg *namespaceConfig) (datastore.Conn, error)
 
 // Options store storage plugin related configs
 type Options struct {

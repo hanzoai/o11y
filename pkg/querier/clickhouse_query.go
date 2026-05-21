@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -23,7 +23,7 @@ type chSQLQuery struct {
 	logger         *slog.Logger
 	telemetryStore telemetrystore.TelemetryStore
 
-	query  qbtypes.ClickHouseQuery
+	query  qbtypes.DatastoreQuery
 	args   []any
 	fromMS uint64
 	toMS   uint64
@@ -36,7 +36,7 @@ var _ qbtypes.Query = (*chSQLQuery)(nil)
 func newchSQLQuery(
 	logger *slog.Logger,
 	telemetryStore telemetrystore.TelemetryStore,
-	query qbtypes.ClickHouseQuery,
+	query qbtypes.DatastoreQuery,
 	args []any,
 	tr qbtypes.TimeRange,
 	kind qbtypes.RequestType,
@@ -84,7 +84,7 @@ func (q *chSQLQuery) renderVars(query string, vars map[string]qbtypes.VariableIt
 		query = strings.Replace(query, fmt.Sprintf("$%s", k), fmt.Sprint(varsData[k]), -1)
 	}
 
-	tmpl := template.New("clickhouse-query")
+	tmpl := template.New("datastore-query")
 	tmpl, err := tmpl.Parse(query)
 	if err != nil {
 		return "", errors.WrapInternalf(err, errors.CodeInternal, "error while replacing template variables")
@@ -108,7 +108,7 @@ func (q *chSQLQuery) Execute(ctx context.Context) (*qbtypes.Result, error) {
 	totalBytes := uint64(0)
 	elapsed := time.Duration(0)
 
-	ctx = clickhouse.Context(ctx, clickhouse.WithProgress(func(p *clickhouse.Progress) {
+	ctx = datastore.Context(ctx, datastore.WithProgress(func(p *datastore.Progress) {
 		totalRows += p.Rows
 		totalBytes += p.Bytes
 		elapsed += p.Elapsed
@@ -125,7 +125,7 @@ func (q *chSQLQuery) Execute(ctx context.Context) (*qbtypes.Result, error) {
 	}
 	defer rows.Close()
 
-	// TODO: map the errors from ClickHouse to our error types
+	// TODO: map the errors from Datastore to our error types
 	payload, err := consume(rows, q.kind, nil, qbtypes.Step{}, q.query.Name)
 	if err != nil {
 		return nil, err

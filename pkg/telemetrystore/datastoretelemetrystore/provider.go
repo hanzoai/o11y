@@ -1,9 +1,9 @@
-package clickhousetelemetrystore
+package datastoretelemetrystore
 
 import (
 	"context"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -11,21 +11,21 @@ import (
 
 type provider struct {
 	settings       factory.ScopedProviderSettings
-	clickHouseConn clickhouse.Conn
+	clickHouseConn datastore.Conn
 	cluster        string
 	hooks          []telemetrystore.TelemetryStoreHook
 }
 
 func NewFactory(hookFactories ...factory.ProviderFactory[telemetrystore.TelemetryStoreHook, telemetrystore.Config]) factory.ProviderFactory[telemetrystore.TelemetryStore, telemetrystore.Config] {
-	return factory.NewProviderFactory(factory.MustNewName("clickhouse"), func(ctx context.Context, providerSettings factory.ProviderSettings, config telemetrystore.Config) (telemetrystore.TelemetryStore, error) {
+	return factory.NewProviderFactory(factory.MustNewName("datastore"), func(ctx context.Context, providerSettings factory.ProviderSettings, config telemetrystore.Config) (telemetrystore.TelemetryStore, error) {
 		return New(ctx, providerSettings, config, hookFactories...)
 	})
 }
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config telemetrystore.Config, hookFactories ...factory.ProviderFactory[telemetrystore.TelemetryStoreHook, telemetrystore.Config]) (telemetrystore.TelemetryStore, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/telemetrystore/clickhousetelemetrystore")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/telemetrystore/datastoretelemetrystore")
 
-	options, err := clickhouse.ParseDSN(config.Clickhouse.DSN)
+	options, err := datastore.ParseDSN(config.Clickhouse.DSN)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 	// This is to avoid the driver decoding issues with JSON columns
 	options.Settings["output_format_native_write_json_as_string"] = 1
 
-	chConn, err := clickhouse.Open(options)
+	chConn, err := datastore.Open(options)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 	}, nil
 }
 
-func (p *provider) ClickhouseDB() clickhouse.Conn {
+func (p *provider) ClickhouseDB() datastore.Conn {
 	return p
 }
 

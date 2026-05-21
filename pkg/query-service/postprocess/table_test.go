@@ -307,7 +307,7 @@ func TestSortRowsStability(t *testing.T) {
 	}
 }
 
-func TestTransformToTableForClickHouseQueries(t *testing.T) {
+func TestTransformToTableForDatastoreQueries(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    []*v3.Result
@@ -547,17 +547,17 @@ func TestTransformToTableForClickHouseQueries(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := TransformToTableForClickHouseQueries(tt.input)
+			result := TransformToTableForDatastoreQueries(tt.input)
 			exp, _ := json.Marshal(tt.expected)
 			got, _ := json.Marshal(result)
 			if !bytes.Equal(got, exp) {
-				t.Errorf("TransformToTableForClickHouseQueries() = %v, want %v", string(got), string(exp))
+				t.Errorf("TransformToTableForDatastoreQueries() = %v, want %v", string(got), string(exp))
 			}
 		})
 	}
 }
 
-func TestTransformToTableForClickHouseQueriesSorting(t *testing.T) {
+func TestTransformToTableForDatastoreQueriesSorting(t *testing.T) {
 	input := []*v3.Result{
 		{
 			QueryName: "B",
@@ -603,10 +603,10 @@ func TestTransformToTableForClickHouseQueriesSorting(t *testing.T) {
 		},
 	}
 
-	result := TransformToTableForClickHouseQueries(input)
+	result := TransformToTableForDatastoreQueries(input)
 	exp, _ := json.Marshal(expected)
 	got, _ := json.Marshal(result)
 	if !bytes.Equal(got, exp) {
-		t.Errorf("TransformToTableForClickHouseQueries() sorting test failed. Got %v, want %v", string(got), string(exp))
+		t.Errorf("TransformToTableForDatastoreQueries() sorting test failed. Got %v, want %v", string(got), string(exp))
 	}
 }

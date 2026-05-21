@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -38,7 +38,7 @@ func (tracker *inMemoryQueryProgressTracker) ReportQueryStarted(
 }
 
 func (tracker *inMemoryQueryProgressTracker) ReportQueryProgress(
-	queryId string, chProgress *clickhouse.Progress,
+	queryId string, chProgress *datastore.Progress,
 ) *model.ApiError {
 	queryTracker, err := tracker.getQueryTracker(queryId)
 	if err != nil {
@@ -109,13 +109,13 @@ func newQueryTracker(queryId string) *queryTracker {
 	}
 }
 
-func (qt *queryTracker) handleProgressUpdate(p *clickhouse.Progress) {
+func (qt *queryTracker) handleProgressUpdate(p *datastore.Progress) {
 	qt.lock.Lock()
 	defer qt.lock.Unlock()
 
 	if qt.isFinished {
 		zap.L().Warn(
-			"received clickhouse progress update for finished query",
+			"received datastore progress update for finished query",
 			zap.String("queryId", qt.queryId), zap.Any("progress", p),
 		)
 		return
@@ -247,7 +247,7 @@ func (ch *queryProgressSubscription) close() {
 	}
 }
 
-func updateQueryProgress(qp *model.QueryProgress, chProgress *clickhouse.Progress) {
+func updateQueryProgress(qp *model.QueryProgress, chProgress *datastore.Progress) {
 	qp.ReadRows += chProgress.Rows
 	qp.ReadBytes += chProgress.Bytes
 	qp.ElapsedMs += uint64(chProgress.Elapsed.Milliseconds())

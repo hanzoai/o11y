@@ -11,14 +11,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	cmock "github.com/srikanthccv/ClickHouse-go-mock"
+	cmock "github.com/srikanthccv/Datastore-go-mock"
 
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/cache/cachetest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
-	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader"
 	"github.com/hanzoai/o11y/pkg/query-service/common"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
@@ -495,8 +495,8 @@ func TestThresholdRuleEvalDelay(t *testing.T) {
 		}},
 		RuleCondition: &ruletypes.RuleCondition{
 			CompositeQuery: &v3.CompositeQuery{
-				QueryType: v3.QueryTypeClickHouseSQL,
-				ClickHouseQueries: map[string]*v3.ClickHouseQuery{
+				QueryType: v3.QueryTypeDatastoreSQL,
+				DatastoreQueries: map[string]*v3.DatastoreQuery{
 					"A": {
 						Query: "SELECT 1 >= {{.start_timestamp_ms}} AND 1 <= {{.end_timestamp_ms}}",
 					},
@@ -539,15 +539,15 @@ func TestThresholdRuleEvalDelay(t *testing.T) {
 
 		params, err := rule.prepareQueryRange(context.Background(), ts)
 		assert.NoError(t, err)
-		assert.Equal(t, c.expectedQuery, params.CompositeQuery.ClickHouseQueries["A"].Query, "Test case %d", idx)
+		assert.Equal(t, c.expectedQuery, params.CompositeQuery.DatastoreQueries["A"].Query, "Test case %d", idx)
 
 		secondTimeParams, err := rule.prepareQueryRange(context.Background(), ts)
 		assert.NoError(t, err)
-		assert.Equal(t, c.expectedQuery, secondTimeParams.CompositeQuery.ClickHouseQueries["A"].Query, "Test case %d", idx)
+		assert.Equal(t, c.expectedQuery, secondTimeParams.CompositeQuery.DatastoreQueries["A"].Query, "Test case %d", idx)
 	}
 }
 
-func TestThresholdRuleClickHouseTmpl(t *testing.T) {
+func TestThresholdRuleDatastoreTmpl(t *testing.T) {
 	postableRule := ruletypes.PostableRule{
 		AlertName: "Tricky Condition Tests",
 		AlertType: ruletypes.AlertTypeMetric,
@@ -558,8 +558,8 @@ func TestThresholdRuleClickHouseTmpl(t *testing.T) {
 		}},
 		RuleCondition: &ruletypes.RuleCondition{
 			CompositeQuery: &v3.CompositeQuery{
-				QueryType: v3.QueryTypeClickHouseSQL,
-				ClickHouseQueries: map[string]*v3.ClickHouseQuery{
+				QueryType: v3.QueryTypeDatastoreSQL,
+				DatastoreQueries: map[string]*v3.DatastoreQuery{
 					"A": {
 						Query: "SELECT 1 >= {{.start_timestamp_ms}} AND 1 <= {{.end_timestamp_ms}}",
 					},
@@ -601,11 +601,11 @@ func TestThresholdRuleClickHouseTmpl(t *testing.T) {
 
 		params, err := rule.prepareQueryRange(context.Background(), ts)
 		assert.NoError(t, err)
-		assert.Equal(t, c.expectedQuery, params.CompositeQuery.ClickHouseQueries["A"].Query, "Test case %d", idx)
+		assert.Equal(t, c.expectedQuery, params.CompositeQuery.DatastoreQueries["A"].Query, "Test case %d", idx)
 
 		secondTimeParams, err := rule.prepareQueryRange(context.Background(), ts)
 		assert.NoError(t, err)
-		assert.Equal(t, c.expectedQuery, secondTimeParams.CompositeQuery.ClickHouseQueries["A"].Query, "Test case %d", idx)
+		assert.Equal(t, c.expectedQuery, secondTimeParams.CompositeQuery.DatastoreQueries["A"].Query, "Test case %d", idx)
 	}
 }
 
@@ -767,7 +767,7 @@ func TestThresholdRuleUnitCombinations(t *testing.T) {
 			"summary":     "The rule threshold is set to {{$threshold}}, and the observed metric value is {{$value}}",
 		}
 
-		options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+		options := datastoreReader.NewOptions("", "", "archiveNamespace")
 		readerCache, err := cachetest.New(
 			cache.Config{
 				Provider: "memory",
@@ -778,7 +778,7 @@ func TestThresholdRuleUnitCombinations(t *testing.T) {
 			},
 		)
 		require.NoError(t, err)
-		reader := clickhouseReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Duration(time.Second), nil, readerCache, options)
+		reader := datastoreReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Duration(time.Second), nil, readerCache, options)
 		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 		rule.TemporalityMap = map[string]map[v3.Temporality]bool{
 			"observe_calls_total": {
@@ -892,8 +892,8 @@ func TestThresholdRuleNoData(t *testing.T) {
 			},
 		)
 		assert.NoError(t, err)
-		options := clickhouseReader.NewOptions("", "", "archiveNamespace")
-		reader := clickhouseReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Duration(time.Second), nil, readerCache, options)
+		options := datastoreReader.NewOptions("", "", "archiveNamespace")
+		reader := datastoreReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Duration(time.Second), nil, readerCache, options)
 
 		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 		rule.TemporalityMap = map[string]map[v3.Temporality]bool{
@@ -1012,8 +1012,8 @@ func TestThresholdRuleTracesLink(t *testing.T) {
 			"summary":     "The rule threshold is set to {{$threshold}}, and the observed metric value is {{$value}}",
 		}
 
-		options := clickhouseReader.NewOptions("", "", "archiveNamespace")
-		reader := clickhouseReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Duration(time.Second), nil, nil, options)
+		options := datastoreReader.NewOptions("", "", "archiveNamespace")
+		reader := datastoreReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Duration(time.Second), nil, nil, options)
 
 		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 		rule.TemporalityMap = map[string]map[v3.Temporality]bool{
@@ -1149,8 +1149,8 @@ func TestThresholdRuleLogsLink(t *testing.T) {
 			"summary":     "The rule threshold is set to {{$threshold}}, and the observed metric value is {{$value}}",
 		}
 
-		options := clickhouseReader.NewOptions("", "", "archiveNamespace")
-		reader := clickhouseReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Duration(time.Second), nil, nil, options)
+		options := datastoreReader.NewOptions("", "", "archiveNamespace")
+		reader := datastoreReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Duration(time.Second), nil, nil, options)
 
 		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 		rule.TemporalityMap = map[string]map[v3.Temporality]bool{
@@ -1406,7 +1406,7 @@ func TestMultipleThresholdRule(t *testing.T) {
 			"summary":     "The rule threshold is set to {{$threshold}}, and the observed metric value is {{$value}}",
 		}
 
-		options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+		options := datastoreReader.NewOptions("", "", "archiveNamespace")
 		readerCache, err := cachetest.New(
 			cache.Config{
 				Provider: "memory",
@@ -1417,7 +1417,7 @@ func TestMultipleThresholdRule(t *testing.T) {
 			},
 		)
 		require.NoError(t, err)
-		reader := clickhouseReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Second, nil, readerCache, options)
+		reader := datastoreReader.NewReader(nil, telemetryStore, prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore), "", time.Second, nil, readerCache, options)
 		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 		rule.TemporalityMap = map[string]map[v3.Temporality]bool{
 			"observe_calls_total": {
@@ -2207,7 +2207,7 @@ func TestThresholdEval_RequireMinPoints(t *testing.T) {
 				},
 			}
 
-			options := clickhouseReader.NewOptions("primaryNamespace")
+			options := datastoreReader.NewOptions("primaryNamespace")
 			readerCache, err := cachetest.New(
 				cache.Config{
 					Provider: "memory",
@@ -2220,7 +2220,7 @@ func TestThresholdEval_RequireMinPoints(t *testing.T) {
 			require.NoError(t, err)
 
 			prometheusProvider := prometheustest.New(context.Background(), instrumentationtest.New().ToProviderSettings(), prometheus.Config{}, telemetryStore)
-			reader := clickhouseReader.NewReader(nil, telemetryStore, prometheusProvider, "", time.Second, nil, readerCache, options)
+			reader := datastoreReader.NewReader(nil, telemetryStore, prometheusProvider, "", time.Second, nil, readerCache, options)
 
 			rule, err := NewThresholdRule("some-id", valuer.GenerateUUID(), &postableRule, reader, nil, logger)
 			t.Run(fmt.Sprintf("%d Version=%s, %s", idx, version, c.description), func(t *testing.T) {

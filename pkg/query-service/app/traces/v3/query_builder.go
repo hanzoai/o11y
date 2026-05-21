@@ -162,7 +162,7 @@ func buildTracesFilterQuery(fs *v3.FilterSet) (string, error) {
 				}
 			}
 			if val != nil {
-				fmtVal = utils.ClickHouseFormattedValue(val)
+				fmtVal = utils.DatastoreFormattedValue(val)
 			}
 			if operator, ok := tracesOperatorMappingV3[item.Operator]; ok {
 				switch item.Operator {
@@ -317,7 +317,7 @@ func Having(items []v3.Having) string {
 	// aggregate something and filter on that aggregate
 	var having []string
 	for _, item := range items {
-		having = append(having, fmt.Sprintf("value %s %s", item.Operator, utils.ClickHouseFormattedValue(item.Value)))
+		having = append(having, fmt.Sprintf("value %s %s", item.Operator, utils.DatastoreFormattedValue(item.Value)))
 	}
 	return strings.Join(having, " AND ")
 }

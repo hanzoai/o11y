@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
@@ -64,7 +64,7 @@ func (q *traceOperatorQuery) executeWithContext(ctx context.Context, query strin
 	totalBytes := uint64(0)
 	elapsed := time.Duration(0)
 
-	ctx = clickhouse.Context(ctx, clickhouse.WithProgress(func(p *clickhouse.Progress) {
+	ctx = datastore.Context(ctx, datastore.WithProgress(func(p *datastore.Progress) {
 		totalRows += p.Rows
 		totalBytes += p.Bytes
 		elapsed += p.Elapsed

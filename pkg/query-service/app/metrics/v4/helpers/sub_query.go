@@ -256,7 +256,7 @@ func PrepareTimeseriesFilterQuery(start, end int64, mq *v3.BuilderQuery) (string
 	var fs *v3.FilterSet = mq.Filters
 	var groupTags []v3.AttributeKey = mq.GroupBy
 
-	conditions = append(conditions, fmt.Sprintf("metric_name IN %s", utils.ClickHouseFormattedMetricNames(mq.AggregateAttribute.Key)))
+	conditions = append(conditions, fmt.Sprintf("metric_name IN %s", utils.DatastoreFormattedMetricNames(mq.AggregateAttribute.Key)))
 	conditions = append(conditions, fmt.Sprintf("temporality = '%s'", mq.Temporality))
 	if constants.IsDotMetricsEnabled {
 		conditions = append(conditions, "__normalized = false")
@@ -281,7 +281,7 @@ func PrepareTimeseriesFilterQuery(start, end int64, mq *v3.BuilderQuery) (string
 			}
 			var fmtVal string
 			if op != v3.FilterOperatorExists && op != v3.FilterOperatorNotExists {
-				fmtVal = utils.ClickHouseFormattedValue(toFormat)
+				fmtVal = utils.DatastoreFormattedValue(toFormat)
 			}
 			switch op {
 			case v3.FilterOperatorEqual:
@@ -352,7 +352,7 @@ func PrepareTimeseriesFilterQueryV3(start, end int64, mq *v3.BuilderQuery) (stri
 	var fs *v3.FilterSet = mq.Filters
 	var groupTags []v3.AttributeKey = mq.GroupBy
 
-	conditions = append(conditions, fmt.Sprintf("metric_name IN %s", utils.ClickHouseFormattedMetricNames(mq.AggregateAttribute.Key)))
+	conditions = append(conditions, fmt.Sprintf("metric_name IN %s", utils.DatastoreFormattedMetricNames(mq.AggregateAttribute.Key)))
 	conditions = append(conditions, fmt.Sprintf("temporality = '%s'", mq.Temporality))
 	if constants.IsDotMetricsEnabled {
 		conditions = append(conditions, "__normalized = false")
@@ -371,7 +371,7 @@ func PrepareTimeseriesFilterQueryV3(start, end int64, mq *v3.BuilderQuery) (stri
 			if op == v3.FilterOperatorContains || op == v3.FilterOperatorNotContains {
 				toFormat = fmt.Sprintf("%%%s%%", toFormat)
 			}
-			fmtVal := utils.ClickHouseFormattedValue(toFormat)
+			fmtVal := utils.DatastoreFormattedValue(toFormat)
 			switch op {
 			case v3.FilterOperatorEqual:
 				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') = %s", item.Key.Key, fmtVal))

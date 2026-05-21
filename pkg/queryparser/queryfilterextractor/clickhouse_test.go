@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func TestClickHouseFilterExtractor_GroupByColumns(t *testing.T) {
-	extractor := NewClickHouseFilterExtractor()
+func TestDatastoreFilterExtractor_GroupByColumns(t *testing.T) {
+	extractor := NewDatastoreFilterExtractor()
 
 	tests := []struct {
 		name               string
@@ -216,8 +216,8 @@ func TestClickHouseFilterExtractor_GroupByColumns(t *testing.T) {
 	}
 }
 
-func TestClickHouseFilterExtractor_SimpleCHQueries(t *testing.T) {
-	extractor := NewClickHouseFilterExtractor()
+func TestDatastoreFilterExtractor_SimpleCHQueries(t *testing.T) {
+	extractor := NewDatastoreFilterExtractor()
 
 	tests := []struct {
 		name               string
@@ -691,8 +691,8 @@ func TestClickHouseFilterExtractor_SimpleCHQueries(t *testing.T) {
 	}
 }
 
-func TestClickHouseFilterExtractor_SimpleCTEGroupByQueries(t *testing.T) {
-	extractor := NewClickHouseFilterExtractor()
+func TestDatastoreFilterExtractor_SimpleCTEGroupByQueries(t *testing.T) {
+	extractor := NewDatastoreFilterExtractor()
 
 	tests := []struct {
 		name               string
@@ -826,8 +826,8 @@ func TestClickHouseFilterExtractor_SimpleCTEGroupByQueries(t *testing.T) {
 	}
 }
 
-func TestClickHouseFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
-	extractor := NewClickHouseFilterExtractor()
+func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
+	extractor := NewDatastoreFilterExtractor()
 
 	tests := []struct {
 		name               string
@@ -1112,7 +1112,7 @@ func TestClickHouseFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) 
 			},
 		},
 		{
-			name: "TC6 - Outer GROUP BY with ClickHouse dialect (backticks)",
+			name: "TC6 - Outer GROUP BY with Datastore dialect (backticks)",
 			query: `
 		SELECT
 		    ` + "`os.type`" + `,
