@@ -2,7 +2,7 @@ package alertmanagertypes
 
 import (
 	"github.com/prometheus/alertmanager/config"
-	"github.com/prometheus/common/model"
+	"github.com/hanzoai/common/model"
 )
 
 func NewRouteFromRouteConfig(route *config.Route, cfg RouteConfig) (*config.Route, error) {

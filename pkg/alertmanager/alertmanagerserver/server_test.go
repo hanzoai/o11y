@@ -17,8 +17,8 @@ import (
 	"github.com/prometheus/alertmanager/api/v2/models"
 	"github.com/prometheus/alertmanager/config"
 	"github.com/prometheus/client_golang/prometheus"
-	commoncfg "github.com/prometheus/common/config"
-	"github.com/prometheus/common/model"
+	commoncfg "github.com/hanzoai/common/config"
+	"github.com/hanzoai/common/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -20,7 +20,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/kafka"
 	queues2 "github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/queues"
 	"github.com/gorilla/mux"
-	promModel "github.com/prometheus/common/model"
+	promModel "github.com/hanzoai/common/model"
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 

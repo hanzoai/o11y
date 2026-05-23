@@ -18,7 +18,7 @@ import (
 	"github.com/prometheus/alertmanager/pkg/labels"
 	"github.com/prometheus/alertmanager/provider"
 	"github.com/prometheus/alertmanager/types"
-	"github.com/prometheus/common/model"
+	"github.com/hanzoai/common/model"
 )
 
 type (
