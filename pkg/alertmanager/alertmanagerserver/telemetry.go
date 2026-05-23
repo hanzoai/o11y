@@ -4,38 +4,38 @@ package alertmanagerserver
 //
 // NOTE: This file is the prometheus/alertmanager-library boundary —
 // dispatch.NewDispatcher, silence.New, notify.NewIntegration etc. all
-// require prometheus.Registerer from prometheus/client_golang. We
+// require metric.Registerer from prometheus/client_golang. We
 // haven't replaced prometheus/alertmanager yet, so this single file
 // still pulls prometheus/client_golang.
 //
 // Everything else in o11y (instrumentation/factory/test) uses luxfi/metric.
 // The alertmanager rip is its own workstream — see project notes.
 
-import "github.com/prometheus/client_golang/prometheus"
+import "github.com/luxfi/metric"
 
 type DispatcherMetrics struct {
-	aggrGroups            prometheus.Gauge
-	processingDuration    prometheus.Summary
-	aggrGroupLimitReached prometheus.Counter
+	aggrGroups            metric.Gauge
+	processingDuration    metric.Summary
+	aggrGroupLimitReached metric.Counter
 }
 
 // NewDispatcherMetrics returns a new registered DispatchMetrics.
-func NewDispatcherMetrics(registerLimitMetrics bool, r prometheus.Registerer) *DispatcherMetrics {
+func NewDispatcherMetrics(registerLimitMetrics bool, r metric.Registerer) *DispatcherMetrics {
 	m := DispatcherMetrics{
-		aggrGroups: prometheus.NewGauge(
-			prometheus.GaugeOpts{
+		aggrGroups: metric.NewGauge(
+			metric.GaugeOpts{
 				Name: "o11y_alertmanager_dispatcher_aggregation_groups",
 				Help: "Number of active aggregation groups",
 			},
 		),
-		processingDuration: prometheus.NewSummary(
-			prometheus.SummaryOpts{
+		processingDuration: metric.NewSummary(
+			metric.SummaryOpts{
 				Name: "o11y_alertmanager_dispatcher_alert_processing_duration_seconds",
 				Help: "Summary of latencies for the processing of alerts.",
 			},
 		),
-		aggrGroupLimitReached: prometheus.NewCounter(
-			prometheus.CounterOpts{
+		aggrGroupLimitReached: metric.NewCounter(
+			metric.CounterOpts{
 				Name: "o11y_alertmanager_dispatcher_aggregation_group_limit_reached_total",
 				Help: "Number of times when dispatcher failed to create new aggregation group due to limit.",
 			},
