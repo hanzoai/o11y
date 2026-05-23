@@ -23,7 +23,7 @@ import (
 	"github.com/prometheus/alertmanager/silence"
 	"github.com/prometheus/alertmanager/template"
 	"github.com/prometheus/alertmanager/timeinterval"
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/luxfi/metric"
 	"github.com/prometheus/common/model"
 )
 
@@ -39,7 +39,7 @@ type Server struct {
 	logger *slog.Logger
 
 	// registry is the prometheus registry for the alertmanager
-	registry prometheus.Registerer
+	registry metric.Registerer
 
 	// srvConfig is the server config for the alertmanager
 	srvConfig Config
@@ -70,7 +70,7 @@ type Server struct {
 	notificationManager nfmanager.NotificationManager
 }
 
-func New(ctx context.Context, logger *slog.Logger, registry prometheus.Registerer, srvConfig Config, orgID string, stateStore alertmanagertypes.StateStore, nfManager nfmanager.NotificationManager) (*Server, error) {
+func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, srvConfig Config, orgID string, stateStore alertmanagertypes.StateStore, nfManager nfmanager.NotificationManager) (*Server, error) {
 	server := &Server{
 		logger:              logger.With("pkg", "go.observe.hanzo.ai/pkg/alertmanager/alertmanagerserver"),
 		registry:            registry,
@@ -80,8 +80,8 @@ func New(ctx context.Context, logger *slog.Logger, registry prometheus.Registere
 		stopc:               make(chan struct{}),
 		notificationManager: nfManager,
 	}
-	o11yRegisterer := prometheus.WrapRegistererWithPrefix("o11y_", registry)
-	o11yRegisterer = prometheus.WrapRegistererWith(prometheus.Labels{"org_id": server.orgID}, o11yRegisterer)
+	o11yRegisterer := metric.WrapRegistererWithPrefix("o11y_", registry)
+	o11yRegisterer = metric.WrapRegistererWith(metric.Labels{"org_id": server.orgID}, o11yRegisterer)
 	// initialize marker
 	server.marker = alertmanagertypes.NewMarker(o11yRegisterer)
 

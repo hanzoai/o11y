@@ -38,7 +38,7 @@ require (
 	github.com/knadh/koanf/providers/rawbytes v1.0.0
 	github.com/knadh/koanf/v2 v2.3.2
 	github.com/luxfi/log v1.4.3
-	github.com/luxfi/metric v1.5.1
+	github.com/luxfi/metric v1.5.7
 	github.com/luxfi/zap v0.2.0
 	github.com/mailru/easyjson v0.9.0
 	github.com/open-telemetry/opamp-go v0.22.0
