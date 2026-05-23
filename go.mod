@@ -27,6 +27,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/hanzoai/cloud v0.0.0-20260519060517-1e48ac6d14e3
+	github.com/hanzoai/common v0.67.5-hanzo.1
 	github.com/hanzoai/zip v0.1.0
 	github.com/huandu/go-sqlbuilder v1.35.0
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12
@@ -47,7 +48,6 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/alertmanager v0.31.0
 	github.com/prometheus/client_golang v1.23.2
-	github.com/prometheus/common v0.67.5
 	github.com/prometheus/prometheus v0.310.0
 	github.com/redis/go-redis/extra/redisotel/v9 v9.15.1
 	github.com/redis/go-redis/v9 v9.17.2
@@ -137,6 +137,7 @@ require (
 	github.com/mattn/go-isatty v0.0.21 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
+	github.com/prometheus/common v0.67.5 // indirect
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.15.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/swaggest/refl v1.4.0 // indirect
@@ -298,3 +299,11 @@ replace github.com/expr-lang/expr => github.com/SigNoz/expr v1.17.7-beta
 // Exclude v1 so resolution always picks the standalone module per
 // path.
 exclude github.com/knadh/koanf v1.5.0
+
+// ugorji/go pre-modules ambiguity — the pre-modules version exposes
+// the same codec path as the standalone github.com/ugorji/go/codec
+// module. Exclude the legacy non-modules tag so resolution picks the
+// canonical /codec module.
+exclude github.com/ugorji/go v0.0.0-20171122102828-84cb69a8af83
+
+exclude github.com/ugorji/go v1.1.4

@@ -6,7 +6,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
-	"github.com/prometheus/common/model"
+	"github.com/hanzoai/common/model"
 )
 
 // MockNotificationManager is a simple mock implementation of NotificationManager

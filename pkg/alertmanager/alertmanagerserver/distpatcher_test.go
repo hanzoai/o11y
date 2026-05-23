@@ -25,8 +25,8 @@ import (
 	"github.com/prometheus/alertmanager/notify"
 	"github.com/prometheus/alertmanager/provider/mem"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/common/model"
-	"github.com/prometheus/common/promslog"
+	"github.com/hanzoai/common/model"
+	"github.com/hanzoai/common/promslog"
 
 	"github.com/stretchr/testify/require"
 )

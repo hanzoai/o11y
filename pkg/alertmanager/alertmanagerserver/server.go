@@ -24,7 +24,7 @@ import (
 	"github.com/prometheus/alertmanager/template"
 	"github.com/prometheus/alertmanager/timeinterval"
 	"github.com/luxfi/metric"
-	"github.com/prometheus/common/model"
+	"github.com/hanzoai/common/model"
 )
 
 var (

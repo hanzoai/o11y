@@ -18,7 +18,7 @@ import (
 	"github.com/prometheus/alertmanager/provider"
 	"github.com/prometheus/alertmanager/store"
 	"github.com/prometheus/alertmanager/types"
-	"github.com/prometheus/common/model"
+	"github.com/hanzoai/common/model"
 )
 
 // Dispatcher sorts incoming alerts into aggregation groups and

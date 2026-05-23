@@ -6,7 +6,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/prometheus/alertmanager/config"
-	"github.com/prometheus/common/model"
+	"github.com/hanzoai/common/model"
 )
 
 type Config struct {
