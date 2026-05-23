@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
-	"github.com/prometheus/common/model"
+	"github.com/hanzoai/common/model"
 
 	amConfig "github.com/prometheus/alertmanager/config"
 
