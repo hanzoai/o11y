@@ -481,8 +481,8 @@ github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0 h1:HWRh5R2+9EifMyIHV7ZV+MIZqgz
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0/go.mod h1:JfhWUomR1baixubs02l85lZYYOm7LV6om4ceouMv45c=
 github.com/hanzoai/cloud v0.0.0-20260519060517-1e48ac6d14e3 h1:PqJ0LRSRsvNl02MX9uknaalVAotWZXREFyy/cjA+zaM=
 github.com/hanzoai/cloud v0.0.0-20260519060517-1e48ac6d14e3/go.mod h1:d9Nw4Nr1iLc5UbDJugzOrYpylEWLBbjixE5mhOhGXnk=
-github.com/hanzoai/common v0.67.5-hanzo.1 h1:oDjS//oSbti2UDOcY3Pt/nbs3KfA8Q7vSy2cdx1wUVQ=
-github.com/hanzoai/common v0.67.5-hanzo.1/go.mod h1:5bHRjMM3zyieuv0xi4S4HRlC2drcyfPGVJRQUT8moQo=
+github.com/hanzoai/common v0.67.6 h1:zlgfEqIGGzGQsZkBvTa8lIISuvnXi801w9ZzpoN1MnU=
+github.com/hanzoai/common v0.67.6/go.mod h1:5bHRjMM3zyieuv0xi4S4HRlC2drcyfPGVJRQUT8moQo=
 github.com/hanzoai/zip v0.1.0 h1:rsGLHl0cr7EBvp2EQk6KoEizBpOvgU7Uv0JP9GJ7cnw=
 github.com/hanzoai/zip v0.1.0/go.mod h1:3G+k2wy5bQ1wld66m0OPH8/LJ0kgIeNi1KPymMmlbf4=
 github.com/hashicorp/consul/api v1.12.0/go.mod h1:6pVBMo0ebnYdt2S3H87XhekM/HHrUoTD2XXb/VrZVy0=

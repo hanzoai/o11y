@@ -27,7 +27,7 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/hanzoai/cloud v0.0.0-20260519060517-1e48ac6d14e3
-	github.com/hanzoai/common v0.67.5-hanzo.1
+	github.com/hanzoai/common v0.67.6
 	github.com/hanzoai/zip v0.1.0
 	github.com/huandu/go-sqlbuilder v1.35.0
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12
