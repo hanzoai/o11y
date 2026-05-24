@@ -30,11 +30,9 @@ type Task interface {
 	Pause(b bool)
 }
 
-// newTask returns an appropriate group for
-// rule type
+// newTask returns an appropriate group for the rule type. PromQL
+// rule-tasks are removed; the only task type is TaskTypeCh
+// (datastore-SQL rule tasks).
 func newTask(taskType TaskType, name, file string, frequency time.Duration, rules []Rule, opts *ManagerOptions, notify NotifyFunc, maintenanceStore ruletypes.MaintenanceStore, orgID valuer.UUID) Task {
-	if taskType == TaskTypeCh {
-		return NewRuleTask(name, file, frequency, rules, opts, notify, maintenanceStore, orgID)
-	}
-	return NewPromRuleTask(name, file, frequency, rules, opts, notify, maintenanceStore, orgID)
+	return NewRuleTask(name, file, frequency, rules, opts, notify, maintenanceStore, orgID)
 }

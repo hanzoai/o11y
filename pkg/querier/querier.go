@@ -12,7 +12,6 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
-	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -34,7 +33,6 @@ type querier struct {
 	logger                   *slog.Logger
 	telemetryStore           telemetrystore.TelemetryStore
 	metadataStore            telemetrytypes.MetadataStore
-	promEngine               prometheus.Prometheus
 	traceStmtBuilder         qbtypes.StatementBuilder[qbtypes.TraceAggregation]
 	logStmtBuilder           qbtypes.StatementBuilder[qbtypes.LogAggregation]
 	metricStmtBuilder        qbtypes.StatementBuilder[qbtypes.MetricAggregation]
@@ -50,7 +48,6 @@ func New(
 	settings factory.ProviderSettings,
 	telemetryStore telemetrystore.TelemetryStore,
 	metadataStore telemetrytypes.MetadataStore,
-	promEngine prometheus.Prometheus,
 	traceStmtBuilder qbtypes.StatementBuilder[qbtypes.TraceAggregation],
 	logStmtBuilder qbtypes.StatementBuilder[qbtypes.LogAggregation],
 	metricStmtBuilder qbtypes.StatementBuilder[qbtypes.MetricAggregation],
@@ -63,7 +60,6 @@ func New(
 		logger:                   querierSettings.Logger(),
 		telemetryStore:           telemetryStore,
 		metadataStore:            metadataStore,
-		promEngine:               promEngine,
 		traceStmtBuilder:         traceStmtBuilder,
 		logStmtBuilder:           logStmtBuilder,
 		metricStmtBuilder:        metricStmtBuilder,
@@ -329,13 +325,7 @@ func (q *querier) QueryRange(ctx context.Context, orgID valuer.UUID, req *qbtype
 
 		switch query.Type {
 		case qbtypes.QueryTypePromQL:
-			promQuery, ok := query.Spec.(qbtypes.PromQuery)
-			if !ok {
-				return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid promql query spec %T", query.Spec)
-			}
-			promqlQuery := newPromqlQuery(q.logger, q.promEngine, promQuery, qbtypes.TimeRange{From: req.Start, To: req.End}, req.RequestType, tmplVars)
-			queries[promQuery.Name] = promqlQuery
-			steps[promQuery.Name] = promQuery.Step
+			return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "PromQL queries are not supported on this o11y build; use datastore SQL queries instead")
 		case qbtypes.QueryTypeDatastoreSQL:
 			chQuery, ok := query.Spec.(qbtypes.DatastoreQuery)
 			if !ok {
@@ -769,10 +759,6 @@ func (q *querier) executeWithCache(ctx context.Context, orgID valuer.UUID, query
 func (q *querier) createRangedQuery(originalQuery qbtypes.Query, timeRange qbtypes.TimeRange) qbtypes.Query {
 	// this is called in a goroutine, so we create a copy of the query to avoid race conditions
 	switch qt := originalQuery.(type) {
-	case *promqlQuery:
-		queryCopy := qt.query.Copy()
-		return newPromqlQuery(q.logger, q.promEngine, queryCopy, timeRange, qt.requestType, qt.vars)
-
 	case *chSQLQuery:
 		queryCopy := qt.query.Copy()
 		argsCopy := make([]any, len(qt.args))

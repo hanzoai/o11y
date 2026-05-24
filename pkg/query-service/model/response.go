@@ -8,8 +8,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/prometheus/prometheus/promql/parser"
-	"github.com/prometheus/prometheus/util/stats"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
@@ -130,17 +128,6 @@ func WrapApiError(err *ApiError, msg string) *ApiError {
 		Typ: err.Type(),
 		Err: errors.Wrap(err.ToError(), msg),
 	}
-}
-
-type QueryDataV2 struct {
-	ResultType parser.ValueType `json:"resultType"`
-	Result     parser.Value     `json:"result"`
-}
-
-type QueryData struct {
-	ResultType parser.ValueType  `json:"resultType"`
-	Result     parser.Value      `json:"result"`
-	Stats      *stats.QueryStats `json:"stats,omitempty"`
 }
 
 type RuleResponseItem struct {

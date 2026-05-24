@@ -6,7 +6,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
-	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter"
@@ -21,7 +20,6 @@ import (
 // NewFactory creates a new factory for the o11y querier provider
 func NewFactory(
 	telemetryStore telemetrystore.TelemetryStore,
-	prometheus prometheus.Prometheus,
 	cache cache.Cache,
 	flagger flagger.Flagger,
 ) factory.ProviderFactory[querier.Querier, querier.Config] {
@@ -32,7 +30,7 @@ func NewFactory(
 			settings factory.ProviderSettings,
 			cfg querier.Config,
 		) (querier.Querier, error) {
-			return newProvider(ctx, settings, cfg, telemetryStore, prometheus, cache, flagger)
+			return newProvider(ctx, settings, cfg, telemetryStore, cache, flagger)
 		},
 	)
 }
@@ -42,7 +40,6 @@ func newProvider(
 	settings factory.ProviderSettings,
 	cfg querier.Config,
 	telemetryStore telemetrystore.TelemetryStore,
-	prometheus prometheus.Prometheus,
 	cache cache.Cache,
 	flagger flagger.Flagger,
 ) (querier.Querier, error) {
@@ -165,7 +162,6 @@ func newProvider(
 		settings,
 		telemetryStore,
 		telemetryMetadataStore,
-		prometheus,
 		traceStmtBuilder,
 		logStmtBuilder,
 		metricStmtBuilder,

@@ -34,7 +34,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/app/metricsexplorer"
 	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/prometheus/prometheus/promql"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -472,8 +471,6 @@ func (aH *APIHandler) Respond(w http.ResponseWriter, data interface{}) {
 
 // RegisterRoutes registers routes for this handler on the given router
 func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/api/v1/query_range", am.ViewAccess(aH.queryRangeMetrics)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/query", am.ViewAccess(aH.queryMetrics)).Methods(http.MethodGet)
 	router.HandleFunc("/api/v1/channels", am.ViewAccess(aH.AlertmanagerAPI.ListChannels)).Methods(http.MethodGet)
 	router.HandleFunc("/api/v1/channels/{id}", am.ViewAccess(aH.AlertmanagerAPI.GetChannelByID)).Methods(http.MethodGet)
 	router.HandleFunc("/api/v1/channels/{id}", am.AdminAccess(aH.AlertmanagerAPI.UpdateChannelByID)).Methods(http.MethodPut)
@@ -1444,115 +1441,6 @@ func (aH *APIHandler) createRule(w http.ResponseWriter, r *http.Request) {
 	}
 
 	aH.Respond(w, rule)
-
-}
-
-func (aH *APIHandler) queryRangeMetrics(w http.ResponseWriter, r *http.Request) {
-
-	query, apiErrorObj := parseQueryRangeRequest(r)
-
-	if apiErrorObj != nil {
-		RespondError(w, apiErrorObj, nil)
-		return
-	}
-
-	// slog.Info(query, apiError)
-
-	ctx := r.Context()
-	if to := r.FormValue("timeout"); to != "" {
-		var cancel context.CancelFunc
-		timeout, err := parseMetricsDuration(to)
-		if aH.HandleError(w, err, http.StatusBadRequest) {
-			return
-		}
-
-		ctx, cancel = context.WithTimeout(ctx, timeout)
-		defer cancel()
-	}
-
-	res, qs, apiError := aH.reader.GetQueryRangeResult(ctx, query)
-
-	if apiError != nil {
-		RespondError(w, apiError, nil)
-		return
-	}
-
-	if res.Err != nil {
-		slog.Error("error in query range metrics", "error", res.Err)
-	}
-
-	if res.Err != nil {
-		switch res.Err.(type) {
-		case promql.ErrQueryCanceled:
-			RespondError(w, &model.ApiError{Typ: model.ErrorCanceled, Err: res.Err}, nil)
-		case promql.ErrQueryTimeout:
-			RespondError(w, &model.ApiError{Typ: model.ErrorTimeout, Err: res.Err}, nil)
-		}
-		RespondError(w, &model.ApiError{Typ: model.ErrorExec, Err: res.Err}, nil)
-		return
-	}
-
-	response_data := &model.QueryData{
-		ResultType: res.Value.Type(),
-		Result:     res.Value,
-		Stats:      qs,
-	}
-
-	aH.Respond(w, response_data)
-
-}
-
-func (aH *APIHandler) queryMetrics(w http.ResponseWriter, r *http.Request) {
-
-	queryParams, apiErrorObj := parseInstantQueryMetricsRequest(r)
-
-	if apiErrorObj != nil {
-		RespondError(w, apiErrorObj, nil)
-		return
-	}
-
-	// slog.Info(query, apiError)
-
-	ctx := r.Context()
-	if to := r.FormValue("timeout"); to != "" {
-		var cancel context.CancelFunc
-		timeout, err := parseMetricsDuration(to)
-		if aH.HandleError(w, err, http.StatusBadRequest) {
-			return
-		}
-
-		ctx, cancel = context.WithTimeout(ctx, timeout)
-		defer cancel()
-	}
-
-	res, qs, apiError := aH.reader.GetInstantQueryMetricsResult(ctx, queryParams)
-
-	if apiError != nil {
-		RespondError(w, apiError, nil)
-		return
-	}
-
-	if res.Err != nil {
-		slog.Error("error in query range metrics", "error", res.Err)
-	}
-
-	if res.Err != nil {
-		switch res.Err.(type) {
-		case promql.ErrQueryCanceled:
-			RespondError(w, &model.ApiError{Typ: model.ErrorCanceled, Err: res.Err}, nil)
-		case promql.ErrQueryTimeout:
-			RespondError(w, &model.ApiError{Typ: model.ErrorTimeout, Err: res.Err}, nil)
-		}
-		RespondError(w, &model.ApiError{Typ: model.ErrorExec, Err: res.Err}, nil)
-	}
-
-	responseData := &model.QueryData{
-		ResultType: res.Value.Type(),
-		Result:     res.Value,
-		Stats:      qs,
-	}
-
-	aH.Respond(w, responseData)
 
 }
 

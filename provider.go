@@ -30,8 +30,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/session/implsession"
 	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
-	"github.com/hanzoai/o11y/pkg/prometheus"
-	"github.com/hanzoai/o11y/pkg/prometheus/nooprometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/querier/o11yquerier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
@@ -186,19 +184,6 @@ func NewTelemetryStoreProviderFactories() factory.NamedMap[factory.ProviderFacto
 	)
 }
 
-// NewPrometheusProviderFactories wires the o11y PromQL adapter.
-//
-// Default build: nooprometheus (empty engine + empty storage). PromQL
-// over Datastore is signoz-inherited and gated behind -tags signoz —
-// the real adapter at pkg/prometheus/datastoreprometheus imports the
-// upstream prometheus/prometheus/storage/remote chain which pulls
-// google api → s2a-go → google.golang.org/grpc.
-func NewPrometheusProviderFactories(telemetryStore telemetrystore.TelemetryStore) factory.NamedMap[factory.ProviderFactory[prometheus.Prometheus, prometheus.Config]] {
-	return factory.MustNewNamedMap(
-		nooprometheus.NewFactory(telemetryStore),
-	)
-}
-
 func NewNotificationManagerProviderFactories(routeStore alertmanagertypes.RouteStore) factory.NamedMap[factory.ProviderFactory[nfmanager.NotificationManager, nfmanager.Config]] {
 	return factory.MustNewNamedMap(
 		rulebasednotification.NewFactory(routeStore),
@@ -238,9 +223,9 @@ func NewStatsReporterProviderFactories(telemetryStore telemetrystore.TelemetrySt
 	)
 }
 
-func NewQuerierProviderFactories(telemetryStore telemetrystore.TelemetryStore, prometheus prometheus.Prometheus, cache cache.Cache, flagger flagger.Flagger) factory.NamedMap[factory.ProviderFactory[querier.Querier, querier.Config]] {
+func NewQuerierProviderFactories(telemetryStore telemetrystore.TelemetryStore, cache cache.Cache, flagger flagger.Flagger) factory.NamedMap[factory.ProviderFactory[querier.Querier, querier.Config]] {
 	return factory.MustNewNamedMap(
-		o11yquerier.NewFactory(telemetryStore, prometheus, cache, flagger),
+		o11yquerier.NewFactory(telemetryStore, cache, flagger),
 	)
 }
 

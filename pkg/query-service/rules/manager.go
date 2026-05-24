@@ -21,7 +21,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
-	"github.com/hanzoai/o11y/pkg/prometheus"
 	querierV5 "github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
@@ -87,7 +86,6 @@ func prepareTaskName(ruleId interface{}) string {
 type ManagerOptions struct {
 	TelemetryStore telemetrystore.TelemetryStore
 	MetadataStore  telemetrytypes.MetadataStore
-	Prometheus     prometheus.Prometheus
 
 	Context     context.Context
 	Logger      *zap.Logger
@@ -186,31 +184,9 @@ func defaultPrepareTaskFunc(opts PrepareTaskOptions) (Task, error) {
 		task = newTask(TaskTypeCh, opts.TaskName, taskNameSuffix, evaluation.GetFrequency().Duration(), rules, opts.ManagerOpts, opts.NotifyFunc, opts.MaintenanceStore, opts.OrgID)
 
 	} else if opts.Rule.RuleType == ruletypes.RuleTypeProm {
-
-		// create promql rule
-		pr, err := NewPromRule(
-			ruleId,
-			opts.OrgID,
-			opts.Rule,
-			opts.SLogger,
-			opts.Reader,
-			opts.ManagerOpts.Prometheus,
-			WithSQLStore(opts.SQLStore),
-			WithQueryParser(opts.ManagerOpts.QueryParser),
-			WithMetadataStore(opts.ManagerOpts.MetadataStore),
-		)
-
-		if err != nil {
-			return task, err
-		}
-
-		rules = append(rules, pr)
-
-		// create promql rule task for evaluation
-		task = newTask(TaskTypeProm, opts.TaskName, taskNameSuffix, evaluation.GetFrequency().Duration(), rules, opts.ManagerOpts, opts.NotifyFunc, opts.MaintenanceStore, opts.OrgID)
-
+		return task, fmt.Errorf("rule type %s is no longer supported; convert to %s (datastore SQL)", ruletypes.RuleTypeProm, ruletypes.RuleTypeThreshold)
 	} else {
-		return nil, fmt.Errorf("unsupported rule type %s. Supported types: %s, %s", opts.Rule.RuleType, ruletypes.RuleTypeProm, ruletypes.RuleTypeThreshold)
+		return nil, fmt.Errorf("unsupported rule type %s. Supported type: %s", opts.Rule.RuleType, ruletypes.RuleTypeThreshold)
 	}
 
 	return task, nil
