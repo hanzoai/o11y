@@ -22,7 +22,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/organization/implorganization"
 	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
-	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/sharder"
@@ -55,7 +54,6 @@ type HanzoO11y struct {
 	SQLStore               sqlstore.SQLStore
 	TelemetryStore         telemetrystore.TelemetryStore
 	TelemetryMetadataStore telemetrytypes.MetadataStore
-	Prometheus             prometheus.Prometheus
 	Alertmanager           alertmanager.Alertmanager
 	Querier                querier.Querier
 	APIServer              apiserver.APIServer
@@ -201,24 +199,12 @@ func New(
 		return nil, err
 	}
 
-	// Initialize prometheus from the available prometheus provider factories
-	prometheus, err := factory.NewProviderFromNamedMap(
-		ctx,
-		providerSettings,
-		config.Prometheus,
-		NewPrometheusProviderFactories(telemetrystore),
-		config.Prometheus.Provider(),
-	)
-	if err != nil {
-		return nil, err
-	}
-
 	// Initialize querier from the available querier provider factories
 	querier, err := factory.NewProviderFromNamedMap(
 		ctx,
 		providerSettings,
 		config.Querier,
-		NewQuerierProviderFactories(telemetrystore, prometheus, cache, flagger),
+		NewQuerierProviderFactories(telemetrystore, cache, flagger),
 		config.Querier.Provider(),
 	)
 	if err != nil {
@@ -459,7 +445,6 @@ func New(
 		SQLStore:               sqlstore,
 		TelemetryStore:         telemetrystore,
 		TelemetryMetadataStore: telemetryMetadataStore,
-		Prometheus:             prometheus,
 		Alertmanager:           alertmanager,
 		Querier:                querier,
 		APIServer:              apiserver,

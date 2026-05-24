@@ -15,7 +15,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/query-service/model/metrics_explorer"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -30,8 +29,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
-	"github.com/prometheus/prometheus/promql"
-	"github.com/prometheus/prometheus/util/stats"
 
 	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
@@ -119,7 +116,6 @@ var (
 // SpanWriter for reading spans from Datastore
 type DatastoreReader struct {
 	db                      datastore.Conn
-	prometheus              prometheus.Prometheus
 	sqlDB                   sqlstore.SQLStore
 	TraceDB                 string
 	operationsTable         string
@@ -167,7 +163,6 @@ type DatastoreReader struct {
 func NewReader(
 	sqlDB sqlstore.SQLStore,
 	telemetryStore telemetrystore.TelemetryStore,
-	prometheus prometheus.Prometheus,
 	cluster string,
 	fluxIntervalForTraceDetail time.Duration,
 	cacheForTraceDetail cache.Cache,
@@ -185,7 +180,6 @@ func NewReader(
 
 	return &DatastoreReader{
 		db:                         telemetryStore.ClickhouseDB(),
-		prometheus:                 prometheus,
 		sqlDB:                      sqlDB,
 		TraceDB:                    options.primary.TraceDB,
 		operationsTable:            options.primary.OperationsTable,
@@ -225,51 +219,20 @@ func NewReader(
 	}
 }
 
-func (r *DatastoreReader) GetInstantQueryMetricsResult(ctx context.Context, queryParams *model.InstantQueryMetricsParams) (*promql.Result, *stats.QueryStats, *model.ApiError) {
-	qry, err := r.prometheus.Engine().NewInstantQuery(ctx, r.prometheus.Storage(), nil, queryParams.Query, queryParams.Time)
-	if err != nil {
-		return nil, nil, &model.ApiError{Typ: model.ErrorBadData, Err: err}
-	}
-
-	res := qry.Exec(ctx)
-
-	// Optional stats field in response if parameter "stats" is not empty.
-	var qs stats.QueryStats
-	if queryParams.Stats != "" {
-		qs = stats.NewQueryStats(qry.Stats())
-	}
-
-	qry.Close()
-	err = prometheus.RemoveExtraLabels(res, prometheus.FingerprintAsPromLabelName)
-	if err != nil {
-		return nil, nil, &model.ApiError{Typ: model.ErrorInternal, Err: err}
-	}
-	return res, &qs, nil
-
+// GetInstantQueryMetricsResult and GetQueryRangeResult were the PromQL
+// query entrypoints. PromQL support is removed in this build; callers
+// should use the Datastore SQL query path. The methods are retained as
+// stubs that always return ErrorBadData so any stale router wiring
+// surfaces a clear error instead of a nil-deref panic.
+func (r *DatastoreReader) GetInstantQueryMetricsResult(_ context.Context, _ *model.InstantQueryMetricsParams) (any, any, *model.ApiError) {
+	return nil, nil, &model.ApiError{Typ: model.ErrorBadData, Err: errPromQLRemoved}
 }
 
-func (r *DatastoreReader) GetQueryRangeResult(ctx context.Context, query *model.QueryRangeParams) (*promql.Result, *stats.QueryStats, *model.ApiError) {
-	qry, err := r.prometheus.Engine().NewRangeQuery(ctx, r.prometheus.Storage(), nil, query.Query, query.Start, query.End, query.Step)
-
-	if err != nil {
-		return nil, nil, &model.ApiError{Typ: model.ErrorBadData, Err: err}
-	}
-
-	res := qry.Exec(ctx)
-
-	// Optional stats field in response if parameter "stats" is not empty.
-	var qs stats.QueryStats
-	if query.Stats != "" {
-		qs = stats.NewQueryStats(qry.Stats())
-	}
-
-	qry.Close()
-	err = prometheus.RemoveExtraLabels(res, prometheus.FingerprintAsPromLabelName)
-	if err != nil {
-		return nil, nil, &model.ApiError{Typ: model.ErrorInternal, Err: err}
-	}
-	return res, &qs, nil
+func (r *DatastoreReader) GetQueryRangeResult(_ context.Context, _ *model.QueryRangeParams) (any, any, *model.ApiError) {
+	return nil, nil, &model.ApiError{Typ: model.ErrorBadData, Err: errPromQLRemoved}
 }
+
+var errPromQLRemoved = fmt.Errorf("promql is not supported on this o11y build; use datastore SQL")
 
 func (r *DatastoreReader) GetServicesList(ctx context.Context) (*[]string, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{

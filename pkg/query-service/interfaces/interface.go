@@ -9,13 +9,13 @@ import (
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/querycache"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/prometheus/prometheus/promql"
-	"github.com/prometheus/prometheus/util/stats"
 )
 
 type Reader interface {
-	GetInstantQueryMetricsResult(ctx context.Context, query *model.InstantQueryMetricsParams) (*promql.Result, *stats.QueryStats, *model.ApiError)
-	GetQueryRangeResult(ctx context.Context, query *model.QueryRangeParams) (*promql.Result, *stats.QueryStats, *model.ApiError)
+	// PromQL entrypoints — retained for ABI shape; this build returns
+	// ErrorBadData ("promql not supported; use datastore SQL").
+	GetInstantQueryMetricsResult(ctx context.Context, query *model.InstantQueryMetricsParams) (any, any, *model.ApiError)
+	GetQueryRangeResult(ctx context.Context, query *model.QueryRangeParams) (any, any, *model.ApiError)
 	GetTopLevelOperations(ctx context.Context, start, end time.Time, services []string) (*map[string][]string, *model.ApiError)
 	GetEntryPointOperations(ctx context.Context, query *model.GetTopOperationsParams) (*[]model.TopOperationsItem, error)
 	GetServices(ctx context.Context, query *model.GetServicesParams) (*[]model.ServiceItem, *model.ApiError)

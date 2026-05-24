@@ -62,26 +62,9 @@ func defaultTestNotification(opts PrepareTestRuleOptions) (int, *model.ApiError)
 		}
 
 	} else if parsedRule.RuleType == ruletypes.RuleTypeProm {
-
-		// create promql rule
-		rule, err = NewPromRule(
-			alertname,
-			opts.OrgID,
-			parsedRule,
-			opts.SLogger,
-			opts.Reader,
-			opts.ManagerOpts.Prometheus,
-			WithSendAlways(),
-			WithSendUnmatched(),
-			WithSQLStore(opts.SQLStore),
-			WithQueryParser(opts.ManagerOpts.QueryParser),
-			WithMetadataStore(opts.ManagerOpts.MetadataStore),
-		)
-
-		if err != nil {
-			zap.L().Error("failed to prepare a new promql rule for test", zap.Error(err))
-			return 0, model.BadRequest(err)
-		}
+		err := fmt.Errorf("promql rule testing is removed; convert rule to %s (datastore SQL)", ruletypes.RuleTypeThreshold)
+		zap.L().Error("promql rule test rejected", zap.Error(err))
+		return 0, model.BadRequest(err)
 	} else {
 		return 0, model.BadRequest(fmt.Errorf("failed to derive ruletype with given information"))
 	}
