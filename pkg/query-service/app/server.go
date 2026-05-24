@@ -21,7 +21,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	"github.com/hanzoai/o11y/pkg/licensing/nooplicensing"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
-	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
 	"github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader"
@@ -90,7 +89,6 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 	reader := datastoreReader.NewReader(
 		o11y.SQLStore,
 		o11y.TelemetryStore,
-		o11y.Prometheus,
 		o11y.TelemetryStore.Cluster(),
 		config.Querier.FluxInterval,
 		cacheForTraceDetail,
@@ -105,7 +103,6 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 		o11y.SQLStore,
 		o11y.TelemetryStore,
 		o11y.TelemetryMetadataStore,
-		o11y.Prometheus,
 		o11y.Modules.OrgGetter,
 		o11y.Querier,
 		o11y.Instrumentation.ToProviderSettings(),
@@ -339,7 +336,6 @@ func makeRulesManager(
 	sqlstore sqlstore.SQLStore,
 	telemetryStore telemetrystore.TelemetryStore,
 	metadataStore telemetrytypes.MetadataStore,
-	prometheus prometheus.Prometheus,
 	orgGetter organization.Getter,
 	querier querier.Querier,
 	providerSettings factory.ProviderSettings,
@@ -351,7 +347,6 @@ func makeRulesManager(
 	managerOpts := &rules.ManagerOptions{
 		TelemetryStore:   telemetryStore,
 		MetadataStore:    metadataStore,
-		Prometheus:       prometheus,
 		Context:          context.Background(),
 		Logger:           zap.L(),
 		Reader:           ch,

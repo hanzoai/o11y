@@ -58,7 +58,7 @@ func NewExtractor(extractorType ExtractorType) (FilterExtractor, error) {
 	case ExtractorTypeDatastoreSQL:
 		return NewDatastoreFilterExtractor(), nil
 	case ExtractorTypePromQL:
-		return NewPromQLFilterExtractor(), nil
+		return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "promql filter extractor is not supported on this o11y build; use datastore SQL filters instead")
 	default:
 		return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid extractor type: %s", extractorType)
 	}

@@ -23,7 +23,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/instrumentation"
 	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer"
 	"github.com/hanzoai/o11y/pkg/modules/user"
-	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/ruler"
 	"github.com/hanzoai/o11y/pkg/sharder"
@@ -77,9 +76,6 @@ type Config struct {
 
 	// TelemetryStore config
 	TelemetryStore telemetrystore.Config `mapstructure:"telemetrystore"`
-
-	// Prometheus config
-	Prometheus prometheus.Config `mapstructure:"prometheus"`
 
 	// Alertmanager config
 	Alertmanager alertmanager.Config `mapstructure:"alertmanager" yaml:"alertmanager"`
@@ -164,7 +160,6 @@ func NewConfig(ctx context.Context, logger *slog.Logger, resolverConfig config.R
 		sqlschema.NewConfigFactory(),
 		apiserver.NewConfigFactory(),
 		telemetrystore.NewConfigFactory(),
-		prometheus.NewConfigFactory(),
 		alertmanager.NewConfigFactory(),
 		querier.NewConfigFactory(),
 		ruler.NewConfigFactory(),

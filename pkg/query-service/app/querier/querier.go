@@ -118,31 +118,14 @@ func (q *querier) execDatastoreQuery(ctx context.Context, query string) ([]*v3.S
 	return result, err
 }
 
-func (q *querier) execPromQuery(ctx context.Context, params *model.QueryRangeParams) ([]*v3.Series, error) {
+func (q *querier) execPromQuery(_ context.Context, params *model.QueryRangeParams) ([]*v3.Series, error) {
 	q.queriesExecuted = append(q.queriesExecuted, params.Query)
 	if q.testingMode && q.reader == nil {
 		q.timeRanges = append(q.timeRanges, []int{int(params.Start.UnixMilli()), int(params.End.UnixMilli())})
 		return q.returnedSeries, q.returnedErr
 	}
-	promResult, _, err := q.reader.GetQueryRangeResult(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-	matrix, promErr := promResult.Matrix()
-	if promErr != nil {
-		return nil, promErr
-	}
-	var seriesList []*v3.Series
-	for _, v := range matrix {
-		var s v3.Series
-		s.Labels = v.Metric.Copy().Map()
-		for idx := range v.Floats {
-			p := v.Floats[idx]
-			s.Points = append(s.Points, v3.Point{Timestamp: p.T, Value: p.F})
-		}
-		seriesList = append(seriesList, &s)
-	}
-	return seriesList, nil
+	// PromQL queries are no longer supported on this o11y build.
+	return nil, fmt.Errorf("promql is not supported on this o11y build; use datastore SQL")
 }
 
 func (q *querier) runBuilderQueries(ctx context.Context, orgID valuer.UUID, params *v3.QueryRangeParamsV3) ([]*v3.Result, map[string]error, error) {
