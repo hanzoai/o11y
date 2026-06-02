@@ -6,9 +6,13 @@ import { MemoryRouter } from 'react-router-dom';
 import { render as rtlRender, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PANEL_TYPES } from 'constants/queryBuilder';
+import {
+	FillMode,
+	LineInterpolation,
+	LineStyle,
+} from 'lib/uPlotV2/config/types';
 import { AppContext } from 'providers/App/App';
 import { IAppContext } from 'providers/App/types';
-import { DashboardProvider } from 'providers/Dashboard/Dashboard';
 import { ErrorModalProvider } from 'providers/ErrorModalProvider';
 import { QueryBuilderProvider } from 'providers/QueryBuilder';
 import configureStore from 'redux-mock-store';
@@ -96,9 +100,7 @@ const render = (ui: React.ReactElement): ReturnType<typeof rtlRender> =>
 				<Provider store={createMockStore()}>
 					<AppContext.Provider value={createMockAppContext() as IAppContext}>
 						<ErrorModalProvider>
-							<DashboardProvider>
-								<QueryBuilderProvider>{ui}</QueryBuilderProvider>
-							</DashboardProvider>
+							<QueryBuilderProvider>{ui}</QueryBuilderProvider>
 						</ErrorModalProvider>
 					</AppContext.Provider>
 				</Provider>
@@ -111,14 +113,16 @@ jest.mock('hooks/queryBuilder/useCreateAlerts', () => ({
 	default: jest.fn(() => jest.fn()),
 }));
 
-jest.mock('lucide-react', () => ({
-	...jest.requireActual('lucide-react'),
-	ConciergeBell: (): JSX.Element => <svg data-testid="lucide-concierge-bell" />,
-	SquareArrowOutUpRight: (): JSX.Element => (
-		<svg data-testid="lucide-square-arrow-out-up-right" />
-	),
-	Plus: (): JSX.Element => <svg data-testid="lucide-plus" />,
-}));
+jest.mock('@signozhq/icons', () => {
+	const { createIconsMock } = jest.requireActual<
+		typeof import('test-mocks/createIconsMock')
+	>('test-mocks/createIconsMock');
+	return createIconsMock({
+		SquareArrowOutUpRight: (): JSX.Element => (
+			<svg data-testid="lucide-square-arrow-out-up-right" />
+		),
+	});
+});
 
 describe('RightContainer - Alerts Section', () => {
 	const defaultProps: RightContainerProps = {
@@ -168,6 +172,16 @@ describe('RightContainer - Alerts Section', () => {
 		setContextLinks: jest.fn(),
 		enableDrillDown: false,
 		isNewDashboard: false,
+		lineInterpolation: LineInterpolation.Spline,
+		fillMode: FillMode.None,
+		lineStyle: LineStyle.Solid,
+		setLineInterpolation: jest.fn(),
+		setFillMode: jest.fn(),
+		setLineStyle: jest.fn(),
+		showPoints: false,
+		setShowPoints: jest.fn(),
+		spanGaps: false,
+		setSpanGaps: jest.fn(),
 	};
 
 	beforeEach(() => {
@@ -179,7 +193,7 @@ describe('RightContainer - Alerts Section', () => {
 
 		const alertsSection = screen.getByText('Alerts').closest('section');
 		expect(alertsSection).toBeInTheDocument();
-		expect(alertsSection).toHaveClass('alerts');
+		expect(alertsSection).toHaveClass('alerts-section');
 	});
 
 	it('renders alerts section with correct text and SquareArrowOutUpRight icon', () => {
@@ -193,8 +207,9 @@ describe('RightContainer - Alerts Section', () => {
 
 	it('calls onCreateAlertsHandler when alerts section is clicked', async () => {
 		const mockCreateAlertsHandler = jest.fn();
-		const useCreateAlerts = jest.requireMock('hooks/queryBuilder/useCreateAlerts')
-			.default;
+		const useCreateAlerts = jest.requireMock(
+			'hooks/queryBuilder/useCreateAlerts',
+		).default;
 		useCreateAlerts.mockReturnValue(mockCreateAlertsHandler);
 
 		render(<RightContainer {...defaultProps} />);
@@ -208,8 +223,9 @@ describe('RightContainer - Alerts Section', () => {
 	});
 
 	it('passes correct parameters to useCreateAlerts hook', () => {
-		const useCreateAlerts = jest.requireMock('hooks/queryBuilder/useCreateAlerts')
-			.default;
+		const useCreateAlerts = jest.requireMock(
+			'hooks/queryBuilder/useCreateAlerts',
+		).default;
 
 		render(<RightContainer {...defaultProps} />);
 

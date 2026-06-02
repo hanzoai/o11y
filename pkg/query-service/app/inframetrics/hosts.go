@@ -427,7 +427,7 @@ func (h *HostsRepo) GetHostList(ctx context.Context, orgID valuer.UUID, req mode
 
 	step := int64(math.Max(float64(common.MinAllowedStepInterval(req.Start, req.End)), 60))
 	if step <= 0 {
-		zap.L().Error("step is less than or equal to 0", zap.Int64("step", step))
+		slog.ErrorContext(ctx, "step is less than or equal to 0", "step", step)
 		return resp, errors.New("step is less than or equal to 0")
 	}
 

@@ -87,7 +87,7 @@ func (q *queryCache) FindMissingTimeRangesV2(orgID valuer.UUID, start, end int64
 		return cachedSeriesDataList[i].Start < cachedSeriesDataList[j].Start
 	})
 
-	zap.L().Info("Number of non-overlapping cached series data", zap.Int("count", len(cachedSeriesDataList)))
+	slog.Info("number of non-overlapping cached series data", "count", len(cachedSeriesDataList))
 
 	// Exclude the flux interval from the cached end time
 
@@ -180,7 +180,7 @@ func (q *queryCache) FindMissingTimeRanges(orgID valuer.UUID, start, end, step i
 		return cachedSeriesDataList[i].Start < cachedSeriesDataList[j].Start
 	})
 
-	zap.L().Info("Number of non-overlapping cached series data", zap.Int("count", len(cachedSeriesDataList)))
+	slog.Info("number of non-overlapping cached series data", "count", len(cachedSeriesDataList))
 
 	// Exclude the flux interval from the cached end time
 
@@ -291,7 +291,7 @@ func (q *queryCache) storeMergedData(orgID valuer.UUID, cacheKey string, mergedD
 	cacheableSeriesData := CacheableSeriesData{Series: mergedData}
 	err := q.cache.Set(context.TODO(), orgID, cacheKey, &cacheableSeriesData, 0)
 	if err != nil {
-		zap.L().Error("error storing merged data", zap.Error(err))
+		slog.Error("error storing merged data", errors.Attr(err))
 	}
 }
 

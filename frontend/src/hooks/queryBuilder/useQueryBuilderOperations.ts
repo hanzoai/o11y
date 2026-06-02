@@ -12,6 +12,8 @@ import {
 	ATTRIBUTE_TYPES,
 	initialAutocompleteData,
 	initialQueryBuilderFormValuesMap,
+	listViewInitialLogQuery,
+	listViewInitialTraceQuery,
 	mapOfFormulaToFilters,
 	mapOfQueryFilters,
 	PANEL_TYPES,
@@ -23,10 +25,6 @@ import {
 	metricsUnknownSpaceAggregateOperatorOptions,
 	metricsUnknownTimeAggregateOperatorOptions,
 } from 'constants/queryBuilderOperators';
-import {
-	listViewInitialLogQuery,
-	listViewInitialTraceQuery,
-} from 'container/DashboardContainer/ComponentsSlider/constants';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { getMetricsOperatorsByAttributeType } from 'lib/newQueryBuilder/getMetricsOperatorsByAttributeType';
 import { getOperatorsBySourceAndPanelType } from 'lib/newQueryBuilder/getOperatorsBySourceAndPanelType';
@@ -122,7 +120,7 @@ export const useQueryOperations: UseQueryOperations = ({
 				(acc, item) => {
 					if (
 						filterConfigs &&
-						filterConfigs[item.field as typeof additionalFiltersKeys[number]]
+						filterConfigs[item.field as (typeof additionalFiltersKeys)[number]]
 							?.isHidden
 					) {
 						return acc;
@@ -145,10 +143,8 @@ export const useQueryOperations: UseQueryOperations = ({
 		string[]
 	>(getNewListOfAdditionalFilters(dataSource, true));
 
-	const [
-		listOfAdditionalFormulaFilters,
-		setListOfAdditionalFormulaFilters,
-	] = useState<string[]>(getNewListOfAdditionalFilters(dataSource, false));
+	const [listOfAdditionalFormulaFilters, setListOfAdditionalFormulaFilters] =
+		useState<string[]>(getNewListOfAdditionalFilters(dataSource, false));
 
 	const handleChangeOperator = useCallback(
 		(value: string): void => {
@@ -220,7 +216,7 @@ export const useQueryOperations: UseQueryOperations = ({
 						panelType: panelType || PANEL_TYPES.TIME_SERIES,
 						aggregateAttributeType:
 							(aggregateAttribute?.type as ATTRIBUTE_TYPES) || ATTRIBUTE_TYPES.GAUGE,
-				  });
+					});
 
 			switch (aggregateAttribute?.type) {
 				case ATTRIBUTE_TYPES.SUM:
@@ -532,32 +528,31 @@ export const useQueryOperations: UseQueryOperations = ({
 		index,
 	]);
 
-	const handleChangeQueryData:
-		| HandleChangeQueryData
-		| HandleChangeQueryDataV5 = useCallback(
-		(key: string, value: any) => {
-			const newQuery = {
-				...query,
-				[key]:
-					key === LEGEND && typeof value === 'string'
-						? getFormatedLegend(value)
-						: value,
-			};
+	const handleChangeQueryData: HandleChangeQueryData | HandleChangeQueryDataV5 =
+		useCallback(
+			(key: string, value: any) => {
+				const newQuery = {
+					...query,
+					[key]:
+						key === LEGEND && typeof value === 'string'
+							? getFormatedLegend(value)
+							: value,
+				};
 
-			if (isForTraceOperator) {
-				handleSetTraceOperatorData(index, newQuery);
-			} else {
-				handleSetQueryData(index, newQuery);
-			}
-		},
-		[
-			query,
-			index,
-			handleSetQueryData,
-			handleSetTraceOperatorData,
-			isForTraceOperator,
-		],
-	);
+				if (isForTraceOperator) {
+					handleSetTraceOperatorData(index, newQuery);
+				} else {
+					handleSetQueryData(index, newQuery);
+				}
+			},
+			[
+				query,
+				index,
+				handleSetQueryData,
+				handleSetTraceOperatorData,
+				isForTraceOperator,
+			],
+		);
 
 	const handleChangeFormulaData: HandleChangeFormulaData = useCallback(
 		(key, value) => {

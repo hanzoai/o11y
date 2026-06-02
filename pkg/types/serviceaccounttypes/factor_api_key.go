@@ -2,6 +2,7 @@ package serviceaccounttypes
 
 import (
 	"encoding/json"
+	"regexp"
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/errors"
@@ -11,31 +12,27 @@ import (
 )
 
 var (
-	ErrCodeServiceAccountFactorAPIkeyInvalidInput  = errors.MustNewCode("service_account_factor_api_key_invalid_input")
-	ErrCodeServiceAccountFactorAPIKeyAlreadyExists = errors.MustNewCode("service_account_factor_api_key_already_exists")
-	ErrCodeServiceAccounFactorAPIKeytNotFound      = errors.MustNewCode("service_account_factor_api_key_not_found")
+	factorAPIKeyNameRegex = regexp.MustCompile("^[a-z][a-z0-9-]{0,79}$")
 )
 
-type StorableFactorAPIKey struct {
-	bun.BaseModel `bun:"table:factor_api_key"`
-
-	types.Identifiable
-	types.TimeAuditable
-	Name             string    `bun:"name"`
-	Key              string    `bun:"key"`
-	ExpiresAt        uint64    `bun:"expires_at"`
-	LastUsed         time.Time `bun:"last_used"`
-	ServiceAccountID string    `bun:"service_account_id"`
-}
+var (
+	ErrCodeAPIKeyInvalidInput  = errors.MustNewCode("api_key_invalid_input")
+	ErrCodeAPIKeyAlreadyExists = errors.MustNewCode("api_key_already_exists")
+	ErrCodeAPIKeytNotFound     = errors.MustNewCode("api_key_not_found")
+	ErrCodeAPIKeyExpired       = errors.MustNewCode("api_key_expired")
+	errInvalidAPIKeyName       = errors.New(errors.TypeInvalidInput, ErrCodeAPIKeyInvalidInput, "name must start with a lowercase letter (a-z), contain only lowercase letters, numbers (0-9), and hyphens (-), and be at most 80 characters long")
+)
 
 type FactorAPIKey struct {
+	bun.BaseModel `bun:"table:factor_api_key,alias:factor_api_key"`
+
 	types.Identifiable
 	types.TimeAuditable
-	Name             string      `json:"name" requrired:"true"`
-	Key              string      `json:"key" required:"true"`
-	ExpiresAt        uint64      `json:"expires_at" required:"true"`
-	LastUsed         time.Time   `json:"last_used" required:"true"`
-	ServiceAccountID valuer.UUID `json:"service_account_id" required:"true"`
+	Name             string      `bun:"name"`
+	Key              string      `bun:"key"`
+	ExpiresAt        uint64      `bun:"expires_at"`
+	LastObservedAt   time.Time   `bun:"last_observed_at"`
+	ServiceAccountID valuer.UUID `bun:"service_account_id"`
 }
 
 type GettableFactorAPIKeyWithKey struct {
@@ -47,53 +44,19 @@ type GettableFactorAPIKey struct {
 	types.Identifiable
 	types.TimeAuditable
 	Name             string      `json:"name" requrired:"true"`
-	ExpiresAt        uint64      `json:"expires_at" required:"true"`
-	LastUsed         time.Time   `json:"last_used" required:"true"`
-	ServiceAccountID valuer.UUID `json:"service_account_id" required:"true"`
+	ExpiresAt        uint64      `json:"expiresAt" required:"true"`
+	LastObservedAt   time.Time   `json:"lastObservedAt" required:"true"`
+	ServiceAccountID valuer.UUID `json:"serviceAccountId" required:"true"`
 }
 
 type PostableFactorAPIKey struct {
 	Name      string `json:"name" required:"true"`
-	ExpiresAt uint64 `json:"expires_at" required:"true"`
+	ExpiresAt uint64 `json:"expiresAt" required:"true"`
 }
 
 type UpdatableFactorAPIKey struct {
 	Name      string `json:"name" required:"true"`
-	ExpiresAt uint64 `json:"expires_at" required:"true"`
-}
-
-func NewFactorAPIKeyFromStorable(storable *StorableFactorAPIKey) *FactorAPIKey {
-	return &FactorAPIKey{
-		Identifiable:     storable.Identifiable,
-		TimeAuditable:    storable.TimeAuditable,
-		Name:             storable.Name,
-		Key:              storable.Key,
-		ExpiresAt:        storable.ExpiresAt,
-		LastUsed:         storable.LastUsed,
-		ServiceAccountID: valuer.MustNewUUID(storable.ServiceAccountID),
-	}
-}
-
-func NewFactorAPIKeyFromStorables(storables []*StorableFactorAPIKey) []*FactorAPIKey {
-	factorAPIKeys := make([]*FactorAPIKey, len(storables))
-
-	for idx, storable := range storables {
-		factorAPIKeys[idx] = NewFactorAPIKeyFromStorable(storable)
-	}
-
-	return factorAPIKeys
-}
-
-func NewStorableFactorAPIKey(factorAPIKey *FactorAPIKey) *StorableFactorAPIKey {
-	return &StorableFactorAPIKey{
-		Identifiable:     factorAPIKey.Identifiable,
-		TimeAuditable:    factorAPIKey.TimeAuditable,
-		Name:             factorAPIKey.Name,
-		Key:              factorAPIKey.Key,
-		ExpiresAt:        factorAPIKey.ExpiresAt,
-		LastUsed:         factorAPIKey.LastUsed,
-		ServiceAccountID: factorAPIKey.ServiceAccountID.String(),
-	}
+	ExpiresAt uint64 `json:"expiresAt" required:"true"`
 }
 
 func NewGettableFactorAPIKeys(keys []*FactorAPIKey) []*GettableFactorAPIKey {
@@ -105,7 +68,7 @@ func NewGettableFactorAPIKeys(keys []*FactorAPIKey) []*GettableFactorAPIKey {
 			TimeAuditable:    key.TimeAuditable,
 			Name:             key.Name,
 			ExpiresAt:        key.ExpiresAt,
-			LastUsed:         key.LastUsed,
+			LastObservedAt:   key.LastObservedAt,
 			ServiceAccountID: key.ServiceAccountID,
 		}
 	}
@@ -122,10 +85,23 @@ func NewGettableFactorAPIKeyWithKey(id valuer.UUID, key string) *GettableFactorA
 	}
 }
 
-func (apiKey *FactorAPIKey) Update(name string, expiresAt uint64) {
+func (apiKey *FactorAPIKey) Update(name string, expiresAt uint64) error {
 	apiKey.Name = name
 	apiKey.ExpiresAt = expiresAt
 	apiKey.UpdatedAt = time.Now()
+	return nil
+}
+
+func (apiKey *FactorAPIKey) IsExpired() error {
+	if apiKey.ExpiresAt == 0 {
+		return nil
+	}
+
+	if time.Now().After(time.Unix(int64(apiKey.ExpiresAt), 0)) {
+		return errors.New(errors.TypeUnauthenticated, ErrCodeAPIKeyExpired, "api key has been expired")
+	}
+
+	return nil
 }
 
 func (key *PostableFactorAPIKey) UnmarshalJSON(data []byte) error {
@@ -136,8 +112,12 @@ func (key *PostableFactorAPIKey) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if temp.Name == "" {
-		return errors.New(errors.TypeInvalidInput, ErrCodeServiceAccountFactorAPIkeyInvalidInput, "name cannot be empty")
+	if match := factorAPIKeyNameRegex.MatchString(temp.Name); !match {
+		return errInvalidAPIKeyName
+	}
+
+	if temp.ExpiresAt != 0 && time.Now().After(time.Unix(int64(temp.ExpiresAt), 0)) {
+		return errors.New(errors.TypeInvalidInput, ErrCodeAPIKeyInvalidInput, "cannot set api key expiry in the past")
 	}
 
 	*key = PostableFactorAPIKey(temp)
@@ -152,10 +132,29 @@ func (key *UpdatableFactorAPIKey) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if temp.Name == "" {
-		return errors.New(errors.TypeInvalidInput, ErrCodeServiceAccountFactorAPIkeyInvalidInput, "name cannot be empty")
+	if match := factorAPIKeyNameRegex.MatchString(temp.Name); !match {
+		return errInvalidAPIKeyName
+	}
+
+	if temp.ExpiresAt != 0 && time.Now().After(time.Unix(int64(temp.ExpiresAt), 0)) {
+		return errors.New(errors.TypeInvalidInput, ErrCodeAPIKeyInvalidInput, "cannot set api key expiry in the past")
 	}
 
 	*key = UpdatableFactorAPIKey(temp)
 	return nil
+}
+
+func (key FactorAPIKey) MarshalBinary() ([]byte, error) {
+	return json.Marshal(key)
+}
+
+func (key *FactorAPIKey) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, key)
+}
+
+func (key *FactorAPIKey) Traits() map[string]any {
+	return map[string]any{
+		"name":       key.Name,
+		"expires_at": key.ExpiresAt,
+	}
 }

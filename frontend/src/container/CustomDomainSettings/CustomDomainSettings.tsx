@@ -44,10 +44,11 @@ function DomainUpdateToast({
 			<div className="custom-domain-toast-actions">
 				<Button
 					variant="ghost"
-					size="xs"
+					size="sm"
 					className="custom-domain-toast-visit-btn"
-					suffixIcon={<ExternalLink size={12} />}
+					suffix={<ExternalLink size={12} />}
 					onClick={(): void => {
+						// oxlint-disable-next-line signoz/no-raw-absolute-path
 						window.open(url, '_blank', 'noopener,noreferrer');
 					}}
 				>
@@ -61,7 +62,7 @@ function DomainUpdateToast({
 						toast.dismiss(toastId);
 					}}
 					aria-label="Dismiss"
-					prefixIcon={<X size={14} />}
+					prefix={<X size={14} />}
 				/>
 			</div>
 		</div>
@@ -69,16 +70,15 @@ function DomainUpdateToast({
 }
 
 export default function CustomDomainSettings(): JSX.Element {
-	const { org, activeLicense } = useAppContext();
+	const { org } = useAppContext();
 	const { timezone } = useTimezone();
+
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [isPollingEnabled, setIsPollingEnabled] = useState(false);
 	const [hosts, setHosts] = useState<ZeustypesHostDTO[] | null>(null);
 
-	const [
-		updateDomainError,
-		setUpdateDomainError,
-	] = useState<AxiosError<RenderErrorResponseDTO> | null>(null);
+	const [updateDomainError, setUpdateDomainError] =
+		useState<AxiosError<RenderErrorResponseDTO> | null>(null);
 
 	const [customDomainSubdomain, setCustomDomainSubdomain] = useState<
 		string | undefined
@@ -91,10 +91,8 @@ export default function CustomDomainSettings(): JSX.Element {
 		refetch: refetchHosts,
 	} = useGetHosts();
 
-	const {
-		mutate: updateSubDomain,
-		isLoading: isLoadingUpdateCustomDomain,
-	} = usePutHost<AxiosError<RenderErrorResponseDTO>>();
+	const { mutate: updateSubDomain, isLoading: isLoadingUpdateCustomDomain } =
+		usePutHost<AxiosError<RenderErrorResponseDTO>>();
 
 	const stripProtocol = (url: string): string => url?.split('://')[1] ?? url;
 
@@ -138,7 +136,7 @@ export default function CustomDomainSettings(): JSX.Element {
 			{
 				onSuccess: () => {
 					setIsPollingEnabled(true);
-					refetchHosts();
+					void refetchHosts();
 					setIsEditModalOpen(false);
 					setCustomDomainSubdomain(subdomain);
 					const newUrl = `https://${subdomain}.${dnsSuffix}`;
@@ -175,98 +173,81 @@ export default function CustomDomainSettings(): JSX.Element {
 		[hosts, activeHost],
 	);
 
-	const planName = activeLicense?.plan?.name;
+	const workspaceName =
+		org?.[0]?.displayName || customDomainSubdomain || activeHost?.name;
 
 	if (isLoadingHosts) {
 		return (
 			<div className="custom-domain-card custom-domain-card--loading">
-				<Skeleton
-					active
-					title={{ width: '40%' }}
-					paragraph={{ rows: 1, width: '60%' }}
-				/>
+				<Skeleton active paragraph={{ rows: 1, width: '60%' }} />
 			</div>
 		);
 	}
 
 	return (
 		<>
-			<div className="custom-domain-card">
-				<div className="custom-domain-card-top">
-					<div className="custom-domain-card-info">
+			<div className="custom-domain-card-top">
+				<div className="custom-domain-card-info">
+					{!!workspaceName && (
 						<div className="custom-domain-card-name-row">
 							<span className="beacon" />
-							<span className="custom-domain-card-org-name">
-								{org?.[0]?.displayName ? org?.[0]?.displayName : customDomainSubdomain}
-							</span>
+							<span className="custom-domain-card-org-name">{workspaceName}</span>
 						</div>
+					)}
 
-						<div className="custom-domain-card-meta-row">
-							<Dropdown
-								trigger={['click']}
-								dropdownRender={(): JSX.Element => (
-									<div className="workspace-url-dropdown">
-										<span className="workspace-url-dropdown-header">
-											All Workspace URLs
-										</span>
-										<div className="workspace-url-dropdown-divider" />
-										{sortedHosts.map((host) => {
-											const isActive = host.name === activeHost?.name;
-											return (
-												<a
-													key={host.name}
-													href={host.url}
-													target="_blank"
-													rel="noopener noreferrer"
-													className={`workspace-url-dropdown-item${
-														isActive ? ' workspace-url-dropdown-item--active' : ''
-													}`}
-												>
-													<span className="workspace-url-dropdown-item-label">
-														{stripProtocol(host.url ?? '')}
-													</span>
-													{isActive ? (
-														<Check size={14} className="workspace-url-dropdown-item-check" />
-													) : (
-														<ExternalLink
-															size={12}
-															className="workspace-url-dropdown-item-external"
-														/>
-													)}
-												</a>
-											);
-										})}
-									</div>
-								)}
-							>
-								<Button
-									type="button"
-									size="xs"
-									className="workspace-url-trigger"
-									disabled={isFetchingHosts}
-								>
+					<div
+						className={`custom-domain-card-meta-row ${
+							!workspaceName ? 'workspace-name-hidden' : ''
+						}`}
+					>
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="link" color="none" disabled={isFetchingHosts}>
 									<Link2 size={12} />
 									<span>{stripProtocol(activeHost?.url ?? '')}</span>
 									<ChevronDown size={12} />
 								</Button>
-							</Dropdown>
-							<span className="custom-domain-card-meta-timezone">
-								<Clock size={11} />
-								{timezone.offset}
-							</span>
-						</div>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="start">
+								<div className="workspace-url-dropdown">
+									<span className="workspace-url-dropdown-header">
+										All Workspace URLs
+									</span>
+									<div className="workspace-url-dropdown-divider" />
+									{sortedHosts.map((host) => {
+										const isActive = host.name === activeHost?.name;
+										return (
+											<a
+												key={host.name}
+												href={host.url}
+												target="_blank"
+												rel="noopener noreferrer"
+												className={`workspace-url-dropdown-item${
+													isActive ? ' workspace-url-dropdown-item--active' : ''
+												}`}
+											>
+												<span className="workspace-url-dropdown-item-label">
+													{stripProtocol(host.url ?? '')}
+												</span>
+												{isActive ? (
+													<Check size={14} className="workspace-url-dropdown-item-check" />
+												) : (
+													<ExternalLink
+														size={12}
+														className="workspace-url-dropdown-item-external"
+													/>
+												)}
+											</a>
+										);
+									})}
+								</div>
+							</DropdownMenuContent>
+						</DropdownMenu>
+						<span className="custom-domain-card-meta-timezone">
+							<Clock size={11} />
+							{timezone.offset}
+						</span>
 					</div>
-
-					<Button
-						variant="solid"
-						size="sm"
-						className="custom-domain-edit-button"
-						prefixIcon={<FilePenLine size={12} />}
-						disabled={isFetchingHosts || isPollingEnabled}
-						onClick={(): void => setIsEditModalOpen(true)}
-					>
-						Edit workspace link
-					</Button>
 				</div>
 
 				{isPollingEnabled && (
@@ -290,6 +271,17 @@ export default function CustomDomainSettings(): JSX.Element {
 					</span>
 				</div>
 			</div>
+
+			{isPollingEnabled && (
+				<Callout
+					type="info"
+					showIcon
+					className="custom-domain-callout"
+					size="small"
+					icon={<SolidAlertCircle size={13} color="primary" />}
+					title={`Updating your URL to ⎯ ${customDomainSubdomain}.${dnsSuffix}. This may take a few mins.`}
+				/>
+			)}
 
 			<CustomDomainEditModal
 				isOpen={isEditModalOpen}

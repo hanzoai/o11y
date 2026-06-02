@@ -1,10 +1,12 @@
-import { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useState } from 'react';
 import {
-	ArrowLeftOutlined,
-	ArrowRightOutlined,
-	LeftCircleOutlined,
-} from '@ant-design/icons';
-import { Button, Space, Steps, Typography } from 'antd';
+	ArrowLeft,
+	ArrowRight,
+	CircleArrowLeft,
+	UserPlus,
+} from '@signozhq/icons';
+import { Button, Space, Steps } from 'antd';
+import { Typography } from '@signozhq/ui/typography';
 import logEvent from 'api/common/logEvent';
 import BrandMark from 'components/BrandMark';
 import LaunchChatSupport from 'components/LaunchChatSupport/LaunchChatSupport';
@@ -13,9 +15,11 @@ import ROUTES from 'constants/routes';
 import { stepsMap } from 'container/OnboardingContainer/constants/stepsConfig';
 import { DataSourceType } from 'container/OnboardingContainer/Steps/DataSource/DataSource';
 import { hasFrameworks } from 'container/OnboardingContainer/utils/dataSourceUtils';
-import history from 'lib/history';
+import { useSafeNavigate } from 'hooks/useSafeNavigate';
 import { isEmpty, isNull } from 'lodash-es';
-import { UserPlus } from 'lucide-react';
+import { isModifierKeyPressed } from 'utils/app';
+
+import signozBrandLogoUrl from '@/assets/Logos/signoz-brand-logo.svg';
 
 import { useOnboardingContext } from '../../context/OnboardingContext';
 import {
@@ -64,6 +68,7 @@ export default function ModuleStepsContainer({
 	selectedModuleSteps,
 	setIsInviteTeamMemberModalOpen,
 }: ModuleStepsContainerProps): JSX.Element {
+	const { safeNavigate } = useSafeNavigate();
 	const {
 		activeStep,
 		serviceName,
@@ -88,9 +93,8 @@ export default function ModuleStepsContainer({
 
 		const { step } = activeStep;
 
-		const {
-			name: selectedDataSourceName = '',
-		} = selectedDataSource as DataSourceType;
+		const { name: selectedDataSourceName = '' } =
+			selectedDataSource as DataSourceType;
 
 		if (
 			step.id === environmentDetailsStep &&
@@ -131,7 +135,7 @@ export default function ModuleStepsContainer({
 		);
 	};
 
-	const redirectToModules = (): void => {
+	const redirectToModules = (event?: React.MouseEvent): void => {
 		logEvent('Onboarding V2 Complete', {
 			module: selectedModule.id,
 			dataSource: selectedDataSource?.id,
@@ -141,26 +145,28 @@ export default function ModuleStepsContainer({
 			serviceName,
 		});
 
+		let targetPath: string;
 		if (selectedModule.id === ModulesMap.APM) {
-			history.push(ROUTES.APPLICATION);
+			targetPath = ROUTES.APPLICATION;
 		} else if (selectedModule.id === ModulesMap.LogsManagement) {
-			history.push(ROUTES.LOGS_EXPLORER);
+			targetPath = ROUTES.LOGS_EXPLORER;
 		} else if (selectedModule.id === ModulesMap.InfrastructureMonitoring) {
-			history.push(ROUTES.APPLICATION);
+			targetPath = ROUTES.APPLICATION;
 		} else if (selectedModule.id === ModulesMap.AwsMonitoring) {
-			history.push(ROUTES.APPLICATION);
+			targetPath = ROUTES.APPLICATION;
 		} else {
-			history.push(ROUTES.APPLICATION);
+			targetPath = ROUTES.APPLICATION;
 		}
+		safeNavigate(targetPath, { newTab: !!event && isModifierKeyPressed(event) });
 	};
 
-	const handleNext = (): void => {
+	const handleNext = (event?: React.MouseEvent): void => {
 		const isValid = isValidForm();
 
 		if (isValid) {
 			if (current === lastStepIndex) {
 				resetProgress();
-				redirectToModules();
+				redirectToModules(event);
 				return;
 			}
 
@@ -368,8 +374,8 @@ export default function ModuleStepsContainer({
 		}
 	};
 
-	const handleLogoClick = (): void => {
-		history.push('/home');
+	const handleLogoClick = (e: React.MouseEvent): void => {
+		safeNavigate('/home', { newTab: isModifierKeyPressed(e) });
 	};
 
 	return (
@@ -386,8 +392,8 @@ export default function ModuleStepsContainer({
 						<Button
 							style={{ display: 'flex', alignItems: 'center' }}
 							type="default"
-							icon={<LeftCircleOutlined />}
-							onClick={onReselectModule}
+							icon={<CircleArrowLeft size="md" />}
+							onClick={(e): void => onReselectModule(e)}
 						>
 							{selectedModule.title}
 						</Button>
@@ -453,11 +459,15 @@ export default function ModuleStepsContainer({
 					<Button
 						onClick={handlePrev}
 						disabled={current === 0}
-						icon={<ArrowLeftOutlined />}
+						icon={<ArrowLeft size="md" />}
 					>
 						Back
 					</Button>
-					<Button onClick={handleNext} type="primary" icon={<ArrowRightOutlined />}>
+					<Button
+						onClick={(e): void => handleNext(e)}
+						type="primary"
+						icon={<ArrowRight size="md" />}
+					>
 						{current < lastStepIndex ? 'Continue to next step' : 'Done'}
 					</Button>
 					<LaunchChatSupport

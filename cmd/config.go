@@ -15,13 +15,12 @@ func NewHanzoO11yConfig(ctx context.Context, logger *slog.Logger, flags o11y.Dep
 		ctx,
 		logger,
 		config.ResolverConfig{
-			Uris: []string{"env:"},
+			Uris: uris,
 			ProviderFactories: []config.ProviderFactory{
 				envprovider.NewFactory(),
 				fileprovider.NewFactory(),
 			},
 		},
-		flags,
 	)
 	if err != nil {
 		return o11y.Config{}, err

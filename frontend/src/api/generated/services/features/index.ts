@@ -4,6 +4,7 @@
  * * regenerate with 'yarn generate:api'
  * Hanzo O11y
  */
+import { useQuery } from 'react-query';
 import type {
 	InvalidateOptions,
 	QueryClient,
@@ -12,11 +13,13 @@ import type {
 	UseQueryOptions,
 	UseQueryResult,
 } from 'react-query';
-import { useQuery } from 'react-query';
 
 import type { ErrorType } from '../../../generatedAPIInstance';
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type { GetFeatures200, RenderErrorResponseDTO } from '../o11y.schemas';
+
+import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
+import type { ErrorType } from '../../../generatedAPIInstance';
 
 /**
  * This endpoint returns the supported features and their details
@@ -36,7 +39,7 @@ export const getGetFeaturesQueryKey = () => {
 
 export const getGetFeaturesQueryOptions = <
 	TData = Awaited<ReturnType<typeof getFeatures>>,
-	TError = ErrorType<RenderErrorResponseDTO>
+	TError = ErrorType<RenderErrorResponseDTO>,
 >(options?: {
 	query?: UseQueryOptions<
 		Awaited<ReturnType<typeof getFeatures>>,
@@ -70,7 +73,7 @@ export type GetFeaturesQueryError = ErrorType<RenderErrorResponseDTO>;
 
 export function useGetFeatures<
 	TData = Awaited<ReturnType<typeof getFeatures>>,
-	TError = ErrorType<RenderErrorResponseDTO>
+	TError = ErrorType<RenderErrorResponseDTO>,
 >(options?: {
 	query?: UseQueryOptions<
 		Awaited<ReturnType<typeof getFeatures>>,
@@ -84,9 +87,7 @@ export function useGetFeatures<
 		queryKey: QueryKey;
 	};
 
-	query.queryKey = queryOptions.queryKey;
-
-	return query;
+	return { ...query, queryKey: queryOptions.queryKey };
 }
 
 /**

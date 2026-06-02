@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	_ "net/http/pprof" // http profiler
 	"slices"
 
 	"github.com/hanzoai/o11y/pkg/cache/memorycache"
@@ -15,6 +14,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel/propagation"
+
+	"github.com/SigNoz/signoz/pkg/cache/memorycache"
+	"github.com/SigNoz/signoz/pkg/errors"
 
 	"github.com/gorilla/handlers"
 
@@ -132,6 +134,8 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 	logParsingPipelineController, err := logparsingpipeline.NewLogParsingPipelinesController(
 		o11y.SQLStore,
 		integrationsController.GetPipelinesForInstalledIntegrations,
+		reader,
+		signoz.Flagger,
 	)
 	if err != nil {
 		return nil, err
@@ -158,10 +162,8 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 
 	apiOpts := api.APIHandlerOptions{
 		DataConnector:                 reader,
-		RulesManager:                  rm,
 		UsageManager:                  usageManager,
 		IntegrationsController:        integrationsController,
-		CloudIntegrationsController:   cloudIntegrationsController,
 		LogsParsingPipelineController: logParsingPipelineController,
 		FluxInterval:                  config.Querier.FluxInterval,
 		GatewayUrl:                    config.Gateway.URL.String(),
@@ -206,6 +208,7 @@ func (s *Server) createPublicServer(apiHandler *api.APIHandler, web web.Web) (*h
 	r := baseapp.NewRouter()
 	am := middleware.NewAuthZ(s.o11y.Instrumentation.Logger(), s.o11y.Modules.OrgGetter, s.o11y.Authz)
 
+	r.Use(middleware.NewRecovery(s.signoz.Instrumentation.Logger()).Wrap)
 	r.Use(otelmux.Middleware(
 		"apiserver",
 		otelmux.WithMeterProvider(s.o11y.Instrumentation.MeterProvider()),
@@ -214,7 +217,6 @@ func (s *Server) createPublicServer(apiHandler *api.APIHandler, web web.Web) (*h
 		otelmux.WithFilter(func(r *http.Request) bool {
 			return !slices.Contains([]string{"/api/v1/health"}, r.URL.Path)
 		}),
-		otelmux.WithPublicEndpoint(),
 	))
 	r.Use(middleware.NewAuthN([]string{"Authorization", "Sec-WebSocket-Protocol"}, s.o11y.Sharder, s.o11y.Tokenizer, s.o11y.Instrumentation.Logger()).Wrap)
 	r.Use(middleware.NewAPIKey(s.o11y.SQLStore, []string{"HANZO-API-KEY"}, s.o11y.Instrumentation.Logger(), s.o11y.Sharder).Wrap)
@@ -229,14 +231,12 @@ func (s *Server) createPublicServer(apiHandler *api.APIHandler, web web.Web) (*h
 	apiHandler.RegisterRoutes(r, am)
 	apiHandler.RegisterLogsRoutes(r, am)
 	apiHandler.RegisterIntegrationRoutes(r, am)
-	apiHandler.RegisterCloudIntegrationsRoutes(r, am)
 	apiHandler.RegisterQueryRangeV3Routes(r, am)
 	apiHandler.RegisterInfraMetricsRoutes(r, am)
 	apiHandler.RegisterQueryRangeV4Routes(r, am)
 	apiHandler.RegisterWebSocketPaths(r, am)
 	apiHandler.RegisterMessagingQueuesRoutes(r, am)
 	apiHandler.RegisterThirdPartyApiRoutes(r, am)
-	apiHandler.MetricExplorerRoutes(r, am)
 	apiHandler.RegisterTraceFunnelsRoutes(r, am)
 
 	err := s.o11y.APIServer.AddToRouter(r)
@@ -259,6 +259,20 @@ func (s *Server) createPublicServer(apiHandler *api.APIHandler, web web.Web) (*h
 		return nil, err
 	}
 
+	routePrefix := s.config.Global.ExternalPath()
+	if routePrefix != "" {
+		prefixed := http.StripPrefix(routePrefix, handler)
+		handler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			switch req.URL.Path {
+			case "/api/v1/health", "/api/v2/healthz", "/api/v2/readyz", "/api/v2/livez":
+				r.ServeHTTP(w, req)
+				return
+			}
+
+			prefixed.ServeHTTP(w, req)
+		})
+	}
+
 	return &http.Server{
 		Handler: handler,
 	}, nil
@@ -278,15 +292,13 @@ func (s *Server) initListeners() error {
 		return err
 	}
 
-	zap.L().Info(fmt.Sprintf("Query server started listening on %s...", s.httpHostPort))
+	slog.Info(fmt.Sprintf("Query server started listening on %s...", s.httpHostPort))
 
 	return nil
 }
 
 // Start listening on http and private http port concurrently
 func (s *Server) Start(ctx context.Context) error {
-	s.ruleManager.Start(ctx)
-
 	err := s.initListeners()
 	if err != nil {
 		return err
@@ -298,31 +310,22 @@ func (s *Server) Start(ctx context.Context) error {
 	}
 
 	go func() {
-		zap.L().Info("Starting HTTP server", zap.Int("port", httpPort), zap.String("addr", s.httpHostPort))
+		slog.Info("Starting HTTP server", "port", httpPort, "addr", s.httpHostPort)
 
 		switch err := s.httpServer.Serve(s.httpConn); err {
 		case nil, http.ErrServerClosed, cmux.ErrListenerClosed:
 			// normal exit, nothing to do
 		default:
-			zap.L().Error("Could not start HTTP server", zap.Error(err))
+			slog.Error("Could not start HTTP server", errors.Attr(err))
 		}
 		s.unavailableChannel <- healthcheck.Unavailable
 	}()
 
 	go func() {
-		zap.L().Info("Starting pprof server", zap.String("addr", baseconst.DebugHttpPort))
-
-		err = http.ListenAndServe(baseconst.DebugHttpPort, nil)
-		if err != nil {
-			zap.L().Error("Could not start pprof server", zap.Error(err))
-		}
-	}()
-
-	go func() {
-		zap.L().Info("Starting OpAmp Websocket server", zap.String("addr", baseconst.OpAmpWsEndpoint))
+		slog.Info("Starting OpAmp Websocket server", "addr", baseconst.OpAmpWsEndpoint)
 		err := s.opampServer.Start(baseconst.OpAmpWsEndpoint)
 		if err != nil {
-			zap.L().Error("opamp ws server failed to start", zap.Error(err))
+			slog.Error("opamp ws server failed to start", errors.Attr(err))
 			s.unavailableChannel <- healthcheck.Unavailable
 		}
 	}()
@@ -339,48 +342,8 @@ func (s *Server) Stop(ctx context.Context) error {
 
 	s.opampServer.Stop()
 
-	if s.ruleManager != nil {
-		s.ruleManager.Stop(ctx)
-	}
-
 	// stop usage manager
 	s.usageManager.Stop(ctx)
 
 	return nil
-}
-
-func makeRulesManager(ch baseint.Reader, cache cache.Cache, alertmanager alertmanager.Alertmanager, sqlstore sqlstore.SQLStore, telemetryStore telemetrystore.TelemetryStore, metadataStore telemetrytypes.MetadataStore, prometheus prometheus.Prometheus, orgGetter organization.Getter, querier querier.Querier, providerSettings factory.ProviderSettings, queryParser queryparser.QueryParser) (*baserules.Manager, error) {
-	ruleStore := sqlrulestore.NewRuleStore(sqlstore, queryParser, providerSettings)
-	maintenanceStore := sqlrulestore.NewMaintenanceStore(sqlstore)
-	// create manager opts
-	managerOpts := &baserules.ManagerOptions{
-		TelemetryStore:      telemetryStore,
-		MetadataStore:       metadataStore,
-		Prometheus:          prometheus,
-		Context:             context.Background(),
-		Logger:              zap.L(),
-		Reader:              ch,
-		Querier:             querier,
-		SLogger:             providerSettings.Logger,
-		Cache:               cache,
-		EvalDelay:           baseconst.GetEvalDelay(),
-		PrepareTaskFunc:     rules.PrepareTaskFunc,
-		PrepareTestRuleFunc: rules.TestNotification,
-		Alertmanager:        alertmanager,
-		OrgGetter:           orgGetter,
-		RuleStore:           ruleStore,
-		MaintenanceStore:    maintenanceStore,
-		SqlStore:            sqlstore,
-		QueryParser:         queryParser,
-	}
-
-	// create Manager
-	manager, err := baserules.NewManager(managerOpts)
-	if err != nil {
-		return nil, fmt.Errorf("rule manager error: %v", err)
-	}
-
-	zap.L().Info("rules manager is ready")
-
-	return manager, nil
 }

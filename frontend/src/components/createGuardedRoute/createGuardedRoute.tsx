@@ -7,13 +7,12 @@ import {
 } from 'hooks/useAuthZ/types';
 import { parsePermission } from 'hooks/useAuthZ/utils';
 
-import ErrorBoundaryFallback from '../../pages/ErrorBoundaryFallback/ErrorBoundaryFallback';
+import noDataUrl from '@/assets/Icons/no-data.svg';
+
 import AppLoading from '../AppLoading/AppLoading';
 import { GuardAuthZ } from '../GuardAuthZ/GuardAuthZ';
 
 import './createGuardedRoute.styles.scss';
-
-const onErrorFallback = (): JSX.Element => <ErrorBoundaryFallback />;
 
 function OnNoPermissionsFallback(response: {
 	requiredPermissionName: BrandedPermission;
@@ -23,7 +22,7 @@ function OnNoPermissionsFallback(response: {
 	return (
 		<div className="guard-authz-error-no-authz">
 			<div className="guard-authz-error-no-authz-content">
-				<img src="/Icons/no-data.svg" alt="No permission" />
+				<img src={noDataUrl} alt="No permission" />
 				<h3>Uh-oh! You don’t have permission to view this page.</h3>
 				<p>
 					You need the following permission to view this page:
@@ -61,7 +60,6 @@ export function createGuardedRoute<P extends object, R extends AuthZRelation>(
 				relation={relation}
 				object={resolvedObject}
 				fallbackOnLoading={<AppLoading />}
-				fallbackOnError={onErrorFallback}
 				fallbackOnNoPermissions={(response): ReactElement => (
 					<OnNoPermissionsFallback {...response} />
 				)}

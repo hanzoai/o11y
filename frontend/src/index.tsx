@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider } from 'react-redux';
 import AppRoutes from 'AppRoutes';
 import { AxiosError } from 'axios';
+import { GlobalTimeStoreAdapter } from 'components/GlobalTimeStoreAdapter/GlobalTimeStoreAdapter';
 import { ThemeProvider } from 'hooks/useDarkMode';
 import { NuqsAdapter } from 'nuqs/adapters/react';
 import { AppProvider } from 'providers/App/App';

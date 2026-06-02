@@ -76,10 +76,17 @@ func NewCacheProviderFactories() factory.NamedMap[factory.ProviderFactory[cache.
 	)
 }
 
-func NewWebProviderFactories() factory.NamedMap[factory.ProviderFactory[web.Web, web.Config]] {
+func NewWebProviderFactories(globalConfig global.Config) factory.NamedMap[factory.ProviderFactory[web.Web, web.Config]] {
 	return factory.MustNewNamedMap(
-		routerweb.NewFactory(),
+		routerweb.NewFactory(globalConfig),
 		noopweb.NewFactory(),
+	)
+}
+
+func NewPProfProviderFactories() factory.NamedMap[factory.ProviderFactory[pprof.PProf, pprof.Config]] {
+	return factory.MustNewNamedMap(
+		httppprof.NewFactory(),
+		nooppprof.NewFactory(),
 	)
 }
 
@@ -170,6 +177,29 @@ func NewSQLMigrationProviderFactories(
 		sqlmigration.NewMigrateRulesV4ToV5Factory(sqlstore, telemetryStore),
 		sqlmigration.NewAddStatusUserFactory(sqlstore, sqlschema),
 		sqlmigration.NewDeprecateUserInviteFactory(sqlstore, sqlschema),
+		sqlmigration.NewUpdateCloudIntegrationUniqueIndexFactory(sqlstore, sqlschema),
+		sqlmigration.NewUpdatePlannedMaintenanceRuleFactory(sqlstore, sqlschema),
+		sqlmigration.NewAddUserRoleFactory(sqlstore, sqlschema),
+		sqlmigration.NewDropUserRoleColumnFactory(sqlstore, sqlschema),
+		sqlmigration.NewAddServiceAccountFactory(sqlstore, sqlschema),
+		sqlmigration.NewDeprecateAPIKeyFactory(sqlstore, sqlschema),
+		sqlmigration.NewServiceAccountAuthzactory(sqlstore),
+		sqlmigration.NewDropUserDeletedAtFactory(sqlstore, sqlschema),
+		sqlmigration.NewMigrateAWSAllRegionsFactory(sqlstore),
+		sqlmigration.NewAddServiceAccountManagedRoleTransactionsFactory(sqlstore),
+		sqlmigration.NewAddSpanMapperFactory(sqlstore, sqlschema),
+		sqlmigration.NewAddLLMPricingRulesFactory(sqlstore, sqlschema),
+		sqlmigration.NewMigrateMetaresourcesTuplesFactory(sqlstore),
+		sqlmigration.NewAddTagsFactory(sqlstore, sqlschema),
+		sqlmigration.NewAddRoleCRUDTuplesFactory(sqlstore),
+		sqlmigration.NewAddIntegrationDashboardFactory(sqlstore, sqlschema),
+		sqlmigration.NewAddSourceToDashboardFactory(sqlstore, sqlschema),
+		sqlmigration.NewMigrateCloudIntegrationDashboardsFactory(sqlstore),
+		sqlmigration.NewAddScopeToPlannedMaintenanceFactory(sqlstore, sqlschema),
+		sqlmigration.NewMigrateInstalledIntegrationDashboardsFactory(sqlstore),
+		sqlmigration.NewAddDashboardNameFactory(sqlstore, sqlschema),
+		sqlmigration.NewFixChangelogOperationTypeFactory(sqlstore, sqlschema),
+		sqlmigration.NewCloudIntegrationRemoveCascadeDeleteFactory(sqlschema),
 	)
 }
 
@@ -190,7 +220,12 @@ func NewNotificationManagerProviderFactories(routeStore alertmanagertypes.RouteS
 	)
 }
 
-func NewAlertmanagerProviderFactories(sqlstore sqlstore.SQLStore, orgGetter organization.Getter, nfManager nfmanager.NotificationManager) factory.NamedMap[factory.ProviderFactory[alertmanager.Alertmanager, alertmanager.Config]] {
+func NewAlertmanagerProviderFactories(
+	sqlstore sqlstore.SQLStore,
+	orgGetter organization.Getter,
+	nfManager nfmanager.NotificationManager,
+	maintenanceStore alertmanagertypes.MaintenanceStore,
+) factory.NamedMap[factory.ProviderFactory[alertmanager.Alertmanager, alertmanager.Config]] {
 	return factory.MustNewNamedMap(
 		o11yalertmanager.NewFactory(sqlstore, orgGetter, nfManager),
 	)
@@ -229,13 +264,13 @@ func NewQuerierProviderFactories(telemetryStore telemetrystore.TelemetryStore, c
 	)
 }
 
-func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.AuthZ, global global.Global, modules Modules, handlers Handlers) factory.NamedMap[factory.ProviderFactory[apiserver.APIServer, apiserver.Config]] {
+func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.AuthZ, modules Modules, handlers Handlers) factory.NamedMap[factory.ProviderFactory[apiserver.APIServer, apiserver.Config]] {
 	return factory.MustNewNamedMap(
 		o11yapiserver.NewFactory(
 			orgGetter,
 			authz,
 			implorganization.NewHandler(modules.OrgGetter, modules.OrgSetter),
-			impluser.NewHandler(modules.User, modules.UserGetter),
+			impluser.NewHandler(modules.UserSetter, modules.UserGetter),
 			implsession.NewHandler(modules.Session),
 			implauthdomain.NewHandler(modules.AuthDomain),
 			implpreference.NewHandler(modules.Preference),
@@ -245,12 +280,22 @@ func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.Au
 			modules.Dashboard,
 			handlers.Dashboard,
 			handlers.MetricsExplorer,
+			handlers.InfraMonitoring,
 			handlers.GatewayHandler,
 			handlers.Fields,
 			handlers.AuthzHandler,
+			handlers.RawDataExport,
 			handlers.ZeusHandler,
 			handlers.QuerierHandler,
 			handlers.ServiceAccountHandler,
+			handlers.RegistryHandler,
+			handlers.CloudIntegrationHandler,
+			handlers.RuleStateHistory,
+			handlers.SpanMapperHandler,
+			handlers.AlertmanagerHandler,
+			handlers.LLMPricingRuleHandler,
+			handlers.TraceDetail,
+			handlers.RulerHandler,
 		),
 	)
 }
@@ -263,7 +308,7 @@ func NewTokenizerProviderFactories(cache cache.Cache, sqlstore sqlstore.SQLStore
 	)
 }
 
-func NewGlobalProviderFactories() factory.NamedMap[factory.ProviderFactory[global.Global, global.Config]] {
+func NewIdentNProviderFactories(tokenizer tokenizer.Tokenizer, serviceAccount serviceaccount.Module, orgGetter organization.Getter, userGetter user.Getter, userConfig user.Config) factory.NamedMap[factory.ProviderFactory[identn.IdentN, identn.Config]] {
 	return factory.MustNewNamedMap(
 		o11yglobal.NewFactory(),
 	)

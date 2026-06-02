@@ -62,7 +62,6 @@ func TestLastObservedAt_Concurrent(t *testing.T) {
 		&authtypes.Identity{
 			UserID: valuer.GenerateUUID(),
 			OrgID:  orgID,
-			Role:   types.RoleAdmin,
 			Email:  valuer.MustNewEmail("test@test.com"),
 		},
 		map[string]string{},
@@ -74,7 +73,6 @@ func TestLastObservedAt_Concurrent(t *testing.T) {
 		&authtypes.Identity{
 			UserID: valuer.GenerateUUID(),
 			OrgID:  orgID,
-			Role:   types.RoleAdmin,
 			Email:  valuer.MustNewEmail("test@test.com"),
 		},
 		map[string]string{},

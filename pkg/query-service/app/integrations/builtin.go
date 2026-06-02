@@ -178,27 +178,6 @@ func HydrateFileUris(spec interface{}, fs embed.FS, basedir string) (interface{}
 	if specMap, ok := spec.(map[string]interface{}); ok {
 		result := map[string]interface{}{}
 		for k, v := range specMap {
-			// Check if this is a dashboards slice and if dot metrics are enabled
-			if k == "dashboards" && constants.IsDotMetricsEnabled {
-				if dashboards, ok := v.([]interface{}); ok {
-					for i, dashboard := range dashboards {
-						if dashboardUri, ok := dashboard.(string); ok {
-							if strings.HasPrefix(dashboardUri, "file://") {
-								dashboards[i] = strings.Replace(dashboardUri, ".json", "_dot.json", 1)
-							}
-						} else if dashBoardMap, ok := dashboard.(map[string]interface{}); ok {
-							if dashboardUri, ok := dashBoardMap["definition"].(string); ok {
-								if strings.HasPrefix(dashboardUri, "file://") {
-									dashboardUri = strings.Replace(dashboardUri, ".json", "_dot.json", 1)
-								}
-								dashBoardMap["definition"] = dashboardUri
-							}
-							dashboards[i] = dashBoardMap
-						}
-					}
-					v = dashboards
-				}
-			}
 			hydrated, err := HydrateFileUris(v, fs, basedir)
 			if err != nil {
 				return nil, err

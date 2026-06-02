@@ -333,7 +333,7 @@ describe('QuerySection', () => {
 
 		const result = mockUseQueryBuilder.redirectWithQueryBuilderData.mock.calls[0];
 
-		expect(result[0]).toEqual({
+		expect(result[0]).toStrictEqual({
 			id: MOCK_UUID,
 			queryType: EQueryType.QUERY_BUILDER,
 			unit: undefined,
@@ -351,7 +351,7 @@ describe('QuerySection', () => {
 			datastore_sql: [initialDatastoreData],
 		});
 
-		expect(result[1]).toEqual({
+		expect(result[1]).toStrictEqual({
 			[QueryParams.alertType]: AlertTypes.METRICS_BASED_ALERT,
 			[QueryParams.ruleType]: AlertDetectionTypes.THRESHOLD_ALERT,
 		});
@@ -368,11 +368,10 @@ describe('QuerySection', () => {
 			mockUseQueryBuilder.redirectWithQueryBuilderData,
 		).toHaveBeenCalledTimes(1);
 
-		const [
-			queryArg,
-		] = mockUseQueryBuilder.redirectWithQueryBuilderData.mock.calls[0];
+		const [queryArg] =
+			mockUseQueryBuilder.redirectWithQueryBuilderData.mock.calls[0];
 
-		expect(queryArg).toEqual({
+		expect(queryArg).toStrictEqual({
 			...mockUseQueryBuilder.currentQuery,
 			queryType: EQueryType.PROM,
 		});
@@ -423,11 +422,10 @@ describe('QuerySection', () => {
 			mockUseQueryBuilder.redirectWithQueryBuilderData,
 		).toHaveBeenCalledTimes(1);
 
-		const [
-			queryArg,
-		] = mockUseQueryBuilder.redirectWithQueryBuilderData.mock.calls[0];
+		const [queryArg] =
+			mockUseQueryBuilder.redirectWithQueryBuilderData.mock.calls[0];
 
-		expect(queryArg).toEqual({
+		expect(queryArg).toStrictEqual({
 			...mockCurrentQueryWithPromQL,
 			queryType: EQueryType.QUERY_BUILDER,
 		});
@@ -478,9 +476,8 @@ describe('QuerySection', () => {
 			mockUseQueryBuilder.redirectWithQueryBuilderData,
 		).toHaveBeenCalledTimes(1);
 
-		const [
-			queryArg,
-		] = mockUseQueryBuilder.redirectWithQueryBuilderData.mock.calls[0];
+		const [queryArg] =
+			mockUseQueryBuilder.redirectWithQueryBuilderData.mock.calls[0];
 
 		expect(queryArg).toEqual({
 			...mockCurrentQueryWithDatastoreSQL,

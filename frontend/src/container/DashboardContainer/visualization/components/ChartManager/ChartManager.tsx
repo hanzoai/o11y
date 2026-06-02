@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Input } from 'antd';
+import { Input } from '@signozhq/ui/input';
+import { Button } from 'antd';
 import { PrecisionOption, PrecisionOptionsEnum } from 'components/Graph/types';
 import { ResizeTable } from 'components/ResizeTable';
 import { useNotifications } from 'hooks/useNotifications';
 import { UPlotConfigBuilder } from 'lib/uPlotV2/config/UPlotConfigBuilder';
 import { usePlotContext } from 'lib/uPlotV2/context/PlotContext';
 import useLegendsSync from 'lib/uPlotV2/hooks/useLegendsSync';
-import { useDashboard } from 'providers/Dashboard/Dashboard';
+import {
+	selectIsDashboardLocked,
+	useDashboardStore,
+} from 'providers/Dashboard/store/useDashboardStore';
 
 import { getChartManagerColumns } from './getChartMangerColumns';
 import { ExtendedChartDataset, getDefaultTableDataSet } from './utils';
@@ -50,7 +54,7 @@ export default function ChartManager({
 		onToggleSeriesVisibility,
 		syncSeriesVisibilityToLocalStorage,
 	} = usePlotContext();
-	const { isDashboardLocked } = useDashboard();
+	const isDashboardLocked = useDashboardStore(selectIsDashboardLocked);
 
 	const [tableDataSet, setTableDataSet] = useState<ExtendedChartDataset[]>(() =>
 		getDefaultTableDataSet(

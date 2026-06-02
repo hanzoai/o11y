@@ -15,8 +15,10 @@ import (
 type Instrumentation interface {
 	// Logger returns the slog logger.
 	Logger() *slog.Logger
+
 	// MeterProvider returns the OpenTelemetry meter provider.
 	MeterProvider() sdkmetric.MeterProvider
+
 	// TracerProvider returns the OpenTelemetry tracer provider.
 	TracerProvider() sdktrace.TracerProvider
 	// MetricsRegisterer returns the luxfi/metric registerer for application metrics.
@@ -25,7 +27,7 @@ type Instrumentation interface {
 	ToProviderSettings() factory.ProviderSettings
 }
 
-// conversion functions required for using zap interface with underlying slog provider
+// ZapToSlogConverter defines conversion functions required for using zap interface with underlying slog provider.
 type ZapToSlogConverter interface {
 	FieldsToAttributes(fields []zap.Field) []any
 }

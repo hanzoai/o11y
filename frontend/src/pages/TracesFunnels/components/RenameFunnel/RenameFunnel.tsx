@@ -5,7 +5,7 @@ import O11yModal from 'components/O11yModal/O11yModal';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import { useRenameFunnel } from 'hooks/TracesFunnels/useFunnels';
 import { useNotifications } from 'hooks/useNotifications';
-import { Check, X } from 'lucide-react';
+import { Check, X } from '@signozhq/icons';
 
 import './RenameFunnel.styles.scss';
 

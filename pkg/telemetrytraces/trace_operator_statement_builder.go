@@ -28,8 +28,8 @@ func NewTraceOperatorStatementBuilder(
 	fieldMapper qbtypes.FieldMapper,
 	conditionBuilder qbtypes.ConditionBuilder,
 	traceStmtBuilder qbtypes.StatementBuilder[qbtypes.TraceAggregation],
-	resourceFilterStmtBuilder qbtypes.StatementBuilder[qbtypes.TraceAggregation],
 	aggExprRewriter qbtypes.AggExprRewriter,
+	flagger flagger.Flagger,
 ) *traceOperatorStatementBuilder {
 	tracesSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/telemetrytraces")
 	return &traceOperatorStatementBuilder{
@@ -69,8 +69,8 @@ func (b *traceOperatorStatementBuilder) Build(
 	}
 
 	b.logger.DebugContext(ctx, "Building trace operator query",
-		"expression", query.Expression,
-		"request_type", requestType)
+		slog.String("expression", query.Expression),
+		slog.Any("request_type", requestType))
 
 	// Build the CTE-based query
 	builder := &traceOperatorCTEBuilder{

@@ -17,13 +17,13 @@ type Rule interface {
 	Name() string
 	Type() ruletypes.RuleType
 
-	Labels() labels.BaseLabels
-	Annotations() labels.BaseLabels
+	Labels() ruletypes.Labels
+	Annotations() ruletypes.Labels
 	Condition() *ruletypes.RuleCondition
 	EvalDelay() valuer.TextDuration
 	EvalWindow() valuer.TextDuration
 	HoldDuration() valuer.TextDuration
-	State() model.AlertState
+	State() ruletypes.AlertState
 	ActiveAlerts() []*ruletypes.Alert
 	// ActiveAlertsLabelFP returns a map of active alert labels fingerprint
 	ActiveAlertsLabelFP() map[uint64]struct{}
@@ -42,7 +42,13 @@ type Rule interface {
 	SetEvaluationTimestamp(time.Time)
 	GetEvaluationTimestamp() time.Time
 
-	RecordRuleStateHistory(ctx context.Context, prevState, currentState model.AlertState, itemsToAdd []model.RuleStateHistory) error
+	RecordRuleStateHistory(ctx context.Context, itemsToAdd []rulestatehistorytypes.RuleStateHistory) error
 
-	SendAlerts(ctx context.Context, ts time.Time, resendDelay time.Duration, interval time.Duration, notifyFunc NotifyFunc)
+	SendAlerts(
+		ctx context.Context,
+		ts time.Time,
+		resendDelay time.Duration,
+		interval time.Duration,
+		notifyFunc NotifyFunc,
+	)
 }

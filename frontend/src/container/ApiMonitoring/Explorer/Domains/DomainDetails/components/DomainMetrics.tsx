@@ -87,28 +87,16 @@ function DomainMetrics({
 		<div className="domain-detail-drawer__endpoint">
 			<div className="domain-details-grid">
 				<div className="labels-row">
-					<Typography.Text
-						type="secondary"
-						className="domain-details-metadata-label"
-					>
+					<Typography.Text color="muted" className="domain-details-metadata-label">
 						EXTERNAL API
 					</Typography.Text>
-					<Typography.Text
-						type="secondary"
-						className="domain-details-metadata-label"
-					>
+					<Typography.Text color="muted" className="domain-details-metadata-label">
 						AVERAGE LATENCY
 					</Typography.Text>
-					<Typography.Text
-						type="secondary"
-						className="domain-details-metadata-label"
-					>
+					<Typography.Text color="muted" className="domain-details-metadata-label">
 						ERROR %
 					</Typography.Text>
-					<Typography.Text
-						type="secondary"
-						className="domain-details-metadata-label"
-					>
+					<Typography.Text color="muted" className="domain-details-metadata-label">
 						LAST USED
 					</Typography.Text>
 				</div>
@@ -147,12 +135,11 @@ function DomainMetrics({
 							<Tooltip title={formattedDomainMetricsData.errorRate}>
 								{formattedDomainMetricsData.errorRate !== '-' ? (
 									<Progress
-										status="active"
 										percent={Number(
 											Number(formattedDomainMetricsData.errorRate).toFixed(2),
 										)}
 										strokeLinecap="butt"
-										size="small"
+										showInfo
 										strokeColor={((): string => {
 											const errorRatePercent = Number(
 												Number(formattedDomainMetricsData.errorRate).toFixed(2),

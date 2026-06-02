@@ -42,14 +42,21 @@ func TestNewModules(t *testing.T) {
 	emailing := emailingtest.New()
 	queryParser := queryparser.New(providerSettings)
 	require.NoError(t, err)
-	dashboardModule := impldashboard.NewModule(impldashboard.NewStore(sqlstore), providerSettings, nil, orgGetter, queryParser)
+	tagModule := impltag.NewModule(impltag.NewStore(sqlstore))
+	dashboardModule := impldashboard.NewModule(impldashboard.NewStore(sqlstore), providerSettings, nil, orgGetter, queryParser, tagModule)
 
 	flagger, err := flagger.New(context.Background(), instrumentationtest.New().ToProviderSettings(), flagger.Config{}, flagger.MustNewRegistry())
 	require.NoError(t, err)
 
-	userGetter := impluser.NewGetter(impluser.NewStore(sqlstore, providerSettings), flagger)
+	userRoleStore := impluser.NewUserRoleStore(sqlstore, providerSettings)
 
-	modules := NewModules(sqlstore, tokenizer, emailing, providerSettings, orgGetter, alertmanager, nil, nil, nil, nil, nil, nil, nil, queryParser, Config{}, dashboardModule, userGetter)
+	userGetter := impluser.NewGetter(impluser.NewStore(sqlstore, providerSettings), userRoleStore, flagger)
+
+	serviceAccount := implserviceaccount.NewModule(implserviceaccount.NewStore(sqlstore), nil, nil, nil, providerSettings, serviceaccount.Config{})
+
+	retentionGetter := implretention.NewGetter(implretention.NewStore(sqlstore))
+
+	modules := NewModules(sqlstore, tokenizer, emailing, providerSettings, orgGetter, alertmanager, nil, nil, nil, nil, nil, nil, nil, queryParser, Config{}, dashboardModule, userGetter, userRoleStore, serviceAccount, implcloudintegration.NewModule(), retentionGetter, flagger, tagModule)
 
 	reflectVal := reflect.ValueOf(modules)
 	for i := 0; i < reflectVal.NumField(); i++ {

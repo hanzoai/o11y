@@ -40,7 +40,7 @@ import {
 	Search,
 	Trash2,
 	X,
-} from 'lucide-react';
+} from '@signozhq/icons';
 import { useAppContext } from 'providers/App/App';
 import { useTimezone } from 'providers/Timezone';
 import { ICompositeMetricQuery } from 'types/api/alerts/compositeQuery';
@@ -64,10 +64,8 @@ function SaveView(): JSX.Element {
 	const [color, setColor] = useState(Color.BG_SIENNA_500);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [activeViewName, setActiveViewName] = useState<string>('');
-	const [
-		activeCompositeQuery,
-		setActiveCompositeQuery,
-	] = useState<ICompositeMetricQuery | null>(null);
+	const [activeCompositeQuery, setActiveCompositeQuery] =
+		useState<ICompositeMetricQuery | null>(null);
 	const [searchValue, setSearchValue] = useState<string>('');
 	const [dataSource, setDataSource] = useState<ViewProps[]>([]);
 	const { t } = useTranslation(['explorer']);
@@ -125,10 +123,8 @@ function SaveView(): JSX.Element {
 		setSearchValue('');
 	};
 
-	const {
-		mutateAsync: deleteViewAsync,
-		isLoading: isDeleteLoading,
-	} = useDeleteView(activeViewKey);
+	const { mutateAsync: deleteViewAsync, isLoading: isDeleteLoading } =
+		useDeleteView(activeViewKey);
 
 	const onDeleteHandler = (): void => {
 		deleteViewHandler({
@@ -141,16 +137,14 @@ function SaveView(): JSX.Element {
 		});
 	};
 
-	const {
-		mutateAsync: updateViewAsync,
-		isLoading: isViewUpdating,
-	} = useUpdateView({
-		compositeQuery: activeCompositeQuery || ({} as ICompositeMetricQuery),
-		viewKey: activeViewKey,
-		extraData: JSON.stringify({ color }),
-		sourcePage: sourcepage || DataSource.LOGS,
-		viewName: newViewName,
-	});
+	const { mutateAsync: updateViewAsync, isLoading: isViewUpdating } =
+		useUpdateView({
+			compositeQuery: activeCompositeQuery || ({} as ICompositeMetricQuery),
+			viewKey: activeViewKey,
+			extraData: JSON.stringify({ color }),
+			sourcePage: sourcepage || DataSource.LOGS,
+			viewName: newViewName,
+		});
 
 	const logEventCalledRef = useRef(false);
 	useEffect(() => {
@@ -323,12 +317,15 @@ function SaveView(): JSX.Element {
 						Learn more
 					</Typography.Link>
 				</Typography.Text>
-				<Input
-					placeholder="Search for views..."
-					prefix={<Search size={12} color={Color.BG_VANILLA_400} />}
-					value={searchValue}
-					onChange={handleSearch}
-				/>
+				<div className="search-input-container">
+					<Input
+						placeholder="Search for views..."
+						prefix={<Search size={12} color={Color.BG_VANILLA_400} />}
+						value={searchValue}
+						onChange={handleSearch}
+						className="search-input"
+					/>
+				</div>
 
 				<Table
 					columns={columns}
@@ -348,15 +345,19 @@ function SaveView(): JSX.Element {
 				footer={[
 					<Button
 						key="cancel"
+						variant="solid"
+						color="secondary"
 						onClick={hideDeleteViewModal}
 						className="cancel-btn"
-						icon={<X size={16} />}
+						prefix={<X size={16} />}
 					>
 						Cancel
 					</Button>,
 					<Button
 						key="submit"
-						icon={<Trash2 size={16} />}
+						variant="solid"
+						color="destructive"
+						prefix={<Trash2 size={16} />}
 						onClick={onDeleteHandler}
 						className="delete-btn"
 						disabled={isDeleteLoading}
@@ -382,7 +383,9 @@ function SaveView(): JSX.Element {
 				footer={[
 					<Button
 						key="submit"
-						icon={<Check size={16} color={Color.BG_VANILLA_100} />}
+						variant="solid"
+						color="primary"
+						prefix={<Check size={16} color={Color.BG_VANILLA_100} />}
 						onClick={onUpdateQueryHandler}
 						disabled={isViewUpdating}
 						data-testid="save-view"

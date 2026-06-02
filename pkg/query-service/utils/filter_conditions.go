@@ -1,8 +1,6 @@
 package utils
 
 import (
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/query-service/constants"

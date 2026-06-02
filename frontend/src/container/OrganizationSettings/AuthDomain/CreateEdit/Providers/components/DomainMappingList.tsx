@@ -70,10 +70,10 @@ function DomainMappingList({
 						))}
 
 						<Button
-							variant="dashed"
+							variant="outlined"
+							color="secondary"
 							onClick={(): void => add({ domain: '', adminEmail: '' })}
-							prefixIcon={<Plus size={14} />}
-							className="domain-mapping-list__add-btn"
+							prefix={<Plus size={14} />}
 						>
 							Add Domain Mapping
 						</Button>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-use';
 import { Button } from '@hanzo/ui';
@@ -12,7 +12,7 @@ import ROUTES from 'constants/routes';
 import useDebouncedFn from 'hooks/useDebouncedFunction';
 import { useNotifications } from 'hooks/useNotifications';
 import history from 'lib/history';
-import { ArrowRight, CircleAlert, KeyRound } from 'lucide-react';
+import { ArrowRight, CircleAlert, KeyRound } from '@signozhq/icons';
 import { Label } from 'pages/SignUp/styles';
 import APIError from 'types/api/error';
 
@@ -23,9 +23,8 @@ import './ResetPassword.styles.scss';
 type FormValues = { password: string; confirmPassword: string };
 
 function ResetPassword({ version }: ResetPasswordProps): JSX.Element {
-	const [confirmPasswordError, setConfirmPasswordError] = useState<boolean>(
-		false,
-	);
+	const [confirmPasswordError, setConfirmPasswordError] =
+		useState<boolean>(false);
 
 	const [errorMessage, setErrorMessage] = useState<APIError | null>();
 
@@ -38,13 +37,6 @@ function ResetPassword({ version }: ResetPasswordProps): JSX.Element {
 	const { notifications } = useNotifications();
 
 	const [form] = Form.useForm<FormValues>();
-	useEffect(() => {
-		if (!token) {
-			Logout();
-			history.push(ROUTES.LOGIN);
-		}
-	}, [token]);
-
 	const handleFormSubmit: () => Promise<void> = async () => {
 		try {
 			setLoading(true);
@@ -154,9 +146,9 @@ function ResetPassword({ version }: ResetPasswordProps): JSX.Element {
 					<Typography.Title level={4} className="reset-password-header-title">
 						Reset Your Password
 					</Typography.Title>
-					<Typography.Paragraph className="reset-password-header-subtitle">
+					<Typography.Text className="reset-password-header-subtitle">
 						Monitor your applications. Find what is causing issues.
-					</Typography.Paragraph>
+					</Typography.Text>
 					{version && (
 						<div className="reset-password-version-badge">v{version}</div>
 					)}
@@ -215,8 +207,9 @@ function ResetPassword({ version }: ResetPasswordProps): JSX.Element {
 							showIcon
 							icon={<CircleAlert size={12} />}
 							className="reset-password-error-callout"
-							description="Passwords don't match. Please try again."
-						/>
+						>
+							Passwords don&apos;t match. Please try again.
+						</Callout>
 					)}
 
 					{errorMessage && !confirmPasswordError && (
@@ -231,7 +224,7 @@ function ResetPassword({ version }: ResetPasswordProps): JSX.Element {
 							data-attr="reset-password"
 							disabled={!isValidPassword || loading}
 							className="reset-password-submit-button"
-							suffixIcon={<ArrowRight size={16} />}
+							suffix={<ArrowRight size={16} />}
 						>
 							Reset Password
 						</Button>

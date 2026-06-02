@@ -51,8 +51,8 @@ function TopContributorsRows({
 					<Progress
 						percent={(count / totalCurrentTriggers) * 100}
 						showInfo={false}
-						trailColor="rgba(255, 255, 255, 0)"
 						strokeColor={Color.BG_ROBIN_500}
+						className="top-contributors-progress"
 					/>
 				</ConditionalAlertPopover>
 			),

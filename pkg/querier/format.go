@@ -149,7 +149,7 @@ func quoteEscapedString(str string) string {
 	return str
 }
 
-// formatValueForProm formats the value to be used in promql
+// formatValueForProm formats the value to be used in promql.
 func formatValueForProm(v any) string {
 	switch x := v.(type) {
 	case int:

@@ -29,6 +29,7 @@ type provider struct {
 	configStore         alertmanagertypes.ConfigStore
 	stateStore          alertmanagertypes.StateStore
 	notificationManager nfmanager.NotificationManager
+	maintenanceStore    alertmanagertypes.MaintenanceStore
 	stopC               chan struct{}
 }
 
@@ -45,19 +46,20 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 
 	p := &provider{
 		service: alertmanager.New(
-			ctx,
 			settings,
 			config.O11y.Config,
 			stateStore,
 			configStore,
 			orgGetter,
 			notificationManager,
+			maintenanceStore,
 		),
 		settings:            settings,
 		config:              config,
 		configStore:         configStore,
 		stateStore:          stateStore,
 		notificationManager: notificationManager,
+		maintenanceStore:    maintenanceStore,
 		stopC:               make(chan struct{}),
 	}
 
@@ -66,7 +68,7 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 
 func (provider *provider) Start(ctx context.Context) error {
 	if err := provider.service.SyncServers(ctx); err != nil {
-		provider.settings.Logger().ErrorContext(ctx, "failed to sync alertmanager servers", "error", err)
+		provider.settings.Logger().ErrorContext(ctx, "failed to sync alertmanager servers", errors.Attr(err))
 		return err
 	}
 
@@ -78,7 +80,7 @@ func (provider *provider) Start(ctx context.Context) error {
 			return nil
 		case <-ticker.C:
 			if err := provider.service.SyncServers(ctx); err != nil {
-				provider.settings.Logger().ErrorContext(ctx, "failed to sync alertmanager servers", "error", err)
+				provider.settings.Logger().ErrorContext(ctx, "failed to sync alertmanager servers", errors.Attr(err))
 			}
 		}
 	}
@@ -112,7 +114,7 @@ func (provider *provider) TestAlert(ctx context.Context, orgID string, ruleID st
 			for k, v := range alert.Labels {
 				set[model.LabelName(k)] = model.LabelValue(v)
 			}
-			match, err := provider.notificationManager.Match(ctx, orgID, alert.Labels[labels.AlertRuleIdLabel], set)
+			match, err := provider.notificationManager.Match(ctx, orgID, alert.Labels[ruletypes.LabelRuleID], set)
 			if err != nil {
 				return err
 			}
@@ -168,6 +170,21 @@ func (provider *provider) DeleteChannelByID(ctx context.Context, orgID string, c
 		return err
 	}
 
+	// Check if channel is referenced by any route policy (rule-based or policy-based)
+	policies, err := provider.notificationManager.GetRoutePoliciesByChannel(ctx, orgID, channel.Name)
+	if err != nil {
+		return err
+	}
+	if len(policies) > 0 {
+		names := make([]string, 0, len(policies))
+		for _, p := range policies {
+			names = append(names, p.Name)
+		}
+		return errors.NewInvalidInputf(errors.CodeInvalidInput,
+			"channel %q cannot be deleted because it is used by the following routing policies: %v",
+			channel.Name, names)
+	}
+
 	config, err := provider.configStore.Get(ctx, orgID)
 	if err != nil {
 		return err
@@ -205,6 +222,10 @@ func (provider *provider) CreateChannel(ctx context.Context, orgID string, recei
 	}
 
 	return channel, nil
+}
+
+func (provider *provider) Config() alertmanagerserver.Config {
+	return provider.config.Signoz.Config
 }
 
 func (provider *provider) SetConfig(ctx context.Context, config *alertmanagertypes.Config) error {
@@ -293,8 +314,8 @@ func (provider *provider) CreateRoutePolicy(ctx context.Context, routeRequest *a
 	return &alertmanagertypes.GettableRoutePolicy{
 		PostableRoutePolicy: *routeRequest,
 		ID:                  route.ID.StringValue(),
-		CreatedAt:           &route.CreatedAt,
-		UpdatedAt:           &route.UpdatedAt,
+		CreatedAt:           route.CreatedAt,
+		UpdatedAt:           route.UpdatedAt,
 		CreatedBy:           &route.CreatedBy,
 		UpdatedBy:           &route.UpdatedBy,
 	}, nil
@@ -349,8 +370,8 @@ func (provider *provider) CreateRoutePolicies(ctx context.Context, routeRequests
 		results = append(results, &alertmanagertypes.GettableRoutePolicy{
 			PostableRoutePolicy: *routeRequest,
 			ID:                  route.ID.StringValue(),
-			CreatedAt:           &route.CreatedAt,
-			UpdatedAt:           &route.UpdatedAt,
+			CreatedAt:           route.CreatedAt,
+			UpdatedAt:           route.UpdatedAt,
 			CreatedBy:           &route.CreatedBy,
 			UpdatedBy:           &route.UpdatedBy,
 		})
@@ -389,8 +410,8 @@ func (provider *provider) GetRoutePolicyByID(ctx context.Context, routeID string
 			Tags:           route.Tags,
 		},
 		ID:        route.ID.StringValue(),
-		CreatedAt: &route.CreatedAt,
-		UpdatedAt: &route.UpdatedAt,
+		CreatedAt: route.CreatedAt,
+		UpdatedAt: route.UpdatedAt,
 		CreatedBy: &route.CreatedBy,
 		UpdatedBy: &route.UpdatedBy,
 	}, nil
@@ -423,8 +444,8 @@ func (provider *provider) GetAllRoutePolicies(ctx context.Context) ([]*alertmana
 				Tags:           route.Tags,
 			},
 			ID:        route.ID.StringValue(),
-			CreatedAt: &route.CreatedAt,
-			UpdatedAt: &route.UpdatedAt,
+			CreatedAt: route.CreatedAt,
+			UpdatedAt: route.UpdatedAt,
 			CreatedBy: &route.CreatedBy,
 			UpdatedBy: &route.UpdatedBy,
 		})
@@ -492,8 +513,8 @@ func (provider *provider) UpdateRoutePolicyByID(ctx context.Context, routeID str
 	return &alertmanagertypes.GettableRoutePolicy{
 		PostableRoutePolicy: *route,
 		ID:                  updatedRoute.ID.StringValue(),
-		CreatedAt:           &updatedRoute.CreatedAt,
-		UpdatedAt:           &updatedRoute.UpdatedAt,
+		CreatedAt:           updatedRoute.CreatedAt,
+		UpdatedAt:           updatedRoute.UpdatedAt,
 		CreatedBy:           &updatedRoute.CreatedBy,
 		UpdatedBy:           &updatedRoute.UpdatedBy,
 	}, nil

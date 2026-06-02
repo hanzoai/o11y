@@ -10,7 +10,6 @@ import { ConditionalAlertPopover } from 'container/AlertHistory/AlertPopover/Ale
 import { transformKeyValuesToAttributeValuesMap } from 'container/QueryBuilder/filters/utils';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { TimestampInput } from 'hooks/useTimezoneFormatter/useTimezoneFormatter';
-import { Search } from 'lucide-react';
 import AlertLabels, {
 	AlertLabelsProps,
 } from 'pages/AlertDetails/AlertHeader/AlertLabels/AlertLabels';
@@ -126,7 +125,7 @@ export const timelineTableColumns = ({
 				relatedLogsLink={record.relatedLogsLink}
 			>
 				<Button type="text" ghost>
-					<EllipsisOutlined className="dropdown-icon" />
+					<Ellipsis className="dropdown-icon" size="md" />
 				</Button>
 			</ConditionalAlertPopover>
 		),

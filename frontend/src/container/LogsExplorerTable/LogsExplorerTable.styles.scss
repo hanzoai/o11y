@@ -32,27 +32,11 @@
 		letter-spacing: -0.07px;
 
 		.ant-table-cell-row-hover {
-			background: rgba(171, 189, 255, 0.04) !important;
-		}
-	}
-}
-
-.lightMode {
-	.ant-table {
-		color: var(--bg-slate-400) !important;
-	}
-
-	.ant-table-thead {
-		.ant-table-cell {
-			color: var(--bg-slate-400) !important;
-		}
-	}
-
-	.ant-table-row {
-		color: var(--bg-slate-400) !important;
-
-		.ant-table-cell-row-hover {
-			background: var(--bg-vanilla-300) !important;
+			background: color-mix(
+				in srgb,
+				var(--bg-robin-200) 4%,
+				transparent
+			) !important;
 		}
 	}
 }

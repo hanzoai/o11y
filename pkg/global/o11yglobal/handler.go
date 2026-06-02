@@ -1,7 +1,9 @@
 package o11yglobal
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/http/render"
@@ -17,7 +19,10 @@ func NewHandler(global global.Global) global.Handler {
 }
 
 func (handler *handler) GetConfig(rw http.ResponseWriter, r *http.Request) {
-	cfg := handler.global.GetConfig()
+	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	defer cancel()
 
-	render.Success(rw, http.StatusOK, types.NewGettableGlobalConfig(cfg.ExternalURL, cfg.IngestionURL))
+	cfg := handler.global.GetConfig(ctx)
+
+	render.Success(rw, http.StatusOK, cfg)
 }

@@ -81,10 +81,8 @@ function OnboardingQuestionaire(): JSX.Element {
 		InviteTeamMembersProps[] | null
 	>(null);
 
-	const [
-		updatingOrgOnboardingStatus,
-		setUpdatingOrgOnboardingStatus,
-	] = useState<boolean>(false);
+	const [updatingOrgOnboardingStatus, setUpdatingOrgOnboardingStatus] =
+		useState<boolean>(false);
 
 	useEffect(() => {
 		logEvent('Org Onboarding: Started', {
@@ -123,9 +121,8 @@ function OnboardingQuestionaire(): JSX.Element {
 		optimiseO11yDetails.hostsPerDay === 0 &&
 		optimiseO11yDetails.services === 0;
 
-	const { mutate: updateProfile, isLoading: isUpdatingProfile } = usePutProfile<
-		AxiosError<RenderErrorResponseDTO>
-	>();
+	const { mutate: updateProfile, isLoading: isUpdatingProfile } =
+		usePutProfile<AxiosError<RenderErrorResponseDTO>>();
 
 	const { mutate: updateOrgPreference } = useMutation(updateOrgPreferenceAPI, {
 		onSuccess: () => {
