@@ -97,21 +97,17 @@ jobs:
       GO_VERSION: 1.24
       GO_INPUT_ARTIFACT_CACHE_KEY: staging-jsbuild-${{ github.sha }}
       GO_INPUT_ARTIFACT_PATH: frontend/build
-      GO_BUILD_CONTEXT: ./cmd/enterprise
+      GO_BUILD_CONTEXT: ./cmd/server
       GO_BUILD_FLAGS: >-
         -tags timetzdata
         -ldflags='-s -w
-        -X github.com/Hanzo O11y/observe/pkg/version.version=${{ needs.prepare.outputs.version }}
-        -X github.com/Hanzo O11y/observe/pkg/version.variant=enterprise
-        -X github.com/Hanzo O11y/observe/pkg/version.hash=${{ needs.prepare.outputs.hash }}
-        -X github.com/Hanzo O11y/observe/pkg/version.time=${{ needs.prepare.outputs.time }}
-        -X github.com/Hanzo O11y/observe/pkg/version.branch=${{ needs.prepare.outputs.branch }}
-        -X github.com/Hanzo O11y/observe/ee/zeus.url=https://api.staging.o11y.hanzo.ai
-        -X github.com/Hanzo O11y/observe/ee/zeus.deprecatedURL=https://license.staging.o11y.hanzo.ai
-        -X github.com/Hanzo O11y/observe/ee/query-service/constants.LicenseObserveIo=https://license.staging.o11y.hanzo.ai/api/v1
-        -X github.com/Hanzo O11y/observe/pkg/analytics.key=9kRrJ7oPCGPEJLF6QjMPLt5bljFhRQBr'
+        -X github.com/hanzoai/o11y/pkg/version.version=${{ needs.prepare.outputs.version }}
+        -X github.com/hanzoai/o11y/pkg/version.hash=${{ needs.prepare.outputs.hash }}
+        -X github.com/hanzoai/o11y/pkg/version.time=${{ needs.prepare.outputs.time }}
+        -X github.com/hanzoai/o11y/pkg/version.branch=${{ needs.prepare.outputs.branch }}
+        -X github.com/hanzoai/o11y/pkg/analytics.key=9kRrJ7oPCGPEJLF6QjMPLt5bljFhRQBr'
       DOCKER_BASE_IMAGES: '{"alpine": "alpine:3.20.3"}'
-      DOCKER_DOCKERFILE_PATH: ./cmd/enterprise/Dockerfile.multi-arch
+      DOCKER_DOCKERFILE_PATH: ./cmd/server/Dockerfile.multi-arch
       DOCKER_MANIFEST: true
       DOCKER_PROVIDERS: gcp
   staging:
