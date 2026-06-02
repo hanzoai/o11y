@@ -48,6 +48,9 @@ type Alertmanager interface {
 	// DeleteChannelByID deletes a channel for the organization.
 	DeleteChannelByID(context.Context, string, valuer.UUID) error
 
+	// Config returns the alertmanagerserver configuration.
+	Config() alertmanagerserver.Config
+
 	// SetConfig sets the config for the organization.
 	SetConfig(context.Context, *alertmanagertypes.Config) error
 

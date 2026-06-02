@@ -1,6 +1,8 @@
 import BrandMark from 'components/BrandMark';
 import history from 'lib/history';
 
+import signozBrandLogoUrl from '@/assets/Logos/signoz-brand-logo.svg';
+
 import './FullScreenHeader.styles.scss';
 
 export default function FullScreenHeader({

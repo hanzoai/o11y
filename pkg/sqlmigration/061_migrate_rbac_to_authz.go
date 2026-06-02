@@ -125,7 +125,7 @@ func (migration *migrateRbacToAuthz) Up(ctx context.Context, db *bun.DB) error {
 
 		tuples = append(tuples, tuple{
 			OrgID:    orgID,
-			ID:       authtypes.AnonymousUser.StringValue(),
+			ID:       coretypes.AnonymousUser.StringValue(),
 			Type:     "anonymous",
 			RoleName: "o11y-anonymous",
 		})

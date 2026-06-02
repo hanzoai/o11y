@@ -84,17 +84,17 @@ describe('mapQueryDataFromApi', (): void => {
 		expect(q.dataSource).toBe(DataSource.TRACES);
 		expect(q.stepInterval).toBe(60);
 		// filter overridden from V5 spec (no trailing space)
-		expect(q.filter).toEqual({ expression: "service.name = 'adservice'" });
+		expect(q.filter).toStrictEqual({ expression: "service.name = 'adservice'" });
 		// having overridden from V5 spec
-		expect(((q.having as unknown) as { expression: string }).expression).toBe(
+		expect((q.having as unknown as { expression: string }).expression).toBe(
 			'avg(app.ads.count) != 0',
 		);
 		// orderBy preserved from base
-		expect(q.orderBy).toEqual([
+		expect(q.orderBy).toStrictEqual([
 			{ columnName: 'avg(app.ads.count)', order: 'asc' },
 		]);
 		// groupBy converted from V5 spec
-		expect(q.groupBy).toEqual([
+		expect(q.groupBy).toStrictEqual([
 			{
 				key: 'service.name',
 				dataType: DataTypes.String,
@@ -103,7 +103,7 @@ describe('mapQueryDataFromApi', (): void => {
 			},
 		]);
 		// aggregations replaced with array from V5 spec
-		expect(q.aggregations).toEqual<TraceAggregation[]>([
+		expect(q.aggregations).toStrictEqual<TraceAggregation[]>([
 			{ expression: 'count()' },
 			{ expression: 'avg(app.ads.count)', alias: 'avtv' },
 		]);

@@ -2,7 +2,7 @@ package featuretypes
 
 import "github.com/hanzoai/o11y/pkg/valuer"
 
-// A concrete type for a feature flag kind
+// A concrete type for a feature flag kind.
 type Kind struct{ valuer.String }
 
 var (

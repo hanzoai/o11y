@@ -9,7 +9,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
 )
 
-// sanitizeClause adds AND prefix to non-empty clauses if not already present
+// sanitizeClause adds AND prefix to non-empty clauses if not already present.
 func sanitizeClause(clause string) string {
 	if clause == "" {
 		return ""

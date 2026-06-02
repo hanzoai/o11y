@@ -11,6 +11,9 @@ import ROUTES from 'constants/routes';
 import history from 'lib/history';
 import APIError from 'types/api/error';
 import { OrgSessionContext } from 'types/api/v2/sessions/context/get';
+import { getBaseUrl } from 'utils/basePath';
+
+import tvUrl from '@/assets/svgs/tv.svg';
 
 import SuccessScreen from './SuccessScreen';
 
@@ -104,7 +107,7 @@ function ForgotPassword({
 			data: {
 				email: values.email,
 				orgId: currentOrgId,
-				frontendBaseURL: window.location.origin,
+				frontendBaseURL: getBaseUrl(),
 			},
 		});
 	}, [form, forgotPasswordMutate, initialOrgId, hasMultipleOrgs]);
@@ -190,7 +193,7 @@ function ForgotPassword({
 						data-testid="forgot-password-back"
 						className="forgot-password-back-button"
 						onClick={handleBackToLogin}
-						prefixIcon={<ArrowLeft size={12} />}
+						prefix={<ArrowLeft size={12} />}
 					>
 						Back to login
 					</Button>
@@ -203,7 +206,7 @@ function ForgotPassword({
 						type="submit"
 						data-testid="forgot-password-submit"
 						className="login-submit-btn"
-						suffixIcon={<ArrowRight size={12} />}
+						suffix={<ArrowRight size={12} />}
 					>
 						{isLoading ? 'Sending...' : 'Send reset link'}
 					</Button>

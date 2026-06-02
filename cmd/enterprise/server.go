@@ -58,7 +58,7 @@ func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
 		},
 	}
 
-	flags.RegisterFlags(serverCmd)
+	serverCmd.Flags().StringArrayVar(&configFiles, "config", nil, "path to a YAML configuration file (can be specified multiple times, later files override earlier ones)")
 	parentCmd.AddCommand(serverCmd)
 }
 
@@ -116,21 +116,65 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 
 			return authNs, nil
 		},
-		func(ctx context.Context, sqlstore sqlstore.SQLStore, licensing licensing.Licensing, dashboardModule dashboard.Module) factory.ProviderFactory[authz.AuthZ, authz.Config] {
-			return openfgaauthz.NewProviderFactory(sqlstore, openfgaschema.NewSchema().Get(ctx), licensing, dashboardModule)
+		func(ctx context.Context, sqlstore sqlstore.SQLStore, config authz.Config, licensing licensing.Licensing, onBeforeRoleDelete []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error) {
+			openfgaDataStore, err := openfgaserver.NewSQLStore(sqlstore, config)
+			if err != nil {
+				return nil, err
+			}
+			return openfgaauthz.NewProviderFactory(sqlstore, openfgaschema.NewSchema().Get(ctx), openfgaDataStore, licensing, onBeforeRoleDelete, authtypes.NewRegistry()), nil
 		},
-		func(store sqlstore.SQLStore, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser, querier querier.Querier, licensing licensing.Licensing) dashboard.Module {
-			return impldashboard.NewModule(pkgimpldashboard.NewStore(store), settings, analytics, orgGetter, queryParser, querier, licensing)
+		func(store sqlstore.SQLStore, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser, querier querier.Querier, licensing licensing.Licensing, tagModule tag.Module) dashboard.Module {
+			return impldashboard.NewModule(pkgimpldashboard.NewStore(store), settings, analytics, orgGetter, queryParser, querier, licensing, tagModule)
 		},
 		func(licensing licensing.Licensing) factory.ProviderFactory[gateway.Gateway, gateway.Config] {
 			return httpgateway.NewProviderFactory(licensing)
+		},
+		func(licensing licensing.Licensing) factory.NamedMap[factory.ProviderFactory[auditor.Auditor, auditor.Config]] {
+			factories := signoz.NewAuditorProviderFactories()
+			if err := factories.Add(otlphttpauditor.NewFactory(licensing, version.Info)); err != nil {
+				panic(err)
+			}
+			if err := factories.Add(fileauditor.NewFactory(licensing, version.Info)); err != nil {
+				panic(err)
+			}
+			return factories
+		},
+		func(ctx context.Context, providerSettings factory.ProviderSettings, flagger pkgflagger.Flagger, licensing licensing.Licensing, telemetryStore telemetrystore.TelemetryStore, retentionGetter retention.Getter, orgGetter organization.Getter, zeus zeus.Zeus) (factory.NamedMap[factory.ProviderFactory[meterreporter.Reporter, meterreporter.Config]], string) {
+			factories := signoz.NewMeterReporterProviderFactories()
+
+			collectorFactories := factory.MustNewNamedMap(
+				staticmetercollector.NewFactory(),
+				telemetrymetercollector.NewFactory(telemetryStore, retentionGetter),
+			)
+
+			if err := factories.Add(httpmeterreporter.NewFactory(collectorFactories, meterConfigs, flagger, licensing, orgGetter, zeus)); err != nil {
+				panic(err)
+			}
+
+			return factories, "http"
 		},
 		func(ps factory.ProviderSettings, q querier.Querier, a analytics.Analytics) querier.Handler {
 			communityHandler := querier.NewHandler(ps, q, a)
 			return eequerier.NewHandler(ps, q, communityHandler)
 		},
-	)
+		func(sqlStore sqlstore.SQLStore, dashboardModule dashboard.Module, global global.Global, zeus zeus.Zeus, gateway gateway.Gateway, licensing licensing.Licensing, serviceAccount serviceaccount.Module, config cloudintegration.Config) (cloudintegration.Module, error) {
+			defStore := pkgcloudintegration.NewServiceDefinitionStore()
+			awsCloudProviderModule, err := implcloudprovider.NewAWSCloudProvider(defStore)
+			if err != nil {
+				return nil, err
+			}
+			azureCloudProviderModule := implcloudprovider.NewAzureCloudProvider(defStore)
+			cloudProvidersMap := map[cloudintegrationtypes.CloudProviderType]cloudintegration.CloudProviderModule{
+				cloudintegrationtypes.CloudProviderTypeAWS:   awsCloudProviderModule,
+				cloudintegrationtypes.CloudProviderTypeAzure: azureCloudProviderModule,
+			}
 
+			return implcloudintegration.NewModule(pkgcloudintegration.NewStore(sqlStore), dashboardModule, global, zeus, gateway, licensing, serviceAccount, cloudProvidersMap, config)
+		},
+		func(c cache.Cache, am alertmanager.Alertmanager, ss sqlstore.SQLStore, ts telemetrystore.TelemetryStore, ms telemetrytypes.MetadataStore, p prometheus.Prometheus, og organization.Getter, rsh rulestatehistory.Module, q querier.Querier, qp queryparser.QueryParser) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]] {
+			return factory.MustNewNamedMap(signozruler.NewFactory(c, am, ss, ts, ms, p, og, rsh, q, qp, eerules.PrepareTaskFunc, eerules.TestNotification))
+		},
+	)
 	if err != nil {
 		logger.ErrorContext(ctx, "failed to create o11y", "error", err)
 		return err
@@ -138,12 +182,12 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 
 	server, err := enterpriseapp.NewServer(config, o11y)
 	if err != nil {
-		logger.ErrorContext(ctx, "failed to create server", "error", err)
+		logger.ErrorContext(ctx, "failed to create server", errors.Attr(err))
 		return err
 	}
 
 	if err := server.Start(ctx); err != nil {
-		logger.ErrorContext(ctx, "failed to start server", "error", err)
+		logger.ErrorContext(ctx, "failed to start server", errors.Attr(err))
 		return err
 	}
 
@@ -156,7 +200,7 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 
 	err = server.Stop(ctx)
 	if err != nil {
-		logger.ErrorContext(ctx, "failed to stop server", "error", err)
+		logger.ErrorContext(ctx, "failed to stop server", errors.Attr(err))
 		return err
 	}
 

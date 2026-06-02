@@ -3,7 +3,6 @@ package o11y
 import (
 	"context"
 	"log/slog"
-	"net/url"
 	"os"
 	"path"
 	"reflect"
@@ -49,6 +48,9 @@ type Config struct {
 
 	// Instrumentation config
 	Instrumentation instrumentation.Config `mapstructure:"instrumentation"`
+
+	// PProf config
+	PProf pprof.Config `mapstructure:"pprof"`
 
 	// Analytics config
 	Analytics analytics.Config `mapstructure:"analytics"`
@@ -104,11 +106,35 @@ type Config struct {
 	// MetricsExplorer config
 	MetricsExplorer metricsexplorer.Config `mapstructure:"metricsexplorer"`
 
+	// InfraMonitoring config
+	InfraMonitoring inframonitoring.Config `mapstructure:"inframonitoring"`
+
 	// Flagger config
 	Flagger flagger.Config `mapstructure:"flagger"`
 
 	// User config
 	User user.Config `mapstructure:"user"`
+
+	// IdentN config
+	IdentN identn.Config `mapstructure:"identn"`
+
+	// ServiceAccount config
+	ServiceAccount serviceaccount.Config `mapstructure:"serviceaccount"`
+
+	// Auditor config
+	Auditor auditor.Config `mapstructure:"auditor"`
+
+	// MeterReporter config
+	MeterReporter meterreporter.Config `mapstructure:"meterreporter"`
+
+	// CloudIntegration config
+	CloudIntegration cloudintegration.Config `mapstructure:"cloudintegration"`
+
+	// TraceDetail config
+	TraceDetail tracedetail.Config `mapstructure:"tracedetail"`
+
+	// Authz config
+	Authz authz.Config `mapstructure:"authz"`
 }
 
 // DeprecatedFlags are the flags that are deprecated and scheduled for removal.
@@ -152,6 +178,7 @@ func NewConfig(ctx context.Context, logger *slog.Logger, resolverConfig config.R
 		global.NewConfigFactory(),
 		version.NewConfigFactory(),
 		instrumentation.NewConfigFactory(),
+		pprof.NewConfigFactory(),
 		analytics.NewConfigFactory(),
 		web.NewConfigFactory(),
 		cache.NewConfigFactory(),
@@ -169,8 +196,16 @@ func NewConfig(ctx context.Context, logger *slog.Logger, resolverConfig config.R
 		gateway.NewConfigFactory(),
 		tokenizer.NewConfigFactory(),
 		metricsexplorer.NewConfigFactory(),
+		inframonitoring.NewConfigFactory(),
 		flagger.NewConfigFactory(),
 		user.NewConfigFactory(),
+		identn.NewConfigFactory(),
+		serviceaccount.NewConfigFactory(),
+		auditor.NewConfigFactory(),
+		meterreporter.NewConfigFactory(),
+		cloudintegration.NewConfigFactory(),
+		tracedetail.NewConfigFactory(),
+		authz.NewConfigFactory(),
 	}
 
 	conf, err := config.New(ctx, resolverConfig, configFactories)
@@ -183,7 +218,7 @@ func NewConfig(ctx context.Context, logger *slog.Logger, resolverConfig config.R
 		return Config{}, err
 	}
 
-	mergeAndEnsureBackwardCompatibility(ctx, logger, &config, deprecatedFlags)
+	mergeAndEnsureBackwardCompatibility(ctx, logger, &config)
 
 	if err := validateConfig(config); err != nil {
 		return Config{}, err
@@ -370,6 +405,14 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 		config.Flagger.Config.Boolean[flagger.FeatureKafkaSpanEval.String()] = os.Getenv("KAFKA_SPAN_EVAL") == "true"
 	}
 
+	if os.Getenv("RULES_EVAL_DELAY") != "" {
+		logger.WarnContext(ctx, "[Deprecated] env RULES_EVAL_DELAY is deprecated and scheduled for removal. Please use SIGNOZ_RULER_EVAL__DELAY instead.")
+		if d, err := time.ParseDuration(os.Getenv("RULES_EVAL_DELAY")); err == nil {
+			config.Ruler.EvalDelay = d
+		} else {
+			logger.WarnContext(ctx, "Error parsing RULES_EVAL_DELAY, using default value of 2m")
+		}
+	}
 }
 
 func (config Config) Collect(_ context.Context, _ valuer.UUID) (map[string]any, error) {

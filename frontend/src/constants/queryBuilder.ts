@@ -266,10 +266,11 @@ export const initialFormulaBuilderFormValues: IBuilderFormula = {
 	legend: '',
 };
 
-export const initialQueryBuilderFormTraceOperatorValues: IBuilderTraceOperator = {
-	...initialQueryBuilderFormTracesValues,
-	queryName: TRACE_OPERATOR_QUERY_NAME,
-};
+export const initialQueryBuilderFormTraceOperatorValues: IBuilderTraceOperator =
+	{
+		...initialQueryBuilderFormTracesValues,
+		queryName: TRACE_OPERATOR_QUERY_NAME,
+	};
 
 export const initialQueryPromQLData: IPromQLQuery = {
 	name: createNewBuilderItemName({ existNames: [], sourceNames: alphabet }),
@@ -429,6 +430,31 @@ export const OPERATORS = {
 	NOTILIKE: 'NOT_ILIKE',
 };
 
+/**
+ * Maps short-form InfraMonitoring operators to long-form display labels.
+ * InfraMonitoring backend uses short forms (NIN), UI displays long forms (NOT_IN).
+ */
+export const INFRA_SHORT_TO_LONG_OPERATOR_MAP: Record<string, string> = {
+	NIN: 'NOT_IN',
+	NLIKE: 'NOT_LIKE',
+	NOTILIKE: 'NOT_ILIKE',
+	NREGEX: 'NOT_REGEX',
+	NEXISTS: 'NOT_EXISTS',
+	NCONTAINS: 'NOT_CONTAINS',
+};
+
+/**
+ * Maps long-form operators to short-form for InfraMonitoring API.
+ */
+export const INFRA_LONG_TO_SHORT_OPERATOR_MAP: Record<string, string> = {
+	NOT_IN: 'NIN',
+	NOT_LIKE: 'NLIKE',
+	NOT_ILIKE: 'NOTILIKE',
+	NOT_REGEX: 'NREGEX',
+	NOT_EXISTS: 'NEXISTS',
+	NOT_CONTAINS: 'NCONTAINS',
+};
+
 export const QUERY_BUILDER_OPERATORS_BY_TYPES = {
 	string: [
 		OPERATORS['='],
@@ -547,4 +573,50 @@ export const DATA_TYPE_VS_ATTRIBUTE_VALUES_KEY: Record<
 	[DataTypes.ArrayString]: 'stringAttributeValues',
 	[DataTypes.ArrayBool]: 'boolAttributeValues',
 	[DataTypes.EMPTY]: 'stringAttributeValues',
+};
+
+export const listViewInitialLogQuery: Query = {
+	...initialQueriesMap.logs,
+	builder: {
+		...initialQueriesMap.logs.builder,
+		queryData: [
+			{
+				...initialQueriesMap.logs.builder.queryData[0],
+				aggregateOperator: LogsAggregatorOperator.NOOP,
+				orderBy: [{ columnName: 'timestamp', order: 'desc' }],
+				offset: 0,
+				pageSize: 100,
+			},
+		],
+	},
+};
+
+export const PANEL_TYPES_INITIAL_QUERY: Record<PANEL_TYPES, Query> = {
+	[PANEL_TYPES.TIME_SERIES]: initialQueriesMap.metrics,
+	[PANEL_TYPES.VALUE]: initialQueriesMap.metrics,
+	[PANEL_TYPES.TABLE]: initialQueriesMap.metrics,
+	[PANEL_TYPES.LIST]: listViewInitialLogQuery,
+	[PANEL_TYPES.TRACE]: initialQueriesMap.traces,
+	[PANEL_TYPES.BAR]: initialQueriesMap.metrics,
+	[PANEL_TYPES.PIE]: initialQueriesMap.metrics,
+	[PANEL_TYPES.HISTOGRAM]: initialQueriesMap.metrics,
+	[PANEL_TYPES.EMPTY_WIDGET]: initialQueriesMap.metrics,
+};
+
+export const listViewInitialTraceQuery: Query = {
+	// it should be the above commented query
+	...initialQueriesMap.traces,
+	builder: {
+		...initialQueriesMap.traces.builder,
+		queryData: [
+			{
+				...initialQueriesMap.traces.builder.queryData[0],
+				aggregateOperator: LogsAggregatorOperator.NOOP,
+				orderBy: [{ columnName: 'timestamp', order: 'desc' }],
+				offset: 0,
+				pageSize: 10,
+				selectColumns: defaultTraceSelectedColumns,
+			},
+		],
+	},
 };

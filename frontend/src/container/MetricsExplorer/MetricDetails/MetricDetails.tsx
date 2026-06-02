@@ -6,7 +6,7 @@ import { Button, Divider, Drawer, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { useGetMetricMetadata } from 'api/generated/services/metrics';
 import { useIsDarkMode } from 'hooks/useDarkMode';
-import { Compass, Crosshair, X } from 'lucide-react';
+import { Compass, Crosshair, X } from '@signozhq/icons';
 import { AppState } from 'store/reducers';
 import { GlobalReducer } from 'types/reducer/globalTime';
 
@@ -54,16 +54,11 @@ function MetricDetails({
 	);
 
 	const metadata = useMemo(() => {
-		if (!metricMetadataResponse) {
+		if (!metricMetadataResponse?.data) {
 			return null;
 		}
-		const {
-			type,
-			description,
-			unit,
-			temporality,
-			isMonotonic,
-		} = metricMetadataResponse.data;
+		const { type, description, unit, temporality, isMonotonic } =
+			metricMetadataResponse.data;
 
 		return {
 			type,
@@ -74,9 +69,10 @@ function MetricDetails({
 		};
 	}, [metricMetadataResponse]);
 
-	const showInspectFeature = useMemo(() => isInspectEnabled(metadata?.type), [
-		metadata?.type,
-	]);
+	const showInspectFeature = useMemo(
+		() => isInspectEnabled(metadata?.type),
+		[metadata?.type],
+	);
 
 	const goToMetricsExplorerwithSelectedMetric = useCallback(() => {
 		if (metricName) {

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"math"
 	"net/http"
 	"sort"
@@ -16,13 +17,14 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/types/thirdpartyapitypes"
 
+	"log/slog"
+
 	"github.com/SigNoz/govaluate"
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/kafka"
 	queues2 "github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/queues"
 	"github.com/gorilla/mux"
 	promModel "github.com/hanzoai/common/model"
 	"go.uber.org/multierr"
-	"go.uber.org/zap"
 
 	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/app/metrics"
@@ -413,7 +415,7 @@ func parseTime(param string, r *http.Request) (*time.Time, error) {
 
 }
 
-func parseTTLParams(r *http.Request) (*model.TTLParams, error) {
+func parseTTLParams(r *http.Request) (*retentiontypes.TTLParams, error) {
 
 	// make sure either of the query params are present
 	typeTTL := r.URL.Query().Get("type")
@@ -426,7 +428,7 @@ func parseTTLParams(r *http.Request) (*model.TTLParams, error) {
 	}
 
 	// Validate the type parameter
-	if typeTTL != baseconstants.TraceTTL && typeTTL != baseconstants.MetricsTTL && typeTTL != baseconstants.LogsTTL {
+	if typeTTL != retentiontypes.TraceTTL && typeTTL != retentiontypes.MetricsTTL && typeTTL != retentiontypes.LogsTTL {
 		return nil, fmt.Errorf("type param should be metrics|traces|logs, got %v", typeTTL)
 	}
 
@@ -449,7 +451,7 @@ func parseTTLParams(r *http.Request) (*model.TTLParams, error) {
 		}
 	}
 
-	return &model.TTLParams{
+	return &retentiontypes.TTLParams{
 		Type:                  typeTTL,
 		DelDuration:           int64(durationParsed.Seconds()),
 		ColdStorageVolume:     coldStorage,
@@ -457,7 +459,7 @@ func parseTTLParams(r *http.Request) (*model.TTLParams, error) {
 	}, nil
 }
 
-func parseGetTTL(r *http.Request) (*model.GetTTLParams, error) {
+func parseGetTTL(r *http.Request) (*retentiontypes.GetTTLParams, error) {
 
 	typeTTL := r.URL.Query().Get("type")
 
@@ -465,12 +467,12 @@ func parseGetTTL(r *http.Request) (*model.GetTTLParams, error) {
 		return nil, fmt.Errorf("type param cannot be empty from the query")
 	} else {
 		// Validate the type parameter
-		if typeTTL != baseconstants.TraceTTL && typeTTL != baseconstants.MetricsTTL && typeTTL != baseconstants.LogsTTL {
+		if typeTTL != retentiontypes.TraceTTL && typeTTL != retentiontypes.MetricsTTL && typeTTL != retentiontypes.LogsTTL {
 			return nil, fmt.Errorf("type param should be metrics|traces|logs, got %v", typeTTL)
 		}
 	}
 
-	return &model.GetTTLParams{Type: typeTTL}, nil
+	return &retentiontypes.GetTTLParams{Type: typeTTL}, nil
 }
 
 func parseAggregateAttributeRequest(r *http.Request) (*v3.AggregateAttributeRequest, error) {
@@ -760,6 +762,13 @@ func ParseQueryRangeParams(r *http.Request) (*v3.QueryRangeParamsV3, *model.ApiE
 	// validate the request body
 	if err := validateQueryRangeParamsV3(queryRangeParams); err != nil {
 		return nil, &model.ApiError{Typ: model.ErrorBadData, Err: err}
+	}
+
+	// Clamp the top-level Step for PromQL
+	if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypePromQL {
+		if minStep := common.MinAllowedStepInterval(queryRangeParams.Start, queryRangeParams.End); queryRangeParams.Step < minStep {
+			queryRangeParams.Step = minStep
+		}
 	}
 
 	// prepare the variables for the corresponding query type

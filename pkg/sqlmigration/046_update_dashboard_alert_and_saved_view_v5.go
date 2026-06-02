@@ -59,7 +59,7 @@ func (migration *queryBuilderV5Migration) getTraceDuplicateKeys(ctx context.Cont
 
 	rows, err := migration.telemetryStore.ClickhouseDB().Query(ctx, query)
 	if err != nil {
-		migration.logger.WarnContext(ctx, "failed to query trace duplicate keys", "error", err)
+		migration.logger.WarnContext(ctx, "failed to query trace duplicate keys", errors.Attr(err))
 		return nil, nil
 	}
 	defer rows.Close()
@@ -68,7 +68,7 @@ func (migration *queryBuilderV5Migration) getTraceDuplicateKeys(ctx context.Cont
 	for rows.Next() {
 		var key string
 		if err := rows.Scan(&key); err != nil {
-			migration.logger.WarnContext(ctx, "failed to scan trace duplicate key", "error", err)
+			migration.logger.WarnContext(ctx, "failed to scan trace duplicate key", errors.Attr(err))
 			continue
 		}
 		keys = append(keys, key)
@@ -90,7 +90,7 @@ func (migration *queryBuilderV5Migration) getLogDuplicateKeys(ctx context.Contex
 
 	rows, err := migration.telemetryStore.ClickhouseDB().Query(ctx, query)
 	if err != nil {
-		migration.logger.WarnContext(ctx, "failed to query log duplicate keys", "error", err)
+		migration.logger.WarnContext(ctx, "failed to query log duplicate keys", errors.Attr(err))
 		return nil, nil
 	}
 	defer rows.Close()
@@ -99,7 +99,7 @@ func (migration *queryBuilderV5Migration) getLogDuplicateKeys(ctx context.Contex
 	for rows.Next() {
 		var key string
 		if err := rows.Scan(&key); err != nil {
-			migration.logger.WarnContext(ctx, "failed to scan log duplicate key", "error", err)
+			migration.logger.WarnContext(ctx, "failed to scan log duplicate key", errors.Attr(err))
 			continue
 		}
 		keys = append(keys, key)
@@ -277,7 +277,7 @@ func (migration *queryBuilderV5Migration) migrateRules(
 	alertsMigrator := transition.NewAlertMigrateV5(migration.logger, logsKeys, tracesKeys)
 
 	for _, rule := range rules {
-		migration.logger.InfoContext(ctx, "migrating rule", "rule_id", rule.ID)
+		migration.logger.InfoContext(ctx, "migrating rule", slog.String("rule_id", rule.ID))
 
 		updated := alertsMigrator.Migrate(ctx, rule.Data)
 

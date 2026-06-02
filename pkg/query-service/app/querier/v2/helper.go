@@ -98,7 +98,7 @@ func (q *querier) runBuilderQuery(
 		var query string
 		var err error
 		if _, ok := cacheKeys[queryName]; !ok || params.NoCache {
-			zap.L().Info("skipping cache for logs query", zap.String("queryName", queryName), zap.Int64("start", params.Start), zap.Int64("end", params.End), zap.Int64("step", params.Step), zap.Bool("noCache", params.NoCache), zap.String("cacheKey", cacheKeys[queryName]))
+			q.logger.InfoContext(ctx, "skipping cache for logs query", "query_name", queryName, "start", params.Start, "end", params.End, "step", params.Step, "no_cache", params.NoCache, "cache_key", cacheKeys[queryName])
 			query, err = prepareLogsQuery(ctx, start, end, builderQuery, params)
 			if err != nil {
 				ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
@@ -109,7 +109,7 @@ func (q *querier) runBuilderQuery(
 			return
 		}
 		misses := q.queryCache.FindMissingTimeRangesV2(orgID, start, end, builderQuery.StepInterval, cacheKeys[queryName])
-		zap.L().Info("cache misses for logs query", zap.Any("misses", misses))
+		q.logger.InfoContext(ctx, "cache misses for logs query", "misses", misses)
 		missedSeries := make([]querycache.CachedSeriesData, 0)
 		filteredMissedSeries := make([]querycache.CachedSeriesData, 0)
 		for _, miss := range misses {
@@ -218,7 +218,7 @@ func (q *querier) runBuilderQuery(
 	// We are only caching the graph panel queries. A non-existant cache key means that the query is not cached.
 	// If the query is not cached, we execute the query and return the result without caching it.
 	if _, ok := cacheKeys[queryName]; !ok || params.NoCache {
-		zap.L().Info("skipping cache for metrics query", zap.String("queryName", queryName), zap.Int64("start", params.Start), zap.Int64("end", params.End), zap.Int64("step", params.Step), zap.Bool("noCache", params.NoCache), zap.String("cacheKey", cacheKeys[queryName]))
+		q.logger.InfoContext(ctx, "skipping cache for metrics query", "query_name", queryName, "start", params.Start, "end", params.End, "step", params.Step, "no_cache", params.NoCache, "cache_key", cacheKeys[queryName])
 		query, err := metricsV4.PrepareMetricQuery(start, end, params.CompositeQuery.QueryType, params.CompositeQuery.PanelType, builderQuery, metricsV3.Options{})
 		if err != nil {
 			ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
@@ -230,7 +230,7 @@ func (q *querier) runBuilderQuery(
 	}
 
 	misses := q.queryCache.FindMissingTimeRanges(orgID, start, end, builderQuery.StepInterval, cacheKeys[queryName])
-	zap.L().Info("cache misses for metrics query", zap.Any("misses", misses))
+	q.logger.InfoContext(ctx, "cache misses for metrics query", "misses", misses)
 	missedSeries := make([]querycache.CachedSeriesData, 0)
 	for _, miss := range misses {
 		query, err := metricsV4.PrepareMetricQuery(
@@ -288,14 +288,14 @@ func (q *querier) ValidateMetricNames(ctx context.Context, query *v3.CompositeQu
 		}
 		metrics, err := q.reader.GetNormalizedStatus(ctx, orgID, metricNames)
 		if err != nil {
-			zap.L().Debug("error getting corresponding normalized metrics", zap.Error(err))
+			q.logger.DebugContext(ctx, "error getting corresponding normalized metrics", errors.Attr(err))
 			return
 		}
 		for metricName, metricPresent := range metrics {
 			if metricPresent {
 				continue
 			} else {
-				zap.L().Warn("using normalized metric name", zap.String("metrics", metricName))
+				q.logger.WarnContext(ctx, "using normalized metric name", "metrics", metricName)
 				continue
 			}
 		}

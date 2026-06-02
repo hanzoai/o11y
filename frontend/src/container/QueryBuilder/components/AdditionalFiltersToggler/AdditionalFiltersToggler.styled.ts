@@ -8,11 +8,11 @@ const IconCss = css`
 	transition: all 0.2s ease;
 `;
 
-export const StyledIconOpen = styled(PlusSquareOutlined)`
+export const StyledIconOpen = styled(SquarePlus)`
 	${IconCss}
 `;
 
-export const StyledIconClose = styled(MinusSquareOutlined)`
+export const StyledIconClose = styled(SquareMinus)`
 	${IconCss}
 `;
 

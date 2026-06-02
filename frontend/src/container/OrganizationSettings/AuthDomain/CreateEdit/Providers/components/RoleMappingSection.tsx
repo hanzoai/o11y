@@ -128,16 +128,17 @@ function RoleMappingSection({
 						<div className="role-mapping-section__checkbox-row">
 							<Form.Item
 								name={[...fieldNamePrefix, 'useRoleAttribute']}
-								valuePropName="checked"
+								valuePropName="value"
 								noStyle
 							>
 								<Checkbox
 									id="use-role-attribute"
-									labelName="Use Role Attribute Directly"
-									onCheckedChange={(checked: boolean): void => {
+									onChange={(checked: boolean): void => {
 										form.setFieldValue([...fieldNamePrefix, 'useRoleAttribute'], checked);
 									}}
-								/>
+								>
+									Use Role Attribute Directly
+								</Checkbox>
 							</Form.Item>
 							<Tooltip title="If enabled, the role claim/attribute from the IDP will be used directly instead of group mappings. The role value must match a Hanzo role (VIEWER, EDITOR, or ADMIN).">
 								<CircleHelp size={14} color={Style.L3_FOREGROUND} cursor="help" />
@@ -194,10 +195,10 @@ function RoleMappingSection({
 											))}
 
 											<Button
-												variant="dashed"
+												variant="outlined"
+												color="secondary"
 												onClick={(): void => add({ groupName: '', role: 'VIEWER' })}
-												prefixIcon={<Plus size={14} />}
-												className="role-mapping-section__add-btn"
+												prefix={<Plus size={14} />}
 											>
 												Add Group Mapping
 											</Button>

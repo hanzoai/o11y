@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"log/slog"
+
 	"github.com/SigNoz/govaluate"
 	"github.com/hanzoai/o11y/pkg/cache"
 	metricsV3 "github.com/hanzoai/o11y/pkg/query-service/app/metrics/v3"
@@ -238,7 +240,7 @@ func (qb *QueryBuilder) PrepareQueries(params *v3.QueryRangeParamsV3) (map[strin
 					}
 					queries[queryName] = queryString
 				default:
-					zap.L().Error("Unknown data source", zap.String("dataSource", string(query.DataSource)))
+					slog.Error("unknown data source", "data_source", string(query.DataSource))
 				}
 			}
 		}

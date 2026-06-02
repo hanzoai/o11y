@@ -16,12 +16,23 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestStmtBuilderTimeSeriesBodyGroupByJSON(t *testing.T) {
-	enableBodyJSONQuery(t)
-	defer func() {
-		disableBodyJSONQuery(t)
-	}()
-	statementBuilder := buildJSONTestStatementBuilder(t)
+const (
+	testJSONQueryPrefix = "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body_v2 as body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE"
+	testJSONQuerySuffix = "AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?"
+)
+
+type TestExpected struct {
+	WhereClause string
+	Args        []any
+	Warnings    []string
+}
+
+func (t TestExpected) GetQuery() string {
+	return strings.Join([]string{testJSONQueryPrefix, t.WhereClause, testJSONQuerySuffix}, " ")
+}
+
+func TestJSONStmtBuilder_TimeSeries(t *testing.T) {
+	statementBuilder, _ := buildJSONTestStatementBuilder(t, false)
 
 	cases := []struct {
 		name                string
@@ -97,11 +108,10 @@ func TestStmtBuilderTimeSeriesBodyGroupByJSON(t *testing.T) {
 	}
 }
 
+/* Promoted path tests commented out — Materialized now means type hint (direct sub-column),
+   not a body_promoted.* column. These tests assumed the old coalesce(body_promoted.x, body_v2.x) path.
+
 func TestStmtBuilderTimeSeriesBodyGroupByPromoted(t *testing.T) {
-	enableBodyJSONQuery(t)
-	defer func() {
-		disableBodyJSONQuery(t)
-	}()
 	statementBuilder := buildJSONTestStatementBuilder(t, "user.age", "user.name")
 
 	cases := []struct {
@@ -159,22 +169,18 @@ func TestStmtBuilderTimeSeriesBodyGroupByPromoted(t *testing.T) {
 	}
 }
 
-func TestStatementBuilderListQueryBodyHas(t *testing.T) {
-	enableBodyJSONQuery(t)
-	defer func() {
-		disableBodyJSONQuery(t)
-	}()
+func TestJSONStmtBuilder_OrderBy(t *testing.T) {
+	statementBuilder, _ := buildJSONTestStatementBuilder(t, false)
 
-	statementBuilder := buildJSONTestStatementBuilder(t)
 	cases := []struct {
-		name        string
-		requestType qbtypes.RequestType
-		query       qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]
-		expected    qbtypes.Statement
-		expectedErr error
+		name                string
+		requestType         qbtypes.RequestType
+		query               qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]
+		expected            qbtypes.Statement
+		expectedErrContains string
 	}{
 		{
-			name:        "Simple has filter",
+			name:        "order_by_education[].awards[].participated[].members",
 			requestType: qbtypes.RequestTypeRaw,
 			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
 				Signal: telemetrytypes.SignalLogs,
@@ -188,10 +194,13 @@ func TestStatementBuilderListQueryBodyHas(t *testing.T) {
 					"Key `education[].parameters` is ambiguous, found 2 different combinations of field context / data type: [name=education[].parameters,context=body,datatype=[]float64,jsondatatype=Array(Nullable(Float64)) name=education[].parameters,context=body,datatype=[]dynamic,jsondatatype=Array(Dynamic)].",
 				},
 			},
-			expectedErr: nil,
+			expected: qbtypes.Statement{
+				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body_v2 as body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE (dynamicElement(body_v2.`user.name`, 'String') IS NOT NULL) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? ORDER BY arrayFlatten(arrayConcat(arrayMap(`body_v2.education`->arrayConcat(arrayMap(`body_v2.education[].awards`->arrayConcat(arrayMap(`body_v2.education[].awards[].participated`->dynamicElement(`body_v2.education[].awards[].participated`.`members`, 'Array(Nullable(String))'), dynamicElement(`body_v2.education[].awards`.`participated`, 'Array(JSON(max_dynamic_types=4, max_dynamic_paths=0))')), arrayMap(`body_v2.education[].awards[].participated`->dynamicElement(`body_v2.education[].awards[].participated`.`members`, 'Array(Nullable(String))'), arrayMap(x->assumeNotNull(dynamicElement(x, 'JSON')), arrayFilter(x->(dynamicType(x) = 'JSON'), dynamicElement(`body_v2.education[].awards`.`participated`, 'Array(Dynamic)'))))), dynamicElement(`body_v2.education`.`awards`, 'Array(JSON(max_dynamic_types=8, max_dynamic_paths=0))')), arrayMap(`body_v2.education[].awards`->arrayConcat(arrayMap(`body_v2.education[].awards[].participated`->dynamicElement(`body_v2.education[].awards[].participated`.`members`, 'Array(Nullable(String))'), dynamicElement(`body_v2.education[].awards`.`participated`, 'Array(JSON(max_dynamic_types=16, max_dynamic_paths=256))')), arrayMap(`body_v2.education[].awards[].participated`->dynamicElement(`body_v2.education[].awards[].participated`.`members`, 'Array(Nullable(String))'), arrayMap(x->assumeNotNull(dynamicElement(x, 'JSON')), arrayFilter(x->(dynamicType(x) = 'JSON'), dynamicElement(`body_v2.education[].awards`.`participated`, 'Array(Dynamic)'))))), arrayMap(x->assumeNotNull(dynamicElement(x, 'JSON')), arrayFilter(x->(dynamicType(x) = 'JSON'), dynamicElement(`body_v2.education`.`awards`, 'Array(Dynamic)'))))), dynamicElement(body_v2.`education`, 'Array(JSON(max_dynamic_types=16, max_dynamic_paths=0))')))) AS `education[].awards[].participated[].members` asc LIMIT ?",
+				Args:  []any{"1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+			},
 		},
 		{
-			name:        "Flat path hasAll filter",
+			name:        "order_by_user.name",
 			requestType: qbtypes.RequestTypeRaw,
 			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
 				Signal: telemetrytypes.SignalLogs,
@@ -723,24 +732,6 @@ func TestStatementBuilderListQueryBodyMessage(t *testing.T) {
 					IndexExpression:  "(lower(assumeNotNull(dynamicElement(body_promoted.message, 'String'))))",
 				},
 			},
-		},
-	}
-	testAddIndexedPaths(t, statementBuilder, indexed...)
-	cases := []struct {
-		name        string
-		requestType qbtypes.RequestType
-		query       qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]
-		expected    qbtypes.Statement
-		expectedErr error
-	}{
-		{
-			name:        "body.message Exists",
-			requestType: qbtypes.RequestTypeRaw,
-			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
-				Signal: telemetrytypes.SignalLogs,
-				Filter: &qbtypes.Filter{Expression: "body.message Exists"},
-				Limit:  10,
-			},
 			expected: qbtypes.Statement{
 				Query: "WITH __resource_filter AS (SELECT fingerprint FROM observe_logs.distributed_logs_v2_resource WHERE true AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ?) SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, body_v2, body_promoted, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM observe_logs.distributed_logs_v2 WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND (dynamicElement(body_v2.`message`, 'String') IS NOT NULL OR dynamicElement(body_promoted.`message`, 'String') IS NOT NULL) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
 				Args:  []any{uint64(1747945619), uint64(1747983448), "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
@@ -793,12 +784,10 @@ func TestStatementBuilderListQueryBodyMessage(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-
 			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
-
-			if c.expectedErr != nil {
+			if c.expectedErrContains != "" {
 				require.Error(t, err)
-				require.Contains(t, err.Error(), c.expectedErr.Error())
+				require.Contains(t, err.Error(), c.expectedErrContains)
 			} else {
 				require.NoError(t, err)
 				require.Equal(t, c.expected.Query, q.Query)
@@ -809,35 +798,103 @@ func TestStatementBuilderListQueryBodyMessage(t *testing.T) {
 	}
 }
 
-func buildTestTelemetryMetadataStore(t *testing.T, promotedPaths ...string) *telemetrytypestest.MockMetadataStore {
-	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
-
-	types, _ := telemetrytypes.TestJSONTypeSet()
-	for path, jsonTypes := range types {
-		promoted := false
-
-		split := strings.Split(path, telemetrytypes.ArraySep)
-		if path == "message" {
-			promoted = true
-		} else if slices.Contains(promotedPaths, split[0]) {
-			promoted = true
+func TestResourceAggrAndGroupBy_WithJSONEnabled(t *testing.T) {
+	statementBuilder, metadataStore := buildJSONTestStatementBuilder(t, false)
+	releaseTime := time.Date(2024, 1, 15, 10, 0, 0, 0, time.UTC)
+	keysMap := buildCompleteFieldKeyMap(releaseTime)
+	for _, keys := range keysMap {
+		for _, key := range keys {
+			metadataStore.SetKey(key)
 		}
-		// Create a TelemetryFieldKey for each JSONDataType for this path
-		// Since a path can have multiple types, we create one key per type
-		for _, jsonType := range jsonTypes {
+	}
+
+	cases := []struct {
+		name                string
+		requestType         qbtypes.RequestType
+		query               qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]
+		expected            qbtypes.Statement
+		expectedErrContains string
+	}{
+		{
+			name:        "resource_aggregation_and_group_by_with_json_enabled",
+			requestType: qbtypes.RequestTypeTimeSeries,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal:       telemetrytypes.SignalLogs,
+				StepInterval: qbtypes.Step{Duration: 30 * time.Second},
+				GroupBy: []qbtypes.GroupByKey{
+					{
+						TelemetryFieldKey: telemetrytypes.TelemetryFieldKey{
+							Name: "region",
+						},
+					},
+				},
+				Filter: &qbtypes.Filter{
+					Expression: "user.name exists",
+				},
+				Aggregations: []qbtypes.LogAggregation{
+					{
+						Expression: "count_distinct(service.name)",
+					},
+				},
+			},
+			expected: qbtypes.Statement{
+				Query:    "SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 30 SECOND) AS ts, toString(multiIf(resource.`region`::String IS NOT NULL, resource.`region`::String, NULL)) AS `region`, countDistinct(multiIf(resource.`service.name`::String IS NOT NULL, resource.`service.name`::String, NULL)) AS __result_0 FROM signoz_logs.distributed_logs_v2 WHERE ((dynamicElement(body_v2.`user.name`, 'String') IS NOT NULL) OR mapContains(attributes_string, 'user.name') = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? GROUP BY ts, `region`",
+				Args:     []any{true, "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448)},
+				Warnings: []string{"Key `user.name` is ambiguous, found 2 different combinations of field context / data type: [name=user.name,context=body,datatype=string name=user.name,context=attribute,datatype=string]."},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
+			if c.expectedErrContains != "" {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), c.expectedErrContains)
+			} else {
+				require.NoError(t, err)
+				require.Equal(t, c.expected.Query, q.Query)
+				require.Equal(t, c.expected.Args, q.Args)
+				require.Equal(t, c.expected.Warnings, q.Warnings)
+			}
+		})
+	}
+}
+
+func buildTestTelemetryMetadataStore(t *testing.T, addIndexes bool) *telemetrytypestest.MockMetadataStore {
+	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
+	mockMetadataStore.SetStaticFields(IntrinsicFields)
+	types, _ := telemetrytypes.TestJSONTypeSet()
+	for path, fieldDataTypes := range types {
+		for _, fdt := range fieldDataTypes {
 			key := &telemetrytypes.TelemetryFieldKey{
 				Name:          path,
 				Signal:        telemetrytypes.SignalLogs,
 				FieldContext:  telemetrytypes.FieldContextBody,
-				FieldDataType: telemetrytypes.MappingJSONDataTypeToFieldDataType[jsonType],
-				JSONDataType:  &jsonType,
-				Materialized:  promoted,
+				FieldDataType: fdt,
 			}
+			if addIndexes {
+				jsonType := telemetrytypes.MappingFieldDataTypeToJSONDataType[fdt]
+				idx := slices.IndexFunc(telemetrytypes.TestIndexedPaths, func(entry telemetrytypes.TestIndexedPathEntry) bool {
+					return entry.Path == path && entry.Type == jsonType
+				})
+				if idx >= 0 {
+					key.Indexes = append(key.Indexes, telemetrytypes.TelemetryFieldKeySkipIndex{
+						Name:            path,
+						FieldContext:    telemetrytypes.FieldContextBody,
+						FieldDataType:   fdt,
+						BaseColumn:      LogsV2BodyV2Column,
+						IndexExpression: schemamigrator.JSONSubColumnIndexExpr(LogsV2BodyV2Column, path, jsonType.StringValue()),
+					})
+				}
+			}
+
 			err := key.SetJSONAccessPlan(telemetrytypes.JSONColumnMetadata{
-				BaseColumn:     LogsV2BodyJSONColumn,
+				BaseColumn:     LogsV2BodyV2Column,
 				PromotedColumn: LogsV2BodyPromotedColumn,
 			}, types)
 			require.NoError(t, err)
+
 			mockMetadataStore.SetKey(key)
 		}
 	}
@@ -845,52 +902,26 @@ func buildTestTelemetryMetadataStore(t *testing.T, promotedPaths ...string) *tel
 	return mockMetadataStore
 }
 
-func buildJSONTestStatementBuilder(t *testing.T, promotedPaths ...string) *logQueryStatementBuilder {
-	mockMetadataStore := buildTestTelemetryMetadataStore(t, promotedPaths...)
-	fm := NewFieldMapper()
-	cb := NewConditionBuilder(fm)
+func buildJSONTestStatementBuilder(t *testing.T, addIndexes bool) (*logQueryStatementBuilder, *telemetrytypestest.MockMetadataStore) {
+	t.Helper()
 
-	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil)
-	resourceFilterStmtBuilder := resourcefilter.NewLogResourceFilterStatementBuilder(
-		instrumentationtest.New().ToProviderSettings(),
-		fm,
-		cb,
-		mockMetadataStore,
-		DefaultFullTextColumn,
-		GetBodyJSONKey,
-	)
+	mockMetadataStore := buildTestTelemetryMetadataStore(t, addIndexes)
+	fl := flaggertest.WithUseJSONBody(t, true)
+	fm := NewFieldMapper(fl)
+	cb := NewConditionBuilder(fm, fl)
+
+	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil, fl)
 
 	statementBuilder := NewLogQueryStatementBuilder(
 		instrumentationtest.New().ToProviderSettings(),
 		mockMetadataStore,
 		fm,
 		cb,
-		resourceFilterStmtBuilder,
 		aggExprRewriter,
 		DefaultFullTextColumn,
 		GetBodyJSONKey,
+		fl,
 	)
 
-	return statementBuilder
-}
-
-func testAddIndexedPaths(t *testing.T, statementBuilder *logQueryStatementBuilder, telemetryFieldKeys ...*telemetrytypes.TelemetryFieldKey) {
-	mockMetadataStore := statementBuilder.metadataStore.(*telemetrytypestest.MockMetadataStore)
-	for _, key := range telemetryFieldKeys {
-		if strings.Contains(key.Name, telemetrytypes.ArraySep) || strings.Contains(key.Name, telemetrytypes.ArrayAnyIndex) {
-			t.Fatalf("array paths are not supported: %s", key.Name)
-		}
-
-		for _, storedKey := range mockMetadataStore.KeysMap[key.Name] {
-			storedKey.Indexes = append(storedKey.Indexes, key.Indexes...)
-		}
-	}
-}
-
-func enableBodyJSONQuery(_ *testing.T) {
-	querybuilder.BodyJSONQueryEnabled = true
-}
-
-func disableBodyJSONQuery(_ *testing.T) {
-	querybuilder.BodyJSONQueryEnabled = false
+	return statementBuilder, mockMetadataStore
 }

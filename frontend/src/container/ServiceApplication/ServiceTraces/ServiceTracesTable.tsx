@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { WarningFilled } from '@ant-design/icons';
-import { Flex, Typography } from 'antd';
+import { Flex } from 'antd';
+import { SolidAlertTriangle } from '@signozhq/icons';
+import { Typography } from '@signozhq/ui/typography';
 import { ResizeTable } from 'components/ResizeTable';
 import { MAX_RPS_LIMIT } from 'constants/global';
 import ResourceAttributesFilter from 'container/ResourceAttributesFilter';

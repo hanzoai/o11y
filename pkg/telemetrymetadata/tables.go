@@ -1,6 +1,6 @@
 package telemetrymetadata
 
-import otelcollectorconst "github.com/SigNoz/signoz-otel-collector/constants"
+import otelconst "github.com/SigNoz/signoz-otel-collector/constants"
 
 const (
 	DBName                           = "observe_metadata"

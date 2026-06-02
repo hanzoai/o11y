@@ -27,12 +27,10 @@ import (
 	"github.com/hanzoai/common/model"
 )
 
-var (
-	// This is not a real file and will never be used. We need this placeholder to ensure maintenance runs on shutdown. See
-	// https://github.com/prometheus/server/blob/3ee2cd0f1271e277295c02b6160507b4d193dde2/silence/silence.go#L435-L438
-	// and https://github.com/prometheus/server/blob/3b06b97af4d146e141af92885a185891eb79a5b0/nflog/nflog.go#L362.
-	snapfnoop string = "snapfnoop"
-)
+// This is not a real snapshot file and will never be used. We need this placeholder to ensure maintenance runs on shutdown.
+// See https://github.com/prometheus/alertmanager/blob/3ee2cd0f1271e277295c02b6160507b4d193dde2/silence/silence.go#L435-L438
+// and https://github.com/prometheus/alertmanager/blob/3b06b97af4d146e141af92885a185891eb79a5b0/nflog/nflog.go#L362.
+var snapfnoop string = "snapfnoop"
 
 type Server struct {
 	// logger is the logger for the alertmanager
@@ -62,9 +60,11 @@ type Server struct {
 	silencer            *silence.Silencer
 	silences            *silence.Silences
 	timeIntervals       map[string][]timeinterval.TimeInterval
-	pipelineBuilder     *notify.PipelineBuilder
-	marker              *alertmanagertypes.MemMarker
+	pipelineBuilder     *pipelineBuilder
+	muter               *MaintenanceMuter
+	marker              *types.MemMarker
 	tmpl                *template.Template
+	templater           alertmanagertypes.Templater
 	wg                  sync.WaitGroup
 	stopc               chan struct{}
 	notificationManager nfmanager.NotificationManager
@@ -139,7 +139,7 @@ func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, s
 		server.silences.Maintenance(server.srvConfig.Silences.MaintenanceInterval, snapfnoop, server.stopc, func() (int64, error) {
 			// Delete silences older than the retention period.
 			if _, err := server.silences.GC(); err != nil {
-				server.logger.ErrorContext(ctx, "silence garbage collection", "error", err)
+				server.logger.ErrorContext(ctx, "silence garbage collection", errors.Attr(err))
 				// Don't return here - we need to snapshot our state first.
 			}
 
@@ -159,7 +159,6 @@ func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, s
 
 			return c, server.stateStore.Set(ctx, storableSilences)
 		})
-
 	}()
 
 	// Start maintenance for notification logs
@@ -168,7 +167,7 @@ func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, s
 		defer server.wg.Done()
 		server.nflog.Maintenance(server.srvConfig.NFLog.MaintenanceInterval, snapfnoop, server.stopc, func() (int64, error) {
 			if _, err := server.nflog.GC(); err != nil {
-				server.logger.ErrorContext(ctx, "notification log garbage collection", "error", err)
+				server.logger.ErrorContext(ctx, "notification log garbage collection", errors.Attr(err))
 				// Don't return without saving the current state.
 			}
 
@@ -202,10 +201,17 @@ func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, s
 }
 
 func (server *Server) GetAlerts(ctx context.Context, params alertmanagertypes.GettableAlertsParams) (alertmanagertypes.GettableAlerts, error) {
-	return alertmanagertypes.NewGettableAlertsFromAlertProvider(server.alerts, server.alertmanagerConfig, server.marker.Status, func(labels model.LabelSet) {
-		server.inhibitor.Mutes(ctx, labels)
-		server.silencer.Mutes(ctx, labels)
-	}, params)
+	return alertmanagertypes.NewGettableAlertsFromAlertProvider(
+		server.alerts, server.alertmanagerConfig, server.marker.Status,
+		func(labels model.LabelSet) {
+			server.inhibitor.Mutes(ctx, labels)
+			server.silencer.Mutes(ctx, labels)
+		},
+		func(labels model.LabelSet) []string {
+			return server.muter.MutedBy(ctx, labels)
+		},
+		params,
+	)
 }
 
 func (server *Server) PutAlerts(ctx context.Context, postableAlerts alertmanagertypes.PostableAlerts) error {
@@ -226,12 +232,20 @@ func (server *Server) SetConfig(ctx context.Context, alertmanagerConfig *alertma
 	config := alertmanagerConfig.AlertmanagerConfig()
 
 	var err error
-	server.tmpl, err = alertmanagertypes.FromGlobs(config.Templates)
+	// Load SigNoz's alertmanager notification templates from the configured
+	// globs. The upstream default templates (default.tmpl, email.tmpl) are
+	// always loaded from the embedded alertmanager assets inside FromGlobs, so
+	// only SigNoz's own templates (e.g. the email.signoz.html layout) are listed
+	// here. The upstream config.Templates field is not used: SigNoz never
+	// populates it (there is no per-org template configuration).
+	server.tmpl, err = alertmanagertypes.FromGlobs(server.srvConfig.Templates)
 	if err != nil {
 		return err
 	}
 
 	server.tmpl.ExternalURL = server.srvConfig.ExternalURL
+
+	server.templater = alertmanagertemplate.New(server.tmpl, server.logger)
 
 	// Build the routing tree and record which receivers are used.
 	routes := dispatch.NewRoute(config.Route, nil)
@@ -246,10 +260,10 @@ func (server *Server) SetConfig(ctx context.Context, alertmanagerConfig *alertma
 	for _, rcv := range config.Receivers {
 		if _, found := activeReceivers[rcv.Name]; !found {
 			// No need to build a receiver if no route is using it.
-			server.logger.InfoContext(ctx, "skipping creation of receiver not referenced by any route", "receiver", rcv.Name)
+			server.logger.InfoContext(ctx, "skipping creation of receiver not referenced by any route", slog.String("receiver", rcv.Name))
 			continue
 		}
-		integrations, err := alertmanagernotify.NewReceiverIntegrations(rcv, server.tmpl, server.logger)
+		integrations, err := alertmanagernotify.NewReceiverIntegrations(rcv, server.tmpl, server.logger, server.templater)
 		if err != nil {
 			return err
 		}
@@ -289,6 +303,7 @@ func (server *Server) SetConfig(ctx context.Context, alertmanagerConfig *alertma
 		server.silencer,
 		intervener,
 		server.marker,
+		server.muter,
 		server.nflog,
 		pipelinePeer,
 	)
@@ -325,7 +340,7 @@ func (server *Server) SetConfig(ctx context.Context, alertmanagerConfig *alertma
 
 func (server *Server) TestReceiver(ctx context.Context, receiver alertmanagertypes.Receiver) error {
 	testAlert := alertmanagertypes.NewTestAlert(receiver, time.Now(), time.Now())
-	return alertmanagertypes.TestReceiver(ctx, receiver, alertmanagernotify.NewReceiverIntegrations, server.alertmanagerConfig, server.tmpl, server.logger, testAlert.Labels, testAlert)
+	return alertmanagertypes.TestReceiver(ctx, receiver, alertmanagernotify.NewReceiverIntegrations, server.alertmanagerConfig, server.tmpl, server.logger, server.templater, testAlert.Labels, testAlert)
 }
 
 func (server *Server) TestAlert(ctx context.Context, receiversMap map[*alertmanagertypes.PostableAlert][]string, config *alertmanagertypes.NotificationConfig) error {
@@ -408,6 +423,7 @@ func (server *Server) TestAlert(ctx context.Context, receiversMap map[*alertmana
 					server.alertmanagerConfig,
 					server.tmpl,
 					server.logger,
+					server.templater,
 					group.groupLabels,
 					group.alerts...,
 				)

@@ -10,13 +10,13 @@ import setRetentionApi from 'api/settings/setRetention';
 import setRetentionApiV2 from 'api/settings/setRetentionV2';
 import TextToolTip from 'components/TextToolTip';
 import CustomDomainSettings from 'container/CustomDomainSettings';
+import LicenseKeyRow from 'container/GeneralSettings/LicenseKeyRow/LicenseKeyRow';
 import GeneralSettingsCloud from 'container/GeneralSettingsCloud';
 import useComponentPermission from 'hooks/useComponentPermission';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import { useNotifications } from 'hooks/useNotifications';
 import { StatusCodes } from 'http-status-codes';
 import find from 'lodash-es/find';
-import { BarChart2 } from 'lucide-react';
 import { useAppContext } from 'providers/App/App';
 import {
 	ErrorResponse,
@@ -37,6 +37,7 @@ import {
 } from 'types/api/settings/getRetention';
 import { USER_ROLES } from 'types/roles';
 
+import LicenseRowDismissibleCallout from './LicenseKeyRow/LicenseRowDismissibleCallout/LicenseRowDismissibleCallout';
 import Retention from './Retention';
 import StatusMessage from './StatusMessage';
 import { ActionItemsContainer, ErrorText, ErrorTextContainer } from './styles';
@@ -60,12 +61,10 @@ function GeneralSettings({
 	const [modalTraces, setModalTraces] = useState<boolean>(false);
 	const [modalLogs, setModalLogs] = useState<boolean>(false);
 
-	const [postApiLoadingMetrics, setPostApiLoadingMetrics] = useState<boolean>(
-		false,
-	);
-	const [postApiLoadingTraces, setPostApiLoadingTraces] = useState<boolean>(
-		false,
-	);
+	const [postApiLoadingMetrics, setPostApiLoadingMetrics] =
+		useState<boolean>(false);
+	const [postApiLoadingTraces, setPostApiLoadingTraces] =
+		useState<boolean>(false);
 	const [postApiLoadingLogs, setPostApiLoadingLogs] = useState<boolean>(false);
 
 	const [availableDisks] = useState<IDiskType[]>(getAvailableDiskPayload);
@@ -77,42 +76,29 @@ function GeneralSettings({
 		tracesTtlValuesPayload,
 	);
 
-	const [logsCurrentTTLValues, setLogsCurrentTTLValues] = useState(
-		logsTtlValuesPayload,
-	);
+	const [logsCurrentTTLValues, setLogsCurrentTTLValues] =
+		useState(logsTtlValuesPayload);
 
-	const { user } = useAppContext();
+	const { user, activeLicense } = useAppContext();
 
 	const [setRetentionPermission] = useComponentPermission(
 		['set_retention_period'],
 		user.role,
 	);
 
-	const [
-		metricsTotalRetentionPeriod,
-		setMetricsTotalRetentionPeriod,
-	] = useState<NumberOrNull>(null);
-	const [
-		metricsS3RetentionPeriod,
-		setMetricsS3RetentionPeriod,
-	] = useState<NumberOrNull>(null);
-	const [
-		tracesTotalRetentionPeriod,
-		setTracesTotalRetentionPeriod,
-	] = useState<NumberOrNull>(null);
-	const [
-		tracesS3RetentionPeriod,
-		setTracesS3RetentionPeriod,
-	] = useState<NumberOrNull>(null);
+	const [metricsTotalRetentionPeriod, setMetricsTotalRetentionPeriod] =
+		useState<NumberOrNull>(null);
+	const [metricsS3RetentionPeriod, setMetricsS3RetentionPeriod] =
+		useState<NumberOrNull>(null);
+	const [tracesTotalRetentionPeriod, setTracesTotalRetentionPeriod] =
+		useState<NumberOrNull>(null);
+	const [tracesS3RetentionPeriod, setTracesS3RetentionPeriod] =
+		useState<NumberOrNull>(null);
 
-	const [
-		logsTotalRetentionPeriod,
-		setLogsTotalRetentionPeriod,
-	] = useState<NumberOrNull>(null);
-	const [
-		logsS3RetentionPeriod,
-		setLogsS3RetentionPeriod,
-	] = useState<NumberOrNull>(null);
+	const [logsTotalRetentionPeriod, setLogsTotalRetentionPeriod] =
+		useState<NumberOrNull>(null);
+	const [logsS3RetentionPeriod, setLogsS3RetentionPeriod] =
+		useState<NumberOrNull>(null);
 
 	useEffect(() => {
 		if (metricsCurrentTTLValues) {
@@ -463,20 +449,16 @@ function GeneralSettings({
 		onModalToggleHandler(type);
 	};
 
-	const {
-		isCloudUser: isCloudUserVal,
-		isEnterpriseSelfHostedUser,
-	} = useGetTenantLicense();
+	const { isCloudUser: isCloudUserVal } = useGetTenantLicense();
 
 	const isAdmin = user.role === USER_ROLES.ADMIN;
-	const showCustomDomainSettings =
-		(isCloudUserVal || isEnterpriseSelfHostedUser) && isAdmin;
+	const showCustomDomainSettings = isCloudUserVal && isAdmin;
 
 	const renderConfig = [
 		{
 			name: 'Metrics',
 			type: 'metrics',
-			icon: <BarChart2 size={14} />,
+			icon: <BarChart size={14} />,
 			retentionFields: [
 				{
 					name: t('total_retention_period'),
@@ -497,7 +479,11 @@ function GeneralSettings({
 				saveButtonText:
 					metricsTtlValuesPayload.status === 'pending' ? (
 						<span>
-							<Spin spinning size="small" indicator={<LoadingOutlined spin />} />{' '}
+							<Spin
+								spinning
+								size="small"
+								indicator={<Loader className="animate-spin" />}
+							/>{' '}
 							{t('retention_save_button.pending', { name: 'metrics' })}
 						</span>
 					) : (
@@ -540,7 +526,11 @@ function GeneralSettings({
 				saveButtonText:
 					tracesTtlValuesPayload.status === 'pending' ? (
 						<span>
-							<Spin spinning size="small" indicator={<LoadingOutlined spin />} />{' '}
+							<Spin
+								spinning
+								size="small"
+								indicator={<Loader className="animate-spin" />}
+							/>{' '}
 							{t('retention_save_button.pending', { name: 'traces' })}
 						</span>
 					) : (
@@ -582,7 +572,11 @@ function GeneralSettings({
 				saveButtonText:
 					logsTtlValuesPayload.status === 'pending' ? (
 						<span>
-							<Spin spinning size="small" indicator={<LoadingOutlined spin />} />{' '}
+							<Spin
+								spinning
+								size="small"
+								indicator={<Loader className="animate-spin" />}
+							/>{' '}
 							{t('retention_save_button.pending', { name: 'logs' })}
 						</span>
 					) : (
@@ -680,7 +674,20 @@ function GeneralSettings({
 				</span>
 			</div>
 
-			{showCustomDomainSettings && <CustomDomainSettings />}
+			{(showCustomDomainSettings || activeLicense?.key) && (
+				<div className="custom-domain-card">
+					{showCustomDomainSettings && <CustomDomainSettings />}
+					{showCustomDomainSettings && activeLicense?.key && (
+						<div className="custom-domain-card-divider" />
+					)}
+					{activeLicense?.key && (
+						<>
+							<LicenseKeyRow />
+							<LicenseRowDismissibleCallout />
+						</>
+					)}
+				</div>
+			)}
 
 			<div className="retention-controls-container">
 				<div className="retention-controls-header">

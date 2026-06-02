@@ -14,7 +14,7 @@ import { DEBOUNCE_DELAY } from 'constants/queryBuilderFilterConfig';
 import { useGetFieldKeys } from 'hooks/dynamicVariables/useGetFieldKeys';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import useDebounce from 'hooks/useDebounce';
-import { Info } from 'lucide-react';
+import { Info } from '@signozhq/icons';
 import { FieldKey } from 'types/api/dynamicVariables/getFieldKeys';
 import { isRetryableError as checkIfRetryableError } from 'utils/errorUtils';
 
@@ -213,7 +213,7 @@ function DynamicVariable({
 			</div>
 			{errorAttributeKeyMessage && (
 				<div>
-					<Typography.Text type="warning">
+					<Typography.Text color="warning">
 						{errorAttributeKeyMessage}
 					</Typography.Text>
 				</div>

@@ -7,17 +7,18 @@ import (
 
 type telemetry struct {
 	cacheRatio   metric.Float64ObservableGauge
-	cacheHits    metric.Int64ObservableGauge
-	cacheMisses  metric.Int64ObservableGauge
-	costAdded    metric.Int64ObservableGauge
-	costEvicted  metric.Int64ObservableGauge
-	keysAdded    metric.Int64ObservableGauge
-	keysEvicted  metric.Int64ObservableGauge
-	keysUpdated  metric.Int64ObservableGauge
-	setsDropped  metric.Int64ObservableGauge
-	setsRejected metric.Int64ObservableGauge
-	getsDropped  metric.Int64ObservableGauge
-	getsKept     metric.Int64ObservableGauge
+	cacheHits    metric.Int64ObservableCounter
+	cacheMisses  metric.Int64ObservableCounter
+	costAdded    metric.Int64ObservableCounter
+	costEvicted  metric.Int64ObservableCounter
+	keysAdded    metric.Int64ObservableCounter
+	keysEvicted  metric.Int64ObservableCounter
+	keysUpdated  metric.Int64ObservableCounter
+	setsDropped  metric.Int64ObservableCounter
+	setsRejected metric.Int64ObservableCounter
+	getsDropped  metric.Int64ObservableCounter
+	getsKept     metric.Int64ObservableCounter
+	costUsed     metric.Int64ObservableGauge
 	totalCost    metric.Int64ObservableGauge
 }
 
@@ -105,6 +106,7 @@ func newMetrics(meter metric.Meter) (*telemetry, error) {
 		setsRejected: setsRejected,
 		getsDropped:  getsDropped,
 		getsKept:     getsKept,
+		costUsed:     costUsed,
 		totalCost:    totalCost,
 	}, nil
 }

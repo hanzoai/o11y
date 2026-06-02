@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import RGL, { WidthProvider } from 'react-grid-layout';
-import { Typography } from 'antd';
+import { Typography } from '@signozhq/ui/typography';
 import cx from 'classnames';
 import { PANEL_GROUP_TYPES, PANEL_TYPES } from 'constants/queryBuilder';
 import { themeColors } from 'constants/theme';
 import { Card, CardContainer } from 'container/GridCardLayout/styles';
 import DateTimeSelectionV2 from 'container/TopNav/DateTimeSelectionV2';
+import { DEFAULT_TIME_RANGE } from 'container/TopNav/DateTimeSelectionV2/constants';
 import {
 	CustomTimeType,
 	Time,
@@ -17,6 +18,8 @@ import BrandMark from 'components/BrandMark';
 import { SuccessResponseV2 } from 'types/api';
 import { Widgets } from 'types/api/dashboard/getAll';
 import { PublicDashboardDataProps } from 'types/api/dashboard/public/get';
+
+import signozBrandLogoUrl from '@/assets/Logos/signoz-brand-logo.svg';
 
 import Panel from './Panel';
 
@@ -81,7 +84,7 @@ function PublicDashboardContainer({
 	const { widgets } = dashboard?.data || {};
 
 	const [selectedTimeRangeLabel, setSelectedTimeRangeLabel] = useState<string>(
-		publicDashboard?.defaultTimeRange || '30m',
+		publicDashboard?.defaultTimeRange || DEFAULT_TIME_RANGE,
 	);
 
 	const [selectedTimeRange, setSelectedTimeRange] = useState<{
@@ -89,20 +92,22 @@ function PublicDashboardContainer({
 		endTime: number;
 	}>(
 		getStartTimeAndEndTimeFromTimeRange(
-			publicDashboard?.defaultTimeRange || '30m',
+			publicDashboard?.defaultTimeRange || DEFAULT_TIME_RANGE,
 		),
 	);
 
 	const isTimeRangeEnabled = publicDashboard?.timeRangeEnabled || false;
 
 	// Memoize dashboardLayout to prevent array recreation on every render
-	const dashboardLayout = useMemo(() => dashboard?.data?.layout || [], [
-		dashboard?.data?.layout,
-	]);
+	const dashboardLayout = useMemo(
+		() => dashboard?.data?.layout || [],
+		[dashboard?.data?.layout],
+	);
 
-	const currentPanelMap = useMemo(() => dashboard?.data?.panelMap || {}, [
-		dashboard?.data?.panelMap,
-	]);
+	const currentPanelMap = useMemo(
+		() => dashboard?.data?.panelMap || {},
+		[dashboard?.data?.panelMap],
+	);
 
 	const handleTimeChange = (
 		interval: Time | CustomTimeType,

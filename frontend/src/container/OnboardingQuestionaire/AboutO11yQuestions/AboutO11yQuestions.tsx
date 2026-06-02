@@ -4,7 +4,8 @@ import { Checkbox } from '@o11yhq/checkbox';
 import { Input } from '@o11yhq/input';
 import { Input as AntdInput } from 'antd';
 import logEvent from 'api/common/logEvent';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight } from '@signozhq/icons';
+import { useAppContext } from 'providers/App/App';
 
 import { OnboardingQuestionHeader } from '../OnboardingQuestionHeader';
 
@@ -29,6 +30,7 @@ const interestedInOptions: Record<string, string> = {
 	singleTool:
 		'Single Tool (logs, metrics & traces) to reduce operational overhead',
 	correlateSignals: 'Correlate signals for faster troubleshooting',
+	openSourceTooling: 'Prefer open-source tooling',
 };
 
 export function AboutHanzoQuestions({
@@ -46,6 +48,12 @@ export function AboutHanzoQuestions({
 		o11yDetails?.discoverO11y || '',
 	);
 	const [isNextDisabled, setIsNextDisabled] = useState<boolean>(true);
+
+	const shuffledOptionKeys = useMemo(
+		() =>
+			seededShuffle(Object.keys(interestedInOptions), versionData?.version ?? ''),
+		[versionData?.version],
+	);
 
 	useEffect((): void => {
 		if (
@@ -67,11 +75,11 @@ export function AboutHanzoQuestions({
 		}
 	};
 
-	const createInterestChangeHandler = (option: string) => (
-		checked: boolean,
-	): void => {
-		handleInterestChange(option, Boolean(checked));
-	};
+	const createInterestChangeHandler =
+		(option: string) =>
+		(checked: boolean): void => {
+			handleInterestChange(option, Boolean(checked));
+		};
 
 	const handleOnNext = (): void => {
 		setO11yDetails({
@@ -114,7 +122,7 @@ export function AboutHanzoQuestions({
 					<div className="form-group">
 						<div className="question">What got you interested in Hanzo?</div>
 						<div className="checkbox-grid">
-							{Object.keys(interestedInOptions).map((option: string) => (
+							{shuffledOptionKeys.map((option: string) => (
 								<div key={option} className="checkbox-item">
 									<Checkbox
 										id={`checkbox-${option}`}
@@ -154,7 +162,7 @@ export function AboutHanzoQuestions({
 						className={`onboarding-next-button ${isNextDisabled ? 'disabled' : ''}`}
 						onClick={handleOnNext}
 						disabled={isNextDisabled}
-						suffixIcon={<ArrowRight size={12} />}
+						suffix={<ArrowRight size={12} />}
 					>
 						Next
 					</Button>

@@ -2,6 +2,7 @@ package smart
 
 import (
 	"errors"
+	"log/slog"
 	"strconv"
 
 	basemodel "github.com/hanzoai/o11y/pkg/query-service/model"
@@ -53,7 +54,7 @@ func SmartTraceAlgorithm(payload []basemodel.SearchSpanResponseItem, targetSpanI
 			break
 		}
 		if err != nil {
-			zap.L().Error("Error during BreadthFirstSearch()", zap.Error(err))
+			slog.Error("error during breadth first search", signozerrors.Attr(err))
 			return nil, err
 		}
 	}
@@ -191,7 +192,7 @@ func buildSpanTrees(spansPtr *[]*SpanForTraceDetails) ([]*SpanForTraceDetails, e
 
 		// If the parent span is not found, add current span to list of roots
 		if parent == nil {
-			// zap.L().Debug("Parent Span not found parent_id: ", span.ParentID)
+			// slog.Debug("parent span not found", "parent_id", span.ParentID)
 			roots = append(roots, span)
 			span.ParentID = ""
 			continue

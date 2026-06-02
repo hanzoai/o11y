@@ -209,7 +209,7 @@ func DatastoreFormattedValue(v interface{}) string {
 		case uint8, uint16, uint32, uint64, int, int8, int16, int32, int64, float32, float64, bool:
 			return strings.Join(strings.Fields(fmt.Sprint(x)), ",")
 		default:
-			zap.L().Error("invalid type for formatted value", zap.Any("type", reflect.TypeOf(x[0])))
+			slog.Error("invalid type for formatted value", "type", reflect.TypeOf(x[0]))
 			return "[]"
 		}
 	case []string:
@@ -226,7 +226,7 @@ func DatastoreFormattedValue(v interface{}) string {
 		str += "]"
 		return str
 	default:
-		zap.L().Error("invalid type for formatted value", zap.Any("type", reflect.TypeOf(x)))
+		slog.Error("invalid type for formatted value", "type", reflect.TypeOf(x))
 		return ""
 	}
 }
@@ -246,7 +246,11 @@ func DatastoreFormattedMetricNames(v interface{}) string {
 
 func AddBackTickToFormatTag(str string) string {
 	if strings.Contains(str, ".") || strings.Contains(str, "-") {
-		if strings.HasPrefix(str, "`") && strings.HasSuffix(str, "`") { return str } else { return "`" + str + "`" }
+		if strings.HasPrefix(str, "`") && strings.HasSuffix(str, "`") {
+			return str
+		} else {
+			return "`" + str + "`"
+		}
 	} else {
 		return str
 	}

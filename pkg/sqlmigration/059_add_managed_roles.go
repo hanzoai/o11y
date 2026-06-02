@@ -54,7 +54,7 @@ func (migration *addManagedRoles) Up(ctx context.Context, db *bun.DB) error {
 		return err
 	}
 
-	managedRoles := []*roletypes.StorableRole{}
+	managedRoles := []*authtypes.Role{}
 	for _, orgIDStr := range orgIDs {
 		orgID, err := valuer.NewUUID(orgIDStr)
 		if err != nil {

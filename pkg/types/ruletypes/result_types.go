@@ -15,7 +15,7 @@ type Vector []Sample
 type Sample struct {
 	Point
 
-	Metric labels.Labels
+	Metric Labels
 
 	IsMissing bool
 
@@ -26,6 +26,10 @@ type Sample struct {
 	RecoveryTarget *float64
 
 	TargetUnit string
+
+	// CompareOperator and MatchType carry the threshold evaluation context
+	CompareOperator CompareOperator
+	MatchType       MatchType
 }
 
 func (s Sample) String() string {
@@ -34,8 +38,8 @@ func (s Sample) String() string {
 
 func (s Sample) MarshalJSON() ([]byte, error) {
 	v := struct {
-		M labels.Labels `json:"metric"`
-		V Point         `json:"value"`
+		M Labels `json:"metric"`
+		V Point  `json:"value"`
 	}{
 		M: s.Metric,
 		V: s.Point,
@@ -57,5 +61,5 @@ func (p Point) String() string {
 // MarshalJSON implements json.Marshaler.
 func (p Point) MarshalJSON() ([]byte, error) {
 	v := strconv.FormatFloat(p.V, 'f', -1, 64)
-	return json.Marshal([...]interface{}{float64(p.T) / 1000, v})
+	return json.Marshal([...]any{float64(p.T) / 1000, v})
 }

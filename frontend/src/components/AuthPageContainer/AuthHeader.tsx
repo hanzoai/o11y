@@ -17,8 +17,10 @@ function AuthHeader(): JSX.Element {
 			</div>
 			<Button
 				className="auth-header-help-button"
-				prefixIcon={<LifeBuoy size={12} />}
+				prefix={<LifeBuoy size={12} />}
 				onClick={handleGetHelp}
+				variant="solid"
+				color="none"
 			>
 				Get Help
 			</Button>
