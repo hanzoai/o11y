@@ -13,6 +13,7 @@ import {
 	usePatchRole,
 } from 'api/generated/services/role';
 import {
+	AuthtypesPostableRoleDTO,
 	RenderErrorResponseDTO,
 	RoletypesPostableRoleDTO,
 } from 'api/generated/services/o11y.schemas';
@@ -114,7 +115,7 @@ function CreateRoleModal({
 					data: { description: values.description || '' },
 				});
 			} else {
-				const data: RoletypesPostableRoleDTO = {
+				const data: AuthtypesPostableRoleDTO = {
 					name: values.name,
 					...(values.description ? { description: values.description } : {}),
 				};
@@ -176,7 +177,7 @@ function CreateRoleModal({
 				</Form.Item>
 				<Form.Item name="description" label="Description">
 					<textarea
-						className={inputVariants()}
+						className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm text-foreground shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 						placeholder="A helpful description of the role"
 					/>
 				</Form.Item>

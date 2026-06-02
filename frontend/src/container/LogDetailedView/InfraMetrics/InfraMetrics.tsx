@@ -60,8 +60,8 @@ function InfraMetrics({
 		return options;
 	}, [podName]);
 
-	const handleModeChange = (e: RadioChangeEvent): void => {
-		setSelectedView(e.target.value);
+	const handleModeChange = (value: string): void => {
+		setSelectedView(value);
 	};
 
 	if (!podName && !nodeName && !hostName) {

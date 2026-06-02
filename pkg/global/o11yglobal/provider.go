@@ -8,8 +8,9 @@ import (
 )
 
 type provider struct {
-	config   global.Config
-	settings factory.ScopedProviderSettings
+	config       global.Config
+	identNConfig identn.Config
+	settings     factory.ScopedProviderSettings
 }
 
 func NewFactory() factory.ProviderFactory[global.Global, global.Config] {
@@ -21,11 +22,36 @@ func NewFactory() factory.ProviderFactory[global.Global, global.Config] {
 func newProvider(_ context.Context, providerSettings factory.ProviderSettings, config global.Config) (global.Global, error) {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/global/o11yglobal")
 	return &provider{
-		config:   config,
-		settings: settings,
+		config:       config,
+		identNConfig: identNConfig,
+		settings:     settings,
 	}, nil
 }
 
-func (provider *provider) GetConfig() global.Config {
-	return provider.config
+func (provider *provider) GetConfig(context.Context) *globaltypes.Config {
+	var mcpURL *string
+	if provider.config.MCPURL != nil {
+		s := provider.config.MCPURL.String()
+		mcpURL = &s
+	}
+
+	var aiAssistantURL *string
+	if provider.config.AIAssistantURL != nil {
+		s := provider.config.AIAssistantURL.String()
+		aiAssistantURL = &s
+	}
+
+	return globaltypes.NewConfig(
+		globaltypes.NewEndpoint(
+			provider.config.ExternalURL.String(),
+			provider.config.IngestionURL.String(),
+			mcpURL,
+			aiAssistantURL,
+		),
+		globaltypes.NewIdentNConfig(
+			globaltypes.TokenizerConfig{Enabled: provider.identNConfig.Tokenizer.Enabled},
+			globaltypes.APIKeyConfig{Enabled: provider.identNConfig.APIKeyConfig.Enabled},
+			globaltypes.ImpersonationConfig{Enabled: provider.identNConfig.Impersonation.Enabled},
+		),
+	)
 }

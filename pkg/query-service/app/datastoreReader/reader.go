@@ -34,7 +34,7 @@ import (
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/hanzoai/o11y/pkg/cache"
 
-	"go.uber.org/zap"
+	"log/slog"
 
 	queryprogress "github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader/query_progress"
 	"github.com/hanzoai/o11y/pkg/query-service/app/resource"
@@ -134,6 +134,7 @@ type DatastoreReader struct {
 	logsAttributeKeys       string
 	logsResourceKeys        string
 	logsTagAttributeTableV2 string
+	logger                  *slog.Logger
 	queryProgressTracker    queryprogress.QueryProgressTracker
 
 	logsTableV2              string
@@ -161,6 +162,7 @@ type DatastoreReader struct {
 
 // NewTraceReader returns a TraceReader for the database
 func NewReader(
+	logger *slog.Logger,
 	sqlDB sqlstore.SQLStore,
 	telemetryStore telemetrystore.TelemetryStore,
 	cluster string,
@@ -200,7 +202,7 @@ func NewReader(
 		logsTagAttributeTableV2:    options.primary.LogsTagAttributeTableV2,
 		liveTailRefreshSeconds:     options.primary.LiveTailRefreshSeconds,
 		cluster:                    cluster,
-		queryProgressTracker:       queryprogress.NewQueryProgressTracker(),
+		queryProgressTracker:       queryprogress.NewQueryProgressTracker(logger),
 		logsTableV2:                options.primary.LogsTableV2,
 		logsLocalTableV2:           options.primary.LogsLocalTableV2,
 		logsResourceTableV2:        options.primary.LogsResourceTableV2,
@@ -281,7 +283,7 @@ func (r *DatastoreReader) GetTopLevelOperations(ctx context.Context, start, end 
 	rows, err := r.db.Query(ctx, query, datastore.Named("start", start), datastore.Named("services", services))
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 	}
 
@@ -353,7 +355,7 @@ func (r *DatastoreReader) buildResourceSubQuery(tags []model.TagQueryParam, svc 
 		v3.AttributeKey{},
 		false)
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return "", err
 	}
 	return resourceSubQuery, nil
@@ -433,7 +435,7 @@ func (r *DatastoreReader) GetServices(ctx context.Context, queryParams *model.Ge
 
 			resourceSubQuery, err := r.buildResourceSubQuery(queryParams.Tags, svc, *queryParams.Start, *queryParams.End)
 			if err != nil {
-				zap.L().Error("Error in processing sql query", zap.Error(err))
+				r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 				return
 			}
 			query += `
@@ -458,7 +460,7 @@ func (r *DatastoreReader) GetServices(ctx context.Context, queryParams *model.Ge
 			}
 
 			if err != nil {
-				zap.L().Error("Error in processing sql query", zap.Error(err))
+				r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 				return
 			}
 
@@ -470,7 +472,7 @@ func (r *DatastoreReader) GetServices(ctx context.Context, queryParams *model.Ge
 
 			err = r.db.QueryRow(ctx, errorQuery, args...).Scan(&numErrors)
 			if err != nil {
-				zap.L().Error("Error in processing sql query", zap.Error(err))
+				r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 				return
 			}
 
@@ -753,7 +755,7 @@ func (r *DatastoreReader) GetTopOperations(ctx context.Context, queryParams *mod
 
 	resourceSubQuery, err := r.buildResourceSubQuery(queryParams.Tags, queryParams.ServiceName, *queryParams.Start, *queryParams.End)
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 	}
 	query += `
@@ -770,7 +772,7 @@ func (r *DatastoreReader) GetTopOperations(ctx context.Context, queryParams *mod
 	err = r.db.Select(ctx, &topOperationsItems, query, namedArgs...)
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 	}
 
@@ -804,10 +806,10 @@ func (r *DatastoreReader) GetUsage(ctx context.Context, queryParams *model.GetUs
 
 	err := r.db.Select(ctx, &usageItems, query, namedArgs...)
 
-	zap.L().Info(query)
+	r.logger.Info(query)
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error in processing sql query")
 	}
 
@@ -837,19 +839,19 @@ func (r *DatastoreReader) GetSpansForTrace(ctx context.Context, traceID string, 
 		if err == sql.ErrNoRows {
 			return []model.SpanItemV2{}, nil
 		}
-		zap.L().Error("Error in processing trace summary sql query", zap.Error(err))
+		r.logger.Error("Error in processing trace summary sql query", errorsV2.Attr(err))
 		return nil, model.ExecutionError(fmt.Errorf("error in processing trace summary sql query: %w", err))
 	}
 
 	var searchScanResponses []model.SpanItemV2
 	queryStartTime := time.Now()
 	err = r.db.Select(ctx, &searchScanResponses, traceDetailsQuery, traceID, strconv.FormatInt(traceSummary.Start.Unix()-1800, 10), strconv.FormatInt(traceSummary.End.Unix(), 10))
-	zap.L().Info(traceDetailsQuery)
+	r.logger.Info(traceDetailsQuery)
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, model.ExecutionError(fmt.Errorf("error in processing trace data sql query: %w", err))
 	}
-	zap.L().Info("trace details query took: ", zap.Duration("duration", time.Since(queryStartTime)), zap.String("traceID", traceID))
+	r.logger.Info("trace details query took: ", "duration", time.Since(queryStartTime), "traceID", traceID)
 
 	return searchScanResponses, nil
 }
@@ -858,16 +860,16 @@ func (r *DatastoreReader) GetWaterfallSpansForTraceWithMetadataCache(ctx context
 	cachedTraceData := new(model.GetWaterfallSpansForTraceWithMetadataCache)
 	err := r.cacheForTraceDetail.Get(ctx, orgID, strings.Join([]string{"getWaterfallSpansForTraceWithMetadata", traceID}, "-"), cachedTraceData)
 	if err != nil {
-		zap.L().Debug("error in retrieving getWaterfallSpansForTraceWithMetadata cache", zap.Error(err), zap.String("traceID", traceID))
+		r.logger.Debug("error in retrieving getWaterfallSpansForTraceWithMetadata cache", errorsV2.Attr(err), "traceID", traceID)
 		return nil, err
 	}
 
 	if time.Since(time.UnixMilli(int64(cachedTraceData.EndTime))) < r.fluxIntervalForTraceDetail {
-		zap.L().Info("the trace end time falls under the flux interval, skipping getWaterfallSpansForTraceWithMetadata cache", zap.String("traceID", traceID))
+		r.logger.Info("the trace end time falls under the flux interval, skipping getWaterfallSpansForTraceWithMetadata cache", "traceID", traceID)
 		return nil, errors.Errorf("the trace end time falls under the flux interval, skipping getWaterfallSpansForTraceWithMetadata cache, traceID: %s", traceID)
 	}
 
-	zap.L().Info("cache is successfully hit, applying cache for getWaterfallSpansForTraceWithMetadata", zap.String("traceID", traceID))
+	r.logger.Info("cache is successfully hit, applying cache for getWaterfallSpansForTraceWithMetadata", "traceID", traceID)
 	return cachedTraceData, nil
 }
 
@@ -894,7 +896,7 @@ func (r *DatastoreReader) GetWaterfallSpansForTraceWithMetadata(ctx context.Cont
 	}
 
 	if err != nil {
-		zap.L().Info("cache miss for getWaterfallSpansForTraceWithMetadata", zap.String("traceID", traceID))
+		r.logger.Info("cache miss for getWaterfallSpansForTraceWithMetadata", "traceID", traceID)
 
 		searchScanResponses, err := r.GetSpansForTrace(ctx, traceID, fmt.Sprintf("SELECT DISTINCT ON (span_id) timestamp, duration_nano, span_id, trace_id, has_error, kind, resource_string_service$$name, name, links as references, attributes_string, attributes_number, attributes_bool, resources_string, events, status_message, status_code_string, kind_string FROM %s.%s WHERE trace_id=$1 and ts_bucket_start>=$2 and ts_bucket_start<=$3 ORDER BY timestamp ASC, name ASC", r.TraceDB, r.traceTableName))
 		if err != nil {
@@ -904,12 +906,11 @@ func (r *DatastoreReader) GetWaterfallSpansForTraceWithMetadata(ctx context.Cont
 			return response, nil
 		}
 		totalSpans = uint64(len(searchScanResponses))
-		processingBeforeCache := time.Now()
 		for _, item := range searchScanResponses {
 			ref := []model.OtelSpanRef{}
 			err := json.Unmarshal([]byte(item.References), &ref)
 			if err != nil {
-				zap.L().Error("getWaterfallSpansForTraceWithMetadata: error unmarshalling references", zap.Error(err), zap.String("traceID", traceID))
+				r.logger.Error("getWaterfallSpansForTraceWithMetadata: error unmarshalling references", errorsV2.Attr(err), "traceID", traceID)
 				return nil, errorsV2.Newf(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, "getWaterfallSpansForTraceWithMetadata: error unmarshalling references %s", err.Error())
 			}
 
@@ -929,7 +930,7 @@ func (r *DatastoreReader) GetWaterfallSpansForTraceWithMetadata(ctx context.Cont
 				var eventMap model.Event
 				err = json.Unmarshal([]byte(event), &eventMap)
 				if err != nil {
-					zap.L().Error("Error unmarshalling events", zap.Error(err))
+					r.logger.Error("Error unmarshalling events", errorsV2.Attr(err))
 					return nil, errorsV2.Newf(errorsV2.TypeInternal, errorsV2.CodeInternal, "getWaterfallSpansForTraceWithMetadata: error in unmarshalling events %s", err.Error())
 				}
 				events = append(events, eventMap)
@@ -1027,28 +1028,28 @@ func (r *DatastoreReader) GetWaterfallSpansForTraceWithMetadata(ctx context.Cont
 
 		serviceNameToTotalDurationMap = tracedetail.CalculateServiceTime(serviceNameIntervalMap)
 
-		traceCache := model.GetWaterfallSpansForTraceWithMetadataCache{
-			StartTime:                     startTime,
-			EndTime:                       endTime,
-			DurationNano:                  durationNano,
-			TotalSpans:                    totalSpans,
-			TotalErrorSpans:               totalErrorSpans,
-			SpanIdToSpanNodeMap:           spanIdToSpanNodeMap,
-			ServiceNameToTotalDurationMap: serviceNameToTotalDurationMap,
-			TraceRoots:                    traceRoots,
-			HasMissingSpans:               hasMissingSpans,
-		}
-
-		zap.L().Info("getWaterfallSpansForTraceWithMetadata: processing pre cache", zap.Duration("duration", time.Since(processingBeforeCache)), zap.String("traceID", traceID))
-		cacheErr := r.cacheForTraceDetail.Set(ctx, orgID, strings.Join([]string{"getWaterfallSpansForTraceWithMetadata", traceID}, "-"), &traceCache, time.Minute*5)
-		if cacheErr != nil {
-			zap.L().Debug("failed to store cache for getWaterfallSpansForTraceWithMetadata", zap.String("traceID", traceID), zap.Error(err))
-		}
+		// TODO: set the span data (model.GetWaterfallSpansForTraceWithMetadataCache) in cache here
+		// removed existing cache usage since it was not getting used due to this bug https://github.com/SigNoz/engineering-pod/issues/4648
+		// and was causing out of memory issues https://github.com/SigNoz/engineering-pod/issues/4638
 	}
 
 	processingPostCache := time.Now()
-	selectedSpans, uncollapsedSpans, rootServiceName, rootServiceEntryPoint := tracedetail.GetSelectedSpans(req.UncollapsedSpans, req.SelectedSpanID, traceRoots, spanIdToSpanNodeMap, req.IsSelectedSpanIDUnCollapsed)
-	zap.L().Info("getWaterfallSpansForTraceWithMetadata: processing post cache", zap.Duration("duration", time.Since(processingPostCache)), zap.String("traceID", traceID))
+	// When req.Limit is 0 (not set by the client),  selectAllSpans is set to false
+	// preserving the old paged behaviour for backward compatibility
+	limit := min(req.Limit, tracedetail.MaxLimitToSelectAllSpans)
+	selectAllSpans := totalSpans <= uint64(limit)
+
+	var (
+		selectedSpans                          []*model.Span
+		uncollapsedSpans                       []string
+		rootServiceName, rootServiceEntryPoint string
+	)
+	if selectAllSpans {
+		selectedSpans, rootServiceName, rootServiceEntryPoint = tracedetail.GetAllSpans(traceRoots)
+	} else {
+		selectedSpans, uncollapsedSpans, rootServiceName, rootServiceEntryPoint = tracedetail.GetSelectedSpans(req.UncollapsedSpans, req.SelectedSpanID, traceRoots, spanIdToSpanNodeMap, req.IsSelectedSpanIDUnCollapsed)
+	}
+	r.logger.Info("getWaterfallSpansForTraceWithMetadata: processing post cache", "duration", time.Since(processingPostCache), "traceID", traceID)
 
 	// convert start timestamp to millis because right now frontend is expecting it in millis
 	for _, span := range selectedSpans {
@@ -1060,7 +1061,7 @@ func (r *DatastoreReader) GetWaterfallSpansForTraceWithMetadata(ctx context.Cont
 	}
 
 	response.Spans = selectedSpans
-	response.UncollapsedSpans = uncollapsedSpans
+	response.UncollapsedSpans = uncollapsedSpans // ignoring if all spans are returning
 	response.StartTimestampMillis = startTime / 1000000
 	response.EndTimestampMillis = endTime / 1000000
 	response.TotalSpansCount = totalSpans
@@ -1069,6 +1070,7 @@ func (r *DatastoreReader) GetWaterfallSpansForTraceWithMetadata(ctx context.Cont
 	response.RootServiceEntryPoint = rootServiceEntryPoint
 	response.ServiceNameToTotalDurationMap = serviceNameToTotalDurationMap
 	response.HasMissingSpans = hasMissingSpans
+	response.HasMore = !selectAllSpans
 	return response, nil
 }
 
@@ -1076,16 +1078,16 @@ func (r *DatastoreReader) GetFlamegraphSpansForTraceCache(ctx context.Context, o
 	cachedTraceData := new(model.GetFlamegraphSpansForTraceCache)
 	err := r.cacheForTraceDetail.Get(ctx, orgID, strings.Join([]string{"getFlamegraphSpansForTrace", traceID}, "-"), cachedTraceData)
 	if err != nil {
-		zap.L().Debug("error in retrieving getFlamegraphSpansForTrace cache", zap.Error(err), zap.String("traceID", traceID))
+		r.logger.Debug("error in retrieving getFlamegraphSpansForTrace cache", errorsV2.Attr(err), "traceID", traceID)
 		return nil, err
 	}
 
 	if time.Since(time.UnixMilli(int64(cachedTraceData.EndTime))) < r.fluxIntervalForTraceDetail {
-		zap.L().Info("the trace end time falls under the flux interval, skipping getFlamegraphSpansForTrace cache", zap.String("traceID", traceID))
+		r.logger.Info("the trace end time falls under the flux interval, skipping getFlamegraphSpansForTrace cache", "traceID", traceID)
 		return nil, errors.Errorf("the trace end time falls under the flux interval, skipping getFlamegraphSpansForTrace cache, traceID: %s", traceID)
 	}
 
-	zap.L().Info("cache is successfully hit, applying cache for getFlamegraphSpansForTrace", zap.String("traceID", traceID))
+	r.logger.Info("cache is successfully hit, applying cache for getFlamegraphSpansForTrace", "traceID", traceID)
 	return cachedTraceData, nil
 }
 
@@ -1109,9 +1111,15 @@ func (r *DatastoreReader) GetFlamegraphSpansForTrace(ctx context.Context, orgID 
 	}
 
 	if err != nil {
-		zap.L().Info("cache miss for getFlamegraphSpansForTrace", zap.String("traceID", traceID))
+		r.logger.Info("cache miss for getFlamegraphSpansForTrace", "traceID", traceID)
 
-		searchScanResponses, err := r.GetSpansForTrace(ctx, traceID, fmt.Sprintf("SELECT timestamp, duration_nano, span_id, trace_id, has_error,links as references, resource_string_service$$name, name, events FROM %s.%s WHERE trace_id=$1 and ts_bucket_start>=$2 and ts_bucket_start<=$3 ORDER BY timestamp ASC, name ASC", r.TraceDB, r.traceTableName))
+		selectCols := "timestamp, duration_nano, span_id, trace_id, has_error, links as references, resource_string_service$$name, name, events"
+		if len(req.SelectFields) > 0 {
+			selectCols += ", attributes_string, attributes_number, attributes_bool, resources_string"
+		}
+		flamegraphQuery := fmt.Sprintf("SELECT %s FROM %s.%s WHERE trace_id=$1 and ts_bucket_start>=$2 and ts_bucket_start<=$3 ORDER BY timestamp ASC, name ASC", selectCols, r.TraceDB, r.traceTableName)
+
+		searchScanResponses, err := r.GetSpansForTrace(ctx, traceID, flamegraphQuery)
 		if err != nil {
 			return nil, err
 		}
@@ -1119,12 +1127,11 @@ func (r *DatastoreReader) GetFlamegraphSpansForTrace(ctx context.Context, orgID 
 			return trace, nil
 		}
 
-		processingBeforeCache := time.Now()
 		for _, item := range searchScanResponses {
 			ref := []model.OtelSpanRef{}
 			err := json.Unmarshal([]byte(item.References), &ref)
 			if err != nil {
-				zap.L().Error("Error unmarshalling references", zap.Error(err))
+				r.logger.Error("Error unmarshalling references", errorsV2.Attr(err))
 				return nil, errorsV2.Newf(errorsV2.TypeInternal, errorsV2.CodeInternal, "getFlamegraphSpansForTrace: error in unmarshalling references %s", err.Error())
 			}
 
@@ -1133,7 +1140,7 @@ func (r *DatastoreReader) GetFlamegraphSpansForTrace(ctx context.Context, orgID 
 				var eventMap model.Event
 				err = json.Unmarshal([]byte(event), &eventMap)
 				if err != nil {
-					zap.L().Error("Error unmarshalling events", zap.Error(err))
+					r.logger.Error("Error unmarshalling events", errorsV2.Attr(err))
 					return nil, errorsV2.Newf(errorsV2.TypeInternal, errorsV2.CodeInternal, "getFlamegraphSpansForTrace: error in unmarshalling events %s", err.Error())
 				}
 				events = append(events, eventMap)
@@ -1149,6 +1156,10 @@ func (r *DatastoreReader) GetFlamegraphSpansForTrace(ctx context.Context, orgID 
 				References:   ref,
 				Events:       events,
 				Children:     make([]*model.FlamegraphSpan, 0),
+			}
+
+			if len(req.SelectFields) > 0 {
+				jsonItem.SetRequestedFields(item, req.SelectFields)
 			}
 
 			// metadata calculation
@@ -1200,29 +1211,33 @@ func (r *DatastoreReader) GetFlamegraphSpansForTrace(ctx context.Context, orgID 
 			}
 		}
 
-		selectedSpans = tracedetail.GetSelectedSpansForFlamegraph(traceRoots, spanIdToSpanNodeMap)
-		traceCache := model.GetFlamegraphSpansForTraceCache{
-			StartTime:     startTime,
-			EndTime:       endTime,
-			DurationNano:  durationNano,
-			SelectedSpans: selectedSpans,
-			TraceRoots:    traceRoots,
-		}
+		selectedSpans = tracedetail.GetAllSpansForFlamegraph(traceRoots, spanIdToSpanNodeMap)
 
-		zap.L().Info("getFlamegraphSpansForTrace: processing pre cache", zap.Duration("duration", time.Since(processingBeforeCache)), zap.String("traceID", traceID))
-		cacheErr := r.cacheForTraceDetail.Set(ctx, orgID, strings.Join([]string{"getFlamegraphSpansForTrace", traceID}, "-"), &traceCache, time.Minute*5)
-		if cacheErr != nil {
-			zap.L().Debug("failed to store cache for getFlamegraphSpansForTrace", zap.String("traceID", traceID), zap.Error(err))
-		}
+		// TODO: set the trace data (model.GetFlamegraphSpansForTraceCache) in cache here
+		// removed existing cache usage since it was not getting used due to this bug https://github.com/SigNoz/engineering-pod/issues/4648
+		// and was causing out of memory issues https://github.com/SigNoz/engineering-pod/issues/4638
 	}
 
 	processingPostCache := time.Now()
-	selectedSpansForRequest := tracedetail.GetSelectedSpansForFlamegraphForRequest(req.SelectedSpanID, selectedSpans, startTime, endTime)
-	zap.L().Info("getFlamegraphSpansForTrace: processing post cache", zap.Duration("duration", time.Since(processingPostCache)), zap.String("traceID", traceID))
+	selectedSpansForRequest := selectedSpans
+	clientLimit := min(req.Limit, tracedetail.MaxLimitWithoutSampling)
+	totalSpanCount := tracedetail.GetTotalSpanCount(selectedSpans)
+	if totalSpanCount > uint64(clientLimit) {
+		// using trace start and end time if boundary ts are set to zero (or not set)
+		boundaryStart := max(timestamp.MilliToNano(req.BoundaryStartTS), startTime)
+		boundaryEnd := timestamp.MilliToNano(req.BoundaryEndTS)
+		if boundaryEnd == 0 {
+			boundaryEnd = endTime
+		}
+
+		selectedSpansForRequest = tracedetail.GetSelectedSpansForFlamegraphForRequest(req.SelectedSpanID, selectedSpans, boundaryStart, boundaryEnd)
+	}
+	r.logger.Debug("getFlamegraphSpansForTrace: processing post cache", "duration", time.Since(processingPostCache), "traceID", traceID, "totalSpans", totalSpanCount, "limit", clientLimit)
 
 	trace.Spans = selectedSpansForRequest
 	trace.StartTimestampMillis = startTime / 1000000
 	trace.EndTimestampMillis = endTime / 1000000
+	trace.HasMore = totalSpanCount > uint64(clientLimit)
 	return trace, nil
 }
 
@@ -1267,12 +1282,12 @@ func (r *DatastoreReader) GetDependencyGraph(ctx context.Context, queryParams *m
 	query += filterQuery + " GROUP BY src, dest;"
 	args = append(args, filterArgs...)
 
-	zap.L().Debug("GetDependencyGraph query", zap.String("query", query), zap.Any("args", args))
+	r.logger.Debug("GetDependencyGraph query", "query", query, "args", args)
 
 	err := r.db.Select(ctx, &response, query, args...)
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error in processing sql query %w", err)
 	}
 
@@ -1321,7 +1336,7 @@ func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *
 		if apiErr != nil {
 			return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing ttl_status check sql query")}
 		}
-		if statusItem.Status == constants.StatusPending {
+		if statusItem.Status == retentiontypes.TTLSettingStatusPending {
 			return nil, &model.ApiError{Typ: model.ErrorConflict, Err: fmt.Errorf("TTL is already running")}
 		}
 	}
@@ -1369,7 +1384,7 @@ func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *
 			// we will change ttl for only the new parts and not the old ones
 			query += " SETTINGS materialize_ttl_after_modify=0"
 
-			ttl := types.TTLSetting{
+			ttl := retentiontypes.TTLSetting{
 				Identifiable: types.Identifiable{
 					ID: valuer.GenerateUUID(),
 				},
@@ -1380,7 +1395,7 @@ func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *
 				TransactionID:  uuid,
 				TableName:      tableName,
 				TTL:            int(params.DelDuration),
-				Status:         constants.StatusPending,
+				Status:         retentiontypes.TTLSettingStatusPending,
 				ColdStorageTTL: coldStorageDuration,
 				OrgID:          orgID,
 			}
@@ -1391,46 +1406,46 @@ func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *
 				Model(&ttl).
 				Exec(ctx)
 			if dbErr != nil {
-				zap.L().Error("error in inserting to ttl_status table", zap.Error(dbErr))
+				r.logger.Error("error in inserting to ttl_status table", errorsV2.Attr(dbErr))
 				return
 			}
 
 			err := r.setColdStorage(context.Background(), tableName, params.ColdStorageVolume)
 			if err != nil {
-				zap.L().Error("error in setting cold storage", zap.Error(err))
+				r.logger.Error("error in setting cold storage", errorsV2.Attr(err))
 				statusItem, apiErr := r.checkTTLStatusItem(ctx, orgID, tableName)
 				if apiErr == nil {
 					_, dbErr := r.
 						sqlDB.
 						BunDB().
 						NewUpdate().
-						Model(new(types.TTLSetting)).
+						Model(new(retentiontypes.TTLSetting)).
 						Set("updated_at = ?", time.Now()).
-						Set("status = ?", constants.StatusFailed).
+						Set("status = ?", retentiontypes.TTLSettingStatusFailed).
 						Where("id = ?", statusItem.ID.StringValue()).
 						Exec(ctx)
 					if dbErr != nil {
-						zap.L().Error("Error in processing ttl_status update sql query", zap.Error(dbErr))
+						r.logger.Error("Error in processing ttl_status update sql query", errorsV2.Attr(dbErr))
 						return
 					}
 				}
 				return
 			}
-			zap.L().Info("Executing TTL request: ", zap.String("request", query))
+			r.logger.Info("Executing TTL request: ", "request", query)
 			statusItem, _ := r.checkTTLStatusItem(ctx, orgID, tableName)
 			if err := r.db.Exec(ctx, query); err != nil {
-				zap.L().Error("error while setting ttl", zap.Error(err))
+				r.logger.Error("error while setting ttl", errorsV2.Attr(err))
 				_, dbErr := r.
 					sqlDB.
 					BunDB().
 					NewUpdate().
-					Model(new(types.TTLSetting)).
+					Model(new(retentiontypes.TTLSetting)).
 					Set("updated_at = ?", time.Now()).
-					Set("status = ?", constants.StatusFailed).
+					Set("status = ?", retentiontypes.TTLSettingStatusFailed).
 					Where("id = ?", statusItem.ID.StringValue()).
 					Exec(ctx)
 				if dbErr != nil {
-					zap.L().Error("Error in processing ttl_status update sql query", zap.Error(dbErr))
+					r.logger.Error("Error in processing ttl_status update sql query", errorsV2.Attr(dbErr))
 					return
 				}
 				return
@@ -1439,19 +1454,19 @@ func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *
 				sqlDB.
 				BunDB().
 				NewUpdate().
-				Model(new(types.TTLSetting)).
+				Model(new(retentiontypes.TTLSetting)).
 				Set("updated_at = ?", time.Now()).
-				Set("status = ?", constants.StatusSuccess).
+				Set("status = ?", retentiontypes.TTLSettingStatusSuccess).
 				Where("id = ?", statusItem.ID.StringValue()).
 				Exec(ctx)
 			if dbErr != nil {
-				zap.L().Error("Error in processing ttl_status update sql query", zap.Error(dbErr))
+				r.logger.Error("Error in processing ttl_status update sql query", errorsV2.Attr(dbErr))
 				return
 			}
 		}
 
 	}(ttlPayload)
-	return &model.SetTTLResponseItem{Message: "move ttl has been successfully set up"}, nil
+	return &retentiontypes.SetTTLResponseItem{Message: "move ttl has been successfully set up"}, nil
 }
 
 func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
@@ -1484,7 +1499,7 @@ func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params
 		if apiErr != nil {
 			return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing ttl_status check sql query")}
 		}
-		if statusItem.Status == constants.StatusPending {
+		if statusItem.Status == retentiontypes.TTLSettingStatusPending {
 			return nil, &model.ApiError{Typ: model.ErrorConflict, Err: fmt.Errorf("TTL is already running")}
 		}
 	}
@@ -1507,7 +1522,7 @@ func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params
 				timestamp = "end"
 			}
 
-			ttl := types.TTLSetting{
+			ttl := retentiontypes.TTLSetting{
 				Identifiable: types.Identifiable{
 					ID: valuer.GenerateUUID(),
 				},
@@ -1518,7 +1533,7 @@ func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params
 				TransactionID:  uuid,
 				TableName:      tableName,
 				TTL:            int(params.DelDuration),
-				Status:         constants.StatusPending,
+				Status:         retentiontypes.TTLSettingStatusPending,
 				ColdStorageTTL: coldStorageDuration,
 				OrgID:          orgID,
 			}
@@ -1529,7 +1544,7 @@ func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params
 				Model(&ttl).
 				Exec(ctx)
 			if dbErr != nil {
-				zap.L().Error("error in inserting to ttl_status table", zap.Error(dbErr))
+				r.logger.Error("error in inserting to ttl_status table", errorsV2.Attr(dbErr))
 				return
 			}
 
@@ -1547,41 +1562,41 @@ func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params
 			}
 			err := r.setColdStorage(context.Background(), tableName, params.ColdStorageVolume)
 			if err != nil {
-				zap.L().Error("Error in setting cold storage", zap.Error(err))
+				r.logger.Error("Error in setting cold storage", errorsV2.Attr(err))
 				statusItem, apiErr := r.checkTTLStatusItem(ctx, orgID, tableName)
 				if apiErr == nil {
 					_, dbErr := r.
 						sqlDB.
 						BunDB().
 						NewUpdate().
-						Model(new(types.TTLSetting)).
+						Model(new(retentiontypes.TTLSetting)).
 						Set("updated_at = ?", time.Now()).
-						Set("status = ?", constants.StatusFailed).
+						Set("status = ?", retentiontypes.TTLSettingStatusFailed).
 						Where("id = ?", statusItem.ID.StringValue()).
 						Exec(ctx)
 					if dbErr != nil {
-						zap.L().Error("Error in processing ttl_status update sql query", zap.Error(dbErr))
+						r.logger.Error("Error in processing ttl_status update sql query", errorsV2.Attr(dbErr))
 						return
 					}
 				}
 				return
 			}
 			req += " SETTINGS materialize_ttl_after_modify=0;"
-			zap.L().Error(" ExecutingTTL request: ", zap.String("request", req))
+			r.logger.Error(" ExecutingTTL request: ", "request", req)
 			statusItem, _ := r.checkTTLStatusItem(ctx, orgID, tableName)
 			if err := r.db.Exec(ctx, req); err != nil {
-				zap.L().Error("Error in executing set TTL query", zap.Error(err))
+				r.logger.Error("Error in executing set TTL query", errorsV2.Attr(err))
 				_, dbErr := r.
 					sqlDB.
 					BunDB().
 					NewUpdate().
-					Model(new(types.TTLSetting)).
+					Model(new(retentiontypes.TTLSetting)).
 					Set("updated_at = ?", time.Now()).
-					Set("status = ?", constants.StatusFailed).
+					Set("status = ?", retentiontypes.TTLSettingStatusFailed).
 					Where("id = ?", statusItem.ID.StringValue()).
 					Exec(ctx)
 				if dbErr != nil {
-					zap.L().Error("Error in processing ttl_status update sql query", zap.Error(dbErr))
+					r.logger.Error("Error in processing ttl_status update sql query", errorsV2.Attr(dbErr))
 					return
 				}
 				return
@@ -1590,18 +1605,18 @@ func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params
 				sqlDB.
 				BunDB().
 				NewUpdate().
-				Model(new(types.TTLSetting)).
+				Model(new(retentiontypes.TTLSetting)).
 				Set("updated_at = ?", time.Now()).
-				Set("status = ?", constants.StatusSuccess).
+				Set("status = ?", retentiontypes.TTLSettingStatusSuccess).
 				Where("id = ?", statusItem.ID.StringValue()).
 				Exec(ctx)
 			if dbErr != nil {
-				zap.L().Error("Error in processing ttl_status update sql query", zap.Error(dbErr))
+				r.logger.Error("Error in processing ttl_status update sql query", errorsV2.Attr(dbErr))
 				return
 			}
 		}(distributedTableName)
 	}
-	return &model.SetTTLResponseItem{Message: "move ttl has been successfully set up"}, nil
+	return &retentiontypes.SetTTLResponseItem{Message: "move ttl has been successfully set up"}, nil
 }
 
 func (r *DatastoreReader) hasCustomRetentionColumn(ctx context.Context) (bool, error) {
@@ -1619,14 +1634,14 @@ func (r *DatastoreReader) hasCustomRetentionColumn(ctx context.Context) (bool, e
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// Column doesn't exist
-			zap.L().Debug("_retention_days column not found in logs table", zap.String("table", r.logsLocalTableV2))
+			r.logger.Debug("_retention_days column not found in logs table", "table", r.logsLocalTableV2)
 			return false, nil
 		}
-		zap.L().Error("Error checking for _retention_days column", zap.Error(err))
+		r.logger.Error("Error checking for _retention_days column", errorsV2.Attr(err))
 		return false, errorsV2.Wrapf(err, errorsV2.TypeInternal, errorsV2.CodeInternal, "error checking columns")
 	}
 
-	zap.L().Debug("Found _retention_days column in logs table", zap.String("table", r.logsLocalTableV2))
+	r.logger.Debug("Found _retention_days column in logs table", "table", r.logsLocalTableV2)
 	return true, nil
 }
 
@@ -1643,10 +1658,9 @@ func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *mo
 	}
 
 	if !hasCustomRetention {
-		zap.L().Info("Custom retention not supported, falling back to standard TTL method",
-			zap.String("orgID", orgID))
+		r.logger.Info("Custom retention not supported, falling back to standard TTL method", "orgID", orgID)
 
-		ttlParams := &model.TTLParams{
+		ttlParams := &retentiontypes.TTLParams{
 			Type:        params.Type,
 			DelDuration: int64(params.DefaultTTLDays * 24 * 3600),
 		}
@@ -1667,7 +1681,7 @@ func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *mo
 			return nil, errorsV2.Wrapf(apiErr.Err, errorsV2.TypeInternal, errorsV2.CodeInternal, "failed to set standard TTL")
 		}
 
-		return &model.CustomRetentionTTLResponse{
+		return &retentiontypes.CustomRetentionTTLResponse{
 			Message: fmt.Sprintf("Custom retention not supported, applied standard TTL of %d days. %s", params.DefaultTTLDays, ttlResult.Message),
 		}, nil
 	}
@@ -1678,7 +1692,7 @@ func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *mo
 	uuidWithHyphen := valuer.GenerateUUID()
 	uuid := strings.Replace(uuidWithHyphen.String(), "-", "", -1)
 
-	if params.Type != constants.LogsTTL {
+	if params.Type != retentiontypes.LogsTTL {
 		return nil, errorsV2.Newf(errorsV2.TypeInternal, errorsV2.CodeInternal, "custom retention TTL only supported for logs")
 	}
 
@@ -1709,7 +1723,7 @@ func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *mo
 		if apiErr != nil {
 			return nil, errorsV2.Newf(errorsV2.TypeInternal, errorsV2.CodeInternal, "error in processing custom_retention_ttl_status check sql query")
 		}
-		if statusItem.Status == constants.StatusPending {
+		if statusItem.Status == retentiontypes.TTLSettingStatusPending {
 			return nil, errorsV2.Newf(errorsV2.TypeInternal, errorsV2.CodeInternal, "custom retention TTL is already running")
 		}
 	}
@@ -1783,7 +1797,7 @@ func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *mo
 	}
 
 	for tableName, queries := range ttlPayload {
-		customTTL := types.TTLSetting{
+		customTTL := retentiontypes.TTLSetting{
 			Identifiable: types.Identifiable{
 				ID: valuer.GenerateUUID(),
 			},
@@ -1795,7 +1809,7 @@ func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *mo
 			TableName:      tableName,
 			TTL:            params.DefaultTTLDays,
 			Condition:      string(ttlConditionsJSON),
-			Status:         constants.StatusPending,
+			Status:         retentiontypes.TTLSettingStatusPending,
 			ColdStorageTTL: coldStorageDuration,
 			OrgID:          orgID,
 		}
@@ -1803,32 +1817,32 @@ func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *mo
 		// Insert TTL setting record
 		_, dbErr := r.sqlDB.BunDB().NewInsert().Model(&customTTL).Exec(ctx)
 		if dbErr != nil {
-			zap.L().Error("error in inserting to custom_retention_ttl_settings table", zap.Error(dbErr))
+			r.logger.Error("error in inserting to custom_retention_ttl_settings table", errorsV2.Attr(dbErr))
 			return nil, errorsV2.Wrapf(dbErr, errorsV2.TypeInternal, errorsV2.CodeInternal, "error inserting TTL settings")
 		}
 
 		if len(params.ColdStorageVolume) > 0 && coldStorageDuration > 0 {
 			err := r.setColdStorage(ctx, tableName, params.ColdStorageVolume)
 			if err != nil {
-				zap.L().Error("error in setting cold storage", zap.Error(err))
-				r.updateCustomRetentionTTLStatus(ctx, orgID, tableName, constants.StatusFailed)
+				r.logger.Error("error in setting cold storage", errorsV2.Attr(err))
+				r.updateCustomRetentionTTLStatus(ctx, orgID, tableName, retentiontypes.TTLSettingStatusFailed)
 				return nil, errorsV2.Wrapf(err.Err, errorsV2.TypeInternal, errorsV2.CodeInternal, "error setting cold storage for table %s", tableName)
 			}
 		}
 
 		for i, query := range queries {
-			zap.L().Debug("Executing custom retention TTL request: ", zap.String("request", query), zap.Int("step", i+1))
+			r.logger.Debug("Executing custom retention TTL request: ", "request", query, "step", i+1)
 			if err := r.db.Exec(ctx, query); err != nil {
-				zap.L().Error("error while setting custom retention ttl", zap.Error(err))
-				r.updateCustomRetentionTTLStatus(ctx, orgID, tableName, constants.StatusFailed)
+				r.logger.Error("error while setting custom retention ttl", errorsV2.Attr(err))
+				r.updateCustomRetentionTTLStatus(ctx, orgID, tableName, retentiontypes.TTLSettingStatusFailed)
 				return nil, errorsV2.Wrapf(err, errorsV2.TypeInternal, errorsV2.CodeInternal, "error setting custom retention TTL for table %s, query: %s", tableName, query)
 			}
 		}
 
-		r.updateCustomRetentionTTLStatus(ctx, orgID, tableName, constants.StatusSuccess)
+		r.updateCustomRetentionTTLStatus(ctx, orgID, tableName, retentiontypes.TTLSettingStatusSuccess)
 	}
 
-	return &model.CustomRetentionTTLResponse{
+	return &retentiontypes.CustomRetentionTTLResponse{
 		Message: "custom retention TTL has been successfully set up",
 	}, nil
 }
@@ -1838,21 +1852,21 @@ func (r *DatastoreReader) buildMultiIfExpression(ttlConditions []model.CustomRet
 	var conditions []string
 
 	for i, rule := range ttlConditions {
-		zap.L().Debug("Processing rule", zap.Int("ruleIndex", i), zap.Int("ttlDays", rule.TTLDays), zap.Int("conditionsCount", len(rule.Filters)))
+		r.logger.Debug("Processing rule", "ruleIndex", i, "ttlDays", rule.TTLDays, "conditionsCount", len(rule.Filters))
 
 		if len(rule.Filters) == 0 {
-			zap.L().Warn("Rule has no filters, skipping", zap.Int("ruleIndex", i))
+			r.logger.Warn("Rule has no filters, skipping", "ruleIndex", i)
 			continue
 		}
 
 		// Build AND conditions for this rule
 		var andConditions []string
 		for j, condition := range rule.Filters {
-			zap.L().Debug("Processing condition", zap.Int("ruleIndex", i), zap.Int("conditionIndex", j), zap.String("key", condition.Key), zap.Strings("values", condition.Values))
+			r.logger.Debug("Processing condition", "ruleIndex", i, "conditionIndex", j, "key", condition.Key, "values", condition.Values)
 
 			// This should not happen as validation should catch it
 			if len(condition.Values) == 0 {
-				zap.L().Error("Condition has no values - this should have been caught in validation", zap.Int("ruleIndex", i), zap.Int("conditionIndex", j))
+				r.logger.Error("Condition has no values - this should have been caught in validation", "ruleIndex", i, "conditionIndex", j)
 				continue
 			}
 
@@ -1885,14 +1899,14 @@ func (r *DatastoreReader) buildMultiIfExpression(ttlConditions []model.CustomRet
 			// Join all conditions with AND
 			fullCondition := strings.Join(andConditions, " AND ")
 			conditionWithTTL := fmt.Sprintf("%s, %d", fullCondition, rule.TTLDays)
-			zap.L().Debug("Adding condition to multiIf", zap.String("condition", conditionWithTTL))
+			r.logger.Debug("Adding condition to multiIf", "condition", conditionWithTTL)
 			conditions = append(conditions, conditionWithTTL)
 		}
 	}
 
 	// Handle case where no valid conditions were found
 	if len(conditions) == 0 {
-		zap.L().Info("No valid conditions found, returning default TTL", zap.Int("defaultTTLDays", defaultTTLDays))
+		r.logger.Info("No valid conditions found, returning default TTL", "defaultTTLDays", defaultTTLDays)
 		return fmt.Sprintf("%d", defaultTTLDays)
 	}
 
@@ -1902,7 +1916,7 @@ func (r *DatastoreReader) buildMultiIfExpression(ttlConditions []model.CustomRet
 		defaultTTLDays,
 	)
 
-	zap.L().Debug("Final multiIf expression", zap.String("expression", result))
+	r.logger.Debug("Final multiIf expression", "expression", result)
 	return result
 }
 
@@ -1911,18 +1925,18 @@ func (r *DatastoreReader) GetCustomRetentionTTL(ctx context.Context, orgID strin
 	hasCustomRetention, err := r.hasCustomRetentionColumn(ctx)
 	if err != nil {
 		// If there's an error checking, assume V1 and proceed
-		zap.L().Warn("Error checking for custom retention column, assuming V1", zap.Error(err))
+		r.logger.Warn("Error checking for custom retention column, assuming V1", errorsV2.Attr(err))
 		hasCustomRetention = false
 	}
 
-	response := &model.GetCustomRetentionTTLResponse{}
+	response := &retentiontypes.GetCustomRetentionTTLResponse{}
 
 	if hasCustomRetention {
 		// V2 - Custom retention is supported
 		response.Version = "v2"
 
 		// Get the latest custom retention TTL setting
-		customTTL := new(types.TTLSetting)
+		customTTL := new(retentiontypes.TTLSetting)
 		err := r.sqlDB.BunDB().NewSelect().
 			Model(customTTL).
 			Where("org_id = ?", orgID).
@@ -1932,25 +1946,25 @@ func (r *DatastoreReader) GetCustomRetentionTTL(ctx context.Context, orgID strin
 			Scan(ctx)
 
 		if err != nil && err != sql.ErrNoRows {
-			zap.L().Error("Error in processing sql query", zap.Error(err))
+			r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 			return nil, errorsV2.Newf(errorsV2.TypeInternal, errorsV2.CodeInternal, "error in processing get custom ttl query")
 		}
 
 		if err == sql.ErrNoRows {
 			// No V2 configuration found, return defaults
-			response.DefaultTTLDays = 15
-			response.TTLConditions = []model.CustomRetentionRule{}
-			response.Status = constants.StatusSuccess
+			response.DefaultTTLDays = retentiontypes.DefaultLogsRetentionDays
+			response.TTLConditions = []retentiontypes.CustomRetentionRule{}
+			response.Status = retentiontypes.TTLSettingStatusSuccess
 			response.ColdStorageTTLDays = -1
 			return response, nil
 		}
 
 		// Parse TTL conditions from Condition
-		var ttlConditions []model.CustomRetentionRule
+		var ttlConditions []retentiontypes.CustomRetentionRule
 		if customTTL.Condition != "" {
 			if err := json.Unmarshal([]byte(customTTL.Condition), &ttlConditions); err != nil {
-				zap.L().Error("Error parsing TTL conditions", zap.Error(err))
-				ttlConditions = []model.CustomRetentionRule{}
+				r.logger.Error("Error parsing TTL conditions", errorsV2.Attr(err))
+				ttlConditions = []retentiontypes.CustomRetentionRule{}
 			}
 		}
 
@@ -1964,8 +1978,8 @@ func (r *DatastoreReader) GetCustomRetentionTTL(ctx context.Context, orgID strin
 		response.Version = "v1"
 
 		// Get V1 TTL configuration
-		ttlParams := &model.GetTTLParams{
-			Type: constants.LogsTTL,
+		ttlParams := &retentiontypes.GetTTLParams{
+			Type: retentiontypes.LogsTTL,
 		}
 
 		ttlResult, apiErr := r.GetTTL(ctx, orgID, ttlParams)
@@ -1985,7 +1999,7 @@ func (r *DatastoreReader) GetCustomRetentionTTL(ctx context.Context, orgID strin
 		}
 
 		// For V1, we don't have TTL conditions
-		response.TTLConditions = []model.CustomRetentionRule{}
+		response.TTLConditions = []retentiontypes.CustomRetentionRule{}
 	}
 
 	return response, nil
@@ -2002,7 +2016,7 @@ func (r *DatastoreReader) checkCustomRetentionTTLStatusItem(ctx context.Context,
 		Scan(ctx)
 
 	if err != nil && err != sql.ErrNoRows {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return ttl, errorsV2.Newf(errorsV2.TypeInternal, errorsV2.CodeInternal, "error in processing custom_retention_ttl_status check sql query")
 	}
 
@@ -2013,13 +2027,13 @@ func (r *DatastoreReader) updateCustomRetentionTTLStatus(ctx context.Context, or
 	statusItem, apiErr := r.checkCustomRetentionTTLStatusItem(ctx, orgID, tableName)
 	if apiErr == nil && statusItem != nil {
 		_, dbErr := r.sqlDB.BunDB().NewUpdate().
-			Model(new(types.TTLSetting)).
+			Model(new(retentiontypes.TTLSetting)).
 			Set("updated_at = ?", time.Now()).
 			Set("status = ?", status).
 			Where("id = ?", statusItem.ID.StringValue()).
 			Exec(ctx)
 		if dbErr != nil {
-			zap.L().Error("Error in processing custom_retention_ttl_status update sql query", zap.Error(dbErr))
+			r.logger.Error("Error in processing custom_retention_ttl_status update sql query", errorsV2.Attr(dbErr))
 		}
 	}
 }
@@ -2134,11 +2148,11 @@ func (r *DatastoreReader) SetTTL(ctx context.Context, orgID string, params *mode
 	r.deleteTtlTransactions(ctx, orgID, 100)
 
 	switch params.Type {
-	case constants.TraceTTL:
+	case retentiontypes.TraceTTL:
 		return r.setTTLTraces(ctx, orgID, params)
-	case constants.MetricsTTL:
+	case retentiontypes.MetricsTTL:
 		return r.setTTLMetrics(ctx, orgID, params)
-	case constants.LogsTTL:
+	case retentiontypes.LogsTTL:
 		return r.setTTLLogs(ctx, orgID, params)
 	default:
 		return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error while setting ttl. ttl type should be <metrics|traces>, got %v", params.Type)}
@@ -2175,12 +2189,12 @@ func (r *DatastoreReader) setTTLMetrics(ctx context.Context, orgID string, param
 		if apiErr != nil {
 			return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing ttl_status check sql query")}
 		}
-		if statusItem.Status == constants.StatusPending {
+		if statusItem.Status == retentiontypes.TTLSettingStatusPending {
 			return nil, &model.ApiError{Typ: model.ErrorConflict, Err: fmt.Errorf("TTL is already running")}
 		}
 	}
 	metricTTL := func(tableName string) {
-		ttl := types.TTLSetting{
+		ttl := retentiontypes.TTLSetting{
 			Identifiable: types.Identifiable{
 				ID: valuer.GenerateUUID(),
 			},
@@ -2191,7 +2205,7 @@ func (r *DatastoreReader) setTTLMetrics(ctx context.Context, orgID string, param
 			TransactionID:  uuid,
 			TableName:      tableName,
 			TTL:            int(params.DelDuration),
-			Status:         constants.StatusPending,
+			Status:         retentiontypes.TTLSettingStatusPending,
 			ColdStorageTTL: coldStorageDuration,
 			OrgID:          orgID,
 		}
@@ -2202,7 +2216,7 @@ func (r *DatastoreReader) setTTLMetrics(ctx context.Context, orgID string, param
 			Model(&ttl).
 			Exec(ctx)
 		if dbErr != nil {
-			zap.L().Error("error in inserting to ttl_status table", zap.Error(dbErr))
+			r.logger.Error("error in inserting to ttl_status table", errorsV2.Attr(dbErr))
 			return
 		}
 		timeColumn := "timestamp_ms"
@@ -2220,41 +2234,41 @@ func (r *DatastoreReader) setTTLMetrics(ctx context.Context, orgID string, param
 		}
 		err := r.setColdStorage(context.Background(), tableName, params.ColdStorageVolume)
 		if err != nil {
-			zap.L().Error("Error in setting cold storage", zap.Error(err))
+			r.logger.Error("Error in setting cold storage", errorsV2.Attr(err))
 			statusItem, apiErr := r.checkTTLStatusItem(ctx, orgID, tableName)
 			if apiErr == nil {
 				_, dbErr := r.
 					sqlDB.
 					BunDB().
 					NewUpdate().
-					Model(new(types.TTLSetting)).
+					Model(new(retentiontypes.TTLSetting)).
 					Set("updated_at = ?", time.Now()).
-					Set("status = ?", constants.StatusFailed).
+					Set("status = ?", retentiontypes.TTLSettingStatusFailed).
 					Where("id = ?", statusItem.ID.StringValue()).
 					Exec(ctx)
 				if dbErr != nil {
-					zap.L().Error("Error in processing ttl_status update sql query", zap.Error(dbErr))
+					r.logger.Error("Error in processing ttl_status update sql query", errorsV2.Attr(dbErr))
 					return
 				}
 			}
 			return
 		}
 		req += " SETTINGS materialize_ttl_after_modify=0"
-		zap.L().Info("Executing TTL request: ", zap.String("request", req))
+		r.logger.Info("Executing TTL request: ", "request", req)
 		statusItem, _ := r.checkTTLStatusItem(ctx, orgID, tableName)
 		if err := r.db.Exec(ctx, req); err != nil {
-			zap.L().Error("error while setting ttl.", zap.Error(err))
+			r.logger.Error("error while setting ttl.", errorsV2.Attr(err))
 			_, dbErr := r.
 				sqlDB.
 				BunDB().
 				NewUpdate().
-				Model(new(types.TTLSetting)).
+				Model(new(retentiontypes.TTLSetting)).
 				Set("updated_at = ?", time.Now()).
-				Set("status = ?", constants.StatusFailed).
+				Set("status = ?", retentiontypes.TTLSettingStatusFailed).
 				Where("id = ?", statusItem.ID.StringValue()).
 				Exec(ctx)
 			if dbErr != nil {
-				zap.L().Error("Error in processing ttl_status update sql query", zap.Error(dbErr))
+				r.logger.Error("Error in processing ttl_status update sql query", errorsV2.Attr(dbErr))
 				return
 			}
 			return
@@ -2263,20 +2277,20 @@ func (r *DatastoreReader) setTTLMetrics(ctx context.Context, orgID string, param
 			sqlDB.
 			BunDB().
 			NewUpdate().
-			Model(new(types.TTLSetting)).
+			Model(new(retentiontypes.TTLSetting)).
 			Set("updated_at = ?", time.Now()).
-			Set("status = ?", constants.StatusSuccess).
+			Set("status = ?", retentiontypes.TTLSettingStatusSuccess).
 			Where("id = ?", statusItem.ID.StringValue()).
 			Exec(ctx)
 		if dbErr != nil {
-			zap.L().Error("Error in processing ttl_status update sql query", zap.Error(dbErr))
+			r.logger.Error("Error in processing ttl_status update sql query", errorsV2.Attr(dbErr))
 			return
 		}
 	}
 	for _, tableName := range tableNames {
 		go metricTTL(tableName)
 	}
-	return &model.SetTTLResponseItem{Message: "move ttl has been successfully set up"}, nil
+	return &retentiontypes.SetTTLResponseItem{Message: "move ttl has been successfully set up"}, nil
 }
 
 func (r *DatastoreReader) deleteTtlTransactions(ctx context.Context, orgID string, numberOfTransactionsStore int) {
@@ -2286,7 +2300,7 @@ func (r *DatastoreReader) deleteTtlTransactions(ctx context.Context, orgID strin
 		BunDB().
 		NewSelect().
 		Column("transaction_id").
-		Model(new(types.TTLSetting)).
+		Model(new(retentiontypes.TTLSetting)).
 		Where("org_id = ?", orgID).
 		Group("transaction_id").
 		OrderExpr("MAX(created_at) DESC").
@@ -2294,18 +2308,18 @@ func (r *DatastoreReader) deleteTtlTransactions(ctx context.Context, orgID strin
 		Scan(ctx, &limitTransactions)
 
 	if err != nil {
-		zap.L().Error("Error in processing ttl_status delete sql query", zap.Error(err))
+		r.logger.Error("Error in processing ttl_status delete sql query", errorsV2.Attr(err))
 	}
 
 	_, err = r.
 		sqlDB.
 		BunDB().
 		NewDelete().
-		Model(new(types.TTLSetting)).
+		Model(new(retentiontypes.TTLSetting)).
 		Where("transaction_id NOT IN (?)", bun.In(limitTransactions)).
 		Exec(ctx)
 	if err != nil {
-		zap.L().Error("Error in processing ttl_status delete sql query", zap.Error(err))
+		r.logger.Error("Error in processing ttl_status delete sql query", errorsV2.Attr(err))
 	}
 }
 
@@ -2324,7 +2338,7 @@ func (r *DatastoreReader) checkTTLStatusItem(ctx context.Context, orgID string, 
 		Limit(1).
 		Scan(ctx)
 	if err != nil && err != sql.ErrNoRows {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return ttl, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing ttl_status check sql query")}
 	}
 	return ttl, nil
@@ -2333,26 +2347,26 @@ func (r *DatastoreReader) checkTTLStatusItem(ctx context.Context, orgID string, 
 // getTTLQueryStatus fetches ttl_status table status from DB
 func (r *DatastoreReader) getTTLQueryStatus(ctx context.Context, orgID string, tableNameArray []string) (string, *model.ApiError) {
 	failFlag := false
-	status := constants.StatusSuccess
+	status := retentiontypes.TTLSettingStatusSuccess
 	for _, tableName := range tableNameArray {
 		statusItem, apiErr := r.checkTTLStatusItem(ctx, orgID, tableName)
-		emptyStatusStruct := new(types.TTLSetting)
+		emptyStatusStruct := new(retentiontypes.TTLSetting)
 		if statusItem == emptyStatusStruct {
 			return "", nil
 		}
 		if apiErr != nil {
 			return "", &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing ttl_status check sql query")}
 		}
-		if statusItem.Status == constants.StatusPending && statusItem.UpdatedAt.Unix()-time.Now().Unix() < 3600 {
-			status = constants.StatusPending
+		if statusItem.Status == retentiontypes.TTLSettingStatusPending && statusItem.UpdatedAt.Unix()-time.Now().Unix() < 3600 {
+			status = retentiontypes.TTLSettingStatusPending
 			return status, nil
 		}
-		if statusItem.Status == constants.StatusFailed {
+		if statusItem.Status == retentiontypes.TTLSettingStatusFailed {
 			failFlag = true
 		}
 	}
 	if failFlag {
-		status = constants.StatusFailed
+		status = retentiontypes.TTLSettingStatusFailed
 	}
 
 	return status, nil
@@ -2369,9 +2383,9 @@ func (r *DatastoreReader) setColdStorage(ctx context.Context, tableName string, 
 	if len(coldStorageVolume) > 0 {
 		policyReq := fmt.Sprintf("ALTER TABLE %s ON CLUSTER %s MODIFY SETTING storage_policy='tiered'", tableName, r.cluster)
 
-		zap.L().Info("Executing Storage policy request: ", zap.String("request", policyReq))
+		r.logger.Info("Executing Storage policy request: ", "request", policyReq)
 		if err := r.db.Exec(ctx, policyReq); err != nil {
-			zap.L().Error("error while setting storage policy", zap.Error(err))
+			r.logger.Error("error while setting storage policy", errorsV2.Attr(err))
 			return &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error while setting storage policy. Err=%v", err)}
 		}
 	}
@@ -2388,7 +2402,7 @@ func (r *DatastoreReader) GetDisks(ctx context.Context) (*[]model.DiskItem, *mod
 
 	query := "SELECT name,type FROM system.disks"
 	if err := r.db.Select(ctx, &diskItems, query); err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error while getting disks. Err=%v", err)}
 	}
 
@@ -2413,7 +2427,7 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *m
 	})
 	parseTTL := func(queryResp string) (int, int) {
 
-		zap.L().Info("Parsing TTL from: ", zap.String("queryResp", queryResp))
+		r.logger.Info("Parsing TTL from: ", "queryResp", queryResp)
 		deleteTTLExp := regexp.MustCompile(`toIntervalSecond\(([0-9]*)\)`)
 		moveTTLExp := regexp.MustCompile(`toIntervalSecond\(([0-9]*)\) TO VOLUME`)
 
@@ -2440,15 +2454,15 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *m
 		return delTTL, moveTTL
 	}
 
-	getMetricsTTL := func() (*model.DBResponseTTL, *model.ApiError) {
-		var dbResp []model.DBResponseTTL
+	getMetricsTTL := func() (*retentiontypes.DBResponseTTL, *model.ApiError) {
+		var dbResp []retentiontypes.DBResponseTTL
 
 		query := fmt.Sprintf("SELECT engine_full FROM system.tables WHERE name='%v'", o11ySampleLocalTableName)
 
 		err := r.db.Select(ctx, &dbResp, query)
 
 		if err != nil {
-			zap.L().Error("error while getting ttl", zap.Error(err))
+			r.logger.Error("error while getting ttl", errorsV2.Attr(err))
 			return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error while getting ttl. Err=%v", err)}
 		}
 		if len(dbResp) == 0 {
@@ -2458,15 +2472,15 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *m
 		}
 	}
 
-	getTracesTTL := func() (*model.DBResponseTTL, *model.ApiError) {
-		var dbResp []model.DBResponseTTL
+	getTracesTTL := func() (*retentiontypes.DBResponseTTL, *model.ApiError) {
+		var dbResp []retentiontypes.DBResponseTTL
 
 		query := fmt.Sprintf("SELECT engine_full FROM system.tables WHERE name='%v' AND database='%v'", r.traceLocalTableName, o11yTraceDBName)
 
 		err := r.db.Select(ctx, &dbResp, query)
 
 		if err != nil {
-			zap.L().Error("error while getting ttl", zap.Error(err))
+			r.logger.Error("error while getting ttl", errorsV2.Attr(err))
 			return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error while getting ttl. Err=%v", err)}
 		}
 		if len(dbResp) == 0 {
@@ -2476,15 +2490,15 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *m
 		}
 	}
 
-	getLogsTTL := func() (*model.DBResponseTTL, *model.ApiError) {
-		var dbResp []model.DBResponseTTL
+	getLogsTTL := func() (*retentiontypes.DBResponseTTL, *model.ApiError) {
+		var dbResp []retentiontypes.DBResponseTTL
 
 		query := fmt.Sprintf("SELECT engine_full FROM system.tables WHERE name='%v' AND database='%v'", r.logsLocalTableName, r.logsDB)
 
 		err := r.db.Select(ctx, &dbResp, query)
 
 		if err != nil {
-			zap.L().Error("error while getting ttl", zap.Error(err))
+			r.logger.Error("error while getting ttl", errorsV2.Attr(err))
 			return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error while getting ttl. Err=%v", err)}
 		}
 		if len(dbResp) == 0 {
@@ -2495,7 +2509,7 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *m
 	}
 
 	switch ttlParams.Type {
-	case constants.TraceTTL:
+	case retentiontypes.TraceTTL:
 		tableNameArray := []string{
 			r.TraceDB + "." + r.traceTableName,
 			r.TraceDB + "." + r.traceResourceTableV3,
@@ -2523,7 +2537,7 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *m
 		}
 
 		delTTL, moveTTL := parseTTL(dbResp.EngineFull)
-		return &model.GetTTLResponseItem{TracesTime: delTTL, TracesMoveTime: moveTTL, ExpectedTracesTime: ttlQuery.TTL, ExpectedTracesMoveTime: ttlQuery.ColdStorageTTL, Status: status}, nil
+		return &retentiontypes.GetTTLResponseItem{TracesTime: delTTL, TracesMoveTime: moveTTL, ExpectedTracesTime: ttlQuery.TTL, ExpectedTracesMoveTime: ttlQuery.ColdStorageTTL, Status: status}, nil
 
 	case constants.MetricsTTL:
 		tableNameArray := []string{observeMetricDBName + "." + o11ySampleTableName}
@@ -2546,9 +2560,9 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *m
 		}
 
 		delTTL, moveTTL := parseTTL(dbResp.EngineFull)
-		return &model.GetTTLResponseItem{MetricsTime: delTTL, MetricsMoveTime: moveTTL, ExpectedMetricsTime: ttlQuery.TTL, ExpectedMetricsMoveTime: ttlQuery.ColdStorageTTL, Status: status}, nil
+		return &retentiontypes.GetTTLResponseItem{MetricsTime: delTTL, MetricsMoveTime: moveTTL, ExpectedMetricsTime: ttlQuery.TTL, ExpectedMetricsMoveTime: ttlQuery.ColdStorageTTL, Status: status}, nil
 
-	case constants.LogsTTL:
+	case retentiontypes.LogsTTL:
 		tableNameArray := []string{r.logsDB + "." + r.logsTableName}
 		tableNameArray = getLocalTableNameArray(tableNameArray)
 		status, apiErr := r.getTTLQueryStatus(ctx, orgID, tableNameArray)
@@ -2569,7 +2583,7 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *m
 		}
 
 		delTTL, moveTTL := parseTTL(dbResp.EngineFull)
-		return &model.GetTTLResponseItem{LogsTime: delTTL, LogsMoveTime: moveTTL, ExpectedLogsTime: ttlQuery.TTL, ExpectedLogsMoveTime: ttlQuery.ColdStorageTTL, Status: status}, nil
+		return &retentiontypes.GetTTLResponseItem{LogsTime: delTTL, LogsMoveTime: moveTTL, ExpectedLogsTime: ttlQuery.TTL, ExpectedLogsMoveTime: ttlQuery.ColdStorageTTL, Status: status}, nil
 
 	default:
 		return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error while getting ttl. ttl type should be metrics|traces, got %v",
@@ -2617,7 +2631,7 @@ func (r *DatastoreReader) ListErrors(ctx context.Context, queryParams *model.Lis
 	args = append(args, argsSubQuery...)
 
 	if errStatus != nil {
-		zap.L().Error("Error in processing tags", zap.Error(errStatus))
+		r.logger.Error("Error in processing tags", errorsV2.Attr(errStatus))
 		return nil, errStatus
 	}
 	query = query + " GROUP BY groupID"
@@ -2645,10 +2659,10 @@ func (r *DatastoreReader) ListErrors(ctx context.Context, queryParams *model.Lis
 	}
 
 	err := r.db.Select(ctx, &getErrorResponses, query, args...)
-	zap.L().Info(query)
+	r.logger.Info(query)
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 	}
 
@@ -2683,15 +2697,15 @@ func (r *DatastoreReader) CountErrors(ctx context.Context, queryParams *model.Co
 	args = append(args, argsSubQuery...)
 
 	if errStatus != nil {
-		zap.L().Error("Error in processing tags", zap.Error(errStatus))
+		r.logger.Error("Error in processing tags", errorsV2.Attr(errStatus))
 		return 0, errStatus
 	}
 
 	err := r.db.QueryRow(ctx, query, args...).Scan(&errorCount)
-	zap.L().Info(query)
+	r.logger.Info(query)
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return 0, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 	}
 
@@ -2706,7 +2720,7 @@ func (r *DatastoreReader) GetErrorFromErrorID(ctx context.Context, queryParams *
 		instrumentationtypes.CodeFunctionName: "GetErrorFromErrorID",
 	})
 	if queryParams.ErrorID == "" {
-		zap.L().Error("errorId missing from params")
+		r.logger.Error("errorId missing from params")
 		return nil, &model.ApiError{Typ: model.ErrorBadData, Err: fmt.Errorf("ErrorID missing from params")}
 	}
 	var getErrorWithSpanReponse []model.ErrorWithSpan
@@ -2715,10 +2729,10 @@ func (r *DatastoreReader) GetErrorFromErrorID(ctx context.Context, queryParams *
 	args := []interface{}{datastore.Named("errorID", queryParams.ErrorID), datastore.Named("groupID", queryParams.GroupID), datastore.Named("timestamp", strconv.FormatInt(queryParams.Timestamp.UnixNano(), 10))}
 
 	err := r.db.Select(ctx, &getErrorWithSpanReponse, query, args...)
-	zap.L().Info(query)
+	r.logger.Info(query)
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 	}
 
@@ -2744,10 +2758,10 @@ func (r *DatastoreReader) GetErrorFromGroupID(ctx context.Context, queryParams *
 
 	err := r.db.Select(ctx, &getErrorWithSpanReponse, query, args...)
 
-	zap.L().Info(query)
+	r.logger.Info(query)
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 	}
 
@@ -2762,7 +2776,7 @@ func (r *DatastoreReader) GetErrorFromGroupID(ctx context.Context, queryParams *
 func (r *DatastoreReader) GetNextPrevErrorIDs(ctx context.Context, queryParams *model.GetErrorParams) (*model.NextPrevErrorIDs, *model.ApiError) {
 
 	if queryParams.ErrorID == "" {
-		zap.L().Error("errorId missing from params")
+		r.logger.Error("errorId missing from params")
 		return nil, &model.ApiError{Typ: model.ErrorBadData, Err: fmt.Errorf("ErrorID missing from params")}
 	}
 	var apiErr *model.ApiError
@@ -2771,12 +2785,12 @@ func (r *DatastoreReader) GetNextPrevErrorIDs(ctx context.Context, queryParams *
 	}
 	getNextPrevErrorIDsResponse.NextErrorID, getNextPrevErrorIDsResponse.NextTimestamp, apiErr = r.getNextErrorID(ctx, queryParams)
 	if apiErr != nil {
-		zap.L().Error("Unable to get next error ID due to err: ", zap.Error(apiErr))
+		r.logger.Error("Unable to get next error ID due to err: ", errorsV2.Attr(apiErr))
 		return nil, apiErr
 	}
 	getNextPrevErrorIDsResponse.PrevErrorID, getNextPrevErrorIDsResponse.PrevTimestamp, apiErr = r.getPrevErrorID(ctx, queryParams)
 	if apiErr != nil {
-		zap.L().Error("Unable to get prev error ID due to err: ", zap.Error(apiErr))
+		r.logger.Error("Unable to get prev error ID due to err: ", errorsV2.Attr(apiErr))
 		return nil, apiErr
 	}
 	return &getNextPrevErrorIDsResponse, nil
@@ -2797,17 +2811,17 @@ func (r *DatastoreReader) getNextErrorID(ctx context.Context, queryParams *model
 
 	err := r.db.Select(ctx, &getNextErrorIDReponse, query, args...)
 
-	zap.L().Info(query)
+	r.logger.Info(query)
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return "", time.Time{}, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 	}
 	if len(getNextErrorIDReponse) == 0 {
-		zap.L().Info("NextErrorID not found")
+		r.logger.Info("NextErrorID not found")
 		return "", time.Time{}, nil
 	} else if len(getNextErrorIDReponse) == 1 {
-		zap.L().Info("NextErrorID found")
+		r.logger.Info("NextErrorID found")
 		return getNextErrorIDReponse[0].NextErrorID, getNextErrorIDReponse[0].NextTimestamp, nil
 	} else {
 		if getNextErrorIDReponse[0].Timestamp.UnixNano() == getNextErrorIDReponse[1].Timestamp.UnixNano() {
@@ -2818,10 +2832,10 @@ func (r *DatastoreReader) getNextErrorID(ctx context.Context, queryParams *model
 
 			err := r.db.Select(ctx, &getNextErrorIDReponse, query, args...)
 
-			zap.L().Info(query)
+			r.logger.Info(query)
 
 			if err != nil {
-				zap.L().Error("Error in processing sql query", zap.Error(err))
+				r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 				return "", time.Time{}, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 			}
 			if len(getNextErrorIDReponse) == 0 {
@@ -2832,26 +2846,26 @@ func (r *DatastoreReader) getNextErrorID(ctx context.Context, queryParams *model
 
 				err := r.db.Select(ctx, &getNextErrorIDReponse, query, args...)
 
-				zap.L().Info(query)
+				r.logger.Info(query)
 
 				if err != nil {
-					zap.L().Error("Error in processing sql query", zap.Error(err))
+					r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 					return "", time.Time{}, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 				}
 
 				if len(getNextErrorIDReponse) == 0 {
-					zap.L().Info("NextErrorID not found")
+					r.logger.Info("NextErrorID not found")
 					return "", time.Time{}, nil
 				} else {
-					zap.L().Info("NextErrorID found")
+					r.logger.Info("NextErrorID found")
 					return getNextErrorIDReponse[0].NextErrorID, getNextErrorIDReponse[0].NextTimestamp, nil
 				}
 			} else {
-				zap.L().Info("NextErrorID found")
+				r.logger.Info("NextErrorID found")
 				return getNextErrorIDReponse[0].NextErrorID, getNextErrorIDReponse[0].NextTimestamp, nil
 			}
 		} else {
-			zap.L().Info("NextErrorID found")
+			r.logger.Info("NextErrorID found")
 			return getNextErrorIDReponse[0].NextErrorID, getNextErrorIDReponse[0].NextTimestamp, nil
 		}
 	}
@@ -2871,17 +2885,17 @@ func (r *DatastoreReader) getPrevErrorID(ctx context.Context, queryParams *model
 
 	err := r.db.Select(ctx, &getPrevErrorIDReponse, query, args...)
 
-	zap.L().Info(query)
+	r.logger.Info(query)
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return "", time.Time{}, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 	}
 	if len(getPrevErrorIDReponse) == 0 {
-		zap.L().Info("PrevErrorID not found")
+		r.logger.Info("PrevErrorID not found")
 		return "", time.Time{}, nil
 	} else if len(getPrevErrorIDReponse) == 1 {
-		zap.L().Info("PrevErrorID found")
+		r.logger.Info("PrevErrorID found")
 		return getPrevErrorIDReponse[0].PrevErrorID, getPrevErrorIDReponse[0].PrevTimestamp, nil
 	} else {
 		if getPrevErrorIDReponse[0].Timestamp.UnixNano() == getPrevErrorIDReponse[1].Timestamp.UnixNano() {
@@ -2892,10 +2906,10 @@ func (r *DatastoreReader) getPrevErrorID(ctx context.Context, queryParams *model
 
 			err := r.db.Select(ctx, &getPrevErrorIDReponse, query, args...)
 
-			zap.L().Info(query)
+			r.logger.Info(query)
 
 			if err != nil {
-				zap.L().Error("Error in processing sql query", zap.Error(err))
+				r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 				return "", time.Time{}, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 			}
 			if len(getPrevErrorIDReponse) == 0 {
@@ -2906,26 +2920,26 @@ func (r *DatastoreReader) getPrevErrorID(ctx context.Context, queryParams *model
 
 				err := r.db.Select(ctx, &getPrevErrorIDReponse, query, args...)
 
-				zap.L().Info(query)
+				r.logger.Info(query)
 
 				if err != nil {
-					zap.L().Error("Error in processing sql query", zap.Error(err))
+					r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 					return "", time.Time{}, &model.ApiError{Typ: model.ErrorExec, Err: fmt.Errorf("error in processing sql query")}
 				}
 
 				if len(getPrevErrorIDReponse) == 0 {
-					zap.L().Info("PrevErrorID not found")
+					r.logger.Info("PrevErrorID not found")
 					return "", time.Time{}, nil
 				} else {
-					zap.L().Info("PrevErrorID found")
+					r.logger.Info("PrevErrorID found")
 					return getPrevErrorIDReponse[0].PrevErrorID, getPrevErrorIDReponse[0].PrevTimestamp, nil
 				}
 			} else {
-				zap.L().Info("PrevErrorID found")
+				r.logger.Info("PrevErrorID found")
 				return getPrevErrorIDReponse[0].PrevErrorID, getPrevErrorIDReponse[0].PrevTimestamp, nil
 			}
 		} else {
-			zap.L().Info("PrevErrorID found")
+			r.logger.Info("PrevErrorID found")
 			return getPrevErrorIDReponse[0].PrevErrorID, getPrevErrorIDReponse[0].PrevTimestamp, nil
 		}
 	}
@@ -2937,7 +2951,7 @@ func (r *DatastoreReader) FetchTemporality(ctx context.Context, orgID valuer.UUI
 	// Batch fetch all metadata at once
 	metadataMap, apiErr := r.GetUpdatedMetricsMetadata(ctx, orgID, metricNames...)
 	if apiErr != nil {
-		zap.L().Warn("Failed to fetch updated metrics metadata", zap.Error(apiErr))
+		r.logger.Warn("Failed to fetch updated metrics metadata", errorsV2.Attr(apiErr))
 		return nil, apiErr
 	}
 
@@ -3283,10 +3297,10 @@ func (r *DatastoreReader) QueryDashboardVars(ctx context.Context, query string) 
 	var result = model.DashboardVar{VariableValues: make([]interface{}, 0)}
 	rows, err := r.db.Query(ctx, query)
 
-	zap.L().Info(query)
+	r.logger.Info(query)
 
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, err
 	}
 
@@ -3329,8 +3343,8 @@ func (r *DatastoreReader) GetMetricAggregateAttributes(ctx context.Context, orgI
 
 	// Query all relevant metric names from time_series_v4, but leave metadata retrieval to cache/db
 	query := fmt.Sprintf(
-		`SELECT DISTINCT metric_name 
-		 FROM %s.%s 
+		`SELECT DISTINCT metric_name
+		 FROM %s.%s
 		 WHERE metric_name ILIKE $1 AND __normalized = $2`,
 		observeMetricDBName, observeTSTableNameV41Day)
 
@@ -3340,7 +3354,7 @@ func (r *DatastoreReader) GetMetricAggregateAttributes(ctx context.Context, orgI
 
 	rows, err := r.db.Query(ctx, query, fmt.Sprintf("%%%s%%", req.SearchText), normalized)
 	if err != nil {
-		zap.L().Error("Error while querying metric names", zap.Error(err))
+		r.logger.Error("Error while querying metric names", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing metric name query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -3407,8 +3421,8 @@ func (r *DatastoreReader) GetMeterAggregateAttributes(ctx context.Context, orgID
 	var response v3.AggregateAttributeResponse
 	// Query all relevant metric names from time_series_v4, but leave metadata retrieval to cache/db
 	query := fmt.Sprintf(
-		`SELECT metric_name,type,temporality,is_monotonic 
-		 FROM %s.%s 
+		`SELECT metric_name,type,temporality,is_monotonic
+		 FROM %s.%s
 		 WHERE metric_name ILIKE $1
 		 GROUP BY metric_name,type,temporality,is_monotonic`,
 		o11yMeterDBName, o11yMeterSamplesName)
@@ -3419,7 +3433,7 @@ func (r *DatastoreReader) GetMeterAggregateAttributes(ctx context.Context, orgID
 
 	rows, err := r.db.Query(ctx, query, fmt.Sprintf("%%%s%%", req.SearchText))
 	if err != nil {
-		zap.L().Error("Error while querying meter names", zap.Error(err))
+		r.logger.Error("Error while querying meter names", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing meter name query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -3474,7 +3488,7 @@ func (r *DatastoreReader) GetMetricAttributeKeys(ctx context.Context, req *v3.Fi
 	}
 	rows, err = r.db.Query(ctx, query, req.AggregateAttribute, common.PastDayRoundOff(), normalized, fmt.Sprintf("%%%s%%", req.SearchText))
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -3514,7 +3528,7 @@ func (r *DatastoreReader) GetMeterAttributeKeys(ctx context.Context, req *v3.Fil
 	}
 	rows, err = r.db.Query(ctx, query, req.AggregateAttribute, fmt.Sprintf("%%%s%%", req.SearchText))
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -3563,7 +3577,7 @@ func (r *DatastoreReader) GetMetricAttributeValues(ctx context.Context, req *v3.
 	rows, err = r.db.Query(ctx, query, req.FilterAttributeKey, names, req.FilterAttributeKey, fmt.Sprintf("%%%s%%", req.SearchText), common.PastDayRoundOff(), normalized)
 
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -3593,7 +3607,7 @@ func (r *DatastoreReader) GetMetricMetadata(ctx context.Context, orgID valuer.UU
 	// 1. Fetch metadata from cache/db using unified function
 	metadataMap, apiError := r.GetUpdatedMetricsMetadata(ctx, orgID, metricName)
 	if apiError != nil {
-		zap.L().Error("Error in getting metric cached metadata", zap.Error(apiError))
+		r.logger.Error("Error in getting metric cached metadata", errorsV2.Attr(apiError))
 		return nil, fmt.Errorf("error fetching metric metadata: %s", apiError.Err.Error())
 	}
 
@@ -3636,7 +3650,7 @@ func (r *DatastoreReader) GetMetricMetadata(ctx context.Context, orgID valuer.UU
 
 		rows, err := r.db.Query(ctx, query, metricName, unixMilli, serviceName, serviceName)
 		if err != nil {
-			zap.L().Error("Error while querying histogram buckets", zap.Error(err))
+			r.logger.Error("Error while querying histogram buckets", errorsV2.Attr(err))
 			return nil, fmt.Errorf("error while querying histogram buckets: %s", err.Error())
 		}
 		defer rows.Close()
@@ -3648,7 +3662,7 @@ func (r *DatastoreReader) GetMetricMetadata(ctx context.Context, orgID valuer.UU
 			}
 			le, err := strconv.ParseFloat(leStr, 64)
 			if err != nil || math.IsInf(le, 0) {
-				zap.L().Error("Invalid 'le' bucket value", zap.String("value", leStr), zap.Error(err))
+				r.logger.Error("Invalid 'le' bucket value", "value", leStr, errorsV2.Attr(err))
 				continue
 			}
 			leFloat64 = append(leFloat64, le)
@@ -3861,7 +3875,7 @@ func (r *DatastoreReader) GetLogAggregateAttributes(ctx context.Context, req *v3
 	query = fmt.Sprintf("SELECT DISTINCT(tag_key), tag_type, tag_data_type from %s.%s WHERE %s and tag_type != 'logfield' limit $2", r.logsDB, r.logsTagAttributeTableV2, where)
 	rows, err = r.db.Query(ctx, query, fmt.Sprintf("%%%s%%", req.SearchText), req.Limit)
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -3925,7 +3939,7 @@ func (r *DatastoreReader) GetLogAttributeKeys(ctx context.Context, req *v3.Filte
 	}
 
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -4044,7 +4058,7 @@ func (r *DatastoreReader) FetchRelatedValues(ctx context.Context, req *v3.Filter
 		r.metadataTable,
 		whereClause,
 	)
-	zap.L().Debug("filterSubQuery for related values", zap.String("query", filterSubQuery))
+	r.logger.Debug("filterSubQuery for related values", "query", filterSubQuery)
 
 	rows, err := r.db.Query(ctx, filterSubQuery)
 	if err != nil {
@@ -4140,7 +4154,7 @@ func (r *DatastoreReader) GetLogAttributeValues(ctx context.Context, req *v3.Fil
 	}
 
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -4210,7 +4224,7 @@ func readRow(vars []interface{}, columnNames []string, countOfNumberCols int) ([
 				var metric map[string]string
 				err := json.Unmarshal([]byte(*v), &metric)
 				if err != nil {
-					zap.L().Error("unexpected error encountered", zap.Error(err))
+					slog.Error("unexpected error encountered", errorsV2.Attr(err))
 				}
 				for key, val := range metric {
 					groupBy = append(groupBy, val)
@@ -4316,7 +4330,7 @@ func readRow(vars []interface{}, columnNames []string, countOfNumberCols int) ([
 			groupAttributes[colName] = fmt.Sprintf("%v", *v)
 
 		default:
-			zap.L().Error("unsupported var type found in query builder query result", zap.Any("v", v), zap.String("colName", colName))
+			slog.Error("unsupported var type found in query builder query result", "v", v, "colName", colName)
 		}
 	}
 	if isValidPoint {
@@ -4398,7 +4412,7 @@ func (r *DatastoreReader) GetTimeSeriesResultV3(ctx context.Context, query strin
 	if queryId != nil {
 		qid, ok := queryId.(string)
 		if !ok {
-			zap.L().Error("GetTimeSeriesResultV3: queryId in ctx not a string as expected", zap.Any("queryId", queryId))
+			r.logger.Error("GetTimeSeriesResultV3: queryId in ctx not a string as expected", "queryId", queryId)
 
 		} else {
 			ctx = datastore.Context(ctx, datastore.WithProgress(
@@ -4406,10 +4420,7 @@ func (r *DatastoreReader) GetTimeSeriesResultV3(ctx context.Context, query strin
 					go func() {
 						err := r.queryProgressTracker.ReportQueryProgress(qid, p)
 						if err != nil {
-							zap.L().Error(
-								"Couldn't report query progress",
-								zap.String("queryId", qid), zap.Error(err),
-							)
+							r.logger.Error("Couldn't report query progress", "queryId", qid, errorsV2.Attr(err))
 						}
 					}()
 				},
@@ -4420,7 +4431,7 @@ func (r *DatastoreReader) GetTimeSeriesResultV3(ctx context.Context, query strin
 	rows, err := r.db.Query(ctx, query)
 
 	if err != nil {
-		zap.L().Error("error while reading time series result", zap.Error(err))
+		r.logger.Error("error while reading time series result", errorsV2.Attr(err))
 		return nil, errors.New(err.Error())
 	}
 	defer rows.Close()
@@ -4462,7 +4473,7 @@ func (r *DatastoreReader) GetListResultV3(ctx context.Context, query string) ([]
 	})
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
-		zap.L().Error("error while reading time series result", zap.Error(err))
+		r.logger.Error("error while reading time series result", errorsV2.Attr(err))
 		return nil, errors.New(err.Error())
 	}
 
@@ -4540,7 +4551,7 @@ func (r *DatastoreReader) GetMetricsExistenceAndEarliestTime(ctx context.Context
 	var count, minFirstReported uint64
 	err := r.db.QueryRow(ctx, query, datastore.Named("metric_names", metricNames)).Scan(&count, &minFirstReported)
 	if err != nil {
-		zap.L().Error("error getting host metrics existence and earliest time", zap.Error(err))
+		r.logger.Error("error getting host metrics existence and earliest time", errorsV2.Attr(err))
 		return 0, 0, err
 	}
 	return count, minFirstReported, nil
@@ -4550,7 +4561,7 @@ func getPersonalisedError(err error) error {
 	if err == nil {
 		return nil
 	}
-	zap.L().Error("error while reading result", zap.Error(err))
+	slog.Error("error while reading result", errorsV2.Attr(err))
 	if strings.Contains(err.Error(), "code: 307") {
 		return chErrors.ErrResourceBytesLimitExceeded
 	}
@@ -4628,7 +4639,7 @@ func (r *DatastoreReader) GetTraceAggregateAttributes(ctx context.Context, req *
 	rows, err = r.db.Query(ctx, query, fmt.Sprintf("%%%s%%", req.SearchText))
 
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -4694,7 +4705,7 @@ func (r *DatastoreReader) GetTraceAttributeKeys(ctx context.Context, req *v3.Fil
 	rows, err = r.db.Query(ctx, query, fmt.Sprintf("%%%s%%", req.SearchText), req.Limit)
 
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -4810,7 +4821,7 @@ func (r *DatastoreReader) GetTraceAttributeValues(ctx context.Context, req *v3.F
 	}
 
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -4859,7 +4870,7 @@ func (r *DatastoreReader) GetSpanAttributeKeysByNames(ctx context.Context, names
 
 	rows, err = r.db.Query(ctx, query)
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error while executing query: %s", err.Error())
 	}
 	defer rows.Close()
@@ -5017,10 +5028,10 @@ func (r *DatastoreReader) ReadRuleStateHistoryByRuleID(
 		observeHistoryDBName, ruleStateHistoryTableName, whereClause, params.Order, params.Limit, params.Offset)
 
 	history := []model.RuleStateHistory{}
-	zap.L().Debug("rule state history query", zap.String("query", query))
+	r.logger.Debug("rule state history query", "query", query)
 	err := r.db.Select(ctx, &history, query)
 	if err != nil {
-		zap.L().Error("Error while reading rule state history", zap.Error(err))
+		r.logger.Error("Error while reading rule state history", errorsV2.Attr(err))
 		return nil, err
 	}
 
@@ -5084,11 +5095,11 @@ func (r *DatastoreReader) ReadRuleStateHistoryTopContributorsByRuleID(
 	ORDER BY count DESC`,
 		observeHistoryDBName, ruleStateHistoryTableName, ruleID, model.StateFiring.String(), params.Start, params.End)
 
-	zap.L().Debug("rule state history top contributors query", zap.String("query", query))
+	r.logger.Debug("rule state history top contributors query", "query", query)
 	contributors := []model.RuleStateHistoryContributor{}
 	err := r.db.Select(ctx, &contributors, query)
 	if err != nil {
-		zap.L().Error("Error while reading rule state history", zap.Error(err))
+		r.logger.Error("Error while reading rule state history", errorsV2.Attr(err))
 		return nil, err
 	}
 
@@ -5107,7 +5118,7 @@ func (r *DatastoreReader) GetOverallStateTransitions(ctx context.Context, ruleID
         state,
         unix_milli AS firing_time
     FROM %s.%s
-    WHERE overall_state = '` + model.StateFiring.String() + `' 
+    WHERE overall_state = '` + model.StateFiring.String() + `'
       AND overall_state_changed = true
       AND rule_id IN ('%s')
 	  AND unix_milli >= %d AND unix_milli <= %d
@@ -5118,7 +5129,7 @@ resolution_events AS (
         state,
         unix_milli AS resolution_time
     FROM %s.%s
-    WHERE overall_state = '` + model.StateInactive.String() + `' 
+    WHERE overall_state = '` + model.StateInactive.String() + `'
       AND overall_state_changed = true
       AND rule_id IN ('%s')
 	  AND unix_milli >= %d AND unix_milli <= %d
@@ -5143,7 +5154,7 @@ ORDER BY firing_time ASC;`
 		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End,
 		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End)
 
-	zap.L().Debug("overall state transitions query", zap.String("query", query))
+	r.logger.Debug("overall state transitions query", "query", query)
 
 	transitions := []model.RuleStateTransition{}
 	err := r.db.Select(ctx, &transitions, query)
@@ -5239,7 +5250,7 @@ WITH firing_events AS (
         state,
         unix_milli AS firing_time
     FROM %s.%s
-    WHERE overall_state = '` + model.StateFiring.String() + `' 
+    WHERE overall_state = '` + model.StateFiring.String() + `'
       AND overall_state_changed = true
       AND rule_id IN ('%s')
 	  AND unix_milli >= %d AND unix_milli <= %d
@@ -5250,7 +5261,7 @@ resolution_events AS (
         state,
         unix_milli AS resolution_time
     FROM %s.%s
-    WHERE overall_state = '` + model.StateInactive.String() + `' 
+    WHERE overall_state = '` + model.StateInactive.String() + `'
       AND overall_state_changed = true
       AND rule_id IN ('%s')
 	  AND unix_milli >= %d AND unix_milli <= %d
@@ -5275,7 +5286,7 @@ FROM matched_events;
 		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End,
 		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End)
 
-	zap.L().Debug("avg resolution time query", zap.String("query", query))
+	r.logger.Debug("avg resolution time query", "query", query)
 	var avgResolutionTime float64
 	err := r.db.QueryRow(ctx, query).Scan(&avgResolutionTime)
 	if err != nil {
@@ -5296,7 +5307,7 @@ WITH firing_events AS (
         state,
         unix_milli AS firing_time
     FROM %s.%s
-    WHERE overall_state = '` + model.StateFiring.String() + `' 
+    WHERE overall_state = '` + model.StateFiring.String() + `'
       AND overall_state_changed = true
       AND rule_id IN ('%s')
 	  AND unix_milli >= %d AND unix_milli <= %d
@@ -5307,7 +5318,7 @@ resolution_events AS (
         state,
         unix_milli AS resolution_time
     FROM %s.%s
-    WHERE overall_state = '` + model.StateInactive.String() + `' 
+    WHERE overall_state = '` + model.StateInactive.String() + `'
       AND overall_state_changed = true
       AND rule_id IN ('%s')
 	  AND unix_milli >= %d AND unix_milli <= %d
@@ -5333,7 +5344,7 @@ ORDER BY ts ASC;`
 		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End,
 		observeHistoryDBName, ruleStateHistoryTableName, ruleID, params.Start, params.End, step)
 
-	zap.L().Debug("avg resolution time by interval query", zap.String("query", query))
+	r.logger.Debug("avg resolution time by interval query", "query", query)
 	result, err := r.GetTimeSeriesResultV3(ctx, query)
 	if err != nil || len(result) == 0 {
 		return nil, err
@@ -5385,21 +5396,21 @@ func (r *DatastoreReader) GetMinAndMaxTimestampForTraceID(ctx context.Context, t
 	query := fmt.Sprintf("SELECT min(timestamp), max(timestamp) FROM %s.%s WHERE traceID IN ('%s')",
 		r.TraceDB, r.SpansTable, strings.Join(traceID, "','"))
 
-	zap.L().Debug("GetMinAndMaxTimestampForTraceID", zap.String("query", query))
+	r.logger.Debug("GetMinAndMaxTimestampForTraceID", "query", query)
 
 	err := r.db.QueryRow(ctx, query).Scan(&minTime, &maxTime)
 	if err != nil {
-		zap.L().Error("Error while executing query", zap.Error(err))
+		r.logger.Error("Error while executing query", errorsV2.Attr(err))
 		return 0, 0, err
 	}
 
 	// return current time if traceID not found
 	if minTime.IsZero() || maxTime.IsZero() {
-		zap.L().Debug("minTime or maxTime is zero, traceID not found")
+		r.logger.Debug("minTime or maxTime is zero, traceID not found")
 		return time.Now().UnixNano(), time.Now().UnixNano(), nil
 	}
 
-	zap.L().Debug("GetMinAndMaxTimestampForTraceID", zap.Any("minTime", minTime), zap.Any("maxTime", maxTime))
+	r.logger.Debug("GetMinAndMaxTimestampForTraceID", "minTime", minTime, "maxTime", maxTime)
 
 	return minTime.UnixNano(), maxTime.UnixNano(), nil
 }
@@ -6754,14 +6765,14 @@ func (r *DatastoreReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID v
 	var stillMissing []string
 	if len(missingMetrics) > 0 {
 		metricList := "'" + strings.Join(missingMetrics, "', '") + "'"
-		query := fmt.Sprintf(`SELECT 
+		query := fmt.Sprintf(`SELECT
 						metric_name,
 						argMax(type, created_at) AS type,
 						argMax(description, created_at) AS description,
 						argMax(temporality, created_at) AS temporality,
 						argMax(is_monotonic, created_at) AS is_monotonic,
 						argMax(unit, created_at) AS unit
-					FROM %s.%s 
+					FROM %s.%s
 					WHERE metric_name IN (%s)
 					GROUP BY metric_name;`,
 			observeMetricDBName,
@@ -6791,7 +6802,7 @@ func (r *DatastoreReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID v
 
 			cacheKey := constants.UpdatedMetricsMetadataCachePrefix + metadata.MetricName
 			if cacheErr := r.cache.Set(ctx, orgID, cacheKey, metadata, 0); cacheErr != nil {
-				zap.L().Error("Failed to store metrics metadata in cache", zap.String("metric_name", metadata.MetricName), zap.Error(cacheErr))
+				r.logger.Error("Failed to store metrics metadata in cache", "metric_name", metadata.MetricName, errorsV2.Attr(cacheErr))
 			}
 			cachedMetadata[metadata.MetricName] = metadata
 			found[metadata.MetricName] = struct{}{}
@@ -6832,7 +6843,7 @@ func (r *DatastoreReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID v
 
 			cacheKey := constants.UpdatedMetricsMetadataCachePrefix + metadata.MetricName
 			if cacheErr := r.cache.Set(ctx, orgID, cacheKey, metadata, 0); cacheErr != nil {
-				zap.L().Error("Failed to cache fallback metadata", zap.String("metric_name", metadata.MetricName), zap.Error(cacheErr))
+				r.logger.Error("Failed to cache fallback metadata", "metric_name", metadata.MetricName, errorsV2.Attr(cacheErr))
 			}
 			cachedMetadata[metadata.MetricName] = metadata
 		}
@@ -6864,12 +6875,12 @@ func (r *DatastoreReader) SearchTraces(ctx context.Context, params *model.Search
 		if err == sql.ErrNoRows {
 			return &searchSpansResult, nil
 		}
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error in processing sql query")
 	}
 
 	if traceSummary.NumSpans > uint64(params.MaxSpansInTrace) {
-		zap.L().Error("Max spans allowed in a trace limit reached", zap.Int("MaxSpansInTrace", params.MaxSpansInTrace), zap.Uint64("Count", traceSummary.NumSpans))
+		r.logger.Error("Max spans allowed in a trace limit reached", "MaxSpansInTrace", params.MaxSpansInTrace, "Count", traceSummary.NumSpans)
 		return nil, fmt.Errorf("max spans allowed in trace limit reached, please contact support for more details")
 	}
 
@@ -6879,7 +6890,7 @@ func (r *DatastoreReader) SearchTraces(ctx context.Context, params *model.Search
 	query := fmt.Sprintf("SELECT timestamp, duration_nano, span_id, trace_id, has_error, kind, resource_string_service$$name, name, links as references, attributes_string, attributes_number, attributes_bool, resources_string, events, status_message, status_code_string, kind_string FROM %s.%s WHERE trace_id=$1 and ts_bucket_start>=$2 and ts_bucket_start<=$3", r.TraceDB, r.traceTableName)
 	err = r.db.Select(ctx, &searchScanResponses, query, params.TraceID, strconv.FormatInt(traceSummary.Start.Unix()-1800, 10), strconv.FormatInt(traceSummary.End.Unix(), 10))
 	if err != nil {
-		zap.L().Error("Error in processing sql query", zap.Error(err))
+		r.logger.Error("Error in processing sql query", errorsV2.Attr(err))
 		return nil, fmt.Errorf("error in processing sql query")
 	}
 
@@ -6891,7 +6902,7 @@ func (r *DatastoreReader) SearchTraces(ctx context.Context, params *model.Search
 		ref := []model.OtelSpanRef{}
 		err := json.Unmarshal([]byte(item.References), &ref)
 		if err != nil {
-			zap.L().Error("Error unmarshalling references", zap.Error(err))
+			r.logger.Error("Error unmarshalling references", errorsV2.Attr(err))
 			return nil, err
 		}
 

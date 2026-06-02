@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	// MetricNameColumn is the column name used for filtering metrics
+	// MetricNameColumn is the column name used for filtering metrics.
 	MetricNameColumn = "metric_name"
 )
 

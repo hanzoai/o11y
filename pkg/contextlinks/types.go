@@ -5,7 +5,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 )
 
-// TODO(srikanthccv): Fix the URL management
+// TODO(srikanthccv): Fix the URL management.
 type URLShareableTimeRange struct {
 	Start    int64 `json:"start"`
 	End      int64 `json:"end"`

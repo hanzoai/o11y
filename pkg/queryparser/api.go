@@ -18,7 +18,7 @@ func NewAPI(settings factory.ProviderSettings, queryParser QueryParser) *API {
 	return &API{settings: settings, queryParser: queryParser}
 }
 
-// AnalyzeQueryFilter analyzes a query and extracts metric names and grouping columns
+// AnalyzeQueryFilter analyzes a query and extracts metric names and grouping columns.
 func (a *API) AnalyzeQueryFilter(w http.ResponseWriter, r *http.Request) {
 	// Limit request body size to 255 KB (CH query limit is 256 KB)
 	r.Body = http.MaxBytesReader(w, r.Body, 255*1024)
@@ -31,7 +31,7 @@ func (a *API) AnalyzeQueryFilter(w http.ResponseWriter, r *http.Request) {
 
 	result, err := a.queryParser.AnalyzeQueryFilter(r.Context(), req.QueryType, req.Query)
 	if err != nil {
-		a.settings.Logger.ErrorContext(r.Context(), "failed to analyze query filter", "error", err)
+		a.settings.Logger.ErrorContext(r.Context(), "failed to analyze query filter", errors.Attr(err))
 		render.Error(w, err)
 		return
 	}

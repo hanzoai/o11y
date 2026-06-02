@@ -1,7 +1,7 @@
 import { Color } from 'constants/designTokens';
 import { Button, Typography } from 'antd';
 import classNames from 'classnames';
-import { ArrowUpRightFromSquare, RefreshCcw } from 'lucide-react';
+import { RefreshCcw, SquareArrowOutUpRight } from '@signozhq/icons';
 
 import { SPACE_AGGREGATION_LINK, TEMPORAL_AGGREGATION_LINK } from './constants';
 import { InspectionStep, StepperProps } from './types';
@@ -40,7 +40,7 @@ function Stepper({
 						First, align the data by selecting a{' '}
 						<Typography.Link href={TEMPORAL_AGGREGATION_LINK} target="_blank">
 							Temporal Aggregation{' '}
-							<ArrowUpRightFromSquare color={Color.BG_ROBIN_500} size={10} />
+							<SquareArrowOutUpRight color={Color.BG_ROBIN_500} size={10} />
 						</Typography.Link>
 					</div>
 				</div>
@@ -64,7 +64,7 @@ function Stepper({
 						Add a{' '}
 						<Typography.Link href={SPACE_AGGREGATION_LINK} target="_blank">
 							Spatial Aggregation{' '}
-							<ArrowUpRightFromSquare color={Color.BG_ROBIN_500} size={10} />
+							<SquareArrowOutUpRight color={Color.BG_ROBIN_500} size={10} />
 						</Typography.Link>
 					</div>
 				</div>

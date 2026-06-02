@@ -14,8 +14,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/migrate"
-	"log/slog"
-	"time"
 )
 
 // Shared types for migration

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	_ "net/http/pprof" // http profiler
 	"slices"
 
 	"github.com/hanzoai/o11y/pkg/cache/memorycache"
@@ -115,6 +114,8 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 	logParsingPipelineController, err := logparsingpipeline.NewLogParsingPipelinesController(
 		o11y.SQLStore,
 		integrationsController.GetPipelinesForInstalledIntegrations,
+		reader,
+		signoz.Flagger,
 	)
 	if err != nil {
 		return nil, err
@@ -122,9 +123,7 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 
 	apiHandler, err := NewAPIHandler(APIHandlerOpts{
 		Reader:                        reader,
-		RuleManager:                   rm,
 		IntegrationsController:        integrationsController,
-		CloudIntegrationsController:   cloudIntegrationsController,
 		LogsParsingPipelineController: logParsingPipelineController,
 		FluxInterval:                  config.Querier.FluxInterval,
 		AlertmanagerAPI:               alertmanager.NewAPI(o11y.Alertmanager),
@@ -195,7 +194,6 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 		otelmux.WithFilter(func(r *http.Request) bool {
 			return !slices.Contains([]string{"/api/v1/health"}, r.URL.Path)
 		}),
-		otelmux.WithPublicEndpoint(),
 	))
 	r.Use(middleware.NewAuthN([]string{"Authorization", "Sec-WebSocket-Protocol"}, s.o11y.Sharder, s.o11y.Tokenizer, s.o11y.Instrumentation.Logger()).Wrap)
 	r.Use(middleware.NewTimeout(s.o11y.Instrumentation.Logger(),
@@ -212,14 +210,12 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 	api.RegisterRoutes(r, am)
 	api.RegisterLogsRoutes(r, am)
 	api.RegisterIntegrationRoutes(r, am)
-	api.RegisterCloudIntegrationsRoutes(r, am)
 	api.RegisterQueryRangeV3Routes(r, am)
 	api.RegisterInfraMetricsRoutes(r, am)
 	api.RegisterWebSocketPaths(r, am)
 	api.RegisterQueryRangeV4Routes(r, am)
 	api.RegisterMessagingQueuesRoutes(r, am)
 	api.RegisterThirdPartyApiRoutes(r, am)
-	api.MetricExplorerRoutes(r, am)
 	api.RegisterTraceFunnelsRoutes(r, am)
 
 	err := s.o11y.APIServer.AddToRouter(r)
@@ -240,6 +236,20 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 	err = web.AddToRouter(r)
 	if err != nil {
 		return nil, err
+	}
+
+	routePrefix := s.config.Global.ExternalPath()
+	if routePrefix != "" {
+		prefixed := http.StripPrefix(routePrefix, handler)
+		handler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			switch req.URL.Path {
+			case "/api/v1/health", "/api/v2/healthz", "/api/v2/readyz", "/api/v2/livez":
+				r.ServeHTTP(w, req)
+				return
+			}
+
+			prefixed.ServeHTTP(w, req)
+		})
 	}
 
 	return &http.Server{
@@ -268,8 +278,6 @@ func (s *Server) initListeners() error {
 
 // Start listening on http and private http port concurrently
 func (s *Server) Start(ctx context.Context) error {
-	s.ruleManager.Start(ctx)
-
 	err := s.initListeners()
 	if err != nil {
 		return err
@@ -321,10 +329,6 @@ func (s *Server) Stop(ctx context.Context) error {
 	}
 
 	s.opampServer.Stop()
-
-	if s.ruleManager != nil {
-		s.ruleManager.Stop(ctx)
-	}
 
 	return nil
 }

@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { WarningFilled } from '@ant-design/icons';
-import { Flex, Typography } from 'antd';
+import { SolidAlertTriangle } from '@signozhq/icons';
+import { Flex } from 'antd';
+import { Typography } from '@signozhq/ui/typography';
 import { ResizeTable } from 'components/ResizeTable';
 import { ENTITY_VERSION_V4 } from 'constants/app';
 import { MAX_RPS_LIMIT } from 'constants/global';
@@ -26,10 +27,11 @@ function ServiceMetricTable({
 	topLevelOperations,
 	queryRangeRequestData,
 }: ServiceMetricsTableProps): JSX.Element {
-	const { minTime, maxTime, selectedTime: globalSelectedInterval } = useSelector<
-		AppState,
-		GlobalReducer
-	>((state) => state.globalTime);
+	const {
+		minTime,
+		maxTime,
+		selectedTime: globalSelectedInterval,
+	} = useSelector<AppState, GlobalReducer>((state) => state.globalTime);
 
 	const { notifications } = useNotifications();
 	const { t: getText } = useTranslation(['services']);

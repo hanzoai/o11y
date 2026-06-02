@@ -1,7 +1,6 @@
 import afterLogin from 'AppRoutes/utils';
 import { rest, server } from 'mocks-server/server';
 import { render, screen, userEvent, waitFor } from 'tests/test-utils';
-import { InviteDetails } from 'types/api/user/getInviteDetails';
 import { SignupResponse } from 'types/api/v1/register/post';
 import { Token } from 'types/api/v2/sessions/email_password/post';
 
@@ -32,14 +31,8 @@ jest.mock('lib/history', () => ({
 
 const REGISTER_ENDPOINT = '*/api/v1/register';
 const EMAIL_PASSWORD_ENDPOINT = '*/api/v2/sessions/email_password';
-const INVITE_DETAILS_ENDPOINT = '*/api/v1/invite/*';
-const ACCEPT_INVITE_ENDPOINT = '*/api/v1/invite/accept';
 
-interface MockSignupResponse extends SignupResponse {
-	orgId: string;
-}
-
-const mockSignupResponse: MockSignupResponse = {
+const mockSignupResponse: SignupResponse = {
 	orgId: 'test-org-id',
 	createdAt: Date.now(),
 	email: 'test@o11y.hanzo.ai',
@@ -154,9 +147,9 @@ describe('SignUp Component - Regular Signup', () => {
 			await user.type(confirmPasswordInput, 'password456');
 			await user.tab(); // Blur the confirm password field to trigger validation
 
-			expect(
-				await screen.findByText(/passwords don't match/i),
-			).toBeInTheDocument();
+			await expect(
+				screen.findByText(/passwords don't match/i),
+			).resolves.toBeInTheDocument();
 		});
 
 		it('clears password mismatch error when passwords match', async () => {
@@ -173,9 +166,9 @@ describe('SignUp Component - Regular Signup', () => {
 			await user.type(confirmPasswordInput, 'password456');
 			await user.tab(); // Blur the confirm password field to trigger validation
 
-			expect(
-				await screen.findByText(/passwords don't match/i),
-			).toBeInTheDocument();
+			await expect(
+				screen.findByText(/passwords don't match/i),
+			).resolves.toBeInTheDocument();
 
 			await user.clear(confirmPasswordInput);
 			await user.type(confirmPasswordInput, 'password123');

@@ -14,30 +14,14 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func resourceFilterStmtBuilder() qbtypes.StatementBuilder[qbtypes.LogAggregation] {
-	fm := resourcefilter.NewFieldMapper()
-	cb := resourcefilter.NewConditionBuilder(fm)
-	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
-	keysMap := buildCompleteFieldKeyMap()
-	for _, keys := range keysMap {
-		for _, key := range keys {
-			key.Signal = telemetrytypes.SignalLogs
-		}
-	}
-	mockMetadataStore.KeysMap = keysMap
-
-	return resourcefilter.NewLogResourceFilterStatementBuilder(
-		instrumentationtest.New().ToProviderSettings(),
-		fm,
-		cb,
-		mockMetadataStore,
-		DefaultFullTextColumn,
-		GetBodyJSONKey,
-	)
-}
-
 func TestStatementBuilderTimeSeries(t *testing.T) {
+	// Create a test release time
+	releaseTime := time.Date(2024, 1, 15, 10, 0, 0, 0, time.UTC)
+	releaseTimeNano := uint64(releaseTime.UnixNano())
+
 	cases := []struct {
+		startTs     uint64
+		endTs       uint64
 		name        string
 		requestType qbtypes.RequestType
 		query       qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]
@@ -45,14 +29,16 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 		expectedErr error
 	}{
 		{
-			name:        "Time series with limit",
+			startTs:     releaseTimeNano + uint64(24*time.Hour.Nanoseconds()),
+			endTs:       releaseTimeNano + uint64(48*time.Hour.Nanoseconds()),
+			name:        "Time series with limit and count distinct on service.name",
 			requestType: qbtypes.RequestTypeTimeSeries,
 			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
 				Signal:       telemetrytypes.SignalLogs,
 				StepInterval: qbtypes.Step{Duration: 30 * time.Second},
 				Aggregations: []qbtypes.LogAggregation{
 					{
-						Expression: "count()",
+						Expression: "count_distinct(service.name)",
 					},
 				},
 				Filter: &qbtypes.Filter{
@@ -74,14 +60,16 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name:        "Time series with OR b/w resource attr and attribute filter",
+			startTs:     releaseTimeNano - uint64(24*time.Hour.Nanoseconds()),
+			endTs:       releaseTimeNano + uint64(48*time.Hour.Nanoseconds()),
+			name:        "Time series with OR b/w resource attr and attribute filter and count distinct on service.name",
 			requestType: qbtypes.RequestTypeTimeSeries,
 			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
 				Signal:       telemetrytypes.SignalTraces,
 				StepInterval: qbtypes.Step{Duration: 30 * time.Second},
 				Aggregations: []qbtypes.LogAggregation{
 					{
-						Expression: "count()",
+						Expression: "count_distinct(service.name)",
 					},
 				},
 				Filter: &qbtypes.Filter{
@@ -103,6 +91,8 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
+			startTs:     releaseTimeNano + uint64(24*time.Hour.Nanoseconds()),
+			endTs:       releaseTimeNano + uint64(48*time.Hour.Nanoseconds()),
 			name:        "Time series with limit + custom order by",
 			requestType: qbtypes.RequestTypeTimeSeries,
 			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
@@ -142,6 +132,8 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
+			startTs:     releaseTimeNano + uint64(24*time.Hour.Nanoseconds()),
+			endTs:       releaseTimeNano + uint64(48*time.Hour.Nanoseconds()),
 			name:        "Time series with group by on materialized column",
 			requestType: qbtypes.RequestTypeTimeSeries,
 			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
@@ -172,6 +164,8 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 			},
 		},
 		{
+			startTs:     releaseTimeNano + uint64(24*time.Hour.Nanoseconds()),
+			endTs:       releaseTimeNano + uint64(48*time.Hour.Nanoseconds()),
 			name:        "Time series with materialised column using or with regex operator",
 			requestType: qbtypes.RequestTypeTimeSeries,
 			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
@@ -195,30 +189,34 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 		},
 	}
 
+	ctx := context.Background()
+	fl := flaggertest.New(t)
+
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
-	mockMetadataStore.KeysMap = buildCompleteFieldKeyMap()
-	fm := NewFieldMapper()
-	cb := NewConditionBuilder(fm)
+	keysMap := buildCompleteFieldKeyMap(releaseTime)
 
-	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil)
+	mockMetadataStore.KeysMap = keysMap
 
-	resourceFilterStmtBuilder := resourceFilterStmtBuilder()
+	fm := NewFieldMapper(fl)
+	cb := NewConditionBuilder(fm, fl)
+
+	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil, fl)
 
 	statementBuilder := NewLogQueryStatementBuilder(
 		instrumentationtest.New().ToProviderSettings(),
 		mockMetadataStore,
 		fm,
 		cb,
-		resourceFilterStmtBuilder,
 		aggExprRewriter,
 		DefaultFullTextColumn,
 		GetBodyJSONKey,
+		fl,
 	)
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 
-			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
+			q, err := statementBuilder.Build(ctx, c.startTs, c.endTs, c.requestType, c.query, nil)
 
 			if c.expectedErr != nil {
 				require.Error(t, err)
@@ -238,8 +236,10 @@ func TestStatementBuilderListQuery(t *testing.T) {
 		name        string
 		requestType qbtypes.RequestType
 		query       qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]
+		variables   map[string]qbtypes.VariableItem
 		expected    qbtypes.Statement
 		expectedErr error
+		expectWarn  bool
 	}{
 		{
 			name:        "default list",
@@ -313,41 +313,64 @@ func TestStatementBuilderListQuery(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
+		{
+			name:        "filter skips entirely but emits LIKE-without-wildcards warning",
+			requestType: qbtypes.RequestTypeRaw,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal: telemetrytypes.SignalLogs,
+				Filter: &qbtypes.Filter{
+					Expression: "message LIKE 'plain' OR message IN $env",
+				},
+				Limit: 10,
+			},
+			variables: map[string]qbtypes.VariableItem{
+				"env": {Type: qbtypes.DynamicVariableType, Value: "__all__"},
+			},
+			expectedErr: nil,
+			expectWarn:  true,
+		},
 	}
 
+	ctx := context.Background()
+	fl := flaggertest.New(t)
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
-	mockMetadataStore.KeysMap = buildCompleteFieldKeyMap()
-	fm := NewFieldMapper()
-	cb := NewConditionBuilder(fm)
+	fm := NewFieldMapper(fl)
 
-	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil)
+	// Create a test release time
+	releaseTime := time.Date(2024, 1, 15, 10, 0, 0, 0, time.UTC)
+	mockMetadataStore.KeysMap = buildCompleteFieldKeyMap(releaseTime)
+	cb := NewConditionBuilder(fm, fl)
 
-	resourceFilterStmtBuilder := resourceFilterStmtBuilder()
+	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil, fl)
 
 	statementBuilder := NewLogQueryStatementBuilder(
 		instrumentationtest.New().ToProviderSettings(),
 		mockMetadataStore,
 		fm,
 		cb,
-		resourceFilterStmtBuilder,
 		aggExprRewriter,
 		DefaultFullTextColumn,
 		GetBodyJSONKey,
+		fl,
 	)
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 
-			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
+			q, err := statementBuilder.Build(ctx, 1747947419000, 1747983448000, c.requestType, c.query, c.variables)
 
 			if c.expectedErr != nil {
 				require.Error(t, err)
 				require.Contains(t, err.Error(), c.expectedErr.Error())
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, c.expected.Query, q.Query)
-				require.Equal(t, c.expected.Args, q.Args)
-				require.Equal(t, c.expected.Warnings, q.Warnings)
+				if c.expectWarn {
+					require.NotEmpty(t, q.Warnings)
+				} else {
+					require.Equal(t, c.expected.Query, q.Query)
+					require.Equal(t, c.expected.Args, q.Args)
+					require.Equal(t, c.expected.Warnings, q.Warnings)
+				}
 			}
 		})
 	}
@@ -455,32 +478,32 @@ func TestStatementBuilderListQueryResourceTests(t *testing.T) {
 		},
 	}
 
+	ctx := context.Background()
+	fl := flaggertest.New(t)
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
-	mockMetadataStore.KeysMap = buildCompleteFieldKeyMap()
-	fm := NewFieldMapper()
-	cb := NewConditionBuilder(fm)
+	fm := NewFieldMapper(fl)
+	// Create a test release time
+	releaseTime := time.Date(2024, 1, 15, 10, 0, 0, 0, time.UTC)
+	mockMetadataStore.KeysMap = buildCompleteFieldKeyMap(releaseTime)
+	cb := NewConditionBuilder(fm, fl)
 
-	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil)
-
-	resourceFilterStmtBuilder := resourceFilterStmtBuilder()
+	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil, fl)
 
 	statementBuilder := NewLogQueryStatementBuilder(
 		instrumentationtest.New().ToProviderSettings(),
 		mockMetadataStore,
 		fm,
 		cb,
-		resourceFilterStmtBuilder,
 		aggExprRewriter,
 		DefaultFullTextColumn,
 		GetBodyJSONKey,
+		fl,
 	)
-
-	//
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 
-			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
+			q, err := statementBuilder.Build(ctx, 1747947419000, 1747983448000, c.requestType, c.query, nil)
 
 			if c.expectedErr != nil {
 				require.Error(t, err)
@@ -531,30 +554,32 @@ func TestStatementBuilderTimeSeriesBodyGroupBy(t *testing.T) {
 		},
 	}
 
+	ctx := context.Background()
+	fl := flaggertest.New(t)
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
-	mockMetadataStore.KeysMap = buildCompleteFieldKeyMap()
-	fm := NewFieldMapper()
-	cb := NewConditionBuilder(fm)
+	fm := NewFieldMapper(fl)
+	// Create a test release time
+	releaseTime := time.Date(2024, 1, 15, 10, 0, 0, 0, time.UTC)
+	mockMetadataStore.KeysMap = buildCompleteFieldKeyMap(releaseTime)
+	cb := NewConditionBuilder(fm, fl)
 
-	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil)
-
-	resourceFilterStmtBuilder := resourceFilterStmtBuilder()
+	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil, fl)
 
 	statementBuilder := NewLogQueryStatementBuilder(
 		instrumentationtest.New().ToProviderSettings(),
 		mockMetadataStore,
 		fm,
 		cb,
-		resourceFilterStmtBuilder,
 		aggExprRewriter,
 		DefaultFullTextColumn,
 		GetBodyJSONKey,
+		fl,
 	)
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 
-			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
+			q, err := statementBuilder.Build(ctx, 1747947419000, 1747983448000, c.requestType, c.query, nil)
 
 			if c.expectedErrContains != "" {
 				require.Error(t, err)
@@ -626,30 +651,30 @@ func TestStatementBuilderListQueryServiceCollision(t *testing.T) {
 		},
 	}
 
+	ctx := context.Background()
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
+	fl := flaggertest.New(t)
+	fm := NewFieldMapper(fl)
 	mockMetadataStore.KeysMap = buildCompleteFieldKeyMapCollision()
-	fm := NewFieldMapper()
-	cb := NewConditionBuilder(fm)
+	cb := NewConditionBuilder(fm, fl)
 
-	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil)
-
-	resourceFilterStmtBuilder := resourceFilterStmtBuilder()
+	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil, fl)
 
 	statementBuilder := NewLogQueryStatementBuilder(
 		instrumentationtest.New().ToProviderSettings(),
 		mockMetadataStore,
 		fm,
 		cb,
-		resourceFilterStmtBuilder,
 		aggExprRewriter,
 		DefaultFullTextColumn,
 		GetBodyJSONKey,
+		fl,
 	)
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 
-			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
+			q, err := statementBuilder.Build(ctx, 1747947419000, 1747983448000, c.requestType, c.query, nil)
 
 			if c.expectedErr != nil {
 				require.Error(t, err)
@@ -667,6 +692,9 @@ func TestStatementBuilderListQueryServiceCollision(t *testing.T) {
 }
 
 func TestAdjustKey(t *testing.T) {
+
+	// Create a test release time
+	releaseTime := time.Date(2024, 1, 15, 10, 0, 0, 0, time.UTC)
 	cases := []struct {
 		name        string
 		inputKey    telemetrytypes.TelemetryFieldKey
@@ -680,7 +708,7 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextUnspecified,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap:     buildCompleteFieldKeyMap(),
+			keysMap:     buildCompleteFieldKeyMap(releaseTime),
 			expectedKey: IntrinsicFields["severity_text"],
 		},
 		{
@@ -717,7 +745,7 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextBody,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap: buildCompleteFieldKeyMap(),
+			keysMap: buildCompleteFieldKeyMap(releaseTime),
 			expectedKey: telemetrytypes.TelemetryFieldKey{
 				Name:          "severity_number",
 				FieldContext:  telemetrytypes.FieldContextBody,
@@ -731,8 +759,8 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextUnspecified,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap:     buildCompleteFieldKeyMap(),
-			expectedKey: *buildCompleteFieldKeyMap()["service.name"][0],
+			keysMap:     buildCompleteFieldKeyMap(releaseTime),
+			expectedKey: *buildCompleteFieldKeyMap(releaseTime)["service.name"][0],
 		},
 		{
 			name: "single matching key with incorrect context specified - no override",
@@ -741,7 +769,7 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap: buildCompleteFieldKeyMap(),
+			keysMap: buildCompleteFieldKeyMap(releaseTime),
 			expectedKey: telemetrytypes.TelemetryFieldKey{
 				Name:          "service.name",
 				FieldContext:  telemetrytypes.FieldContextAttribute,
@@ -755,8 +783,8 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextUnspecified,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap:     buildCompleteFieldKeyMap(),
-			expectedKey: *buildCompleteFieldKeyMap()["service.name"][0],
+			keysMap:     buildCompleteFieldKeyMap(releaseTime),
+			expectedKey: *buildCompleteFieldKeyMap(releaseTime)["service.name"][0],
 		},
 		{
 			name: "multiple matching keys - all materialized",
@@ -765,7 +793,7 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextUnspecified,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap: buildCompleteFieldKeyMap(),
+			keysMap: buildCompleteFieldKeyMap(releaseTime),
 			expectedKey: telemetrytypes.TelemetryFieldKey{
 				Name:          "multi.mat.key",
 				FieldDataType: telemetrytypes.FieldDataTypeString,
@@ -779,7 +807,7 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextUnspecified,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap: buildCompleteFieldKeyMap(),
+			keysMap: buildCompleteFieldKeyMap(releaseTime),
 			expectedKey: telemetrytypes.TelemetryFieldKey{
 				Name:          "mixed.materialization.key",
 				FieldDataType: telemetrytypes.FieldDataTypeString,
@@ -793,8 +821,8 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap:     buildCompleteFieldKeyMap(),
-			expectedKey: *buildCompleteFieldKeyMap()["mixed.materialization.key"][0],
+			keysMap:     buildCompleteFieldKeyMap(releaseTime),
+			expectedKey: *buildCompleteFieldKeyMap(releaseTime)["mixed.materialization.key"][0],
 		},
 		{
 			name: "no matching keys - unknown field",
@@ -803,7 +831,7 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextUnspecified,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap: buildCompleteFieldKeyMap(),
+			keysMap: buildCompleteFieldKeyMap(releaseTime),
 			expectedKey: telemetrytypes.TelemetryFieldKey{
 				Name:          "unknown.field",
 				FieldContext:  telemetrytypes.FieldContextUnspecified,
@@ -818,7 +846,7 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap: buildCompleteFieldKeyMap(),
+			keysMap: buildCompleteFieldKeyMap(releaseTime),
 			expectedKey: telemetrytypes.TelemetryFieldKey{
 				Name:          "unknown.field",
 				FieldContext:  telemetrytypes.FieldContextAttribute,
@@ -833,8 +861,8 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextUnspecified,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap:     buildCompleteFieldKeyMap(),
-			expectedKey: *buildCompleteFieldKeyMap()["mat.key"][0],
+			keysMap:     buildCompleteFieldKeyMap(releaseTime),
+			expectedKey: *buildCompleteFieldKeyMap(releaseTime)["mat.key"][0],
 		},
 		{
 			name: "non-materialized field",
@@ -843,29 +871,28 @@ func TestAdjustKey(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextUnspecified,
 				FieldDataType: telemetrytypes.FieldDataTypeUnspecified,
 			},
-			keysMap:     buildCompleteFieldKeyMap(),
-			expectedKey: *buildCompleteFieldKeyMap()["user.id"][0],
+			keysMap:     buildCompleteFieldKeyMap(releaseTime),
+			expectedKey: *buildCompleteFieldKeyMap(releaseTime)["user.id"][0],
 		},
 	}
 
-	fm := NewFieldMapper()
+	fl := flaggertest.New(t)
+	fm := NewFieldMapper(fl)
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
 	mockMetadataStore.KeysMap = buildCompleteFieldKeyMapCollision()
-	cb := NewConditionBuilder(fm)
+	cb := NewConditionBuilder(fm, fl)
 
-	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil)
-
-	resourceFilterStmtBuilder := resourceFilterStmtBuilder()
+	aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil, fl)
 
 	statementBuilder := NewLogQueryStatementBuilder(
 		instrumentationtest.New().ToProviderSettings(),
 		mockMetadataStore,
 		fm,
 		cb,
-		resourceFilterStmtBuilder,
 		aggExprRewriter,
 		DefaultFullTextColumn,
 		GetBodyJSONKey,
+		fl,
 	)
 
 	for _, c := range cases {
@@ -881,8 +908,251 @@ func TestAdjustKey(t *testing.T) {
 			require.Equal(t, c.expectedKey.FieldContext, key.FieldContext, "field context should match")
 			require.Equal(t, c.expectedKey.FieldDataType, key.FieldDataType, "field data type should match")
 			require.Equal(t, c.expectedKey.Materialized, key.Materialized, "materialized should match")
-			require.Equal(t, c.expectedKey.JSONDataType, key.JSONDataType, "json data type should match")
 			require.Equal(t, c.expectedKey.Indexes, key.Indexes, "json exists should match")
+		})
+	}
+}
+
+func TestStmtBuilderBodyField(t *testing.T) {
+	cases := []struct {
+		name              string
+		requestType       qbtypes.RequestType
+		query             qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]
+		enableUseJSONBody bool
+		expected          qbtypes.Statement
+		expectedErr       error
+	}{
+		{
+			name:        "body_exists",
+			requestType: qbtypes.RequestTypeRaw,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal: telemetrytypes.SignalLogs,
+				Filter: &qbtypes.Filter{Expression: "body Exists"},
+				Limit:  10,
+			},
+			enableUseJSONBody: true,
+			expected: qbtypes.Statement{
+				Query:    "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body_v2 as body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE body_v2.message <> ? AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Args:     []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Warnings: []string{bodySearchDefaultWarning},
+			},
+			expectedErr: nil,
+		},
+		{
+			name:        "body_exists_disabled",
+			requestType: qbtypes.RequestTypeRaw,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal: telemetrytypes.SignalLogs,
+				Filter: &qbtypes.Filter{Expression: "body Exists"},
+				Limit:  10,
+			},
+			enableUseJSONBody: false,
+			expected: qbtypes.Statement{
+				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE body <> ? AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Args:  []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+			},
+			expectedErr: nil,
+		},
+		{
+			name:        "body_empty",
+			requestType: qbtypes.RequestTypeRaw,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal: telemetrytypes.SignalLogs,
+				Filter: &qbtypes.Filter{Expression: "body == ''"},
+				Limit:  10,
+			},
+			enableUseJSONBody: true,
+			expected: qbtypes.Statement{
+				Query:    "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body_v2 as body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE body_v2.message = ? AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Args:     []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Warnings: []string{bodySearchDefaultWarning},
+			},
+			expectedErr: nil,
+		},
+		{
+			name:        "body_empty_disabled",
+			requestType: qbtypes.RequestTypeRaw,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal: telemetrytypes.SignalLogs,
+				Filter: &qbtypes.Filter{Expression: "body == ''"},
+				Limit:  10,
+			},
+			enableUseJSONBody: false,
+			expected: qbtypes.Statement{
+				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE body = ? AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Args:  []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+			},
+			expectedErr: nil,
+		},
+		{
+			name:        "body_contains",
+			requestType: qbtypes.RequestTypeRaw,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal: telemetrytypes.SignalLogs,
+				Filter: &qbtypes.Filter{Expression: "body CONTAINS 'error'"},
+				Limit:  10,
+			},
+			enableUseJSONBody: true,
+			expected: qbtypes.Statement{
+				Query:    "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body_v2 as body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE LOWER(body_v2.message) LIKE LOWER(?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Args:     []any{"%error%", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Warnings: []string{bodySearchDefaultWarning},
+			},
+			expectedErr: nil,
+		},
+		{
+			name:        "body_contains_disabled",
+			requestType: qbtypes.RequestTypeRaw,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal: telemetrytypes.SignalLogs,
+				Filter: &qbtypes.Filter{Expression: "body CONTAINS 'error'"},
+				Limit:  10,
+			},
+			enableUseJSONBody: false,
+			expected: qbtypes.Statement{
+				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE LOWER(body) LIKE LOWER(?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Args:  []any{"%error%", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+			},
+			expectedErr: nil,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			fl := flaggertest.WithUseJSONBody(t, c.enableUseJSONBody)
+			fm := NewFieldMapper(fl)
+			cb := NewConditionBuilder(fm, fl)
+			// build the key map
+			mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
+			for _, field := range IntrinsicFields {
+				f := field
+				mockMetadataStore.KeysMap[field.Name] = append(mockMetadataStore.KeysMap[field.Name], &f)
+			}
+			aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil, fl)
+			statementBuilder := NewLogQueryStatementBuilder(
+				instrumentationtest.New().ToProviderSettings(),
+				mockMetadataStore,
+				fm,
+				cb,
+				aggExprRewriter,
+				DefaultFullTextColumn,
+				GetBodyJSONKey,
+				fl,
+			)
+
+			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
+			if c.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), c.expectedErr.Error())
+			} else {
+				if err != nil {
+					_, _, _, _, _, add := errors.Unwrapb(err)
+					t.Logf("error additionals: %v", add)
+				}
+				require.NoError(t, err)
+				require.Equal(t, c.expected.Query, q.Query)
+				require.Equal(t, c.expected.Args, q.Args)
+				require.Equal(t, c.expected.Warnings, q.Warnings)
+			}
+		})
+	}
+}
+
+func TestStmtBuilderBodyFullTextSearch(t *testing.T) {
+	cases := []struct {
+		name              string
+		requestType       qbtypes.RequestType
+		query             qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]
+		enableUseJSONBody bool
+		expected          qbtypes.Statement
+		expectedErr       error
+	}{
+		{
+			name:        "fts",
+			requestType: qbtypes.RequestTypeRaw,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal: telemetrytypes.SignalLogs,
+				Filter: &qbtypes.Filter{Expression: "'error'"},
+				Limit:  10,
+			},
+			enableUseJSONBody: true,
+			expected: qbtypes.Statement{
+				Query:    "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body_v2 as body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE match(LOWER(body_v2.message), LOWER(?)) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Args:     []any{"error", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Warnings: []string{querybuilder.BodyFullTextSearchDefaultWarning},
+			},
+			expectedErr: nil,
+		},
+		{
+			name:        "fts_2",
+			requestType: qbtypes.RequestTypeRaw,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal: telemetrytypes.SignalLogs,
+				Filter: &qbtypes.Filter{Expression: "error"},
+				Limit:  10,
+			},
+			enableUseJSONBody: true,
+			expected: qbtypes.Statement{
+				Query:    "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body_v2 as body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE match(LOWER(body_v2.message), LOWER(?)) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Args:     []any{"error", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Warnings: []string{querybuilder.BodyFullTextSearchDefaultWarning},
+			},
+			expectedErr: nil,
+		},
+		{
+			name:        "fts_disabled",
+			requestType: qbtypes.RequestTypeRaw,
+			query: qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]{
+				Signal: telemetrytypes.SignalLogs,
+				Filter: &qbtypes.Filter{Expression: "'error'"},
+				Limit:  10,
+			},
+			enableUseJSONBody: false,
+			expected: qbtypes.Statement{
+				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, attributes_string, attributes_number, attributes_bool, resources_string, scope_string FROM signoz_logs.distributed_logs_v2 WHERE match(LOWER(body), LOWER(?)) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Args:  []any{"error", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+			},
+			expectedErr: nil,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			fl := flaggertest.WithUseJSONBody(t, c.enableUseJSONBody)
+			fm := NewFieldMapper(fl)
+			cb := NewConditionBuilder(fm, fl)
+			// build the key map
+			mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
+			for _, field := range IntrinsicFields {
+				f := field
+				mockMetadataStore.KeysMap[field.Name] = append(mockMetadataStore.KeysMap[field.Name], &f)
+			}
+			aggExprRewriter := querybuilder.NewAggExprRewriter(instrumentationtest.New().ToProviderSettings(), nil, fm, cb, nil, fl)
+			statementBuilder := NewLogQueryStatementBuilder(
+				instrumentationtest.New().ToProviderSettings(),
+				mockMetadataStore,
+				fm,
+				cb,
+				aggExprRewriter,
+				DefaultFullTextColumn,
+				GetBodyJSONKey,
+				fl,
+			)
+
+			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
+			if c.expectedErr != nil {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), c.expectedErr.Error())
+			} else {
+				if err != nil {
+					_, _, _, _, _, add := errors.Unwrapb(err)
+					t.Logf("error additionals: %v", add)
+				}
+				require.NoError(t, err)
+				require.Equal(t, c.expected.Query, q.Query)
+				require.Equal(t, c.expected.Args, q.Args)
+				require.Equal(t, c.expected.Warnings, q.Warnings)
+			}
 		})
 	}
 }

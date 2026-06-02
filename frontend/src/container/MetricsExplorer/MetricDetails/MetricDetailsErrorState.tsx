@@ -10,7 +10,7 @@ function MetricDetailsErrorState({
 }: MetricDetailsErrorStateProps): JSX.Element {
 	return (
 		<div className="metric-details-error-state">
-			<InfoIcon size={20} color={Color.BG_CHERRY_500} />
+			<Info size={20} color={Color.BG_CHERRY_500} />
 			<Typography.Text>{errorMessage}</Typography.Text>
 			{refetch && <Button onClick={refetch}>Retry</Button>}
 		</div>

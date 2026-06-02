@@ -26,16 +26,23 @@ type SqliteConfig struct {
 	// Path is the path to the sqlite database.
 	Path string `mapstructure:"path"`
 
-	// Mode is the mode to use for the sqlite database.
+	// Mode is the journal mode for the sqlite database.
 	Mode string `mapstructure:"mode"`
 
 	// BusyTimeout is the timeout for the sqlite database to wait for a lock.
 	BusyTimeout time.Duration `mapstructure:"busy_timeout"`
+
+	// TransactionMode is the default transaction locking behavior for the sqlite database.
+	TransactionMode string `mapstructure:"transaction_mode"`
 }
 
 type ConnectionConfig struct {
 	// MaxOpenConns is the maximum number of open connections to the database.
 	MaxOpenConns int `mapstructure:"max_open_conns"`
+
+	// MaxConnLifetime is the maximum amount of time a connection may be reused.
+	// If max_conn_lifetime == 0, connections are not closed due to a connection's age.
+	MaxConnLifetime time.Duration `mapstructure:"max_conn_lifetime"`
 }
 
 func NewConfigFactory() factory.ConfigFactory {
@@ -46,7 +53,8 @@ func newConfig() factory.Config {
 	return Config{
 		Provider: "sqlite",
 		Connection: ConnectionConfig{
-			MaxOpenConns: 100,
+			MaxOpenConns:    100,
+			MaxConnLifetime: 0,
 		},
 		Sqlite: SqliteConfig{
 			Path:        "/var/lib/o11y/o11y.db",

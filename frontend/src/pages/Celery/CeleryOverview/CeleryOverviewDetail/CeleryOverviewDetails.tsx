@@ -3,7 +3,7 @@ import { Color, Spacing } from 'constants/designTokens';
 import { Divider, Drawer, Typography } from 'antd';
 import { RowData } from 'components/CeleryOverview/CeleryOverviewTable/CeleryOverviewTable';
 import { useIsDarkMode } from 'hooks/useDarkMode';
-import { X } from 'lucide-react';
+import { X } from '@signozhq/icons';
 import { TagFilterItem } from 'types/api/queryBuilder/queryBuilderData';
 
 import { getFiltersFromKeyValue } from '../CeleryOverviewUtils';

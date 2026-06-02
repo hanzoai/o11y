@@ -4,10 +4,12 @@ import (
 	"errors" //nolint:depguard
 	"fmt"
 	"log/slog"
+	"time"
+
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // base is the fundamental struct that implements the error interface.
-// The order of the struct is 'TCMEUA'.
 type base struct {
 	// t denotes the custom type of the error.
 	t typ
@@ -21,16 +23,41 @@ type base struct {
 	u string
 	// a denotes any additional error messages (if present).
 	a []string
+	// s contains the stacktrace captured at error creation time.
+	s fmt.Stringer
+	// r is the retry strategy for the error, if applicable.
+	r *retry
+	// suggestions is a list of user-facing suggestions related to the error, if present.
+	// For example, narrow the time range window or typo suggestion
+	suggestions []string
+	// invalidReferences is a list of references that were invalid and contributed to the error, if present.
+	// For example, a typo from user avg(sum), we return invalidRefences: ['sum']
+	invalidReferences []string
 }
 
-func (b *base) LogValue() slog.Value {
-	return slog.GroupValue(
-		slog.String("type", b.t.s),
-		slog.String("code", b.c.s),
-		slog.String("message", b.m),
-		slog.String("url", b.u),
-		slog.Any("additional", b.a),
-	)
+// Stacktrace returns the stacktrace captured at error creation time, formatted as a string.
+func (b *base) Stacktrace() string {
+	if b.s == nil {
+		return ""
+	}
+	return b.s.String()
+}
+
+// WithStacktrace replaces the auto-captured stacktrace with a pre-formatted string
+// and returns a new base error.
+func (b *base) WithStacktrace(s string) *base {
+	return &base{
+		t:                 b.t,
+		c:                 b.c,
+		m:                 b.m,
+		e:                 b.e,
+		u:                 b.u,
+		a:                 b.a,
+		s:                 rawStacktrace(s),
+		r:                 b.r,
+		suggestions:       b.suggestions,
+		invalidReferences: b.invalidReferences,
+	}
 }
 
 // base implements Error interface.
@@ -51,6 +78,7 @@ func New(t typ, code Code, message string) *base {
 		e: nil,
 		u: "",
 		a: []string{},
+		s: newStackTrace(),
 	}
 }
 
@@ -61,6 +89,7 @@ func Newf(t typ, code Code, format string, args ...any) *base {
 		c: code,
 		m: fmt.Sprintf(format, args...),
 		e: nil,
+		s: newStackTrace(),
 	}
 }
 
@@ -72,6 +101,7 @@ func Wrapf(cause error, t typ, code Code, format string, args ...any) *base {
 		c: code,
 		m: fmt.Sprintf(format, args...),
 		e: cause,
+		s: newStackTrace(),
 	}
 }
 
@@ -82,19 +112,28 @@ func Wrap(cause error, t typ, code Code, message string) *base {
 		c: code,
 		m: message,
 		e: cause,
+		s: newStackTrace(),
 	}
 }
 
 // WithAdditionalf adds an additional error message to the existing error.
 func WithAdditionalf(cause error, format string, args ...any) *base {
 	t, c, m, e, u, a := Unwrapb(cause)
+	var s fmt.Stringer
+	if original, ok := cause.(*base); ok {
+		s = original.s
+	}
 	b := &base{
-		t: t,
-		c: c,
-		m: m,
-		e: e,
-		u: u,
-		a: a,
+		t:                 t,
+		c:                 c,
+		m:                 m,
+		e:                 e,
+		u:                 u,
+		a:                 a,
+		s:                 s,
+		r:                 retryOf(cause),
+		suggestions:       suggestionsOf(cause),
+		invalidReferences: invalidReferencesOf(cause),
 	}
 
 	return b.WithAdditional(append(a, fmt.Sprintf(format, args...))...)
@@ -103,25 +142,86 @@ func WithAdditionalf(cause error, format string, args ...any) *base {
 // WithUrl adds a url to the base error and returns a new base error.
 func (b *base) WithUrl(u string) *base {
 	return &base{
-		t: b.t,
-		c: b.c,
-		m: b.m,
-		e: b.e,
-		u: u,
-		a: b.a,
+		t:                 b.t,
+		c:                 b.c,
+		m:                 b.m,
+		e:                 b.e,
+		u:                 u,
+		a:                 b.a,
+		s:                 b.s,
+		r:                 b.r,
+		suggestions:       b.suggestions,
+		invalidReferences: b.invalidReferences,
 	}
 }
 
 // WithAdditional adds additional messages to the base error and returns a new base error.
 func (b *base) WithAdditional(a ...string) *base {
 	return &base{
-		t: b.t,
-		c: b.c,
-		m: b.m,
-		e: b.e,
-		u: b.u,
-		a: a,
+		t:                 b.t,
+		c:                 b.c,
+		m:                 b.m,
+		e:                 b.e,
+		u:                 b.u,
+		a:                 a,
+		s:                 b.s,
+		r:                 b.r,
+		suggestions:       b.suggestions,
+		invalidReferences: b.invalidReferences,
 	}
+}
+
+// withRetry adds retry metadata to the base error and returns a new base error.
+func (b *base) withRetry(r retry) *base {
+	return &base{
+		t:                 b.t,
+		c:                 b.c,
+		m:                 b.m,
+		e:                 b.e,
+		u:                 b.u,
+		a:                 b.a,
+		s:                 b.s,
+		r:                 &r,
+		suggestions:       b.suggestions,
+		invalidReferences: b.invalidReferences,
+	}
+}
+
+// WithSuggestions replaces the list of suggestions on the base error.
+func (b *base) WithSuggestions(suggestions ...string) *base {
+	return &base{
+		t:                 b.t,
+		c:                 b.c,
+		m:                 b.m,
+		e:                 b.e,
+		u:                 b.u,
+		a:                 b.a,
+		s:                 b.s,
+		r:                 b.r,
+		suggestions:       suggestions,
+		invalidReferences: b.invalidReferences,
+	}
+}
+
+// WithInvalidReferences replaces the list of invalid references on the base error.
+func (b *base) WithInvalidReferences(invalidReferences ...string) *base {
+	return &base{
+		t:                 b.t,
+		c:                 b.c,
+		m:                 b.m,
+		e:                 b.e,
+		u:                 b.u,
+		a:                 b.a,
+		s:                 b.s,
+		r:                 b.r,
+		suggestions:       b.suggestions,
+		invalidReferences: invalidReferences,
+	}
+}
+
+// WithRetryAfter sets the retry delay on the base error and returns a new base error.
+func (b *base) WithRetryAfter(delay time.Duration) *base {
+	return b.withRetry(newRetryAfter(delay))
 }
 
 // Unwrapb is a combination of built-in errors.As and type casting.
@@ -130,7 +230,7 @@ func (b *base) WithAdditional(a ...string) *base {
 // Otherwise, it returns TypeInternal, the original error string
 // and the error itself.
 //
-//lint:ignore ST1008 we want to return arguments in the 'TCMEUA' order of the struct
+//nolint:staticcheck // ST1008: intentional return order matching struct field order (TCMEUA)
 func Unwrapb(cause error) (typ, Code, string, error, string, []string) {
 	base, ok := cause.(*base)
 	if ok {
@@ -147,7 +247,7 @@ func Ast(cause error, typ typ) bool {
 	return t == typ
 }
 
-// Ast checks if the provided error matches the specified custom error code.
+// Asc checks if the provided error matches the specified custom error code.
 func Asc(cause error, code Code) bool {
 	_, c, _, _, _, _ := Unwrapb(cause)
 
@@ -199,16 +299,6 @@ func NewInvalidInputf(code Code, format string, args ...any) *base {
 	return Newf(TypeInvalidInput, code, format, args...)
 }
 
-// WrapUnexpectedf is a wrapper around Wrapf with TypeUnexpected.
-func WrapUnexpectedf(cause error, code Code, format string, args ...any) *base {
-	return Wrapf(cause, TypeInvalidInput, code, format, args...)
-}
-
-// NewUnexpectedf is a wrapper around Newf with TypeUnexpected.
-func NewUnexpectedf(code Code, format string, args ...any) *base {
-	return Newf(TypeInvalidInput, code, format, args...)
-}
-
 // NewMethodNotAllowedf is a wrapper around Newf with TypeMethodNotAllowed.
 func NewMethodNotAllowedf(code Code, format string, args ...any) *base {
 	return Newf(TypeMethodNotAllowed, code, format, args...)
@@ -222,4 +312,70 @@ func WrapTimeoutf(cause error, code Code, format string, args ...any) *base {
 // NewTimeoutf is a wrapper around Newf with TypeTimeout.
 func NewTimeoutf(code Code, format string, args ...any) *base {
 	return Newf(TypeTimeout, code, format, args...)
+}
+
+// WrapUnauthenticatedf is a wrapper around Wrapf with TypeUnauthenticated.
+func WrapUnauthenticatedf(cause error, code Code, format string, args ...any) *base {
+	return Wrapf(cause, TypeUnauthenticated, code, format, args...)
+}
+
+// NewUnauthenticatedf is a wrapper around Newf with TypeUnauthenticated.
+func NewUnauthenticatedf(code Code, format string, args ...any) *base {
+	return Newf(TypeUnauthenticated, code, format, args...)
+}
+
+// WrapForbiddenf is a wrapper around Wrapf with TypeForbidden.
+func WrapForbiddenf(cause error, code Code, format string, args ...any) *base {
+	return Wrapf(cause, TypeForbidden, code, format, args...)
+}
+
+// NewForbiddenf is a wrapper around Newf with TypeForbidden.
+func NewForbiddenf(code Code, format string, args ...any) *base {
+	return Newf(TypeForbidden, code, format, args...)
+}
+
+// Attr returns an slog.Attr with a standardized "exception" key for the given error.
+func Attr(err error) slog.Attr {
+	return slog.Any("exception", err)
+}
+
+// TypeAttr returns an OTel attribute.KeyValue with the "error.type" semconv key
+// set to the error's type string.
+func TypeAttr(err error) attribute.KeyValue {
+	t, _, _, _, _, _ := Unwrapb(err)
+	return attribute.String("error.type", t.String())
+}
+
+// RetryDelayOf returns the explicit retry delay set via WithRetryAfter,
+// or zero if the error carries no retry delay.
+func RetryDelayOf(err error) time.Duration {
+	base, ok := err.(*base)
+	if !ok || base.r == nil {
+		return 0
+	}
+	return base.r.delay
+}
+
+func retryOf(err error) *retry {
+	base, ok := err.(*base)
+	if ok {
+		return base.r
+	}
+	return nil
+}
+
+func suggestionsOf(err error) []string {
+	base, ok := err.(*base)
+	if ok {
+		return base.suggestions
+	}
+	return nil
+}
+
+func invalidReferencesOf(err error) []string {
+	base, ok := err.(*base)
+	if ok {
+		return base.invalidReferences
+	}
+	return nil
 }

@@ -105,9 +105,9 @@ const mockRefetchMetricMetadata = jest.fn();
 
 describe('Metadata', () => {
 	beforeEach(() => {
-		mockUseUpdateMetricMetadataHook.mockReturnValue(({
+		mockUseUpdateMetricMetadataHook.mockReturnValue({
 			mutate: mockUseUpdateMetricMetadata,
-		} as Partial<UseUpdateMetricMetadataResult>) as UseUpdateMetricMetadataResult);
+		} as Partial<UseUpdateMetricMetadataResult> as UseUpdateMetricMetadataResult);
 	});
 
 	it('should render the metadata properly', () => {
@@ -180,7 +180,10 @@ describe('Metadata', () => {
 
 		const temporalitySelect = screen.getByTestId('temporality-select');
 		expect(temporalitySelect).toBeInTheDocument();
-		await userEvent.selectOptions(temporalitySelect, Temporality.CUMULATIVE);
+		await userEvent.selectOptions(
+			temporalitySelect,
+			MetrictypesTemporalityDTO.cumulative,
+		);
 
 		const unitSelect = screen.getByTestId('unit-select');
 		expect(unitSelect).toBeInTheDocument();

@@ -23,7 +23,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"go.uber.org/multierr"
-	"go.uber.org/zap"
 )
 
 type channelResult struct {
@@ -43,6 +42,8 @@ type querier struct {
 	fluxInterval time.Duration
 
 	builder *queryBuilder.QueryBuilder
+
+	logger *slog.Logger
 
 	// used for testing
 	// TODO(srikanthccv): remove this once we have a proper mock
@@ -85,6 +86,8 @@ func NewQuerier(opts QuerierOptions) interfaces.Querier {
 			BuildMetricQuery: metricsV3.PrepareMetricQuery,
 		}),
 
+		logger: slog.Default(),
+
 		testingMode:    opts.TestingMode,
 		returnedSeries: opts.ReturnedSeries,
 		returnedErr:    opts.ReturnedErr,
@@ -113,7 +116,7 @@ func (q *querier) execDatastoreQuery(ctx context.Context, query string) ([]*v3.S
 		series.Points = points
 	}
 	if pointsWithNegativeTimestamps > 0 {
-		zap.L().Error("found points with negative timestamps for query", zap.String("query", query))
+		q.logger.ErrorContext(ctx, "found points with negative timestamps for query", "query", query)
 	}
 	return result, err
 }
@@ -189,14 +192,14 @@ func (q *querier) runPromQueries(ctx context.Context, orgID valuer.UUID, params 
 			cacheKey, ok := cacheKeys[queryName]
 
 			if !ok || params.NoCache {
-				zap.L().Info("skipping cache for metrics prom query", zap.String("queryName", queryName), zap.Int64("start", params.Start), zap.Int64("end", params.End), zap.Int64("step", params.Step), zap.Bool("noCache", params.NoCache), zap.String("cacheKey", cacheKeys[queryName]))
+				q.logger.InfoContext(ctx, "skipping cache for metrics prom query", "query_name", queryName, "start", params.Start, "end", params.End, "step", params.Step, "no_cache", params.NoCache, "cache_key", cacheKeys[queryName])
 				query := metricsV3.BuildPromQuery(promQuery, params.Step, params.Start, params.End)
 				series, err := q.execPromQuery(ctx, query)
 				channelResults <- channelResult{Err: err, Name: queryName, Query: query.Query, Series: series}
 				return
 			}
 			misses := q.queryCache.FindMissingTimeRanges(orgID, params.Start, params.End, params.Step, cacheKey)
-			zap.L().Info("cache misses for metrics prom query", zap.Any("misses", misses))
+			q.logger.InfoContext(ctx, "cache misses for metrics prom query", "misses", misses)
 			missedSeries := make([]querycache.CachedSeriesData, 0)
 			for _, miss := range misses {
 				query := metricsV3.BuildPromQuery(promQuery, params.Step, miss.Start, miss.End)

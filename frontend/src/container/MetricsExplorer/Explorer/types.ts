@@ -11,6 +11,7 @@ export enum ExplorerTabs {
 }
 
 export interface TimeSeriesProps {
+	onFetchingStateChange?: (isFetching: boolean) => void;
 	showOneChartPerQuery: boolean;
 	setWarning: Dispatch<SetStateAction<Warning | undefined>>;
 	areAllMetricUnitsSame: boolean;
@@ -23,28 +24,5 @@ export interface TimeSeriesProps {
 	yAxisUnit: string | undefined;
 	setYAxisUnit: (unit: string) => void;
 	showYAxisUnitSelector: boolean;
-}
-
-export interface RelatedMetricsProps {
-	metricNames: string[];
-}
-
-export interface RelatedMetricsCardProps {
-	metric: RelatedMetricWithQueryResult;
-}
-
-export interface UseGetRelatedMetricsGraphsProps {
-	selectedMetricName: string | null;
-	startMs: number;
-	endMs: number;
-}
-
-export interface UseGetRelatedMetricsGraphsReturn {
-	relatedMetrics: RelatedMetricWithQueryResult[];
-	isRelatedMetricsLoading: boolean;
-	isRelatedMetricsError: boolean;
-}
-
-export interface RelatedMetricWithQueryResult extends RelatedMetric {
-	queryResult: UseQueryResult<SuccessResponse<MetricRangePayloadProps>, unknown>;
+	isCancelled?: boolean;
 }

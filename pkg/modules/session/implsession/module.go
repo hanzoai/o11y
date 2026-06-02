@@ -2,6 +2,7 @@ package implsession
 
 import (
 	"context"
+	"log/slog"
 	"net/url"
 	"slices"
 	"strings"
@@ -23,18 +24,18 @@ import (
 type module struct {
 	settings   factory.ScopedProviderSettings
 	authNs     map[authtypes.AuthNProvider]authn.AuthN
-	user       user.Module
+	userSetter user.Setter
 	userGetter user.Getter
 	authDomain authdomain.Module
 	tokenizer  tokenizer.Tokenizer
 	orgGetter  organization.Getter
 }
 
-func NewModule(providerSettings factory.ProviderSettings, authNs map[authtypes.AuthNProvider]authn.AuthN, user user.Module, userGetter user.Getter, authDomain authdomain.Module, tokenizer tokenizer.Tokenizer, orgGetter organization.Getter) session.Module {
+func NewModule(providerSettings factory.ProviderSettings, authNs map[authtypes.AuthNProvider]authn.AuthN, userSetter user.Setter, userGetter user.Getter, authDomain authdomain.Module, tokenizer tokenizer.Tokenizer, orgGetter organization.Getter) session.Module {
 	return &module{
 		settings:   factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/modules/session/implsession"),
 		authNs:     authNs,
-		user:       user,
+		userSetter: userSetter,
 		userGetter: userGetter,
 		authDomain: authDomain,
 		tokenizer:  tokenizer,
@@ -123,7 +124,7 @@ func (module *module) CreateCallbackAuthNSession(ctx context.Context, authNProvi
 
 	callbackIdentity, err := callbackAuthN.HandleCallback(ctx, values)
 	if err != nil {
-		module.settings.Logger().ErrorContext(ctx, "failed to handle callback", "error", err, "authn_provider", authNProvider)
+		module.settings.Logger().ErrorContext(ctx, "failed to handle callback", errors.Attr(err), slog.Any("authn_provider", authNProvider))
 		return "", err
 	}
 
@@ -134,13 +135,14 @@ func (module *module) CreateCallbackAuthNSession(ctx context.Context, authNProvi
 
 	roleMapping := authDomain.AuthDomainConfig().RoleMapping
 	role := roleMapping.NewRoleFromCallbackIdentity(callbackIdentity)
+	signozManagedRole := authtypes.MustGetSigNozManagedRoleFromExistingRole(role)
 
-	user, err := types.NewUser(callbackIdentity.Name, callbackIdentity.Email, role, callbackIdentity.OrgID, types.UserStatusActive)
+	newUser, err := types.NewUser(callbackIdentity.Name, callbackIdentity.Email, callbackIdentity.OrgID, types.UserStatusActive)
 	if err != nil {
 		return "", err
 	}
 
-	user, err = module.user.GetOrCreateUser(ctx, user)
+	newUser, err = module.userSetter.GetOrCreateUser(ctx, newUser, user.WithRoleNames([]string{signozManagedRole}))
 	if err != nil {
 		return "", err
 	}

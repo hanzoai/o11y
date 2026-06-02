@@ -1,7 +1,7 @@
+import type { TypesUserDTO } from 'api/generated/services/sigNoz.schemas';
+import userEvent from '@testing-library/user-event';
 import { rest, server } from 'mocks-server/server';
-import { render, screen, userEvent } from 'tests/test-utils';
-import { PendingInvite } from 'types/api/user/getPendingInvites';
-import { UserResponse } from 'types/api/user/getUser';
+import { fireEvent, render, screen } from 'tests/test-utils';
 
 import MembersSettings from '../MembersSettings';
 
@@ -12,10 +12,9 @@ jest.mock('@hanzo/ui', () => ({
 	},
 }));
 
-const USERS_ENDPOINT = '*/api/v1/user';
-const INVITES_ENDPOINT = '*/api/v1/invite';
+const USERS_ENDPOINT = '*/api/v2/users';
 
-const mockUsers: UserResponse[] = [
+const mockUsers: TypesUserDTO[] = [
 	{
 		id: 'user-1',
 		displayName: 'Alice Smith',
@@ -34,9 +33,6 @@ const mockUsers: UserResponse[] = [
 		organization: 'TestOrg',
 		orgId: 'org-1',
 	},
-];
-
-const mockInvites: PendingInvite[] = [
 	{
 		id: 'inv-1',
 		email: 'charlie@o11y.hanzo.ai',
@@ -54,9 +50,6 @@ describe('MembersSettings (integration)', () => {
 			rest.get(USERS_ENDPOINT, (_, res, ctx) =>
 				res(ctx.status(200), ctx.json({ data: mockUsers })),
 			),
-			rest.get(INVITES_ENDPOINT, (_, res, ctx) =>
-				res(ctx.status(200), ctx.json({ data: mockInvites })),
-			),
 		);
 	});
 
@@ -64,7 +57,7 @@ describe('MembersSettings (integration)', () => {
 		server.resetHandlers();
 	});
 
-	it('loads and displays active users and pending invites', async () => {
+	it('loads and displays active users, pending invites, and deleted members', async () => {
 		render(<MembersSettings />);
 
 		await screen.findByText('Alice Smith');
@@ -72,11 +65,11 @@ describe('MembersSettings (integration)', () => {
 		expect(screen.getByText('charlie@o11y.hanzo.ai')).toBeInTheDocument();
 		expect(screen.getAllByText('ACTIVE')).toHaveLength(2);
 		expect(screen.getByText('INVITED')).toBeInTheDocument();
+		expect(screen.getByText('DELETED')).toBeInTheDocument();
 	});
 
 	it('filters to pending invites via the filter dropdown', async () => {
 		const user = userEvent.setup({ pointerEventsCheck: 0 });
-
 		render(<MembersSettings />);
 
 		await screen.findByText('Alice Smith');
@@ -91,38 +84,31 @@ describe('MembersSettings (integration)', () => {
 	});
 
 	it('filters members by name using the search input', async () => {
-		const user = userEvent.setup({ pointerEventsCheck: 0 });
-
 		render(<MembersSettings />);
 
 		await screen.findByText('Alice Smith');
 
-		await user.type(
-			screen.getByPlaceholderText(/Search by name, email, or role/i),
-			'bob',
-		);
+		fireEvent.change(screen.getByPlaceholderText(/Search by name or email/i), {
+			target: { value: 'bob' },
+		});
 
 		await screen.findByText('Bob Jones');
 		expect(screen.queryByText('Alice Smith')).not.toBeInTheDocument();
 		expect(screen.queryByText('charlie@o11y.hanzo.ai')).not.toBeInTheDocument();
 	});
 
-	it('opens EditMemberDrawer when a member row is clicked', async () => {
-		const user = userEvent.setup({ pointerEventsCheck: 0 });
-
+	it('opens EditMemberDrawer when an active member row is clicked', async () => {
 		render(<MembersSettings />);
 
-		await user.click(await screen.findByText('Alice Smith'));
+		fireEvent.click(await screen.findByText('Alice Smith'));
 
 		await screen.findByText('Member Details');
 	});
 
-	it('opens InviteMembersModal when "Invite member" button is clicked', async () => {
-		const user = userEvent.setup({ pointerEventsCheck: 0 });
-
+	it('opens EditMemberDrawer when a deleted member row is clicked', async () => {
 		render(<MembersSettings />);
 
-		await user.click(screen.getByRole('button', { name: /invite member/i }));
+		fireEvent.click(await screen.findByText('Dave Deleted'));
 
 		expect(await screen.findAllByPlaceholderText('john@o11y.hanzo.ai')).toHaveLength(
 			3,

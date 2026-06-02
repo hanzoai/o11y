@@ -2,6 +2,7 @@ package telemetrymetadata
 
 import (
 	"context"
+	"regexp"
 	"testing"
 
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
@@ -16,6 +17,20 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+type regexMatcher struct {
+}
+
+func (m *regexMatcher) Match(expectedSQL, actualSQL string) error {
+	re, err := regexp.Compile(expectedSQL)
+	if err != nil {
+		return err
+	}
+	if !re.MatchString(actualSQL) {
+		return errors.NewInvalidInputf(errors.CodeInvalidInput, "expected query to contain %s, got %s", expectedSQL, actualSQL)
+	}
+	return nil
+}
 
 func TestGetFirstSeenFromMetricMetadata(t *testing.T) {
 	mockTelemetryStore := telemetrystoretest.New(telemetrystore.Config{}, &regexMatcher{})
@@ -37,8 +52,15 @@ func TestGetFirstSeenFromMetricMetadata(t *testing.T) {
 		telemetrylogs.TagAttributesV2TableName,
 		telemetrylogs.LogAttributeKeysTblName,
 		telemetrylogs.LogResourceKeysTblName,
+		telemetryaudit.DBName,
+		telemetryaudit.AuditLogsTableName,
+		telemetryaudit.TagAttributesTableName,
+		telemetryaudit.LogAttributeKeysTblName,
+		telemetryaudit.LogResourceKeysTblName,
 		DBName,
 		AttributesMetadataLocalTableName,
+		ColumnEvolutionMetadataTableName,
+		flaggertest.New(t),
 	)
 
 	lookupKeys := []telemetrytypes.MetricMetadataLookupKey{

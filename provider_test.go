@@ -22,6 +22,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/tokenizer/tokenizertest"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // This is a test to ensure that provider factories can be created without panicking since
@@ -33,7 +34,7 @@ func TestNewProviderFactories(t *testing.T) {
 	})
 
 	assert.NotPanics(t, func() {
-		NewWebProviderFactories()
+		NewWebProviderFactories(global.Config{})
 	})
 
 	assert.NotPanics(t, func() {
@@ -58,14 +59,11 @@ func TestNewProviderFactories(t *testing.T) {
 	})
 
 	assert.NotPanics(t, func() {
-		orgGetter := implorganization.NewGetter(implorganization.NewStore(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual)), nil)
+		store := sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual)
+		orgGetter := implorganization.NewGetter(implorganization.NewStore(store), nil)
 		notificationManager := nfmanagertest.NewMock()
-		NewAlertmanagerProviderFactories(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual), orgGetter, notificationManager)
-	})
-
-	assert.NotPanics(t, func() {
-		queryParser := queryparser.New(instrumentationtest.New().ToProviderSettings())
-		NewRulerProviderFactories(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual), queryParser)
+		maintenanceStore := sqlalertmanagerstore.NewMaintenanceStore(store, factorytest.NewSettings())
+		NewAlertmanagerProviderFactories(store, orgGetter, notificationManager, maintenanceStore)
 	})
 
 	assert.NotPanics(t, func() {
@@ -77,12 +75,13 @@ func TestNewProviderFactories(t *testing.T) {
 	})
 
 	assert.NotPanics(t, func() {
-		flagger, err := flagger.New(context.Background(), instrumentationtest.New().ToProviderSettings(), flagger.Config{}, flagger.MustNewRegistry())
-		if err != nil {
-			panic(err)
-		}
+		providerSettings := instrumentationtest.New().ToProviderSettings()
+		ss := sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual)
+		userRoleStore := impluser.NewUserRoleStore(ss, providerSettings)
+		flagger, err := flagger.New(context.Background(), providerSettings, flagger.Config{}, flagger.MustNewRegistry())
+		require.NoError(t, err)
 
-		userGetter := impluser.NewGetter(impluser.NewStore(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual), instrumentationtest.New().ToProviderSettings()), flagger)
+		userGetter := impluser.NewGetter(impluser.NewStore(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual), instrumentationtest.New().ToProviderSettings()), userRoleStore, flagger)
 		orgGetter := implorganization.NewGetter(implorganization.NewStore(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual)), nil)
 		telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherEqual)
 		NewStatsReporterProviderFactories(telemetryStore, []statsreporter.StatsCollector{}, orgGetter, userGetter, tokenizertest.NewMockTokenizer(t), version.Build{}, analytics.Config{Enabled: true})
@@ -91,7 +90,6 @@ func TestNewProviderFactories(t *testing.T) {
 	assert.NotPanics(t, func() {
 		NewAPIServerProviderFactories(
 			implorganization.NewGetter(implorganization.NewStore(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual)), nil),
-			nil,
 			nil,
 			Modules{},
 			Handlers{},

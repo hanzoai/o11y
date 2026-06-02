@@ -6,13 +6,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/modules/thirdpartyapi"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 
-	"io"
+	"log/slog"
 	"math"
 	"net/http"
 	"regexp"
@@ -96,8 +97,9 @@ func NewRouter() *mux.Router {
 
 // APIHandler implements the query service public API
 type APIHandler struct {
+	logger       *slog.Logger
 	reader       interfaces.Reader
-	ruleManager  *rules.Manager
+	ruleManager  ruler.Ruler
 	querier      interfaces.Querier
 	querierV2    interfaces.Querier
 	queryBuilder *queryBuilder.QueryBuilder
@@ -111,8 +113,6 @@ type APIHandler struct {
 	temporalityMux sync.Mutex
 
 	IntegrationsController *integrations.Controller
-
-	CloudIntegrationsController *cloudintegrations.Controller
 
 	LogsParsingPipelineController *logparsingpipeline.LogParsingPipelineController
 
@@ -136,11 +136,7 @@ type APIHandler struct {
 	statefulsetsRepo *inframetrics.StatefulSetsRepo
 	jobsRepo         *inframetrics.JobsRepo
 
-	SummaryService *metricsexplorer.SummaryService
-
 	pvcsRepo *inframetrics.PvcsRepo
-
-	AlertmanagerAPI *alertmanager.API
 
 	LicensingAPI licensing.API
 
@@ -153,22 +149,14 @@ type APIHandlerOpts struct {
 	// business data reader e.g. datastore
 	Reader interfaces.Reader
 
-	// rule manager handles rule crud operations
-	RuleManager *rules.Manager
-
 	// Integrations
 	IntegrationsController *integrations.Controller
-
-	// Cloud Provider Integrations
-	CloudIntegrationsController *cloudintegrations.Controller
 
 	// Log parsing pipelines
 	LogsParsingPipelineController *logparsingpipeline.LogParsingPipelineController
 
 	// Flux Interval
 	FluxInterval time.Duration
-
-	AlertmanagerAPI *alertmanager.API
 
 	LicensingAPI licensing.API
 
@@ -211,11 +199,11 @@ func NewAPIHandler(opts APIHandlerOpts, config o11y.Config) (*APIHandler, error)
 	//quickFilterModule := quickfilter.NewAPI(opts.QuickFilterModule)
 
 	aH := &APIHandler{
+		logger:                        slog.Default(),
 		reader:                        opts.Reader,
 		temporalityMap:                make(map[string]map[v3.Temporality]bool),
-		ruleManager:                   opts.RuleManager,
+		ruleManager:                   opts.Signoz.Ruler,
 		IntegrationsController:        opts.IntegrationsController,
-		CloudIntegrationsController:   opts.CloudIntegrationsController,
 		LogsParsingPipelineController: opts.LogsParsingPipelineController,
 		querier:                       querier,
 		querierV2:                     querierv2,
@@ -230,8 +218,6 @@ func NewAPIHandler(opts APIHandlerOpts, config o11y.Config) (*APIHandler, error)
 		statefulsetsRepo:              statefulsetsRepo,
 		jobsRepo:                      jobsRepo,
 		pvcsRepo:                      pvcsRepo,
-		SummaryService:                summaryService,
-		AlertmanagerAPI:               opts.AlertmanagerAPI,
 		LicensingAPI:                  opts.LicensingAPI,
 		O11y:                        opts.O11y,
 		QueryParserAPI:                opts.QueryParserAPI,
@@ -498,12 +484,6 @@ func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
 	router.HandleFunc("/api/v1/rules/{id}/history/top_contributors", am.ViewAccess(aH.getRuleStateHistoryTopContributors)).Methods(http.MethodPost)
 	router.HandleFunc("/api/v1/rules/{id}/history/overall_status", am.ViewAccess(aH.getOverallStateTransitions)).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/v1/downtime_schedules", am.ViewAccess(aH.listDowntimeSchedules)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/downtime_schedules/{id}", am.ViewAccess(aH.getDowntimeSchedule)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/downtime_schedules", am.EditAccess(aH.createDowntimeSchedule)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/downtime_schedules/{id}", am.EditAccess(aH.editDowntimeSchedule)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v1/downtime_schedules/{id}", am.EditAccess(aH.deleteDowntimeSchedule)).Methods(http.MethodDelete)
-
 	router.HandleFunc("/api/v1/dashboards", am.ViewAccess(aH.List)).Methods(http.MethodGet)
 	router.HandleFunc("/api/v1/dashboards", am.EditAccess(aH.O11y.Handlers.Dashboard.Create)).Methods(http.MethodPost)
 	router.HandleFunc("/api/v1/dashboards/{id}", am.ViewAccess(aH.Get)).Methods(http.MethodGet)
@@ -580,33 +560,6 @@ func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
 	router.HandleFunc("/api/v1/query_filter/analyze", am.ViewAccess(aH.QueryParserAPI.AnalyzeQueryFilter)).Methods(http.MethodPost)
 }
 
-func (ah *APIHandler) MetricExplorerRoutes(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/api/v1/metrics/filters/keys",
-		am.ViewAccess(ah.FilterKeysSuggestion)).
-		Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/metrics/filters/values",
-		am.ViewAccess(ah.FilterValuesSuggestion)).
-		Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/metrics/{metric_name}/metadata",
-		am.ViewAccess(ah.GetMetricsDetails)).
-		Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/metrics",
-		am.ViewAccess(ah.ListMetrics)).
-		Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/metrics/treemap",
-		am.ViewAccess(ah.GetTreeMap)).
-		Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/metrics/related",
-		am.ViewAccess(ah.GetRelatedMetrics)).
-		Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/metrics/inspect",
-		am.ViewAccess(ah.GetInspectMetricsData)).
-		Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/metrics/{metric_name}/metadata",
-		am.ViewAccess(ah.UpdateMetricsMetadata)).
-		Methods(http.MethodPost)
-}
-
 func Intersection(a, b []int) (c []int) {
 	m := make(map[int]bool)
 
@@ -620,26 +573,6 @@ func Intersection(a, b []int) (c []int) {
 		}
 	}
 	return
-}
-
-func (aH *APIHandler) getRule(w http.ResponseWriter, r *http.Request) {
-	idStr := mux.Vars(r)["id"]
-	id, err := valuer.NewUUID(idStr)
-	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	ruleResponse, err := aH.ruleManager.GetRule(r.Context(), id)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
-			return
-		}
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, nil)
-		return
-	}
-	aH.Respond(w, ruleResponse)
 }
 
 // populateTemporality adds the temporality to the query if it is not present
@@ -697,127 +630,164 @@ func (aH *APIHandler) PopulateTemporality(ctx context.Context, orgID valuer.UUID
 	return nil
 }
 
-func (aH *APIHandler) listDowntimeSchedules(w http.ResponseWriter, r *http.Request) {
-	claims, errv2 := authtypes.ClaimsFromContext(r.Context())
-	if errv2 != nil {
-		render.Error(w, errv2)
-		return
-	}
+func (aH *APIHandler) listRules(w http.ResponseWriter, r *http.Request) {
 
-	schedules, err := aH.ruleManager.MaintenanceStore().GetAllPlannedMaintenance(r.Context(), claims.OrgID)
+	rules, err := aH.ruleManager.ListRuleStates(r.Context())
 	if err != nil {
-		render.Error(w, err)
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, nil)
 		return
 	}
 
-	// The schedules are stored as JSON in the database, so we need to filter them here
-	// Since the number of schedules is expected to be small, this should be fine
+	// todo(amol): need to add sorter
 
-	if r.URL.Query().Get("active") != "" {
-		activeSchedules := make([]*ruletypes.GettablePlannedMaintenance, 0)
-		active, _ := strconv.ParseBool(r.URL.Query().Get("active"))
-		for _, schedule := range schedules {
-			now := time.Now().In(time.FixedZone(schedule.Schedule.Timezone, 0))
-			if schedule.IsActive(now) == active {
-				activeSchedules = append(activeSchedules, schedule)
-			}
-		}
-		schedules = activeSchedules
-	}
-
-	if r.URL.Query().Get("recurring") != "" {
-		recurringSchedules := make([]*ruletypes.GettablePlannedMaintenance, 0)
-		recurring, _ := strconv.ParseBool(r.URL.Query().Get("recurring"))
-		for _, schedule := range schedules {
-			if schedule.IsRecurring() == recurring {
-				recurringSchedules = append(recurringSchedules, schedule)
-			}
-		}
-		schedules = recurringSchedules
-	}
-
-	aH.Respond(w, schedules)
+	aH.Respond(w, rules)
 }
 
-func (aH *APIHandler) getDowntimeSchedule(w http.ResponseWriter, r *http.Request) {
+func (aH *APIHandler) getRule(w http.ResponseWriter, r *http.Request) {
 	idStr := mux.Vars(r)["id"]
 	id, err := valuer.NewUUID(idStr)
-	if err != nil {
-		render.Error(w, errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, err.Error()))
-		return
-	}
-
-	schedule, err := aH.ruleManager.MaintenanceStore().GetPlannedMaintenanceByID(r.Context(), id)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-	aH.Respond(w, schedule)
-}
-
-func (aH *APIHandler) createDowntimeSchedule(w http.ResponseWriter, r *http.Request) {
-	var schedule ruletypes.GettablePlannedMaintenance
-	err := json.NewDecoder(r.Body).Decode(&schedule)
 	if err != nil {
 		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
 		return
 	}
-	if err := schedule.Validate(); err != nil {
-		render.Error(w, err)
-		return
-	}
 
-	_, err = aH.ruleManager.MaintenanceStore().CreatePlannedMaintenance(r.Context(), schedule)
+	ruleResponse, err := aH.ruleManager.GetRule(r.Context(), id)
 	if err != nil {
-		render.Error(w, err)
+		if errors.Is(err, sql.ErrNoRows) {
+			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
+			return
+		}
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, nil)
 		return
 	}
-	aH.Respond(w, nil)
+	aH.Respond(w, ruleResponse)
 }
 
-func (aH *APIHandler) editDowntimeSchedule(w http.ResponseWriter, r *http.Request) {
+func (aH *APIHandler) createRule(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		aH.logger.ErrorContext(r.Context(), "error reading request body for create rule", errors.Attr(err))
+		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
+		return
+	}
+
+	rule, err := aH.ruleManager.CreateRule(r.Context(), string(body))
+	if err != nil {
+		RespondError(w, toApiError(err), nil)
+		return
+	}
+
+	aH.Respond(w, rule)
+}
+
+func (aH *APIHandler) editRule(w http.ResponseWriter, r *http.Request) {
 	idStr := mux.Vars(r)["id"]
 	id, err := valuer.NewUUID(idStr)
 	if err != nil {
-		render.Error(w, errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, err.Error()))
+		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
 		return
 	}
 
-	var schedule ruletypes.GettablePlannedMaintenance
-	err = json.NewDecoder(r.Body).Decode(&schedule)
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		render.Error(w, err)
-		return
-	}
-	if err := schedule.Validate(); err != nil {
-		render.Error(w, err)
+		aH.logger.ErrorContext(r.Context(), "error reading request body for edit rule", errors.Attr(err))
+		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
 		return
 	}
 
-	err = aH.ruleManager.MaintenanceStore().EditPlannedMaintenance(r.Context(), schedule, id)
+	err = aH.ruleManager.EditRule(r.Context(), string(body), id)
 	if err != nil {
-		render.Error(w, err)
+		if errors.Is(err, sql.ErrNoRows) {
+			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
+			return
+		}
+		RespondError(w, toApiError(err), nil)
 		return
 	}
 
-	aH.Respond(w, nil)
+	aH.Respond(w, "rule successfully edited")
 }
 
-func (aH *APIHandler) deleteDowntimeSchedule(w http.ResponseWriter, r *http.Request) {
+func (aH *APIHandler) deleteRule(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+
+	err := aH.ruleManager.DeleteRule(r.Context(), id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
+			return
+		}
+		RespondError(w, toApiError(err), nil)
+		return
+	}
+
+	aH.Respond(w, "rule successfully deleted")
+}
+
+func (aH *APIHandler) patchRule(w http.ResponseWriter, r *http.Request) {
 	idStr := mux.Vars(r)["id"]
 	id, err := valuer.NewUUID(idStr)
 	if err != nil {
-		render.Error(w, errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, err.Error()))
+		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
 		return
 	}
 
-	err = aH.ruleManager.MaintenanceStore().DeletePlannedMaintenance(r.Context(), id)
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		aH.logger.ErrorContext(r.Context(), "error reading request body for patch rule", errors.Attr(err))
+		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
+		return
+	}
+
+	gettableRule, err := aH.ruleManager.PatchRule(r.Context(), string(body), id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
+			return
+		}
+		RespondError(w, toApiError(err), nil)
+		return
+	}
+
+	aH.Respond(w, gettableRule)
+}
+
+func (aH *APIHandler) testRule(w http.ResponseWriter, r *http.Request) {
+	claims, err := authtypes.ClaimsFromContext(r.Context())
 	if err != nil {
 		render.Error(w, err)
 		return
 	}
+	orgID, err := valuer.NewUUID(claims.OrgID)
+	if err != nil {
+		render.Error(w, err)
+		return
+	}
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		aH.logger.ErrorContext(r.Context(), "error reading request body for test rule", errors.Attr(err))
+		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
+		return
+	}
 
-	aH.Respond(w, nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	alertCount, err := aH.ruleManager.TestNotification(ctx, orgID, string(body))
+	if err != nil {
+		RespondError(w, toApiError(err), nil)
+		return
+	}
+
+	response := map[string]interface{}{
+		"alertCount": alertCount,
+		"message":    "notification sent",
+	}
+	aH.Respond(w, response)
 }
 
 func (aH *APIHandler) getRuleStats(w http.ResponseWriter, r *http.Request) {
@@ -995,8 +965,6 @@ func (aH *APIHandler) getRuleStateHistory(w http.ResponseWriter, r *http.Request
 			if err != nil {
 				continue
 			}
-			filterItems, groupBy, keys := aH.metaForLinks(r.Context(), rule)
-			newFilters := contextlinks.PrepareFilters(lbls, filterItems, groupBy, keys)
 			end := time.Unix(res.Items[idx].UnixMilli/1000, 0)
 			// why are we subtracting 3 minutes?
 			// the query range is calculated based on the rule's evalWindow and evalDelay
@@ -1004,54 +972,46 @@ func (aH *APIHandler) getRuleStateHistory(w http.ResponseWriter, r *http.Request
 			// to get the correct query range
 			start := end.Add(-rule.EvalWindow.Duration() - 3*time.Minute)
 			if rule.AlertType == ruletypes.AlertTypeLogs {
-				if rule.Version != "v5" {
-					res.Items[idx].RelatedLogsLink = contextlinks.PrepareLinksToLogs(start, end, newFilters)
-				} else {
-					// TODO(srikanthccv): re-visit this and support multiple queries
-					var q qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]
+				// TODO(srikanthccv): re-visit this and support multiple queries
+				var q qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]
 
-					for _, query := range rule.RuleCondition.CompositeQuery.Queries {
-						if query.Type == qbtypes.QueryTypeBuilder {
-							switch spec := query.Spec.(type) {
-							case qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]:
-								q = spec
-							}
+				for _, query := range rule.RuleCondition.CompositeQuery.Queries {
+					if query.Type == qbtypes.QueryTypeBuilder {
+						switch spec := query.Spec.(type) {
+						case qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]:
+							q = spec
 						}
 					}
-
-					filterExpr := ""
-					if q.Filter != nil && q.Filter.Expression != "" {
-						filterExpr = q.Filter.Expression
-					}
-
-					whereClause := contextlinks.PrepareFilterExpression(lbls, filterExpr, q.GroupBy)
-
-					res.Items[idx].RelatedLogsLink = contextlinks.PrepareLinksToLogsV5(start, end, whereClause)
 				}
+
+				filterExpr := ""
+				if q.Filter != nil && q.Filter.Expression != "" {
+					filterExpr = q.Filter.Expression
+				}
+
+				whereClause := contextlinks.PrepareFilterExpression(lbls, filterExpr, q.GroupBy)
+
+				res.Items[idx].RelatedLogsLink = contextlinks.PrepareParamsForLogsV5(start, end, whereClause).Encode()
 			} else if rule.AlertType == ruletypes.AlertTypeTraces {
-				if rule.Version != "v5" {
-					res.Items[idx].RelatedTracesLink = contextlinks.PrepareLinksToTraces(start, end, newFilters)
-				} else {
-					// TODO(srikanthccv): re-visit this and support multiple queries
-					var q qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation]
+				// TODO(srikanthccv): re-visit this and support multiple queries
+				var q qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation]
 
-					for _, query := range rule.RuleCondition.CompositeQuery.Queries {
-						if query.Type == qbtypes.QueryTypeBuilder {
-							switch spec := query.Spec.(type) {
-							case qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation]:
-								q = spec
-							}
+				for _, query := range rule.RuleCondition.CompositeQuery.Queries {
+					if query.Type == qbtypes.QueryTypeBuilder {
+						switch spec := query.Spec.(type) {
+						case qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation]:
+							q = spec
 						}
 					}
-
-					filterExpr := ""
-					if q.Filter != nil && q.Filter.Expression != "" {
-						filterExpr = q.Filter.Expression
-					}
-
-					whereClause := contextlinks.PrepareFilterExpression(lbls, filterExpr, q.GroupBy)
-					res.Items[idx].RelatedTracesLink = contextlinks.PrepareLinksToTracesV5(start, end, whereClause)
 				}
+
+				filterExpr := ""
+				if q.Filter != nil && q.Filter.Expression != "" {
+					filterExpr = q.Filter.Expression
+				}
+
+				whereClause := contextlinks.PrepareFilterExpression(lbls, filterExpr, q.GroupBy)
+				res.Items[idx].RelatedTracesLink = contextlinks.PrepareParamsForTracesV5(start, end, whereClause).Encode()
 			}
 		}
 	}
@@ -1080,40 +1040,7 @@ func (aH *APIHandler) getRuleStateHistoryTopContributors(w http.ResponseWriter, 
 		return
 	}
 
-	rule, err := aH.ruleManager.GetRule(r.Context(), id)
-	if err == nil {
-		for idx := range res {
-			lbls := make(map[string]string)
-			err := json.Unmarshal([]byte(res[idx].Labels), &lbls)
-			if err != nil {
-				continue
-			}
-			filterItems, groupBy, keys := aH.metaForLinks(r.Context(), rule)
-			newFilters := contextlinks.PrepareFilters(lbls, filterItems, groupBy, keys)
-			end := time.Unix(params.End/1000, 0)
-			start := time.Unix(params.Start/1000, 0)
-			if rule.AlertType == ruletypes.AlertTypeLogs {
-				res[idx].RelatedLogsLink = contextlinks.PrepareLinksToLogs(start, end, newFilters)
-			} else if rule.AlertType == ruletypes.AlertTypeTraces {
-				res[idx].RelatedTracesLink = contextlinks.PrepareLinksToTraces(start, end, newFilters)
-			}
-		}
-	}
-
 	aH.Respond(w, res)
-}
-
-func (aH *APIHandler) listRules(w http.ResponseWriter, r *http.Request) {
-
-	rules, err := aH.ruleManager.ListRuleStates(r.Context())
-	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, nil)
-		return
-	}
-
-	// todo(amol): need to add sorter
-
-	aH.Respond(w, rules)
 }
 
 func prepareQuery(r *http.Request) (string, error) {
@@ -1203,7 +1130,7 @@ func (aH *APIHandler) Get(rw http.ResponseWriter, r *http.Request) {
 
 	id := mux.Vars(r)["id"]
 	if id == "" {
-		render.Error(rw, errorsV2.Newf(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, "id is missing in the path"))
+		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
 	}
 
@@ -1788,20 +1715,20 @@ func (aH *APIHandler) setCustomRetentionTTL(w http.ResponseWriter, r *http.Reque
 	ctx := r.Context()
 	claims, errv2 := authtypes.ClaimsFromContext(ctx)
 	if errv2 != nil {
-		render.Error(w, errorsV2.Newf(errorsV2.TypeInternal, errorsV2.CodeInternal, "failed to get org id from context"))
+		render.Error(w, errors.Newf(errors.TypeInternal, errors.CodeInternal, "failed to get org id from context"))
 		return
 	}
 
-	var params model.CustomRetentionTTLParams
+	var params retentiontypes.CustomRetentionTTLParams
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
-		render.Error(w, errorsV2.Newf(errorsV2.TypeInvalidInput, errorsV2.CodeInvalidInput, "Invalid data"))
+		render.Error(w, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "Invalid data"))
 		return
 	}
 
 	// Context is not used here as TTL is long duration DB operation
 	result, apiErr := aH.reader.SetTTLV2(context.Background(), claims.OrgID, &params)
 	if apiErr != nil {
-		render.Error(w, errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInternal, apiErr.Error()))
+		render.Error(w, errors.New(errors.TypeInvalidInput, errors.CodeInternal, apiErr.Error()))
 		return
 	}
 
@@ -1812,13 +1739,13 @@ func (aH *APIHandler) getCustomRetentionTTL(w http.ResponseWriter, r *http.Reque
 	ctx := r.Context()
 	claims, errv2 := authtypes.ClaimsFromContext(ctx)
 	if errv2 != nil {
-		render.Error(w, errorsV2.New(errorsV2.TypeInternal, errorsV2.CodeInternal, "failed to get org id from context"))
+		render.Error(w, errors.New(errors.TypeInternal, errors.CodeInternal, "failed to get org id from context"))
 		return
 	}
 
 	result, apiErr := aH.reader.GetCustomRetentionTTL(r.Context(), claims.OrgID)
 	if apiErr != nil {
-		render.Error(w, errorsV2.New(errorsV2.TypeInvalidInput, errorsV2.CodeInternal, apiErr.Error()))
+		render.Error(w, errors.New(errors.TypeInvalidInput, errors.CodeInternal, apiErr.Error()))
 		return
 	}
 
@@ -1884,6 +1811,33 @@ func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseSpanMetrics.String()),
 		Active:     useSpanMetrics,
+		Usage:      0,
+		UsageLimit: -1,
+		Route:      "",
+	})
+
+	bodyJSONQuery := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseJSONBody, evalCtx)
+	featureSet = append(featureSet, &licensetypes.Feature{
+		Name:       valuer.NewString(flagger.FeatureUseJSONBody.String()),
+		Active:     bodyJSONQuery,
+		Usage:      0,
+		UsageLimit: -1,
+		Route:      "",
+	})
+
+	fineGrainedAuthz := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseFineGrainedAuthz, evalCtx)
+	featureSet = append(featureSet, &licensetypes.Feature{
+		Name:       valuer.NewString(flagger.FeatureUseFineGrainedAuthz.String()),
+		Active:     fineGrainedAuthz,
+		Usage:      0,
+		UsageLimit: -1,
+		Route:      "",
+	})
+
+	useDashboardV2 := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseDashboardV2, evalCtx)
+	featureSet = append(featureSet, &licensetypes.Feature{
+		Name:       valuer.NewString(flagger.FeatureUseDashboardV2.String()),
+		Active:     useDashboardV2,
 		Usage:      0,
 		UsageLimit: -1,
 		Route:      "",
@@ -3382,7 +3336,7 @@ func (aH *APIHandler) InstallIntegration(w http.ResponseWriter, r *http.Request)
 	}
 
 	integration, apiErr := aH.IntegrationsController.Install(
-		r.Context(), claims.OrgID, &req,
+		r.Context(), claims.OrgID, &req, claims.Email, valuer.MustNewUUID(claims.IdentityID()),
 	)
 	if apiErr != nil {
 		RespondError(w, apiErr, nil)
@@ -4069,7 +4023,7 @@ func (aH *APIHandler) listLogsPipelines(ctx context.Context, orgID valuer.UUID) 
 	// get latest agent config
 	latestVersion := -1
 	lastestConfig, err := agentConf.GetLatestVersion(ctx, orgID, opamptypes.ElementTypeLogPipelines)
-	if err != nil && !errorsV2.Ast(err, errorsV2.TypeNotFound) {
+	if err != nil && !errors.Ast(err, errors.TypeNotFound) {
 		return nil, err
 	}
 

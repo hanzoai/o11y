@@ -38,23 +38,32 @@ import (
 )
 
 type Handlers struct {
-	SavedView             savedview.Handler
-	Apdex                 apdex.Handler
-	Dashboard             dashboard.Handler
-	QuickFilter           quickfilter.Handler
-	TraceFunnel           tracefunnel.Handler
-	RawDataExport         rawdataexport.Handler
-	SpanPercentile        spanpercentile.Handler
-	Services              services.Handler
-	MetricsExplorer       metricsexplorer.Handler
-	Global                global.Handler
-	FlaggerHandler        flagger.Handler
-	GatewayHandler        gateway.Handler
-	Fields                fields.Handler
-	AuthzHandler          authz.Handler
-	ZeusHandler           zeus.Handler
-	QuerierHandler        querier.Handler
-	ServiceAccountHandler serviceaccount.Handler
+	SavedView               savedview.Handler
+	Apdex                   apdex.Handler
+	Dashboard               dashboard.Handler
+	QuickFilter             quickfilter.Handler
+	TraceFunnel             tracefunnel.Handler
+	RawDataExport           rawdataexport.Handler
+	SpanPercentile          spanpercentile.Handler
+	Services                services.Handler
+	MetricsExplorer         metricsexplorer.Handler
+	InfraMonitoring         inframonitoring.Handler
+	Global                  global.Handler
+	FlaggerHandler          flagger.Handler
+	GatewayHandler          gateway.Handler
+	Fields                  fields.Handler
+	AuthzHandler            authz.Handler
+	ZeusHandler             zeus.Handler
+	QuerierHandler          querier.Handler
+	ServiceAccountHandler   serviceaccount.Handler
+	RegistryHandler         factory.Handler
+	CloudIntegrationHandler cloudintegration.Handler
+	RuleStateHistory        rulestatehistory.Handler
+	SpanMapperHandler       spanmapper.Handler
+	AlertmanagerHandler     alertmanager.Handler
+	TraceDetail             tracedetail.Handler
+	RulerHandler            ruler.Handler
+	LLMPricingRuleHandler   llmpricingrule.Handler
 }
 
 func NewHandlers(
@@ -69,6 +78,9 @@ func NewHandlers(
 	telemetryMetadataStore telemetrytypes.MetadataStore,
 	authz authz.AuthZ,
 	zeusService zeus.Zeus,
+	registryHandler factory.Handler,
+	alertmanagerService alertmanager.Alertmanager,
+	rulerService ruler.Ruler,
 ) Handlers {
 	return Handlers{
 		SavedView:             implsavedview.NewHandler(modules.SavedView),

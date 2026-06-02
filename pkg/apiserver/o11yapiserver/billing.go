@@ -39,7 +39,7 @@ func (provider *provider) addBillingRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusOK,
 		ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound},
 		Deprecated:          false,
-		SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
+		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 	})).Methods(http.MethodGet).GetError(); err != nil {
 		return err
 	}

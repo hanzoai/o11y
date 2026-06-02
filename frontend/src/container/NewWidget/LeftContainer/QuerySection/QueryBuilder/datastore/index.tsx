@@ -1,6 +1,8 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { Plus } from '@signozhq/icons';
+import { Callout } from '@signozhq/ui/callout';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { EQueryType } from 'types/common/dashboard';
+import DOCLINKS from 'utils/docLinks';
 
 import { QueryButton } from '../../styles';
 import DatastoreQueryBuilder from './query';
@@ -23,7 +25,7 @@ function DatastoreQueryContainer(): JSX.Element | null {
 			))}
 			<QueryButton
 				onClick={addQueryHandler}
-				icon={<PlusOutlined />}
+				icon={<Plus size="md" />}
 				style={{ margin: '0.4rem 1rem' }}
 			>
 				Query

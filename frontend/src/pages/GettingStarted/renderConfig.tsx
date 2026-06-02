@@ -1,16 +1,26 @@
-import {
-	AlertFilled,
-	AlignLeftOutlined,
-	ApiFilled,
-	BarChartOutlined,
-	DashboardFilled,
-	SoundFilled,
-} from '@ant-design/icons';
-import { Typography } from 'antd';
+import { Typography } from '@signozhq/ui/typography';
 import Slack from 'container/SideNav/Slack';
 import store from 'store';
 
+import elixirPngUrl from '@/assets/Logos/elixir.png';
+import goPngUrl from '@/assets/Logos/go.png';
+import javaPngUrl from '@/assets/Logos/java.png';
+import javascriptPngUrl from '@/assets/Logos/javascript.png';
+import msNetFrameworkPngUrl from '@/assets/Logos/ms-net-framework.png';
+import phpPngUrl from '@/assets/Logos/php.png';
+import pythonPngUrl from '@/assets/Logos/python.png';
+import railsPngUrl from '@/assets/Logos/rails.png';
+import rustPngUrl from '@/assets/Logos/rust.png';
+
 import { TGetStartedContentSection } from './types';
+import {
+	AlignLeft,
+	BellRing,
+	ChartBar,
+	LayoutDashboard,
+	Volume2,
+	Unplug,
+} from '@signozhq/icons';
 
 export const GetStartedContent = (): TGetStartedContentSection[] => {
 	const {
@@ -23,14 +33,14 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 				{
 					title: 'Instrument your Java Application',
 					icon: (
-						<img src={`/Logos/java.png?currentVersion=${currentVersion}`} alt="" />
+						<img src={`${javaPngUrl}?currentVersion=${currentVersion}`} alt="" />
 					),
 					url: 'https://o11y.hanzo.ai/docs/instrumentation/java/',
 				},
 				{
 					title: 'Instrument your Python Application',
 					icon: (
-						<img src={`/Logos/python.png?currentVersion=${currentVersion}`} alt="" />
+						<img src={`${pythonPngUrl}?currentVersion=${currentVersion}`} alt="" />
 					),
 					url: 'https://o11y.hanzo.ai/docs/instrumentation/python/',
 				},
@@ -38,7 +48,7 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 					title: 'Instrument your JS Application',
 					icon: (
 						<img
-							src={`/Logos/javascript.png?currentVersion=${currentVersion}`}
+							src={`${javascriptPngUrl}?currentVersion=${currentVersion}`}
 							alt=""
 						/>
 					),
@@ -55,7 +65,7 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 					title: 'Instrument your .NET Application',
 					icon: (
 						<img
-							src={`/Logos/ms-net-framework.png?currentVersion=${currentVersion}`}
+							src={`${msNetFrameworkPngUrl}?currentVersion=${currentVersion}`}
 							alt=""
 						/>
 					),
@@ -71,21 +81,21 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 				{
 					title: 'Instrument your Rails Application',
 					icon: (
-						<img src={`/Logos/rails.png?currentVersion=${currentVersion}`} alt="" />
+						<img src={`${railsPngUrl}?currentVersion=${currentVersion}`} alt="" />
 					),
 					url: 'https://o11y.hanzo.ai/docs/instrumentation/ruby-on-rails/',
 				},
 				{
 					title: 'Instrument your Rust Application',
 					icon: (
-						<img src={`/Logos/rust.png?currentVersion=${currentVersion}`} alt="" />
+						<img src={`${rustPngUrl}?currentVersion=${currentVersion}`} alt="" />
 					),
 					url: 'https://o11y.hanzo.ai/docs/instrumentation/rust/',
 				},
 				{
 					title: 'Instrument your Elixir Application',
 					icon: (
-						<img src={`/Logos/elixir.png?currentVersion=${currentVersion}`} alt="" />
+						<img src={`${elixirPngUrl}?currentVersion=${currentVersion}`} alt="" />
 					),
 					url: 'https://o11y.hanzo.ai/docs/instrumentation/elixir/',
 				},

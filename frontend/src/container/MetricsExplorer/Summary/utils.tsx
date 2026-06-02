@@ -76,14 +76,6 @@ export const getMetricsTableColumns = (
 	},
 ];
 
-export const getMetricsListQuery = (): MetricsListPayload => ({
-	filters: {
-		items: [],
-		op: 'and',
-	},
-	orderBy: { columnName: 'metric_name', order: 'asc' },
-});
-
 function ValidateRowValueWrapper({
 	value,
 	children,
@@ -110,7 +102,7 @@ export const formatNumberIntoHumanReadableFormat = (
 			? `${value}${suffix}${addPlusSign ? '+' : ''}`
 			: `${value.toFixed(1).replace(/\.0$/, '')}${suffix}${
 					addPlusSign ? '+' : ''
-			  }`;
+				}`;
 	}
 
 	if (num >= 1_000_000_000) {

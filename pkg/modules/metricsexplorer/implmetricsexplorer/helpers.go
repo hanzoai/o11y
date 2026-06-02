@@ -9,7 +9,7 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
-// used for mapping the sqlColumns via orderBy
+// used for mapping the sqlColumns via orderBy.
 const (
 	sqlColumnTimeSeries = "timeseries"
 	sqlColumnSamples    = "samples"

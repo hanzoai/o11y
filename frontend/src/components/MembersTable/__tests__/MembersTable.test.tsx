@@ -1,6 +1,5 @@
 import { MemberStatus } from 'container/MembersSettings/utils';
 import { render, screen, userEvent } from 'tests/test-utils';
-import { ROLES } from 'types/roles';
 
 import MembersTable, { MemberRow } from '../MembersTable';
 
@@ -24,13 +23,12 @@ const mockActiveMembers: MemberRow[] = [
 ];
 
 const mockInvitedMember: MemberRow = {
-	id: 'invite-abc',
+	id: 'inv-abc',
 	name: '',
 	email: 'charlie@o11y.hanzo.ai',
 	role: 'EDITOR' as ROLES,
 	status: MemberStatus.Invited,
 	joinedOn: null,
-	token: 'tok-123',
 };
 
 const defaultProps = {
@@ -48,7 +46,7 @@ describe('MembersTable', () => {
 		jest.clearAllMocks();
 	});
 
-	it('renders member rows with name, email, role badge, and ACTIVE status', () => {
+	it('renders member rows with name, email, and ACTIVE status', () => {
 		render(<MembersTable {...defaultProps} data={mockActiveMembers} />);
 
 		expect(screen.getByText('Alice Smith')).toBeInTheDocument();
@@ -90,6 +88,33 @@ describe('MembersTable', () => {
 		expect(onRowClick).toHaveBeenCalledTimes(1);
 		expect(onRowClick).toHaveBeenCalledWith(
 			expect.objectContaining({ id: 'user-1', email: 'alice@o11y.hanzo.ai' }),
+		);
+	});
+
+	it('renders DELETED badge and calls onRowClick when a deleted member row is clicked', async () => {
+		const onRowClick = jest.fn();
+		const user = userEvent.setup({ pointerEventsCheck: 0 });
+		const deletedMember: MemberRow = {
+			id: 'user-del',
+			name: 'Dave Deleted',
+			email: 'dave@signoz.io',
+			status: MemberStatus.Deleted,
+			joinedOn: null,
+		};
+
+		render(
+			<MembersTable
+				{...defaultProps}
+				data={[...mockActiveMembers, deletedMember]}
+				total={3}
+				onRowClick={onRowClick}
+			/>,
+		);
+
+		expect(screen.getByText('DELETED')).toBeInTheDocument();
+		await user.click(screen.getByText('Dave Deleted'));
+		expect(onRowClick).toHaveBeenCalledWith(
+			expect.objectContaining({ id: 'user-del' }),
 		);
 	});
 

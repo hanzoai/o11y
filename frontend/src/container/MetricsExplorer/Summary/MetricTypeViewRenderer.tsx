@@ -31,12 +31,12 @@ export function MetricTypeViewRenderer({
 				];
 			case MetrictypesTypeDTO.histogram:
 				return [
-					<BarChart2 key={type} size={12} color={Color.BG_SIENNA_500} />,
+					<BarChart key={type} size={12} color={Color.BG_SIENNA_500} />,
 					Color.BG_SIENNA_500,
 				];
 			case MetrictypesTypeDTO.summary:
 				return [
-					<BarChartHorizontal key={type} size={12} color={Color.BG_FOREST_500} />,
+					<ChartBar key={type} size={12} color={Color.BG_FOREST_500} />,
 					Color.BG_FOREST_500,
 				];
 			case MetrictypesTypeDTO.exponentialhistogram:
@@ -49,22 +49,20 @@ export function MetricTypeViewRenderer({
 		}
 	}, [type]);
 
-	const {
-		metricTypeViewRendererStyle,
-		metricTypeViewRendererTextStyle,
-	} = useMemo(() => {
-		return {
-			metricTypeViewRendererStyle: {
-				backgroundColor: `${color}33`,
-				border: `1px solid ${color}`,
-				color,
-			},
-			metricTypeViewRendererTextStyle: {
-				color,
-				fontSize: 12,
-			},
-		};
-	}, [color]);
+	const { metricTypeViewRendererStyle, metricTypeViewRendererTextStyle } =
+		useMemo(() => {
+			return {
+				metricTypeViewRendererStyle: {
+					backgroundColor: `${color}33`,
+					border: `1px solid ${color}`,
+					color,
+				},
+				metricTypeViewRendererTextStyle: {
+					color,
+					fontSize: 12,
+				},
+			};
+		}, [color]);
 
 	return (
 		<div className="metric-type-renderer" style={metricTypeViewRendererStyle}>

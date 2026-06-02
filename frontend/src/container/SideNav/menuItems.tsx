@@ -4,12 +4,12 @@ import { MenuProps } from 'antd';
 import ROUTES from 'constants/routes';
 import {
 	ArrowUpRight,
-	BarChart2,
+	BarChart,
 	BellDot,
-	Binoculars,
 	Book,
+	Bot,
 	Boxes,
-	BugIcon,
+	Bug,
 	Building2,
 	ChartArea,
 	Cloudy,
@@ -18,7 +18,6 @@ import {
 	Github,
 	HardDrive,
 	Home,
-	Key,
 	Keyboard,
 	Layers2,
 	LayoutGrid,
@@ -27,33 +26,39 @@ import {
 	MessageSquareText,
 	Plus,
 	Receipt,
+	Rocket,
 	Route,
 	ScrollText,
 	Settings,
 	Shield,
 	Slack,
+	Sparkles,
 	Unplug,
 	User,
 	UserPlus,
 	Users,
-} from 'lucide-react';
+	Binoculars,
+} from '@signozhq/icons';
 
 import {
 	SecondaryMenuItemKey,
 	SettingsNavSection,
 	SidebarItem,
 } from './sideNav.types';
+import { Style } from '@signozhq/design-tokens';
+import Noz from 'components/Noz/Noz';
+import { NOZ_TOOLTIP_TITLE } from 'components/Noz/Noz.constants';
 
 export const getStartedMenuItem = {
 	key: ROUTES.GET_STARTED,
 	label: 'Get Started',
-	icon: <RocketOutlined rotate={45} />,
+	icon: <Rocket size={16} style={{ transform: 'rotate(45deg)' }} />,
 };
 
 export const getStartedV3MenuItem = {
 	key: ROUTES.GET_STARTED_WITH_CLOUD,
 	label: 'Get Started',
-	icon: <RocketOutlined rotate={45} />,
+	icon: <Rocket size={16} style={{ transform: 'rotate(45deg)' }} />,
 };
 
 export const homeMenuItem = {
@@ -78,6 +83,24 @@ export const helpSupportMenuItem = {
 	key: ROUTES.SUPPORT,
 	label: 'Help & Support',
 	icon: <MessageSquareText size={16} />,
+};
+
+// The AI Assistant route is parameterized as `/ai-assistant/:conversationId`.
+// Sending the user to `/ai-assistant/new` triggers the page's fallback that
+// spawns a fresh conversation and replaces the URL with the real id, so
+// every sidenav click starts a new chat (the in-page history sidebar lets
+// the user resume earlier ones). Using a stable concrete path also lets
+// the active-highlight map below resolve `/ai-assistant/<any id>` back to
+// this menu key.
+const AI_ASSISTANT_NAV_KEY = '/ai-assistant/new';
+
+export const aiAssistantMenuItem = {
+	key: AI_ASSISTANT_NAV_KEY,
+	label: 'Noz',
+	icon: <Noz size={16} />,
+	itemKey: 'ai-assistant',
+	isEarlyAccess: true,
+	tooltip: NOZ_TOOLTIP_TITLE,
 };
 
 export const shortcutMenuItem = {
@@ -121,7 +144,7 @@ const menuItems: SidebarItem[] = [
 	{
 		key: ROUTES.METRICS_EXPLORER,
 		label: 'Metrics',
-		icon: <BarChart2 size={16} />,
+		icon: <BarChart size={16} />,
 		isNew: false,
 		itemKey: 'metrics',
 	},
@@ -165,7 +188,7 @@ const menuItems: SidebarItem[] = [
 	{
 		key: ROUTES.ALL_ERROR,
 		label: 'Exceptions',
-		icon: <BugIcon size={16} />,
+		icon: <Bug size={16} />,
 		itemKey: 'exceptions',
 	},
 	{
@@ -238,7 +261,7 @@ export const defaultMoreMenuItems: SidebarItem[] = [
 	{
 		key: ROUTES.METRICS_EXPLORER,
 		label: 'Metrics',
-		icon: <BarChart2 size={16} />,
+		icon: <BarChart size={16} />,
 		isNew: false,
 		isEnabled: true,
 		itemKey: 'metrics',
@@ -261,7 +284,7 @@ export const defaultMoreMenuItems: SidebarItem[] = [
 	{
 		key: ROUTES.ALL_ERROR,
 		label: 'Exceptions',
-		icon: <BugIcon size={16} />,
+		icon: <Bug size={16} />,
 		isEnabled: true,
 		itemKey: 'exceptions',
 	},
@@ -337,6 +360,13 @@ export const settingsNavSections: SettingsNavSection[] = [
 				isEnabled: false,
 				itemKey: 'integrations',
 			},
+			{
+				key: ROUTES.MCP_SERVER,
+				label: 'MCP Server',
+				icon: <Sparkles size={16} />,
+				isEnabled: false,
+				itemKey: 'mcp-server',
+			},
 		],
 	},
 
@@ -350,6 +380,7 @@ export const settingsNavSections: SettingsNavSection[] = [
 				icon: <Shield size={16} />,
 				isEnabled: false,
 				itemKey: 'roles',
+				isBeta: true,
 			},
 			{
 				key: ROUTES.MEMBERS_SETTINGS,
@@ -359,16 +390,16 @@ export const settingsNavSections: SettingsNavSection[] = [
 				itemKey: 'members',
 			},
 			{
-				key: ROUTES.API_KEYS,
-				label: 'API Keys',
-				icon: <Key size={16} />,
+				key: ROUTES.SERVICE_ACCOUNTS_SETTINGS,
+				label: 'Service Accounts',
+				icon: <Bot size={16} />,
 				isEnabled: false,
-				itemKey: 'api-keys',
+				itemKey: 'service-accounts',
 			},
 			{
 				key: ROUTES.INGESTION_SETTINGS,
 				label: 'Ingestion',
-				icon: <RocketOutlined rotate={45} />,
+				icon: <Rocket size={16} style={{ transform: 'rotate(45deg)' }} />,
 				isEnabled: false,
 				itemKey: 'ingestion',
 			},
@@ -504,7 +535,7 @@ export const getUserSettingsDropdownMenuItems = ({
 						icon: <Shield size={14} color={Style.L1_FOREGROUND} />,
 						dataTestId: 'manage-license-nav-item',
 					},
-			  ]
+				]
 			: []),
 		{
 			key: 'keyboard-shortcuts',
@@ -539,6 +570,10 @@ export const NEW_ROUTES_MENU_ITEM_KEY_MAP: Record<string, string> = {
 		ROUTES.INFRASTRUCTURE_MONITORING_HOSTS,
 	[ROUTES.API_MONITORING_BASE]: ROUTES.API_MONITORING,
 	[ROUTES.MESSAGING_QUEUES_BASE]: ROUTES.MESSAGING_QUEUES_OVERVIEW,
+	// `getActiveMenuKeyFromPath` strips the URL down to its first segment;
+	// `/ai-assistant/<id>` reduces to `/ai-assistant`, which we point back
+	// to the AI Assistant menu item's concrete key.
+	'/ai-assistant': AI_ASSISTANT_NAV_KEY,
 };
 
 export default menuItems;
