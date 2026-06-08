@@ -6,7 +6,10 @@ import (
 )
 
 func TestPromQLFilterExtractor_Extract(t *testing.T) {
-	extractor := NewPromQLFilterExtractor()
+	extractor, err := NewExtractor(ExtractorTypePromQL)
+	if err != nil {
+		t.Fatalf("NewExtractor(PromQL): %v", err)
+	}
 
 	tests := []struct {
 		name               string
