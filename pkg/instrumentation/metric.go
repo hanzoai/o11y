@@ -9,8 +9,7 @@ import (
 
 	"github.com/SigNoz/signoz/pkg/errors"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
+	metric "github.com/luxfi/metric"
 	contribsdkconfig "go.opentelemetry.io/contrib/config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -37,7 +36,7 @@ func (rws readerWithServer) Shutdown(ctx context.Context) error {
 
 // prometheusReaderWithCustomRegistry creates a Prometheus metric reader using a custom registry
 // This is based on the upstream contrib/config implementation but allows passing a custom registry.
-func prometheusReaderWithCustomRegistry(ctx context.Context, prometheusConfig *contribsdkconfig.Prometheus, customRegistry *prometheus.Registry) (sdkmetric.Reader, error) {
+func prometheusReaderWithCustomRegistry(ctx context.Context, prometheusConfig *contribsdkconfig.Prometheus, customRegistry *metric.Registry) (sdkmetric.Reader, error) {
 	var opts []otelprom.Option
 	if prometheusConfig.Host == nil {
 		return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "host must be specified")
@@ -75,7 +74,7 @@ func prometheusReaderWithCustomRegistry(ctx context.Context, prometheusConfig *c
 	opts = append(opts, otelprom.WithRegisterer(customRegistry))
 
 	mux := http.NewServeMux()
-	mux.Handle("/metrics", promhttp.HandlerFor(customRegistry, promhttp.HandlerOpts{Registry: customRegistry}))
+	mux.Handle("/metrics", metric.NewHTTPHandler(customRegistry, metric.HandlerOpts{Registry: customRegistry}))
 	server := http.Server{
 		// Timeouts are necessary to make a server resilient to attacks, but ListenAndServe doesn't set any.
 		// We use values from this example: https://blog.cloudflare.com/exposing-go-on-the-internet/#:~:text=There%20are%20three%20main%20timeouts
@@ -114,7 +113,7 @@ func noopShutdown(context.Context) error { return nil }
 
 // meterProviderWithCustomRegistry creates a meter provider using contrib config approach
 // but with custom Prometheus registry injection.
-func meterProviderWithCustomRegistry(ctx context.Context, meterProviderConfig *contribsdkconfig.MeterProvider, res *resource.Resource, customRegistry *prometheus.Registry) (metric.MeterProvider, shutdownFunc, error) {
+func meterProviderWithCustomRegistry(ctx context.Context, meterProviderConfig *contribsdkconfig.MeterProvider, res *resource.Resource, customRegistry *metric.Registry) (metric.MeterProvider, shutdownFunc, error) {
 	if meterProviderConfig == nil {
 		return noop.NewMeterProvider(), noopShutdown, nil
 	}
@@ -141,7 +140,7 @@ func meterProviderWithCustomRegistry(ctx context.Context, meterProviderConfig *c
 }
 
 // metricReaderWithCustomRegistry creates metric readers with custom Prometheus registry support.
-func metricReaderWithCustomRegistry(ctx context.Context, r contribsdkconfig.MetricReader, customRegistry *prometheus.Registry) (sdkmetric.Reader, error) {
+func metricReaderWithCustomRegistry(ctx context.Context, r contribsdkconfig.MetricReader, customRegistry *metric.Registry) (sdkmetric.Reader, error) {
 	if r.Periodic != nil && r.Pull != nil {
 		return nil, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "must not specify multiple metric reader type")
 	}
@@ -153,7 +152,7 @@ func metricReaderWithCustomRegistry(ctx context.Context, r contribsdkconfig.Metr
 }
 
 // pullReaderWithCustomRegistry creates pull readers with custom Prometheus registry support.
-func pullReaderWithCustomRegistry(ctx context.Context, exporter contribsdkconfig.MetricExporter, customRegistry *prometheus.Registry) (sdkmetric.Reader, error) {
+func pullReaderWithCustomRegistry(ctx context.Context, exporter contribsdkconfig.MetricExporter, customRegistry *metric.Registry) (sdkmetric.Reader, error) {
 	if exporter.Prometheus != nil {
 		return prometheusReaderWithCustomRegistry(ctx, exporter.Prometheus, customRegistry)
 	}
