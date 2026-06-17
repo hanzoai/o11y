@@ -17,7 +17,7 @@ env:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     if: ${{ contains(github.event.label.name, 'staging:') || github.event.ref == 'refs/heads/main' }}
     outputs:
       version: ${{ steps.build-info.outputs.version }}
