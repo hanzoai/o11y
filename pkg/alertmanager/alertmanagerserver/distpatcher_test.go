@@ -20,13 +20,13 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 
+	"github.com/hanzoai/common/model"
+	"github.com/hanzoai/common/promslog"
+	metric "github.com/luxfi/metric"
 	"github.com/prometheus/alertmanager/config"
 	"github.com/prometheus/alertmanager/dispatch"
 	"github.com/prometheus/alertmanager/notify"
 	"github.com/prometheus/alertmanager/provider/mem"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/hanzoai/common/model"
-	"github.com/hanzoai/common/promslog"
 
 	"github.com/stretchr/testify/require"
 )
@@ -364,8 +364,8 @@ route:
 	providerSettings := createTestProviderSettings()
 	logger := providerSettings.Logger
 	route := dispatch.NewRoute(conf.Route, nil)
-	marker := alertmanagertypes.NewMarker(prometheus.NewRegistry())
-	alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, prometheus.NewRegistry(), nil)
+	marker := alertmanagertypes.NewMarker(metric.NewRegistry())
+	alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, metric.NewRegistry(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -373,7 +373,7 @@ route:
 
 	timeout := func(d time.Duration) time.Duration { return time.Duration(0) }
 	recorder := &recordStage{alerts: make(map[string]map[model.Fingerprint]*alertmanagertypes.Alert)}
-	metrics := NewDispatcherMetrics(false, prometheus.NewRegistry())
+	metrics := NewDispatcherMetrics(false, metric.NewRegistry())
 	store := nfroutingstoretest.NewMockSQLRouteStore()
 	store.MatchExpectationsInOrder(false)
 	nfManager, err := rulebasednotification.New(context.Background(), providerSettings, nfmanager.Config{}, store)
@@ -637,8 +637,8 @@ route:
 	providerSettings := createTestProviderSettings()
 	logger := providerSettings.Logger
 	route := dispatch.NewRoute(conf.Route, nil)
-	marker := alertmanagertypes.NewMarker(prometheus.NewRegistry())
-	alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, prometheus.NewRegistry(), nil)
+	marker := alertmanagertypes.NewMarker(metric.NewRegistry())
+	alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, metric.NewRegistry(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -646,7 +646,7 @@ route:
 
 	timeout := func(d time.Duration) time.Duration { return time.Duration(0) }
 	recorder := &recordStage{alerts: make(map[string]map[model.Fingerprint]*alertmanagertypes.Alert)}
-	metrics := NewDispatcherMetrics(false, prometheus.NewRegistry())
+	metrics := NewDispatcherMetrics(false, metric.NewRegistry())
 	store := nfroutingstoretest.NewMockSQLRouteStore()
 	store.MatchExpectationsInOrder(false)
 	nfManager, err := rulebasednotification.New(context.Background(), providerSettings, nfmanager.Config{}, store)
@@ -896,8 +896,8 @@ route:
 	providerSettings := createTestProviderSettings()
 	logger := providerSettings.Logger
 	route := dispatch.NewRoute(conf.Route, nil)
-	marker := alertmanagertypes.NewMarker(prometheus.NewRegistry())
-	alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, prometheus.NewRegistry(), nil)
+	marker := alertmanagertypes.NewMarker(metric.NewRegistry())
+	alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, metric.NewRegistry(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -905,7 +905,7 @@ route:
 
 	timeout := func(d time.Duration) time.Duration { return time.Duration(0) }
 	recorder := &recordStage{alerts: make(map[string]map[model.Fingerprint]*alertmanagertypes.Alert)}
-	metrics := NewDispatcherMetrics(false, prometheus.NewRegistry())
+	metrics := NewDispatcherMetrics(false, metric.NewRegistry())
 	store := nfroutingstoretest.NewMockSQLRouteStore()
 	store.MatchExpectationsInOrder(false)
 	nfManager, err := rulebasednotification.New(context.Background(), providerSettings, nfmanager.Config{}, store)
@@ -1158,15 +1158,15 @@ func newAlert(labels model.LabelSet) *alertmanagertypes.Alert {
 
 func TestDispatcherRace(t *testing.T) {
 	logger := promslog.NewNopLogger()
-	marker := alertmanagertypes.NewMarker(prometheus.NewRegistry())
-	alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, prometheus.NewRegistry(), nil)
+	marker := alertmanagertypes.NewMarker(metric.NewRegistry())
+	alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, metric.NewRegistry(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer alerts.Close()
 
 	timeout := func(d time.Duration) time.Duration { return time.Duration(0) }
-	metrics := NewDispatcherMetrics(false, prometheus.NewRegistry())
+	metrics := NewDispatcherMetrics(false, metric.NewRegistry())
 	nfManager := nfmanagertest.NewMock()
 	// Set up default expectation that won't be called in this race test
 	dispatcher := NewDispatcher(alerts, nil, nil, marker, timeout, nil, logger, metrics, nfManager, "test-org")
@@ -1194,15 +1194,15 @@ route:
 	route := dispatch.NewRoute(conf.Route, nil)
 	providerSettings := createTestProviderSettings()
 	logger := providerSettings.Logger
-	marker := alertmanagertypes.NewMarker(prometheus.NewRegistry())
-	alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, prometheus.NewRegistry(), nil)
+	marker := alertmanagertypes.NewMarker(metric.NewRegistry())
+	alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, metric.NewRegistry(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer alerts.Close()
 	timeout := func(d time.Duration) time.Duration { return d }
 	recorder := &recordStage{alerts: make(map[string]map[model.Fingerprint]*alertmanagertypes.Alert)}
-	metrics := NewDispatcherMetrics(false, prometheus.NewRegistry())
+	metrics := NewDispatcherMetrics(false, metric.NewRegistry())
 	store := nfroutingstoretest.NewMockSQLRouteStore()
 	store.MatchExpectationsInOrder(false)
 	nfManager, err := rulebasednotification.New(context.Background(), providerSettings, nfmanager.Config{}, store)
@@ -1263,10 +1263,10 @@ route:
 }
 
 func TestDispatcher_DoMaintenance(t *testing.T) {
-	r := prometheus.NewRegistry()
+	r := metric.NewRegistry()
 	marker := alertmanagertypes.NewMarker(r)
 
-	alerts, err := mem.NewAlerts(context.Background(), marker, time.Minute, 0, nil, promslog.NewNopLogger(), prometheus.NewRegistry(), nil)
+	alerts, err := mem.NewAlerts(context.Background(), marker, time.Minute, 0, nil, promslog.NewNopLogger(), metric.NewRegistry(), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1370,8 +1370,8 @@ route:
 			providerSettings := createTestProviderSettings()
 			logger := providerSettings.Logger
 			route := dispatch.NewRoute(conf.Route, nil)
-			marker := alertmanagertypes.NewMarker(prometheus.NewRegistry())
-			alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, prometheus.NewRegistry(), nil)
+			marker := alertmanagertypes.NewMarker(metric.NewRegistry())
+			alerts, err := mem.NewAlerts(context.Background(), marker, time.Hour, 0, nil, logger, metric.NewRegistry(), nil)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -1379,7 +1379,7 @@ route:
 
 			timeout := func(d time.Duration) time.Duration { return time.Duration(0) }
 			recorder := &recordStage{alerts: make(map[string]map[model.Fingerprint]*alertmanagertypes.Alert)}
-			metrics := NewDispatcherMetrics(false, prometheus.NewRegistry())
+			metrics := NewDispatcherMetrics(false, metric.NewRegistry())
 			store := nfroutingstoretest.NewMockSQLRouteStore()
 			store.MatchExpectationsInOrder(false)
 			nfManager, err := rulebasednotification.New(context.Background(), providerSettings, nfmanager.Config{}, store)
