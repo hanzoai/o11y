@@ -1,6 +1,6 @@
 module github.com/hanzoai/o11y
 
-go 1.26.3
+go 1.26.4
 
 require (
 	dario.cat/mergo v1.0.2
@@ -48,7 +48,6 @@ require (
 	github.com/perses/perses v0.53.1
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/alertmanager v0.31.1
-	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/common v0.67.5
 	github.com/prometheus/prometheus v0.311.3
 	github.com/redis/go-redis/extra/redisotel/v9 v9.15.1
@@ -267,6 +266,7 @@ require (
 	github.com/leodido/go-syslog/v4 v4.3.0 // indirect
 	github.com/leodido/ragel-machinery v0.0.0-20190525184631-5f46317e436b // indirect
 	github.com/lufia/plan9stats v0.0.0-20251013123823-9fd1530e3ec3 // indirect
+	github.com/luxfi/metric v1.5.8
 	github.com/magefile/mage v1.15.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mdlayher/socket v0.5.1 // indirect

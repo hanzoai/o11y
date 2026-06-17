@@ -17,6 +17,7 @@ package alertmanagerserver
 import (
 	"time"
 
+	metric "github.com/luxfi/metric"
 	"github.com/prometheus/alertmanager/featurecontrol"
 	"github.com/prometheus/alertmanager/inhibit"
 	"github.com/prometheus/alertmanager/nflog/nflogpb"
@@ -24,7 +25,6 @@ import (
 	"github.com/prometheus/alertmanager/silence"
 	"github.com/prometheus/alertmanager/timeinterval"
 	"github.com/prometheus/alertmanager/types"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // pipelineBuilder is a local copy of notify.PipelineBuilder that injects
@@ -42,7 +42,7 @@ type pipelineBuilder struct {
 }
 
 func newPipelineBuilder(
-	r prometheus.Registerer,
+	r metric.Registerer,
 	ff featurecontrol.Flagger,
 ) *pipelineBuilder {
 	return &pipelineBuilder{
