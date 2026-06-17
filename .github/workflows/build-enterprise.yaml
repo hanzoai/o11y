@@ -15,7 +15,7 @@ env:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     outputs:
       docker_providers: ${{ steps.set-docker-providers.outputs.providers }}
       version: ${{ steps.build-info.outputs.version }}
