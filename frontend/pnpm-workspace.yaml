@@ -1,3 +1,4 @@
+packages: []
 trustPolicy: no-downgrade
 minimumReleaseAge: 2880 # 2d
 minimumReleaseAgeStrict: true
