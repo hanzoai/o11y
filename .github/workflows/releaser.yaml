@@ -8,7 +8,7 @@ on:
 jobs:
   detect:
     if: ${{ !startsWith(github.event.release.tag_name, 'histogram-quantile/') }}
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     outputs:
       release_type: ${{ steps.find.outputs.release_type }}
     steps:
