@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/hero.svg" alt="o11y" width="880"></p>
+
 # o11y
 
 Metrics, traces, logs — the unified observability spine for the Hanzo platform. OpenTelemetry-native, OLAP-backed via Hanzo Datastore.
