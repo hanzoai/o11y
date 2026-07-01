@@ -10,7 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
+	"go.uber.org/zap"
+
+	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 
 	"github.com/go-openapi/strfmt"
@@ -19,8 +21,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
-	querierV5 "github.com/hanzoai/o11y/pkg/querier"
-	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"

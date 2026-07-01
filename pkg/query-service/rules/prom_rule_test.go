@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	pql "github.com/prometheus/prometheus/promql"
 	cmock "github.com/hanzoai/clickhouse-go-mock"
+	pql "github.com/prometheus/prometheus/promql"
 
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/prometheus"

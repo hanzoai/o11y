@@ -6,10 +6,15 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/hanzoai/o11y/pkg/http/handler"
-	"github.com/hanzoai/o11y/pkg/types"
-	"github.com/hanzoai/o11y/pkg/types/serviceaccounttypes"
 	"github.com/gorilla/mux"
+
+	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/types/serviceaccounttypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {

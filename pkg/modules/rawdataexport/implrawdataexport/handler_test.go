@@ -4,10 +4,11 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/hanzoai/o11y/pkg/telemetrylogs"
-	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/hanzoai/o11y/pkg/http/binding"
+	"github.com/hanzoai/o11y/pkg/types/exporttypes"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
 func TestExportRawDataFormatQueryParam_BindingDefaults(t *testing.T) {

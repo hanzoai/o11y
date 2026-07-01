@@ -3,10 +3,11 @@ package o11yapiserver
 import (
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/hanzoai/o11y/pkg/http/handler"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
-	"github.com/gorilla/mux"
 )
 
 func (provider *provider) addFlaggerRoutes(router *mux.Router) error {

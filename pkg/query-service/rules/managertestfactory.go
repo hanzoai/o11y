@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/require"
+
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	alertmanagermock "github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertest"
 	"github.com/hanzoai/o11y/pkg/cache"
@@ -16,12 +18,10 @@ import (
 	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/querier/o11yquerier"
-	"github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstoretest"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
-	"github.com/stretchr/testify/require"
 )
 
 type queryMatcherAny struct {

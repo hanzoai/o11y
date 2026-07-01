@@ -400,6 +400,11 @@ func (r *PostableRule) validate() error {
 	return o11yError.Join(errs...)
 }
 
+// Validate is the exported entry point for rule validation.
+func (r *PostableRule) Validate() error {
+	return r.validate()
+}
+
 func testTemplateParsing(rl *PostableRule) (errs []error) {
 	if rl.AlertName == "" {
 		// Not an alerting rule.

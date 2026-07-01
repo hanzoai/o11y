@@ -3,9 +3,10 @@ package o11yapiserver
 import (
 	"net/http"
 
+	"github.com/gorilla/mux"
+
 	"github.com/hanzoai/o11y/pkg/http/handler"
 	"github.com/hanzoai/o11y/pkg/types"
-	"github.com/gorilla/mux"
 )
 
 func (provider *provider) addOrgRoutes(router *mux.Router) error {

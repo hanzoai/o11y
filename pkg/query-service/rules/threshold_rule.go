@@ -1,39 +1,33 @@
 package rules
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"math"
 	"net/url"
 	"reflect"
+	"text/template"
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/contextlinks"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/common"
-	"github.com/hanzoai/o11y/pkg/query-service/model"
-	"github.com/hanzoai/o11y/pkg/query-service/postprocess"
-	"github.com/hanzoai/o11y/pkg/transition"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
+	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 
-	"github.com/hanzoai/o11y/pkg/query-service/app/querier"
-	querierV2 "github.com/hanzoai/o11y/pkg/query-service/app/querier/v2"
-	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
-	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
+	"github.com/hanzoai/o11y/pkg/querier"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
 	querytemplate "github.com/hanzoai/o11y/pkg/query-service/utils/queryTemplate"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/timestamp"
 
-	logsv3 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v3"
-	tracesV4 "github.com/hanzoai/o11y/pkg/query-service/app/traces/v4"
 	"github.com/hanzoai/o11y/pkg/units"
-
-	querierV5 "github.com/hanzoai/o11y/pkg/querier"
 
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
@@ -88,12 +82,12 @@ func (r *ThresholdRule) prepareQueryRange(ctx context.Context, ts time.Time) (*q
 			End:   end,
 			Step:  int64(math.Max(float64(common.MinAllowedStepInterval(start, end)), 60)),
 			CompositeQuery: &v3.CompositeQuery{
-				QueryType:         r.ruleCondition.CompositeQuery.QueryType,
-				PanelType:         r.ruleCondition.CompositeQuery.PanelType,
-				BuilderQueries:    make(map[string]*v3.BuilderQuery),
+				QueryType:        r.ruleCondition.CompositeQuery.QueryType,
+				PanelType:        r.ruleCondition.CompositeQuery.PanelType,
+				BuilderQueries:   make(map[string]*v3.BuilderQuery),
 				DatastoreQueries: make(map[string]*v3.DatastoreQuery),
-				PromQueries:       make(map[string]*v3.PromQuery),
-				Unit:              r.ruleCondition.CompositeQuery.Unit,
+				PromQueries:      make(map[string]*v3.PromQuery),
+				Unit:             r.ruleCondition.CompositeQuery.Unit,
 			},
 			Variables: make(map[string]interface{}),
 			NoCache:   true,
