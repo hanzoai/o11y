@@ -11,7 +11,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
-	"github.com/hanzoai/o11y/pkg/types/integrationtypes"
 	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/valuer"

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/hanzoai/o11y/pkg/query-service/model"
-	"github.com/hanzoai/o11y/pkg/types/integrationtypes"
 )
 
 type InstalledIntegrationsRepo interface {

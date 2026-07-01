@@ -41,7 +41,6 @@ func New[T any](
 	conditionBuilder qbtypes.ConditionBuilder,
 	metadataStore telemetrytypes.MetadataStore,
 ) *resourceFilterStatementBuilder[qbtypes.TraceAggregation] {
-	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter")
 	return &resourceFilterStatementBuilder[qbtypes.TraceAggregation]{
 		logger:           set.Logger(),
 		fieldMapper:      fieldMapper,
@@ -59,7 +58,6 @@ func NewLogResourceFilterStatementBuilder(
 	fullTextColumn *telemetrytypes.TelemetryFieldKey,
 	jsonKeyToKey qbtypes.JsonKeyToFieldFunc,
 ) *resourceFilterStatementBuilder[qbtypes.LogAggregation] {
-	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter")
 	return &resourceFilterStatementBuilder[qbtypes.LogAggregation]{
 		logger:           set.Logger(),
 		dbName:           dbName,

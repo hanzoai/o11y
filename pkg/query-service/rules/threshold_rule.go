@@ -27,7 +27,6 @@ import (
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
 	querytemplate "github.com/hanzoai/o11y/pkg/query-service/utils/queryTemplate"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/times"
 	"github.com/hanzoai/o11y/pkg/query-service/utils/timestamp"
 
 	logsv3 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v3"
