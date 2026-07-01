@@ -25,6 +25,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/preference"
 	"github.com/hanzoai/o11y/pkg/modules/promote"
+	"github.com/hanzoai/o11y/pkg/modules/rawdataexport"
 	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/session"
@@ -39,9 +40,11 @@ import (
 
 type provider struct {
 	config                 apiserver.Config
-	settings               factory.ScopedProviderSettings
-	router                 *mux.Router
-	authZ                  *middleware.AuthZ
+	settings                factory.ScopedProviderSettings
+	router                  *mux.Router
+	authzMiddleware         *middleware.AuthZ
+	authzService            authz.AuthZ
+	rawDataExportHandler    rawdataexport.Handler
 	orgHandler             organization.Handler
 	userHandler            user.Handler
 	sessionHandler         session.Handler
@@ -57,8 +60,17 @@ type provider struct {
 	fieldsHandler          fields.Handler
 	authzHandler           authz.Handler
 	billingHandler         billing.Handler
-	querierHandler         querier.Handler
-	serviceAccountHandler  serviceaccount.Handler
+	querierHandler          querier.Handler
+	serviceAccountHandler   serviceaccount.Handler
+	alertmanagerHandler     alertmanager.Handler
+	infraMonitoringHandler  inframonitoring.Handler
+	factoryHandler          factory.Handler
+	cloudIntegrationHandler cloudintegration.Handler
+	ruleStateHistoryHandler rulestatehistory.Handler
+	spanMapperHandler       spanmapper.Handler
+	llmPricingRuleHandler   llmpricingrule.Handler
+	traceDetailHandler      tracedetail.Handler
+	rulerHandler            ruler.Handler
 }
 
 func NewFactory(
@@ -82,6 +94,7 @@ func NewFactory(
 	billingHandler billing.Handler,
 	querierHandler querier.Handler,
 	serviceAccountHandler serviceaccount.Handler,
+	rawDataExportHandler rawdataexport.Handler,
 	factoryHandler factory.Handler,
 	cloudIntegrationHandler cloudintegration.Handler,
 	ruleStateHistoryHandler rulestatehistory.Handler,
@@ -116,6 +129,7 @@ func NewFactory(
 			billingHandler,
 			querierHandler,
 			serviceAccountHandler,
+			rawDataExportHandler,
 			factoryHandler,
 			cloudIntegrationHandler,
 			ruleStateHistoryHandler,
@@ -152,6 +166,7 @@ func newProvider(
 	billingHandler billing.Handler,
 	querierHandler querier.Handler,
 	serviceAccountHandler serviceaccount.Handler,
+	rawDataExportHandler rawdataexport.Handler,
 	factoryHandler factory.Handler,
 	cloudIntegrationHandler cloudintegration.Handler,
 	ruleStateHistoryHandler rulestatehistory.Handler,
@@ -183,8 +198,19 @@ func newProvider(
 		fieldsHandler:          fieldsHandler,
 		authzHandler:           authzHandler,
 		billingHandler:         billingHandler,
-		querierHandler:         querierHandler,
-		serviceAccountHandler:  serviceAccountHandler,
+		querierHandler:          querierHandler,
+		serviceAccountHandler:   serviceAccountHandler,
+		alertmanagerHandler:     alertmanagerHandler,
+		infraMonitoringHandler:  infraMonitoringHandler,
+		factoryHandler:          factoryHandler,
+		cloudIntegrationHandler: cloudIntegrationHandler,
+		ruleStateHistoryHandler: ruleStateHistoryHandler,
+		spanMapperHandler:       spanMapperHandler,
+		llmPricingRuleHandler:   llmPricingRuleHandler,
+		traceDetailHandler:      traceDetailHandler,
+		rulerHandler:            rulerHandler,
+		authzService:            authzService,
+		rawDataExportHandler:    rawDataExportHandler,
 	}
 
 	provider.authzMiddleware = middleware.NewAuthZ(settings.Logger(), orgGetter, authzService)

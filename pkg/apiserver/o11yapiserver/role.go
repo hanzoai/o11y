@@ -14,7 +14,7 @@ import (
 
 func (provider *provider) addRoleRoutes(router *mux.Router) error {
 	if err := router.Handle("/api/v1/roles", handler.New(provider.authzMiddleware.Check(provider.authzHandler.Create, authtypes.Relation{Verb: coretypes.VerbCreate}, coretypes.ResourceRole, roleCollectionSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "CreateRole",
 		Tags:                []string{"role"},
@@ -33,7 +33,7 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/roles", handler.New(provider.authzMiddleware.Check(provider.authzHandler.List, authtypes.Relation{Verb: coretypes.VerbList}, coretypes.ResourceRole, roleCollectionSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "ListRoles",
 		Tags:                []string{"role"},
@@ -52,7 +52,7 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/roles/{id}", handler.New(provider.authzMiddleware.Check(provider.authzHandler.Get, authtypes.Relation{Verb: coretypes.VerbRead}, coretypes.ResourceRole, provider.roleInstanceSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "GetRole",
 		Tags:                []string{"role"},
@@ -71,7 +71,7 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/roles/{id}/relations/{relation}/objects", handler.New(provider.authzMiddleware.Check(provider.authzHandler.GetObjects, authtypes.Relation{Verb: coretypes.VerbRead}, coretypes.ResourceRole, provider.roleInstanceSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "GetObjects",
 		Tags:                []string{"role"},
@@ -90,7 +90,7 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/roles/{id}", handler.New(provider.authzMiddleware.Check(provider.authzHandler.Patch, authtypes.Relation{Verb: coretypes.VerbUpdate}, coretypes.ResourceRole, provider.roleInstanceSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "PatchRole",
 		Tags:                []string{"role"},
@@ -109,7 +109,7 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/roles/{id}/relations/{relation}/objects", handler.New(provider.authzMiddleware.Check(provider.authzHandler.PatchObjects, authtypes.Relation{Verb: coretypes.VerbUpdate}, coretypes.ResourceRole, provider.roleInstanceSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "PatchObjects",
 		Tags:                []string{"role"},
@@ -128,7 +128,7 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/roles/{id}", handler.New(provider.authzMiddleware.Check(provider.authzHandler.Delete, authtypes.Relation{Verb: coretypes.VerbDelete}, coretypes.ResourceRole, provider.roleInstanceSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "DeleteRole",
 		Tags:                []string{"role"},

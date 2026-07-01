@@ -10,8 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"go.uber.org/zap"
-
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 
@@ -22,7 +20,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
-	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types"
@@ -1011,83 +1008,5 @@ func (m *Manager) TestNotification(ctx context.Context, orgID valuer.UUID, ruleS
 		OrgID:       orgID,
 	})
 
-	return alertCount, apiErr
-}
-
-func (m *Manager) GetAlertDetailsForMetricNames(ctx context.Context, metricNames []string) (map[string][]ruletypes.GettableRule, *model.ApiError) {
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		return nil, &model.ApiError{Typ: model.ErrorExec, Err: err}
-	}
-
-	result := make(map[string][]ruletypes.GettableRule)
-	rules, err := m.ruleStore.GetStoredRules(ctx, claims.OrgID)
-	if err != nil {
-		zap.L().Error("Error getting stored rules", zap.Error(err))
-		return nil, &model.ApiError{Typ: model.ErrorExec, Err: err}
-	}
-
-	metricRulesMap := make(map[string][]ruletypes.GettableRule)
-
-	for _, storedRule := range rules {
-		var rule ruletypes.GettableRule
-		err = json.Unmarshal([]byte(storedRule.Data), &rule)
-		if err != nil {
-			zap.L().Error("failed to unmarshal rule from db", zap.String("id", storedRule.ID.StringValue()), zap.Error(err))
-			continue
-		}
-
-		if rule.AlertType != ruletypes.AlertTypeMetric || rule.RuleCondition == nil || rule.RuleCondition.CompositeQuery == nil {
-			continue
-		}
-		rule.Id = storedRule.ID.StringValue()
-		rule.CreatedAt = &storedRule.CreatedAt
-		rule.CreatedBy = &storedRule.CreatedBy
-		rule.UpdatedAt = &storedRule.UpdatedAt
-		rule.UpdatedBy = &storedRule.UpdatedBy
-
-		for _, query := range rule.RuleCondition.CompositeQuery.BuilderQueries {
-			if query.AggregateAttribute.Key != "" {
-				metricRulesMap[query.AggregateAttribute.Key] = append(metricRulesMap[query.AggregateAttribute.Key], rule)
-			}
-		}
-
-		for _, query := range rule.RuleCondition.CompositeQuery.PromQueries {
-			if query.Query != "" {
-				for _, metricName := range metricNames {
-					if strings.Contains(query.Query, metricName) {
-						metricRulesMap[metricName] = append(metricRulesMap[metricName], rule)
-					}
-				}
-			}
-		}
-
-		for _, query := range rule.RuleCondition.CompositeQuery.DatastoreQueries {
-			if query.Query != "" {
-				for _, metricName := range metricNames {
-					if strings.Contains(query.Query, metricName) {
-						metricRulesMap[metricName] = append(metricRulesMap[metricName], rule)
-					}
-				}
-			}
-		}
-	}
-
-	for _, metricName := range metricNames {
-		if rules, exists := metricRulesMap[metricName]; exists {
-			seen := make(map[string]bool)
-			uniqueRules := make([]ruletypes.GettableRule, 0)
-
-			for _, rule := range rules {
-				if !seen[rule.Id] {
-					seen[rule.Id] = true
-					uniqueRules = append(uniqueRules, rule)
-				}
-			}
-
-			result[metricName] = uniqueRules
-		}
-	}
-
-	return result, nil
+	return alertCount, err
 }

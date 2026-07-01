@@ -3,7 +3,6 @@ package rules
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/require"
@@ -14,8 +13,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/cache/cachetest"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
-	"github.com/hanzoai/o11y/pkg/prometheus"
-	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/querier/o11yquerier"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
@@ -98,7 +95,6 @@ func NewTestManager(t *testing.T, testOpts *TestManagerOptions) *Manager {
 	require.NoError(t, err)
 
 	providerSettings := instrumentationtest.New().ToProviderSettings()
-	prometheus := prometheustest.New(context.Background(), providerSettings, prometheus.Config{Timeout: 2 * time.Minute}, telemetryStore)
 
 	flagger, err := flagger.New(context.Background(), instrumentationtest.New().ToProviderSettings(), flagger.Config{}, flagger.MustNewRegistry())
 	if err != nil {
@@ -106,7 +102,7 @@ func NewTestManager(t *testing.T, testOpts *TestManagerOptions) *Manager {
 	}
 
 	// Create mock querierV5 with test values
-	providerFactory := o11yquerier.NewFactory(telemetryStore, prometheus, readerCache, flagger)
+	providerFactory := o11yquerier.NewFactory(telemetryStore, cache, flagger)
 	mockQuerier, err := providerFactory.New(context.Background(), providerSettings, querier.Config{})
 	require.NoError(t, err)
 

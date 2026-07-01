@@ -19,7 +19,7 @@ import (
 
 func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 	if err := router.Handle("/api/v1/service_accounts", handler.New(provider.authzMiddleware.Check(provider.serviceAccountHandler.Create, authtypes.Relation{Verb: coretypes.VerbCreate}, coretypes.ResourceServiceAccount, serviceAccountCollectionSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "CreateServiceAccount",
 		Tags:                []string{"serviceaccount"},
@@ -38,7 +38,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/service_accounts", handler.New(provider.authzMiddleware.Check(provider.serviceAccountHandler.List, authtypes.Relation{Verb: coretypes.VerbList}, coretypes.ResourceServiceAccount, serviceAccountCollectionSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "ListServiceAccounts",
 		Tags:                []string{"serviceaccount"},
@@ -74,7 +74,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/service_accounts/{id}", handler.New(provider.authzMiddleware.Check(provider.serviceAccountHandler.Get, authtypes.Relation{Verb: coretypes.VerbRead}, coretypes.ResourceServiceAccount, serviceAccountInstanceSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "GetServiceAccount",
 		Tags:                []string{"serviceaccount"},
@@ -93,7 +93,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/service_accounts/{id}/roles", handler.New(provider.authzMiddleware.Check(provider.serviceAccountHandler.GetRoles, authtypes.Relation{Verb: coretypes.VerbRead}, coretypes.ResourceServiceAccount, serviceAccountInstanceSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "GetServiceAccountRoles",
 		Tags:                []string{"serviceaccount"},
@@ -113,10 +113,10 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 
 	if err := router.Handle("/api/v1/service_accounts/{id}/roles", handler.New(provider.authzMiddleware.CheckAll(provider.serviceAccountHandler.SetRole, []middleware.AuthZCheckGroup{
 		{{Relation: authtypes.Relation{Verb: coretypes.VerbAttach}, Resource: coretypes.ResourceServiceAccount, SelectorCallback: serviceAccountInstanceSelectorCallback, Roles: []string{
-			authtypes.SigNozAdminRoleName,
+			authtypes.HanzoO11yAdminRoleName,
 		}}},
 		{{Relation: authtypes.Relation{Verb: coretypes.VerbAttach}, Resource: coretypes.ResourceRole, SelectorCallback: provider.roleAttachSelectorFromBody, Roles: []string{
-			authtypes.SigNozAdminRoleName,
+			authtypes.HanzoO11yAdminRoleName,
 		}}},
 	}), handler.OpenAPIDef{
 		ID:                  "CreateServiceAccountRole",
@@ -137,10 +137,10 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 
 	if err := router.Handle("/api/v1/service_accounts/{id}/roles/{rid}", handler.New(provider.authzMiddleware.CheckAll(provider.serviceAccountHandler.DeleteRole, []middleware.AuthZCheckGroup{
 		{{Relation: authtypes.Relation{Verb: coretypes.VerbDetach}, Resource: coretypes.ResourceServiceAccount, SelectorCallback: serviceAccountInstanceSelectorCallback, Roles: []string{
-			authtypes.SigNozAdminRoleName,
+			authtypes.HanzoO11yAdminRoleName,
 		}}},
 		{{Relation: authtypes.Relation{Verb: coretypes.VerbDetach}, Resource: coretypes.ResourceRole, SelectorCallback: provider.roleDetachSelectorFromPath, Roles: []string{
-			authtypes.SigNozAdminRoleName,
+			authtypes.HanzoO11yAdminRoleName,
 		}}},
 	}), handler.OpenAPIDef{
 		ID:                  "DeleteServiceAccountRole",
@@ -177,7 +177,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/service_accounts/{id}", handler.New(provider.authzMiddleware.Check(provider.serviceAccountHandler.Update, authtypes.Relation{Verb: coretypes.VerbUpdate}, coretypes.ResourceServiceAccount, serviceAccountInstanceSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "UpdateServiceAccount",
 		Tags:                []string{"serviceaccount"},
@@ -196,7 +196,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/service_accounts/{id}", handler.New(provider.authzMiddleware.Check(provider.serviceAccountHandler.Delete, authtypes.Relation{Verb: coretypes.VerbDelete}, coretypes.ResourceServiceAccount, serviceAccountInstanceSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "DeleteServiceAccount",
 		Tags:                []string{"serviceaccount"},
@@ -216,10 +216,10 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 
 	if err := router.Handle("/api/v1/service_accounts/{id}/keys", handler.New(provider.authzMiddleware.CheckAll(provider.serviceAccountHandler.CreateFactorAPIKey, []middleware.AuthZCheckGroup{
 		{{Relation: authtypes.Relation{Verb: coretypes.VerbCreate}, Resource: coretypes.ResourceMetaResourceFactorAPIKey, SelectorCallback: factorAPIKeyCollectionSelectorCallback, Roles: []string{
-			authtypes.SigNozAdminRoleName,
+			authtypes.HanzoO11yAdminRoleName,
 		}}},
 		{{Relation: authtypes.Relation{Verb: coretypes.VerbAttach}, Resource: coretypes.ResourceServiceAccount, SelectorCallback: serviceAccountInstanceSelectorCallback, Roles: []string{
-			authtypes.SigNozAdminRoleName,
+			authtypes.HanzoO11yAdminRoleName,
 		}}},
 	}), handler.OpenAPIDef{
 		ID:                  "CreateServiceAccountKey",
@@ -239,7 +239,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/service_accounts/{id}/keys", handler.New(provider.authzMiddleware.Check(provider.serviceAccountHandler.ListFactorAPIKey, authtypes.Relation{Verb: coretypes.VerbList}, coretypes.ResourceMetaResourceFactorAPIKey, factorAPIKeyCollectionSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "ListServiceAccountKeys",
 		Tags:                []string{"serviceaccount"},
@@ -258,7 +258,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 	}
 
 	if err := router.Handle("/api/v1/service_accounts/{id}/keys/{fid}", handler.New(provider.authzMiddleware.Check(provider.serviceAccountHandler.UpdateFactorAPIKey, authtypes.Relation{Verb: coretypes.VerbUpdate}, coretypes.ResourceMetaResourceFactorAPIKey, factorAPIKeyInstanceSelectorCallback, []string{
-		authtypes.SigNozAdminRoleName,
+		authtypes.HanzoO11yAdminRoleName,
 	}), handler.OpenAPIDef{
 		ID:                  "UpdateServiceAccountKey",
 		Tags:                []string{"serviceaccount"},
@@ -278,10 +278,10 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 
 	if err := router.Handle("/api/v1/service_accounts/{id}/keys/{fid}", handler.New(provider.authzMiddleware.CheckAll(provider.serviceAccountHandler.RevokeFactorAPIKey, []middleware.AuthZCheckGroup{
 		{{Relation: authtypes.Relation{Verb: coretypes.VerbDelete}, Resource: coretypes.ResourceMetaResourceFactorAPIKey, SelectorCallback: factorAPIKeyInstanceSelectorCallback, Roles: []string{
-			authtypes.SigNozAdminRoleName,
+			authtypes.HanzoO11yAdminRoleName,
 		}}},
 		{{Relation: authtypes.Relation{Verb: coretypes.VerbDetach}, Resource: coretypes.ResourceServiceAccount, SelectorCallback: serviceAccountInstanceSelectorCallback, Roles: []string{
-			authtypes.SigNozAdminRoleName,
+			authtypes.HanzoO11yAdminRoleName,
 		}}},
 	}), handler.OpenAPIDef{
 		ID:                  "RevokeServiceAccountKey",

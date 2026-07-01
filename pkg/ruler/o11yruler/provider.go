@@ -51,7 +51,6 @@ func NewFactory(
 		managerOpts := &rules.ManagerOptions{
 			TelemetryStore:         telemetryStore,
 			MetadataStore:          metadataStore,
-			Prometheus:             prometheus,
 			Context:                context.Background(),
 			Querier:                querier,
 			Logger:                 providerSettings.Logger,
