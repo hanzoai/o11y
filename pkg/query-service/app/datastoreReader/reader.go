@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/query-service/model/metrics_explorer"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/timestamp"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types"
@@ -29,7 +30,7 @@ import (
 	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-
+	"go.uber.org/zap"
 
 	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
@@ -2540,7 +2541,7 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *r
 		delTTL, moveTTL := parseTTL(dbResp.EngineFull)
 		return &retentiontypes.GetTTLResponseItem{TracesTime: delTTL, TracesMoveTime: moveTTL, ExpectedTracesTime: ttlQuery.TTL, ExpectedTracesMoveTime: ttlQuery.ColdStorageTTL, Status: status}, nil
 
-	case constants.MetricsTTL:
+	case retentiontypes.MetricsTTL:
 		tableNameArray := []string{observeMetricDBName + "." + o11ySampleTableName}
 		tableNameArray = getLocalTableNameArray(tableNameArray)
 		status, apiErr := r.getTTLQueryStatus(ctx, orgID, tableNameArray)
