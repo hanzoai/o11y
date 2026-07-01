@@ -66,7 +66,7 @@ type (
 	QueryEnvelope          = qb.QueryEnvelope
 	FormulaSpec            = qb.QueryBuilderFormula
 	PromQLQuerySpec        = qb.PromQuery
-	ClickHouseSQLQuerySpec = qb.ClickHouseQuery
+	ClickHouseSQLQuerySpec = qb.DatastoreQuery
 	TraceOperatorSpec      = qb.QueryBuilderTraceOperator
 )
 

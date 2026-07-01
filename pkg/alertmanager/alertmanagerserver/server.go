@@ -11,6 +11,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertemplate"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
@@ -194,7 +195,7 @@ func New(ctx context.Context, logger *slog.Logger, registry prometheus.Registere
 		return nil, err
 	}
 
-	server.pipelineBuilder = notify.NewPipelineBuilder(o11yRegisterer, featurecontrol.NoopFlags{})
+	server.pipelineBuilder = newPipelineBuilder(o11yRegisterer, featurecontrol.NoopFlags{})
 	server.dispatcherMetrics = NewDispatcherMetrics(false, o11yRegisterer)
 
 	return server, nil

@@ -318,7 +318,7 @@ func (provider *provider) getManagedRoleGrantTuples(orgID valuer.UUID, userID va
 		coretypes.NewResourceRole(),
 		adminSubject,
 		authtypes.Relation{Verb: coretypes.VerbAssignee},
-		[]coretypes.Selector{coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName)},
+		[]coretypes.Selector{coretypes.TypeRole.MustSelector(authtypes.HanzoO11yAdminRoleName)},
 		orgID,
 	)
 	tuples = append(tuples, adminTuple...)
@@ -329,7 +329,7 @@ func (provider *provider) getManagedRoleGrantTuples(orgID valuer.UUID, userID va
 		coretypes.NewResourceRole(),
 		anonymousSubject,
 		authtypes.Relation{Verb: coretypes.VerbAssignee},
-		[]coretypes.Selector{coretypes.TypeRole.MustSelector(authtypes.SigNozAnonymousRoleName)},
+		[]coretypes.Selector{coretypes.TypeRole.MustSelector(authtypes.HanzoO11yAnonymousRoleName)},
 		orgID,
 	)
 	tuples = append(tuples, anonymousTuple...)

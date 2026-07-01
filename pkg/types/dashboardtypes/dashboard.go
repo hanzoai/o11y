@@ -9,7 +9,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/transition"
 	"github.com/hanzoai/o11y/pkg/types"
-	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/uptrace/bun"

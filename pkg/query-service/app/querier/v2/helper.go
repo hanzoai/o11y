@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/hanzoai/o11y/pkg/errors"
 	logsV4 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v4"
 	metricsV3 "github.com/hanzoai/o11y/pkg/query-service/app/metrics/v3"
 	metricsV4 "github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4"
@@ -15,7 +16,6 @@ import (
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/querycache"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"go.uber.org/zap"
 )
 
 func prepareLogsQuery(
