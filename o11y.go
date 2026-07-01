@@ -271,6 +271,9 @@ func New(
 	// Initialize organization getter
 	orgGetter := implorganization.NewGetter(implorganization.NewStore(sqlstore), sharder)
 
+	// Initialize retention getter
+	retentionGetter := implretention.NewGetter(implretention.NewStore(sqlstore))
+
 	// Initialize tokenizer from the available tokenizer provider factories
 	tokenizer, err := factory.NewProviderFromNamedMap(
 		ctx,
@@ -359,7 +362,7 @@ func New(
 	}
 
 	// Initialize ruler from the available ruler provider factories
-	ruler, err := factory.NewProviderFromNamedMap(
+	rulerInstance, err := factory.NewProviderFromNamedMap(
 		ctx,
 		providerSettings,
 		config.Ruler,
@@ -438,33 +441,10 @@ func New(
 
 	serviceAccount := implserviceaccount.NewModule(implserviceaccount.NewStore(sqlstore), authz, cache, analytics, providerSettings, config.ServiceAccount)
 
-	cloudIntegrationModule, err := cloudIntegrationCallback(sqlstore, dashboard, global, zeus, gateway, licensing, serviceAccount, config.CloudIntegration)
-	if err != nil {
-		return nil, err
-	}
+	cloudIntegrationModule := implcloudintegration.NewModule()
 
 	// Initialize all modules
 	modules := NewModules(sqlstore, tokenizer, emailing, providerSettings, orgGetter, alertmanager, analytics, querier, telemetrystore, telemetryMetadataStore, authNs, authz, cache, queryParser, config, dashboard, userGetter, userRoleStore, serviceAccount, cloudIntegrationModule, retentionGetter, flagger, tagModule)
-
-	userService := impluser.NewService(providerSettings, impluser.NewStore(sqlstore, providerSettings), modules.User, orgGetter, authz, config.User.Root)
-
-	// Initialize the querier handler via callback (allows EE to decorate with anomaly detection)
-	querierHandler := querierHandlerCallback(providerSettings, querier, analytics)
-
-	// Initialize all handlers for the modules
-	handlers := NewHandlers(modules, providerSettings, analytics, querierHandler, licensing, global, flagger, gateway, telemetryMetadataStore, authz, zeus)
-
-	// Initialize the API server
-	apiserver, err := factory.NewProviderFromNamedMap(
-		ctx,
-		providerSettings,
-		config.APIServer,
-		NewAPIServerProviderFactories(orgGetter, authz, global, modules, handlers),
-		"observe",
-	)
-	if err != nil {
-		return nil, err
-	}
 
 	// Initialize identN resolver
 	identNFactories := NewIdentNProviderFactories(tokenizer, serviceAccount, orgGetter, userGetter, config.User)
@@ -536,7 +516,7 @@ func New(
 		providerSettings,
 		config.APIServer,
 		NewAPIServerProviderFactories(orgGetter, authz, modules, handlers),
-		"signoz",
+		"observe",
 	)
 	if err != nil {
 		return nil, err

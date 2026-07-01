@@ -1,6 +1,9 @@
 package authtypes
 
-import "github.com/hanzoai/o11y/pkg/valuer"
+import (
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
+)
 
 func NewSubject(resource coretypes.Resource, selector string, orgID valuer.UUID, relation *coretypes.Verb) (string, error) {
 	if relation == nil {

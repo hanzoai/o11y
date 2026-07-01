@@ -3,7 +3,7 @@ package authtypes
 import (
 	"encoding/json"
 
-	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 

@@ -1,26 +1,37 @@
 package authtypes
 
 import (
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
+	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 )
 
-// TupleKey is the canonical relationship-tuple type. Mirrors the
-// openfga.v1.TupleKey wire shape (User / Relation / Object), but lives
-// here so the authz API stays transport-agnostic — keeps grpc and
-// protobuf out of the default dep graph.
-type TupleKey struct {
-	User     string
-	Relation string
-	Object   string
-}
+var (
+	ErrCodeAuthZUnavailable = errors.MustNewCode("authz_unavailable")
+	ErrCodeAuthZForbidden   = errors.MustNewCode("authz_forbidden")
+	ErrCodeAuthZInvalidType = errors.MustNewCode("authz_invalid_type")
+	ErrCodeTypeableNotFound = errors.MustNewCode("typeable_not_found")
+)
 
 type TupleKeyAuthorization struct {
-	Tuple      *TupleKey
+	Tuple      *openfgav1.TupleKey
 	Authorized bool
 }
 
-func NewTuplesFromTransactions(transactions []*Transaction, subject string, orgID valuer.UUID) (map[string]*TupleKey, error) {
-	tuples := make(map[string]*TupleKey, len(transactions))
+func NewTuples(resource coretypes.Resource, subject string, relation Relation, selectors []coretypes.Selector, orgID valuer.UUID) []*openfgav1.TupleKey {
+	tuples := make([]*openfgav1.TupleKey, 0)
+
+	for _, selector := range selectors {
+		object := resource.Object(orgID, selector.String())
+		tuples = append(tuples, &openfgav1.TupleKey{User: subject, Relation: relation.StringValue(), Object: object})
+	}
+
+	return tuples
+}
+
+func NewTuplesFromTransactions(transactions []*Transaction, subject string, orgID valuer.UUID) (map[string]*openfgav1.TupleKey, error) {
+	tuples := make(map[string]*openfgav1.TupleKey, len(transactions))
 	for _, txn := range transactions {
 		resource, err := coretypes.NewResourceFromTypeAndKind(txn.Object.Resource.Type, txn.Object.Resource.Kind)
 		if err != nil {

@@ -1,8 +1,9 @@
 package authtypes
 
 import (
-	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/valuer"
+	"encoding/json"
+
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 )
 
 type Relation struct {
