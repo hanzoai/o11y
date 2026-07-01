@@ -1106,14 +1106,7 @@ func (aH *APIHandler) Get(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	dashboard := new(dashboardtypes.Dashboard)
-	if aH.IntegrationsController.IsInstalledIntegrationDashboardID(id) {
-		integrationDashboard, apiErr := aH.IntegrationsController.GetInstalledIntegrationDashboardById(ctx, orgID, id)
-		if apiErr != nil {
-			render.Error(rw, errorsV2.Wrapf(apiErr, errorsV2.TypeInternal, errorsV2.CodeInternal, "failed to get dashboard"))
-			return
-		}
-		dashboard = integrationDashboard
-	} else {
+	{
 		dashboardID, err := valuer.NewUUID(id)
 		if err != nil {
 			render.Error(rw, err)
@@ -1162,12 +1155,6 @@ func (aH *APIHandler) List(rw http.ResponseWriter, r *http.Request) {
 		dashboards = append(dashboards, sqlDashboards...)
 	}
 
-	installedIntegrationDashboards, apiErr := aH.IntegrationsController.GetDashboardsForInstalledIntegrations(ctx, orgID)
-	if apiErr != nil {
-		slog.Error("failed to get dashboards for installed integrations", "error", apiErr)
-	} else {
-		dashboards = append(dashboards, installedIntegrationDashboards...)
-	}
 
 	gettableDashboards, err := dashboardtypes.NewGettableDashboardsFromDashboards(dashboards)
 	if err != nil {
@@ -1637,7 +1624,7 @@ func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Route:      "",
 	})
 
-	bodyJSONQuery := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseJSONBody, evalCtx)
+	bodyJSONQuery := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseJSONBody, evalCtx)
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseJSONBody.String()),
 		Active:     bodyJSONQuery,
@@ -1646,7 +1633,7 @@ func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Route:      "",
 	})
 
-	fineGrainedAuthz := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseFineGrainedAuthz, evalCtx)
+	fineGrainedAuthz := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseFineGrainedAuthz, evalCtx)
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseFineGrainedAuthz.String()),
 		Active:     fineGrainedAuthz,
@@ -1655,7 +1642,7 @@ func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Route:      "",
 	})
 
-	useDashboardV2 := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseDashboardV2, evalCtx)
+	useDashboardV2 := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseDashboardV2, evalCtx)
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseDashboardV2.String()),
 		Active:     useDashboardV2,
@@ -1703,7 +1690,7 @@ func (aH *APIHandler) registerUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	organization := types.NewOrganization(req.OrgDisplayName, req.OrgName)
-	user, errv2 := aH.O11y.Modules.User.CreateFirstUser(r.Context(), organization, req.Name, req.Email, req.Password)
+	user, errv2 := aH.O11y.Modules.UserSetter.CreateFirstUser(r.Context(), organization, req.Name, req.Email, req.Password)
 	if errv2 != nil {
 		render.Error(w, errv2)
 		return
