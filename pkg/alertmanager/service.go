@@ -7,7 +7,7 @@ import (
 
 	"github.com/prometheus/alertmanager/featurecontrol"
 	"github.com/prometheus/alertmanager/matcher/compat"
-	"github.com/luxfi/metric"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerserver"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"

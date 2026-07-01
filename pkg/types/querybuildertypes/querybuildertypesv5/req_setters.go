@@ -59,7 +59,7 @@ func (q *QueryEnvelope) SetQuery(query string) {
 	case PromQuery:
 		spec.Query = query
 		q.Spec = spec
-	case ClickHouseQuery:
+	case DatastoreQuery:
 		spec.Query = query
 		q.Spec = spec
 	}
@@ -134,7 +134,7 @@ func (q *QueryEnvelope) SetQueryName(name string) {
 	case PromQuery:
 		spec.Name = name
 		q.Spec = spec
-	case ClickHouseQuery:
+	case DatastoreQuery:
 		spec.Name = name
 		q.Spec = spec
 	}
@@ -164,7 +164,7 @@ func (q *QueryEnvelope) SetDisabled(disabled bool) {
 	case PromQuery:
 		spec.Disabled = disabled
 		q.Spec = spec
-	case ClickHouseQuery:
+	case DatastoreQuery:
 		spec.Disabled = disabled
 		q.Spec = spec
 	}
@@ -373,7 +373,7 @@ func (q *QueryEnvelope) SetLegend(legend string) {
 	case PromQuery:
 		spec.Legend = legend
 		q.Spec = spec
-	case ClickHouseQuery:
+	case DatastoreQuery:
 		spec.Legend = legend
 		q.Spec = spec
 	}
