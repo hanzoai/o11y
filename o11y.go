@@ -3,7 +3,6 @@ package o11y
 import (
 	"context"
 
-	"github.com/hanzoai/o11y/pkg/modules/cloudintegration/implcloudintegration"
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerstore/sqlalertmanagerstore"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
@@ -19,19 +18,24 @@ import (
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/gateway"
+	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/identn"
 	"github.com/hanzoai/o11y/pkg/instrumentation"
 	"github.com/hanzoai/o11y/pkg/licensing"
 	"github.com/hanzoai/o11y/pkg/meterreporter"
+	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/organization/implorganization"
 	"github.com/hanzoai/o11y/pkg/modules/retention"
 	"github.com/hanzoai/o11y/pkg/modules/retention/implretention"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount/implserviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/tag"
 	"github.com/hanzoai/o11y/pkg/modules/tag/impltag"
 	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
+	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/ruler"
@@ -107,6 +111,8 @@ func New(
 	auditorProviderFactories func(licensing.Licensing) factory.NamedMap[factory.ProviderFactory[auditor.Auditor, auditor.Config]],
 	meterReporterProviderFactories func(context.Context, factory.ProviderSettings, flagger.Flagger, licensing.Licensing, telemetrystore.TelemetryStore, retention.Getter, organization.Getter, zeus.Zeus) (factory.NamedMap[factory.ProviderFactory[meterreporter.Reporter, meterreporter.Config]], string),
 	querierHandlerCallback func(factory.ProviderSettings, querier.Querier, analytics.Analytics) querier.Handler,
+	cloudIntegrationCallback func(sqlstore.SQLStore, dashboard.Module, global.Global, zeus.Zeus, gateway.Gateway, licensing.Licensing, serviceaccount.Module, cloudintegration.Config) (cloudintegration.Module, error),
+	rulerProviderFactories func(cache.Cache, alertmanager.Alertmanager, sqlstore.SQLStore, telemetrystore.TelemetryStore, telemetrytypes.MetadataStore, prometheus.Prometheus, organization.Getter, rulestatehistory.Module, querier.Querier, queryparser.QueryParser) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]],
 ) (*HanzoO11y, error) {
 	// Initialize instrumentation
 	instrumentation, err := instrumentation.New(ctx, config.Instrumentation, version.Info, "observe")
@@ -441,7 +447,10 @@ func New(
 
 	serviceAccount := implserviceaccount.NewModule(implserviceaccount.NewStore(sqlstore), authz, cache, analytics, providerSettings, config.ServiceAccount)
 
-	cloudIntegrationModule := implcloudintegration.NewModule()
+	cloudIntegrationModule, err := cloudIntegrationCallback(sqlstore, dashboard, global, zeus, gateway, licensing, serviceAccount, config.CloudIntegration)
+	if err != nil {
+		return nil, err
+	}
 
 	// Initialize all modules
 	modules := NewModules(sqlstore, tokenizer, emailing, providerSettings, orgGetter, alertmanager, analytics, querier, telemetrystore, telemetryMetadataStore, authNs, authz, cache, queryParser, config, dashboard, userGetter, userRoleStore, serviceAccount, cloudIntegrationModule, retentionGetter, flagger, tagModule)
@@ -452,7 +461,7 @@ func New(
 		ctx,
 		providerSettings,
 		config.Ruler,
-		NewRulerProviderFactories(cache, alertmanager, sqlstore, telemetrystore, telemetryMetadataStore, nil, orgGetter, modules.RuleStateHistory, querier, queryParser),
+		rulerProviderFactories(cache, alertmanager, sqlstore, telemetrystore, telemetryMetadataStore, nil, orgGetter, modules.RuleStateHistory, querier, queryParser),
 		"observe",
 	)
 	if err != nil {
