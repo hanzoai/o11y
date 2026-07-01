@@ -39,7 +39,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/app"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/ruler"
-	"github.com/hanzoai/o11y/pkg/ruler/signozruler"
+	"github.com/hanzoai/o11y/pkg/ruler/o11yruler"
 	"github.com/hanzoai/o11y/pkg/signoz"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -120,7 +120,7 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 			return implcloudintegration.NewModule(), nil
 		},
 		func(c cache.Cache, am alertmanager.Alertmanager, ss sqlstore.SQLStore, ts telemetrystore.TelemetryStore, ms telemetrytypes.MetadataStore, p prometheus.Prometheus, og organization.Getter, rsh rulestatehistory.Module, q querier.Querier, qp queryparser.QueryParser) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]] {
-			return factory.MustNewNamedMap(signozruler.NewFactory(c, am, ss, ts, ms, p, og, rsh, q, qp, nil, nil))
+			return factory.MustNewNamedMap(o11yruler.NewFactory(c, am, ss, ts, ms, p, og, rsh, q, qp, nil, nil))
 		},
 	)
 	if err != nil {

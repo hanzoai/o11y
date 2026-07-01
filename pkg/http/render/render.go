@@ -1,9 +1,7 @@
 package render
 
 import (
-	"math"
 	"net/http"
-	"strconv"
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	jsoniter "github.com/json-iterator/go"
