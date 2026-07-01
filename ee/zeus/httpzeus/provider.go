@@ -129,7 +129,7 @@ func (provider *Provider) GetMeters(ctx context.Context, key string) ([]byte, er
 func (provider *Provider) PutMeters(ctx context.Context, key string, data []byte) error {
 	_, err := provider.do(
 		ctx,
-		provider.config.DeprecatedURL.JoinPath("/api/v1/usage"),
+		provider.config.DeprecatedURL.JoinPath("/v1/o11y/v1/usage"),
 		http.MethodPost,
 		key,
 		data,

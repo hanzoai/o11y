@@ -56,7 +56,7 @@ func (handler *healthOpenAPIHandler) AuditDef() *pkghandler.AuditDef {
 }
 
 func (provider *provider) addRegistryRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v2/healthz", newHealthOpenAPIHandler(
+	if err := router.Handle("/v1/o11y/v2/healthz", newHealthOpenAPIHandler(
 		provider.authzMiddleware.OpenAccess(provider.factoryHandler.Healthz),
 		"Healthz",
 		"Health check",
@@ -64,7 +64,7 @@ func (provider *provider) addRegistryRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/readyz", newHealthOpenAPIHandler(
+	if err := router.Handle("/v1/o11y/v2/readyz", newHealthOpenAPIHandler(
 		provider.authzMiddleware.OpenAccess(provider.factoryHandler.Readyz),
 		"Readyz",
 		"Readiness check",
@@ -72,7 +72,7 @@ func (provider *provider) addRegistryRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/livez", pkghandler.New(provider.authzMiddleware.OpenAccess(provider.factoryHandler.Livez),
+	if err := router.Handle("/v1/o11y/v2/livez", pkghandler.New(provider.authzMiddleware.OpenAccess(provider.factoryHandler.Livez),
 		pkghandler.OpenAPIDef{
 			ID:                  "Livez",
 			Tags:                []string{"health"},

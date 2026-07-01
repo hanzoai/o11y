@@ -72,7 +72,7 @@ func getTenantForHost(host string) *TenantBranding {
 
 func (provider *provider) addTenantRoutes(router *mux.Router) error {
 	// Public endpoint — no auth required. Frontend calls this on page load to get branding.
-	router.HandleFunc("/api/v1/tenant", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/v1/o11y/v1/tenant", func(w http.ResponseWriter, r *http.Request) {
 		tenant := getTenantForHost(r.Host)
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(tenant)

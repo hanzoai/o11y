@@ -38,8 +38,8 @@ func TestNewAuditEventFromHTTPRequest(t *testing.T) {
 		{
 			name:            "Success_DashboardCreated",
 			method:          http.MethodPost,
-			path:            "/api/v1/dashboards",
-			route:           "/api/v1/dashboards",
+			path:            "/v1/o11y/v1/dashboards",
+			route:           "/v1/o11y/v1/dashboards",
 			statusCode:      http.StatusOK,
 			action:          coretypes.VerbCreate,
 			category:        ActionCategoryConfigurationChange,
@@ -52,8 +52,8 @@ func TestNewAuditEventFromHTTPRequest(t *testing.T) {
 		{
 			name:            "Failure_ForbiddenDashboardUpdate",
 			method:          http.MethodPut,
-			path:            "/api/v1/dashboards/019b-5678-efgh-9012",
-			route:           "/api/v1/dashboards/{id}",
+			path:            "/v1/o11y/v1/dashboards/019b-5678-efgh-9012",
+			route:           "/v1/o11y/v1/dashboards/{id}",
 			statusCode:      http.StatusForbidden,
 			action:          coretypes.VerbUpdate,
 			category:        ActionCategoryConfigurationChange,

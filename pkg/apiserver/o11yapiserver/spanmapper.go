@@ -10,7 +10,7 @@ import (
 )
 
 func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v1/span_mapper_groups", handler.New(
+	if err := router.Handle("/v1/o11y/v1/span_mapper_groups", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.spanMapperHandler.ListGroups),
 		handler.OpenAPIDef{
 			ID:                  "ListSpanMapperGroups",
@@ -31,7 +31,7 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/span_mapper_groups", handler.New(
+	if err := router.Handle("/v1/o11y/v1/span_mapper_groups", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.CreateGroup),
 		handler.OpenAPIDef{
 			ID:                  "CreateSpanMapperGroup",
@@ -51,7 +51,7 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/span_mapper_groups/{groupId}", handler.New(
+	if err := router.Handle("/v1/o11y/v1/span_mapper_groups/{groupId}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.UpdateGroup),
 		handler.OpenAPIDef{
 			ID:                 "UpdateSpanMapperGroup",
@@ -69,7 +69,7 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/span_mapper_groups/{groupId}", handler.New(
+	if err := router.Handle("/v1/o11y/v1/span_mapper_groups/{groupId}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.DeleteGroup),
 		handler.OpenAPIDef{
 			ID:                  "DeleteSpanMapperGroup",
@@ -89,7 +89,7 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/span_mapper_groups/{groupId}/span_mappers", handler.New(
+	if err := router.Handle("/v1/o11y/v1/span_mapper_groups/{groupId}/span_mappers", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.spanMapperHandler.ListMappers),
 		handler.OpenAPIDef{
 			ID:                  "ListSpanMappers",
@@ -109,7 +109,7 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/span_mapper_groups/{groupId}/span_mappers", handler.New(
+	if err := router.Handle("/v1/o11y/v1/span_mapper_groups/{groupId}/span_mappers", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.CreateMapper),
 		handler.OpenAPIDef{
 			ID:                  "CreateSpanMapper",
@@ -129,7 +129,7 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/span_mapper_groups/{groupId}/span_mappers/{mapperId}", handler.New(
+	if err := router.Handle("/v1/o11y/v1/span_mapper_groups/{groupId}/span_mappers/{mapperId}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.UpdateMapper),
 		handler.OpenAPIDef{
 			ID:                 "UpdateSpanMapper",
@@ -147,7 +147,7 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/span_mapper_groups/{groupId}/span_mappers/{mapperId}", handler.New(
+	if err := router.Handle("/v1/o11y/v1/span_mapper_groups/{groupId}/span_mappers/{mapperId}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.DeleteMapper),
 		handler.OpenAPIDef{
 			ID:                  "DeleteSpanMapper",
