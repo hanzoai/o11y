@@ -16,6 +16,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/authz/iamauthz"
 	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/gateway"
@@ -48,7 +49,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/zapreceiver"
 	"github.com/hanzoai/o11y/pkg/zeus"
 	"github.com/hanzoai/o11y/pkg/zeus/noopzeus"
-	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {

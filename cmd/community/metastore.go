@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y"
+	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlschema"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 )

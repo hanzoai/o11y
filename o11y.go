@@ -378,7 +378,6 @@ func New(
 		return nil, err
 	}
 
-
 	gatewayFactory := gatewayProviderFactory(licensing)
 	gateway, err := gatewayFactory.New(ctx, providerSettings, config.Gateway)
 	if err != nil {
