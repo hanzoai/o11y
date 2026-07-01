@@ -32,6 +32,19 @@ func NewTraceOperatorStatementBuilder(
 	flagger flagger.Flagger,
 ) *traceOperatorStatementBuilder {
 	tracesSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/telemetrytraces")
+
+	resourceFilterStmtBuilder := telemetryresourcefilter.New[qbtypes.TraceAggregation](
+		settings,
+		DBName,
+		TracesResourceV3TableName,
+		telemetrytypes.SignalTraces,
+		telemetrytypes.SourceUnspecified,
+		metadataStore,
+		nil,
+		nil,
+		flagger,
+	)
+
 	return &traceOperatorStatementBuilder{
 		logger:                    tracesSettings.Logger(),
 		metadataStore:             metadataStore,
