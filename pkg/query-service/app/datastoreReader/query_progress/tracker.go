@@ -1,6 +1,8 @@
 package queryprogress
 
 import (
+	"log/slog"
+
 	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 )

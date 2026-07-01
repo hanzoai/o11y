@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/query-service/model"
-	"github.com/hanzoai/o11y/pkg/query-service/model/metrics_explorer"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/querycache"
+	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 

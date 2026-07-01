@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"slices"
 
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/sqlstore"

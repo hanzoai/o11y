@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	basemodel "github.com/hanzoai/o11y/pkg/query-service/model"
-	"go.uber.org/zap"
+	o11yerrors "github.com/hanzoai/o11y/pkg/errors"
 )
 
 // SmartTraceAlgorithm is an algorithm to find the target span and build a tree of spans around it with the given levelUp and levelDown parameters and the given spanLimit
@@ -54,7 +54,7 @@ func SmartTraceAlgorithm(payload []basemodel.SearchSpanResponseItem, targetSpanI
 			break
 		}
 		if err != nil {
-			slog.Error("error during breadth first search", signozerrors.Attr(err))
+			slog.Error("error during breadth first search", o11yerrors.Attr(err))
 			return nil, err
 		}
 	}

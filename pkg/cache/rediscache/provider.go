@@ -15,8 +15,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/types/cachetypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/redis/go-redis/extra/redisotel/v9"
-	"github.com/redis/go-redis/v9"
 )
 
 type provider struct {

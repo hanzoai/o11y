@@ -117,9 +117,9 @@ func (qt *queryTracker) handleProgressUpdate(p *datastore.Progress) {
 	defer qt.lock.Unlock()
 
 	if qt.isFinished {
-		zap.L().Warn(
+		qt.logger.Warn(
 			"received datastore progress update for finished query",
-			zap.String("queryId", qt.queryId), zap.Any("progress", p),
+			"queryId", qt.queryId, "progress", p,
 		)
 		return
 	}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/analytics"
 	"github.com/hanzoai/o11y/pkg/analytics/segmentanalytics"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/user"
