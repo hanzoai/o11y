@@ -5,6 +5,7 @@ import (
 
 	amConfig "github.com/prometheus/alertmanager/config"
 
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerserver"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/statsreporter"

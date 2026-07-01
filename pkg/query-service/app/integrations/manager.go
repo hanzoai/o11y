@@ -6,10 +6,12 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/cloudintegrationtypes"
 	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
 	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"

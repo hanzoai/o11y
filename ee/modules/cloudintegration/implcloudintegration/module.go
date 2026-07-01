@@ -513,7 +513,7 @@ func (module *module) getOrCreateAPIKey(ctx context.Context, orgID valuer.UUID, 
 	if err != nil {
 		return "", err
 	}
-	err = module.serviceAccount.SetRoleByName(ctx, orgID, serviceAccount.ID, authtypes.SigNozViewerRoleName)
+	err = module.serviceAccount.SetRoleByName(ctx, orgID, serviceAccount.ID, authtypes.HanzoO11yViewerRoleName)
 	if err != nil {
 		return "", err
 	}

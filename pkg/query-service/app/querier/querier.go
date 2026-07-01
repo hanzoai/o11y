@@ -3,6 +3,7 @@ package querier
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
 	"sync"
 	"time"

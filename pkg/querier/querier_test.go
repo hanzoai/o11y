@@ -7,6 +7,9 @@ import (
 
 	cmock "github.com/hanzoai/clickhouse-go-mock"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -16,8 +19,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes/telemetrytypestest"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 type queryMatcherAny struct{}

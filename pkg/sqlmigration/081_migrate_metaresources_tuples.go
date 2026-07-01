@@ -86,19 +86,19 @@ func (migration *migrateMetaresourcesTuples) Up(ctx context.Context, db *bun.DB)
 	// Also add new detach tuples for role/user/serviceaccount.
 	tuples := []migrationTuple{
 		// New detach tuples for admin
-		{authtypes.SigNozAdminRoleName, "role", "role", "detach"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "detach"},
+		{authtypes.HanzoO11yAdminRoleName, "role", "role", "detach"},
+		{authtypes.HanzoO11yAdminRoleName, "serviceaccount", "serviceaccount", "detach"},
 		// Replacement create/list for user/serviceaccount/role (moved from metaresources to own types)
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "create"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "list"},
-		{authtypes.SigNozAdminRoleName, "role", "role", "create"},
-		{authtypes.SigNozAdminRoleName, "role", "role", "list"},
+		{authtypes.HanzoO11yAdminRoleName, "serviceaccount", "serviceaccount", "create"},
+		{authtypes.HanzoO11yAdminRoleName, "serviceaccount", "serviceaccount", "list"},
+		{authtypes.HanzoO11yAdminRoleName, "role", "role", "create"},
+		{authtypes.HanzoO11yAdminRoleName, "role", "role", "list"},
 		// Replacement create/list for resources that move from "metaresources" to "metaresource"
-		{authtypes.SigNozAdminRoleName, "metaresource", "factor-api-key", "create"},
-		{authtypes.SigNozAdminRoleName, "metaresource", "factor-api-key", "list"},
-		{authtypes.SigNozAdminRoleName, "metaresource", "factor-api-key", "read"},
-		{authtypes.SigNozAdminRoleName, "metaresource", "factor-api-key", "update"},
-		{authtypes.SigNozAdminRoleName, "metaresource", "factor-api-key", "delete"},
+		{authtypes.HanzoO11yAdminRoleName, "metaresource", "factor-api-key", "create"},
+		{authtypes.HanzoO11yAdminRoleName, "metaresource", "factor-api-key", "list"},
+		{authtypes.HanzoO11yAdminRoleName, "metaresource", "factor-api-key", "read"},
+		{authtypes.HanzoO11yAdminRoleName, "metaresource", "factor-api-key", "update"},
+		{authtypes.HanzoO11yAdminRoleName, "metaresource", "factor-api-key", "delete"},
 	}
 
 	for _, orgID := range orgIDs {

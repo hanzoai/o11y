@@ -28,7 +28,7 @@ type module struct {
 	tagModule   tag.Module
 }
 
-func NewModule(store dashboardtypes.Store, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser) dashboard.Module {
+func NewModule(store dashboardtypes.Store, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser, tagModule tag.Module) dashboard.Module {
 	scopedProviderSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard")
 	return &module{
 		store:       store,

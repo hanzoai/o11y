@@ -60,9 +60,9 @@ func (migration *addRoleCRUDTuples) Up(ctx context.Context, db *bun.DB) error {
 	// only inserted create and list. The read, update, and delete tuples were
 	// lost in the migration. Re-add them here.
 	tuples := []migrationTuple{
-		{authtypes.SigNozAdminRoleName, "role", "role", "read"},
-		{authtypes.SigNozAdminRoleName, "role", "role", "update"},
-		{authtypes.SigNozAdminRoleName, "role", "role", "delete"},
+		{authtypes.HanzoO11yAdminRoleName, "role", "role", "read"},
+		{authtypes.HanzoO11yAdminRoleName, "role", "role", "update"},
+		{authtypes.HanzoO11yAdminRoleName, "role", "role", "delete"},
 	}
 
 	for _, orgID := range orgIDs {

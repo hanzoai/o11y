@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
-	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
 	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )

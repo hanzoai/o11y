@@ -11,6 +11,7 @@ import (
 	"time"
 
 	datastore "github.com/ClickHouse/clickhouse-go/v2"
+
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"

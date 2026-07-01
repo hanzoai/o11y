@@ -5,12 +5,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestBucketCacheStepAlignment(t *testing.T) {

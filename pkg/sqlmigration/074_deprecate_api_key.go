@@ -244,9 +244,9 @@ func (migration *deprecateAPIKey) Up(ctx context.Context, db *bun.DB) error {
 			OrgID:        user.OrgID,
 		})
 
-		managedRoleName, ok := authtypes.ExistingRoleToSigNozManagedRoleMap[types.Role(oldKey.Role)]
+		managedRoleName, ok := authtypes.ExistingRoleToHanzoO11yManagedRoleMap[types.Role(oldKey.Role)]
 		if !ok {
-			managedRoleName = authtypes.SigNozViewerRoleName
+			managedRoleName = authtypes.HanzoO11yViewerRoleName
 		}
 
 		roleID, ok := roleMap[orgRoleKey{OrgID: user.OrgID, RoleName: managedRoleName}]
