@@ -42,8 +42,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/ruler"
-	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
-	"github.com/hanzoai/o11y/pkg/zeus"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 )
 
 const signozDiscriminatorKey string = "x-signoz-discriminator"

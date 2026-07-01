@@ -65,6 +65,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/web"
 	"github.com/hanzoai/o11y/pkg/web/noopweb"
 	"github.com/hanzoai/o11y/pkg/web/routerweb"
+	"github.com/hanzoai/o11y/pkg/identn/apikeyidentn"
+	"github.com/hanzoai/o11y/pkg/identn/impersonationidentn"
+	"github.com/hanzoai/o11y/pkg/identn/tokenizeridentn"
 )
 
 func NewAnalyticsProviderFactories() factory.NamedMap[factory.ProviderFactory[analytics.Analytics, analytics.Config]] {
@@ -232,7 +235,7 @@ func NewAlertmanagerProviderFactories(
 	maintenanceStore alertmanagertypes.MaintenanceStore,
 ) factory.NamedMap[factory.ProviderFactory[alertmanager.Alertmanager, alertmanager.Config]] {
 	return factory.MustNewNamedMap(
-		o11yalertmanager.NewFactory(sqlstore, orgGetter, nfManager),
+		o11yalertmanager.NewFactory(sqlstore, orgGetter, nfManager, maintenanceStore),
 	)
 }
 
@@ -315,7 +318,9 @@ func NewTokenizerProviderFactories(cache cache.Cache, sqlstore sqlstore.SQLStore
 
 func NewIdentNProviderFactories(tokenizer tokenizer.Tokenizer, serviceAccount serviceaccount.Module, orgGetter organization.Getter, userGetter user.Getter, userConfig user.Config) factory.NamedMap[factory.ProviderFactory[identn.IdentN, identn.Config]] {
 	return factory.MustNewNamedMap(
-		o11yglobal.NewFactory(),
+		impersonationidentn.NewFactory(orgGetter, userGetter, userConfig),
+		tokenizeridentn.NewFactory(tokenizer),
+		apikeyidentn.NewFactory(serviceAccount),
 	)
 }
 
