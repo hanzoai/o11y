@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	redirectPath string = "/api/v1/complete/oidc"
+	redirectPath string = "/v1/o11y/v1/complete/oidc"
 )
 
 var defaultScopes []string = []string{"email", "profile", oidc.ScopeOpenID}

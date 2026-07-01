@@ -13,7 +13,7 @@ import (
 )
 
 func (provider *provider) addDashboardRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v2/dashboards", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.CreateV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/v2/dashboards", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.CreateV2), handler.OpenAPIDef{
 		ID:                  "CreateDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Create dashboard (v2)",
@@ -30,7 +30,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboards/{id}", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.GetV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/v2/dashboards/{id}", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.GetV2), handler.OpenAPIDef{
 		ID:                  "GetDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Get dashboard (v2)",
@@ -47,7 +47,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.CreatePublic), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.CreatePublic), handler.OpenAPIDef{
 		ID:                  "CreatePublicDashboard",
 		Tags:                []string{"dashboard"},
 		Summary:             "Create public dashboard",
@@ -64,7 +64,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.GetPublic), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.GetPublic), handler.OpenAPIDef{
 		ID:                  "GetPublicDashboard",
 		Tags:                []string{"dashboard"},
 		Summary:             "Get public dashboard",
@@ -81,7 +81,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.UpdatePublic), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.UpdatePublic), handler.OpenAPIDef{
 		ID:                  "UpdatePublicDashboard",
 		Tags:                []string{"dashboard"},
 		Summary:             "Update public dashboard",
@@ -98,7 +98,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.DeletePublic), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.DeletePublic), handler.OpenAPIDef{
 		ID:                  "DeletePublicDashboard",
 		Tags:                []string{"dashboard"},
 		Summary:             "Delete public dashboard",
@@ -115,7 +115,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/public/dashboards/{id}", handler.New(provider.authzMiddleware.CheckWithoutClaims(
+	if err := router.Handle("/v1/o11y/v1/public/dashboards/{id}", handler.New(provider.authzMiddleware.CheckWithoutClaims(
 		provider.dashboardHandler.GetPublicData,
 		authtypes.Relation{Verb: coretypes.VerbRead},
 		coretypes.ResourceMetaResourcePublicDashboard,
@@ -143,7 +143,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/public/dashboards/{id}/widgets/{idx}/query_range", handler.New(provider.authzMiddleware.CheckWithoutClaims(
+	if err := router.Handle("/v1/o11y/v1/public/dashboards/{id}/widgets/{idx}/query_range", handler.New(provider.authzMiddleware.CheckWithoutClaims(
 		provider.dashboardHandler.GetPublicWidgetQueryRange,
 		authtypes.Relation{Verb: coretypes.VerbRead},
 		coretypes.ResourceMetaResourcePublicDashboard,

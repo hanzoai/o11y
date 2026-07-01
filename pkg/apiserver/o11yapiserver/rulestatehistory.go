@@ -12,7 +12,7 @@ import (
 
 func (provider *provider) addRuleStateHistoryRoutes(router *mux.Router) error {
 
-	if err := router.Handle("/api/v2/rules/{id}/history/stats", handler.New(
+	if err := router.Handle("/v1/o11y/v2/rules/{id}/history/stats", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.ruleStateHistoryHandler.GetRuleHistoryStats),
 		handler.OpenAPIDef{
 			ID:                  "GetRuleHistoryStats",
@@ -29,7 +29,7 @@ func (provider *provider) addRuleStateHistoryRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/rules/{id}/history/timeline", handler.New(
+	if err := router.Handle("/v1/o11y/v2/rules/{id}/history/timeline", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.ruleStateHistoryHandler.GetRuleHistoryTimeline),
 		handler.OpenAPIDef{
 			ID:                  "GetRuleHistoryTimeline",
@@ -46,7 +46,7 @@ func (provider *provider) addRuleStateHistoryRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/rules/{id}/history/top_contributors", handler.New(
+	if err := router.Handle("/v1/o11y/v2/rules/{id}/history/top_contributors", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.ruleStateHistoryHandler.GetRuleHistoryContributors),
 		handler.OpenAPIDef{
 			ID:                  "GetRuleHistoryTopContributors",
@@ -63,7 +63,7 @@ func (provider *provider) addRuleStateHistoryRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/rules/{id}/history/filter_keys", handler.New(
+	if err := router.Handle("/v1/o11y/v2/rules/{id}/history/filter_keys", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.ruleStateHistoryHandler.GetRuleHistoryFilterKeys),
 		handler.OpenAPIDef{
 			ID:                  "GetRuleHistoryFilterKeys",
@@ -80,7 +80,7 @@ func (provider *provider) addRuleStateHistoryRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/rules/{id}/history/filter_values", handler.New(
+	if err := router.Handle("/v1/o11y/v2/rules/{id}/history/filter_values", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.ruleStateHistoryHandler.GetRuleHistoryFilterValues),
 		handler.OpenAPIDef{
 			ID:                  "GetRuleHistoryFilterValues",
@@ -97,7 +97,7 @@ func (provider *provider) addRuleStateHistoryRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/rules/{id}/history/overall_status", handler.New(
+	if err := router.Handle("/v1/o11y/v2/rules/{id}/history/overall_status", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.ruleStateHistoryHandler.GetRuleHistoryOverallStatus),
 		handler.OpenAPIDef{
 			ID:                  "GetRuleHistoryOverallStatus",

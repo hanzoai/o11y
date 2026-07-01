@@ -9,7 +9,7 @@ import (
 )
 
 func (provider *provider) addAuthzRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v1/authz/check", handler.New(provider.authzHandler.Check, handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/v1/authz/check", handler.New(provider.authzHandler.Check, handler.OpenAPIDef{
 		ID:                  "AuthzCheck",
 		Tags:                []string{"authz"},
 		Summary:             "Check permissions",

@@ -182,7 +182,7 @@ func TestAPI_AnalyzeQueryFilter(t *testing.T) {
 			}
 
 			// Create HTTP request
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/v1/query_filter/analyze", bytes.NewBuffer(reqBody))
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/o11y/v1/query_filter/analyze", bytes.NewBuffer(reqBody))
 			req.Header.Set("Content-Type", "application/json")
 
 			// Create response recorder
