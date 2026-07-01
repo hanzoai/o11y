@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/instrumentation"
-	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/sqlmigration"
 	"github.com/hanzoai/o11y/pkg/sqlmigrator"
 	"github.com/hanzoai/o11y/pkg/sqlschema"
@@ -70,7 +70,7 @@ func registerSyncUp(parentCmd *cobra.Command, logger *slog.Logger, sqlstoreProvi
 		Short:              "Runs 'up' migrations for the metastore. Up migrations are used to apply new migrations to the metastore",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		RunE: func(currCmd *cobra.Command, args []string) error {
-			config, err := NewSigNozConfig(currCmd.Context(), logger, configFiles)
+			config, err := NewHanzoO11yConfig(currCmd.Context(), logger, configFiles, o11y.DeprecatedFlags{})
 			if err != nil {
 				return err
 			}
@@ -91,7 +91,7 @@ func registerSyncCheck(parentCmd *cobra.Command, logger *slog.Logger, sqlstorePr
 		Short:              "Runs a check for 'sync' migrations on the metastore. Returns a non-zero exit code if any migrations are pending.",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		RunE: func(currCmd *cobra.Command, args []string) error {
-			config, err := NewSigNozConfig(currCmd.Context(), logger, configFiles)
+			config, err := NewHanzoO11yConfig(currCmd.Context(), logger, configFiles, o11y.DeprecatedFlags{})
 			if err != nil {
 				return err
 			}

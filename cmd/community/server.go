@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/cmd"
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/analytics"
@@ -40,7 +41,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/ruler"
 	"github.com/hanzoai/o11y/pkg/ruler/o11yruler"
-	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
@@ -58,7 +58,7 @@ func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
 		Short:              "Run the SigNoz server",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		RunE: func(currCmd *cobra.Command, args []string) error {
-			config, err := cmd.NewSigNozConfig(currCmd.Context(), logger, configFiles)
+			config, err := cmd.NewHanzoO11yConfig(currCmd.Context(), logger, configFiles, o11y.DeprecatedFlags{})
 			if err != nil {
 				return err
 			}

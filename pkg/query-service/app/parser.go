@@ -15,6 +15,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
 	"github.com/hanzoai/o11y/pkg/types/thirdpartyapitypes"
 
 	"log/slog"

@@ -5,52 +5,78 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/spf13/cobra"
+
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/cmd"
+	"github.com/hanzoai/o11y/ee/auditor/fileauditor"
+	"github.com/hanzoai/o11y/ee/auditor/otlphttpauditor"
 	"github.com/hanzoai/o11y/ee/authn/callbackauthn/oidccallbackauthn"
 	"github.com/hanzoai/o11y/ee/authn/callbackauthn/samlcallbackauthn"
 	"github.com/hanzoai/o11y/ee/authz/openfgaauthz"
-	eequerier "github.com/hanzoai/o11y/ee/querier"
 	"github.com/hanzoai/o11y/ee/authz/openfgaschema"
+	"github.com/hanzoai/o11y/ee/authz/openfgaserver"
 	"github.com/hanzoai/o11y/ee/gateway/httpgateway"
 	enterpriselicensing "github.com/hanzoai/o11y/ee/licensing"
 	"github.com/hanzoai/o11y/ee/licensing/httplicensing"
+	"github.com/hanzoai/o11y/ee/metercollector/staticmetercollector"
+	"github.com/hanzoai/o11y/ee/metercollector/telemetrymetercollector"
+	"github.com/hanzoai/o11y/ee/meterreporter/httpmeterreporter"
+	"github.com/hanzoai/o11y/ee/modules/cloudintegration/implcloudintegration"
+	"github.com/hanzoai/o11y/ee/modules/cloudintegration/implcloudintegration/implcloudprovider"
 	"github.com/hanzoai/o11y/ee/modules/dashboard/impldashboard"
+	eequerier "github.com/hanzoai/o11y/ee/querier"
 	enterpriseapp "github.com/hanzoai/o11y/ee/query-service/app"
 	"github.com/hanzoai/o11y/ee/sqlschema/postgressqlschema"
 	"github.com/hanzoai/o11y/ee/sqlstore/postgressqlstore"
 	enterprisezeus "github.com/hanzoai/o11y/ee/zeus"
 	"github.com/hanzoai/o11y/ee/zeus/httpzeus"
+	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/analytics"
+	"github.com/hanzoai/o11y/pkg/auditor"
 	"github.com/hanzoai/o11y/pkg/authn"
 	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/gateway"
+	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/meterreporter"
+	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	pkgimpldashboard "github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/modules/retention"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
+	"github.com/hanzoai/o11y/pkg/modules/tag"
+	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
+	"github.com/hanzoai/o11y/pkg/ruler"
 	"github.com/hanzoai/o11y/pkg/ruler/o11yruler"
-	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/sqlschema"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstorehook"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/cloudintegrationtypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/hanzoai/o11y/pkg/zeus"
-	"github.com/spf13/cobra"
 )
 
 func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
 	var flags o11y.DeprecatedFlags
+	var configFiles []string
 
 	serverCmd := &cobra.Command{
 		Use:                "server",
 		Short:              "Run the HanzoO11y server",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		RunE: func(currCmd *cobra.Command, args []string) error {
-			config, err := cmd.NewHanzoO11yConfig(currCmd.Context(), logger, flags)
+			config, err := cmd.NewHanzoO11yConfig(currCmd.Context(), logger, configFiles, flags)
 			if err != nil {
 				return err
 			}
@@ -60,6 +86,7 @@ func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
 	}
 
 	serverCmd.Flags().StringArrayVar(&configFiles, "config", nil, "path to a YAML configuration file (can be specified multiple times, later files override earlier ones)")
+	flags.RegisterFlags(serverCmd)
 	parentCmd.AddCommand(serverCmd)
 }
 

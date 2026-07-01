@@ -70,7 +70,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	traceFunnels "github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
 
-	"log/slog"
 
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/kafka"
 	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
@@ -78,6 +77,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/hanzoai/o11y/pkg/query-service/rules"
 	"github.com/hanzoai/o11y/pkg/version"
+	"github.com/hanzoai/o11y/pkg/ruler"
 )
 
 type status string
@@ -1215,142 +1215,6 @@ func (aH *APIHandler) queryDashboardVarsV2(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	aH.Respond(w, dashboardVars)
-}
-
-func (aH *APIHandler) testRule(w http.ResponseWriter, r *http.Request) {
-	claims, err := authtypes.ClaimsFromContext(r.Context())
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-	orgID, err := valuer.NewUUID(claims.OrgID)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		slog.Error("Error in getting req body in test rule API", "error", err)
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
-	defer cancel()
-
-	alertCount, apiRrr := aH.ruleManager.TestNotification(ctx, orgID, string(body))
-	if apiRrr != nil {
-		RespondError(w, apiRrr, nil)
-		return
-	}
-
-	response := map[string]interface{}{
-		"alertCount": alertCount,
-		"message":    "notification sent",
-	}
-	aH.Respond(w, response)
-}
-
-func (aH *APIHandler) deleteRule(w http.ResponseWriter, r *http.Request) {
-
-	id := mux.Vars(r)["id"]
-
-	err := aH.ruleManager.DeleteRule(r.Context(), id)
-
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
-			return
-		}
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, nil)
-		return
-	}
-
-	aH.Respond(w, "rule successfully deleted")
-
-}
-
-// patchRule updates only requested changes in the rule
-func (aH *APIHandler) patchRule(w http.ResponseWriter, r *http.Request) {
-	idStr := mux.Vars(r)["id"]
-	id, err := valuer.NewUUID(idStr)
-	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		slog.Error("error in getting req body of patch rule API\n", "error", err)
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	gettableRule, err := aH.ruleManager.PatchRule(r.Context(), string(body), id)
-
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
-			return
-		}
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, nil)
-		return
-	}
-
-	aH.Respond(w, gettableRule)
-}
-
-func (aH *APIHandler) editRule(w http.ResponseWriter, r *http.Request) {
-	idStr := mux.Vars(r)["id"]
-	id, err := valuer.NewUUID(idStr)
-	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		slog.Error("error in getting req body of edit rule API", "error", err)
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	err = aH.ruleManager.EditRule(r.Context(), string(body), id)
-
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
-			return
-		}
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, nil)
-		return
-	}
-
-	aH.Respond(w, "rule successfully edited")
-
-}
-
-func (aH *APIHandler) createRule(w http.ResponseWriter, r *http.Request) {
-
-	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		slog.Error("Error in getting req body for create rule API", "error", err)
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	rule, err := aH.ruleManager.CreateRule(r.Context(), string(body))
-	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	aH.Respond(w, rule)
-
 }
 
 func (aH *APIHandler) registerEvent(w http.ResponseWriter, r *http.Request) {
