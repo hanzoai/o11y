@@ -96,8 +96,12 @@ type PreparedWhereClause struct {
 	WarningsDocURL string
 }
 
+func (p PreparedWhereClause) IsEmpty() bool {
+	return p.WhereClause == nil
+}
+
 // PrepareWhereClause generates a Datastore compatible WHERE clause from the filter query
-func PrepareWhereClause(query string, opts FilterExprVisitorOpts, startNs uint64, endNs uint64) (*PreparedWhereClause, error) {
+func PrepareWhereClause(query string, opts FilterExprVisitorOpts) (PreparedWhereClause, error) {
 
 	// Setup the ANTLR parsing pipeline
 	input := antlr.NewInputStream(query)

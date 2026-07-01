@@ -3,6 +3,7 @@ package querycache
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"math"
 	"sort"
 	"time"
@@ -13,7 +14,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
 	"github.com/hanzoai/o11y/pkg/types/cachetypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"go.uber.org/zap"
 )
 
 type queryCache struct {

@@ -8,9 +8,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/schema"
-
-	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/factory"
 )
 
 type transactorKey struct{}

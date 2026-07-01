@@ -34,11 +34,10 @@ type Service struct {
 	settings factory.ScopedProviderSettings
 
 	// promRegistry is the alertmanager-library boundary: prometheus/alertmanager
-	// (dispatch, silence, notify, mem) requires a metric.Registerer. The
+	// (dispatch, silence, notify, mem) requires a prometheus.Registerer. The
 	// rest of o11y emits through luxfi/metric — this registry lives here only
-	// because the upstream alertmanager library is hard-bound to metric.
-	// Replace when the alertmanager rip ships.
-	promRegistry metric.Registry
+	// because the upstream alertmanager library is hard-bound to prometheus.
+	promRegistry *prometheus.Registry
 
 	// Map of organization id to alertmanager server
 	servers map[string]*alertmanagerserver.Server
@@ -66,7 +65,7 @@ func New(
 		configStore:         configStore,
 		orgGetter:           orgGetter,
 		settings:            settings,
-		promRegistry:        metric.NewRegistry(),
+		promRegistry:        prometheus.NewRegistry(),
 		servers:             make(map[string]*alertmanagerserver.Server),
 		serversMtx:          sync.RWMutex{},
 		notificationManager: nfManager,

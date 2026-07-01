@@ -6,14 +6,14 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
+	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 )
 
-// TupleKey is re-exported from authtypes so existing callers that
-// referenced authz.TupleKey keep compiling. The canonical declaration
-// lives in authtypes (which is the shared schema package).
-type TupleKey = authtypes.TupleKey
+// TupleKey is re-exported so existing callers that referenced authz.TupleKey
+// keep compiling. The canonical declaration is the OpenFGA protobuf type.
+type TupleKey = openfgav1.TupleKey
 
 type AuthZ interface {
 	factory.ServiceWithHealthy
@@ -25,14 +25,14 @@ type AuthZ interface {
 	CheckWithTupleCreationWithoutClaims(context.Context, valuer.UUID, authtypes.Relation, coretypes.Resource, []coretypes.Selector, []coretypes.Selector) error
 
 	// BatchCheck accepts a map of ID → tuple and returns a map of ID → authorization result.
-	BatchCheck(context.Context, map[string]*authtypes.TupleKey) (map[string]*authtypes.TupleKeyAuthorization, error)
+	BatchCheck(context.Context, map[string]*openfgav1.TupleKey) (map[string]*authtypes.TupleKeyAuthorization, error)
 
 	// CheckTransactions checks whether the given subject is authorized for the given transactions.
 	// Returns results in the same order as the input transactions.
 	CheckTransactions(ctx context.Context, subject string, orgID valuer.UUID, transactions []*authtypes.Transaction) ([]*authtypes.TransactionWithAuthorization, error)
 
 	// Write accepts the insertion tuples and the deletion tuples.
-	Write(context.Context, []*authtypes.TupleKey, []*authtypes.TupleKey) error
+	Write(context.Context, []*openfgav1.TupleKey, []*openfgav1.TupleKey) error
 
 	// Lists the selectors for objects assigned to subject (s) with relation (r) on resource (s)
 	ListObjects(context.Context, string, authtypes.Relation, coretypes.Type) ([]*coretypes.Object, error)

@@ -1,6 +1,8 @@
 package ruler
 
 import (
+	"time"
+
 	"github.com/hanzoai/o11y/pkg/factory"
 )
 
