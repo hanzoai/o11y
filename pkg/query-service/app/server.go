@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"slices"
 
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerstore/sqlalertmanagerstore"
 	"github.com/hanzoai/o11y/pkg/alertmanager/o11yalertmanager"
 	"github.com/hanzoai/o11y/pkg/cache/memorycache"
 	"github.com/hanzoai/o11y/pkg/factory"
@@ -41,8 +42,8 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel/propagation"
-	"go.uber.org/zap" //nolint:depguard
 
+	//nolint:depguard
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/healthcheck"
 	"github.com/hanzoai/o11y/pkg/query-service/rules"
@@ -67,7 +68,7 @@ type Server struct {
 
 // NewServer creates and initializes Server
 func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
-	integrationsController, err := integrations.NewController(o11y.SQLStore)
+	integrationsController, err := integrations.NewController(o11y.SQLStore, o11y.Modules.Dashboard)
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +85,7 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 	}
 
 	reader := datastoreReader.NewReader(
+		o11y.Instrumentation.Logger(),
 		o11y.SQLStore,
 		o11y.TelemetryStore,
 		o11y.TelemetryStore.Cluster(),
@@ -193,14 +195,13 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 			return !slices.Contains([]string{"/api/v1/health"}, r.URL.Path)
 		}),
 	))
-	r.Use(middleware.NewAuthN([]string{"Authorization", "Sec-WebSocket-Protocol"}, s.o11y.Sharder, s.o11y.Tokenizer, s.o11y.Instrumentation.Logger()).Wrap)
+	r.Use(middleware.NewIdentN(s.o11y.IdentNResolver, s.o11y.Sharder, s.o11y.Instrumentation.Logger()).Wrap)
 	r.Use(middleware.NewTimeout(s.o11y.Instrumentation.Logger(),
 		s.config.APIServer.Timeout.ExcludedRoutes,
 		s.config.APIServer.Timeout.Default,
 		s.config.APIServer.Timeout.Max,
 	).Wrap)
-	r.Use(middleware.NewAPIKey(s.o11y.SQLStore, []string{"HANZO-API-KEY"}, s.o11y.Instrumentation.Logger(), s.o11y.Sharder).Wrap)
-	r.Use(middleware.NewLogging(s.o11y.Instrumentation.Logger(), s.config.APIServer.Logging.ExcludedRoutes).Wrap)
+	r.Use(middleware.NewAudit(s.o11y.Instrumentation.Logger(), s.config.APIServer.Logging.ExcludedRoutes, s.o11y.Auditor).Wrap)
 	r.Use(middleware.NewComment().Wrap)
 
 	am := middleware.NewAuthZ(s.o11y.Instrumentation.Logger(), s.o11y.Modules.OrgGetter, s.o11y.Authz)
@@ -299,15 +300,6 @@ func (s *Server) Start(ctx context.Context) error {
 	}()
 
 	go func() {
-		slog.Info("Starting pprof server", "addr", constants.DebugHttpPort)
-
-		err = http.ListenAndServe(constants.DebugHttpPort, nil)
-		if err != nil {
-			slog.Error("Could not start pprof server", "error", err)
-		}
-	}()
-
-	go func() {
 		slog.Info("Starting OpAmp Websocket server", "addr", constants.OpAmpWsEndpoint)
 		err := s.opampServer.Start(constants.OpAmpWsEndpoint)
 		if err != nil {
@@ -344,23 +336,21 @@ func makeRulesManager(
 	queryParser queryparser.QueryParser,
 ) (*rules.Manager, error) {
 	ruleStore := sqlrulestore.NewRuleStore(sqlstore, queryParser, providerSettings)
-	maintenanceStore := sqlrulestore.NewMaintenanceStore(sqlstore)
+	maintenanceStore := sqlalertmanagerstore.NewMaintenanceStore(sqlstore, providerSettings)
 	// create manager opts
 	managerOpts := &rules.ManagerOptions{
 		TelemetryStore:   telemetryStore,
 		MetadataStore:    metadataStore,
 		Context:          context.Background(),
-		Logger:           zap.L(),
-		Reader:           ch,
+		Logger:           providerSettings.Logger,
 		Querier:          querier,
-		SLogger:          providerSettings.Logger,
 		Cache:            cache,
 		EvalDelay:        constants.GetEvalDelay(),
 		OrgGetter:        orgGetter,
 		Alertmanager:     alertmanager,
 		RuleStore:        ruleStore,
 		MaintenanceStore: maintenanceStore,
-		SqlStore:         sqlstore,
+		SQLStore:         sqlstore,
 		QueryParser:      queryParser,
 	}
 
