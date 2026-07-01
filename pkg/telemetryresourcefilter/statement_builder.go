@@ -37,16 +37,30 @@ var (
 
 func New[T any](
 	settings factory.ProviderSettings,
-	fieldMapper qbtypes.FieldMapper,
-	conditionBuilder qbtypes.ConditionBuilder,
+	dbName string,
+	tableName string,
+	signal telemetrytypes.Signal,
+	source telemetrytypes.Source,
 	metadataStore telemetrytypes.MetadataStore,
-) *resourceFilterStatementBuilder[qbtypes.TraceAggregation] {
-	return &resourceFilterStatementBuilder[qbtypes.TraceAggregation]{
+	fullTextColumn *telemetrytypes.TelemetryFieldKey,
+	jsonKeyToKey qbtypes.JsonKeyToFieldFunc,
+	fl flagger.Flagger,
+) *resourceFilterStatementBuilder[T] {
+	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/telemetryresourcefilter")
+	fm := NewFieldMapper()
+	cb := NewConditionBuilder(fm)
+	return &resourceFilterStatementBuilder[T]{
 		logger:           set.Logger(),
-		fieldMapper:      fieldMapper,
-		conditionBuilder: conditionBuilder,
+		dbName:           dbName,
+		tableName:        tableName,
+		fieldMapper:      fm,
+		conditionBuilder: cb,
 		metadataStore:    metadataStore,
-		signal:           telemetrytypes.SignalTraces,
+		signal:           signal,
+		source:           source,
+		flagger:          fl,
+		fullTextColumn:   fullTextColumn,
+		jsonKeyToKey:     jsonKeyToKey,
 	}
 }
 

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"log/slog"
 	"math"
 	"reflect"
 	"strconv"
@@ -10,7 +11,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/metrics"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"go.uber.org/zap"
 )
 
 // ValidateAndCastValue validates and casts the value of a key to the corresponding data type of the key
