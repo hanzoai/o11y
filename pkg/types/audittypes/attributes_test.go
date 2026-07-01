@@ -3,9 +3,9 @@ package audittypes
 import (
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/coretypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -13,10 +13,10 @@ import (
 	"github.com/open-telemetry/opamp-go/server"
 	"github.com/open-telemetry/opamp-go/server/types"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/instrumentation"
-	model "github.com/SigNoz/signoz/pkg/query-service/app/opamp/model"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/instrumentation"
+	model "github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 var opAmpServer *Server

@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/types/spantypes"
+	"github.com/hanzoai/o11y/pkg/types/spantypes"
 )
 
 // Handler exposes HTTP handlers for trace detail APIs.

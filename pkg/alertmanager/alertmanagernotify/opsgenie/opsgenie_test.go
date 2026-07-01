@@ -15,9 +15,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/alertmanager/alertmanagertemplate"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
-	"github.com/SigNoz/signoz/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertemplate"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	commoncfg "github.com/prometheus/common/config"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/common/promslog"

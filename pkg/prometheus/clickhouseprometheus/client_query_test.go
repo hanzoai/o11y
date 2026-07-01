@@ -5,12 +5,12 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/telemetrystore/telemetrystoretest"
-	cmock "github.com/SigNoz/clickhouse-go-mock"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
+	cmock "github.com/hanzoai/clickhouse-go-mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/stretchr/testify/assert"
 )

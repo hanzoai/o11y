@@ -11,10 +11,10 @@ import (
 	opentracing "github.com/opentracing/opentracing-go"
 	plabels "github.com/prometheus/prometheus/model/labels"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	ruletypes "github.com/SigNoz/signoz/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
 )
 
 // PromRuleTask is a promql rule executor

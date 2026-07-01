@@ -12,8 +12,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	citypes "github.com/SigNoz/signoz/pkg/types/cloudintegrationtypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	citypes "github.com/hanzoai/o11y/pkg/types/cloudintegrationtypes"
 )
 
 const definitionsRoot = "fs/definitions"

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/SigNoz/signoz/ee/query-service/constants"
-	"github.com/SigNoz/signoz/ee/query-service/model"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/featuretypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/ee/query-service/constants"
+	"github.com/hanzoai/o11y/ee/query-service/model"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type DayWiseBreakdown struct {

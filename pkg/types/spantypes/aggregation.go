@@ -4,9 +4,9 @@ import (
 	"regexp"
 	"slices"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 var validAggregationFieldName = regexp.MustCompile(`^[a-zA-Z0-9._\-]+$`)

@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	schema "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	schema "github.com/hanzoai/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

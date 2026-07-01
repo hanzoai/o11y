@@ -3,8 +3,8 @@ package spantypes
 import (
 	"sort"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/query-service/agentConf"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
 	"gopkg.in/yaml.v3"
 )
 

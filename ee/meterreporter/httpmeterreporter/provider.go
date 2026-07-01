@@ -7,19 +7,19 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/metercollector"
-	"github.com/SigNoz/signoz/pkg/meterreporter"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/featuretypes"
-	"github.com/SigNoz/signoz/pkg/types/licensetypes"
-	"github.com/SigNoz/signoz/pkg/types/zeustypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/metercollector"
+	"github.com/hanzoai/o11y/pkg/meterreporter"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
+	"github.com/hanzoai/o11y/pkg/types/licensetypes"
+	"github.com/hanzoai/o11y/pkg/types/zeustypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/zeus"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
@@ -58,7 +58,7 @@ func newProvider(
 	orgGetter organization.Getter,
 	zeus zeus.Zeus,
 ) (*Provider, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/ee/meterreporter/httpmeterreporter")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/ee/meterreporter/httpmeterreporter")
 
 	collectorsByName := map[zeustypes.MeterName]metercollector.MeterCollector{}
 	for _, collectorConfig := range collectorConfigs {

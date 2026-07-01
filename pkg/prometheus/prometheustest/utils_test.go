@@ -3,7 +3,7 @@ package prometheustest
 import (
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/promql"
 )

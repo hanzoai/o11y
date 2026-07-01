@@ -71,12 +71,12 @@ jobs:
       GO_BUILD_FLAGS: >-
         -tags timetzdata
         -ldflags='-s -w
-        -X github.com/SigNoz/signoz/pkg/version.version=${{ needs.prepare.outputs.version }}
-        -X github.com/SigNoz/signoz/pkg/version.variant=community
-        -X github.com/SigNoz/signoz/pkg/version.hash=${{ needs.prepare.outputs.hash }}
-        -X github.com/SigNoz/signoz/pkg/version.time=${{ needs.prepare.outputs.time }}
-        -X github.com/SigNoz/signoz/pkg/version.branch=${{ needs.prepare.outputs.branch }}
-        -X github.com/SigNoz/signoz/pkg/analytics.key=9kRrJ7oPCGPEJLF6QjMPLt5bljFhRQBr'
+        -X github.com/hanzoai/o11y/pkg/version.version=${{ needs.prepare.outputs.version }}
+        -X github.com/hanzoai/o11y/pkg/version.variant=community
+        -X github.com/hanzoai/o11y/pkg/version.hash=${{ needs.prepare.outputs.hash }}
+        -X github.com/hanzoai/o11y/pkg/version.time=${{ needs.prepare.outputs.time }}
+        -X github.com/hanzoai/o11y/pkg/version.branch=${{ needs.prepare.outputs.branch }}
+        -X github.com/hanzoai/o11y/pkg/analytics.key=9kRrJ7oPCGPEJLF6QjMPLt5bljFhRQBr'
       DOCKER_BASE_IMAGES: '{"alpine": "alpine:3.20.3"}'
       DOCKER_DOCKERFILE_PATH: ./cmd/community/Dockerfile.multi-arch
       DOCKER_MANIFEST: true

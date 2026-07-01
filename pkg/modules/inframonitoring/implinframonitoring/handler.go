@@ -3,12 +3,12 @@ package implinframonitoring
 import (
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/http/binding"
-	"github.com/SigNoz/signoz/pkg/http/render"
-	"github.com/SigNoz/signoz/pkg/modules/inframonitoring"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/inframonitoringtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/http/binding"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/inframonitoringtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type handler struct {

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	signozstanzahelper "github.com/SigNoz/signoz-otel-collector/processor/signozlogspipelineprocessor/stanza/operator/helper"
+	signozstanzahelper "github.com/hanzoai/signoz-otel-collector/processor/signozlogspipelineprocessor/stanza/operator/helper"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
