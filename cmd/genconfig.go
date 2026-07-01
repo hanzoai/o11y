@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/web"
+	"github.com/hanzoai/o11y/pkg/web"
 	"github.com/spf13/cobra"
 	"github.com/swaggest/jsonschema-go"
 )

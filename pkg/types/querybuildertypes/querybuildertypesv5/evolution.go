@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	schema "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	schema "github.com/hanzoai/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 // SelectEvolutionsForColumns selects the appropriate evolution entries for each column based on the time range.

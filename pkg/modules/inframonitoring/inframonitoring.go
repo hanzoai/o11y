@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/types/inframonitoringtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/inframonitoringtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type Handler interface {

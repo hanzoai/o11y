@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/modules/llmpricingrule"
-	"github.com/SigNoz/signoz/pkg/query-service/agentConf"
-	"github.com/SigNoz/signoz/pkg/types/llmpricingruletypes"
-	"github.com/SigNoz/signoz/pkg/types/opamptypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/modules/llmpricingrule"
+	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
+	"github.com/hanzoai/o11y/pkg/types/llmpricingruletypes"
+	"github.com/hanzoai/o11y/pkg/types/opamptypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type module struct {

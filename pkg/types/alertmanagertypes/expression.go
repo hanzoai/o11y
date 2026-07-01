@@ -6,7 +6,7 @@ import (
 	"github.com/expr-lang/expr"
 	"github.com/prometheus/common/model"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 var ErrCodeInvalidScopeExpression = errors.MustNewCode("invalid_scope_expression")

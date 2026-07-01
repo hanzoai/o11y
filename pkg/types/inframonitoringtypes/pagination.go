@@ -3,7 +3,7 @@ package inframonitoringtypes
 import (
 	"sort"
 
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
 // PaginateMetadataByName returns metadataMap groups sorted by name

@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"sync"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/templating/markdownrenderer/blockkit"
-	"github.com/SigNoz/signoz/pkg/templating/markdownrenderer/mrkdwn"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/templating/markdownrenderer/blockkit"
+	"github.com/hanzoai/o11y/pkg/templating/markdownrenderer/mrkdwn"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 )

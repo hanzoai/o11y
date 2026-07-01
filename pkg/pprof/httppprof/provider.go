@@ -7,9 +7,9 @@ import (
 	nethttppprof "net/http/pprof"
 	runtimepprof "runtime/pprof"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	httpserver "github.com/SigNoz/signoz/pkg/http/server"
-	"github.com/SigNoz/signoz/pkg/pprof"
+	"github.com/hanzoai/o11y/pkg/factory"
+	httpserver "github.com/hanzoai/o11y/pkg/http/server"
+	"github.com/hanzoai/o11y/pkg/pprof"
 )
 
 type provider struct {
@@ -22,7 +22,7 @@ func NewFactory() factory.ProviderFactory[pprof.PProf, pprof.Config] {
 
 func New(_ context.Context, settings factory.ProviderSettings, config pprof.Config) (pprof.PProf, error) {
 	server, err := httpserver.New(
-		settings.Logger.With(slog.String("pkg", "github.com/SigNoz/signoz/pkg/pprof/httppprof")),
+		settings.Logger.With(slog.String("pkg", "github.com/hanzoai/o11y/pkg/pprof/httppprof")),
 		httpserver.Config{Address: config.Address},
 		newHandler(),
 	)

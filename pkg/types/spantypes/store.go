@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type SpanMapperStore interface {

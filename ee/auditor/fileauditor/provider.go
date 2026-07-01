@@ -5,13 +5,13 @@ import (
 	"os"
 	"sync"
 
-	"github.com/SigNoz/signoz/pkg/auditor"
-	"github.com/SigNoz/signoz/pkg/auditor/auditorserver"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/types/audittypes"
-	"github.com/SigNoz/signoz/pkg/version"
+	"github.com/hanzoai/o11y/pkg/auditor"
+	"github.com/hanzoai/o11y/pkg/auditor/auditorserver"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/types/audittypes"
+	"github.com/hanzoai/o11y/pkg/version"
 	"go.opentelemetry.io/collector/pdata/plog"
 )
 
@@ -35,7 +35,7 @@ func NewFactory(licensing licensing.Licensing, build version.Build) factory.Prov
 }
 
 func newProvider(_ context.Context, providerSettings factory.ProviderSettings, config auditor.Config, licensing licensing.Licensing, build version.Build) (auditor.Auditor, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/ee/auditor/fileauditor")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/ee/auditor/fileauditor")
 
 	file, err := os.OpenFile(config.File.Path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {

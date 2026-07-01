@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/licensetypes"
-	"github.com/SigNoz/signoz/pkg/types/zeustypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/licensetypes"
+	"github.com/hanzoai/o11y/pkg/types/zeustypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 var (

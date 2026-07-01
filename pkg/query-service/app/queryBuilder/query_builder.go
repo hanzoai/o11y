@@ -6,7 +6,7 @@ import (
 
 	"log/slog"
 
-	"github.com/SigNoz/govaluate"
+	"github.com/hanzoai/govaluate"
 	"github.com/hanzoai/o11y/pkg/cache"
 	metricsV3 "github.com/hanzoai/o11y/pkg/query-service/app/metrics/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
