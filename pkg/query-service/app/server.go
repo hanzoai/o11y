@@ -95,7 +95,7 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 		nil,
 	)
 
-	rm, err := makeRulesManager(
+	rm, err := MakeRulesManager(
 		reader,
 		o11y.Cache,
 		o11y.Alertmanager,
@@ -323,7 +323,7 @@ func (s *Server) Stop(ctx context.Context) error {
 	return nil
 }
 
-func makeRulesManager(
+func MakeRulesManager(
 	ch interfaces.Reader,
 	cache cache.Cache,
 	alertmanager alertmanager.Alertmanager,

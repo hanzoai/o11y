@@ -3,37 +3,29 @@ package app
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"slices"
 
-	"github.com/hanzoai/o11y/pkg/cache/memorycache"
-	"github.com/hanzoai/o11y/pkg/factory"
-	"github.com/hanzoai/o11y/pkg/queryparser"
-	"github.com/hanzoai/o11y/pkg/ruler/rulestore/sqlrulestore"
-	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel/propagation"
+
+	"github.com/hanzoai/o11y/pkg/cache/memorycache"
 
 	"github.com/hanzoai/o11y/pkg/errors"
 
 	"github.com/gorilla/handlers"
 
-	"github.com/hanzoai/o11y/ee/query-service/app/api"
-	"github.com/hanzoai/o11y/ee/query-service/rules"
-	"github.com/hanzoai/o11y/ee/query-service/usage"
-	"github.com/hanzoai/o11y/pkg/alertmanager"
-	"github.com/hanzoai/o11y/pkg/cache"
-	"github.com/hanzoai/o11y/pkg/http/middleware"
-	"github.com/hanzoai/o11y/pkg/modules/organization"
-	"github.com/hanzoai/o11y/pkg/prometheus"
-	"github.com/hanzoai/o11y/pkg/querier"
-	"github.com/hanzoai/o11y"
-	"github.com/hanzoai/o11y/pkg/sqlstore"
-	"github.com/hanzoai/o11y/pkg/telemetrystore"
-	"github.com/hanzoai/o11y/pkg/web"
 	"github.com/rs/cors"
 	"github.com/soheilhy/cmux"
+
+	"github.com/hanzoai/o11y"
+	"github.com/hanzoai/o11y/ee/query-service/app/api"
+	"github.com/hanzoai/o11y/ee/query-service/usage"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/web"
 
 	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
 	baseapp "github.com/hanzoai/o11y/pkg/query-service/app"
@@ -44,16 +36,14 @@ import (
 	opAmpModel "github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
 	baseconst "github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/healthcheck"
-	baseint "github.com/hanzoai/o11y/pkg/query-service/interfaces"
 	baserules "github.com/hanzoai/o11y/pkg/query-service/rules"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
-	"go.uber.org/zap"
 )
 
 // Server runs HTTP, Mux and a grpc server
 type Server struct {
 	config      o11y.Config
-	o11y      *o11y.HanzoO11y
+	o11y        *o11y.HanzoO11y
 	ruleManager *baserules.Manager
 
 	// public http router
@@ -83,9 +73,9 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 	}
 
 	reader := datastoreReader.NewReader(
+		o11y.Instrumentation.Logger(),
 		o11y.SQLStore,
 		o11y.TelemetryStore,
-		o11y.Prometheus,
 		o11y.TelemetryStore.Cluster(),
 		config.Querier.FluxInterval,
 		cacheForTraceDetail,
@@ -93,14 +83,13 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 		nil,
 	)
 
-	rm, err := makeRulesManager(
+	rm, err := baseapp.MakeRulesManager(
 		reader,
 		o11y.Cache,
 		o11y.Alertmanager,
 		o11y.SQLStore,
 		o11y.TelemetryStore,
 		o11y.TelemetryMetadataStore,
-		o11y.Prometheus,
 		o11y.Modules.OrgGetter,
 		o11y.Querier,
 		o11y.Instrumentation.ToProviderSettings(),
@@ -114,13 +103,12 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 	// initiate opamp
 	opAmpModel.Init(o11y.SQLStore, o11y.Instrumentation.Logger(), o11y.Modules.OrgGetter)
 
-	integrationsController, err := integrations.NewController(o11y.SQLStore)
+	integrationsController, err := integrations.NewController(o11y.SQLStore, o11y.Modules.Dashboard)
 	if err != nil {
 		return nil, fmt.Errorf(
 			"couldn't create integrations controller: %w", err,
 		)
 	}
-
 
 	// ingestion pipelines manager
 	logParsingPipelineController, err := logparsingpipeline.NewLogParsingPipelinesController(
@@ -143,7 +131,7 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 	}
 
 	// start the usagemanager
-	usageManager, err := usage.New(o11y.Licensing, o11y.TelemetryStore.ClickhouseDB(), o11y.Zeus, o11y.Modules.OrgGetter)
+	usageManager, err := usage.New(o11y.Licensing, o11y.TelemetryStore.ClickhouseDB(), o11y.Zeus, o11y.Modules.OrgGetter, o11y.Flagger)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +157,7 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 
 	s := &Server{
 		config:             config,
-		o11y:             o11y,
+		o11y:               o11y,
 		ruleManager:        rm,
 		httpHostPort:       baseconst.HTTPHostPort,
 		unavailableChannel: make(chan healthcheck.Status),
@@ -210,14 +198,13 @@ func (s *Server) createPublicServer(apiHandler *api.APIHandler, web web.Web) (*h
 			return !slices.Contains([]string{"/api/v1/health"}, r.URL.Path)
 		}),
 	))
-	r.Use(middleware.NewAuthN([]string{"Authorization", "Sec-WebSocket-Protocol"}, s.o11y.Sharder, s.o11y.Tokenizer, s.o11y.Instrumentation.Logger()).Wrap)
-	r.Use(middleware.NewAPIKey(s.o11y.SQLStore, []string{"HANZO-API-KEY"}, s.o11y.Instrumentation.Logger(), s.o11y.Sharder).Wrap)
+	r.Use(middleware.NewIdentN(s.o11y.IdentNResolver, s.o11y.Sharder, s.o11y.Instrumentation.Logger()).Wrap)
 	r.Use(middleware.NewTimeout(s.o11y.Instrumentation.Logger(),
 		s.config.APIServer.Timeout.ExcludedRoutes,
 		s.config.APIServer.Timeout.Default,
 		s.config.APIServer.Timeout.Max,
 	).Wrap)
-	r.Use(middleware.NewLogging(s.o11y.Instrumentation.Logger(), s.config.APIServer.Logging.ExcludedRoutes).Wrap)
+	r.Use(middleware.NewAudit(s.o11y.Instrumentation.Logger(), s.config.APIServer.Logging.ExcludedRoutes, s.o11y.Auditor).Wrap)
 	r.Use(middleware.NewComment().Wrap)
 
 	apiHandler.RegisterRoutes(r, am)
