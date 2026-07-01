@@ -24,7 +24,7 @@ import (
 	"github.com/prometheus/alertmanager/template"
 	"github.com/prometheus/alertmanager/timeinterval"
 	"github.com/luxfi/metric"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/common/model"
 )
 
 // This is not a real snapshot file and will never be used. We need this placeholder to ensure maintenance runs on shutdown.

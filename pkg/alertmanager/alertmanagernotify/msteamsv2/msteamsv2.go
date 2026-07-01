@@ -16,8 +16,8 @@ import (
 	"strings"
 
 	"github.com/hanzoai/o11y/pkg/errors"
-	commoncfg "github.com/hanzoai/common/config"
-	"github.com/hanzoai/common/model"
+	commoncfg "github.com/prometheus/common/config"
+	"github.com/prometheus/common/model"
 
 	"github.com/prometheus/alertmanager/config"
 	"github.com/prometheus/alertmanager/notify"

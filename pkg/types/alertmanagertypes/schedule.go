@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 type Schedule struct {

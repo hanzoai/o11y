@@ -20,8 +20,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 
-	"github.com/hanzoai/common/model"
-	"github.com/hanzoai/common/promslog"
+	"github.com/prometheus/common/model"
+	"github.com/prometheus/common/promslog"
 	metric "github.com/luxfi/metric"
 	"github.com/prometheus/alertmanager/config"
 	"github.com/prometheus/alertmanager/dispatch"

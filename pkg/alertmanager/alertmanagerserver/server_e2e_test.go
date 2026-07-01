@@ -19,7 +19,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 
 	"github.com/go-openapi/strfmt"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/common/model"
 	metric "github.com/luxfi/metric"
 
 	"github.com/stretchr/testify/mock"

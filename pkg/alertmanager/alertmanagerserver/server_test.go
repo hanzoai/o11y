@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/go-openapi/strfmt"
-	commoncfg "github.com/hanzoai/common/config"
-	"github.com/hanzoai/common/model"
+	commoncfg "github.com/prometheus/common/config"
+	"github.com/prometheus/common/model"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager/nfmanagertest"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes/alertmanagertypestest"
