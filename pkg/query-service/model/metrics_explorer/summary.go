@@ -55,6 +55,7 @@ type MetricDetail struct {
 	MetricType  v3.MetricType `json:"metricType"`
 	MetricUnit  string        `json:"metricUnit"`
 	TimeSeries  uint64        `json:"timeSeries"`
+	Samples     uint64        `json:"samples"`
 }
 
 // SummaryListMetricsResponse is a page of metric summaries.
@@ -80,24 +81,28 @@ type TreeMapResponseItem struct {
 
 // RelatedMetricsRequest requests metrics related to a given metric.
 type RelatedMetricsRequest struct {
-	CurrentMetricName string `json:"currentMetricName"`
-	Start             int64  `json:"start"`
-	End               int64  `json:"end"`
+	CurrentMetricName string      `json:"currentMetricName"`
+	Start             int64       `json:"start"`
+	End               int64       `json:"end"`
+	Filters           v3.FilterSet `json:"filters"`
 }
 
 // RelatedMetricsScore scores a related metric by name/attribute similarity.
 type RelatedMetricsScore struct {
-	NameSimilarity float64        `json:"nameSimilarity"`
-	MetricType     v3.MetricType  `json:"metricType"`
-	Temporality    v3.Temporality `json:"temporality"`
-	IsMonotonic    bool           `json:"isMonotonic"`
+	NameSimilarity      float64        `json:"nameSimilarity"`
+	AttributeSimilarity float64        `json:"attributeSimilarity"`
+	Filters             [][]string     `json:"filters"`
+	MetricType          v3.MetricType  `json:"metricType"`
+	Temporality         v3.Temporality `json:"temporality"`
+	IsMonotonic         bool           `json:"isMonotonic"`
 }
 
 // InspectMetricsRequest requests raw series for a single metric over a range.
 type InspectMetricsRequest struct {
-	MetricName string `json:"metricName"`
-	Start      int64  `json:"start"`
-	End        int64  `json:"end"`
+	MetricName string       `json:"metricName"`
+	Start      int64        `json:"start"`
+	End        int64        `json:"end"`
+	Filters    v3.FilterSet `json:"filters"`
 }
 
 // InspectMetricsResponse holds the inspected series for a metric.
