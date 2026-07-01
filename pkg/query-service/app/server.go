@@ -23,7 +23,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
 	"github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader"
-	"github.com/hanzoai/o11y/pkg/query-service/app/cloudintegrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
 	"github.com/hanzoai/o11y/pkg/query-service/app/opamp"
@@ -69,11 +68,6 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 		return nil, err
 	}
 
-	cloudIntegrationsController, err := cloudintegrations.NewController(o11y.SQLStore)
-	if err != nil {
-		return nil, err
-	}
-
 	cacheForTraceDetail, err := memorycache.New(context.TODO(), o11y.Instrumentation.ToProviderSettings(), cache.Config{
 		Provider: "memory",
 		Memory: cache.Memory{
@@ -115,7 +109,7 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 		o11y.SQLStore,
 		integrationsController.GetPipelinesForInstalledIntegrations,
 		reader,
-		signoz.Flagger,
+		o11y.Flagger,
 	)
 	if err != nil {
 		return nil, err

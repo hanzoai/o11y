@@ -10,7 +10,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	baseapp "github.com/hanzoai/o11y/pkg/query-service/app"
-	"github.com/hanzoai/o11y/pkg/query-service/app/cloudintegrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
 	"github.com/hanzoai/o11y/pkg/query-service/interfaces"

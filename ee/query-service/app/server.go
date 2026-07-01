@@ -15,7 +15,6 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel/propagation"
 
-	"github.com/hanzoai/o11y/pkg/cache/memorycache"
 	"github.com/hanzoai/o11y/pkg/errors"
 
 	"github.com/gorilla/handlers"
@@ -39,7 +38,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
 	baseapp "github.com/hanzoai/o11y/pkg/query-service/app"
 	"github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader"
-	"github.com/hanzoai/o11y/pkg/query-service/app/cloudintegrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
 	"github.com/hanzoai/o11y/pkg/query-service/app/opamp"
@@ -123,19 +121,13 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 		)
 	}
 
-	cloudIntegrationsController, err := cloudintegrations.NewController(o11y.SQLStore)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"couldn't create cloud provider integrations controller: %w", err,
-		)
-	}
 
 	// ingestion pipelines manager
 	logParsingPipelineController, err := logparsingpipeline.NewLogParsingPipelinesController(
 		o11y.SQLStore,
 		integrationsController.GetPipelinesForInstalledIntegrations,
 		reader,
-		signoz.Flagger,
+		o11y.Flagger,
 	)
 	if err != nil {
 		return nil, err
@@ -208,7 +200,7 @@ func (s *Server) createPublicServer(apiHandler *api.APIHandler, web web.Web) (*h
 	r := baseapp.NewRouter()
 	am := middleware.NewAuthZ(s.o11y.Instrumentation.Logger(), s.o11y.Modules.OrgGetter, s.o11y.Authz)
 
-	r.Use(middleware.NewRecovery(s.signoz.Instrumentation.Logger()).Wrap)
+	r.Use(middleware.NewRecovery(s.o11y.Instrumentation.Logger()).Wrap)
 	r.Use(otelmux.Middleware(
 		"apiserver",
 		otelmux.WithMeterProvider(s.o11y.Instrumentation.MeterProvider()),

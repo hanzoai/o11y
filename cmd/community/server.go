@@ -40,7 +40,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/ruler"
 	"github.com/hanzoai/o11y/pkg/ruler/o11yruler"
-	"github.com/hanzoai/o11y/pkg/signoz"
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
@@ -71,11 +71,11 @@ func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
 	parentCmd.AddCommand(serverCmd)
 }
 
-func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) error {
+func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) error {
 	// print the version
 	version.Info.PrettyPrint(config.Version)
 
-	signoz, err := signoz.New(
+	o11yInstance, err := o11y.New(
 		ctx,
 		config,
 		zeus.Config{},
@@ -84,14 +84,14 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		func(_ sqlstore.SQLStore, _ zeus.Zeus, _ organization.Getter, _ analytics.Analytics) factory.ProviderFactory[licensing.Licensing, licensing.Config] {
 			return nooplicensing.NewFactory()
 		},
-		signoz.NewEmailingProviderFactories(),
-		signoz.NewCacheProviderFactories(),
-		signoz.NewWebProviderFactories(config.Global),
+		o11y.NewEmailingProviderFactories(),
+		o11y.NewCacheProviderFactories(),
+		o11y.NewWebProviderFactories(config.Global),
 		sqlschemaProviderFactories,
 		sqlstoreProviderFactories(),
-		signoz.NewTelemetryStoreProviderFactories(),
+		o11y.NewTelemetryStoreProviderFactories(),
 		func(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
-			return signoz.NewAuthNs(ctx, providerSettings, store, licensing)
+			return o11y.NewAuthNs(ctx, providerSettings, store, licensing)
 		},
 		func(ctx context.Context, sqlstore sqlstore.SQLStore, config authz.Config, _ licensing.Licensing, _ []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error) {
 			openfgaDataStore, err := openfgaserver.NewSQLStore(sqlstore, config)
@@ -108,10 +108,10 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 			return noopgateway.NewProviderFactory()
 		},
 		func(_ licensing.Licensing) factory.NamedMap[factory.ProviderFactory[auditor.Auditor, auditor.Config]] {
-			return signoz.NewAuditorProviderFactories()
+			return o11y.NewAuditorProviderFactories()
 		},
 		func(_ context.Context, _ factory.ProviderSettings, _ flagger.Flagger, _ licensing.Licensing, _ telemetrystore.TelemetryStore, _ retention.Getter, _ organization.Getter, _ zeus.Zeus) (factory.NamedMap[factory.ProviderFactory[meterreporter.Reporter, meterreporter.Config]], string) {
-			return signoz.NewMeterReporterProviderFactories(), "noop"
+			return o11y.NewMeterReporterProviderFactories(), "noop"
 		},
 		func(ps factory.ProviderSettings, q querier.Querier, a analytics.Analytics) querier.Handler {
 			return querier.NewHandler(ps, q, a)
@@ -124,11 +124,11 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		},
 	)
 	if err != nil {
-		logger.ErrorContext(ctx, "failed to create signoz", errors.Attr(err))
+		logger.ErrorContext(ctx, "failed to create o11y", errors.Attr(err))
 		return err
 	}
 
-	server, err := app.NewServer(config, signoz)
+	server, err := app.NewServer(config, o11yInstance)
 	if err != nil {
 		logger.ErrorContext(ctx, "failed to create server", errors.Attr(err))
 		return err
@@ -139,10 +139,10 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		return err
 	}
 
-	signoz.Start(ctx)
+	o11yInstance.Start(ctx)
 
-	if err := signoz.Wait(ctx); err != nil {
-		logger.ErrorContext(ctx, "failed to start signoz", errors.Attr(err))
+	if err := o11yInstance.Wait(ctx); err != nil {
+		logger.ErrorContext(ctx, "failed to start o11y", errors.Attr(err))
 		return err
 	}
 
@@ -152,9 +152,9 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		return err
 	}
 
-	err = signoz.Stop(ctx)
+	err = o11yInstance.Stop(ctx)
 	if err != nil {
-		logger.ErrorContext(ctx, "failed to stop signoz", errors.Attr(err))
+		logger.ErrorContext(ctx, "failed to stop o11y", errors.Attr(err))
 		return err
 	}
 
