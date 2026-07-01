@@ -69,6 +69,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/identn/apikeyidentn"
 	"github.com/hanzoai/o11y/pkg/identn/impersonationidentn"
 	"github.com/hanzoai/o11y/pkg/identn/tokenizeridentn"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
 )
 
 func NewAnalyticsProviderFactories() factory.NamedMap[factory.ProviderFactory[analytics.Analytics, analytics.Config]] {
@@ -240,9 +243,20 @@ func NewAlertmanagerProviderFactories(
 	)
 }
 
-func NewRulerProviderFactories(sqlstore sqlstore.SQLStore, queryParser queryparser.QueryParser) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]] {
+func NewRulerProviderFactories(
+	cache cache.Cache,
+	alertmanager alertmanager.Alertmanager,
+	sqlstore sqlstore.SQLStore,
+	telemetryStore telemetrystore.TelemetryStore,
+	metadataStore telemetrytypes.MetadataStore,
+	prometheus prometheus.Prometheus,
+	orgGetter organization.Getter,
+	ruleStateHistoryModule rulestatehistory.Module,
+	querier querier.Querier,
+	queryParser queryparser.QueryParser,
+) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]] {
 	return factory.MustNewNamedMap(
-		o11yruler.NewFactory(sqlstore, queryParser),
+		o11yruler.NewFactory(cache, alertmanager, sqlstore, telemetryStore, metadataStore, prometheus, orgGetter, ruleStateHistoryModule, querier, queryParser, nil, nil),
 	)
 }
 

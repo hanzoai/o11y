@@ -372,17 +372,6 @@ func New(
 		return nil, err
 	}
 
-	// Initialize ruler from the available ruler provider factories
-	rulerInstance, err := factory.NewProviderFromNamedMap(
-		ctx,
-		providerSettings,
-		config.Ruler,
-		NewRulerProviderFactories(sqlstore, queryParser),
-		"observe",
-	)
-	if err != nil {
-		return nil, err
-	}
 
 	gatewayFactory := gatewayProviderFactory(licensing)
 	gateway, err := gatewayFactory.New(ctx, providerSettings, config.Gateway)
@@ -456,6 +445,19 @@ func New(
 
 	// Initialize all modules
 	modules := NewModules(sqlstore, tokenizer, emailing, providerSettings, orgGetter, alertmanager, analytics, querier, telemetrystore, telemetryMetadataStore, authNs, authz, cache, queryParser, config, dashboard, userGetter, userRoleStore, serviceAccount, cloudIntegrationModule, retentionGetter, flagger, tagModule)
+
+	// Initialize ruler from the available ruler provider factories (after modules,
+	// which supplies RuleStateHistory).
+	rulerInstance, err := factory.NewProviderFromNamedMap(
+		ctx,
+		providerSettings,
+		config.Ruler,
+		NewRulerProviderFactories(cache, alertmanager, sqlstore, telemetrystore, telemetryMetadataStore, nil, orgGetter, modules.RuleStateHistory, querier, queryParser),
+		"observe",
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	// Initialize identN resolver
 	identNFactories := NewIdentNProviderFactories(tokenizer, serviceAccount, orgGetter, userGetter, config.User)
