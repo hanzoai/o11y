@@ -48,6 +48,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/zapreceiver"
 	"github.com/hanzoai/o11y/pkg/zeus"
 	"github.com/hanzoai/o11y/pkg/zeus/noopzeus"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {

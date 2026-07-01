@@ -27,6 +27,7 @@ import (
 	"github.com/hanzoai/o11y/ee/modules/dashboard/impldashboard"
 	eequerier "github.com/hanzoai/o11y/ee/querier"
 	enterpriseapp "github.com/hanzoai/o11y/ee/query-service/app"
+	eerules "github.com/hanzoai/o11y/ee/query-service/rules"
 	"github.com/hanzoai/o11y/ee/sqlschema/postgressqlschema"
 	"github.com/hanzoai/o11y/ee/sqlstore/postgressqlstore"
 	enterprisezeus "github.com/hanzoai/o11y/ee/zeus"
@@ -39,11 +40,13 @@ import (
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
+	pkgflagger "github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/gateway"
 	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/licensing"
 	"github.com/hanzoai/o11y/pkg/meterreporter"
 	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
+	pkgcloudintegration "github.com/hanzoai/o11y/pkg/modules/cloudintegration/implcloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	pkgimpldashboard "github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
@@ -112,7 +115,7 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 		},
 		o11y.NewEmailingProviderFactories(),
 		o11y.NewCacheProviderFactories(),
-		o11y.NewWebProviderFactories(),
+		o11y.NewWebProviderFactories(config.Global),
 		func(sqlstore sqlstore.SQLStore) factory.NamedMap[factory.ProviderFactory[sqlschema.SQLSchema, sqlschema.Config]] {
 			existingFactories := o11y.NewSQLSchemaProviderFactories(sqlstore)
 			if err := existingFactories.Add(postgressqlschema.NewFactory(sqlstore)); err != nil {
@@ -158,7 +161,7 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 			return httpgateway.NewProviderFactory(licensing)
 		},
 		func(licensing licensing.Licensing) factory.NamedMap[factory.ProviderFactory[auditor.Auditor, auditor.Config]] {
-			factories := signoz.NewAuditorProviderFactories()
+			factories := o11y.NewAuditorProviderFactories()
 			if err := factories.Add(otlphttpauditor.NewFactory(licensing, version.Info)); err != nil {
 				panic(err)
 			}
@@ -168,7 +171,7 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 			return factories
 		},
 		func(ctx context.Context, providerSettings factory.ProviderSettings, flagger pkgflagger.Flagger, licensing licensing.Licensing, telemetryStore telemetrystore.TelemetryStore, retentionGetter retention.Getter, orgGetter organization.Getter, zeus zeus.Zeus) (factory.NamedMap[factory.ProviderFactory[meterreporter.Reporter, meterreporter.Config]], string) {
-			factories := signoz.NewMeterReporterProviderFactories()
+			factories := o11y.NewMeterReporterProviderFactories()
 
 			collectorFactories := factory.MustNewNamedMap(
 				staticmetercollector.NewFactory(),
