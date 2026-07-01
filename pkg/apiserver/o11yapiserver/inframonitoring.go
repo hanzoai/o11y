@@ -10,7 +10,7 @@ import (
 )
 
 func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v2/infra_monitoring/hosts", handler.New(
+	if err := router.Handle("/v1/o11y/v2/infra_monitoring/hosts", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListHosts),
 		handler.OpenAPIDef{
 			ID:                  "ListHosts",
@@ -29,7 +29,7 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/infra_monitoring/pods", handler.New(
+	if err := router.Handle("/v1/o11y/v2/infra_monitoring/pods", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListPods),
 		handler.OpenAPIDef{
 			ID:                  "ListPods",
@@ -48,7 +48,7 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/infra_monitoring/nodes", handler.New(
+	if err := router.Handle("/v1/o11y/v2/infra_monitoring/nodes", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListNodes),
 		handler.OpenAPIDef{
 			ID:                  "ListNodes",
@@ -67,7 +67,7 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/infra_monitoring/namespaces", handler.New(
+	if err := router.Handle("/v1/o11y/v2/infra_monitoring/namespaces", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListNamespaces),
 		handler.OpenAPIDef{
 			ID:                  "ListNamespaces",
@@ -86,7 +86,7 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/infra_monitoring/clusters", handler.New(
+	if err := router.Handle("/v1/o11y/v2/infra_monitoring/clusters", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListClusters),
 		handler.OpenAPIDef{
 			ID:                  "ListClusters",
@@ -105,7 +105,7 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/infra_monitoring/pvcs", handler.New(
+	if err := router.Handle("/v1/o11y/v2/infra_monitoring/pvcs", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListVolumes),
 		handler.OpenAPIDef{
 			ID:                  "ListVolumes",
@@ -124,7 +124,7 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/infra_monitoring/deployments", handler.New(
+	if err := router.Handle("/v1/o11y/v2/infra_monitoring/deployments", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListDeployments),
 		handler.OpenAPIDef{
 			ID:                  "ListDeployments",
@@ -143,7 +143,7 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/infra_monitoring/statefulsets", handler.New(
+	if err := router.Handle("/v1/o11y/v2/infra_monitoring/statefulsets", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListStatefulSets),
 		handler.OpenAPIDef{
 			ID:                  "ListStatefulSets",
@@ -162,7 +162,7 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/infra_monitoring/jobs", handler.New(
+	if err := router.Handle("/v1/o11y/v2/infra_monitoring/jobs", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListJobs),
 		handler.OpenAPIDef{
 			ID:                  "ListJobs",
@@ -181,7 +181,7 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/infra_monitoring/daemonsets", handler.New(
+	if err := router.Handle("/v1/o11y/v2/infra_monitoring/daemonsets", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListDaemonSets),
 		handler.OpenAPIDef{
 			ID:                  "ListDaemonSets",

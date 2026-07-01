@@ -182,9 +182,8 @@ func (s Server) HealthCheckStatus() chan healthcheck.Status {
 func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server, error) {
 	r := NewRouter()
 
-	// Rewrite /v1/o11y/* to /api/* so external clients use the
-	// /<version>/<service>/<path> convention while internal routes stay unchanged.
-	r.Use(middleware.NewRewrite("/v1/o11y", "/api").Wrap)
+	// Routes are registered at their exact public path (/v1/o11y/<version>/<path>).
+	// No /api/ prefix, no rewrite shim — one and one way: the route IS the path.
 
 	r.Use(otelmux.Middleware(
 		"apiserver",
@@ -192,7 +191,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 		otelmux.WithTracerProvider(s.o11y.Instrumentation.TracerProvider()),
 		otelmux.WithPropagators(propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})),
 		otelmux.WithFilter(func(r *http.Request) bool {
-			return !slices.Contains([]string{"/api/v1/health"}, r.URL.Path)
+			return !slices.Contains([]string{"/v1/o11y/v1/health"}, r.URL.Path)
 		}),
 	))
 	r.Use(middleware.NewAuthN([]string{"Authorization", "Sec-WebSocket-Protocol"}, s.o11y.Sharder, s.o11y.Tokenizer, s.o11y.Instrumentation.Logger()).Wrap)
@@ -243,7 +242,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 		prefixed := http.StripPrefix(routePrefix, handler)
 		handler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			switch req.URL.Path {
-			case "/api/v1/health", "/api/v2/healthz", "/api/v2/readyz", "/api/v2/livez":
+			case "/v1/o11y/v1/health", "/v1/o11y/v2/healthz", "/v1/o11y/v2/readyz", "/v1/o11y/v2/livez":
 				r.ServeHTTP(w, req)
 				return
 			}
