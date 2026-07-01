@@ -1,6 +1,6 @@
 package logspipeline
 
-import "github.com/SigNoz/signoz/pkg/statsreporter"
+import "github.com/hanzoai/o11y/pkg/statsreporter"
 
 type Module interface {
 	statsreporter.StatsCollector

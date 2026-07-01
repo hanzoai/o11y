@@ -3,17 +3,17 @@ package openfgaauthz
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/ee/authz/openfgaserver"
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/authz/authzstore/sqlauthzstore"
-	pkgopenfgaauthz "github.com/SigNoz/signoz/pkg/authz/openfgaauthz"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/coretypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/ee/authz/openfgaserver"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/authz/authzstore/sqlauthzstore"
+	pkgopenfgaauthz "github.com/hanzoai/o11y/pkg/authz/openfgaauthz"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 	openfgapkgtransformer "github.com/openfga/language/pkg/go/transformer"
 	"github.com/openfga/openfga/pkg/storage"
@@ -48,7 +48,7 @@ func newOpenfgaProvider(ctx context.Context, settings factory.ProviderSettings, 
 		return nil, err
 	}
 
-	scopedSettings := factory.NewScopedProviderSettings(settings, "github.com/SigNoz/signoz/ee/authz/openfgaauthz")
+	scopedSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/ee/authz/openfgaauthz")
 
 	return &provider{
 		config:             config,

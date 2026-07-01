@@ -7,7 +7,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/swaggest/jsonschema-go"

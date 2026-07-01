@@ -3,10 +3,10 @@ package impltag
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/modules/tag"
-	"github.com/SigNoz/signoz/pkg/types/coretypes"
-	"github.com/SigNoz/signoz/pkg/types/tagtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/modules/tag"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/types/tagtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type module struct {

@@ -15,8 +15,8 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
 	"go.opentelemetry.io/otel/propagation"
 
-	"github.com/SigNoz/signoz/pkg/cache/memorycache"
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/cache/memorycache"
+	"github.com/hanzoai/o11y/pkg/errors"
 
 	"github.com/gorilla/handlers"
 

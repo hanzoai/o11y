@@ -1,6 +1,6 @@
 package ruletypes
 
-import "github.com/SigNoz/signoz/pkg/valuer"
+import "github.com/hanzoai/o11y/pkg/valuer"
 
 type RuleHealth struct {
 	valuer.String

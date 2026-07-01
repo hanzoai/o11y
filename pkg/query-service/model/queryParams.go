@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 type InstantQueryMetricsParams struct {

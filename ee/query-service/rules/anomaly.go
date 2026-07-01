@@ -9,19 +9,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/querier"
-	"github.com/SigNoz/signoz/pkg/types/rulestatehistorytypes"
-	"github.com/SigNoz/signoz/pkg/types/ruletypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 
-	"github.com/SigNoz/signoz/pkg/units"
+	"github.com/hanzoai/o11y/pkg/units"
 
-	baserules "github.com/SigNoz/signoz/pkg/query-service/rules"
+	baserules "github.com/hanzoai/o11y/pkg/query-service/rules"
 
-	"github.com/SigNoz/signoz/ee/anomaly"
+	"github.com/hanzoai/o11y/ee/anomaly"
 
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
 type AnomalyRule struct {

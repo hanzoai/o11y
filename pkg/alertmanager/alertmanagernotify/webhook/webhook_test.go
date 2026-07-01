@@ -21,7 +21,7 @@ import (
 	"github.com/prometheus/common/promslog"
 	"github.com/stretchr/testify/require"
 
-	"github.com/SigNoz/signoz/pkg/alertmanager/alertmanagertemplate"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertemplate"
 	"github.com/prometheus/alertmanager/config"
 	"github.com/prometheus/alertmanager/notify"
 	"github.com/prometheus/alertmanager/notify/test"

@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type RepeatType struct {

@@ -14,10 +14,10 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 	opentracing "github.com/opentracing/opentracing-go"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/ctxtypes"
-	"github.com/SigNoz/signoz/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 )
 
 // RuleTask holds a rule (with composite queries)

@@ -4,8 +4,8 @@ import (
 	"context"
 	"sort"
 
-	"github.com/SigNoz/signoz/pkg/modules/cloudintegration"
-	"github.com/SigNoz/signoz/pkg/types/cloudintegrationtypes"
+	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
+	"github.com/hanzoai/o11y/pkg/types/cloudintegrationtypes"
 )
 
 type azurecloudprovider struct {

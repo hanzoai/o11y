@@ -10,9 +10,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	baserules "github.com/SigNoz/signoz/pkg/query-service/rules"
-	"github.com/SigNoz/signoz/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	baserules "github.com/hanzoai/o11y/pkg/query-service/rules"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 )
 
 func PrepareTaskFunc(opts baserules.PrepareTaskOptions) (baserules.Task, error) {

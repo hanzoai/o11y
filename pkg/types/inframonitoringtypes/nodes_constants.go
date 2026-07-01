@@ -1,6 +1,6 @@
 package inframonitoringtypes
 
-import "github.com/SigNoz/signoz/pkg/valuer"
+import "github.com/hanzoai/o11y/pkg/valuer"
 
 type NodeCondition struct {
 	valuer.String

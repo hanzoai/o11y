@@ -8,15 +8,15 @@ import (
 
 	"log/slog"
 
-	"github.com/SigNoz/signoz/ee/query-service/anomaly"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/http/render"
-	baseapp "github.com/SigNoz/signoz/pkg/query-service/app"
-	"github.com/SigNoz/signoz/pkg/query-service/app/queryBuilder"
-	"github.com/SigNoz/signoz/pkg/query-service/model"
-	v3 "github.com/SigNoz/signoz/pkg/query-service/model/v3"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/ee/query-service/anomaly"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	baseapp "github.com/hanzoai/o11y/pkg/query-service/app"
+	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 func (aH *APIHandler) queryRangeV4(w http.ResponseWriter, r *http.Request) {

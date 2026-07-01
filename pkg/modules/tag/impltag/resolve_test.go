@@ -5,10 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SigNoz/signoz/pkg/types/coretypes"
-	"github.com/SigNoz/signoz/pkg/types/tagtypes"
-	"github.com/SigNoz/signoz/pkg/types/tagtypes/tagtypestest"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/types/tagtypes"
+	"github.com/hanzoai/o11y/pkg/types/tagtypes/tagtypestest"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

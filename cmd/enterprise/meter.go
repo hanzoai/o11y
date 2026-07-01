@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/SigNoz/signoz/pkg/metercollector"
-	"github.com/SigNoz/signoz/pkg/telemetrylogs"
-	"github.com/SigNoz/signoz/pkg/telemetrymetrics"
-	"github.com/SigNoz/signoz/pkg/telemetrytraces"
-	"github.com/SigNoz/signoz/pkg/types/retentiontypes"
-	"github.com/SigNoz/signoz/pkg/types/zeustypes"
+	"github.com/hanzoai/o11y/pkg/metercollector"
+	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
+	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
+	"github.com/hanzoai/o11y/pkg/types/zeustypes"
 )
 
 var meterConfigs = []metercollector.Config{
