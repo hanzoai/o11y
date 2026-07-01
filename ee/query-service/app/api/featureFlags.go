@@ -32,7 +32,7 @@ func (ah *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	featureSet, err := ah.Signoz.Licensing.GetFeatureFlags(r.Context(), orgID)
+	featureSet, err := ah.O11y.Licensing.GetFeatureFlags(r.Context(), orgID)
 	if err != nil {
 		ah.HandleError(w, err, http.StatusInternalServerError)
 		return
@@ -40,7 +40,7 @@ func (ah *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 
 	if constants.FetchFeatures == "true" {
 		slog.DebugContext(ctx, "fetching license")
-		license, err := ah.Signoz.Licensing.GetActive(ctx, orgID)
+		license, err := ah.O11y.Licensing.GetActive(ctx, orgID)
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to fetch license", signozerrors.Attr(err))
 		} else if license == nil {
@@ -61,7 +61,7 @@ func (ah *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 	}
 
 	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	useSpanMetrics := ah.Signoz.Flagger.BooleanOrEmpty(ctx, flagger.FeatureUseSpanMetrics, evalCtx)
+	useSpanMetrics := ah.O11y.Flagger.BooleanOrEmpty(ctx, flagger.FeatureUseSpanMetrics, evalCtx)
 
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseSpanMetrics.String()),
@@ -71,7 +71,7 @@ func (ah *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Route:      "",
 	})
 
-	bodyJSONQuery := ah.Signoz.Flagger.BooleanOrEmpty(ctx, flagger.FeatureUseJSONBody, evalCtx)
+	bodyJSONQuery := ah.O11y.Flagger.BooleanOrEmpty(ctx, flagger.FeatureUseJSONBody, evalCtx)
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseJSONBody.String()),
 		Active:     bodyJSONQuery,
@@ -80,7 +80,7 @@ func (ah *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Route:      "",
 	})
 
-	fineGrainedAuthz := ah.Signoz.Flagger.BooleanOrEmpty(ctx, flagger.FeatureUseFineGrainedAuthz, evalCtx)
+	fineGrainedAuthz := ah.O11y.Flagger.BooleanOrEmpty(ctx, flagger.FeatureUseFineGrainedAuthz, evalCtx)
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseFineGrainedAuthz.String()),
 		Active:     fineGrainedAuthz,
@@ -89,7 +89,7 @@ func (ah *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Route:      "",
 	})
 
-	useDashboardV2 := ah.Signoz.Flagger.BooleanOrEmpty(ctx, flagger.FeatureUseDashboardV2, evalCtx)
+	useDashboardV2 := ah.O11y.Flagger.BooleanOrEmpty(ctx, flagger.FeatureUseDashboardV2, evalCtx)
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseDashboardV2.String()),
 		Active:     useDashboardV2,

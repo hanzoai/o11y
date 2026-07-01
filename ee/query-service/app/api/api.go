@@ -6,7 +6,6 @@ import (
 
 	"github.com/hanzoai/o11y/ee/licensing/httplicensing"
 	"github.com/hanzoai/o11y/ee/query-service/usage"
-	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	baseapp "github.com/hanzoai/o11y/pkg/query-service/app"
@@ -14,11 +13,11 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
 	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
 	basemodel "github.com/hanzoai/o11y/pkg/query-service/model"
-	rules "github.com/hanzoai/o11y/pkg/query-service/rules"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/alertmanager/o11yalertmanager"
 )
 
 type APIHandlerOptions struct {
@@ -44,7 +43,7 @@ func NewAPIHandler(opts APIHandlerOptions, o11y *o11y.HanzoO11y, config o11y.Con
 		IntegrationsController:        opts.IntegrationsController,
 		LogsParsingPipelineController: opts.LogsParsingPipelineController,
 		FluxInterval:                  opts.FluxInterval,
-		AlertmanagerAPI:               alertmanager.NewAPI(o11y.Alertmanager),
+		AlertmanagerAPI:               o11yalertmanager.NewHandler(o11y.Alertmanager),
 		LicensingAPI:                  httplicensing.NewLicensingAPI(o11y.Licensing),
 		O11y:                        o11y,
 		QueryParserAPI:                queryparser.NewAPI(o11y.Instrumentation.ToProviderSettings(), o11y.QueryParser),
