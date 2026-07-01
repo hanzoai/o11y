@@ -1419,10 +1419,10 @@ func TestFilterExprLogs(t *testing.T) {
 		},
 		{
 			category:              "REGEXP operator",
-			query:                 "path REGEXP \"^/api/v\\\\d+/users/\\\\d+$\"",
+			query:                 "path REGEXP \"^/v1/o11y/v\\\\d+/users/\\\\d+$\"",
 			shouldPass:            true,
 			expectedQuery:         "WHERE (match(attributes_string['path'], ?) AND mapContains(attributes_string, 'path') = ?)",
-			expectedArgs:          []any{"^/api/v\\d+/users/\\d+$", true},
+			expectedArgs:          []any{"^/v1/o11y/v\\d+/users/\\d+$", true},
 			expectedErrorContains: "",
 		},
 		{
@@ -1461,10 +1461,10 @@ func TestFilterExprLogs(t *testing.T) {
 		},
 		{
 			category:              "NOT REGEXP operator",
-			query:                 "path NOT REGEXP \"^/api/v\\d+/users/\\d+$\"",
+			query:                 "path NOT REGEXP \"^/v1/o11y/v\\d+/users/\\d+$\"",
 			shouldPass:            true,
 			expectedQuery:         "WHERE NOT match(attributes_string['path'], ?)",
-			expectedArgs:          []any{"^/api/v\\d+/users/\\d+$"},
+			expectedArgs:          []any{"^/v1/o11y/v\\d+/users/\\d+$"},
 			expectedErrorContains: "",
 		},
 

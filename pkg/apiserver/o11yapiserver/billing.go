@@ -10,7 +10,7 @@ import (
 )
 
 func (provider *provider) addBillingRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v2/billing/profiles", handler.New(provider.authZ.AdminAccess(provider.billingHandler.PutProfile), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/v2/billing/profiles", handler.New(provider.authZ.AdminAccess(provider.billingHandler.PutProfile), handler.OpenAPIDef{
 		ID:                  "PutProfile",
 		Tags:                []string{"billing"},
 		Summary:             "Put profile for a deployment.",
@@ -27,7 +27,7 @@ func (provider *provider) addBillingRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/billing/hosts", handler.New(provider.authZ.AdminAccess(provider.billingHandler.GetHosts), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/v2/billing/hosts", handler.New(provider.authZ.AdminAccess(provider.billingHandler.GetHosts), handler.OpenAPIDef{
 		ID:                  "GetHosts",
 		Tags:                []string{"billing"},
 		Summary:             "Get host info.",
@@ -44,7 +44,7 @@ func (provider *provider) addBillingRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/billing/hosts", handler.New(provider.authZ.AdminAccess(provider.billingHandler.PutHost), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/v2/billing/hosts", handler.New(provider.authZ.AdminAccess(provider.billingHandler.PutHost), handler.OpenAPIDef{
 		ID:                  "PutHost",
 		Tags:                []string{"billing"},
 		Summary:             "Put host for a deployment.",

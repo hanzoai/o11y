@@ -59,7 +59,7 @@ func TestHandler_List(t *testing.T) {
 	mockModule := new(MockModule)
 	handler := NewHandler(mockModule)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/trace-funnels/list", nil)
+	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/v1/trace-funnels/list", nil)
 
 	orgID := valuer.GenerateUUID()
 	claims := authtypes.Claims{
@@ -114,7 +114,7 @@ func TestHandler_Get(t *testing.T) {
 
 	funnelID := valuer.GenerateUUID()
 	orgID := valuer.GenerateUUID()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/trace-funnels/"+funnelID.String(), nil)
+	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/v1/trace-funnels/"+funnelID.String(), nil)
 	req = mux.SetURLVars(req, map[string]string{"funnel_id": funnelID.String()})
 	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{
 		OrgID: orgID.String(),
@@ -155,7 +155,7 @@ func TestHandler_Delete(t *testing.T) {
 
 	funnelID := valuer.GenerateUUID()
 	orgID := valuer.GenerateUUID()
-	req := httptest.NewRequest(http.MethodDelete, "/api/v1/trace-funnels/"+funnelID.String(), nil)
+	req := httptest.NewRequest(http.MethodDelete, "/v1/o11y/v1/trace-funnels/"+funnelID.String(), nil)
 	req = mux.SetURLVars(req, map[string]string{"funnel_id": funnelID.String()})
 	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{
 		OrgID: orgID.String(),

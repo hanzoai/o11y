@@ -354,7 +354,7 @@ func writeHttpResponse(w http.ResponseWriter, data interface{}) {
 }
 
 func (aH *APIHandler) RegisterQueryRangeV3Routes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/api/v3").Subrouter()
+	subRouter := router.PathPrefix("/v1/o11y/v3").Subrouter()
 	subRouter.HandleFunc("/autocomplete/aggregate_attributes", am.ViewAccess(
 		withCacheControl(AutoCompleteCacheControlAge, aH.autocompleteAggregateAttributes))).Methods(http.MethodGet)
 	subRouter.HandleFunc("/autocomplete/attribute_keys", am.ViewAccess(
@@ -380,62 +380,62 @@ func (aH *APIHandler) RegisterQueryRangeV3Routes(router *mux.Router, am *middlew
 }
 
 func (aH *APIHandler) RegisterInfraMetricsRoutes(router *mux.Router, am *middleware.AuthZ) {
-	hostsSubRouter := router.PathPrefix("/api/v1/hosts").Subrouter()
+	hostsSubRouter := router.PathPrefix("/v1/o11y/v1/hosts").Subrouter()
 	hostsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getHostAttributeKeys)).Methods(http.MethodGet)
 	hostsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getHostAttributeValues)).Methods(http.MethodGet)
 	hostsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getHostList)).Methods(http.MethodPost)
 
-	processesSubRouter := router.PathPrefix("/api/v1/processes").Subrouter()
+	processesSubRouter := router.PathPrefix("/v1/o11y/v1/processes").Subrouter()
 	processesSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getProcessAttributeKeys)).Methods(http.MethodGet)
 	processesSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getProcessAttributeValues)).Methods(http.MethodGet)
 	processesSubRouter.HandleFunc("/list", am.ViewAccess(aH.getProcessList)).Methods(http.MethodPost)
 
-	podsSubRouter := router.PathPrefix("/api/v1/pods").Subrouter()
+	podsSubRouter := router.PathPrefix("/v1/o11y/v1/pods").Subrouter()
 	podsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getPodAttributeKeys)).Methods(http.MethodGet)
 	podsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getPodAttributeValues)).Methods(http.MethodGet)
 	podsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getPodList)).Methods(http.MethodPost)
 
-	pvcsSubRouter := router.PathPrefix("/api/v1/pvcs").Subrouter()
+	pvcsSubRouter := router.PathPrefix("/v1/o11y/v1/pvcs").Subrouter()
 	pvcsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getPvcAttributeKeys)).Methods(http.MethodGet)
 	pvcsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getPvcAttributeValues)).Methods(http.MethodGet)
 	pvcsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getPvcList)).Methods(http.MethodPost)
 
-	nodesSubRouter := router.PathPrefix("/api/v1/nodes").Subrouter()
+	nodesSubRouter := router.PathPrefix("/v1/o11y/v1/nodes").Subrouter()
 	nodesSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getNodeAttributeKeys)).Methods(http.MethodGet)
 	nodesSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getNodeAttributeValues)).Methods(http.MethodGet)
 	nodesSubRouter.HandleFunc("/list", am.ViewAccess(aH.getNodeList)).Methods(http.MethodPost)
 
-	namespacesSubRouter := router.PathPrefix("/api/v1/namespaces").Subrouter()
+	namespacesSubRouter := router.PathPrefix("/v1/o11y/v1/namespaces").Subrouter()
 	namespacesSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getNamespaceAttributeKeys)).Methods(http.MethodGet)
 	namespacesSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getNamespaceAttributeValues)).Methods(http.MethodGet)
 	namespacesSubRouter.HandleFunc("/list", am.ViewAccess(aH.getNamespaceList)).Methods(http.MethodPost)
 
-	clustersSubRouter := router.PathPrefix("/api/v1/clusters").Subrouter()
+	clustersSubRouter := router.PathPrefix("/v1/o11y/v1/clusters").Subrouter()
 	clustersSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getClusterAttributeKeys)).Methods(http.MethodGet)
 	clustersSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getClusterAttributeValues)).Methods(http.MethodGet)
 	clustersSubRouter.HandleFunc("/list", am.ViewAccess(aH.getClusterList)).Methods(http.MethodPost)
 
-	deploymentsSubRouter := router.PathPrefix("/api/v1/deployments").Subrouter()
+	deploymentsSubRouter := router.PathPrefix("/v1/o11y/v1/deployments").Subrouter()
 	deploymentsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getDeploymentAttributeKeys)).Methods(http.MethodGet)
 	deploymentsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getDeploymentAttributeValues)).Methods(http.MethodGet)
 	deploymentsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getDeploymentList)).Methods(http.MethodPost)
 
-	daemonsetsSubRouter := router.PathPrefix("/api/v1/daemonsets").Subrouter()
+	daemonsetsSubRouter := router.PathPrefix("/v1/o11y/v1/daemonsets").Subrouter()
 	daemonsetsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getDaemonSetAttributeKeys)).Methods(http.MethodGet)
 	daemonsetsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getDaemonSetAttributeValues)).Methods(http.MethodGet)
 	daemonsetsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getDaemonSetList)).Methods(http.MethodPost)
 
-	statefulsetsSubRouter := router.PathPrefix("/api/v1/statefulsets").Subrouter()
+	statefulsetsSubRouter := router.PathPrefix("/v1/o11y/v1/statefulsets").Subrouter()
 	statefulsetsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getStatefulSetAttributeKeys)).Methods(http.MethodGet)
 	statefulsetsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getStatefulSetAttributeValues)).Methods(http.MethodGet)
 	statefulsetsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getStatefulSetList)).Methods(http.MethodPost)
 
-	jobsSubRouter := router.PathPrefix("/api/v1/jobs").Subrouter()
+	jobsSubRouter := router.PathPrefix("/v1/o11y/v1/jobs").Subrouter()
 	jobsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getJobAttributeKeys)).Methods(http.MethodGet)
 	jobsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getJobAttributeValues)).Methods(http.MethodGet)
 	jobsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getJobList)).Methods(http.MethodPost)
 
-	infraOnboardingSubRouter := router.PathPrefix("/api/v1/infra_onboarding").Subrouter()
+	infraOnboardingSubRouter := router.PathPrefix("/v1/o11y/v1/infra_onboarding").Subrouter()
 	infraOnboardingSubRouter.HandleFunc("/k8s/status", am.ViewAccess(aH.getK8sInfraOnboardingStatus)).Methods(http.MethodGet)
 }
 
@@ -445,7 +445,7 @@ func (aH *APIHandler) RegisterWebSocketPaths(router *mux.Router, am *middleware.
 }
 
 func (aH *APIHandler) RegisterQueryRangeV4Routes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/api/v4").Subrouter()
+	subRouter := router.PathPrefix("/v1/o11y/v4").Subrouter()
 	subRouter.HandleFunc("/query_range", am.ViewAccess(aH.QueryRangeV4)).Methods(http.MethodPost)
 	subRouter.HandleFunc("/metric/metric_metadata", am.ViewAccess(aH.getMetricMetadata)).Methods(http.MethodGet)
 }
@@ -457,107 +457,107 @@ func (aH *APIHandler) Respond(w http.ResponseWriter, data interface{}) {
 
 // RegisterRoutes registers routes for this handler on the given router
 func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/api/v1/channels", am.ViewAccess(aH.AlertmanagerAPI.ListChannels)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/channels/{id}", am.ViewAccess(aH.AlertmanagerAPI.GetChannelByID)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/channels/{id}", am.AdminAccess(aH.AlertmanagerAPI.UpdateChannelByID)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v1/channels/{id}", am.AdminAccess(aH.AlertmanagerAPI.DeleteChannelByID)).Methods(http.MethodDelete)
-	router.HandleFunc("/api/v1/channels", am.EditAccess(aH.AlertmanagerAPI.CreateChannel)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/testChannel", am.EditAccess(aH.AlertmanagerAPI.TestReceiver)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/channels", am.ViewAccess(aH.AlertmanagerAPI.ListChannels)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/channels/{id}", am.ViewAccess(aH.AlertmanagerAPI.GetChannelByID)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/channels/{id}", am.AdminAccess(aH.AlertmanagerAPI.UpdateChannelByID)).Methods(http.MethodPut)
+	router.HandleFunc("/v1/o11y/v1/channels/{id}", am.AdminAccess(aH.AlertmanagerAPI.DeleteChannelByID)).Methods(http.MethodDelete)
+	router.HandleFunc("/v1/o11y/v1/channels", am.EditAccess(aH.AlertmanagerAPI.CreateChannel)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/testChannel", am.EditAccess(aH.AlertmanagerAPI.TestReceiver)).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/v1/route_policies", am.ViewAccess(aH.AlertmanagerAPI.GetAllRoutePolicies)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/route_policies/{id}", am.ViewAccess(aH.AlertmanagerAPI.GetRoutePolicyByID)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/route_policies", am.AdminAccess(aH.AlertmanagerAPI.CreateRoutePolicy)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/route_policies/{id}", am.AdminAccess(aH.AlertmanagerAPI.DeleteRoutePolicyByID)).Methods(http.MethodDelete)
-	router.HandleFunc("/api/v1/route_policies/{id}", am.AdminAccess(aH.AlertmanagerAPI.UpdateRoutePolicy)).Methods(http.MethodPut)
+	router.HandleFunc("/v1/o11y/v1/route_policies", am.ViewAccess(aH.AlertmanagerAPI.GetAllRoutePolicies)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/route_policies/{id}", am.ViewAccess(aH.AlertmanagerAPI.GetRoutePolicyByID)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/route_policies", am.AdminAccess(aH.AlertmanagerAPI.CreateRoutePolicy)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/route_policies/{id}", am.AdminAccess(aH.AlertmanagerAPI.DeleteRoutePolicyByID)).Methods(http.MethodDelete)
+	router.HandleFunc("/v1/o11y/v1/route_policies/{id}", am.AdminAccess(aH.AlertmanagerAPI.UpdateRoutePolicy)).Methods(http.MethodPut)
 
-	router.HandleFunc("/api/v1/alerts", am.ViewAccess(aH.AlertmanagerAPI.GetAlerts)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/alerts", am.ViewAccess(aH.AlertmanagerAPI.GetAlerts)).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/v1/rules", am.ViewAccess(aH.listRules)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/rules/{id}", am.ViewAccess(aH.getRule)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/rules", am.EditAccess(aH.createRule)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/rules/{id}", am.EditAccess(aH.editRule)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v1/rules/{id}", am.EditAccess(aH.deleteRule)).Methods(http.MethodDelete)
-	router.HandleFunc("/api/v1/rules/{id}", am.EditAccess(aH.patchRule)).Methods(http.MethodPatch)
-	router.HandleFunc("/api/v1/testRule", am.EditAccess(aH.testRule)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/rules/{id}/history/stats", am.ViewAccess(aH.getRuleStats)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/rules/{id}/history/timeline", am.ViewAccess(aH.getRuleStateHistory)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/rules/{id}/history/top_contributors", am.ViewAccess(aH.getRuleStateHistoryTopContributors)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/rules/{id}/history/overall_status", am.ViewAccess(aH.getOverallStateTransitions)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/rules", am.ViewAccess(aH.listRules)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/rules/{id}", am.ViewAccess(aH.getRule)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/rules", am.EditAccess(aH.createRule)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/rules/{id}", am.EditAccess(aH.editRule)).Methods(http.MethodPut)
+	router.HandleFunc("/v1/o11y/v1/rules/{id}", am.EditAccess(aH.deleteRule)).Methods(http.MethodDelete)
+	router.HandleFunc("/v1/o11y/v1/rules/{id}", am.EditAccess(aH.patchRule)).Methods(http.MethodPatch)
+	router.HandleFunc("/v1/o11y/v1/testRule", am.EditAccess(aH.testRule)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/rules/{id}/history/stats", am.ViewAccess(aH.getRuleStats)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/rules/{id}/history/timeline", am.ViewAccess(aH.getRuleStateHistory)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/rules/{id}/history/top_contributors", am.ViewAccess(aH.getRuleStateHistoryTopContributors)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/rules/{id}/history/overall_status", am.ViewAccess(aH.getOverallStateTransitions)).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/v1/dashboards", am.ViewAccess(aH.List)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/dashboards", am.EditAccess(aH.O11y.Handlers.Dashboard.Create)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/dashboards/{id}", am.ViewAccess(aH.Get)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/dashboards/{id}", am.EditAccess(aH.O11y.Handlers.Dashboard.Update)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v1/dashboards/{id}", am.EditAccess(aH.O11y.Handlers.Dashboard.Delete)).Methods(http.MethodDelete)
-	router.HandleFunc("/api/v1/dashboards/{id}/lock", am.EditAccess(aH.O11y.Handlers.Dashboard.LockUnlock)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v2/variables/query", am.ViewAccess(aH.queryDashboardVarsV2)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/dashboards", am.ViewAccess(aH.List)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/dashboards", am.EditAccess(aH.O11y.Handlers.Dashboard.Create)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/dashboards/{id}", am.ViewAccess(aH.Get)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/dashboards/{id}", am.EditAccess(aH.O11y.Handlers.Dashboard.Update)).Methods(http.MethodPut)
+	router.HandleFunc("/v1/o11y/v1/dashboards/{id}", am.EditAccess(aH.O11y.Handlers.Dashboard.Delete)).Methods(http.MethodDelete)
+	router.HandleFunc("/v1/o11y/v1/dashboards/{id}/lock", am.EditAccess(aH.O11y.Handlers.Dashboard.LockUnlock)).Methods(http.MethodPut)
+	router.HandleFunc("/v1/o11y/v2/variables/query", am.ViewAccess(aH.queryDashboardVarsV2)).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/v1/explorer/views", am.ViewAccess(aH.O11y.Handlers.SavedView.List)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/explorer/views", am.EditAccess(aH.O11y.Handlers.SavedView.Create)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.ViewAccess(aH.O11y.Handlers.SavedView.Get)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Update)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Delete)).Methods(http.MethodDelete)
-	router.HandleFunc("/api/v1/event", am.ViewAccess(aH.registerEvent)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/explorer/views", am.ViewAccess(aH.O11y.Handlers.SavedView.List)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/explorer/views", am.EditAccess(aH.O11y.Handlers.SavedView.Create)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/explorer/views/{viewId}", am.ViewAccess(aH.O11y.Handlers.SavedView.Get)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Update)).Methods(http.MethodPut)
+	router.HandleFunc("/v1/o11y/v1/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Delete)).Methods(http.MethodDelete)
+	router.HandleFunc("/v1/o11y/v1/event", am.ViewAccess(aH.registerEvent)).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/v1/services", am.ViewAccess(aH.getServices)).Methods(http.MethodPost) // Deprecated Usage, use the below endpoint /v2/services
-	router.HandleFunc("/api/v2/services", am.ViewAccess(aH.O11y.Handlers.Services.Get)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/services/list", am.ViewAccess(aH.getServicesList)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/services", am.ViewAccess(aH.getServices)).Methods(http.MethodPost) // Deprecated Usage, use the below endpoint /v2/services
+	router.HandleFunc("/v1/o11y/v2/services", am.ViewAccess(aH.O11y.Handlers.Services.Get)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/services/list", am.ViewAccess(aH.getServicesList)).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/v2/service/top_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetTopOperations)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/service/top_operations", am.ViewAccess(aH.getTopOperations)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/service/top_level_operations", am.ViewAccess(aH.getServicesTopLevelOps)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v2/service/top_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetTopOperations)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/service/top_operations", am.ViewAccess(aH.getTopOperations)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/service/top_level_operations", am.ViewAccess(aH.getServicesTopLevelOps)).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/v2/service/entry_point_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetEntryPointOperations)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/service/entry_point_operations", am.ViewAccess(aH.getEntryPointOps)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/traces/{traceId}", am.ViewAccess(aH.SearchTraces)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/usage", am.ViewAccess(aH.getUsage)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/dependency_graph", am.ViewAccess(aH.dependencyGraph)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/settings/ttl", am.AdminAccess(aH.setTTL)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/settings/ttl", am.ViewAccess(aH.getTTL)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v2/settings/ttl", am.AdminAccess(aH.setCustomRetentionTTL)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v2/settings/ttl", am.ViewAccess(aH.getCustomRetentionTTL)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v2/service/entry_point_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetEntryPointOperations)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/service/entry_point_operations", am.ViewAccess(aH.getEntryPointOps)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/traces/{traceId}", am.ViewAccess(aH.SearchTraces)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/usage", am.ViewAccess(aH.getUsage)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/dependency_graph", am.ViewAccess(aH.dependencyGraph)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/settings/ttl", am.AdminAccess(aH.setTTL)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/settings/ttl", am.ViewAccess(aH.getTTL)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v2/settings/ttl", am.AdminAccess(aH.setCustomRetentionTTL)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v2/settings/ttl", am.ViewAccess(aH.getCustomRetentionTTL)).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/v1/settings/apdex", am.AdminAccess(aH.O11y.Handlers.Apdex.Set)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/settings/apdex", am.ViewAccess(aH.O11y.Handlers.Apdex.Get)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/settings/apdex", am.AdminAccess(aH.O11y.Handlers.Apdex.Set)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/settings/apdex", am.ViewAccess(aH.O11y.Handlers.Apdex.Get)).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/v2/traces/fields", am.ViewAccess(aH.traceFields)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v2/traces/fields", am.EditAccess(aH.updateTraceField)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v2/traces/flamegraph/{traceId}", am.ViewAccess(aH.GetFlamegraphSpansForTrace)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v2/traces/waterfall/{traceId}", am.ViewAccess(aH.GetWaterfallSpansForTraceWithMetadata)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v2/traces/fields", am.ViewAccess(aH.traceFields)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v2/traces/fields", am.EditAccess(aH.updateTraceField)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v2/traces/flamegraph/{traceId}", am.ViewAccess(aH.GetFlamegraphSpansForTrace)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v2/traces/waterfall/{traceId}", am.ViewAccess(aH.GetWaterfallSpansForTraceWithMetadata)).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/v1/version", am.OpenAccess(aH.getVersion)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/features", am.ViewAccess(aH.getFeatureFlags)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/health", am.OpenAccess(aH.getHealth)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/version", am.OpenAccess(aH.getVersion)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/features", am.ViewAccess(aH.getFeatureFlags)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/health", am.OpenAccess(aH.getHealth)).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/v1/listErrors", am.ViewAccess(aH.listErrors)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/countErrors", am.ViewAccess(aH.countErrors)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/errorFromErrorID", am.ViewAccess(aH.getErrorFromErrorID)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/errorFromGroupID", am.ViewAccess(aH.getErrorFromGroupID)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/nextPrevErrorIDs", am.ViewAccess(aH.getNextPrevErrorIDs)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/listErrors", am.ViewAccess(aH.listErrors)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/countErrors", am.ViewAccess(aH.countErrors)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/errorFromErrorID", am.ViewAccess(aH.getErrorFromErrorID)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/errorFromGroupID", am.ViewAccess(aH.getErrorFromGroupID)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/nextPrevErrorIDs", am.ViewAccess(aH.getNextPrevErrorIDs)).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/v1/disks", am.ViewAccess(aH.getDisks)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/disks", am.ViewAccess(aH.getDisks)).Methods(http.MethodGet)
 
 	// Quick Filters
-	router.HandleFunc("/api/v1/orgs/me/filters", am.ViewAccess(aH.O11y.Handlers.QuickFilter.GetQuickFilters)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/orgs/me/filters/{signal}", am.ViewAccess(aH.O11y.Handlers.QuickFilter.GetSignalFilters)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/orgs/me/filters", am.AdminAccess(aH.O11y.Handlers.QuickFilter.UpdateQuickFilters)).Methods(http.MethodPut)
+	router.HandleFunc("/v1/o11y/v1/orgs/me/filters", am.ViewAccess(aH.O11y.Handlers.QuickFilter.GetQuickFilters)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/orgs/me/filters/{signal}", am.ViewAccess(aH.O11y.Handlers.QuickFilter.GetSignalFilters)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/orgs/me/filters", am.AdminAccess(aH.O11y.Handlers.QuickFilter.UpdateQuickFilters)).Methods(http.MethodPut)
 
-	router.HandleFunc("/api/v1/register", am.OpenAccess(aH.registerUser)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/register", am.OpenAccess(aH.registerUser)).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/v3/licenses", am.ViewAccess(func(rw http.ResponseWriter, req *http.Request) {
+	router.HandleFunc("/v1/o11y/v3/licenses", am.ViewAccess(func(rw http.ResponseWriter, req *http.Request) {
 		render.Success(rw, http.StatusOK, []any{})
 	})).Methods(http.MethodGet)
-	router.HandleFunc("/api/v3/licenses/active", am.ViewAccess(func(rw http.ResponseWriter, req *http.Request) {
+	router.HandleFunc("/v1/o11y/v3/licenses/active", am.ViewAccess(func(rw http.ResponseWriter, req *http.Request) {
 		aH.LicensingAPI.Activate(rw, req)
 	})).Methods(http.MethodGet)
 
 	// Export
-	router.HandleFunc("/api/v1/export_raw_data", am.ViewAccess(aH.O11y.Handlers.RawDataExport.ExportRawData)).Methods(http.MethodGet)
+	router.HandleFunc("/v1/o11y/v1/export_raw_data", am.ViewAccess(aH.O11y.Handlers.RawDataExport.ExportRawData)).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/v1/span_percentile", am.ViewAccess(aH.O11y.Handlers.SpanPercentile.GetSpanPercentileDetails)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/span_percentile", am.ViewAccess(aH.O11y.Handlers.SpanPercentile.GetSpanPercentileDetails)).Methods(http.MethodPost)
 
 	// Query Filter Analyzer api used to extract metric names and grouping columns from a query
-	router.HandleFunc("/api/v1/query_filter/analyze", am.ViewAccess(aH.QueryParserAPI.AnalyzeQueryFilter)).Methods(http.MethodPost)
+	router.HandleFunc("/v1/o11y/v1/query_filter/analyze", am.ViewAccess(aH.QueryParserAPI.AnalyzeQueryFilter)).Methods(http.MethodPost)
 }
 
 func Intersection(a, b []int) (c []int) {
@@ -1931,7 +1931,7 @@ func (aH *APIHandler) WriteJSON(w http.ResponseWriter, r *http.Request, response
 func (aH *APIHandler) RegisterMessagingQueuesRoutes(router *mux.Router, am *middleware.AuthZ) {
 
 	// Main messaging queues router
-	messagingQueuesRouter := router.PathPrefix("/api/v1/messaging-queues").Subrouter()
+	messagingQueuesRouter := router.PathPrefix("/v1/o11y/v1/messaging-queues").Subrouter()
 
 	// Queue Overview route
 	messagingQueuesRouter.HandleFunc("/queue-overview", am.ViewAccess(aH.getQueueOverview)).Methods(http.MethodPost)
@@ -1973,7 +1973,7 @@ func (aH *APIHandler) RegisterMessagingQueuesRoutes(router *mux.Router, am *midd
 func (aH *APIHandler) RegisterThirdPartyApiRoutes(router *mux.Router, am *middleware.AuthZ) {
 
 	// Main messaging queues router
-	thirdPartyApiRouter := router.PathPrefix("/api/v1/third-party-apis").Subrouter()
+	thirdPartyApiRouter := router.PathPrefix("/v1/o11y/v1/third-party-apis").Subrouter()
 
 	// Domain Overview route
 	overviewRouter := thirdPartyApiRouter.PathPrefix("/overview").Subrouter()
@@ -3036,7 +3036,7 @@ func (aH *APIHandler) getProducerConsumerEval(w http.ResponseWriter, r *http.Req
 
 // RegisterIntegrationRoutes Registers all Integrations
 func (aH *APIHandler) RegisterIntegrationRoutes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/api/v1/integrations").Subrouter()
+	subRouter := router.PathPrefix("/v1/o11y/v1/integrations").Subrouter()
 
 	subRouter.HandleFunc(
 		"/install", am.ViewAccess(aH.InstallIntegration),
@@ -3372,7 +3372,7 @@ func (aH *APIHandler) UninstallIntegration(w http.ResponseWriter, r *http.Reques
 
 // cloud provider integrations
 func (aH *APIHandler) RegisterCloudIntegrationsRoutes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/api/v1/cloud-integrations").Subrouter()
+	subRouter := router.PathPrefix("/v1/o11y/v1/cloud-integrations").Subrouter()
 
 	subRouter.HandleFunc(
 		"/{cloudProvider}/accounts/generate-connection-url", am.EditAccess(aH.CloudIntegrationsGenerateConnectionUrl),
@@ -3894,7 +3894,7 @@ func (aH *APIHandler) CloudIntegrationsUpdateServiceConfig(
 
 // logs
 func (aH *APIHandler) RegisterLogsRoutes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/api/v1/logs").Subrouter()
+	subRouter := router.PathPrefix("/v1/o11y/v1/logs").Subrouter()
 	subRouter.HandleFunc("", am.ViewAccess(aH.getLogs)).Methods(http.MethodGet)
 	subRouter.HandleFunc("/fields", am.ViewAccess(aH.logFields)).Methods(http.MethodGet)
 	subRouter.HandleFunc("/fields", am.EditAccess(aH.logFieldUpdate)).Methods(http.MethodPost)
@@ -4966,7 +4966,7 @@ func (aH *APIHandler) getDomainInfo(w http.ResponseWriter, r *http.Request) {
 // RegisterTraceFunnelsRoutes adds trace funnels routes
 func (aH *APIHandler) RegisterTraceFunnelsRoutes(router *mux.Router, am *middleware.AuthZ) {
 	// Main trace funnels router
-	traceFunnelsRouter := router.PathPrefix("/api/v1/trace-funnels").Subrouter()
+	traceFunnelsRouter := router.PathPrefix("/v1/o11y/v1/trace-funnels").Subrouter()
 
 	// API endpoints
 	traceFunnelsRouter.HandleFunc("/new",
