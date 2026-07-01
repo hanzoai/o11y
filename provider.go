@@ -22,14 +22,19 @@ import (
 	"github.com/hanzoai/o11y/pkg/flagger/configflagger"
 	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/global/o11yglobal"
+	"github.com/hanzoai/o11y/pkg/identn"
 	"github.com/hanzoai/o11y/pkg/modules/authdomain/implauthdomain"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/organization/implorganization"
 	"github.com/hanzoai/o11y/pkg/modules/preference/implpreference"
 	"github.com/hanzoai/o11y/pkg/modules/promote/implpromote"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/session/implsession"
 	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
+	"github.com/hanzoai/o11y/pkg/pprof"
+	"github.com/hanzoai/o11y/pkg/pprof/httppprof"
+	"github.com/hanzoai/o11y/pkg/pprof/nooppprof"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/querier/o11yquerier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
@@ -317,5 +322,11 @@ func NewIdentNProviderFactories(tokenizer tokenizer.Tokenizer, serviceAccount se
 func NewFlaggerProviderFactories(registry featuretypes.Registry) factory.NamedMap[factory.ProviderFactory[flagger.FlaggerProvider, flagger.Config]] {
 	return factory.MustNewNamedMap(
 		configflagger.NewFactory(registry),
+	)
+}
+
+func NewGlobalProviderFactories() factory.NamedMap[factory.ProviderFactory[global.Global, global.Config]] {
+	return factory.MustNewNamedMap(
+		o11yglobal.NewFactory(),
 	)
 }

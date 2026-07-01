@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 
@@ -72,6 +73,7 @@ type ManagerOptions struct {
 
 	Context     context.Context
 	ResendDelay time.Duration
+	Prometheus  prometheus.Prometheus
 	Querier     querier.Querier
 	Logger      *slog.Logger
 	Cache       cache.Cache
