@@ -1,4 +1,4 @@
-package alertmanager
+package o11yalertmanager
 
 import (
 	"context"

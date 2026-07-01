@@ -1,4 +1,4 @@
-package signozruler
+package o11yruler
 
 import (
 	"context"
