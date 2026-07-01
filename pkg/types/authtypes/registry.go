@@ -1,7 +1,7 @@
 package authtypes
 
 import (
-	"github.com/SigNoz/signoz/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 )
 
 // Registry wraps the coretypes Registry and is the authz-aware view consumed

@@ -1,9 +1,9 @@
 package serviceaccount
 
 import (
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/types/serviceaccounttypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/types/serviceaccounttypes"
 )
 
 type Config struct {

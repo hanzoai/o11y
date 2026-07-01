@@ -3,8 +3,8 @@ package noopmeterreporter
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/meterreporter"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/meterreporter"
 )
 
 type provider struct {

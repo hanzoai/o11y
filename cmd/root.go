@@ -7,8 +7,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/spf13/cobra"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/version"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/version"
 )
 
 var RootCmd = &cobra.Command{

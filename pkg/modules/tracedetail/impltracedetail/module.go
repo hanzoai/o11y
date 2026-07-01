@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/modules/tracedetail"
-	"github.com/SigNoz/signoz/pkg/types/spantypes"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/tracedetail"
+	"github.com/hanzoai/o11y/pkg/types/spantypes"
 )
 
 type module struct {
@@ -16,7 +16,7 @@ type module struct {
 }
 
 func NewModule(traceStore spantypes.TraceStore, providerSettings factory.ProviderSettings, cfg tracedetail.Config) *module {
-	scopedProviderSettings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/modules/tracedetail/impltracedetail")
+	scopedProviderSettings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/modules/tracedetail/impltracedetail")
 	return &module{
 		config:   cfg,
 		store:    traceStore,

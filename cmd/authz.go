@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/SigNoz/signoz/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/spf13/cobra"
 )
 

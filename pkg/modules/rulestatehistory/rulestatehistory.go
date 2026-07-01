@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/types/rulestatehistorytypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 // Module defines the core operations for managing rule state history.

@@ -1,7 +1,7 @@
 package httpmeterreporter
 
 import (
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"go.opentelemetry.io/otel/metric"
 )
 

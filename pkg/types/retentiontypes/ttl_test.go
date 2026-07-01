@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/stretchr/testify/require"
 )
 

@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/coretypes"
-	"github.com/SigNoz/signoz/pkg/types/tagtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/types/tagtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/perses/perses/pkg/model/api/v1/common"
 	"k8s.io/apimachinery/pkg/util/validation"
 )

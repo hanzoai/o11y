@@ -3,7 +3,7 @@ package telemetrytypes
 import (
 	"context"
 
-	schemamigrator "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
+	schemamigrator "github.com/hanzoai/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 )
 

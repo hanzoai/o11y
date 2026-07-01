@@ -3,10 +3,10 @@ package impltracedetail
 import (
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/http/binding"
-	"github.com/SigNoz/signoz/pkg/http/render"
-	"github.com/SigNoz/signoz/pkg/modules/tracedetail"
-	"github.com/SigNoz/signoz/pkg/types/spantypes"
+	"github.com/hanzoai/o11y/pkg/http/binding"
+	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/modules/tracedetail"
+	"github.com/hanzoai/o11y/pkg/types/spantypes"
 	"github.com/gorilla/mux"
 )
 

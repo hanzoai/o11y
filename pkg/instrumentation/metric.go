@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 
 	metric "github.com/luxfi/metric"
 	contribsdkconfig "go.opentelemetry.io/contrib/config"

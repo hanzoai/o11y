@@ -4,8 +4,8 @@ import (
 	neturl "net/url"
 	"sync"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/zeus"
 )
 
 // This will be set via ldflags at build time.

@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes/telemetrytypestest"
 	"github.com/stretchr/testify/assert"
-	"github.com/SigNoz/signoz/pkg/flagger/flaggertest"
+	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/stretchr/testify/require"
 )
 

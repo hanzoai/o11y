@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	cmock "github.com/SigNoz/clickhouse-go-mock"
-	"github.com/SigNoz/signoz/pkg/modules/tracedetail/impltracedetail"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/telemetrystore/telemetrystoretest"
-	"github.com/SigNoz/signoz/pkg/types/spantypes"
-	"github.com/SigNoz/signoz/pkg/types/spantypes/spantypestest"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	cmock "github.com/hanzoai/clickhouse-go-mock"
+	"github.com/hanzoai/o11y/pkg/modules/tracedetail/impltracedetail"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
+	"github.com/hanzoai/o11y/pkg/types/spantypes"
+	"github.com/hanzoai/o11y/pkg/types/spantypes/spantypestest"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/stretchr/testify/assert"
 )
 

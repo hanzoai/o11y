@@ -1,8 +1,8 @@
 package spantypestest
 
 import (
-	cmock "github.com/SigNoz/clickhouse-go-mock"
-	"github.com/SigNoz/signoz/pkg/types/spantypes"
+	cmock "github.com/hanzoai/clickhouse-go-mock"
+	"github.com/hanzoai/o11y/pkg/types/spantypes"
 )
 
 // TraceStoreTest pairs a TraceStore with the ClickHouse mock.

@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/SigNoz/govaluate"
+	"github.com/hanzoai/govaluate"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )

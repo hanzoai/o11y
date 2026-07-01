@@ -5,11 +5,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/metercollector"
-	"github.com/SigNoz/signoz/pkg/types/licensetypes"
-	"github.com/SigNoz/signoz/pkg/types/zeustypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/metercollector"
+	"github.com/hanzoai/o11y/pkg/types/licensetypes"
+	"github.com/hanzoai/o11y/pkg/types/zeustypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 var _ metercollector.MeterCollector = (*Provider)(nil)
@@ -27,7 +27,7 @@ func NewFactory() factory.ProviderFactory[metercollector.MeterCollector, meterco
 }
 
 func newProvider(providerSettings factory.ProviderSettings, config metercollector.StaticConfig) *Provider {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/ee/metercollector/staticmetercollector")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/ee/metercollector/staticmetercollector")
 
 	return &Provider{
 		settings: settings,

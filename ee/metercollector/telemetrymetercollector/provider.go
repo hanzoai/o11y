@@ -12,16 +12,16 @@ import (
 
 	"github.com/huandu/go-sqlbuilder"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/metercollector"
-	"github.com/SigNoz/signoz/pkg/modules/retention"
-	"github.com/SigNoz/signoz/pkg/telemetrymeter"
-	"github.com/SigNoz/signoz/pkg/telemetrystore"
-	"github.com/SigNoz/signoz/pkg/types/licensetypes"
-	"github.com/SigNoz/signoz/pkg/types/retentiontypes"
-	"github.com/SigNoz/signoz/pkg/types/zeustypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/metercollector"
+	"github.com/hanzoai/o11y/pkg/modules/retention"
+	"github.com/hanzoai/o11y/pkg/telemetrymeter"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/types/licensetypes"
+	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
+	"github.com/hanzoai/o11y/pkg/types/zeustypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 var (
@@ -51,7 +51,7 @@ func newProvider(
 	telemetryStore telemetrystore.TelemetryStore,
 	retentionGetter retention.Getter,
 ) *Provider {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/ee/metercollector/telemetrymetercollector")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/ee/metercollector/telemetrymetercollector")
 
 	return &Provider{
 		settings:        settings,

@@ -49,7 +49,7 @@ func New(ctx context.Context, settings factory.ProviderSettings, config web.Conf
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "cannot marshal web settings to JSON")
 	}
 
-	logger := factory.NewScopedProviderSettings(settings, "github.com/SigNoz/signoz/pkg/web/routerweb").Logger()
+	logger := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/web/routerweb").Logger()
 	indexContents := web.NewIndex(ctx, logger, config.Index, raw, web.TemplateData{
 		BaseHref: globalConfig.ExternalPathTrailing(),
 		Settings: template.JS(settingsJSON),

@@ -1,7 +1,7 @@
 package coretypes
 
 import (
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type resourceRole struct {

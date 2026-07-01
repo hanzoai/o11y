@@ -1,6 +1,6 @@
 package signozapiserver
 
-import "github.com/SigNoz/signoz/pkg/http/handler"
+import "github.com/hanzoai/o11y/pkg/http/handler"
 
 // postableRuleExamples returns example payloads attached to every rule-write
 // endpoint. They cover each alert type, rule type, and composite-query shape.

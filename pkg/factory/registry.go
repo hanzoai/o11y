@@ -45,7 +45,7 @@ func NewRegistry(ctx context.Context, logger *slog.Logger, services ...NamedServ
 		servicesByName[s.Name()] = ss
 	}
 
-	registryLogger := logger.With(slog.String("pkg", "github.com/SigNoz/signoz/pkg/factory"))
+	registryLogger := logger.With(slog.String("pkg", "github.com/hanzoai/o11y/pkg/factory"))
 
 	for _, ss := range servicesWithState {
 		for _, dep := range ss.service.DependsOn() {
