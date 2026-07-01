@@ -7,8 +7,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/types/cachetypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/types/cachetypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 type TraceSummary struct {

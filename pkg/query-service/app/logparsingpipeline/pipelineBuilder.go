@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	signozstanzahelper "github.com/SigNoz/signoz-otel-collector/processor/signozlogspipelineprocessor/stanza/operator/helper"
+	signozstanzahelper "github.com/hanzoai/signoz-otel-collector/processor/signozlogspipelineprocessor/stanza/operator/helper"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/queryBuilderToExpr"

@@ -1,10 +1,10 @@
 package implinframonitoring
 
 import (
-	"github.com/SigNoz/signoz/pkg/types/inframonitoringtypes"
-	"github.com/SigNoz/signoz/pkg/types/metrictypes"
-	qbtypes "github.com/SigNoz/signoz/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/types/inframonitoringtypes"
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 var clusterNameGroupByKey = qbtypes.GroupByKey{

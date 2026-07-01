@@ -3,8 +3,8 @@ package otlphttpauditor
 import (
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/auditor"
-	client "github.com/SigNoz/signoz/pkg/http/client"
+	"github.com/hanzoai/o11y/pkg/auditor"
+	client "github.com/hanzoai/o11y/pkg/http/client"
 )
 
 // retrier implements client.Retriable with exponential backoff

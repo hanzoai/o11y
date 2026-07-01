@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/SigNoz/signoz/pkg/types/audittypes"
-	"github.com/SigNoz/signoz/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/types/audittypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 )
 
 // Option configures optional behaviour on a handler created by New.

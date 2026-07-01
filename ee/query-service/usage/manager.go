@@ -14,14 +14,14 @@ import (
 	"github.com/go-co-op/gocron"
 	"github.com/google/uuid"
 
-	"github.com/SigNoz/signoz/ee/query-service/model"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/flagger"
-	"github.com/SigNoz/signoz/pkg/licensing"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	"github.com/SigNoz/signoz/pkg/query-service/utils/encryption"
-	"github.com/SigNoz/signoz/pkg/types/featuretypes"
-	"github.com/SigNoz/signoz/pkg/zeus"
+	"github.com/hanzoai/o11y/ee/query-service/model"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/encryption"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
+	"github.com/hanzoai/o11y/pkg/zeus"
 )
 
 const (

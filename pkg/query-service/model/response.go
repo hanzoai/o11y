@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/labels"
 )

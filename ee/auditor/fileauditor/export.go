@@ -4,8 +4,8 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/types/audittypes"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types/audittypes"
 )
 
 func (provider *provider) export(ctx context.Context, events []audittypes.AuditEvent) error {

@@ -3,9 +3,9 @@ package signozapiserver
 import (
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/http/handler"
-	"github.com/SigNoz/signoz/pkg/types"
-	citypes "github.com/SigNoz/signoz/pkg/types/cloudintegrationtypes"
+	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/types"
+	citypes "github.com/hanzoai/o11y/pkg/types/cloudintegrationtypes"
 	"github.com/gorilla/mux"
 )
 

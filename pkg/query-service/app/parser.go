@@ -19,7 +19,7 @@ import (
 
 	"log/slog"
 
-	"github.com/SigNoz/govaluate"
+	"github.com/hanzoai/govaluate"
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/kafka"
 	queues2 "github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/queues"
 	"github.com/gorilla/mux"

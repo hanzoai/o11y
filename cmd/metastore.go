@@ -6,14 +6,14 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/instrumentation"
-	"github.com/SigNoz/signoz/pkg/signoz"
-	"github.com/SigNoz/signoz/pkg/sqlmigration"
-	"github.com/SigNoz/signoz/pkg/sqlmigrator"
-	"github.com/SigNoz/signoz/pkg/sqlschema"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/version"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/instrumentation"
+	"github.com/hanzoai/o11y/pkg/signoz"
+	"github.com/hanzoai/o11y/pkg/sqlmigration"
+	"github.com/hanzoai/o11y/pkg/sqlmigrator"
+	"github.com/hanzoai/o11y/pkg/sqlschema"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/version"
 )
 
 type SQLStoreProviderFactories func() factory.NamedMap[factory.ProviderFactory[sqlstore.SQLStore, sqlstore.Config]]

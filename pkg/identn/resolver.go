@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 )
 
 type identNResolver struct {
@@ -61,7 +61,7 @@ func NewIdentNResolver(ctx context.Context, providerSettings factory.ProviderSet
 
 	return &identNResolver{
 		identNs:  identNs,
-		settings: factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/identn"),
+		settings: factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/identn"),
 	}, nil
 }
 

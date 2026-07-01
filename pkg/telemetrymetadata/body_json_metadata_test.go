@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/SigNoz/signoz-otel-collector/constants"
+	"github.com/hanzoai/signoz-otel-collector/constants"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrylogs"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"

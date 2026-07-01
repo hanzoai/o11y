@@ -12,8 +12,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/pkg/errors"
 
-	signozerrors "github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	signozerrors "github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/valuer"
 
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )

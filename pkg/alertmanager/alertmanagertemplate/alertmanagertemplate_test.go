@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	test "github.com/SigNoz/signoz/pkg/alertmanager/alertmanagernotify/alertmanagernotifytest"
-	"github.com/SigNoz/signoz/pkg/types/alertmanagertypes"
-	"github.com/SigNoz/signoz/pkg/types/ruletypes"
+	test "github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify/alertmanagernotifytest"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 

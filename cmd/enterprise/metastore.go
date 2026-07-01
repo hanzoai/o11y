@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/SigNoz/signoz/ee/sqlschema/postgressqlschema"
-	"github.com/SigNoz/signoz/ee/sqlstore/postgressqlstore"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/signoz"
-	"github.com/SigNoz/signoz/pkg/sqlschema"
-	"github.com/SigNoz/signoz/pkg/sqlstore"
-	"github.com/SigNoz/signoz/pkg/sqlstore/sqlstorehook"
+	"github.com/hanzoai/o11y/ee/sqlschema/postgressqlschema"
+	"github.com/hanzoai/o11y/ee/sqlstore/postgressqlstore"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/signoz"
+	"github.com/hanzoai/o11y/pkg/sqlschema"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstorehook"
 )
 
 func sqlstoreProviderFactories() factory.NamedMap[factory.ProviderFactory[sqlstore.SQLStore, sqlstore.Config]] {

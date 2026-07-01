@@ -1,6 +1,6 @@
 package zeustypes
 
-import "github.com/SigNoz/signoz/pkg/valuer"
+import "github.com/hanzoai/o11y/pkg/valuer"
 
 type MeterUnit struct {
 	valuer.String

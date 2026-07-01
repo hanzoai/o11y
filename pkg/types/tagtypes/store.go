@@ -3,8 +3,8 @@ package tagtypes
 import (
 	"context"
 
-	"github.com/SigNoz/signoz/pkg/types/coretypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type Store interface {

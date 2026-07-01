@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	schema "github.com/SigNoz/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
+	schema "github.com/hanzoai/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )

@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 type filtering struct{}

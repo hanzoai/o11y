@@ -5,10 +5,10 @@ import (
 	"math"
 	"time"
 
-	"github.com/SigNoz/signoz/pkg/modules/rulestatehistory"
-	"github.com/SigNoz/signoz/pkg/types/rulestatehistorytypes"
-	"github.com/SigNoz/signoz/pkg/types/ruletypes"
-	"github.com/SigNoz/signoz/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
+	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 type module struct {

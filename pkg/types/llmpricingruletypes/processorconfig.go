@@ -3,7 +3,7 @@ package llmpricingruletypes
 import (
 	"bytes"
 
-	"github.com/SigNoz/signoz/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"gopkg.in/yaml.v3"
 )
 

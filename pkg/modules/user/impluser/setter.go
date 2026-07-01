@@ -8,19 +8,19 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/SigNoz/signoz/pkg/analytics"
-	"github.com/SigNoz/signoz/pkg/authz"
-	"github.com/SigNoz/signoz/pkg/emailing"
-	"github.com/SigNoz/signoz/pkg/errors"
-	"github.com/SigNoz/signoz/pkg/factory"
-	"github.com/SigNoz/signoz/pkg/modules/organization"
-	root "github.com/SigNoz/signoz/pkg/modules/user"
-	"github.com/SigNoz/signoz/pkg/tokenizer"
-	"github.com/SigNoz/signoz/pkg/types"
-	"github.com/SigNoz/signoz/pkg/types/authtypes"
-	"github.com/SigNoz/signoz/pkg/types/coretypes"
-	"github.com/SigNoz/signoz/pkg/types/emailtypes"
-	"github.com/SigNoz/signoz/pkg/valuer"
+	"github.com/hanzoai/o11y/pkg/analytics"
+	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/emailing"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	root "github.com/hanzoai/o11y/pkg/modules/user"
+	"github.com/hanzoai/o11y/pkg/tokenizer"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/types/emailtypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type setter struct {
@@ -38,7 +38,7 @@ type setter struct {
 
 // This module is a WIP, don't take inspiration from this.
 func NewSetter(store types.UserStore, tokenizer tokenizer.Tokenizer, emailing emailing.Emailing, providerSettings factory.ProviderSettings, orgSetter organization.Setter, authz authz.AuthZ, analytics analytics.Analytics, config root.Config, userRoleStore authtypes.UserRoleStore, getter root.Getter) root.Setter {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/SigNoz/signoz/pkg/modules/user/impluser")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/modules/user/impluser")
 	return &setter{
 		store:         store,
 		userRoleStore: userRoleStore,
