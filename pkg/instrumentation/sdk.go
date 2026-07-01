@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/hanzoai/o11y/pkg/factory"
-	"github.com/hanzoai/o11y/pkg/instrumentation/loghandler"
 	"github.com/hanzoai/o11y/pkg/version"
 	luxmetric "github.com/luxfi/metric"
 	"go.opentelemetry.io/otel"
@@ -106,7 +105,7 @@ func New(ctx context.Context, cfg Config, build version.Build, serviceName strin
 		traceShutdown:  traceShutdown,
 		meterProvider:  meterProvider,
 		metricsReg:     luxmetric.NewRegistry(),
-		logger:         NewLogger(cfg, loghandler.NewCorrelation()),
+		logger:         NewLogger(cfg),
 		startCh:        make(chan struct{}),
 	}, nil
 }

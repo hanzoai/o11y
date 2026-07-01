@@ -19,7 +19,6 @@ import (
 
 	"golang.org/x/text/cases"
 
-	"github.com/hanzoai/o11y/pkg/query-service/common"
 )
 
 // this file contains all the methods and structs

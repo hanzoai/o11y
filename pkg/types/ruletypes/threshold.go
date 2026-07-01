@@ -8,8 +8,6 @@ import (
 	"strings"
 
 	"github.com/hanzoai/o11y/pkg/errors"
-	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/units"
 	"github.com/hanzoai/o11y/pkg/valuer"
