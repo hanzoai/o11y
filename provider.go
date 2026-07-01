@@ -11,6 +11,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/apiserver"
 	"github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver"
 	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/billing"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/cache/memorycache"
 	"github.com/hanzoai/o11y/pkg/cache/rediscache"
@@ -282,7 +283,7 @@ func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.Au
 			implsession.NewHandler(modules.Session),
 			implauthdomain.NewHandler(modules.AuthDomain),
 			implpreference.NewHandler(modules.Preference),
-			o11yglobal.NewHandler(global),
+			handlers.Global,
 			implpromote.NewHandler(modules.Promote),
 			handlers.FlaggerHandler,
 			modules.Dashboard,
@@ -292,10 +293,10 @@ func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.Au
 			handlers.GatewayHandler,
 			handlers.Fields,
 			handlers.AuthzHandler,
-			handlers.RawDataExport,
-			handlers.ZeusHandler,
+			billing.NewNoopHandler(),
 			handlers.QuerierHandler,
 			handlers.ServiceAccountHandler,
+			handlers.RawDataExport,
 			handlers.RegistryHandler,
 			handlers.CloudIntegrationHandler,
 			handlers.RuleStateHistory,

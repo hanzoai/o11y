@@ -3,7 +3,7 @@ package o11y
 import (
 	"context"
 
-	"github.com/hanzoai/o11y/ee/modules/cloudintegration/implcloudintegration"
+	"github.com/hanzoai/o11y/pkg/modules/cloudintegration/implcloudintegration"
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerstore/sqlalertmanagerstore"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
