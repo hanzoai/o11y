@@ -11,8 +11,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
-	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
-	"github.com/hanzoai/o11y/pkg/types/roletypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/gorilla/mux"
 )
@@ -58,23 +56,10 @@ func (middleware *AuthZ) ViewAccess(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		commentCtx := ctxtypes.CommentFromContext(ctx)
-		authtype, ok := commentCtx.Map()["auth_type"]
-		if ok && authtype == ctxtypes.AuthTypeAPIKey.StringValue() {
-			if err := claims.IsViewer(); err != nil {
-				middleware.logger.WarnContext(ctx, authzDeniedMessage, "claims", claims)
-				render.Error(rw, err)
-				return
-			}
-
-			next(rw, req)
-			return
-		}
-
 		selectors := []coretypes.Selector{
-			coretypes.TypeRole.MustSelector(roletypes.HanzoO11yAdminRoleName),
-			coretypes.TypeRole.MustSelector(roletypes.HanzoO11yEditorRoleName),
-			coretypes.TypeRole.MustSelector(roletypes.HanzoO11yViewerRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.HanzoO11yAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.HanzoO11yEditorRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.HanzoO11yViewerRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -110,22 +95,9 @@ func (middleware *AuthZ) EditAccess(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		commentCtx := ctxtypes.CommentFromContext(ctx)
-		authtype, ok := commentCtx.Map()["auth_type"]
-		if ok && authtype == ctxtypes.AuthTypeAPIKey.StringValue() {
-			if err := claims.IsEditor(); err != nil {
-				middleware.logger.WarnContext(ctx, authzDeniedMessage, "claims", claims)
-				render.Error(rw, err)
-				return
-			}
-
-			next(rw, req)
-			return
-		}
-
 		selectors := []coretypes.Selector{
-			coretypes.TypeRole.MustSelector(roletypes.HanzoO11yAdminRoleName),
-			coretypes.TypeRole.MustSelector(roletypes.HanzoO11yEditorRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.HanzoO11yAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.HanzoO11yEditorRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -161,21 +133,8 @@ func (middleware *AuthZ) AdminAccess(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		commentCtx := ctxtypes.CommentFromContext(ctx)
-		authtype, ok := commentCtx.Map()["auth_type"]
-		if ok && authtype == ctxtypes.AuthTypeAPIKey.StringValue() {
-			if err := claims.IsAdmin(); err != nil {
-				middleware.logger.WarnContext(ctx, authzDeniedMessage, "claims", claims)
-				render.Error(rw, err)
-				return
-			}
-
-			next(rw, req)
-			return
-		}
-
 		selectors := []coretypes.Selector{
-			coretypes.TypeRole.MustSelector(roletypes.HanzoO11yAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.HanzoO11yAdminRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -211,7 +170,7 @@ func (middleware *AuthZ) SelfAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []coretypes.Selector{
-			coretypes.TypeRole.MustSelector(roletypes.HanzoO11yAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.HanzoO11yAdminRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(

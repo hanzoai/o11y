@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/huandu/go-sqlbuilder"
 )
 
@@ -50,29 +52,6 @@ func New[T any](
 	fm := NewFieldMapper()
 	cb := NewConditionBuilder(fm)
 	return &resourceFilterStatementBuilder[T]{
-		logger:           set.Logger(),
-		dbName:           dbName,
-		tableName:        tableName,
-		fieldMapper:      fm,
-		conditionBuilder: cb,
-		metadataStore:    metadataStore,
-		signal:           signal,
-		source:           source,
-		flagger:          fl,
-		fullTextColumn:   fullTextColumn,
-		jsonKeyToKey:     jsonKeyToKey,
-	}
-}
-
-func NewLogResourceFilterStatementBuilder(
-	settings factory.ProviderSettings,
-	fieldMapper qbtypes.FieldMapper,
-	conditionBuilder qbtypes.ConditionBuilder,
-	metadataStore telemetrytypes.MetadataStore,
-	fullTextColumn *telemetrytypes.TelemetryFieldKey,
-	jsonKeyToKey qbtypes.JsonKeyToFieldFunc,
-) *resourceFilterStatementBuilder[qbtypes.LogAggregation] {
-	return &resourceFilterStatementBuilder[qbtypes.LogAggregation]{
 		logger:           set.Logger(),
 		dbName:           dbName,
 		tableName:        tableName,

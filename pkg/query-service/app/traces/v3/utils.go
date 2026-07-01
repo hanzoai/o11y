@@ -4,9 +4,9 @@ import (
 	"log/slog"
 	"strconv"
 
+	"github.com/hanzoai/o11y/pkg/errors"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
-	"go.uber.org/zap"
 )
 
 var TracesListViewDefaultSelectedColumns = []v3.AttributeKey{

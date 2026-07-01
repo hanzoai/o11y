@@ -82,6 +82,18 @@ func (p *provider) Name() string { return "iam" }
 func (p *provider) Start(_ context.Context) error { return nil }
 func (p *provider) Stop(_ context.Context) error  { return nil }
 
+// Healthy reports readiness. The IAM-backed provider holds no long-lived
+// state, so it is always healthy; return a closed channel.
+func (p *provider) Healthy() <-chan struct{} {
+	ch := make(chan struct{})
+	close(ch)
+	return ch
+}
+
+func (p *provider) ReadTuples(_ context.Context, _ *openfgav1.ReadRequestTupleKey) ([]*openfgav1.TupleKey, error) {
+	return nil, errNotImplemented
+}
+
 // =============================================================================
 // Check methods — the hot path. Wire to IAM /enforce first.
 // =============================================================================
@@ -97,6 +109,10 @@ func (p *provider) CheckWithTupleCreationWithoutClaims(ctx context.Context, _ va
 }
 
 func (p *provider) BatchCheck(_ context.Context, _ map[string]*openfgav1.TupleKey) (map[string]*authtypes.TupleKeyAuthorization, error) {
+	return nil, errNotImplemented
+}
+
+func (p *provider) CheckTransactions(_ context.Context, _ string, _ valuer.UUID, _ []*authtypes.Transaction) ([]*authtypes.TransactionWithAuthorization, error) {
 	return nil, errNotImplemented
 }
 
