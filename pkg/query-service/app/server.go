@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"slices"
 
+	"github.com/hanzoai/o11y/pkg/alertmanager/o11yalertmanager"
 	"github.com/hanzoai/o11y/pkg/cache/memorycache"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/queryparser"
@@ -15,6 +16,10 @@ import (
 
 	"github.com/gorilla/handlers"
 
+	"github.com/rs/cors"
+	"github.com/soheilhy/cmux"
+
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
@@ -28,27 +33,26 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/app/opamp"
 	opAmpModel "github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
 	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
-	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/web"
-	"github.com/rs/cors"
-	"github.com/soheilhy/cmux"
+
+	"log/slog"
+
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"go.opentelemetry.io/otel/propagation"
+	"go.uber.org/zap" //nolint:depguard
 
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/healthcheck"
 	"github.com/hanzoai/o11y/pkg/query-service/rules"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
-	"go.opentelemetry.io/otel/propagation"
-	"log/slog"
-	"go.uber.org/zap" //nolint:depguard
 )
 
 // Server runs HTTP, Mux and a grpc server
 type Server struct {
 	config      o11y.Config
-	o11y      *o11y.HanzoO11y
+	o11y        *o11y.HanzoO11y
 	ruleManager *rules.Manager
 
 	// public http router
@@ -120,9 +124,9 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 		IntegrationsController:        integrationsController,
 		LogsParsingPipelineController: logParsingPipelineController,
 		FluxInterval:                  config.Querier.FluxInterval,
-		AlertmanagerAPI:               alertmanager.NewAPI(o11y.Alertmanager),
+		AlertmanagerAPI:               o11yalertmanager.NewHandler(o11y.Alertmanager),
 		LicensingAPI:                  nooplicensing.NewLicenseAPI(),
-		O11y:                        o11y,
+		O11y:                          o11y,
 		QueryParserAPI:                queryparser.NewAPI(o11y.Instrumentation.ToProviderSettings(), o11y.QueryParser),
 	}, config)
 	if err != nil {
@@ -131,7 +135,7 @@ func NewServer(config o11y.Config, o11y *o11y.HanzoO11y) (*Server, error) {
 
 	s := &Server{
 		config:             config,
-		o11y:             o11y,
+		o11y:               o11y,
 		ruleManager:        rm,
 		httpHostPort:       constants.HTTPHostPort,
 		unavailableChannel: make(chan healthcheck.Status),
