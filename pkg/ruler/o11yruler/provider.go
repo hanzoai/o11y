@@ -3,12 +3,23 @@ package o11yruler
 import (
 	"context"
 
+	"github.com/hanzoai/o11y/pkg/alertmanager"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerstore/sqlalertmanagerstore"
+	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/query-service/rules"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/ruler"
 	"github.com/hanzoai/o11y/pkg/ruler/rulestore/sqlrulestore"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -19,9 +30,49 @@ type provider struct {
 	healthyC  chan struct{}
 }
 
-func NewFactory(sqlstore sqlstore.SQLStore, queryParser queryparser.QueryParser) factory.ProviderFactory[ruler.Ruler, ruler.Config] {
-	return factory.NewProviderFactory(factory.MustNewName("observe"), func(ctx context.Context, settings factory.ProviderSettings, config ruler.Config) (ruler.Ruler, error) {
-		return New(ctx, settings, config, sqlstore, queryParser)
+func NewFactory(
+	cache cache.Cache,
+	alertmanager alertmanager.Alertmanager,
+	sqlstore sqlstore.SQLStore,
+	telemetryStore telemetrystore.TelemetryStore,
+	metadataStore telemetrytypes.MetadataStore,
+	prometheus prometheus.Prometheus,
+	orgGetter organization.Getter,
+	ruleStateHistoryModule rulestatehistory.Module,
+	querier querier.Querier,
+	queryParser queryparser.QueryParser,
+	prepareTaskFunc func(rules.PrepareTaskOptions) (rules.Task, error),
+	prepareTestRuleFunc func(rules.PrepareTestRuleOptions) (int, error),
+) factory.ProviderFactory[ruler.Ruler, ruler.Config] {
+	return factory.NewProviderFactory(factory.MustNewName("observe"), func(ctx context.Context, providerSettings factory.ProviderSettings, config ruler.Config) (ruler.Ruler, error) {
+		ruleStore := sqlrulestore.NewRuleStore(sqlstore, queryParser, providerSettings)
+		maintenanceStore := sqlalertmanagerstore.NewMaintenanceStore(sqlstore, providerSettings)
+
+		managerOpts := &rules.ManagerOptions{
+			TelemetryStore:         telemetryStore,
+			MetadataStore:          metadataStore,
+			Context:                context.Background(),
+			Querier:                querier,
+			Logger:                 providerSettings.Logger,
+			Cache:                  cache,
+			EvalDelay:              valuer.MustParseTextDuration(config.EvalDelay.String()),
+			PrepareTaskFunc:        prepareTaskFunc,
+			PrepareTestRuleFunc:    prepareTestRuleFunc,
+			Alertmanager:           alertmanager,
+			OrgGetter:              orgGetter,
+			RuleStore:              ruleStore,
+			MaintenanceStore:       maintenanceStore,
+			SQLStore:               sqlstore,
+			QueryParser:            queryParser,
+			RuleStateHistoryModule: ruleStateHistoryModule,
+		}
+
+		manager, err := rules.NewManager(managerOpts)
+		if err != nil {
+			return nil, err
+		}
+
+		return &provider{manager: manager, ruleStore: ruleStore, stopC: make(chan struct{}), healthyC: make(chan struct{})}, nil
 	})
 }
 

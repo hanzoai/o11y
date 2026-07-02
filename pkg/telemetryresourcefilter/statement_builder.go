@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/huandu/go-sqlbuilder"
 )
 
@@ -37,30 +39,19 @@ var (
 
 func New[T any](
 	settings factory.ProviderSettings,
-	fieldMapper qbtypes.FieldMapper,
-	conditionBuilder qbtypes.ConditionBuilder,
-	metadataStore telemetrytypes.MetadataStore,
-) *resourceFilterStatementBuilder[qbtypes.TraceAggregation] {
-	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter")
-	return &resourceFilterStatementBuilder[qbtypes.TraceAggregation]{
-		logger:           set.Logger(),
-		fieldMapper:      fieldMapper,
-		conditionBuilder: conditionBuilder,
-		metadataStore:    metadataStore,
-		signal:           telemetrytypes.SignalTraces,
-	}
-}
-
-func NewLogResourceFilterStatementBuilder(
-	settings factory.ProviderSettings,
-	fieldMapper qbtypes.FieldMapper,
-	conditionBuilder qbtypes.ConditionBuilder,
+	dbName string,
+	tableName string,
+	signal telemetrytypes.Signal,
+	source telemetrytypes.Source,
 	metadataStore telemetrytypes.MetadataStore,
 	fullTextColumn *telemetrytypes.TelemetryFieldKey,
 	jsonKeyToKey qbtypes.JsonKeyToFieldFunc,
-) *resourceFilterStatementBuilder[qbtypes.LogAggregation] {
-	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter")
-	return &resourceFilterStatementBuilder[qbtypes.LogAggregation]{
+	fl flagger.Flagger,
+) *resourceFilterStatementBuilder[T] {
+	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/telemetryresourcefilter")
+	fm := NewFieldMapper()
+	cb := NewConditionBuilder(fm)
+	return &resourceFilterStatementBuilder[T]{
 		logger:           set.Logger(),
 		dbName:           dbName,
 		tableName:        tableName,

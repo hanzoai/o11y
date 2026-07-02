@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/statsreporter"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/serviceaccounttypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )

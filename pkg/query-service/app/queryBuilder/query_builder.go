@@ -11,7 +11,6 @@ import (
 	metricsV3 "github.com/hanzoai/o11y/pkg/query-service/app/metrics/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"go.uber.org/zap"
 )
 
 var SupportedFunctions = []string{

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/common/model"
 	"log/slog"
 	"time"
 

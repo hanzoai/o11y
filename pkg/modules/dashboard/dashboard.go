@@ -4,10 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/statsreporter"
 	"github.com/hanzoai/o11y/pkg/types"
-	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
 	"github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/valuer"

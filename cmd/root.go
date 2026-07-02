@@ -4,7 +4,6 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/spf13/cobra"
 
 	"github.com/hanzoai/o11y/pkg/errors"

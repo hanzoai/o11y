@@ -7,6 +7,7 @@ import (
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"go.opentelemetry.io/otel/metric"
 )
 
 type provider struct {

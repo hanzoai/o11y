@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"log/slog"
 
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"

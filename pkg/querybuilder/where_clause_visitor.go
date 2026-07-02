@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/hanzoai/o11y/pkg/errors"
-	grammar "github.com/hanzoai/o11y/pkg/parser/grammar"
+	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/antlr4-go/antlr/v4"
@@ -96,8 +96,12 @@ type PreparedWhereClause struct {
 	WarningsDocURL string
 }
 
+func (p PreparedWhereClause) IsEmpty() bool {
+	return p.WhereClause == nil
+}
+
 // PrepareWhereClause generates a Datastore compatible WHERE clause from the filter query
-func PrepareWhereClause(query string, opts FilterExprVisitorOpts, startNs uint64, endNs uint64) (*PreparedWhereClause, error) {
+func PrepareWhereClause(query string, opts FilterExprVisitorOpts) (PreparedWhereClause, error) {
 
 	// Setup the ANTLR parsing pipeline
 	input := antlr.NewInputStream(query)

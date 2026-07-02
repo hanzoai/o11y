@@ -9,8 +9,9 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types"
-	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
+	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 	"github.com/uptrace/bun"
 )
 
@@ -54,9 +55,9 @@ var (
 	}
 
 	SigNozManagedRoleToExistingLegacyRole = map[string]types.Role{
-		SigNozAdminRoleName:  types.RoleAdmin,
-		SigNozEditorRoleName: types.RoleEditor,
-		SigNozViewerRoleName: types.RoleViewer,
+		HanzoO11yAdminRoleName:  types.RoleAdmin,
+		HanzoO11yEditorRoleName: types.RoleEditor,
+		HanzoO11yViewerRoleName: types.RoleViewer,
 	}
 )
 
@@ -173,8 +174,8 @@ func (role *PatchableRole) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func GetAdditionTuples(name string, orgID valuer.UUID, relation authtypes.Relation, additions []*authtypes.Object) ([]*authtypes.TupleKey, error) {
-	tuples := make([]*authtypes.TupleKey, 0)
+func GetAdditionTuples(name string, orgID valuer.UUID, relation Relation, additions []*coretypes.Object) ([]*openfgav1.TupleKey, error) {
+	tuples := make([]*openfgav1.TupleKey, 0)
 
 	for _, object := range additions {
 		resource := coretypes.MustNewResourceFromTypeAndKind(object.Resource.Type, object.Resource.Kind)
@@ -197,8 +198,8 @@ func GetAdditionTuples(name string, orgID valuer.UUID, relation authtypes.Relati
 	return tuples, nil
 }
 
-func GetDeletionTuples(name string, orgID valuer.UUID, relation authtypes.Relation, deletions []*authtypes.Object) ([]*authtypes.TupleKey, error) {
-	tuples := make([]*authtypes.TupleKey, 0)
+func GetDeletionTuples(name string, orgID valuer.UUID, relation Relation, deletions []*coretypes.Object) ([]*openfgav1.TupleKey, error) {
+	tuples := make([]*openfgav1.TupleKey, 0)
 
 	for _, object := range deletions {
 		resource := coretypes.MustNewResourceFromTypeAndKind(object.Resource.Type, object.Resource.Kind)

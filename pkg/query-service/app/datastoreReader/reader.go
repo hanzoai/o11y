@@ -16,11 +16,13 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/query-service/model/metrics_explorer"
+	"github.com/hanzoai/o11y/pkg/query-service/utils/timestamp"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
+	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/uptrace/bun"
@@ -28,7 +30,7 @@ import (
 	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-
+	"go.uber.org/zap"
 
 	datastore "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
@@ -1301,7 +1303,7 @@ func getLocalTableName(tableName string) string {
 
 }
 
-func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
+func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *retentiontypes.TTLParams) (*retentiontypes.SetTTLResponseItem, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalLogs.StringValue(),
 		instrumentationtypes.CodeNamespace:    "datastore-reader",
@@ -1469,7 +1471,7 @@ func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *
 	return &retentiontypes.SetTTLResponseItem{Message: "move ttl has been successfully set up"}, nil
 }
 
-func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
+func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params *retentiontypes.TTLParams) (*retentiontypes.SetTTLResponseItem, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalTraces.StringValue(),
 		instrumentationtypes.CodeNamespace:    "datastore-reader",
@@ -1645,7 +1647,7 @@ func (r *DatastoreReader) hasCustomRetentionColumn(ctx context.Context) (bool, e
 	return true, nil
 }
 
-func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *model.CustomRetentionTTLParams) (*model.CustomRetentionTTLResponse, error) {
+func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *retentiontypes.CustomRetentionTTLParams) (*retentiontypes.CustomRetentionTTLResponse, error) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalLogs.StringValue(),
@@ -1848,7 +1850,7 @@ func (r *DatastoreReader) SetTTLV2(ctx context.Context, orgID string, params *mo
 }
 
 // New method to build multiIf expressions with support for multiple AND conditions
-func (r *DatastoreReader) buildMultiIfExpression(ttlConditions []model.CustomRetentionRule, defaultTTLDays int, isResourceTable bool) string {
+func (r *DatastoreReader) buildMultiIfExpression(ttlConditions []retentiontypes.CustomRetentionRule, defaultTTLDays int, isResourceTable bool) string {
 	var conditions []string
 
 	for i, rule := range ttlConditions {
@@ -1920,7 +1922,7 @@ func (r *DatastoreReader) buildMultiIfExpression(ttlConditions []model.CustomRet
 	return result
 }
 
-func (r *DatastoreReader) GetCustomRetentionTTL(ctx context.Context, orgID string) (*model.GetCustomRetentionTTLResponse, error) {
+func (r *DatastoreReader) GetCustomRetentionTTL(ctx context.Context, orgID string) (*retentiontypes.GetCustomRetentionTTLResponse, error) {
 	// Check if V2 (custom retention) is supported
 	hasCustomRetention, err := r.hasCustomRetentionColumn(ctx)
 	if err != nil {
@@ -2005,8 +2007,8 @@ func (r *DatastoreReader) GetCustomRetentionTTL(ctx context.Context, orgID strin
 	return response, nil
 }
 
-func (r *DatastoreReader) checkCustomRetentionTTLStatusItem(ctx context.Context, orgID string, tableName string) (*types.TTLSetting, error) {
-	ttl := new(types.TTLSetting)
+func (r *DatastoreReader) checkCustomRetentionTTLStatusItem(ctx context.Context, orgID string, tableName string) (*retentiontypes.TTLSetting, error) {
+	ttl := new(retentiontypes.TTLSetting)
 	err := r.sqlDB.BunDB().NewSelect().
 		Model(ttl).
 		Where("table_name = ?", tableName).
@@ -2039,7 +2041,7 @@ func (r *DatastoreReader) updateCustomRetentionTTLStatus(ctx context.Context, or
 }
 
 // Enhanced validation function with duplicate detection and efficient key validation
-func (r *DatastoreReader) validateTTLConditions(ctx context.Context, ttlConditions []model.CustomRetentionRule) error {
+func (r *DatastoreReader) validateTTLConditions(ctx context.Context, ttlConditions []retentiontypes.CustomRetentionRule) error {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "validateTTLConditions",
@@ -2143,7 +2145,7 @@ func (r *DatastoreReader) validateTTLConditions(ctx context.Context, ttlConditio
 // SetTTL sets the TTL for traces or metrics or logs tables.
 // This is an async API which creates goroutines to set TTL.
 // Status of TTL update is tracked with ttl_status table in sqlite db.
-func (r *DatastoreReader) SetTTL(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
+func (r *DatastoreReader) SetTTL(ctx context.Context, orgID string, params *retentiontypes.TTLParams) (*retentiontypes.SetTTLResponseItem, *model.ApiError) {
 	// Keep only latest 100 transactions/requests
 	r.deleteTtlTransactions(ctx, orgID, 100)
 
@@ -2160,7 +2162,7 @@ func (r *DatastoreReader) SetTTL(ctx context.Context, orgID string, params *mode
 
 }
 
-func (r *DatastoreReader) setTTLMetrics(ctx context.Context, orgID string, params *model.TTLParams) (*model.SetTTLResponseItem, *model.ApiError) {
+func (r *DatastoreReader) setTTLMetrics(ctx context.Context, orgID string, params *retentiontypes.TTLParams) (*retentiontypes.SetTTLResponseItem, *model.ApiError) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
 		instrumentationtypes.CodeNamespace:    "datastore-reader",
@@ -2324,9 +2326,9 @@ func (r *DatastoreReader) deleteTtlTransactions(ctx context.Context, orgID strin
 }
 
 // checkTTLStatusItem checks if ttl_status table has an entry for the given table name
-func (r *DatastoreReader) checkTTLStatusItem(ctx context.Context, orgID string, tableName string) (*types.TTLSetting, *model.ApiError) {
+func (r *DatastoreReader) checkTTLStatusItem(ctx context.Context, orgID string, tableName string) (*retentiontypes.TTLSetting, *model.ApiError) {
 	zap.L().Info("checkTTLStatusItem query", zap.String("tableName", tableName))
-	ttl := new(types.TTLSetting)
+	ttl := new(retentiontypes.TTLSetting)
 	err := r.
 		sqlDB.
 		BunDB().
@@ -2419,7 +2421,7 @@ func getLocalTableNameArray(tableNames []string) []string {
 }
 
 // GetTTL returns current ttl, expected ttl and past setTTL status for metrics/traces.
-func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *model.GetTTLParams) (*model.GetTTLResponseItem, *model.ApiError) {
+func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *retentiontypes.GetTTLParams) (*retentiontypes.GetTTLResponseItem, *model.ApiError) {
 
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.CodeNamespace:    "datastore-reader",
@@ -2539,7 +2541,7 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *m
 		delTTL, moveTTL := parseTTL(dbResp.EngineFull)
 		return &retentiontypes.GetTTLResponseItem{TracesTime: delTTL, TracesMoveTime: moveTTL, ExpectedTracesTime: ttlQuery.TTL, ExpectedTracesMoveTime: ttlQuery.ColdStorageTTL, Status: status}, nil
 
-	case constants.MetricsTTL:
+	case retentiontypes.MetricsTTL:
 		tableNameArray := []string{observeMetricDBName + "." + o11ySampleTableName}
 		tableNameArray = getLocalTableNameArray(tableNameArray)
 		status, apiErr := r.getTTLQueryStatus(ctx, orgID, tableNameArray)

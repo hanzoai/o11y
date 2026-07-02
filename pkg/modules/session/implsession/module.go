@@ -135,7 +135,7 @@ func (module *module) CreateCallbackAuthNSession(ctx context.Context, authNProvi
 
 	roleMapping := authDomain.AuthDomainConfig().RoleMapping
 	role := roleMapping.NewRoleFromCallbackIdentity(callbackIdentity)
-	signozManagedRole := authtypes.MustGetSigNozManagedRoleFromExistingRole(role)
+	signozManagedRole := authtypes.MustGetHanzoO11yManagedRoleFromExistingRole(role)
 
 	newUser, err := types.NewUser(callbackIdentity.Name, callbackIdentity.Email, callbackIdentity.OrgID, types.UserStatusActive)
 	if err != nil {
@@ -147,7 +147,11 @@ func (module *module) CreateCallbackAuthNSession(ctx context.Context, authNProvi
 		return "", err
 	}
 
-	token, err := module.tokenizer.CreateToken(ctx, authtypes.NewIdentity(user.ID, user.OrgID, user.Email, user.Role), map[string]string{})
+	if err := newUser.ErrIfRoot(); err != nil {
+		return "", errors.WithAdditionalf(err, "root user can only authenticate via password")
+	}
+
+	token, err := module.tokenizer.CreateToken(ctx, authtypes.NewPrincipalUserIdentity(newUser.ID, newUser.OrgID, newUser.Email, authtypes.IdentNProviderTokenizer), map[string]string{})
 	if err != nil {
 		return "", err
 	}

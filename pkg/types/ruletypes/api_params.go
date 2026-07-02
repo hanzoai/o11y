@@ -11,11 +11,9 @@ import (
 	"github.com/prometheus/alertmanager/config"
 
 	o11yError "github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/query-service/model"
-	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/times"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/timestamp"
+	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -207,7 +205,7 @@ func (ns *NotificationSettings) UnmarshalJSON(data []byte) error {
 
 	// Validate states after unmarshaling
 	for _, state := range ns.Renotify.AlertStates {
-		if state != model.StateFiring && state != model.StateNoData {
+		if state != StateFiring && state != StateNoData {
 			return o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "invalid alert state: %s", state)
 
 		}
@@ -337,40 +335,28 @@ func isValidLabelValue(v string) bool {
 	return utf8.ValidString(v)
 }
 
-func isAllQueriesDisabled(compositeQuery *v3.CompositeQuery) bool {
-	if compositeQuery == nil {
+func isAllQueriesDisabled(compositeQuery *AlertCompositeQuery) bool {
+	if compositeQuery == nil || len(compositeQuery.Queries) == 0 {
 		return false
 	}
-	if compositeQuery.BuilderQueries == nil && compositeQuery.PromQueries == nil && compositeQuery.DatastoreQueries == nil {
-		return false
-	}
-	switch compositeQuery.QueryType {
-	case v3.QueryTypeBuilder:
-		if len(compositeQuery.BuilderQueries) == 0 {
+	for _, query := range compositeQuery.Queries {
+		var disabled bool
+		switch spec := query.Spec.(type) {
+		case qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation]:
+			disabled = spec.Disabled
+		case qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]:
+			disabled = spec.Disabled
+		case qbtypes.QueryBuilderQuery[qbtypes.MetricAggregation]:
+			disabled = spec.Disabled
+		case qbtypes.PromQuery:
+			disabled = spec.Disabled
+		case qbtypes.DatastoreQuery:
+			disabled = spec.Disabled
+		default:
+			continue
+		}
+		if !disabled {
 			return false
-		}
-		for _, query := range compositeQuery.BuilderQueries {
-			if !query.Disabled {
-				return false
-			}
-		}
-	case v3.QueryTypePromQL:
-		if len(compositeQuery.PromQueries) == 0 {
-			return false
-		}
-		for _, query := range compositeQuery.PromQueries {
-			if !query.Disabled {
-				return false
-			}
-		}
-	case v3.QueryTypeDatastoreSQL:
-		if len(compositeQuery.DatastoreQueries) == 0 {
-			return false
-		}
-		for _, query := range compositeQuery.DatastoreQueries {
-			if !query.Disabled {
-				return false
-			}
 		}
 	}
 	return true
@@ -412,6 +398,11 @@ func (r *PostableRule) validate() error {
 
 	errs = append(errs, testTemplateParsing(r)...)
 	return o11yError.Join(errs...)
+}
+
+// Validate is the exported entry point for rule validation.
+func (r *PostableRule) Validate() error {
+	return r.validate()
 }
 
 func testTemplateParsing(rl *PostableRule) (errs []error) {

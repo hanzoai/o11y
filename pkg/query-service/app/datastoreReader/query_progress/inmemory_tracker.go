@@ -6,8 +6,8 @@ import (
 	"sync"
 
 	datastore "github.com/ClickHouse/clickhouse-go/v2"
-	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/google/uuid"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"golang.org/x/exp/maps"
 )
 
@@ -117,9 +117,9 @@ func (qt *queryTracker) handleProgressUpdate(p *datastore.Progress) {
 	defer qt.lock.Unlock()
 
 	if qt.isFinished {
-		zap.L().Warn(
+		qt.logger.Warn(
 			"received datastore progress update for finished query",
-			zap.String("queryId", qt.queryId), zap.Any("progress", p),
+			"queryId", qt.queryId, "progress", p,
 		)
 		return
 	}

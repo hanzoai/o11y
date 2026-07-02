@@ -3,9 +3,6 @@ package rules
 import (
 	"context"
 	"time"
-
-	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
-	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type TaskType string
@@ -30,9 +27,11 @@ type Task interface {
 	Pause(b bool)
 }
 
-// newTask returns an appropriate group for the rule type. PromQL
-// rule-tasks are removed; the only task type is TaskTypeCh
-// (datastore-SQL rule tasks).
-func newTask(taskType TaskType, name, file string, frequency time.Duration, rules []Rule, opts *ManagerOptions, notify NotifyFunc, maintenanceStore ruletypes.MaintenanceStore, orgID valuer.UUID) Task {
-	return NewRuleTask(name, file, frequency, rules, opts, notify, maintenanceStore, orgID)
+// newTask returns an appropriate group for
+// rule type
+func newTask(taskType TaskType, name, file string, frequency time.Duration, rules []Rule, opts *ManagerOptions, notify NotifyFunc) Task {
+	if taskType == TaskTypeCh {
+		return NewRuleTask(name, file, frequency, rules, opts, notify)
+	}
+	return NewPromRuleTask(name, file, frequency, rules, opts, notify)
 }

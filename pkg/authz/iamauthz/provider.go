@@ -22,8 +22,10 @@ import (
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/roletypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
+	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 )
 
 // provider is the IAM-backed authz implementation.
@@ -80,21 +82,37 @@ func (p *provider) Name() string { return "iam" }
 func (p *provider) Start(_ context.Context) error { return nil }
 func (p *provider) Stop(_ context.Context) error  { return nil }
 
+// Healthy reports readiness. The IAM-backed provider holds no long-lived
+// state, so it is always healthy; return a closed channel.
+func (p *provider) Healthy() <-chan struct{} {
+	ch := make(chan struct{})
+	close(ch)
+	return ch
+}
+
+func (p *provider) ReadTuples(_ context.Context, _ *openfgav1.ReadRequestTupleKey) ([]*openfgav1.TupleKey, error) {
+	return nil, errNotImplemented
+}
+
 // =============================================================================
 // Check methods — the hot path. Wire to IAM /enforce first.
 // =============================================================================
 
-func (p *provider) CheckWithTupleCreation(ctx context.Context, _ authtypes.Claims, _ valuer.UUID, _ authtypes.Relation, _ authtypes.Typeable, _ []authtypes.Selector, _ []authtypes.Selector) error {
+func (p *provider) CheckWithTupleCreation(ctx context.Context, _ authtypes.Claims, _ valuer.UUID, _ authtypes.Relation, _ coretypes.Resource, _ []coretypes.Selector, _ []coretypes.Selector) error {
 	// TODO: POST {baseURL}/enforce with subject=claims.UserID, action=relation,
 	// resource=typeable.Type/selectors. Until wired, fail closed.
 	return errNotImplemented
 }
 
-func (p *provider) CheckWithTupleCreationWithoutClaims(ctx context.Context, _ valuer.UUID, _ authtypes.Relation, _ authtypes.Typeable, _ []authtypes.Selector, _ []authtypes.Selector) error {
+func (p *provider) CheckWithTupleCreationWithoutClaims(ctx context.Context, _ valuer.UUID, _ authtypes.Relation, _ coretypes.Resource, _ []coretypes.Selector, _ []coretypes.Selector) error {
 	return errNotImplemented
 }
 
-func (p *provider) BatchCheck(_ context.Context, _ map[string]*authtypes.TupleKey) (map[string]*authtypes.TupleKeyAuthorization, error) {
+func (p *provider) BatchCheck(_ context.Context, _ map[string]*openfgav1.TupleKey) (map[string]*authtypes.TupleKeyAuthorization, error) {
+	return nil, errNotImplemented
+}
+
+func (p *provider) CheckTransactions(_ context.Context, _ string, _ valuer.UUID, _ []*authtypes.Transaction) ([]*authtypes.TransactionWithAuthorization, error) {
 	return nil, errNotImplemented
 }
 
@@ -103,11 +121,11 @@ func (p *provider) BatchCheck(_ context.Context, _ map[string]*authtypes.TupleKe
 // IAM's role-assignment endpoints.
 // =============================================================================
 
-func (p *provider) Write(_ context.Context, _ []*authtypes.TupleKey, _ []*authtypes.TupleKey) error {
+func (p *provider) Write(_ context.Context, _ []*openfgav1.TupleKey, _ []*openfgav1.TupleKey) error {
 	return errNotImplemented
 }
 
-func (p *provider) ListObjects(_ context.Context, _ string, _ authtypes.Relation, _ authtypes.Typeable) ([]*authtypes.Object, error) {
+func (p *provider) ListObjects(_ context.Context, _ string, _ authtypes.Relation, _ coretypes.Type) ([]*coretypes.Object, error) {
 	return nil, errNotImplemented
 }
 
@@ -124,11 +142,11 @@ func (p *provider) GetOrCreate(_ context.Context, _ valuer.UUID, _ *roletypes.Ro
 	return nil, errNotImplemented
 }
 
-func (p *provider) GetObjects(_ context.Context, _ valuer.UUID, _ valuer.UUID, _ authtypes.Relation) ([]*authtypes.Object, error) {
+func (p *provider) GetObjects(_ context.Context, _ valuer.UUID, _ valuer.UUID, _ authtypes.Relation) ([]*coretypes.Object, error) {
 	return nil, errNotImplemented
 }
 
-func (p *provider) GetResources(_ context.Context) []*authtypes.Resource {
+func (p *provider) GetResources(_ context.Context) []*coretypes.Resource {
 	return nil
 }
 
@@ -136,7 +154,7 @@ func (p *provider) Patch(_ context.Context, _ valuer.UUID, _ *roletypes.Role) er
 	return errNotImplemented
 }
 
-func (p *provider) PatchObjects(_ context.Context, _ valuer.UUID, _ string, _ authtypes.Relation, _ []*authtypes.Object, _ []*authtypes.Object) error {
+func (p *provider) PatchObjects(_ context.Context, _ valuer.UUID, _ string, _ authtypes.Relation, _ []*coretypes.Object, _ []*coretypes.Object) error {
 	return errNotImplemented
 }
 

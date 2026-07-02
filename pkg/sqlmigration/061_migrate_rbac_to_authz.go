@@ -8,7 +8,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
-	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/oklog/ulid/v2"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect"

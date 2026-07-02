@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"math"
 	"sort"
 	"strings"
@@ -19,7 +20,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"go.uber.org/zap"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )

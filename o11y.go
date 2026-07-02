@@ -2,13 +2,14 @@ package o11y
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/hanzoai/o11y/pkg/alertmanager"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerstore/sqlalertmanagerstore"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager/nfroutingstore/sqlroutingstore"
 	"github.com/hanzoai/o11y/pkg/analytics"
 	"github.com/hanzoai/o11y/pkg/apiserver"
+	"github.com/hanzoai/o11y/pkg/auditor"
 	"github.com/hanzoai/o11y/pkg/authn"
 	"github.com/hanzoai/o11y/pkg/authn/authnstore/sqlauthnstore"
 	"github.com/hanzoai/o11y/pkg/authz"
@@ -17,20 +18,34 @@ import (
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/gateway"
+	"github.com/hanzoai/o11y/pkg/global"
+	"github.com/hanzoai/o11y/pkg/identn"
 	"github.com/hanzoai/o11y/pkg/instrumentation"
 	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/meterreporter"
+	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/organization/implorganization"
+	"github.com/hanzoai/o11y/pkg/modules/retention"
+	"github.com/hanzoai/o11y/pkg/modules/retention/implretention"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount/implserviceaccount"
+	"github.com/hanzoai/o11y/pkg/modules/tag"
+	"github.com/hanzoai/o11y/pkg/modules/tag/impltag"
 	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
+	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
+	"github.com/hanzoai/o11y/pkg/ruler"
 	"github.com/hanzoai/o11y/pkg/sharder"
 	"github.com/hanzoai/o11y/pkg/sqlmigration"
 	"github.com/hanzoai/o11y/pkg/sqlmigrator"
 	"github.com/hanzoai/o11y/pkg/sqlschema"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/statsreporter"
+	"github.com/hanzoai/o11y/pkg/telemetryaudit"
 	"github.com/hanzoai/o11y/pkg/telemetrylogs"
 	"github.com/hanzoai/o11y/pkg/telemetrymetadata"
 	"github.com/hanzoai/o11y/pkg/telemetrymeter"
@@ -96,6 +111,8 @@ func New(
 	auditorProviderFactories func(licensing.Licensing) factory.NamedMap[factory.ProviderFactory[auditor.Auditor, auditor.Config]],
 	meterReporterProviderFactories func(context.Context, factory.ProviderSettings, flagger.Flagger, licensing.Licensing, telemetrystore.TelemetryStore, retention.Getter, organization.Getter, zeus.Zeus) (factory.NamedMap[factory.ProviderFactory[meterreporter.Reporter, meterreporter.Config]], string),
 	querierHandlerCallback func(factory.ProviderSettings, querier.Querier, analytics.Analytics) querier.Handler,
+	cloudIntegrationCallback func(sqlstore.SQLStore, dashboard.Module, global.Global, zeus.Zeus, gateway.Gateway, licensing.Licensing, serviceaccount.Module, cloudintegration.Config) (cloudintegration.Module, error),
+	rulerProviderFactories func(cache.Cache, alertmanager.Alertmanager, sqlstore.SQLStore, telemetrystore.TelemetryStore, telemetrytypes.MetadataStore, prometheus.Prometheus, organization.Getter, rulestatehistory.Module, querier.Querier, queryparser.QueryParser) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]],
 ) (*HanzoO11y, error) {
 	// Initialize instrumentation
 	instrumentation, err := instrumentation.New(ctx, config.Instrumentation, version.Info, "observe")
@@ -271,6 +288,9 @@ func New(
 	// Initialize organization getter
 	orgGetter := implorganization.NewGetter(implorganization.NewStore(sqlstore), sharder)
 
+	// Initialize retention getter
+	retentionGetter := implretention.NewGetter(implretention.NewStore(sqlstore))
+
 	// Initialize tokenizer from the available tokenizer provider factories
 	tokenizer, err := factory.NewProviderFromNamedMap(
 		ctx,
@@ -358,18 +378,6 @@ func New(
 		return nil, err
 	}
 
-	// Initialize ruler from the available ruler provider factories
-	ruler, err := factory.NewProviderFromNamedMap(
-		ctx,
-		providerSettings,
-		config.Ruler,
-		NewRulerProviderFactories(sqlstore, queryParser),
-		"observe",
-	)
-	if err != nil {
-		return nil, err
-	}
-
 	gatewayFactory := gatewayProviderFactory(licensing)
 	gateway, err := gatewayFactory.New(ctx, providerSettings, config.Gateway)
 	if err != nil {
@@ -446,20 +454,13 @@ func New(
 	// Initialize all modules
 	modules := NewModules(sqlstore, tokenizer, emailing, providerSettings, orgGetter, alertmanager, analytics, querier, telemetrystore, telemetryMetadataStore, authNs, authz, cache, queryParser, config, dashboard, userGetter, userRoleStore, serviceAccount, cloudIntegrationModule, retentionGetter, flagger, tagModule)
 
-	userService := impluser.NewService(providerSettings, impluser.NewStore(sqlstore, providerSettings), modules.User, orgGetter, authz, config.User.Root)
-
-	// Initialize the querier handler via callback (allows EE to decorate with anomaly detection)
-	querierHandler := querierHandlerCallback(providerSettings, querier, analytics)
-
-	// Initialize all handlers for the modules
-	handlers := NewHandlers(modules, providerSettings, analytics, querierHandler, licensing, global, flagger, gateway, telemetryMetadataStore, authz, zeus)
-
-	// Initialize the API server
-	apiserver, err := factory.NewProviderFromNamedMap(
+	// Initialize ruler from the available ruler provider factories (after modules,
+	// which supplies RuleStateHistory).
+	rulerInstance, err := factory.NewProviderFromNamedMap(
 		ctx,
 		providerSettings,
-		config.APIServer,
-		NewAPIServerProviderFactories(orgGetter, authz, global, modules, handlers),
+		config.Ruler,
+		rulerProviderFactories(cache, alertmanager, sqlstore, telemetrystore, telemetryMetadataStore, nil, orgGetter, modules.RuleStateHistory, querier, queryParser),
 		"observe",
 	)
 	if err != nil {
@@ -536,7 +537,7 @@ func New(
 		providerSettings,
 		config.APIServer,
 		NewAPIServerProviderFactories(orgGetter, authz, modules, handlers),
-		"signoz",
+		"observe",
 	)
 	if err != nil {
 		return nil, err

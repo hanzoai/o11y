@@ -5,10 +5,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/query-service/model"
-	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 const (
@@ -131,35 +129,19 @@ func (rc *RuleCondition) SelectedQueryName() string {
 
 	queryNames := map[string]struct{}{}
 
-		if rc.CompositeQuery != nil {
-			if rc.QueryType() == v3.QueryTypeBuilder {
-				for name := range rc.CompositeQuery.BuilderQueries {
-					queryNames[name] = struct{}{}
-				}
-
-				for _, query := range rc.CompositeQuery.Queries {
-					switch spec := query.Spec.(type) {
-					case qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation]:
-						queryNames[spec.Name] = struct{}{}
-					case qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]:
-						queryNames[spec.Name] = struct{}{}
-					case qbtypes.QueryBuilderQuery[qbtypes.MetricAggregation]:
-						queryNames[spec.Name] = struct{}{}
-					case qbtypes.QueryBuilderFormula:
-						queryNames[spec.Name] = struct{}{}
-					}
-				}
-			} else if rc.QueryType() == v3.QueryTypeDatastoreSQL {
-				for name := range rc.CompositeQuery.DatastoreQueries {
-					queryNames[name] = struct{}{}
-				}
-
-				for _, query := range rc.CompositeQuery.Queries {
-					switch spec := query.Spec.(type) {
-					case qbtypes.DatastoreQuery:
-						queryNames[spec.Name] = struct{}{}
-					}
-				}
+	if rc.CompositeQuery != nil {
+		for _, query := range rc.CompositeQuery.Queries {
+			switch spec := query.Spec.(type) {
+			case qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation]:
+				queryNames[spec.Name] = struct{}{}
+			case qbtypes.QueryBuilderQuery[qbtypes.LogAggregation]:
+				queryNames[spec.Name] = struct{}{}
+			case qbtypes.QueryBuilderQuery[qbtypes.MetricAggregation]:
+				queryNames[spec.Name] = struct{}{}
+			case qbtypes.QueryBuilderFormula:
+				queryNames[spec.Name] = struct{}{}
+			case qbtypes.DatastoreQuery:
+				queryNames[spec.Name] = struct{}{}
 			}
 		}
 	}
@@ -193,4 +175,3 @@ func (rc *RuleCondition) String() string {
 	data, _ := json.Marshal(*rc)
 	return string(data)
 }
-

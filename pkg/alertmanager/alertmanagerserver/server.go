@@ -11,6 +11,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertemplate"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
@@ -23,8 +24,8 @@ import (
 	"github.com/prometheus/alertmanager/silence"
 	"github.com/prometheus/alertmanager/template"
 	"github.com/prometheus/alertmanager/timeinterval"
-	"github.com/luxfi/metric"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/model"
 )
 
 // This is not a real snapshot file and will never be used. We need this placeholder to ensure maintenance runs on shutdown.
@@ -37,7 +38,7 @@ type Server struct {
 	logger *slog.Logger
 
 	// registry is the prometheus registry for the alertmanager
-	registry metric.Registerer
+	registry prometheus.Registerer
 
 	// srvConfig is the server config for the alertmanager
 	srvConfig Config
@@ -70,7 +71,7 @@ type Server struct {
 	notificationManager nfmanager.NotificationManager
 }
 
-func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, srvConfig Config, orgID string, stateStore alertmanagertypes.StateStore, nfManager nfmanager.NotificationManager) (*Server, error) {
+func New(ctx context.Context, logger *slog.Logger, registry prometheus.Registerer, srvConfig Config, orgID string, stateStore alertmanagertypes.StateStore, nfManager nfmanager.NotificationManager) (*Server, error) {
 	server := &Server{
 		logger:              logger.With("pkg", "go.observe.hanzo.ai/pkg/alertmanager/alertmanagerserver"),
 		registry:            registry,
@@ -80,8 +81,8 @@ func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, s
 		stopc:               make(chan struct{}),
 		notificationManager: nfManager,
 	}
-	o11yRegisterer := metric.WrapRegistererWithPrefix("o11y_", registry)
-	o11yRegisterer = metric.WrapRegistererWith(metric.Labels{"org_id": server.orgID}, o11yRegisterer)
+	o11yRegisterer := prometheus.WrapRegistererWithPrefix("o11y_", registry)
+	o11yRegisterer = prometheus.WrapRegistererWith(prometheus.Labels{"org_id": server.orgID}, o11yRegisterer)
 	// initialize marker
 	server.marker = alertmanagertypes.NewMarker(o11yRegisterer)
 
@@ -194,7 +195,7 @@ func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, s
 		return nil, err
 	}
 
-	server.pipelineBuilder = notify.NewPipelineBuilder(o11yRegisterer, featurecontrol.NoopFlags{})
+	server.pipelineBuilder = newPipelineBuilder(o11yRegisterer, featurecontrol.NoopFlags{})
 	server.dispatcherMetrics = NewDispatcherMetrics(false, o11yRegisterer)
 
 	return server, nil

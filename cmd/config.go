@@ -4,13 +4,19 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/config"
 	"github.com/hanzoai/o11y/pkg/config/envprovider"
 	"github.com/hanzoai/o11y/pkg/config/fileprovider"
-	"github.com/hanzoai/o11y"
 )
 
-func NewHanzoO11yConfig(ctx context.Context, logger *slog.Logger, flags o11y.DeprecatedFlags) (o11y.Config, error) {
+func NewHanzoO11yConfig(ctx context.Context, logger *slog.Logger, configFiles []string, flags o11y.DeprecatedFlags) (o11y.Config, error) {
+	uris := make([]string, 0, len(configFiles)+1)
+	for _, f := range configFiles {
+		uris = append(uris, "file:"+f)
+	}
+	uris = append(uris, "env:")
+
 	config, err := o11y.NewConfig(
 		ctx,
 		logger,
@@ -21,6 +27,7 @@ func NewHanzoO11yConfig(ctx context.Context, logger *slog.Logger, flags o11y.Dep
 				fileprovider.NewFactory(),
 			},
 		},
+		flags,
 	)
 	if err != nil {
 		return o11y.Config{}, err

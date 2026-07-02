@@ -4,38 +4,37 @@ package alertmanagerserver
 //
 // NOTE: This file is the prometheus/alertmanager-library boundary —
 // dispatch.NewDispatcher, silence.New, notify.NewIntegration etc. all
-// require metric.Registerer from prometheus/client_golang. We
-// haven't replaced prometheus/alertmanager yet, so this single file
-// still pulls prometheus/client_golang.
+// require a prometheus.Registerer from prometheus/client_golang. We
+// haven't replaced prometheus/alertmanager yet, so this file still
+// pulls prometheus/client_golang.
 //
 // Everything else in o11y (instrumentation/factory/test) uses luxfi/metric.
-// The alertmanager rip is its own workstream — see project notes.
 
-import "github.com/luxfi/metric"
+import "github.com/prometheus/client_golang/prometheus"
 
 type DispatcherMetrics struct {
-	aggrGroups            metric.Gauge
-	processingDuration    metric.Summary
-	aggrGroupLimitReached metric.Counter
+	aggrGroups            prometheus.Gauge
+	processingDuration    prometheus.Summary
+	aggrGroupLimitReached prometheus.Counter
 }
 
 // NewDispatcherMetrics returns a new registered DispatchMetrics.
-func NewDispatcherMetrics(registerLimitMetrics bool, r metric.Registerer) *DispatcherMetrics {
+func NewDispatcherMetrics(registerLimitMetrics bool, r prometheus.Registerer) *DispatcherMetrics {
 	m := DispatcherMetrics{
-		aggrGroups: metric.NewGauge(
-			metric.GaugeOpts{
+		aggrGroups: prometheus.NewGauge(
+			prometheus.GaugeOpts{
 				Name: "o11y_alertmanager_dispatcher_aggregation_groups",
 				Help: "Number of active aggregation groups",
 			},
 		),
-		processingDuration: metric.NewSummary(
-			metric.SummaryOpts{
+		processingDuration: prometheus.NewSummary(
+			prometheus.SummaryOpts{
 				Name: "o11y_alertmanager_dispatcher_alert_processing_duration_seconds",
 				Help: "Summary of latencies for the processing of alerts.",
 			},
 		),
-		aggrGroupLimitReached: metric.NewCounter(
-			metric.CounterOpts{
+		aggrGroupLimitReached: prometheus.NewCounter(
+			prometheus.CounterOpts{
 				Name: "o11y_alertmanager_dispatcher_aggregation_group_limit_reached_total",
 				Help: "Number of times when dispatcher failed to create new aggregation group due to limit.",
 			},

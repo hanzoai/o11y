@@ -9,7 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/valuer"
+	"log/slog"
+
 	"github.com/pkg/errors"
 
 	signozerrors "github.com/hanzoai/o11y/pkg/errors"

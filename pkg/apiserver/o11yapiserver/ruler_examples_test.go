@@ -1,4 +1,4 @@
-package signozapiserver
+package o11yapiserver
 
 import (
 	"encoding/json"

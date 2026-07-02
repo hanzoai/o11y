@@ -5,9 +5,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hanzoai/o11y/pkg/errors"
-	qbv5 "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	qbv5 "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
 func TestRemoveAllVarMatchers(t *testing.T) {

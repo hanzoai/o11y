@@ -10,14 +10,14 @@ import (
 	"time"
 
 	datastore "github.com/ClickHouse/clickhouse-go/v2"
+
 	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/telemetrylogs"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/bytedance/sonic"
 )
 
 const traceOutsideRangeWarn = "Query %s references a trace_id that exists between %s and %s (UTC) but lies outside the selected time range; adjust the time range to see results"

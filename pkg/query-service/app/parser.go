@@ -15,6 +15,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
 	"github.com/hanzoai/o11y/pkg/types/thirdpartyapitypes"
 
 	"log/slog"
@@ -23,7 +24,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/kafka"
 	queues2 "github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/queues"
 	"github.com/gorilla/mux"
-	promModel "github.com/hanzoai/common/model"
+	promModel "github.com/prometheus/common/model"
 	"go.uber.org/multierr"
 
 	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
@@ -742,9 +743,9 @@ func chTransformQuery(query string, variables map[string]interface{}) {
 	transformer := chVariables.NewQueryTransformer(query, varsForTransform)
 	transformedQuery, err := transformer.Transform()
 	if err != nil {
-		zap.L().Warn("failed to transform datastore query", zap.String("query", query), zap.Error(err))
+		slog.Warn("failed to transform datastore query", "query", query, "error", err)
 	}
-	zap.L().Info("transformed datastore query", zap.String("transformedQuery", transformedQuery), zap.String("originalQuery", query))
+	slog.Info("transformed datastore query", "transformedQuery", transformedQuery, "originalQuery", query)
 }
 
 func ParseQueryRangeParams(r *http.Request) (*v3.QueryRangeParamsV3, *model.ApiError) {

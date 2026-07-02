@@ -3,15 +3,16 @@ package rules
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/query-service/model"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
-	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
+
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
 
 	"github.com/hanzoai/o11y/pkg/errors"
-	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
 )
 
 // TestNotification prepares a dummy rule for given rule parameters and

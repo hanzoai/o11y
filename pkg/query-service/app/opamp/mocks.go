@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/hanzoai/o11y/pkg/types/opamptypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/google/uuid"
 	"github.com/knadh/koanf/parsers/yaml"

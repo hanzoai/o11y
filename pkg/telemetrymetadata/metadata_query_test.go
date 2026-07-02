@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	cmock "github.com/srikanthccv/ClickHouse-go-mock"
+	cmock "github.com/hanzoai/clickhouse-go-mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

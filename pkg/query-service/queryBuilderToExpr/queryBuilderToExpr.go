@@ -2,12 +2,13 @@ package queryBuilderToExpr
 
 import (
 	"fmt"
+	"log/slog"
 	"reflect"
 	"strings"
 
+	expr "github.com/antonmedv/expr"
 	"github.com/hanzoai/o11y/pkg/errors"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	expr "github.com/antonmedv/expr"
 )
 
 var (

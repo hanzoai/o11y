@@ -12,6 +12,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/transition"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/migrate"
+
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 type queryBuilderV5Migration struct {

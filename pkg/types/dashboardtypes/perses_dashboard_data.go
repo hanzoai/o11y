@@ -102,6 +102,6 @@ var (
 		qb.QueryTypeFormula:       QueryKindFormula,
 		qb.QueryTypeTraceOperator: QueryKindTraceOperator,
 		qb.QueryTypePromQL:        QueryKindPromQL,
-		qb.QueryTypeClickHouseSQL: QueryKindClickHouseSQL,
+		qb.QueryTypeDatastoreSQL: QueryKindClickHouseSQL,
 	}
 )

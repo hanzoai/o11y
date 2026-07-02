@@ -111,6 +111,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.19 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.10 // indirect
 	github.com/aws/smithy-go v1.24.2 // indirect
+	github.com/beevik/etree v1.6.0 // indirect
 	github.com/bytedance/gopkg v0.1.4 // indirect
 	github.com/bytedance/sonic/loader v0.5.1 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
@@ -143,10 +144,12 @@ require (
 	github.com/hanzoai/commerce/metering v0.1.0 // indirect
 	github.com/hashicorp/go-metrics v0.5.4 // indirect
 	github.com/huandu/go-clone v1.7.3 // indirect
+	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/luxfi/accel v1.2.4 // indirect
 	github.com/luxfi/crypto v1.19.20 // indirect
 	github.com/luxfi/mdns v0.1.1 // indirect
+	github.com/mattermost/xml-roundtrip-validator v0.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/muhlemmer/gu v0.3.1 // indirect
@@ -159,6 +162,8 @@ require (
 	github.com/redis/go-redis/extra/rediscmd/v9 v9.15.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
+	github.com/russellhaering/gosaml2 v0.11.0 // indirect
+	github.com/russellhaering/goxmldsig v1.6.0 // indirect
 	github.com/savsgio/gotils v0.0.0-20240704082632-aef3928b8a38 // indirect
 	github.com/swaggest/refl v1.4.0 // indirect
 	github.com/swaggest/usecase v1.3.1 // indirect

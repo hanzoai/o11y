@@ -7,6 +7,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlschema"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/roletypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/uptrace/bun"

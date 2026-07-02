@@ -4,9 +4,9 @@ import (
 	"log/slog"
 
 	"github.com/hanzoai/govaluate"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"go.uber.org/zap"
 )
 
 // postProcessResult applies having clause, metric limit, reduce function to the result

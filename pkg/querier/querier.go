@@ -11,6 +11,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/dustin/go-humanize"
+
+	"golang.org/x/exp/maps"
+
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
@@ -20,8 +24,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"golang.org/x/exp/maps"
 
+	"github.com/hanzoai/o11y/pkg/flagger"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
@@ -89,6 +93,11 @@ func (q *querier) QueryRange(ctx context.Context, orgID valuer.UUID, req *qbtype
 	if tmplVars == nil {
 		tmplVars = make(map[string]qbtypes.VariableItem)
 	}
+
+	// Warnings accumulated while normalizing per-query step intervals.
+	var intervalWarnings []string
+	// Whether any query in the request is a trace operator.
+	var isTraceOperator bool
 
 	event := &qbtypes.QBEvent{
 		Version:         "v5",
@@ -418,7 +427,7 @@ func (q *querier) populateQBEvent(event *qbtypes.QBEvent, queries []qbtypes.Quer
 			event.MetricsUsed = true
 		case qbtypes.QueryTypeTraceOperator:
 			event.TracesUsed = true
-		case qbtypes.QueryTypeClickHouseSQL:
+		case qbtypes.QueryTypeDatastoreSQL:
 			sql := query.GetQuery()
 			if strings.TrimSpace(sql) != "" {
 				event.MetricsUsed = strings.Contains(sql, "signoz_metrics")

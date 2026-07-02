@@ -18,7 +18,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/opamptypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/google/uuid"
-	"go.uber.org/zap"
 	yaml "gopkg.in/yaml.v3"
 )
 

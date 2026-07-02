@@ -7,7 +7,6 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/http/render"
-	"github.com/hanzoai/o11y/pkg/types"
 )
 
 type handler struct {

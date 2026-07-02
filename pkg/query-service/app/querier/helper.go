@@ -15,7 +15,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/postprocess"
 	"github.com/hanzoai/o11y/pkg/query-service/querycache"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"go.uber.org/zap"
 )
 
 func prepareLogsQuery(

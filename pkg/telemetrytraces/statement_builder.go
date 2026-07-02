@@ -9,7 +9,9 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/telemetryresourcefilter"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
@@ -43,6 +45,19 @@ func NewTraceQueryStatementBuilder(
 	flagger flagger.Flagger,
 ) *traceQueryStatementBuilder {
 	tracesSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/telemetrytraces")
+
+	resourceFilterStmtBuilder := telemetryresourcefilter.New[qbtypes.TraceAggregation](
+		settings,
+		DBName,
+		TracesResourceV3TableName,
+		telemetrytypes.SignalTraces,
+		telemetrytypes.SourceUnspecified,
+		metadataStore,
+		nil,
+		nil,
+		flagger,
+	)
+
 	return &traceQueryStatementBuilder{
 		logger:                    tracesSettings.Logger(),
 		metadataStore:             metadataStore,

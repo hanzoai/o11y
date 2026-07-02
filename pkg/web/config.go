@@ -50,7 +50,7 @@ func NewConfigFactory() factory.ConfigFactory {
 func newConfig() factory.Config {
 	return &Config{
 		Enabled:   true,
-		Prefix:    "/",
+		Index:     "index.html",
 		Directory: "/etc/o11y/web",
 	}
 }

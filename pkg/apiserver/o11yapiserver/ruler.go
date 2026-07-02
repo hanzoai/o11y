@@ -1,13 +1,14 @@
-package signozapiserver
+package o11yapiserver
 
 import (
 	"net/http"
+
+	"github.com/gorilla/mux"
 
 	"github.com/hanzoai/o11y/pkg/http/handler"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
-	"github.com/gorilla/mux"
 )
 
 func (provider *provider) addRulerRoutes(router *mux.Router) error {

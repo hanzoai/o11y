@@ -7,6 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/prometheus"
+
 	logsV4 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v4"
 	metricsV4 "github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4"
 	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
@@ -17,6 +19,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/querycache"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 	"github.com/hanzoai/o11y/pkg/valuer"
+
+	"log/slog"
 
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/query-service/interfaces"

@@ -8,7 +8,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
-	"github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter"
+	"github.com/hanzoai/o11y/pkg/telemetryaudit"
 	"github.com/hanzoai/o11y/pkg/telemetrylogs"
 	"github.com/hanzoai/o11y/pkg/telemetrymetadata"
 	"github.com/hanzoai/o11y/pkg/telemetrymeter"

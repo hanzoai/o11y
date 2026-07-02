@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/instrumentation"
-	"github.com/hanzoai/o11y/pkg/signoz"
 	"github.com/hanzoai/o11y/pkg/sqlmigration"
 	"github.com/hanzoai/o11y/pkg/sqlmigrator"
 	"github.com/hanzoai/o11y/pkg/sqlschema"
@@ -70,7 +70,7 @@ func registerSyncUp(parentCmd *cobra.Command, logger *slog.Logger, sqlstoreProvi
 		Short:              "Runs 'up' migrations for the metastore. Up migrations are used to apply new migrations to the metastore",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		RunE: func(currCmd *cobra.Command, args []string) error {
-			config, err := NewSigNozConfig(currCmd.Context(), logger, configFiles)
+			config, err := NewHanzoO11yConfig(currCmd.Context(), logger, configFiles, o11y.DeprecatedFlags{})
 			if err != nil {
 				return err
 			}
@@ -91,7 +91,7 @@ func registerSyncCheck(parentCmd *cobra.Command, logger *slog.Logger, sqlstorePr
 		Short:              "Runs a check for 'sync' migrations on the metastore. Returns a non-zero exit code if any migrations are pending.",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		RunE: func(currCmd *cobra.Command, args []string) error {
-			config, err := NewSigNozConfig(currCmd.Context(), logger, configFiles)
+			config, err := NewHanzoO11yConfig(currCmd.Context(), logger, configFiles, o11y.DeprecatedFlags{})
 			if err != nil {
 				return err
 			}
@@ -104,7 +104,7 @@ func registerSyncCheck(parentCmd *cobra.Command, logger *slog.Logger, sqlstorePr
 	parentCmd.AddCommand(syncCheckCmd)
 }
 
-func runSyncUp(ctx context.Context, config signoz.Config, sqlstoreProviderFactories SQLStoreProviderFactories, sqlschemaProviderFactories SQLSchemaProviderFactories) error {
+func runSyncUp(ctx context.Context, config o11y.Config, sqlstoreProviderFactories SQLStoreProviderFactories, sqlschemaProviderFactories SQLSchemaProviderFactories) error {
 	migrator, err := newSyncMigrator(ctx, config, sqlstoreProviderFactories, sqlschemaProviderFactories)
 	if err != nil {
 		return err
@@ -113,7 +113,7 @@ func runSyncUp(ctx context.Context, config signoz.Config, sqlstoreProviderFactor
 	return migrator.Migrate(ctx)
 }
 
-func runSyncCheck(ctx context.Context, config signoz.Config, sqlstoreProviderFactories SQLStoreProviderFactories, sqlschemaProviderFactories SQLSchemaProviderFactories) error {
+func runSyncCheck(ctx context.Context, config o11y.Config, sqlstoreProviderFactories SQLStoreProviderFactories, sqlschemaProviderFactories SQLSchemaProviderFactories) error {
 	migrator, err := newSyncMigrator(ctx, config, sqlstoreProviderFactories, sqlschemaProviderFactories)
 	if err != nil {
 		return err
@@ -122,8 +122,8 @@ func runSyncCheck(ctx context.Context, config signoz.Config, sqlstoreProviderFac
 	return migrator.Check(ctx)
 }
 
-func newSyncMigrator(ctx context.Context, config signoz.Config, sqlstoreProviderFactories SQLStoreProviderFactories, sqlschemaProviderFactories SQLSchemaProviderFactories) (sqlmigrator.SQLMigrator, error) {
-	instrumentation, err := instrumentation.New(ctx, config.Instrumentation, version.Info, "signoz")
+func newSyncMigrator(ctx context.Context, config o11y.Config, sqlstoreProviderFactories SQLStoreProviderFactories, sqlschemaProviderFactories SQLSchemaProviderFactories) (sqlmigrator.SQLMigrator, error) {
+	instrumentation, err := instrumentation.New(ctx, config.Instrumentation, version.Info, "observe")
 	if err != nil {
 		return nil, err
 	}
@@ -140,12 +140,12 @@ func newSyncMigrator(ctx context.Context, config signoz.Config, sqlstoreProvider
 		return nil, err
 	}
 
-	telemetrystore, err := factory.NewProviderFromNamedMap(ctx, providerSettings, config.TelemetryStore, signoz.NewTelemetryStoreProviderFactories(), config.TelemetryStore.Provider)
+	telemetrystore, err := factory.NewProviderFromNamedMap(ctx, providerSettings, config.TelemetryStore, o11y.NewTelemetryStoreProviderFactories(), config.TelemetryStore.Provider)
 	if err != nil {
 		return nil, err
 	}
 
-	sqlmigrations, err := sqlmigration.New(ctx, providerSettings, config.SQLMigration, signoz.NewSQLMigrationProviderFactories(sqlstore, sqlschema, telemetrystore, providerSettings))
+	sqlmigrations, err := sqlmigration.New(ctx, providerSettings, config.SQLMigration, o11y.NewSQLMigrationProviderFactories(sqlstore, sqlschema, telemetrystore, providerSettings))
 	if err != nil {
 		return nil, err
 	}

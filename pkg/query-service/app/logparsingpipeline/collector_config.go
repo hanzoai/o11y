@@ -10,7 +10,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
-	"go.uber.org/zap"
 )
 
 var lockLogsPipelineSpec sync.RWMutex
@@ -88,8 +87,8 @@ func getOtelPipelineFromConfig(config map[string]interface{}) (*otelPipeline, er
 // required order:
 //
 //  1. memory_limiter processors (any processor named "memory_limiter" or "memory_limiter/<id>")
-//  2. signoz user-pipeline processors (in the order given by signozPipelineProcessorNames)
-//  3. custom processors (non-signoz, non-memory_limiter, non-batch processors from the current config)
+//  2. o11y user-pipeline processors (in the order given by o11yPipelineProcessorNames)
+//  3. custom processors (non-o11y, non-memory_limiter, non-batch processors from the current config)
 //  4. batch processors (any processor named "batch" or "batch/<id>") and anything after them
 func buildCollectorPipelineProcessorsList(
 	currentCollectorProcessors []string,
@@ -98,52 +97,27 @@ func buildCollectorPipelineProcessorsList(
 	lockLogsPipelineSpec.Lock()
 	defer lockLogsPipelineSpec.Unlock()
 
-	exists := map[string]struct{}{}
-	for _, v := range o11yPipelineProcessorNames {
-		exists[v] = struct{}{}
+	// Build a set of user pipeline names so custom processors can skip duplicates.
+	userPipelineSet := make(map[string]struct{}, len(o11yPipelineProcessorNames))
+	for _, p := range o11yPipelineProcessorNames {
+		userPipelineSet[p] = struct{}{}
 	}
 
-	// removed the old processors which are not used
-	var pipeline []string
-	for _, procName := range currentCollectorProcessors {
-		_, isInDesiredPipelineProcs := exists[procName]
-		if isInDesiredPipelineProcs || !hasO11yPipelineProcessorPrefix(procName) {
-			pipeline = append(pipeline, procName)
-		}
-	}
+	var memoryLimiters []string
+	var customProcessors []string
+	batchIdx := -1
 
-	// create a reverse map of existing config processors and their position
-	existing := map[string]int{}
-	for i, p := range pipeline {
-		name := p
-		existing[name] = i
-	}
-
-	// create mapping from our logsParserPipeline to position in existing processors (from current config)
-	// this means, if "batch" holds position 3 in the current effective config, and 2 in our config, the map will be [2]: 3
-	specVsExistingMap := map[int]int{}
-	existingVsSpec := map[int]int{}
-
-	// go through plan and map its elements to current positions in effective config
-	for i, m := range o11yPipelineProcessorNames {
-		if loc, ok := existing[m]; ok {
-			specVsExistingMap[i] = loc
-			existingVsSpec[loc] = i
-		}
-	}
-
-	lastMatched := 0
-	newPipeline := []string{}
-
-	for i := 0; i < len(o11yPipelineProcessorNames); i++ {
-		m := o11yPipelineProcessorNames[i]
-		if loc, ok := specVsExistingMap[i]; ok {
-			for j := lastMatched; j < loc; j++ {
-				if hasO11yPipelineProcessorPrefix(pipeline[j]) {
-					delete(specVsExistingMap, existingVsSpec[j])
-				} else {
-					newPipeline = append(newPipeline, pipeline[j])
-				}
+	for idx, p := range currentCollectorProcessors {
+		switch {
+		case p == batchProcessor || strings.HasPrefix(p, batchProcessorPrefix):
+			batchIdx = idx
+		case p == memoryLimiterProcessor || strings.HasPrefix(p, memoryLimiterProcessorPrefix):
+			memoryLimiters = append(memoryLimiters, p)
+		case hasO11yPipelineProcessorPrefix(p):
+			// stale o11y pipeline processor — dropped; o11yPipelineProcessorNames is authoritative
+		default:
+			if _, inUserPipelines := userPipelineSet[p]; !inUserPipelines {
+				customProcessors = append(customProcessors, p)
 			}
 		}
 		if batchIdx >= 0 {
@@ -151,9 +125,9 @@ func buildCollectorPipelineProcessorsList(
 		}
 	}
 
-	result := make([]string, 0, len(currentCollectorProcessors)+len(signozPipelineProcessorNames))
+	result := make([]string, 0, len(currentCollectorProcessors)+len(o11yPipelineProcessorNames))
 	result = append(result, memoryLimiters...)
-	result = append(result, signozPipelineProcessorNames...)
+	result = append(result, o11yPipelineProcessorNames...)
 	result = append(result, customProcessors...)
 	if batchIdx >= 0 {
 		result = append(result, currentCollectorProcessors[batchIdx:]...)

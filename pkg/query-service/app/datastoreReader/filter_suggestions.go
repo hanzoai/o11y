@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	"github.com/hanzoai/signoz-otel-collector/utils/fingerprint"
+	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"go.uber.org/zap"
 )
 
 func (r *DatastoreReader) GetQBFilterSuggestionsForLogs(

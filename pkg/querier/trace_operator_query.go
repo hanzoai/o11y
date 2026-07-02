@@ -5,6 +5,7 @@ import (
 	"time"
 
 	datastore "github.com/ClickHouse/clickhouse-go/v2"
+
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"

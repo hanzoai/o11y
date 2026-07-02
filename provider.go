@@ -11,6 +11,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/apiserver"
 	"github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver"
 	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/billing"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/cache/memorycache"
 	"github.com/hanzoai/o11y/pkg/cache/rediscache"
@@ -22,14 +23,19 @@ import (
 	"github.com/hanzoai/o11y/pkg/flagger/configflagger"
 	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/global/o11yglobal"
+	"github.com/hanzoai/o11y/pkg/identn"
 	"github.com/hanzoai/o11y/pkg/modules/authdomain/implauthdomain"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/organization/implorganization"
 	"github.com/hanzoai/o11y/pkg/modules/preference/implpreference"
 	"github.com/hanzoai/o11y/pkg/modules/promote/implpromote"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/session/implsession"
 	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
+	"github.com/hanzoai/o11y/pkg/pprof"
+	"github.com/hanzoai/o11y/pkg/pprof/httppprof"
+	"github.com/hanzoai/o11y/pkg/pprof/nooppprof"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/querier/o11yquerier"
 	"github.com/hanzoai/o11y/pkg/queryparser"
@@ -60,6 +66,16 @@ import (
 	"github.com/hanzoai/o11y/pkg/web"
 	"github.com/hanzoai/o11y/pkg/web/noopweb"
 	"github.com/hanzoai/o11y/pkg/web/routerweb"
+	"github.com/hanzoai/o11y/pkg/identn/apikeyidentn"
+	"github.com/hanzoai/o11y/pkg/identn/impersonationidentn"
+	"github.com/hanzoai/o11y/pkg/identn/tokenizeridentn"
+	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
+	"github.com/hanzoai/o11y/pkg/auditor"
+	"github.com/hanzoai/o11y/pkg/auditor/noopauditor"
+	"github.com/hanzoai/o11y/pkg/meterreporter"
+	"github.com/hanzoai/o11y/pkg/meterreporter/noopmeterreporter"
 )
 
 func NewAnalyticsProviderFactories() factory.NamedMap[factory.ProviderFactory[analytics.Analytics, analytics.Config]] {
@@ -227,13 +243,24 @@ func NewAlertmanagerProviderFactories(
 	maintenanceStore alertmanagertypes.MaintenanceStore,
 ) factory.NamedMap[factory.ProviderFactory[alertmanager.Alertmanager, alertmanager.Config]] {
 	return factory.MustNewNamedMap(
-		o11yalertmanager.NewFactory(sqlstore, orgGetter, nfManager),
+		o11yalertmanager.NewFactory(sqlstore, orgGetter, nfManager, maintenanceStore),
 	)
 }
 
-func NewRulerProviderFactories(sqlstore sqlstore.SQLStore, queryParser queryparser.QueryParser) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]] {
+func NewRulerProviderFactories(
+	cache cache.Cache,
+	alertmanager alertmanager.Alertmanager,
+	sqlstore sqlstore.SQLStore,
+	telemetryStore telemetrystore.TelemetryStore,
+	metadataStore telemetrytypes.MetadataStore,
+	prometheus prometheus.Prometheus,
+	orgGetter organization.Getter,
+	ruleStateHistoryModule rulestatehistory.Module,
+	querier querier.Querier,
+	queryParser queryparser.QueryParser,
+) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]] {
 	return factory.MustNewNamedMap(
-		o11yruler.NewFactory(sqlstore, queryParser),
+		o11yruler.NewFactory(cache, alertmanager, sqlstore, telemetryStore, metadataStore, prometheus, orgGetter, ruleStateHistoryModule, querier, queryParser, nil, nil),
 	)
 }
 
@@ -274,7 +301,7 @@ func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.Au
 			implsession.NewHandler(modules.Session),
 			implauthdomain.NewHandler(modules.AuthDomain),
 			implpreference.NewHandler(modules.Preference),
-			o11yglobal.NewHandler(global),
+			handlers.Global,
 			implpromote.NewHandler(modules.Promote),
 			handlers.FlaggerHandler,
 			modules.Dashboard,
@@ -284,10 +311,10 @@ func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.Au
 			handlers.GatewayHandler,
 			handlers.Fields,
 			handlers.AuthzHandler,
-			handlers.RawDataExport,
-			handlers.ZeusHandler,
+			billing.NewNoopHandler(),
 			handlers.QuerierHandler,
 			handlers.ServiceAccountHandler,
+			handlers.RawDataExport,
 			handlers.RegistryHandler,
 			handlers.CloudIntegrationHandler,
 			handlers.RuleStateHistory,
@@ -310,12 +337,32 @@ func NewTokenizerProviderFactories(cache cache.Cache, sqlstore sqlstore.SQLStore
 
 func NewIdentNProviderFactories(tokenizer tokenizer.Tokenizer, serviceAccount serviceaccount.Module, orgGetter organization.Getter, userGetter user.Getter, userConfig user.Config) factory.NamedMap[factory.ProviderFactory[identn.IdentN, identn.Config]] {
 	return factory.MustNewNamedMap(
-		o11yglobal.NewFactory(),
+		impersonationidentn.NewFactory(orgGetter, userGetter, userConfig),
+		tokenizeridentn.NewFactory(tokenizer),
+		apikeyidentn.NewFactory(serviceAccount),
+	)
+}
+
+func NewAuditorProviderFactories() factory.NamedMap[factory.ProviderFactory[auditor.Auditor, auditor.Config]] {
+	return factory.MustNewNamedMap(
+		noopauditor.NewFactory(),
+	)
+}
+
+func NewMeterReporterProviderFactories() factory.NamedMap[factory.ProviderFactory[meterreporter.Reporter, meterreporter.Config]] {
+	return factory.MustNewNamedMap(
+		noopmeterreporter.NewFactory(),
 	)
 }
 
 func NewFlaggerProviderFactories(registry featuretypes.Registry) factory.NamedMap[factory.ProviderFactory[flagger.FlaggerProvider, flagger.Config]] {
 	return factory.MustNewNamedMap(
 		configflagger.NewFactory(registry),
+	)
+}
+
+func NewGlobalProviderFactories() factory.NamedMap[factory.ProviderFactory[global.Global, global.Config]] {
+	return factory.MustNewNamedMap(
+		o11yglobal.NewFactory(),
 	)
 }

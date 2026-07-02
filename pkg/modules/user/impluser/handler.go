@@ -12,7 +12,6 @@ import (
 	root "github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/types/integrationtypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/gorilla/mux"
 )

@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"go.uber.org/zap"
 )
 
 func AddMetricValueFilter(mq *v3.BuilderQuery) *v3.MetricValueFilter {

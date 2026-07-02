@@ -1,6 +1,7 @@
 package o11y
 
 import (
+	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/analytics"
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/authz/o11yauthzapi"
@@ -12,27 +13,34 @@ import (
 	"github.com/hanzoai/o11y/pkg/licensing"
 	"github.com/hanzoai/o11y/pkg/modules/apdex"
 	"github.com/hanzoai/o11y/pkg/modules/apdex/implapdex"
+	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard"
 	"github.com/hanzoai/o11y/pkg/modules/fields"
 	"github.com/hanzoai/o11y/pkg/modules/fields/implfields"
+	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
+	"github.com/hanzoai/o11y/pkg/modules/llmpricingrule"
 	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer"
 	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer/implmetricsexplorer"
 	"github.com/hanzoai/o11y/pkg/modules/quickfilter"
 	"github.com/hanzoai/o11y/pkg/modules/quickfilter/implquickfilter"
 	"github.com/hanzoai/o11y/pkg/modules/rawdataexport"
 	"github.com/hanzoai/o11y/pkg/modules/rawdataexport/implrawdataexport"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
 	"github.com/hanzoai/o11y/pkg/modules/savedview"
 	"github.com/hanzoai/o11y/pkg/modules/savedview/implsavedview"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount/implserviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/services"
 	"github.com/hanzoai/o11y/pkg/modules/services/implservices"
+	"github.com/hanzoai/o11y/pkg/modules/spanmapper"
 	"github.com/hanzoai/o11y/pkg/modules/spanpercentile"
 	"github.com/hanzoai/o11y/pkg/modules/spanpercentile/implspanpercentile"
+	"github.com/hanzoai/o11y/pkg/modules/tracedetail"
 	"github.com/hanzoai/o11y/pkg/modules/tracefunnel"
 	"github.com/hanzoai/o11y/pkg/modules/tracefunnel/impltracefunnel"
 	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/ruler"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/zeus"
 )
@@ -85,7 +93,7 @@ func NewHandlers(
 	return Handlers{
 		SavedView:             implsavedview.NewHandler(modules.SavedView),
 		Apdex:                 implapdex.NewHandler(modules.Apdex),
-		Dashboard:             impldashboard.NewHandler(modules.Dashboard, providerSettings),
+		Dashboard:             impldashboard.NewHandler(modules.Dashboard, providerSettings, authz),
 		QuickFilter:           implquickfilter.NewHandler(modules.QuickFilter),
 		TraceFunnel:           impltracefunnel.NewHandler(modules.TraceFunnel),
 		RawDataExport:         implrawdataexport.NewHandler(modules.RawDataExport),

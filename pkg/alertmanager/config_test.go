@@ -9,7 +9,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/config"
 	"github.com/hanzoai/o11y/pkg/config/envprovider"
 	"github.com/hanzoai/o11y/pkg/factory"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

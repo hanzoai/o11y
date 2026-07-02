@@ -2,11 +2,11 @@ package alertmanagertypes
 
 import (
 	"github.com/prometheus/alertmanager/types"
-	"github.com/luxfi/metric"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type MemMarker = types.MemMarker
 
-func NewMarker(r metric.Registerer) *MemMarker {
+func NewMarker(r prometheus.Registerer) *MemMarker {
 	return types.NewMarker(r)
 }

@@ -3,14 +3,19 @@ package o11y
 import (
 	"context"
 	"log/slog"
+	"net/url"
 	"os"
 	"path"
 	"reflect"
 	"time"
 
+	"github.com/spf13/cobra"
+
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/analytics"
 	"github.com/hanzoai/o11y/pkg/apiserver"
+	"github.com/hanzoai/o11y/pkg/auditor"
+	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/config"
 	"github.com/hanzoai/o11y/pkg/emailing"
@@ -19,9 +24,16 @@ import (
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/gateway"
 	"github.com/hanzoai/o11y/pkg/global"
+	"github.com/hanzoai/o11y/pkg/identn"
 	"github.com/hanzoai/o11y/pkg/instrumentation"
+	"github.com/hanzoai/o11y/pkg/meterreporter"
+	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
+	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
 	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer"
+	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
+	"github.com/hanzoai/o11y/pkg/modules/tracedetail"
 	"github.com/hanzoai/o11y/pkg/modules/user"
+	"github.com/hanzoai/o11y/pkg/pprof"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/ruler"
 	"github.com/hanzoai/o11y/pkg/sharder"
@@ -35,7 +47,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/hanzoai/o11y/pkg/web"
-	"github.com/spf13/cobra"
 )
 
 // Config defines the entire input configuration of o11y.
@@ -218,7 +229,7 @@ func NewConfig(ctx context.Context, logger *slog.Logger, resolverConfig config.R
 		return Config{}, err
 	}
 
-	mergeAndEnsureBackwardCompatibility(ctx, logger, &config)
+	mergeAndEnsureBackwardCompatibility(ctx, logger, &config, deprecatedFlags)
 
 	if err := validateConfig(config); err != nil {
 		return Config{}, err

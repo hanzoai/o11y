@@ -9,6 +9,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	schemamigrator "github.com/hanzoai/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
 	"github.com/huandu/go-sqlbuilder"
 )
 

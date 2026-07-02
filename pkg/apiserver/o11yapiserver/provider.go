@@ -3,8 +3,12 @@ package o11yapiserver
 import (
 	"context"
 
+	"github.com/gorilla/mux"
+
+	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/apiserver"
 	"github.com/hanzoai/o11y/pkg/authz"
+	"github.com/hanzoai/o11y/pkg/billing"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/gateway"
@@ -12,27 +16,35 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/handler"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	"github.com/hanzoai/o11y/pkg/modules/authdomain"
+	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/fields"
+	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
+	"github.com/hanzoai/o11y/pkg/modules/llmpricingrule"
 	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/preference"
 	"github.com/hanzoai/o11y/pkg/modules/promote"
+	"github.com/hanzoai/o11y/pkg/modules/rawdataexport"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/session"
+	"github.com/hanzoai/o11y/pkg/modules/spanmapper"
+	"github.com/hanzoai/o11y/pkg/modules/tracedetail"
 	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/querier"
+	"github.com/hanzoai/o11y/pkg/ruler"
 	"github.com/hanzoai/o11y/pkg/types"
-	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
-	"github.com/hanzoai/o11y/pkg/billing"
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 )
 
 type provider struct {
 	config                 apiserver.Config
-	settings               factory.ScopedProviderSettings
-	router                 *mux.Router
-	authZ                  *middleware.AuthZ
+	settings                factory.ScopedProviderSettings
+	router                  *mux.Router
+	authzMiddleware         *middleware.AuthZ
+	authzService            authz.AuthZ
+	rawDataExportHandler    rawdataexport.Handler
 	orgHandler             organization.Handler
 	userHandler            user.Handler
 	sessionHandler         session.Handler
@@ -48,8 +60,17 @@ type provider struct {
 	fieldsHandler          fields.Handler
 	authzHandler           authz.Handler
 	billingHandler         billing.Handler
-	querierHandler         querier.Handler
-	serviceAccountHandler  serviceaccount.Handler
+	querierHandler          querier.Handler
+	serviceAccountHandler   serviceaccount.Handler
+	alertmanagerHandler     alertmanager.Handler
+	infraMonitoringHandler  inframonitoring.Handler
+	factoryHandler          factory.Handler
+	cloudIntegrationHandler cloudintegration.Handler
+	ruleStateHistoryHandler rulestatehistory.Handler
+	spanMapperHandler       spanmapper.Handler
+	llmPricingRuleHandler   llmpricingrule.Handler
+	traceDetailHandler      tracedetail.Handler
+	rulerHandler            ruler.Handler
 }
 
 func NewFactory(
@@ -73,6 +94,7 @@ func NewFactory(
 	billingHandler billing.Handler,
 	querierHandler querier.Handler,
 	serviceAccountHandler serviceaccount.Handler,
+	rawDataExportHandler rawdataexport.Handler,
 	factoryHandler factory.Handler,
 	cloudIntegrationHandler cloudintegration.Handler,
 	ruleStateHistoryHandler rulestatehistory.Handler,
@@ -107,6 +129,7 @@ func NewFactory(
 			billingHandler,
 			querierHandler,
 			serviceAccountHandler,
+			rawDataExportHandler,
 			factoryHandler,
 			cloudIntegrationHandler,
 			ruleStateHistoryHandler,
@@ -143,6 +166,7 @@ func newProvider(
 	billingHandler billing.Handler,
 	querierHandler querier.Handler,
 	serviceAccountHandler serviceaccount.Handler,
+	rawDataExportHandler rawdataexport.Handler,
 	factoryHandler factory.Handler,
 	cloudIntegrationHandler cloudintegration.Handler,
 	ruleStateHistoryHandler rulestatehistory.Handler,
@@ -174,8 +198,19 @@ func newProvider(
 		fieldsHandler:          fieldsHandler,
 		authzHandler:           authzHandler,
 		billingHandler:         billingHandler,
-		querierHandler:         querierHandler,
-		serviceAccountHandler:  serviceAccountHandler,
+		querierHandler:          querierHandler,
+		serviceAccountHandler:   serviceAccountHandler,
+		alertmanagerHandler:     alertmanagerHandler,
+		infraMonitoringHandler:  infraMonitoringHandler,
+		factoryHandler:          factoryHandler,
+		cloudIntegrationHandler: cloudIntegrationHandler,
+		ruleStateHistoryHandler: ruleStateHistoryHandler,
+		spanMapperHandler:       spanMapperHandler,
+		llmPricingRuleHandler:   llmPricingRuleHandler,
+		traceDetailHandler:      traceDetailHandler,
+		rulerHandler:            rulerHandler,
+		authzService:            authzService,
+		rawDataExportHandler:    rawDataExportHandler,
 	}
 
 	provider.authzMiddleware = middleware.NewAuthZ(settings.Logger(), orgGetter, authzService)

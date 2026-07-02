@@ -7,8 +7,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/hanzoai/o11y/pkg/query-service/constants"
-
 	"encoding/base64"
 	"encoding/json"
 	"fmt"

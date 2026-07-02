@@ -1,4 +1,4 @@
-package signozapiserver
+package o11yapiserver
 
 import "github.com/hanzoai/o11y/pkg/http/handler"
 

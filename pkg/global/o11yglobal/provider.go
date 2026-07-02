@@ -5,6 +5,8 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/global"
+	"github.com/hanzoai/o11y/pkg/identn"
+	"github.com/hanzoai/o11y/pkg/types/globaltypes"
 )
 
 type provider struct {
@@ -22,9 +24,8 @@ func NewFactory() factory.ProviderFactory[global.Global, global.Config] {
 func newProvider(_ context.Context, providerSettings factory.ProviderSettings, config global.Config) (global.Global, error) {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/global/o11yglobal")
 	return &provider{
-		config:       config,
-		identNConfig: identNConfig,
-		settings:     settings,
+		config:   config,
+		settings: settings,
 	}, nil
 }
 

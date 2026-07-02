@@ -38,13 +38,13 @@ type managedRoleTuple struct {
 func (migration *addServiceAccountManagedRoleTransactions) Up(ctx context.Context, db *bun.DB) error {
 	// All tuples that need to be created for service account FGA managed role permissions.
 	tuples := []managedRoleTuple{
-		{authtypes.SigNozAdminRoleName, "role", "role", "attach"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "attach"},
-		{authtypes.SigNozAdminRoleName, "metaresources", "serviceaccount", "create"},
-		{authtypes.SigNozAdminRoleName, "metaresources", "serviceaccount", "list"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "read"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "update"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "delete"},
+		{authtypes.HanzoO11yAdminRoleName, "role", "role", "attach"},
+		{authtypes.HanzoO11yAdminRoleName, "serviceaccount", "serviceaccount", "attach"},
+		{authtypes.HanzoO11yAdminRoleName, "metaresources", "serviceaccount", "create"},
+		{authtypes.HanzoO11yAdminRoleName, "metaresources", "serviceaccount", "list"},
+		{authtypes.HanzoO11yAdminRoleName, "serviceaccount", "serviceaccount", "read"},
+		{authtypes.HanzoO11yAdminRoleName, "serviceaccount", "serviceaccount", "update"},
+		{authtypes.HanzoO11yAdminRoleName, "serviceaccount", "serviceaccount", "delete"},
 	}
 
 	tx, err := db.BeginTx(ctx, nil)

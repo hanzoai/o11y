@@ -3,8 +3,9 @@ package querier
 import (
 	"testing"
 
-	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/stretchr/testify/assert"
+
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
 // TestAdjustTimeRangeForShift tests the time range adjustment logic.
