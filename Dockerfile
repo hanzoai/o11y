@@ -1,46 +1,86 @@
-# Stage 1: Build frontend
-FROM node:22-alpine AS frontend
-RUN corepack enable && corepack prepare pnpm@latest --activate
-WORKDIR /app/frontend
-COPY frontend/package.json frontend/pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
-COPY frontend/ .
-RUN pnpm build
+# syntax=docker/dockerfile:1
+#
+# Hanzo O11y — standalone community server image.
+#
+# Builds the real server binary `./cmd/community` (NOT `./cmd/server`, which does
+# not exist). `cmd/community` does not import github.com/hanzoai/cloud, so the
+# go.mod `replace github.com/hanzoai/cloud => ../cloud` is inert for this build
+# and no sibling checkout is required — cloud lives only in the root `mount.go`
+# cloud-embed adapter, which `cmd/community` never pulls in.
+#
+# All external modules in cmd/community's graph are public (hanzoai/* forks of
+# signoz-otel-collector, govaluate, clickhouse-go-mock, expr), so the module
+# fetch needs no private git auth — only GOPRIVATE + GOSUMDB=off.
+#
+# The browser SPA is served at the edge by hanzoai/static (house-native static
+# plugin), not bundled here, so the server runs headless (SIGNOZ_WEB_ENABLED=false).
+# The frontend/ tree is a separate concern — its pnpm-lock.yaml is mid-migration
+# and not build-ready; bundle it back once that is resolved.
 
-# Stage 2: Build Go binary
-FROM golang:1.26-alpine AS backend
-RUN apk add --no-cache git
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
+########################################
+# Stage 1 — Go build (./cmd/community)
+########################################
+FROM golang:1.26.4-alpine AS backend
+RUN apk add --no-cache git ca-certificates
+WORKDIR /src
+
+# hanzoai/* modules are fetched via direct git (all public); trust go.sum.
+ENV GOPRIVATE=github.com/hanzoai/* \
+    GOSUMDB=off \
+    CGO_ENABLED=0 \
+    GOOS=linux
+
 COPY . .
 
-ARG VERSION=""
-ARG COMMIT_HASH=""
-ARG BUILD_TIME=""
-ARG BRANCH=""
+# Version metadata is injected via build-args (the build context excludes .git,
+# so we must not shell out to `git` here).
+ARG VERSION=dev
+ARG COMMIT_HASH=unknown
+ARG BUILD_TIME=unknown
+ARG BRANCH=unknown
+ARG VARIANT=community
 
-RUN VERSION=${VERSION:-$(git describe --tags --always 2>/dev/null || echo "dev")} && \
-    COMMIT_HASH=${COMMIT_HASH:-$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")} && \
-    BUILD_TIME=${BUILD_TIME:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")} && \
-    BRANCH=${BRANCH:-$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")} && \
-    LDFLAGS="-X github.com/hanzoai/o11y/pkg/version.version=$VERSION" && \
-    LDFLAGS="$LDFLAGS -X github.com/hanzoai/o11y/pkg/version.hash=$COMMIT_HASH" && \
-    LDFLAGS="$LDFLAGS -X github.com/hanzoai/o11y/pkg/version.time=$BUILD_TIME" && \
-    LDFLAGS="$LDFLAGS -X github.com/hanzoai/o11y/pkg/version.branch=$BRANCH" && \
-    CGO_ENABLED=0 go build -ldflags "$LDFLAGS" -o /o11y ./cmd/server/
+# Build ONLY ./cmd/community. A bare `go mod download` would fail because
+# github.com/hanzoai/cloud is a direct require replaced to ../cloud (absent
+# here); building the single package resolves only its pruned graph, which does
+# not include cloud.
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    VERPKG=github.com/hanzoai/o11y/pkg/version && \
+    go build -trimpath -tags timetzdata \
+      -ldflags "-s -w \
+        -X ${VERPKG}.version=${VERSION} \
+        -X ${VERPKG}.variant=${VARIANT} \
+        -X ${VERPKG}.hash=${COMMIT_HASH} \
+        -X ${VERPKG}.time=${BUILD_TIME} \
+        -X ${VERPKG}.branch=${BRANCH}" \
+      -o /out/o11y ./cmd/community
 
-# Stage 3: Final image
+########################################
+# Stage 2 — Runtime (minimal)
+########################################
 FROM alpine:3.20
-LABEL maintainer="hanzoai"
+LABEL org.opencontainers.image.source="https://github.com/hanzoai/o11y" \
+      org.opencontainers.image.title="hanzo-o11y" \
+      org.opencontainers.image.description="Hanzo O11y — OTLP-native observability (SigNoz fork), standalone community server" \
+      maintainer="hanzoai"
+
+RUN apk add --no-cache ca-certificates && \
+    mkdir -p /var/lib/signoz
+
 WORKDIR /root
 
-RUN apk add --no-cache ca-certificates
+# Server binary.
+COPY --from=backend /out/o11y /usr/local/bin/o11y
+# Alert/email templates (emailing default dir = /root/templates/email).
+COPY templates/ /root/templates/
 
-COPY --from=backend /o11y /root/o11y
-COPY templates/email /root/templates
-COPY --from=frontend /app/frontend/build/ /etc/o11y/web/
+# The browser SPA is served by hanzoai/static at the edge; run headless. When a
+# deployment bundles/mounts web assets, set SIGNOZ_WEB_ENABLED=true and
+# SIGNOZ_WEB_DIRECTORY to their path.
+ENV SIGNOZ_WEB_ENABLED=false
 
-RUN chmod 755 /root /root/o11y
+# Public query-service HTTP + query API (constants.HTTPHostPort = 0.0.0.0:8080).
+EXPOSE 8080
 
-ENTRYPOINT ["./o11y", "server"]
+ENTRYPOINT ["/usr/local/bin/o11y", "server"]

@@ -1,0 +1,71 @@
+name: docker
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-push:
+    name: build & push image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        # NOTE: no hanzoai/cloud sibling is checked out. The image builds only
+        # `./cmd/community`, which does not import github.com/hanzoai/cloud, so
+        # the go.mod `replace => ../cloud` is inert. (The CI go-build job, which
+        # runs `go build ./...` and thus compiles mount.go, still needs it — see
+        # ci.yaml — but the container does not.)
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata (tags + labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/hanzoai/o11y
+          tags: |
+            type=raw,value=main,enable={{is_default_branch}}
+            type=sha,format=long,prefix=
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+
+      - name: Build timestamp
+        id: date
+        run: echo "value=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
+          build-args: |
+            VERSION=${{ steps.meta.outputs.version }}
+            COMMIT_HASH=${{ github.sha }}
+            BUILD_TIME=${{ steps.date.outputs.value }}
+            BRANCH=${{ github.ref_name }}
+            VARIANT=community
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
