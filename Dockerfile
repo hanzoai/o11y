@@ -11,8 +11,19 @@ RUN pnpm build
 FROM golang:1.26-alpine AS backend
 RUN apk add --no-cache git
 WORKDIR /app
+
+# Private hanzoai/luxfi/zap-proto Go modules (github.com/hanzoai/cloud, zip,
+# zap, …) resolve via direct git — GOPRIVATE skips the public proxy + sumdb.
+# The `netrc` build secret (injected by the reusable docker-build workflow from
+# the org GH_PAT) auths git-over-HTTPS for the private hanzoai/* fetches; the
+# public luxfi/zap-proto repos clone anonymously. GOTOOLCHAIN=local pins the
+# image's Go so a `toolchain` directive never triggers a sumdb-verified
+# toolchain download. The secret is mounted only for the step, never in a layer.
+ENV GOPRIVATE=github.com/hanzoai/*,github.com/luxfi/*,github.com/zap-proto/* \
+    GOTOOLCHAIN=local
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=secret,id=netrc,target=/root/.netrc \
+    go mod download
 COPY . .
 
 ARG VERSION=""
@@ -20,7 +31,8 @@ ARG COMMIT_HASH=""
 ARG BUILD_TIME=""
 ARG BRANCH=""
 
-RUN VERSION=${VERSION:-$(git describe --tags --always 2>/dev/null || echo "dev")} && \
+RUN --mount=type=secret,id=netrc,target=/root/.netrc \
+    VERSION=${VERSION:-$(git describe --tags --always 2>/dev/null || echo "dev")} && \
     COMMIT_HASH=${COMMIT_HASH:-$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")} && \
     BUILD_TIME=${BUILD_TIME:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")} && \
     BRANCH=${BRANCH:-$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")} && \

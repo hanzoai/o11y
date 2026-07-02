@@ -16,14 +16,14 @@ jobs:
     with:
       image: ghcr.io/hanzoai/o11y
       platforms: linux/amd64
-      pre-build-command: |
-        cd frontend && corepack enable && pnpm install --frozen-lockfile && pnpm run build
-        cd ..
-        VERSION=$(git describe --tags --always)
-        HASH=$(git rev-parse --short HEAD)
-        TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-        BRANCH=$(git rev-parse --abbrev-ref HEAD)
-        LDFLAGS="-X github.com/hanzoai/o11y/pkg/version.version=$VERSION -X github.com/hanzoai/o11y/pkg/version.hash=$HASH -X github.com/hanzoai/o11y/pkg/version.time=$TIMESTAMP -X github.com/hanzoai/o11y/pkg/version.branch=$BRANCH"
-        mkdir -p target/linux-amd64
-        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "$LDFLAGS" -o target/linux-amd64/o11y ./cmd/server/
+      # Frontend (Dockerfile stage 1) + Go binary (stage 2) build inside the
+      # Dockerfile — stage 2 mounts the reusable workflow's `netrc` build secret
+      # (from the org GH_PAT) to auth the private github.com/hanzoai/cloud fetch.
+      # No sibling ../cloud checkout is needed; cloud is a pinned, authed module.
+      # Version metadata is passed as build-args because .git is dockerignored,
+      # so the Dockerfile cannot derive it from the repo.
+      build-args: |
+        VERSION=${{ github.ref_name }}
+        COMMIT_HASH=${{ github.sha }}
+        BRANCH=${{ github.ref_name }}
     secrets: inherit
