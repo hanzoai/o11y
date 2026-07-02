@@ -13,11 +13,11 @@ import (
 )
 
 func TestNewWithEnvProvider(t *testing.T) {
-	t.Setenv("O11Y_TELEMETRYSTORE_DATASTORE_DSN", "tcp://localhost:9000")
-	t.Setenv("O11Y_TELEMETRYSTORE_MAX__IDLE__CONNS", "60")
-	t.Setenv("O11Y_TELEMETRYSTORE_MAX__OPEN__CONNS", "150")
-	t.Setenv("O11Y_TELEMETRYSTORE_DIAL__TIMEOUT", "5s")
-	t.Setenv("O11Y_TELEMETRYSTORE_DATASTORE_DEBUG", "true")
+	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN", "tcp://localhost:9000")
+	t.Setenv("SIGNOZ_TELEMETRYSTORE_MAX__IDLE__CONNS", "60")
+	t.Setenv("SIGNOZ_TELEMETRYSTORE_MAX__OPEN__CONNS", "150")
+	t.Setenv("SIGNOZ_TELEMETRYSTORE_DIAL__TIMEOUT", "5s")
+	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DEBUG", "true")
 
 	conf, err := config.New(
 		context.Background(),
@@ -40,7 +40,7 @@ func TestNewWithEnvProvider(t *testing.T) {
 	assert.NoError(t, actual.Validate())
 
 	expected := NewConfigFactory().New().(Config)
-	expected.Provider = "datastore"
+	expected.Provider = "clickhouse"
 	expected.Connection.MaxOpenConns = 150
 	expected.Connection.MaxIdleConns = 60
 	expected.Connection.DialTimeout = 5 * time.Second
@@ -50,11 +50,11 @@ func TestNewWithEnvProvider(t *testing.T) {
 }
 
 func TestNewWithEnvProviderWithQuerySettings(t *testing.T) {
-	t.Setenv("O11Y_TELEMETRYSTORE_DATASTORE_SETTINGS_MAX__EXECUTION__TIME", "10")
-	t.Setenv("O11Y_TELEMETRYSTORE_DATASTORE_SETTINGS_MAX__EXECUTION__TIME__LEAF", "10")
-	t.Setenv("O11Y_TELEMETRYSTORE_DATASTORE_SETTINGS_TIMEOUT__BEFORE__CHECKING__EXECUTION__SPEED", "10")
-	t.Setenv("O11Y_TELEMETRYSTORE_DATASTORE_SETTINGS_MAX__BYTES__TO__READ", "1000000")
-	t.Setenv("O11Y_TELEMETRYSTORE_DATASTORE_SETTINGS_MAX__RESULT__ROWS", "10000")
+	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__EXECUTION__TIME", "10")
+	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__EXECUTION__TIME__LEAF", "10")
+	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_TIMEOUT__BEFORE__CHECKING__EXECUTION__SPEED", "10")
+	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__BYTES__TO__READ", "1000000")
+	t.Setenv("SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_SETTINGS_MAX__RESULT__ROWS", "10000")
 
 	conf, err := config.New(
 		context.Background(),

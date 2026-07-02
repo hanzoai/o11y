@@ -7,14 +7,15 @@ import (
 	"sync"
 	"time"
 
+	"github.com/dgraph-io/ristretto/v2"
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/tokenizer"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/dgraph-io/ristretto/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 var (
@@ -45,7 +46,7 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/tokenizer/jwttokenizer")
 
 	if config.JWT.Secret == "" {
-		settings.Logger().ErrorContext(ctx, "🚨 CRITICAL SECURITY ISSUE: No JWT secret key specified!", "error", "O11Y_TOKENIZER_JWT_SECRET environment variable is not set. This has dire consequences for the security of the application. Without a JWT secret, user sessions are vulnerable to tampering and unauthorized access. Please set the O11Y_TOKENIZER_JWT_SECRET environment variable immediately. For more information, please refer to https://github.com/hanzoai/o11y/issues/8400.")
+		settings.Logger().ErrorContext(ctx, "🚨 CRITICAL SECURITY ISSUE: No JWT secret key specified!", slog.String("error", "SIGNOZ_TOKENIZER_JWT_SECRET environment variable is not set. This has dire consequences for the security of the application. Without a JWT secret, user sessions are vulnerable to tampering and unauthorized access. Please set the SIGNOZ_TOKENIZER_JWT_SECRET environment variable immediately. For more information, please refer to https://github.com/hanzoai/o11y/issues/8400."))
 	}
 
 	lastObservedAtCache, err := ristretto.NewCache(&ristretto.Config[string, map[valuer.UUID]time.Time]{

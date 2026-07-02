@@ -4,7 +4,6 @@ import (
 	"math"
 	"time"
 
-	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"

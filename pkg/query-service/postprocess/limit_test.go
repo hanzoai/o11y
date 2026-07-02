@@ -149,7 +149,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 							Expression:         "A",
 							GroupBy:            []v3.AttributeKey{{Key: "service_name"}},
 							Limit:              1,
-							OrderBy:            []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "asc"}},
+							OrderBy:            []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "asc"}},
 						},
 					},
 					QueryType: v3.QueryTypeBuilder,
@@ -232,7 +232,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 							Expression:         "A",
 							GroupBy:            []v3.AttributeKey{{Key: "service_name"}},
 							Limit:              1,
-							OrderBy:            []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "asc"}},
+							OrderBy:            []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "asc"}},
 						},
 					},
 					QueryType: v3.QueryTypeBuilder,
@@ -278,7 +278,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 			},
 		},
 		{
-			// ["GET /v1/o11y/v1/health", "DELETE /v1/o11y/v1/health"] so result should be ["DELETE /v1/o11y/v1/health"] although it has lower value
+			// ["GET /api/v1/health", "DELETE /api/v1/health"] so result should be ["DELETE /api/v1/health"] although it has lower value
 			name: "test limit with operation asc",
 			inputResult: []*v3.Result{
 				{
@@ -287,7 +287,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 						{
 							Labels: map[string]string{
 								"service_name": "frontend",
-								"operation":    "GET /v1/o11y/v1/health",
+								"operation":    "GET /api/v1/health",
 							},
 							Points: []v3.Point{
 								{
@@ -303,7 +303,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 						{
 							Labels: map[string]string{
 								"service_name": "route",
-								"operation":    "DELETE /v1/o11y/v1/health",
+								"operation":    "DELETE /api/v1/health",
 							},
 							Points: []v3.Point{
 								{
@@ -347,7 +347,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 						{
 							Labels: map[string]string{
 								"service_name": "route",
-								"operation":    "DELETE /v1/o11y/v1/health",
+								"operation":    "DELETE /api/v1/health",
 							},
 							Points: []v3.Point{
 								{
@@ -373,7 +373,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 						{
 							Labels: map[string]string{
 								"service_name": "frontend",
-								"operation":    "GET /v1/o11y/v1/health",
+								"operation":    "GET /api/v1/health",
 								"status_code":  "200",
 								"priority":     "P0",
 							},
@@ -391,7 +391,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 						{
 							Labels: map[string]string{
 								"service_name": "route",
-								"operation":    "DELETE /v1/o11y/v1/health",
+								"operation":    "DELETE /api/v1/health",
 								"status_code":  "301",
 								"priority":     "P1",
 							},
@@ -409,7 +409,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 						{
 							Labels: map[string]string{
 								"service_name": "route",
-								"operation":    "DELETE /v1/o11y/v1/health",
+								"operation":    "DELETE /api/v1/health",
 								"status_code":  "400",
 								"priority":     "P0",
 							},
@@ -427,7 +427,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 						{
 							Labels: map[string]string{
 								"service_name": "route",
-								"operation":    "DELETE /v1/o11y/v1/health",
+								"operation":    "DELETE /api/v1/health",
 								"status_code":  "200",
 								"priority":     "P1",
 							},
@@ -476,7 +476,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 						{
 							Labels: map[string]string{
 								"service_name": "frontend",
-								"operation":    "GET /v1/o11y/v1/health",
+								"operation":    "GET /api/v1/health",
 								"status_code":  "200",
 								"priority":     "P0",
 							},
@@ -494,7 +494,7 @@ func TestApplyLimitOnMetricResult(t *testing.T) {
 						{
 							Labels: map[string]string{
 								"service_name": "route",
-								"operation":    "DELETE /v1/o11y/v1/health",
+								"operation":    "DELETE /api/v1/health",
 								"status_code":  "400",
 								"priority":     "P0",
 							},

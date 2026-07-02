@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -37,7 +37,7 @@ func NewService(
 	config user.RootConfig,
 ) user.Service {
 	return &service{
-		settings:  factory.NewScopedProviderSettings(providerSettings, "go.observe.hanzo.ai/pkg/modules/user"),
+		settings:  factory.NewScopedProviderSettings(providerSettings, "go.signoz.io/pkg/modules/user"),
 		store:     store,
 		getter:    getter,
 		setter:    setter,
@@ -139,12 +139,34 @@ func (s *service) createOrPromoteRootUser(ctx context.Context, orgID valuer.UUID
 			return err
 		}
 
-		if oldRole != types.RoleAdmin {
-			if err := s.authz.ModifyGrant(ctx,
-				orgID,
-				[]string{roletypes.MustGetHanzoO11yManagedRoleFromExistingRole(oldRole)},
-				[]string{roletypes.MustGetHanzoO11yManagedRoleFromExistingRole(types.RoleAdmin)},
-				authtypes.MustNewSubject(authtypes.TypeableUser, existingUser.ID.StringValue(), orgID, nil),
+		existingUserRoleNames := make([]string, len(userRoles))
+		for idx, userRole := range userRoles {
+			existingUserRoleNames[idx] = userRole.Role.Name
+		}
+
+		// idempotent - safe to retry can't put this in a txn
+		if err := s.authz.ModifyGrant(ctx,
+			orgID,
+			existingUserRoleNames,
+			[]string{authtypes.SigNozAdminRoleName},
+			authtypes.MustNewSubject(coretypes.NewResourceUser(), existingUser.ID.StringValue(), orgID, nil),
+		); err != nil {
+			return err
+		}
+
+		existingUser.PromoteToRoot()
+
+		err = s.store.RunInTx(ctx, func(ctx context.Context) error {
+			if err := s.setter.UpdateAnyUser(ctx, orgID, existingUser); err != nil {
+				return err
+			}
+
+			// update user_role entries
+			if err := s.setter.UpdateUserRoles(
+				ctx,
+				existingUser.OrgID,
+				existingUser.ID,
+				[]string{authtypes.SigNozAdminRoleName},
 			); err != nil {
 				return err
 			}

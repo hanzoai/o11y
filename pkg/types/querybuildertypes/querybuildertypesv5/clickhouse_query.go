@@ -1,6 +1,6 @@
 package querybuildertypesv5
 
-type DatastoreQuery struct {
+type ClickHouseQuery struct {
 	// name of the query
 	Name string `json:"name"`
 	// query to execute
@@ -11,7 +11,7 @@ type DatastoreQuery struct {
 	Legend string `json:"legend,omitempty"`
 }
 
-// Copy creates a deep copy of the DatastoreQuery
-func (q DatastoreQuery) Copy() DatastoreQuery {
+// Copy creates a deep copy of the ClickHouseQuery.
+func (q ClickHouseQuery) Copy() ClickHouseQuery {
 	return q
 }

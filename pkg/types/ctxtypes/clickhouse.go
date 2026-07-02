@@ -5,7 +5,7 @@ import "context"
 type ctxKey string
 
 const (
-	ClickhouseContextMaxThreadsKey ctxKey = "datastore_max_threads"
+	ClickhouseContextMaxThreadsKey ctxKey = "clickhouse_max_threads"
 )
 
 // SetClickhouseMaxThreads stores the max threads value in context.

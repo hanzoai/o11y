@@ -31,8 +31,8 @@ func (q *QueryFilterAnalyzeRequest) UnmarshalJSON(data []byte) error {
 	}
 
 	// Validate query type
-	if aux.QueryType != querybuildertypesv5.QueryTypeDatastoreSQL && aux.QueryType != querybuildertypesv5.QueryTypePromQL {
-		return errors.NewInvalidInputf(errors.CodeInvalidInput, "unsupported queryType: %v. Supported values are '%s' and '%s'", aux.QueryType, querybuildertypesv5.QueryTypePromQL, querybuildertypesv5.QueryTypeDatastoreSQL)
+	if aux.QueryType != querybuildertypesv5.QueryTypeClickHouseSQL && aux.QueryType != querybuildertypesv5.QueryTypePromQL {
+		return errors.NewInvalidInputf(errors.CodeInvalidInput, "unsupported queryType: %v. Supported values are '%s' and '%s'", aux.QueryType, querybuildertypesv5.QueryTypePromQL, querybuildertypesv5.QueryTypeClickHouseSQL)
 	}
 	return nil
 }

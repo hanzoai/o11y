@@ -11,6 +11,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/analytics"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
@@ -45,7 +46,7 @@ func (handler *handler) QueryRange(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	var queryRangeRequest qbtypes.QueryRangeRequest
-	if err := json.NewDecoder(req.Body).Decode(&queryRangeRequest); err != nil {
+	if err := binding.JSON.BindBody(req.Body, &queryRangeRequest); err != nil {
 		render.Error(rw, err)
 		return
 	}
@@ -72,6 +73,53 @@ func (handler *handler) QueryRange(rw http.ResponseWriter, req *http.Request) {
 
 	render.Success(rw, http.StatusOK, queryRangeResponse)
 }
+
+// QueryRangePreview is the dry-run counterpart of QueryRange: it validates and
+// renders each query without executing it.
+func (handler *handler) QueryRangePreview(rw http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
+		instrumentationtypes.CodeNamespace:    "querier",
+		instrumentationtypes.CodeFunctionName: "QueryRangePreview",
+	})
+
+	claims, err := authtypes.ClaimsFromContext(ctx)
+	if err != nil {
+		render.Error(rw, err)
+		return
+	}
+
+	var queryRangeRequest qbtypes.QueryRangeRequest
+	if err := json.NewDecoder(req.Body).Decode(&queryRangeRequest); err != nil {
+		render.Error(rw, err)
+		return
+	}
+
+	// Validation is deferred to QueryRangePreview, which reports per-query
+	// errors instead of failing fast.
+
+	orgID, err := valuer.NewUUID(claims.OrgID)
+	if err != nil {
+		render.Error(rw, err)
+		return
+	}
+
+	previewParams := qbtypes.QueryRangePreviewParams{Verbose: req.URL.Query().Get("verbose")}
+	previewOpts, err := previewParams.Validate()
+	if err != nil {
+		render.Error(rw, err)
+		return
+	}
+
+	preview, err := handler.querier.QueryRangePreview(ctx, orgID, &queryRangeRequest, previewOpts)
+	if err != nil {
+		render.Error(rw, err)
+		return
+	}
+
+	render.Success(rw, http.StatusOK, preview)
+}
+
 func (handler *handler) QueryRawStream(rw http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
@@ -186,7 +234,7 @@ func (handler *handler) QueryRawStream(rw http.ResponseWriter, req *http.Request
 func (handler *handler) ReplaceVariables(rw http.ResponseWriter, req *http.Request) {
 
 	var queryRangeRequest qbtypes.QueryRangeRequest
-	if err := json.NewDecoder(req.Body).Decode(&queryRangeRequest); err != nil {
+	if err := binding.JSON.BindBody(req.Body, &queryRangeRequest); err != nil {
 		render.Error(rw, err)
 		return
 	}

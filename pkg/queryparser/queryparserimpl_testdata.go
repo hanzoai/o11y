@@ -110,7 +110,7 @@ var (
 	clickHouseQueryWithGrouping = `
 [
     {
-      "type":"datastore_sql",
+      "type":"clickhouse_sql",
       "spec":{
         "name":"CH1",
         "query":"SELECT region as r, zone FROM metrics WHERE metric_name='cpu' GROUP BY region, zone",
@@ -123,7 +123,7 @@ var (
 	clickHouseQuerySingleGrouping = `
 [
     {
-      "type":"datastore_sql",
+      "type":"clickhouse_sql",
       "spec":{
         "name":"CH2",
         "query":"SELECT region as r FROM metrics WHERE metric_name='cpu_usage' GROUP BY region",
@@ -136,7 +136,7 @@ var (
 	clickHouseQueryNoGrouping = `
 	[
 	    {
-	      "type":"datastore_sql",
+	      "type":"clickhouse_sql",
 	      "spec":{
 	        "name":"CH3",
 	        "query":"SELECT * FROM metrics WHERE metric_name = 'memory_usage'",

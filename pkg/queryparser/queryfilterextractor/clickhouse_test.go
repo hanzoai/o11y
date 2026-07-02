@@ -6,8 +6,8 @@ import (
 	"testing"
 )
 
-func TestDatastoreFilterExtractor_GroupByColumns(t *testing.T) {
-	extractor := NewDatastoreFilterExtractor()
+func TestClickHouseFilterExtractor_GroupByColumns(t *testing.T) {
+	extractor := NewClickHouseFilterExtractor()
 
 	tests := []struct {
 		name               string
@@ -135,7 +135,7 @@ func TestDatastoreFilterExtractor_GroupByColumns(t *testing.T) {
 		        JSONExtractString(labels, 'http.method') AS http_method,
 		        metric_name as metricName,
 		        rand() as value
-		    FROM observe_metrics.time_series_v4
+		    FROM signoz_metrics.time_series_v4
 		    WHERE (metric_name IN ('test_metric_cardinality'))
 		    GROUP BY
 		    ts,
@@ -163,7 +163,7 @@ func TestDatastoreFilterExtractor_GroupByColumns(t *testing.T) {
                 JSONExtractString(labels, 'http.method'),
                 metric_name as metricName,
                 rand() as value
-            FROM observe_metrics.time_series_v4
+            FROM signoz_metrics.time_series_v4
             WHERE (metric_name IN ('test_metric_cardinality'))
             GROUP BY                
             ts,
@@ -216,8 +216,8 @@ func TestDatastoreFilterExtractor_GroupByColumns(t *testing.T) {
 	}
 }
 
-func TestDatastoreFilterExtractor_SimpleCHQueries(t *testing.T) {
-	extractor := NewDatastoreFilterExtractor()
+func TestClickHouseFilterExtractor_SimpleCHQueries(t *testing.T) {
+	extractor := NewClickHouseFilterExtractor()
 
 	tests := []struct {
 		name               string
@@ -691,8 +691,8 @@ func TestDatastoreFilterExtractor_SimpleCHQueries(t *testing.T) {
 	}
 }
 
-func TestDatastoreFilterExtractor_SimpleCTEGroupByQueries(t *testing.T) {
-	extractor := NewDatastoreFilterExtractor()
+func TestClickHouseFilterExtractor_SimpleCTEGroupByQueries(t *testing.T) {
+	extractor := NewClickHouseFilterExtractor()
 
 	tests := []struct {
 		name               string
@@ -826,8 +826,8 @@ func TestDatastoreFilterExtractor_SimpleCTEGroupByQueries(t *testing.T) {
 	}
 }
 
-func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
-	extractor := NewDatastoreFilterExtractor()
+func TestClickHouseFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
+	extractor := NewClickHouseFilterExtractor()
 
 	tests := []struct {
 		name               string
@@ -845,13 +845,13 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 		            service,
 		            op,
 		            sum(value) / 60 AS value
-		            FROM observe_metrics.distributed_samples_v4 AS points
+		            FROM signoz_metrics.distributed_samples_v4 AS points
 		        INNER JOIN   (
 		            SELECT
 		            fingerprint,
 		                JSONExtractString(labels, 'service.name') AS service,
 		                JSONExtractString(labels, 'operation') AS op
-		            FROM observe_metrics.time_series_v4
+		            FROM signoz_metrics.time_series_v4
 		            WHERE (metric_name IN ('app_requests_total')) AND (unix_milli >= 1731340800000) AND (unix_milli <= 1731344400000) AND (LOWER(temporality) LIKE LOWER('delta')) AND (__normalized = false)
 		            GROUP BY
 		            fingerprint,
@@ -882,10 +882,10 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 				        fingerprint,
 				            toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), toIntervalSecond(60)) AS ts,
 				            avg(value) AS per_series_value
-				        FROM observe_metrics.distributed_samples_v4 AS points
+				        FROM signoz_metrics.distributed_samples_v4 AS points
 				        INNER JOIN        (
 				            SELECT fingerprint
-				            FROM observe_metrics.time_series_v4
+				            FROM signoz_metrics.time_series_v4
 				            WHERE (metric_name IN ('node.cpu.usage')) AND (unix_milli >= 1731427200000) AND (unix_milli <= 1731430800000) AND (LOWER(temporality) LIKE LOWER('cumulative')) AND (__normalized = false)
 				            GROUP BY fingerprint
 				        ) AS filtered_time_series
@@ -922,13 +922,13 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 				        svc,
 				        le,
 				        sum(value)/60 AS value
-				        FROM observe_metrics.distributed_samples_v4 AS points
+				        FROM signoz_metrics.distributed_samples_v4 AS points
 				    INNER JOIN (
 				        SELECT
 				            fingerprint,
 				            JSONExtractString(labels, 'service.name') AS svc,
 				            JSONExtractString(labels, 'le') AS le
-				        FROM observe_metrics.time_series_v4
+				        FROM signoz_metrics.time_series_v4
 				        WHERE
 				            metric_name IN ('http_request_duration.bucket')
 				            AND unix_milli >= 1731513600000
@@ -1001,19 +1001,19 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 		                any(le) AS le,
 		                toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) AS ts,
 		                max(value) AS per_series_value
-		            FROM observe_metrics.distributed_samples_v4
+		            FROM signoz_metrics.distributed_samples_v4
 		            INNER JOIN (
 		                SELECT DISTINCT
 		                    JSONExtractString(labels, 'le') AS le,
 		                    fingerprint
-		                FROM observe_metrics.time_series_v4_1day
+		                FROM signoz_metrics.time_series_v4_1day
 		                WHERE
-		                    metric_name IN ['observe_latency_bucket']
+		                    metric_name IN ['signoz_latency_bucket']
 		                    AND temporality = 'Cumulative'                    AND __normalized = false                    AND unix_milli >= 1650931200000                    AND unix_milli < 1651078380000                    AND like(JSONExtractString(labels, 'service_name'), '%frontend%')
 		            ) AS filtered_time_series
 		            USING fingerprint
 		            WHERE
-		                metric_name IN ['observe_latency_bucket']
+		                metric_name IN ['signoz_latency_bucket']
 		                AND unix_milli >= 1650991980000                AND unix_milli < 1651078380000                AND bitAnd(flags, 1) = 0            GROUP BY
 		                fingerprint,
 		                ts
@@ -1036,7 +1036,7 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 		GROUP BY ts
 		ORDER BY ts ASC
 					`,
-			wantMetrics: []string{"observe_latency_bucket"},
+			wantMetrics: []string{"signoz_latency_bucket"},
 			wantGroupByColumns: []ColumnInfo{
 				{Name: "ts", Alias: "", OriginExpr: "toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND)", OriginField: ""},
 			},
@@ -1056,8 +1056,8 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 		    maxIf(s.value, s.metric_name='k8s.job.failed_pods')             AS failed,
 		    maxIf(s.value, s.metric_name='k8s.job.successful_pods')         AS success,
 		    maxIf(s.value, s.metric_name='k8s.job.desired_successful_pods') AS desired
-		  FROM observe_metrics.distributed_samples_v4 AS s
-		  JOIN observe_metrics.time_series_v4_1day AS tsv
+		  FROM signoz_metrics.distributed_samples_v4 AS s
+		  JOIN signoz_metrics.time_series_v4_1day AS tsv
 		    ON s.fingerprint = tsv.fingerprint
 		  WHERE s.metric_name IN (
 		          'k8s.job.failed_pods',
@@ -1112,7 +1112,7 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 			},
 		},
 		{
-			name: "TC6 - Outer GROUP BY with Datastore dialect (backticks)",
+			name: "TC6 - Outer GROUP BY with ClickHouse dialect (backticks)",
 			query: `
 		SELECT
 		    ` + "`os.type`" + `,
@@ -1127,17 +1127,17 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 		        any(` + "`host_name`" + `) AS ` + "`host_name`" + `,
 		        toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) AS ts,
 		        max(value) AS per_series_value
-		    FROM observe_metrics.distributed_samples_v4
+		    FROM signoz_metrics.distributed_samples_v4
 		    INNER JOIN (
 		        SELECT DISTINCT
 		            JSONExtractString(labels, 'os.type') AS ` + "`os.type`" + `,
 		            JSONExtractString(labels, 'state') AS state,
 		            JSONExtractString(labels, 'host_name') AS ` + "`host_name`" + `,
 		            fingerprint
-		        FROM observe_metrics.time_series_v4_1day
+		        FROM signoz_metrics.time_series_v4_1day
 		        WHERE
 		            metric_name IN ['system.memory.usage']
-		            AND temporality = 'Unspecified'            AND __normalized = false            AND unix_milli >= 1650931200000            AND unix_milli < 1651078380000            AND JSONExtractString(labels, 'host.name') = 'o11y-host'    ) AS filtered_time_series
+		            AND temporality = 'Unspecified'            AND __normalized = false            AND unix_milli >= 1650931200000            AND unix_milli < 1651078380000            AND JSONExtractString(labels, 'host.name') = 'signoz-host'    ) AS filtered_time_series
 		    USING fingerprint
 		    WHERE
 		        metric_name IN ['system.memory.usage']
@@ -1178,8 +1178,8 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 		    JSONExtractString(tsv.labels, 'k8s.job.name') AS job,
 		    maxIf(s.value, s.metric_name = 'k8s.job.successful_pods')         AS max_success,
 		    maxIf(s.value, s.metric_name = 'k8s.job.desired_successful_pods') AS max_desired
-		  FROM observe_metrics.distributed_samples_v4 AS s
-		  JOIN observe_metrics.time_series_v4_1day AS tsv
+		  FROM signoz_metrics.distributed_samples_v4 AS s
+		  JOIN signoz_metrics.time_series_v4_1day AS tsv
 		    ON s.fingerprint = tsv.fingerprint
 		  WHERE s.metric_name IN ('k8s.job.successful_pods', 'k8s.job.desired_successful_pods')
 		    AND s.unix_milli >= start_ms AND s.unix_milli < end_ms
@@ -1243,19 +1243,19 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 		                any(le) AS le,
 		                toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) AS ts,
 		                max(value) AS per_series_value
-		            FROM observe_metrics.distributed_samples_v4
+		            FROM signoz_metrics.distributed_samples_v4
 		            INNER JOIN (
 		                SELECT DISTINCT
 		                    JSONExtractString(labels, 'le') AS le,
 		                    fingerprint
-		                FROM observe_metrics.time_series_v4_1day
+		                FROM signoz_metrics.time_series_v4_1day
 		                WHERE
-		                    metric_name IN ['observe_latency_bucket']
+		                    metric_name IN ['signoz_latency_bucket']
 		                    AND temporality = 'Cumulative'                    AND __normalized = false                    AND unix_milli >= 1650931200000                    AND unix_milli < 1651078380000                    AND like(JSONExtractString(labels, 'service_name'), '%frontend%')
 		            ) AS filtered_time_series
 		            USING fingerprint
 		            WHERE
-		                metric_name IN ['observe_latency_bucket']
+		                metric_name IN ['signoz_latency_bucket']
 		                AND unix_milli >= 1650991980000                AND unix_milli < 1651078380000                AND bitAnd(flags, 1) = 0            GROUP BY
 		                fingerprint,
 		                ts
@@ -1276,7 +1276,7 @@ func TestDatastoreFilterExtractor_NestedComplexCTEGroupByQueries(t *testing.T) {
 		        le ASC,
 		        ts ASC)
 					`,
-			wantMetrics: []string{"observe_latency_bucket"},
+			wantMetrics: []string{"signoz_latency_bucket"},
 			wantGroupByColumns: []ColumnInfo{
 				{Name: "ts", Alias: "", OriginExpr: "toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND)", OriginField: ""},
 				{Name: "le", Alias: "", OriginExpr: "JSONExtractString(labels, 'le')", OriginField: "le"},

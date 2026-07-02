@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/hanzoai/o11y/pkg/query-service/utils/times"
 	"github.com/stretchr/testify/require"
 )
 

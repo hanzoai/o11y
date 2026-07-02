@@ -316,7 +316,7 @@ var onePointOne = 1.1
 var oneString = "1"
 var trueBool = true
 
-var testDatastoreFormattedValueData = []struct {
+var testClickHouseFormattedValueData = []struct {
 	name  string
 	value interface{}
 	want  interface{}
@@ -396,12 +396,12 @@ var testDatastoreFormattedValueData = []struct {
 	},
 }
 
-func TestDatastoreFormattedValue(t *testing.T) {
-	for _, tt := range testDatastoreFormattedValueData {
+func TestClickHouseFormattedValue(t *testing.T) {
+	for _, tt := range testClickHouseFormattedValueData {
 		t.Run(tt.name, func(t *testing.T) {
-			got := DatastoreFormattedValue(tt.value)
+			got := ClickHouseFormattedValue(tt.value)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("DatastoreFormattedValue() = %v, want %v", got, tt.want)
+				t.Errorf("ClickHouseFormattedValue() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -449,7 +449,7 @@ func TestGetClickhouseColumnName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := GetClickhouseColumnName(tt.typeName, tt.dataType, tt.field)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("DatastoreFormattedValue() = %v, want %v", got, tt.want)
+				t.Errorf("ClickHouseFormattedValue() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -478,7 +478,7 @@ func TestGetEpochNanoSecs(t *testing.T) {
 		t.Run(tt.Name, func(t *testing.T) {
 			got := GetEpochNanoSecs(tt.Epoch)
 			if !reflect.DeepEqual(got, tt.Result) {
-				t.Errorf("DatastoreFormattedValue() = %v, want %v", got, tt.Result)
+				t.Errorf("ClickHouseFormattedValue() = %v, want %v", got, tt.Result)
 			}
 		})
 	}

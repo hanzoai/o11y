@@ -15,9 +15,11 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertemplate"
 	"github.com/hanzoai/o11y/pkg/errors"
-	commoncfg "github.com/hanzoai/common/config"
-	"github.com/hanzoai/common/model"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	commoncfg "github.com/prometheus/common/config"
+	"github.com/prometheus/common/model"
 
 	"github.com/prometheus/alertmanager/config"
 	"github.com/prometheus/alertmanager/notify"

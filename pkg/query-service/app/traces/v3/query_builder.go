@@ -162,7 +162,7 @@ func buildTracesFilterQuery(fs *v3.FilterSet) (string, error) {
 				}
 			}
 			if val != nil {
-				fmtVal = utils.DatastoreFormattedValue(val)
+				fmtVal = utils.ClickHouseFormattedValue(val)
 			}
 			if operator, ok := tracesOperatorMappingV3[item.Operator]; ok {
 				switch item.Operator {
@@ -275,7 +275,7 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 	var orderBy []string
 
 	for _, item := range items {
-		if item.ColumnName == constants.HanzoO11yOrderByValue {
+		if item.ColumnName == constants.SigNozOrderByValue {
 			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order))
 		} else if _, ok := tagLookup[item.ColumnName]; ok {
 			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
@@ -317,7 +317,7 @@ func Having(items []v3.Having) string {
 	// aggregate something and filter on that aggregate
 	var having []string
 	for _, item := range items {
-		having = append(having, fmt.Sprintf("value %s %s", item.Operator, utils.DatastoreFormattedValue(item.Value)))
+		having = append(having, fmt.Sprintf("value %s %s", item.Operator, utils.ClickHouseFormattedValue(item.Value)))
 	}
 	return strings.Join(having, " AND ")
 }

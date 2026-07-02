@@ -7,7 +7,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlschema"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
-	"github.com/hanzoai/o11y/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/migrate"
@@ -61,21 +61,21 @@ func (migration *addManagedRoles) Up(ctx context.Context, db *bun.DB) error {
 			return err
 		}
 
-		// o11y admin
-		o11yAdminRole := roletypes.NewRole(roletypes.HanzoO11yAdminRoleName, roletypes.HanzoO11yAdminRoleDescription, roletypes.RoleTypeManaged, orgID)
-		managedRoles = append(managedRoles, roletypes.NewStorableRoleFromRole(o11yAdminRole))
+		// signoz admin
+		signozAdminRole := authtypes.NewRole(authtypes.SigNozAdminRoleName, authtypes.SigNozAdminRoleDescription, authtypes.RoleTypeManaged, orgID)
+		managedRoles = append(managedRoles, signozAdminRole)
 
-		// o11y editor
-		o11yEditorRole := roletypes.NewRole(roletypes.HanzoO11yEditorRoleName, roletypes.HanzoO11yEditorRoleDescription, roletypes.RoleTypeManaged, orgID)
-		managedRoles = append(managedRoles, roletypes.NewStorableRoleFromRole(o11yEditorRole))
+		// signoz editor
+		signozEditorRole := authtypes.NewRole(authtypes.SigNozEditorRoleName, authtypes.SigNozEditorRoleDescription, authtypes.RoleTypeManaged, orgID)
+		managedRoles = append(managedRoles, signozEditorRole)
 
-		// o11y viewer
-		o11yViewerRole := roletypes.NewRole(roletypes.HanzoO11yViewerRoleName, roletypes.HanzoO11yViewerRoleDescription, roletypes.RoleTypeManaged, orgID)
-		managedRoles = append(managedRoles, roletypes.NewStorableRoleFromRole(o11yViewerRole))
+		// signoz viewer
+		signozViewerRole := authtypes.NewRole(authtypes.SigNozViewerRoleName, authtypes.SigNozViewerRoleDescription, authtypes.RoleTypeManaged, orgID)
+		managedRoles = append(managedRoles, signozViewerRole)
 
-		// o11y anonymous
-		o11yAnonymousRole := roletypes.NewRole(roletypes.HanzoO11yAnonymousRoleName, roletypes.HanzoO11yAnonymousRoleDescription, roletypes.RoleTypeManaged, orgID)
-		managedRoles = append(managedRoles, roletypes.NewStorableRoleFromRole(o11yAnonymousRole))
+		// signoz anonymous
+		signozAnonymousRole := authtypes.NewRole(authtypes.SigNozAnonymousRoleName, authtypes.SigNozAnonymousRoleDescription, authtypes.RoleTypeManaged, orgID)
+		managedRoles = append(managedRoles, signozAnonymousRole)
 	}
 
 	if len(managedRoles) > 0 {

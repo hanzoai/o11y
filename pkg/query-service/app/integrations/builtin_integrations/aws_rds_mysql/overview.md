@@ -1,4 +1,4 @@
-### Monitor AWS RDS for MySQL with Hanzo O11y
+### Monitor AWS RDS for MySQL with SigNoz
 
 Collect key AWS RDS for MySQL metrics and view them with an out of the box dashboard.  
 

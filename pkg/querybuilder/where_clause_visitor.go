@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/hanzoai/o11y/pkg/errors"
-	grammar "github.com/hanzoai/o11y/pkg/parser/grammar"
+	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/antlr4-go/antlr/v4"
@@ -17,12 +17,12 @@ import (
 	sqlbuilder "github.com/huandu/go-sqlbuilder"
 )
 
-var searchTroubleshootingGuideURL = "https://observe.hanzo.ai/docs/userguide/search-troubleshooting/"
+var searchTroubleshootingGuideURL = "https://signoz.io/docs/userguide/search-troubleshooting/"
 
-const stringMatchingOperatorDocURL = "https://observe.hanzo.ai/docs/userguide/operators-reference/#string-matching-operators"
+const stringMatchingOperatorDocURL = "https://signoz.io/docs/userguide/operators-reference/#string-matching-operators"
 
 // filterExpressionVisitor implements the FilterQueryVisitor interface
-// to convert the parsed filter expressions into Datastore WHERE clause
+// to convert the parsed filter expressions into ClickHouse WHERE clause.
 type filterExpressionVisitor struct {
 	context            context.Context
 	logger             *slog.Logger
@@ -96,8 +96,12 @@ type PreparedWhereClause struct {
 	WarningsDocURL string
 }
 
-// PrepareWhereClause generates a Datastore compatible WHERE clause from the filter query
-func PrepareWhereClause(query string, opts FilterExprVisitorOpts, startNs uint64, endNs uint64) (*PreparedWhereClause, error) {
+func (p PreparedWhereClause) IsEmpty() bool {
+	return p.WhereClause == nil
+}
+
+// PrepareWhereClause generates a ClickHouse compatible WHERE clause from the filter query.
+func PrepareWhereClause(query string, opts FilterExprVisitorOpts) (PreparedWhereClause, error) {
 
 	// Setup the ANTLR parsing pipeline
 	input := antlr.NewInputStream(query)
@@ -141,7 +145,7 @@ func PrepareWhereClause(query string, opts FilterExprVisitorOpts, startNs uint64
 			"Found %d syntax errors while parsing the search expression.",
 			len(parserErrorListener.SyntaxErrors),
 		)
-		additionals := make([]string, len(parserErrorListener.SyntaxErrors))
+		additionals := make([]string, 0, len(parserErrorListener.SyntaxErrors))
 		for _, err := range parserErrorListener.SyntaxErrors {
 			if err.Error() != "" {
 				additionals = append(additionals, err.Error())
@@ -151,7 +155,7 @@ func PrepareWhereClause(query string, opts FilterExprVisitorOpts, startNs uint64
 		return PreparedWhereClause{}, combinedErrors.WithAdditional(additionals...).WithUrl(searchTroubleshootingGuideURL)
 	}
 
-	// Visit the parse tree with our Datastore visitor
+	// Visit the parse tree with our ClickHouse visitor
 	cond := visitor.Visit(tree).(string)
 
 	if len(visitor.errors) > 0 {
@@ -785,7 +789,7 @@ func (v *filterExpressionVisitor) VisitFunctionCall(ctx *grammar.FunctionCallCon
 
 			if key.Name != "body" {
 				if v.mainErrorURL == "" {
-					v.mainErrorURL = "https://observe.hanzo.ai/docs/userguide/functions-reference/#hastoken-function"
+					v.mainErrorURL = "https://signoz.io/docs/userguide/functions-reference/#hastoken-function"
 				}
 				v.errors = append(v.errors, fmt.Sprintf("function `%s` only supports body field as first parameter", functionName))
 			}
@@ -793,7 +797,7 @@ func (v *filterExpressionVisitor) VisitFunctionCall(ctx *grammar.FunctionCallCon
 			// this will only work with string.
 			if _, ok := value[0].(string); !ok {
 				if v.mainErrorURL == "" {
-					v.mainErrorURL = "https://observe.hanzo.ai/docs/userguide/functions-reference/#hastoken-function"
+					v.mainErrorURL = "https://signoz.io/docs/userguide/functions-reference/#hastoken-function"
 				}
 				v.errors = append(v.errors, fmt.Sprintf("function `%s` expects value parameter to be a string", functionName))
 				return ErrorConditionLiteral
@@ -815,14 +819,14 @@ func (v *filterExpressionVisitor) VisitFunctionCall(ctx *grammar.FunctionCallCon
 			} else {
 				// TODO(add docs for json body search)
 				if v.mainErrorURL == "" {
-					v.mainErrorURL = "https://observe.hanzo.ai/docs/userguide/search-troubleshooting/#function-supports-only-body-json-search"
+					v.mainErrorURL = "https://signoz.io/docs/userguide/search-troubleshooting/#function-supports-only-body-json-search"
 				}
 				v.errors = append(v.errors, fmt.Sprintf("function `%s` supports only body JSON search", functionName))
 				return ErrorConditionLiteral
 			}
 
 			var cond string
-			// Map our functions to Datastore equivalents
+			// Map our functions to ClickHouse equivalents
 			switch functionName {
 			case "has":
 				cond = fmt.Sprintf("has(%s, %s)", fieldName, v.builder.Var(value[0]))
@@ -885,7 +889,7 @@ func (v *filterExpressionVisitor) VisitValue(ctx *grammar.ValueContext) any {
 		}
 		return number
 	} else if ctx.BOOL() != nil {
-		// Convert to Datastore boolean literal
+		// Convert to ClickHouse boolean literal
 		boolText := strings.ToLower(ctx.BOOL().GetText())
 		return boolText == TrueConditionLiteral
 	} else if ctx.KEY() != nil {
@@ -958,7 +962,7 @@ func (v *filterExpressionVisitor) VisitKey(ctx *grammar.KeyContext) any {
 			// TODO(srikanthccv): do we want to return an error here?
 			// should we infer the type and auto-magically build a key for expression?
 			v.errors = append(v.errors, fmt.Sprintf("key `%s` not found", fieldKey.Name))
-			v.mainErrorURL = "https://observe.hanzo.ai/docs/userguide/search-troubleshooting/#key-fieldname-not-found"
+			v.mainErrorURL = "https://signoz.io/docs/userguide/search-troubleshooting/#key-fieldname-not-found"
 		}
 	}
 
@@ -990,7 +994,7 @@ func (v *filterExpressionVisitor) VisitKey(ctx *grammar.KeyContext) any {
 		}
 
 		if !v.keysWithWarnings[keyName] {
-			v.mainWarnURL = "https://observe.hanzo.ai/docs/userguide/field-context-data-types/"
+			v.mainWarnURL = "https://signoz.io/docs/userguide/field-context-data-types/"
 			// this is warning state, we must have a unambiguous key
 			v.warnings = append(v.warnings, warnMsg)
 		}
@@ -1018,7 +1022,7 @@ func trimQuotes(txt string) string {
 		}
 	}
 
-	// unescape so datastore-go can escape it
+	// unescape so clickhouse-go can escape it
 	// https://github.com/ClickHouse/clickhouse-go/blob/6c5ddb38dd2edc841a3b927711b841014759bede/bind.go#L278
 	txt = strings.ReplaceAll(txt, `\\`, `\`)
 	txt = strings.ReplaceAll(txt, `\'`, `'`)

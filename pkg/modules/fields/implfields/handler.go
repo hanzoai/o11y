@@ -7,7 +7,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/fields"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 type handler struct {
@@ -54,7 +56,13 @@ func (handler *handler) GetFieldsValues(rw http.ResponseWriter, req *http.Reques
 
 	fieldValueSelector := telemetrytypes.NewFieldValueSelectorFromPostableFieldValueParams(params)
 
-	allValues, allComplete, err := handler.telemetryMetadataStore.GetAllValues(ctx, fieldValueSelector)
+	claims, err := authtypes.ClaimsFromContext(ctx)
+	if err != nil {
+		render.Error(rw, err)
+		return
+	}
+
+	allValues, allComplete, err := handler.telemetryMetadataStore.GetAllValues(ctx, valuer.MustNewUUID(claims.OrgID), fieldValueSelector)
 	if err != nil {
 		render.Error(rw, err)
 		return

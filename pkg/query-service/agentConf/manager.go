@@ -9,6 +9,9 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/google/uuid"
+	yaml "gopkg.in/yaml.v3"
+
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/app/opamp"
 	filterprocessor "github.com/hanzoai/o11y/pkg/query-service/app/opamp/otelconfig/filterprocessor"
@@ -17,9 +20,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types/opamptypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/google/uuid"
-	"go.uber.org/zap"
-	yaml "gopkg.in/yaml.v3"
 )
 
 var m *Manager
@@ -248,10 +248,10 @@ func Redeploy(ctx context.Context, orgId valuer.UUID, typ opamptypes.ElementType
 
 		// merge current config with new filter params
 		processorConf := map[string]interface{}{
-			"o11y_tail_sampling": config,
+			"signoz_tail_sampling": config,
 		}
 
-		opamp.AddToTracePipelineSpec("o11y_tail_sampling")
+		opamp.AddToTracePipelineSpec("signoz_tail_sampling")
 		configHash, err := opamp.UpsertControlProcessors(ctx, "traces", processorConf, m.OnConfigUpdate)
 		if err != nil {
 			slog.ErrorContext(ctx, "failed to call agent config update for trace processor", errors.Attr(err))
@@ -343,10 +343,10 @@ func UpsertSamplingProcessor(ctx context.Context, orgId valuer.UUID, version int
 
 	// merge current config with new filter params
 	processorConf := map[string]interface{}{
-		"o11y_tail_sampling": config,
+		"signoz_tail_sampling": config,
 	}
 
-	opamp.AddToTracePipelineSpec("o11y_tail_sampling")
+	opamp.AddToTracePipelineSpec("signoz_tail_sampling")
 	configHash, err := opamp.UpsertControlProcessors(ctx, "traces", processorConf, m.OnConfigUpdate)
 	if err != nil {
 		slog.ErrorContext(ctx, "failed to call agent config update for trace processor", errors.Attr(err))

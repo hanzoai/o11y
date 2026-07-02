@@ -60,14 +60,14 @@ func buildMetricQuery(start, end, step int64, mq *v3.BuilderQuery) (string, erro
 		return "", err
 	}
 
-	samplesTableTimeFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli < %d", utils.DatastoreFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
+	samplesTableTimeFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli < %d", utils.ClickHouseFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
 
 	// Select the aggregate value for interval
 	queryTmpl :=
 		"SELECT %s" +
 			" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 			" %s as value" +
-			" FROM " + constants.O11Y_METRIC_DBNAME + "." + constants.O11Y_SAMPLES_V4_TABLENAME +
+			" FROM " + constants.SIGNOZ_METRIC_DBNAME + "." + constants.SIGNOZ_SAMPLES_V4_TABLENAME +
 			" INNER JOIN" +
 			" (%s) as filtered_time_series" +
 			" USING fingerprint" +
@@ -198,7 +198,7 @@ func buildMetricQuery(start, end, step int64, mq *v3.BuilderQuery) (string, erro
 			"SELECT fingerprint, labels as fullLabels," +
 				" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 				" any(value) as value" +
-				" FROM " + constants.O11Y_METRIC_DBNAME + "." + constants.O11Y_SAMPLES_V4_TABLENAME +
+				" FROM " + constants.SIGNOZ_METRIC_DBNAME + "." + constants.SIGNOZ_SAMPLES_V4_TABLENAME +
 				" INNER JOIN" +
 				" (%s) as filtered_time_series" +
 				" USING fingerprint" +
@@ -296,7 +296,7 @@ func orderByAttributeKeyTags(items []v3.OrderBy, tags []v3.AttributeKey) string 
 func having(items []v3.Having) string {
 	var having []string
 	for _, item := range items {
-		having = append(having, fmt.Sprintf("%s %s %v", "value", item.Operator, utils.DatastoreFormattedValue(item.Value)))
+		having = append(having, fmt.Sprintf("%s %s %v", "value", item.Operator, utils.ClickHouseFormattedValue(item.Value)))
 	}
 	return strings.Join(having, " AND ")
 }

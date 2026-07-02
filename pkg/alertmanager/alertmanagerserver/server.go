@@ -10,10 +10,7 @@ import (
 	"github.com/prometheus/alertmanager/types"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify"
-	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
 	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/prometheus/alertmanager/dispatch"
 	"github.com/prometheus/alertmanager/featurecontrol"
 	"github.com/prometheus/alertmanager/inhibit"
@@ -23,8 +20,13 @@ import (
 	"github.com/prometheus/alertmanager/silence"
 	"github.com/prometheus/alertmanager/template"
 	"github.com/prometheus/alertmanager/timeinterval"
-	"github.com/luxfi/metric"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/model"
+
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertemplate"
+	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 )
 
 // This is not a real snapshot file and will never be used. We need this placeholder to ensure maintenance runs on shutdown.
@@ -37,7 +39,7 @@ type Server struct {
 	logger *slog.Logger
 
 	// registry is the prometheus registry for the alertmanager
-	registry metric.Registerer
+	registry prometheus.Registerer
 
 	// srvConfig is the server config for the alertmanager
 	srvConfig Config
@@ -70,9 +72,18 @@ type Server struct {
 	notificationManager nfmanager.NotificationManager
 }
 
-func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, srvConfig Config, orgID string, stateStore alertmanagertypes.StateStore, nfManager nfmanager.NotificationManager) (*Server, error) {
+func New(
+	ctx context.Context,
+	logger *slog.Logger,
+	registry prometheus.Registerer,
+	srvConfig Config,
+	orgID string,
+	stateStore alertmanagertypes.StateStore,
+	nfManager nfmanager.NotificationManager,
+	maintenanceStore alertmanagertypes.MaintenanceStore,
+) (*Server, error) {
 	server := &Server{
-		logger:              logger.With("pkg", "go.observe.hanzo.ai/pkg/alertmanager/alertmanagerserver"),
+		logger:              logger.With(slog.String("pkg", "go.signoz.io/pkg/alertmanager/alertmanagerserver")),
 		registry:            registry,
 		srvConfig:           srvConfig,
 		orgID:               orgID,
@@ -80,10 +91,10 @@ func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, s
 		stopc:               make(chan struct{}),
 		notificationManager: nfManager,
 	}
-	o11yRegisterer := metric.WrapRegistererWithPrefix("o11y_", registry)
-	o11yRegisterer = metric.WrapRegistererWith(metric.Labels{"org_id": server.orgID}, o11yRegisterer)
+	signozRegisterer := prometheus.WrapRegistererWithPrefix("signoz_", registry)
+	signozRegisterer = prometheus.WrapRegistererWith(prometheus.Labels{"org_id": server.orgID}, signozRegisterer)
 	// initialize marker
-	server.marker = alertmanagertypes.NewMarker(o11yRegisterer)
+	server.marker = types.NewMarker(signozRegisterer)
 
 	// get silences for initial state
 	state, err := server.stateStore.Get(ctx, server.orgID)
@@ -106,7 +117,7 @@ func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, s
 			MaxSilences:         func() int { return srvConfig.Silences.Max },
 			MaxSilenceSizeBytes: func() int { return srvConfig.Silences.MaxSizeBytes },
 		},
-		Metrics: o11yRegisterer,
+		Metrics: signozRegisterer,
 		Logger:  server.logger,
 	})
 	if err != nil {
@@ -125,7 +136,7 @@ func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, s
 	server.nflog, err = nflog.New(nflog.Options{
 		SnapshotReader: strings.NewReader(nflogSnapshot),
 		Retention:      server.srvConfig.NFLog.Retention,
-		Metrics:        o11yRegisterer,
+		Metrics:        signozRegisterer,
 		Logger:         server.logger,
 	})
 	if err != nil {
@@ -189,13 +200,14 @@ func New(ctx context.Context, logger *slog.Logger, registry metric.Registerer, s
 		})
 	}()
 
-	server.alerts, err = mem.NewAlerts(ctx, server.marker, server.srvConfig.Alerts.GCInterval, 0, nil, server.logger, o11yRegisterer, nil)
+	server.alerts, err = mem.NewAlerts(ctx, server.marker, server.srvConfig.Alerts.GCInterval, 0, nil, server.logger, signozRegisterer, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	server.pipelineBuilder = notify.NewPipelineBuilder(o11yRegisterer, featurecontrol.NoopFlags{})
-	server.dispatcherMetrics = NewDispatcherMetrics(false, o11yRegisterer)
+	server.muter = NewMaintenanceMuter(maintenanceStore, orgID, server.logger)
+	server.pipelineBuilder = newPipelineBuilder(signozRegisterer, featurecontrol.NoopFlags{})
+	server.dispatcherMetrics = NewDispatcherMetrics(false, signozRegisterer)
 
 	return server, nil
 }
@@ -263,7 +275,11 @@ func (server *Server) SetConfig(ctx context.Context, alertmanagerConfig *alertma
 			server.logger.InfoContext(ctx, "skipping creation of receiver not referenced by any route", slog.String("receiver", rcv.Name))
 			continue
 		}
-		integrations, err := alertmanagernotify.NewReceiverIntegrations(rcv, server.tmpl, server.logger, server.templater)
+		extendedRcv, err := alertmanagerConfig.GetReceiver(rcv.Name)
+		if err != nil {
+			return err
+		}
+		integrations, err := alertmanagernotify.NewReceiverIntegrations(extendedRcv, server.tmpl, server.logger, server.templater)
 		if err != nil {
 			return err
 		}
@@ -338,7 +354,7 @@ func (server *Server) SetConfig(ctx context.Context, alertmanagerConfig *alertma
 	return nil
 }
 
-func (server *Server) TestReceiver(ctx context.Context, receiver alertmanagertypes.Receiver) error {
+func (server *Server) TestReceiver(ctx context.Context, receiver *alertmanagertypes.Receiver) error {
 	testAlert := alertmanagertypes.NewTestAlert(receiver, time.Now(), time.Now())
 	return alertmanagertypes.TestReceiver(ctx, receiver, alertmanagernotify.NewReceiverIntegrations, server.alertmanagerConfig, server.tmpl, server.logger, server.templater, testAlert.Labels, testAlert)
 }

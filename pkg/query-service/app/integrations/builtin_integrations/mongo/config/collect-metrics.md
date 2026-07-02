@@ -48,13 +48,13 @@ processors:
       hostname_sources: ["os"]
 
 exporters:
-  # export to Hanzo O11y cloud
+  # export to SigNoz cloud
   otlp/mongodb:
     endpoint: "${env:OTLP_DESTINATION_ENDPOINT}"
     tls:
       insecure: false
     headers:
-      "signoz-access-token": "${env:O11Y_INGESTION_KEY}"
+      "signoz-access-token": "${env:SIGNOZ_INGESTION_KEY}"
 
   # export to local collector
   # otlp/mongodb:
@@ -87,11 +87,11 @@ export MONGODB_USERNAME="monitoring"
 # password for MongoDB monitoring user"
 export MONGODB_PASSWORD="<PASSWORD>"
 
-# region specific Hanzo O11y cloud ingestion endpoint
-export OTLP_DESTINATION_ENDPOINT="ingest.us.o11y.hanzo.ai:443"
+# region specific SigNoz cloud ingestion endpoint
+export OTLP_DESTINATION_ENDPOINT="ingest.us.signoz.cloud:443"
 
-# your Hanzo O11y ingestion key
-export O11Y_INGESTION_KEY="signoz-ingestion-key"
+# your SigNoz ingestion key
+export SIGNOZ_INGESTION_KEY="signoz-ingestion-key"
 
 ```
 

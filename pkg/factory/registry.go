@@ -8,6 +8,8 @@ import (
 	"syscall"
 
 	"github.com/hanzoai/o11y/pkg/errors"
+	"gonum.org/v1/gonum/graph/simple"
+	"gonum.org/v1/gonum/graph/topo"
 )
 
 var (
@@ -68,10 +70,11 @@ func NewRegistry(ctx context.Context, logger *slog.Logger, services ...NamedServ
 	}
 
 	return &Registry{
-		logger:   logger.With("pkg", "go.observe.hanzo.ai/pkg/factory"),
-		services: m,
-		startCh:  make(chan error, 1),
-		stopCh:   make(chan error, len(services)),
+		logger:         registryLogger,
+		services:       servicesWithState,
+		servicesByName: servicesByName,
+		startC:         make(chan error, 1),
+		stopC:          make(chan error, len(services)),
 	}, nil
 }
 

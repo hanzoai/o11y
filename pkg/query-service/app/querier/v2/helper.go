@@ -6,6 +6,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/prometheus/prometheus/promql/parser"
+
+	"github.com/hanzoai/o11y/pkg/errors"
 	logsV4 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v4"
 	metricsV3 "github.com/hanzoai/o11y/pkg/query-service/app/metrics/v3"
 	metricsV4 "github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4"
@@ -15,7 +18,6 @@ import (
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/querycache"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"go.uber.org/zap"
 )
 
 func prepareLogsQuery(
@@ -104,7 +106,7 @@ func (q *querier) runBuilderQuery(
 				ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 				return
 			}
-			series, err := q.execDatastoreQuery(ctx, query)
+			series, err := q.execClickHouseQuery(ctx, query)
 			ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 			return
 		}
@@ -118,7 +120,7 @@ func (q *querier) runBuilderQuery(
 				ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 				return
 			}
-			series, err := q.execDatastoreQuery(ctx, query)
+			series, err := q.execClickHouseQuery(ctx, query)
 			if err != nil {
 				ch <- channelResult{
 					Err:    err,
@@ -209,7 +211,7 @@ func (q *querier) runBuilderQuery(
 			}
 		}
 
-		series, err := q.execDatastoreQuery(ctx, query)
+		series, err := q.execClickHouseQuery(ctx, query)
 		ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 		return
 	}
@@ -224,7 +226,7 @@ func (q *querier) runBuilderQuery(
 			ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 			return
 		}
-		series, err := q.execDatastoreQuery(ctx, query)
+		series, err := q.execClickHouseQuery(ctx, query)
 		ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 		return
 	}
@@ -250,7 +252,7 @@ func (q *querier) runBuilderQuery(
 			}
 			return
 		}
-		series, err := q.execDatastoreQuery(ctx, query)
+		series, err := q.execClickHouseQuery(ctx, query)
 		if err != nil {
 			ch <- channelResult{
 				Err:    err,
@@ -281,6 +283,37 @@ func (q *querier) runBuilderQuery(
 func (q *querier) ValidateMetricNames(ctx context.Context, query *v3.CompositeQuery, orgID valuer.UUID) {
 	var metricNames []string
 	switch query.QueryType {
+	case v3.QueryTypePromQL:
+		for _, query := range query.PromQueries {
+			expr, err := q.parser.ParseExpr(query.Query)
+			if err != nil {
+				q.logger.DebugContext(ctx, "error parsing promql expression", "query", query.Query, errors.Attr(err))
+				continue
+			}
+			parser.Inspect(expr, func(node parser.Node, path []parser.Node) error {
+				if vs, ok := node.(*parser.VectorSelector); ok {
+					for _, m := range vs.LabelMatchers {
+						if m.Name == "__name__" {
+							metricNames = append(metricNames, m.Value)
+						}
+					}
+				}
+				return nil
+			})
+		}
+		metrics, err := q.reader.GetNormalizedStatus(ctx, orgID, metricNames)
+		if err != nil {
+			q.logger.DebugContext(ctx, "error getting corresponding normalized metrics", errors.Attr(err))
+			return
+		}
+		for metricName, metricPresent := range metrics {
+			if metricPresent {
+				continue
+			} else {
+				q.logger.WarnContext(ctx, "using normalized metric name", "metrics", metricName)
+				continue
+			}
+		}
 	case v3.QueryTypeBuilder:
 		for _, query := range query.BuilderQueries {
 			metricName := query.AggregateAttribute.Key

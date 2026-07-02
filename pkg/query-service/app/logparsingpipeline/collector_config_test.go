@@ -352,8 +352,8 @@ func TestPipelineRouterWorksEvenIfFirstOpIsDisabled(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.O11yLog{
-			makeTestO11yLog(
+		[]model.SignozLog{
+			makeTestSignozLog(
 				"test log body",
 				map[string]any{
 					"method": "GET",
@@ -416,8 +416,8 @@ func TestPipeCharInAliasDoesntBreakCollectorConfig(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.O11yLog{
-			makeTestO11yLog(
+		[]model.SignozLog{
+			makeTestSignozLog(
 				"test log body",
 				map[string]any{
 					"method": "GET",

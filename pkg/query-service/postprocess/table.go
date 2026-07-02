@@ -151,11 +151,11 @@ func sortRows(rows []*v3.TableRow, builderQueries map[string]*v3.BuilderQuery, q
 			orderByList := query.OrderBy
 			if len(orderByList) == 0 {
 				// If no orderBy is specified, sort by value in descending order
-				orderByList = []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"}}
+				orderByList = []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "desc"}}
 			}
 			for _, orderBy := range orderByList {
 				name := orderBy.ColumnName
-				if name == constants.HanzoO11yOrderByValue {
+				if name == constants.SigNozOrderByValue {
 					name = queryName
 				}
 
@@ -208,7 +208,7 @@ func sortRows(rows []*v3.TableRow, builderQueries map[string]*v3.BuilderQuery, q
 	}
 }
 
-func TransformToTableForDatastoreQueries(results []*v3.Result) []*v3.Result {
+func TransformToTableForClickHouseQueries(results []*v3.Result) []*v3.Result {
 	if len(results) == 0 {
 		return []*v3.Result{}
 	}

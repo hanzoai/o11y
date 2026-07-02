@@ -1,3 +1,3 @@
-### Monitor API Gateway with Hanzo O11y
+### Monitor API Gateway with SigNoz
 
 Collect key API Gateway metrics and view them with an out of the box dashboard.

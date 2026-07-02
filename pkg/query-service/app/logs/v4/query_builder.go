@@ -45,7 +45,7 @@ const (
 	BODY                         = "body"
 	DISTRIBUTED_LOGS_V2          = "distributed_logs_v2"
 	DISTRIBUTED_LOGS_V2_RESOURCE = "distributed_logs_v2_resource"
-	DB_NAME                      = "observe_logs"
+	DB_NAME                      = "signoz_logs"
 	NANOSECOND                   = 1000000000
 )
 
@@ -144,12 +144,12 @@ func buildAttributeFilter(item v3.FilterItem) (string, error) {
 		if (op != v3.FilterOperatorEqual && op != v3.FilterOperatorContains) || item.Key.DataType != v3.AttributeKeyDataTypeString {
 			return "", fmt.Errorf("only = operator and string data type is supported for __attrs")
 		}
-		val := utils.DatastoreFormattedValue(item.Value)
+		val := utils.ClickHouseFormattedValue(item.Value)
 		return fmt.Sprintf("has(mapValues(attributes_string), %s)", val), nil
 	}
 
 	keyName := getClickhouseKey(item.Key)
-	fmtVal := utils.DatastoreFormattedValue(value)
+	fmtVal := utils.ClickHouseFormattedValue(value)
 
 	if logsOp, ok := logOperators[op]; ok {
 		switch op {
@@ -221,7 +221,7 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 		op := v3.FilterOperator(strings.ToLower(string(item.Operator)))
 
 		// add extra condition for map contains
-		// by default datastore is not able to utilize indexes for keys with all operators.
+		// by default clickhouse is not able to utilize indexes for keys with all operators.
 		// mapContains forces the use of index.
 		// for mat column it's is not required as it will already use the dedicated index.
 		// skip the exists filter for operators such as !=, not like, not contains, not regex, not in
@@ -265,7 +265,7 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 	var orderBy []string
 
 	for _, item := range items {
-		if item.ColumnName == constants.HanzoO11yOrderByValue {
+		if item.ColumnName == constants.SigNozOrderByValue {
 			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order))
 		} else if _, ok := tagLookup[item.ColumnName]; ok {
 			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
@@ -308,7 +308,7 @@ func generateAggregateClause(panelType v3.PanelType, start, end int64, aggOp v3.
 	having string,
 	orderBy string,
 ) (string, error) {
-	queryTmpl := " %s as value from observe_logs." + DISTRIBUTED_LOGS_V2 +
+	queryTmpl := " %s as value from signoz_logs." + DISTRIBUTED_LOGS_V2 +
 		" where " + timeFilter + "%s" +
 		"%s%s" +
 		"%s"
@@ -405,7 +405,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 	if mq.AggregateOperator == v3.AggregateOperatorNoOp {
 		// with noop any filter or different order by other than ts will use new table
 		sqlSelect := constants.LogsSQLSelectV2
-		queryTmpl := sqlSelect + "from observe_logs.%s where %s%s order by %s"
+		queryTmpl := sqlSelect + "from signoz_logs.%s where %s%s order by %s"
 		query := fmt.Sprintf(queryTmpl, DISTRIBUTED_LOGS_V2, timeFilter, filterSubQuery, orderBy)
 		return query, nil
 		// ---- NOOP ends here ----
@@ -488,7 +488,7 @@ func buildLogsLiveTailQuery(mq *v3.BuilderQuery) (string, error) {
 	// the reader will add the timestamp and id filters
 	switch mq.AggregateOperator {
 	case v3.AggregateOperatorNoOp:
-		query := constants.LogsSQLSelectV2 + "from observe_logs." + DISTRIBUTED_LOGS_V2 + " where "
+		query := constants.LogsSQLSelectV2 + "from signoz_logs." + DISTRIBUTED_LOGS_V2 + " where "
 		if len(filterSubQuery) > 0 {
 			query = query + filterSubQuery + " AND "
 		}

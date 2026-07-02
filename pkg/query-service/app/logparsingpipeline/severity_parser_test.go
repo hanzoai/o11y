@@ -110,9 +110,9 @@ func TestSeverityParsingProcessor(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		inputLogs := []model.O11yLog{}
+		inputLogs := []model.SignozLog{}
 		for _, severityAttribValue := range testCase.severityValues {
-			inputLogs = append(inputLogs, makeTestO11yLog(
+			inputLogs = append(inputLogs, makeTestSignozLog(
 				"test log",
 				map[string]interface{}{
 					"method":        "GET",
@@ -171,7 +171,7 @@ func TestNoCollectorErrorsFromSeverityParserForMismatchedLogs(t *testing.T) {
 	type pipelineTestCase struct {
 		Name           string
 		Operator       pipelinetypes.PipelineOperator
-		NonMatchingLog model.O11yLog
+		NonMatchingLog model.SignozLog
 	}
 
 	testCases := []pipelineTestCase{
@@ -188,7 +188,7 @@ func TestNoCollectorErrorsFromSeverityParserForMismatchedLogs(t *testing.T) {
 				},
 				OverwriteSeverityText: true,
 			},
-			makeTestO11yLog("mismatching log", map[string]interface{}{
+			makeTestSignozLog("mismatching log", map[string]interface{}{
 				"method": "GET",
 			}),
 		}, {
@@ -204,7 +204,7 @@ func TestNoCollectorErrorsFromSeverityParserForMismatchedLogs(t *testing.T) {
 				},
 				OverwriteSeverityText: true,
 			},
-			makeTestO11yLog("mismatching log", map[string]interface{}{
+			makeTestSignozLog("mismatching log", map[string]interface{}{
 				"method":        "GET",
 				"test_severity": 200.3,
 			}),
@@ -217,7 +217,7 @@ func TestNoCollectorErrorsFromSeverityParserForMismatchedLogs(t *testing.T) {
 		result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 			context.Background(),
 			testPipelines,
-			[]model.O11yLog{testCase.NonMatchingLog},
+			[]model.SignozLog{testCase.NonMatchingLog},
 		)
 		require.Nil(err)
 		require.Equal(0, len(collectorWarnAndErrorLogs), strings.Join(collectorWarnAndErrorLogs, "\n"))

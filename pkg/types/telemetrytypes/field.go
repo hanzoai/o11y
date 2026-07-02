@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hanzoai/signoz-otel-collector/exporter/jsontypeexporter"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -21,12 +22,9 @@ const (
 	// BodyJSONStringSearchPrefix is the prefix used for body JSON search queries.
 	// e.g., "body.status" where "body." is the prefix.
 	BodyJSONStringSearchPrefix = "body."
-	// ArraySep mirrors signoz-otel-collector's jsontypeexporter.ArraySeparator;
-	// inlined so this package compiles without dragging in the collector
-	// framework (which pulls grpc/codes via consumer/consumererror).
-	ArraySep       = "[]."
-	ArraySepSuffix = "[]"
-	// TODO(Piyush): Remove once we've migrated to the new array syntax
+	ArraySep                   = jsontypeexporter.ArraySeparator
+	ArraySepSuffix             = "[]"
+	// TODO(Piyush): Remove once we've migrated to the new array syntax.
 	ArrayAnyIndex       = "[*]."
 	ArrayAnyIndexSuffix = "[*]"
 )

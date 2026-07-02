@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	datastore "github.com/ClickHouse/clickhouse-go/v2"
+	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
@@ -23,6 +23,7 @@ type traceOperatorQuery struct {
 }
 
 var _ qbtypes.Query = (*traceOperatorQuery)(nil)
+var _ qbtypes.StatementProvider = (*traceOperatorQuery)(nil)
 
 func (q *traceOperatorQuery) Fingerprint() string {
 	return ""
@@ -30,6 +31,11 @@ func (q *traceOperatorQuery) Fingerprint() string {
 
 func (q *traceOperatorQuery) Window() (uint64, uint64) {
 	return q.fromMS, q.toMS
+}
+
+// Statement renders the SQL without executing it, for the preview path.
+func (q *traceOperatorQuery) Statement(ctx context.Context) (*qbtypes.Statement, error) {
+	return q.stmtBuilder.Build(ctx, q.fromMS, q.toMS, q.kind, q.spec, q.compositeQuery)
 }
 
 func (q *traceOperatorQuery) Execute(ctx context.Context) (*qbtypes.Result, error) {
@@ -64,7 +70,7 @@ func (q *traceOperatorQuery) executeWithContext(ctx context.Context, query strin
 	totalBytes := uint64(0)
 	elapsed := time.Duration(0)
 
-	ctx = datastore.Context(ctx, datastore.WithProgress(func(p *datastore.Progress) {
+	ctx = clickhouse.Context(ctx, clickhouse.WithProgress(func(p *clickhouse.Progress) {
 		totalRows += p.Rows
 		totalBytes += p.Bytes
 		elapsed += p.Elapsed
@@ -83,6 +89,13 @@ func (q *traceOperatorQuery) executeWithContext(ctx context.Context, query strin
 	payload, err := consume(rows, q.kind, queryWindow, q.spec.StepInterval, q.spec.Name)
 	if err != nil {
 		return nil, err
+	}
+
+	// TODO: This should move to readAsRaw function in consume.go but for now we can keep it here since it's only relevant for traces
+	if raw, ok := payload.(*qbtypes.RawData); ok {
+		for _, rr := range raw.Rows {
+			mergeSpanAttributeColumns(rr.Data)
+		}
 	}
 
 	return &qbtypes.Result{

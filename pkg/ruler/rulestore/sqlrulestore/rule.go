@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"slices"
 
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
@@ -174,11 +175,11 @@ func (r *rule) GetStoredRulesByMetricName(ctx context.Context, orgID string, met
 						break
 					}
 				}
-			case qbtypes.QueryTypeDatastoreSQL:
-				if spec, ok := queryEnvelope.Spec.(qbtypes.DatastoreQuery); ok {
-					result, err := r.queryParser.AnalyzeQueryFilter(ctx, qbtypes.QueryTypeDatastoreSQL, spec.Query)
+			case qbtypes.QueryTypeClickHouseSQL:
+				if spec, ok := queryEnvelope.Spec.(qbtypes.ClickHouseQuery); ok {
+					result, err := r.queryParser.AnalyzeQueryFilter(ctx, qbtypes.QueryTypeClickHouseSQL, spec.Query)
 					if err != nil {
-						r.logger.WarnContext(ctx, "failed to parse Datastore query", "query", spec.Query, "error", err)
+						r.logger.WarnContext(ctx, "failed to parse ClickHouse query", slog.String("query", spec.Query), errors.Attr(err))
 						continue
 					}
 					if slices.Contains(result.MetricNames, metricName) {

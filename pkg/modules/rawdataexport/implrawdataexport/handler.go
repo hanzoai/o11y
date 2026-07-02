@@ -13,12 +13,12 @@ import (
 	"unicode/utf8"
 
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/rawdataexport"
-	"github.com/hanzoai/o11y/pkg/telemetrylogs"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/exporttypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -114,6 +114,10 @@ func validateAndApplyDefaultExportLimits(queries []qbtypes.QueryEnvelope) error 
 			return errors.NewInvalidInputf(errors.CodeInvalidInput, "limit cannot be more than %d", MaxExportRowCountLimit)
 		}
 		queries[idx].SetLimit(limit)
+
+		if queries[idx].GetOffset() < 0 {
+			return errors.NewInvalidInputf(errors.CodeInvalidInput, "offset must be non-negative")
+		}
 	}
 	return nil
 }

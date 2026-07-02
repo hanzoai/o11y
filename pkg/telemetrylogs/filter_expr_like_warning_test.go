@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/stretchr/testify/require"

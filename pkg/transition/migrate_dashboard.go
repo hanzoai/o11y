@@ -77,8 +77,8 @@ func (migration *dashboardMigrateV5) updateWidget(ctx context.Context, widget ma
 	}
 
 	if qType, ok := query["queryType"]; ok {
-		if qType == "promql" || qType == "datastore_sql" {
-			migration.logger.InfoContext(ctx, "nothing to migrate for query type", "query_type", qType)
+		if qType == "promql" || qType == "clickhouse_sql" {
+			migration.logger.InfoContext(ctx, "nothing to migrate for query type", slog.Any("query_type", qType))
 			return false
 		}
 	}

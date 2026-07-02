@@ -357,7 +357,7 @@ var testOrderBy = []struct {
 				Order:      "asc",
 			},
 			{
-				ColumnName: constants.HanzoO11yOrderByValue,
+				ColumnName: constants.SigNozOrderByValue,
 				Order:      "desc",
 			},
 		},
@@ -394,7 +394,7 @@ var testOrderBy = []struct {
 				Order:      "asc",
 			},
 			{
-				ColumnName: constants.HanzoO11yOrderByValue,
+				ColumnName: constants.SigNozOrderByValue,
 				Order:      "asc",
 			},
 			{

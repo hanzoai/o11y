@@ -11,7 +11,7 @@ type Config struct {
 }
 
 type TelemetryStoreConfig struct {
-	// Threads is the number of threads to use for Datastore queries
+	// Threads is the number of threads to use for ClickHouse queries
 	Threads int `mapstructure:"threads"`
 }
 

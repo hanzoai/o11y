@@ -1,5 +1,3 @@
-//go:build grpc
-
 package otelconfig
 
 import (
@@ -36,7 +34,7 @@ func TestServiceConfig(t *testing.T) {
 			"traces": map[string]interface{}{
 				"receivers": []interface{}{"jaeger", "otlp"},
 				"processors": []interface{}{
-					"o11yspanmetrics/cumulative", "batch",
+					"signozspanmetrics/cumulative", "batch",
 				},
 				"exporters": []interface{}{
 					"clickhousetraces",

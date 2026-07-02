@@ -1,3 +1,3 @@
-### Monitor RDS with Hanzo O11y
+### Monitor RDS with SigNoz
 
 Collect key RDS metrics and view them with an out of the box dashboard.

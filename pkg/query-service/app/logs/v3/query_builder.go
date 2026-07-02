@@ -77,9 +77,9 @@ func getClickhouseLogsColumnDataType(columnDataType v3.AttributeKeyDataType) str
 	return "string"
 }
 
-// getClickhouseColumnName returns the corresponding datastore column name for the given attribute/resource key
+// getClickhouseColumnName returns the corresponding clickhouse column name for the given attribute/resource key
 func getClickhouseColumnName(key v3.AttributeKey) string {
-	datastoreColumn := key.Key
+	clickhouseColumn := key.Key
 	if key.Key == constants.TIMESTAMP || key.Key == "id" {
 		return key.Key
 	}
@@ -89,19 +89,19 @@ func getClickhouseColumnName(key v3.AttributeKey) string {
 	if !key.IsColumn {
 		columnType := GetClickhouseLogsColumnType(key.Type)
 		columnDataType := getClickhouseLogsColumnDataType(key.DataType)
-		datastoreColumn = fmt.Sprintf("%s_%s_value[indexOf(%s_%s_key, '%s')]", columnType, columnDataType, columnType, columnDataType, key.Key)
-		return datastoreColumn
+		clickhouseColumn = fmt.Sprintf("%s_%s_value[indexOf(%s_%s_key, '%s')]", columnType, columnDataType, columnType, columnDataType, key.Key)
+		return clickhouseColumn
 	}
 
 	// check if it is a static field
 	if key.Type == v3.AttributeKeyTypeUnspecified {
 		// name is the column name
-		return datastoreColumn
+		return clickhouseColumn
 	}
 
 	// materialized column created from query
-	datastoreColumn = utils.GetClickhouseColumnName(string(key.Type), string(key.DataType), key.Key)
-	return datastoreColumn
+	clickhouseColumn = utils.GetClickhouseColumnName(string(key.Type), string(key.DataType), key.Key)
+	return clickhouseColumn
 }
 
 // getSelectLabels returns the select labels for the query based on groupBy and aggregateOperator
@@ -194,7 +194,7 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 					conditions = append(conditions, GetExistsNexistsFilter(op, item))
 				case v3.FilterOperatorRegex, v3.FilterOperatorNotRegex:
 					columnName := getClickhouseColumnName(item.Key)
-					fmtVal := utils.DatastoreFormattedValue(value)
+					fmtVal := utils.ClickHouseFormattedValue(value)
 					conditions = append(conditions, fmt.Sprintf(logsOp, columnName, fmtVal))
 				case v3.FilterOperatorContains, v3.FilterOperatorNotContains:
 					columnName := getClickhouseColumnName(item.Key)
@@ -207,7 +207,7 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 					}
 				default:
 					columnName := getClickhouseColumnName(item.Key)
-					fmtVal := utils.DatastoreFormattedValue(value)
+					fmtVal := utils.ClickHouseFormattedValue(value)
 
 					// for use lower for like and ilike
 					if op == v3.FilterOperatorLike || op == v3.FilterOperatorNotLike {
@@ -284,7 +284,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 	queryTmpl =
 		queryTmpl + selectLabels +
 			" %s as value " +
-			"from observe_logs.distributed_logs " +
+			"from signoz_logs.distributed_logs " +
 			"where " + timeFilter + "%s" +
 			"%s%s" +
 			"%s"
@@ -356,7 +356,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 		query := fmt.Sprintf(queryTmpl, op, filterSubQuery, groupBy, having, orderBy)
 		return query, nil
 	case v3.AggregateOperatorNoOp:
-		queryTmpl := constants.LogsSQLSelect + "from observe_logs.distributed_logs where %s%s order by %s"
+		queryTmpl := constants.LogsSQLSelect + "from signoz_logs.distributed_logs where %s%s order by %s"
 		query := fmt.Sprintf(queryTmpl, timeFilter, filterSubQuery, orderBy)
 		return query, nil
 	default:
@@ -372,7 +372,7 @@ func buildLogsLiveTailQuery(mq *v3.BuilderQuery) (string, error) {
 
 	switch mq.AggregateOperator {
 	case v3.AggregateOperatorNoOp:
-		query := constants.LogsSQLSelect + "from observe_logs.distributed_logs where "
+		query := constants.LogsSQLSelect + "from signoz_logs.distributed_logs where "
 		if len(filterSubQuery) > 0 {
 			query = query + filterSubQuery + " AND "
 		}
@@ -407,7 +407,7 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 	var orderBy []string
 
 	for _, item := range items {
-		if item.ColumnName == constants.HanzoO11yOrderByValue {
+		if item.ColumnName == constants.SigNozOrderByValue {
 			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order))
 		} else if _, ok := tagLookup[item.ColumnName]; ok {
 			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
@@ -445,7 +445,7 @@ func Having(items []v3.Having) string {
 	// aggregate something and filter on that aggregate
 	var having []string
 	for _, item := range items {
-		having = append(having, fmt.Sprintf("value %s %s", item.Operator, utils.DatastoreFormattedValue(item.Value)))
+		having = append(having, fmt.Sprintf("value %s %s", item.Operator, utils.ClickHouseFormattedValue(item.Value)))
 	}
 	return strings.Join(having, " AND ")
 }

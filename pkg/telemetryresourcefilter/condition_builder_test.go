@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/huandu/go-sqlbuilder"

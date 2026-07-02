@@ -8,12 +8,29 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/huandu/go-sqlbuilder"
 	"github.com/stretchr/testify/require"
 )
+
+// detailContains reports whether any additional detail on err (its message or one
+// of its suggestions) contains sub.
+func detailContains(err error, sub string) bool {
+	for _, e := range errors.AsJSON(err).Errors {
+		if strings.Contains(e.Message, sub) {
+			return true
+		}
+		for _, s := range e.Suggestions {
+			if strings.Contains(s, sub) {
+				return true
+			}
+		}
+	}
+	return false
+}
 
 // TestFilterExprLogs tests a comprehensive set of query patterns for logs search.
 func TestFilterExprLogs(t *testing.T) {
@@ -169,10 +186,10 @@ func TestFilterExprLogs(t *testing.T) {
 		},
 		{
 			category:              "Special characters",
-			query:                 "srikanth@observe.hanzo.ai",
+			query:                 "srikanth@signoz.io",
 			shouldPass:            true,
 			expectedQuery:         "WHERE match(LOWER(body), LOWER(?))",
-			expectedArgs:          []any{"srikanth@observe.hanzo.ai"},
+			expectedArgs:          []any{"srikanth@signoz.io"},
 			expectedErrorContains: "",
 		},
 		{
@@ -1419,10 +1436,10 @@ func TestFilterExprLogs(t *testing.T) {
 		},
 		{
 			category:              "REGEXP operator",
-			query:                 "path REGEXP \"^/v1/o11y/v\\\\d+/users/\\\\d+$\"",
+			query:                 "path REGEXP \"^/api/v\\\\d+/users/\\\\d+$\"",
 			shouldPass:            true,
 			expectedQuery:         "WHERE (match(attributes_string['path'], ?) AND mapContains(attributes_string, 'path') = ?)",
-			expectedArgs:          []any{"^/v1/o11y/v\\d+/users/\\d+$", true},
+			expectedArgs:          []any{"^/api/v\\d+/users/\\d+$", true},
 			expectedErrorContains: "",
 		},
 		{
@@ -1461,10 +1478,10 @@ func TestFilterExprLogs(t *testing.T) {
 		},
 		{
 			category:              "NOT REGEXP operator",
-			query:                 "path NOT REGEXP \"^/v1/o11y/v\\d+/users/\\d+$\"",
+			query:                 "path NOT REGEXP \"^/api/v\\d+/users/\\d+$\"",
 			shouldPass:            true,
 			expectedQuery:         "WHERE NOT match(attributes_string['path'], ?)",
-			expectedArgs:          []any{"^/v1/o11y/v\\d+/users/\\d+$"},
+			expectedArgs:          []any{"^/api/v\\d+/users/\\d+$"},
 			expectedErrorContains: "",
 		},
 
@@ -2414,15 +2431,7 @@ func TestFilterExprLogs(t *testing.T) {
 				require.Equal(t, tc.expectedArgs, args)
 			} else {
 				require.Error(t, err, "Expected error for query: %s", tc.query)
-				_, _, _, _, _, a := errors.Unwrapb(err)
-				contains := false
-				for _, warn := range a {
-					if strings.Contains(warn, tc.expectedErrorContains) {
-						contains = true
-						break
-					}
-				}
-				require.True(t, contains)
+				require.True(t, detailContains(err, tc.expectedErrorContains))
 			}
 		})
 	}
@@ -2535,15 +2544,7 @@ func TestFilterExprLogsConflictNegation(t *testing.T) {
 				require.Equal(t, tc.expectedArgs, args)
 			} else {
 				require.Error(t, err, "Expected error for query: %s", tc.query)
-				_, _, _, _, _, a := errors.Unwrapb(err)
-				contains := false
-				for _, warn := range a {
-					if strings.Contains(warn, tc.expectedErrorContains) {
-						contains = true
-						break
-					}
-				}
-				require.True(t, contains)
+				require.True(t, detailContains(err, tc.expectedErrorContains))
 			}
 		})
 	}
