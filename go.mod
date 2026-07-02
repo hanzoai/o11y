@@ -144,7 +144,7 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
-	github.com/hanzoai/commerce/metering v0.1.0 // indirect
+	github.com/hanzoai/commerce/metering v0.1.2 // indirect
 	github.com/hashicorp/go-metrics v0.5.4 // indirect
 	github.com/huandu/go-clone v1.7.3 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
