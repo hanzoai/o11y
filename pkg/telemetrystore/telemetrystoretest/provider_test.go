@@ -9,7 +9,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	provider := New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherRegexp)
+	provider := New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherRegexp)
 	assert.NotNil(t, provider)
 	assert.NotNil(t, provider.Mock())
 	assert.NotNil(t, provider.ClickhouseDB())

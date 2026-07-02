@@ -18,6 +18,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 	"github.com/hanzoai/o11y/pkg/valuer"
 
+	"log/slog"
+
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
@@ -94,7 +96,7 @@ func NewQuerier(opts QuerierOptions) interfaces.Querier {
 	}
 }
 
-func (q *querier) execDatastoreQuery(ctx context.Context, query string) ([]*v3.Series, error) {
+func (q *querier) execClickHouseQuery(ctx context.Context, query string) ([]*v3.Series, error) {
 	q.queriesExecuted = append(q.queriesExecuted, query)
 	if q.testingMode && q.reader == nil {
 		return q.returnedSeries, q.returnedErr
@@ -121,14 +123,31 @@ func (q *querier) execDatastoreQuery(ctx context.Context, query string) ([]*v3.S
 	return result, err
 }
 
-func (q *querier) execPromQuery(_ context.Context, params *model.QueryRangeParams) ([]*v3.Series, error) {
+func (q *querier) execPromQuery(ctx context.Context, params *model.QueryRangeParams) ([]*v3.Series, error) {
 	q.queriesExecuted = append(q.queriesExecuted, params.Query)
 	if q.testingMode && q.reader == nil {
 		q.timeRanges = append(q.timeRanges, []int{int(params.Start.UnixMilli()), int(params.End.UnixMilli())})
 		return q.returnedSeries, q.returnedErr
 	}
-	// PromQL queries are no longer supported on this o11y build.
-	return nil, fmt.Errorf("promql is not supported on this o11y build; use datastore SQL")
+	promResult, _, err := q.reader.GetQueryRangeResult(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+	matrix, promErr := promResult.Matrix()
+	if promErr != nil {
+		return nil, promErr
+	}
+	var seriesList []*v3.Series
+	for _, v := range matrix {
+		var s v3.Series
+		s.Labels = v.Metric.Copy().Map()
+		for idx := range v.Floats {
+			p := v.Floats[idx]
+			s.Points = append(s.Points, v3.Point{Timestamp: p.T, Value: p.F})
+		}
+		seriesList = append(seriesList, &s)
+	}
+	return seriesList, nil
 }
 
 func (q *querier) runBuilderQueries(ctx context.Context, orgID valuer.UUID, params *v3.QueryRangeParamsV3) ([]*v3.Result, map[string]error, error) {
@@ -247,17 +266,17 @@ func (q *querier) runPromQueries(ctx context.Context, orgID valuer.UUID, params 
 	return results, errQueriesByName, err
 }
 
-func (q *querier) runDatastoreQueries(ctx context.Context, params *v3.QueryRangeParamsV3) ([]*v3.Result, map[string]error, error) {
-	channelResults := make(chan channelResult, len(params.CompositeQuery.DatastoreQueries))
+func (q *querier) runClickHouseQueries(ctx context.Context, params *v3.QueryRangeParamsV3) ([]*v3.Result, map[string]error, error) {
+	channelResults := make(chan channelResult, len(params.CompositeQuery.ClickHouseQueries))
 	var wg sync.WaitGroup
-	for queryName, clickHouseQuery := range params.CompositeQuery.DatastoreQueries {
+	for queryName, clickHouseQuery := range params.CompositeQuery.ClickHouseQueries {
 		if clickHouseQuery.Disabled {
 			continue
 		}
 		wg.Add(1)
-		go func(queryName string, clickHouseQuery *v3.DatastoreQuery) {
+		go func(queryName string, clickHouseQuery *v3.ClickHouseQuery) {
 			defer wg.Done()
-			series, err := q.execDatastoreQuery(ctx, clickHouseQuery.Query)
+			series, err := q.execClickHouseQuery(ctx, clickHouseQuery.Query)
 			channelResults <- channelResult{Err: err, Name: queryName, Query: clickHouseQuery.Query, Series: series}
 		}(queryName, clickHouseQuery)
 	}
@@ -282,7 +301,7 @@ func (q *querier) runDatastoreQueries(ctx context.Context, params *v3.QueryRange
 
 	var err error
 	if len(errs) > 0 {
-		err = fmt.Errorf("error in datastore queries")
+		err = fmt.Errorf("error in clickhouse queries")
 	}
 	return results, errQueriesByName, err
 }
@@ -433,8 +452,8 @@ func (q *querier) runBuilderListQueries(ctx context.Context, params *v3.QueryRan
 	var err error
 	if params.CompositeQuery.QueryType == v3.QueryTypeBuilder {
 		queries, err = q.builder.PrepareQueries(params)
-	} else if params.CompositeQuery.QueryType == v3.QueryTypeDatastoreSQL {
-		for name, chQuery := range params.CompositeQuery.DatastoreQueries {
+	} else if params.CompositeQuery.QueryType == v3.QueryTypeClickHouseSQL {
+		for name, chQuery := range params.CompositeQuery.ClickHouseQueries {
 			queries[name] = chQuery.Query
 		}
 	}
@@ -505,12 +524,12 @@ func (q *querier) QueryRange(ctx context.Context, orgID valuer.UUID, params *v3.
 			}
 		case v3.QueryTypePromQL:
 			results, errQueriesByName, err = q.runPromQueries(ctx, orgID, params)
-		case v3.QueryTypeDatastoreSQL:
+		case v3.QueryTypeClickHouseSQL:
 			ctx = context.WithValue(ctx, "enforce_max_result_rows", true)
 			if params.CompositeQuery.PanelType == v3.PanelTypeList || params.CompositeQuery.PanelType == v3.PanelTypeTrace {
 				results, errQueriesByName, err = q.runBuilderListQueries(ctx, params)
 			} else {
-				results, errQueriesByName, err = q.runDatastoreQueries(ctx, params)
+				results, errQueriesByName, err = q.runClickHouseQueries(ctx, params)
 			}
 		default:
 			err = fmt.Errorf("invalid query type")

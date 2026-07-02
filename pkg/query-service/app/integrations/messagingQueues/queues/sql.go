@@ -8,10 +8,10 @@ import (
 	format "github.com/hanzoai/o11y/pkg/query-service/utils"
 )
 
-// generateOverviewSQL builds the Datastore SQL query with optional filters.
+// generateOverviewSQL builds the ClickHouse SQL query with optional filters.
 // If a filter slice is empty, the query does not constrain on that field.
 func generateOverviewSQL(start, end int64, item []v3.FilterItem) string {
-	// Convert from nanoseconds to float seconds in Go to avoid decimal overflow in Datastore
+	// Convert from nanoseconds to float seconds in Go to avoid decimal overflow in ClickHouse
 	startSeconds := float64(start) / 1e9
 	endSeconds := float64(end) / 1e9
 
@@ -28,15 +28,15 @@ func generateOverviewSQL(start, end int64, item []v3.FilterItem) string {
 	for _, filter := range item {
 		switch filter.Key.Key {
 		case "service.name":
-			whereClauses = append(whereClauses, fmt.Sprintf("%s IN (%s)", "service_name", format.DatastoreFormattedValue(filter.Value)))
+			whereClauses = append(whereClauses, fmt.Sprintf("%s IN (%s)", "service_name", format.ClickHouseFormattedValue(filter.Value)))
 		case "name":
-			whereClauses = append(whereClauses, fmt.Sprintf("%s IN (%s)", "span_name", format.DatastoreFormattedValue(filter.Value)))
+			whereClauses = append(whereClauses, fmt.Sprintf("%s IN (%s)", "span_name", format.ClickHouseFormattedValue(filter.Value)))
 		case "destination":
-			whereClauses = append(whereClauses, fmt.Sprintf("%s IN (%s)", "destination", format.DatastoreFormattedValue(filter.Value)))
+			whereClauses = append(whereClauses, fmt.Sprintf("%s IN (%s)", "destination", format.ClickHouseFormattedValue(filter.Value)))
 		case "queue":
-			whereClauses = append(whereClauses, fmt.Sprintf("%s IN (%s)", "messaging_system", format.DatastoreFormattedValue(filter.Value)))
+			whereClauses = append(whereClauses, fmt.Sprintf("%s IN (%s)", "messaging_system", format.ClickHouseFormattedValue(filter.Value)))
 		case "kind_string":
-			whereClauses = append(whereClauses, fmt.Sprintf("%s IN (%s)", "kind_string", format.DatastoreFormattedValue(filter.Value)))
+			whereClauses = append(whereClauses, fmt.Sprintf("%s IN (%s)", "kind_string", format.ClickHouseFormattedValue(filter.Value)))
 		}
 	}
 
@@ -65,7 +65,7 @@ WITH
             ) AS destination,
             durationNano,
             status_code
-        FROM observe_traces.distributed_observe_index_v3
+        FROM signoz_traces.distributed_signoz_index_v3
         WHERE
             ts_bucket_start >= toDateTime64(%f, 9)
             AND ts_bucket_start <= toDateTime64(%f, 9)

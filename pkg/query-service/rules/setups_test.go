@@ -3,6 +3,7 @@ package rules
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
@@ -54,6 +55,7 @@ func prepareQuerierForMetrics(t *testing.T, telemetryStore telemetrystore.Teleme
 		nil, // traceOperatorStmtBuilder
 		nil, // bucketCache
 		flagger,
+		0,
 	), metadataStore
 }
 
@@ -89,6 +91,9 @@ func prepareQuerierForLogs(t *testing.T, telemetryStore telemetrystore.Telemetry
 		telemetrylogs.DefaultFullTextColumn,
 		telemetrylogs.GetBodyJSONKey,
 		fl,
+		nil,
+		false,
+		100000,
 	)
 
 	return querier.New(
@@ -104,6 +109,7 @@ func prepareQuerierForLogs(t *testing.T, telemetryStore telemetrystore.Telemetry
 		nil,            // traceOperatorStmtBuilder
 		nil,            // bucketCache
 		fl,
+		5*time.Minute, // logTraceIDWindowPadding
 	)
 }
 
@@ -134,6 +140,8 @@ func prepareQuerierForTraces(t *testing.T, telemetryStore telemetrystore.Telemet
 		traceAggExprRewriter,
 		telemetryStore,
 		fl,
+		false,
+		100000,
 	)
 
 	return querier.New(
@@ -149,5 +157,6 @@ func prepareQuerierForTraces(t *testing.T, telemetryStore telemetrystore.Telemet
 		nil,              // traceOperatorStmtBuilder
 		nil,              // bucketCache
 		fl,
+		0,
 	)
 }

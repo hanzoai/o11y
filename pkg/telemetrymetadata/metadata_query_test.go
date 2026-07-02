@@ -5,7 +5,11 @@ import (
 	"regexp"
 	"testing"
 
+	cmock "github.com/hanzoai/clickhouse-go-mock"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/telemetryaudit"
 	"github.com/hanzoai/o11y/pkg/telemetrylogs"
 	"github.com/hanzoai/o11y/pkg/telemetrymeter"
 	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
@@ -13,7 +17,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	cmock "github.com/srikanthccv/ClickHouse-go-mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -76,11 +79,11 @@ func TestGetFirstSeenFromMetricMetadata(t *testing.T) {
 		},
 	}
 
-	// Datastore tuple syntax is (x, y, z)
+	// ClickHouse tuple syntax is (x, y, z)
 	// the structure should lead to:
 	// SELECT ... WHERE (metric_name, attr_name, attr_string_value) IN ((?, ?, ?), (?, ?, ?)) ...
 
-	expectedQuery := `SELECT metric_name, attr_name, attr_string_value, min\(first_reported_unix_milli\) AS first_seen FROM observe_metrics.distributed_metadata WHERE \(metric_name, attr_name, attr_string_value\) IN \(\(\?, \?, \?\), \(\?, \?, \?\)\) GROUP BY metric_name, attr_name, attr_string_value ORDER BY first_seen`
+	expectedQuery := `SELECT metric_name, attr_name, attr_string_value, min\(first_reported_unix_milli\) AS first_seen FROM signoz_metrics.distributed_metadata WHERE \(metric_name, attr_name, attr_string_value\) IN \(\(\?, \?, \?\), \(\?, \?, \?\)\) GROUP BY metric_name, attr_name, attr_string_value ORDER BY first_seen`
 
 	// Note: regexMatcher uses regexp.MatchString, so we escape parens and ?
 

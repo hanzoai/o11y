@@ -9,19 +9,14 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/query-service/constants"
-	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
-	"github.com/hanzoai/o11y/pkg/query-service/model"
-	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
-	qslabels "github.com/hanzoai/o11y/pkg/query-service/utils/labels"
+	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"go.uber.org/zap"
 )
 
 // BaseRule contains common fields and methods for all rule types

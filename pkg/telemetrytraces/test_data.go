@@ -1,6 +1,8 @@
 package telemetrytraces
 
 import (
+	"time"
+
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 

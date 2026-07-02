@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/prometheus/alertmanager/types"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

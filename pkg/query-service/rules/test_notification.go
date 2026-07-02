@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/query-service/model"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
-	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"log/slog"
+
 	"github.com/google/uuid"
 
 	"github.com/hanzoai/o11y/pkg/errors"
@@ -64,9 +63,26 @@ func defaultTestNotification(opts PrepareTestRuleOptions) (int, error) {
 		}
 
 	} else if parsedRule.RuleType == ruletypes.RuleTypeProm {
-		err := fmt.Errorf("promql rule testing is removed; convert rule to %s (datastore SQL)", ruletypes.RuleTypeThreshold)
-		zap.L().Error("promql rule test rejected", zap.Error(err))
-		return 0, model.BadRequest(err)
+
+		// create promql rule
+		rule, err = NewPromRule(
+			alertname,
+			opts.OrgID,
+			parsedRule,
+			opts.Logger,
+			opts.ManagerOpts.Prometheus,
+			opts.ManagerOpts.Alertmanager.Config().ExternalURL,
+			WithSendAlways(),
+			WithSendUnmatched(),
+			WithSQLStore(opts.SQLStore),
+			WithQueryParser(opts.ManagerOpts.QueryParser),
+			WithMetadataStore(opts.ManagerOpts.MetadataStore),
+		)
+
+		if err != nil {
+			slog.Error("failed to prepare a new promql rule for test", errors.Attr(err))
+			return 0, err
+		}
 	} else {
 		return 0, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid rule type")
 	}

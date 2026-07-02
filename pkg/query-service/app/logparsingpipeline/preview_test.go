@@ -94,13 +94,13 @@ func TestPipelinePreview(t *testing.T) {
 		},
 	}
 
-	matchingLog := makeTestO11yLog(
+	matchingLog := makeTestSignozLog(
 		"test log body",
 		map[string]interface{}{
 			"method": "GET",
 		},
 	)
-	nonMatchingLog := makeTestO11yLog(
+	nonMatchingLog := makeTestSignozLog(
 		"test log body",
 		map[string]interface{}{
 			"method": "POST",
@@ -110,7 +110,7 @@ func TestPipelinePreview(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.O11yLog{
+		[]model.SignozLog{
 			matchingLog,
 			nonMatchingLog,
 		},
@@ -189,7 +189,7 @@ func TestGrokParsingProcessor(t *testing.T) {
 		},
 	}
 
-	testLog := makeTestO11yLog(
+	testLog := makeTestSignozLog(
 		"2023-10-26T04:38:00.602Z INFO route/server.go:71 HTTP request received",
 		map[string]interface{}{
 			"method": "GET",
@@ -198,7 +198,7 @@ func TestGrokParsingProcessor(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		testPipelines,
-		[]model.O11yLog{
+		[]model.SignozLog{
 			testLog,
 		},
 	)
@@ -212,12 +212,12 @@ func TestGrokParsingProcessor(t *testing.T) {
 	require.Equal("route/server.go:71", processed.Attributes_string["location"])
 }
 
-func makeTestO11yLog(
+func makeTestSignozLog(
 	body string,
 	attributes map[string]interface{},
-) model.O11yLog {
+) model.SignozLog {
 
-	testLog := model.O11yLog{
+	testLog := model.SignozLog{
 		Timestamp:          uint64(time.Now().UnixNano()),
 		Body:               body,
 		Attributes_bool:    map[string]bool{},

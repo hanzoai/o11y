@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	datastore "github.com/AfterShip/clickhouse-sql-parser/parser"
+	clickhouse "github.com/AfterShip/clickhouse-sql-parser/parser"
 	"github.com/hanzoai/o11y/pkg/errors"
 )
 
@@ -14,20 +14,20 @@ const (
 	MetricNameColumn = "metric_name"
 )
 
-// DatastoreFilterExtractor extracts metric names and grouping keys from Datastore SQL queries
-type DatastoreFilterExtractor struct{}
+// ClickHouseFilterExtractor extracts metric names and grouping keys from ClickHouse SQL queries.
+type ClickHouseFilterExtractor struct{}
 
-// NewDatastoreFilterExtractor creates a new Datastore filter extractor
-func NewDatastoreFilterExtractor() *DatastoreFilterExtractor {
-	return &DatastoreFilterExtractor{}
+// NewClickHouseFilterExtractor creates a new ClickHouse filter extractor.
+func NewClickHouseFilterExtractor() *ClickHouseFilterExtractor {
+	return &ClickHouseFilterExtractor{}
 }
 
-// Extract parses a Datastore query and extracts metric names and grouping keys
-func (e *DatastoreFilterExtractor) Extract(query string) (*FilterResult, error) {
-	p := datastore.NewParser(query)
+// Extract parses a ClickHouse query and extracts metric names and grouping keys.
+func (e *ClickHouseFilterExtractor) Extract(query string) (*FilterResult, error) {
+	p := clickhouse.NewParser(query)
 	stmts, err := p.ParseStmts()
 	if err != nil {
-		return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "failed to parse datastore query: %s", err.Error())
+		return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "failed to parse clickhouse query: %s", err.Error())
 	}
 
 	result := &FilterResult{MetricNames: []string{}, GroupByColumns: []ColumnInfo{}}
@@ -35,11 +35,11 @@ func (e *DatastoreFilterExtractor) Extract(query string) (*FilterResult, error) 
 	metricNames := make(map[string]bool)
 
 	// Track top-level queries for GROUP BY extraction
-	topLevelQueries := make(map[*datastore.SelectQuery]bool)
+	topLevelQueries := make(map[*clickhouse.SelectQuery]bool)
 
 	// Process all statements
 	for _, stmt := range stmts {
-		selectQuery, ok := stmt.(*datastore.SelectQuery)
+		selectQuery, ok := stmt.(*clickhouse.SelectQuery)
 		if !ok {
 			continue
 		}
@@ -48,7 +48,7 @@ func (e *DatastoreFilterExtractor) Extract(query string) (*FilterResult, error) 
 		topLevelQueries[selectQuery] = true
 
 		// Walk the AST to extract metrics
-		datastore.Walk(selectQuery, func(node datastore.Expr) bool {
+		clickhouse.Walk(selectQuery, func(node clickhouse.Expr) bool {
 			e.fillMetricNamesFromExpr(node, metricNames)
 			return true // Continue traversal
 		})
@@ -58,7 +58,7 @@ func (e *DatastoreFilterExtractor) Extract(query string) (*FilterResult, error) 
 	// then recursively extracting the GROUP BY from the CTEs and subqueries.
 
 	// Build CTE map for all top-level queries
-	cteMap := make(map[string]*datastore.SelectQuery)
+	cteMap := make(map[string]*clickhouse.SelectQuery)
 	for query := range topLevelQueries {
 		e.buildCTEMap(query, cteMap)
 	}
@@ -66,7 +66,7 @@ func (e *DatastoreFilterExtractor) Extract(query string) (*FilterResult, error) 
 	// Extract GROUP BY with aliases and origins from the CTEs and subqueries using recursive approach
 	// Use a map to handle duplicates (last ColumnInfo wins across queries)
 	groupByColumnsMap := make(map[string]ColumnInfo) // column name -> ColumnInfo
-	visited := make(map[*datastore.SelectQuery]bool)
+	visited := make(map[*clickhouse.SelectQuery]bool)
 	for query := range topLevelQueries {
 		columns, err := e.extractGroupByColumns(query, cteMap, visited)
 		if err != nil {
@@ -101,17 +101,17 @@ func (e *DatastoreFilterExtractor) Extract(query string) (*FilterResult, error) 
 // Metric Name Extraction
 // ========================================
 
-// fillMetricNamesFromExpr extracts metric names from various node types
-func (e *DatastoreFilterExtractor) fillMetricNamesFromExpr(node datastore.Expr, metricNames map[string]bool) {
+// fillMetricNamesFromExpr extracts metric names from various node types.
+func (e *ClickHouseFilterExtractor) fillMetricNamesFromExpr(node clickhouse.Expr, metricNames map[string]bool) {
 
 	switch n := node.(type) {
-	case *datastore.BinaryOperation:
+	case *clickhouse.BinaryOperation:
 		e.fillMetricFromBinaryOp(n, metricNames)
 	}
 }
 
-// fillMetricFromBinaryOp extracts metrics from binary operations
-func (e *DatastoreFilterExtractor) fillMetricFromBinaryOp(op *datastore.BinaryOperation, metricNames map[string]bool) {
+// fillMetricFromBinaryOp extracts metrics from binary operations.
+func (e *ClickHouseFilterExtractor) fillMetricFromBinaryOp(op *clickhouse.BinaryOperation, metricNames map[string]bool) {
 	// Check if left side is metric_name column
 	leftCol := e.getColumnName(op.LeftExpr)
 	rightCol := e.getColumnName(op.RightExpr)
@@ -141,12 +141,12 @@ func (e *DatastoreFilterExtractor) fillMetricFromBinaryOp(op *datastore.BinaryOp
 //   - "NOT LIKE", "NOT ILIKE": Negative pattern matching filters
 //   - "OR", "AND": Boolean operators as the Walk function will automatically traverse both sides
 //     of OR/AND operations and extract metrics from each branch. (e.g., metric_name='a' OR metric_name='b')
-func (e *DatastoreFilterExtractor) fillMetricWithBinaryOpConditions(op *datastore.BinaryOperation, valueExpr datastore.Expr, metricNames map[string]bool) {
+func (e *ClickHouseFilterExtractor) fillMetricWithBinaryOpConditions(op *clickhouse.BinaryOperation, valueExpr clickhouse.Expr, metricNames map[string]bool) {
 	switch op.Operation {
-	case datastore.TokenKindSingleEQ, datastore.TokenKindDoubleEQ:
+	case clickhouse.TokenKindSingleEQ, clickhouse.TokenKindDoubleEQ:
 		// metric_name = 'value' or metric_name = any(['a', 'b'])
 		// Skip if value side is a function call (function-wrapped literals are ignored, test case: CH59)
-		if fn, ok := valueExpr.(*datastore.FunctionExpr); ok {
+		if fn, ok := valueExpr.(*clickhouse.FunctionExpr); ok {
 			// Only handle any() function, skip others like lowercase('cpu')
 			if fn.Name != nil && fn.Name.Name == "any" {
 				e.extractInValues(valueExpr, metricNames)
@@ -159,32 +159,32 @@ func (e *DatastoreFilterExtractor) fillMetricWithBinaryOpConditions(op *datastor
 		// metric_name IN ('a', 'b', 'c')
 		// GLOBAL IN behaves the same as IN for metric extraction purposes
 		// Skip if value side is a function call (function-wrapped literals are ignored, test case: CH59)
-		if _, ok := valueExpr.(*datastore.FunctionExpr); !ok {
+		if _, ok := valueExpr.(*clickhouse.FunctionExpr); !ok {
 			e.extractInValues(valueExpr, metricNames)
 		}
 	}
 }
 
-// extractStringLiteral extracts a string literal value from an expression
-func (e *DatastoreFilterExtractor) extractStringLiteral(expr datastore.Expr) string {
+// extractStringLiteral extracts a string literal value from an expression.
+func (e *ClickHouseFilterExtractor) extractStringLiteral(expr clickhouse.Expr) string {
 	switch ex := expr.(type) {
-	case *datastore.StringLiteral:
+	case *clickhouse.StringLiteral:
 		return ex.Literal
 	}
 	return ""
 }
 
-// extractInValues extracts values from IN expressions
-func (e *DatastoreFilterExtractor) extractInValues(expr datastore.Expr, metricNames map[string]bool) {
+// extractInValues extracts values from IN expressions.
+func (e *ClickHouseFilterExtractor) extractInValues(expr clickhouse.Expr, metricNames map[string]bool) {
 	// Find all string literals in the expression
-	strLits := datastore.FindAll(expr, func(node datastore.Expr) bool {
+	strLits := clickhouse.FindAll(expr, func(node clickhouse.Expr) bool {
 		// metric_name passed in `in` condition will be string literal.
-		_, ok := node.(*datastore.StringLiteral)
+		_, ok := node.(*clickhouse.StringLiteral)
 		return ok
 	})
 
 	for _, strLitNode := range strLits {
-		if strLit, ok := strLitNode.(*datastore.StringLiteral); ok {
+		if strLit, ok := strLitNode.(*clickhouse.StringLiteral); ok {
 			// Unquote the string literal
 			val := e.extractStringLiteral(strLit)
 			if val != "" {
@@ -200,8 +200,8 @@ func (e *DatastoreFilterExtractor) extractInValues(expr datastore.Expr, metricNa
 
 // extractGroupByColumns extracts the GROUP BY columns from a query
 // It follows the top-down approach where outer GROUP BY overrides inner GROUP BY in subqueries and CTEs.
-// Returns a slice of ColumnInfo with column names, aliases, and origins
-func (e *DatastoreFilterExtractor) extractGroupByColumns(query *datastore.SelectQuery, cteMap map[string]*datastore.SelectQuery, visited map[*datastore.SelectQuery]bool) ([]ColumnInfo, error) {
+// Returns a slice of ColumnInfo with column names, aliases, and origins.
+func (e *ClickHouseFilterExtractor) extractGroupByColumns(query *clickhouse.SelectQuery, cteMap map[string]*clickhouse.SelectQuery, visited map[*clickhouse.SelectQuery]bool) ([]ColumnInfo, error) {
 	if visited[query] {
 		return nil, nil
 	}
@@ -228,7 +228,7 @@ func (e *DatastoreFilterExtractor) extractGroupByColumns(query *datastore.Select
 			alias := selectAliases[groupByCol] // Will be "" if not in SELECT
 
 			// Extract originExpr by tracing back through queries
-			originVisited := make(map[*datastore.SelectQuery]bool)
+			originVisited := make(map[*clickhouse.SelectQuery]bool)
 			originExpr := e.extractColumnOrigin(groupByCol, query, cteMap, originVisited)
 			originField, err := extractCHOriginFieldFromQuery(fmt.Sprintf("SELECT %s", originExpr))
 			if err != nil {
@@ -255,14 +255,14 @@ func (e *DatastoreFilterExtractor) extractGroupByColumns(query *datastore.Select
 	return nil, nil
 }
 
-// fillGroupsFromGroupByClause extracts GROUP BY columns from a specific GroupByClause and fills the map with the column names
-func (e *DatastoreFilterExtractor) fillGroupsFromGroupByClause(groupByClause *datastore.GroupByClause, groupBy map[string]bool) {
+// fillGroupsFromGroupByClause extracts GROUP BY columns from a specific GroupByClause and fills the map with the column names.
+func (e *ClickHouseFilterExtractor) fillGroupsFromGroupByClause(groupByClause *clickhouse.GroupByClause, groupBy map[string]bool) {
 
 	// Extract GROUP BY expressions properly
 	// Find only the direct child ColumnExprList, not nested ones
 	// We use Find instead of FindAll to get only the first (direct child) ColumnExprList
-	exprListNode, foundList := datastore.Find(groupByClause, func(node datastore.Expr) bool {
-		_, ok := node.(*datastore.ColumnExprList)
+	exprListNode, foundList := clickhouse.Find(groupByClause, func(node clickhouse.Expr) bool {
+		_, ok := node.(*clickhouse.ColumnExprList)
 		return ok
 	})
 
@@ -272,7 +272,7 @@ func (e *DatastoreFilterExtractor) fillGroupsFromGroupByClause(groupByClause *da
 
 	// Note: We only extract from the top-level ColumnExprList.Items to avoid extracting nested parts
 	// This prevents extracting 'timestamp' from 'toDate(timestamp)' - we only get 'toDate(timestamp)'
-	if exprList, ok := exprListNode.(*datastore.ColumnExprList); ok {
+	if exprList, ok := exprListNode.(*clickhouse.ColumnExprList); ok {
 		// Extract each expression from the list - these are top-level only
 		if exprList.Items != nil {
 			for _, item := range exprList.Items {
@@ -299,26 +299,26 @@ func (e *DatastoreFilterExtractor) fillGroupsFromGroupByClause(groupByClause *da
 //   - "region" -> "region"
 //   - "toDate(timestamp)" -> "toDate(timestamp)"
 //   - "`m.region`" -> "`m.region`"
-func (e *DatastoreFilterExtractor) extractColumnStrByExpr(expr datastore.Expr) string {
+func (e *ClickHouseFilterExtractor) extractColumnStrByExpr(expr clickhouse.Expr) string {
 	if expr == nil {
 		return ""
 	}
 
 	switch ex := expr.(type) {
 	// Ident is a simple identifier like "region" or "timestamp"
-	case *datastore.Ident:
-		// Handling for backticks which are native to Datastore and used for literal names.
+	case *clickhouse.Ident:
+		// Handling for backticks which are native to ClickHouse and used for literal names.
 		// CH Parser removes the backticks from the identifier, so we need to add them back.
-		if ex.QuoteType == datastore.BackTicks {
+		if ex.QuoteType == clickhouse.BackTicks {
 			return "`" + ex.Name + "`"
 		}
 		return ex.Name
 	// FunctionExpr is a function call like "toDate(timestamp)"
-	case *datastore.FunctionExpr:
+	case *clickhouse.FunctionExpr:
 		// For function expressions, return the complete function call string
 		return ex.String()
 	// ColumnExpr is a column expression like "m.region", "toDate(timestamp)"
-	case *datastore.ColumnExpr:
+	case *clickhouse.ColumnExpr:
 		// ColumnExpr wraps another expression - extract the underlying expression
 		if ex.Expr != nil {
 			return e.extractColumnStrByExpr(ex.Expr)
@@ -331,9 +331,9 @@ func (e *DatastoreFilterExtractor) extractColumnStrByExpr(expr datastore.Expr) s
 }
 
 // stripTableAlias removes table alias prefix from a column name (e.g., "m.region" -> "region")
-// but for literals with backticks, we need preserve the entire string. (e.g., `os.type` -> "os.type")
-func (e *DatastoreFilterExtractor) stripTableAlias(name string) string {
-	// Handling for backticks which are native to Datastore and used for literal names.
+// but for literals with backticks, we need preserve the entire string. (e.g., `os.type` -> "os.type").
+func (e *ClickHouseFilterExtractor) stripTableAlias(name string) string {
+	// Handling for backticks which are native to ClickHouse and used for literal names.
 	if strings.HasPrefix(name, "`") && strings.HasSuffix(name, "`") {
 		return strings.Trim(name, "`")
 	}
@@ -352,12 +352,12 @@ func (e *DatastoreFilterExtractor) stripTableAlias(name string) string {
 	return name
 }
 
-// getColumnName extracts column name from an expression
-func (e *DatastoreFilterExtractor) getColumnName(expr datastore.Expr) string {
+// getColumnName extracts column name from an expression.
+func (e *ClickHouseFilterExtractor) getColumnName(expr clickhouse.Expr) string {
 	switch ex := expr.(type) {
-	case *datastore.Ident:
+	case *clickhouse.Ident:
 		return ex.Name
-	case *datastore.Path:
+	case *clickhouse.Path:
 		// Handle Path type for qualified column names like "m.metric_name"
 		// Extract the last field which is the column name
 		if len(ex.Fields) > 0 {
@@ -381,15 +381,15 @@ func (e *DatastoreFilterExtractor) getColumnName(expr datastore.Expr) string {
 //		GROUP BY region
 //	 )
 //	 SELECT * FROM aggregated
-func (e *DatastoreFilterExtractor) extractSourceQuery(query *datastore.SelectQuery, cteMap map[string]*datastore.SelectQuery) *datastore.SelectQuery {
+func (e *ClickHouseFilterExtractor) extractSourceQuery(query *clickhouse.SelectQuery, cteMap map[string]*clickhouse.SelectQuery) *clickhouse.SelectQuery {
 	if query.From == nil {
 		return nil
 	}
 
 	// Find the FROM clause and extract the source
-	fromExprs := datastore.FindAll(query.From, func(node datastore.Expr) bool {
+	fromExprs := clickhouse.FindAll(query.From, func(node clickhouse.Expr) bool {
 		switch node.(type) {
-		case *datastore.Ident, *datastore.SelectQuery:
+		case *clickhouse.Ident, *clickhouse.SelectQuery:
 			return true
 		}
 		return false
@@ -397,12 +397,12 @@ func (e *DatastoreFilterExtractor) extractSourceQuery(query *datastore.SelectQue
 
 	for _, fromExpr := range fromExprs {
 		switch expr := fromExpr.(type) {
-		case *datastore.Ident:
+		case *clickhouse.Ident:
 			// CTE reference by simple name
 			if cteQuery, exists := cteMap[expr.Name]; exists {
 				return cteQuery
 			}
-		case *datastore.SelectQuery:
+		case *clickhouse.SelectQuery:
 			// Direct subquery
 			return expr
 		}
@@ -417,12 +417,12 @@ func (e *DatastoreFilterExtractor) extractSourceQuery(query *datastore.SelectQue
 
 // extractColumnOrigin recursively traces a column back to its original expression
 // Returns the original expression string (e.g., "JSONExtractString(labels, 'service.name')")
-// or the column name itself if it's a direct column reference
-func (e *DatastoreFilterExtractor) extractColumnOrigin(
+// or the column name itself if it's a direct column reference.
+func (e *ClickHouseFilterExtractor) extractColumnOrigin(
 	columnName string,
-	query *datastore.SelectQuery,
-	cteMap map[string]*datastore.SelectQuery,
-	visited map[*datastore.SelectQuery]bool,
+	query *clickhouse.SelectQuery,
+	cteMap map[string]*clickhouse.SelectQuery,
+	visited map[*clickhouse.SelectQuery]bool,
 ) string {
 	if query == nil {
 		return columnName
@@ -450,13 +450,13 @@ func (e *DatastoreFilterExtractor) extractColumnOrigin(
 
 	// Step 2: Once we're sure there are no SubQueries and CTE we just find all the selectItem
 	// and then get their column origin values
-	selectItems := datastore.FindAll(query, func(node datastore.Expr) bool {
-		_, ok := node.(*datastore.SelectItem)
+	selectItems := clickhouse.FindAll(query, func(node clickhouse.Expr) bool {
+		_, ok := node.(*clickhouse.SelectItem)
 		return ok
 	})
 
 	// extractOriginFromSelectItem extracts the origin from a SelectItem
-	extractOriginFromSelectItem := func(selectItem *datastore.SelectItem) *string {
+	extractOriginFromSelectItem := func(selectItem *clickhouse.SelectItem) *string {
 		// Check if this SelectItem matches our column (by alias or by name)
 		alias := e.extractSelectItemAlias(selectItem)
 		exprStr := e.extractSelectItemName(selectItem)
@@ -502,7 +502,7 @@ func (e *DatastoreFilterExtractor) extractColumnOrigin(
 
 	var finalColumnOrigin string
 	for _, itemNode := range selectItems {
-		if selectItem, ok := itemNode.(*datastore.SelectItem); ok {
+		if selectItem, ok := itemNode.(*clickhouse.SelectItem); ok {
 			// We call the extractOriginFromSelectItem function for each SelectItem
 			// and if the origin is not nil, we set the finalColumnOrigin to the origin
 			// this has to be done to get to the most nested origin of column where selectItem is present
@@ -519,8 +519,8 @@ func (e *DatastoreFilterExtractor) extractColumnOrigin(
 	return columnName
 }
 
-// extractFullExpression extracts the complete string representation of an expression
-func (e *DatastoreFilterExtractor) extractFullExpression(expr datastore.Expr) string {
+// extractFullExpression extracts the complete string representation of an expression.
+func (e *ClickHouseFilterExtractor) extractFullExpression(expr clickhouse.Expr) string {
 	if expr == nil {
 		return ""
 	}
@@ -528,23 +528,23 @@ func (e *DatastoreFilterExtractor) extractFullExpression(expr datastore.Expr) st
 }
 
 // isSimpleColumnReference checks if an expression is just a simple column reference
-// (not a function call or complex expression)
-func (e *DatastoreFilterExtractor) isSimpleColumnReference(expr datastore.Expr) bool {
+// (not a function call or complex expression).
+func (e *ClickHouseFilterExtractor) isSimpleColumnReference(expr clickhouse.Expr) bool {
 	if expr == nil {
 		return false
 	}
 	switch ex := expr.(type) {
-	case *datastore.Ident:
+	case *clickhouse.Ident:
 		// backticks are treated as non simple column reference
 		// so that we can return the origin expression with backticks
 		// origin parser will handle the backticks and extract the column name from it
-		if ex.QuoteType == datastore.BackTicks {
+		if ex.QuoteType == clickhouse.BackTicks {
 			return false
 		}
 		return true
-	case *datastore.Path:
+	case *clickhouse.Path:
 		return true
-	case *datastore.ColumnExpr:
+	case *clickhouse.ColumnExpr:
 		// Check if it wraps a simple reference
 		if ex.Expr != nil {
 			return e.isSimpleColumnReference(ex.Expr)
@@ -560,8 +560,8 @@ func (e *DatastoreFilterExtractor) isSimpleColumnReference(expr datastore.Expr) 
 // extractSelectColumns extracts column names and their aliases from SELECT clause of a specific query
 // Returns a map where key is normalized column name and value is the alias
 // For duplicate columns with different aliases, the last alias wins
-// This follows the same pattern as extractGroupFromGroupByClause - finding direct children only
-func (e *DatastoreFilterExtractor) extractSelectColumns(query *datastore.SelectQuery) map[string]string {
+// This follows the same pattern as extractGroupFromGroupByClause - finding direct children only.
+func (e *ClickHouseFilterExtractor) extractSelectColumns(query *clickhouse.SelectQuery) map[string]string {
 	aliasMap := make(map[string]string)
 
 	if query == nil {
@@ -570,14 +570,14 @@ func (e *DatastoreFilterExtractor) extractSelectColumns(query *datastore.SelectQ
 
 	// Find SelectItem nodes which represent columns in the SELECT clause
 	// SelectItem has an Expr field (the column/expression) and an Alias field
-	selectItems := datastore.FindAll(query, func(node datastore.Expr) bool {
-		_, ok := node.(*datastore.SelectItem)
+	selectItems := clickhouse.FindAll(query, func(node clickhouse.Expr) bool {
+		_, ok := node.(*clickhouse.SelectItem)
 		return ok
 	})
 
 	// Process each SelectItem and extract column name and alias
 	for _, itemNode := range selectItems {
-		if selectItem, ok := itemNode.(*datastore.SelectItem); ok {
+		if selectItem, ok := itemNode.(*clickhouse.SelectItem); ok {
 			// Extract the column name/expression from SelectItem.Expr
 			columnName := e.extractSelectItemName(selectItem)
 			if columnName == "" {
@@ -598,8 +598,8 @@ func (e *DatastoreFilterExtractor) extractSelectColumns(query *datastore.SelectQ
 	return aliasMap
 }
 
-// extractSelectItemName extracts the column name or expression from a SelectItem
-func (e *DatastoreFilterExtractor) extractSelectItemName(selectItem *datastore.SelectItem) string {
+// extractSelectItemName extracts the column name or expression from a SelectItem.
+func (e *ClickHouseFilterExtractor) extractSelectItemName(selectItem *clickhouse.SelectItem) string {
 	if selectItem == nil || selectItem.Expr == nil {
 		return ""
 	}
@@ -608,8 +608,8 @@ func (e *DatastoreFilterExtractor) extractSelectItemName(selectItem *datastore.S
 }
 
 // extractSelectItemAlias extracts the alias from a SelectItem
-// Returns empty string if no alias is present
-func (e *DatastoreFilterExtractor) extractSelectItemAlias(selectItem *datastore.SelectItem) string {
+// Returns empty string if no alias is present.
+func (e *ClickHouseFilterExtractor) extractSelectItemAlias(selectItem *clickhouse.SelectItem) string {
 	if selectItem == nil || selectItem.Alias == nil {
 		return ""
 	}
@@ -627,8 +627,8 @@ func (e *DatastoreFilterExtractor) extractSelectItemAlias(selectItem *datastore.
 // ========================================
 
 // buildCTEMap builds a map of CTE names to their SelectQuery nodes by recursively
-// traversing all queries and their nested expressions
-func (e *DatastoreFilterExtractor) buildCTEMap(query *datastore.SelectQuery, cteMap map[string]*datastore.SelectQuery) {
+// traversing all queries and their nested expressions.
+func (e *ClickHouseFilterExtractor) buildCTEMap(query *clickhouse.SelectQuery, cteMap map[string]*clickhouse.SelectQuery) {
 
 	// Access CTEs directly from WithClause if it exists
 	if query.With != nil && query.With.CTEs != nil {
@@ -647,50 +647,50 @@ func (e *DatastoreFilterExtractor) buildCTEMap(query *datastore.SelectQuery, cte
 	e.buildCTEMapFromExpr(query, cteMap)
 }
 
-// extractCTEName extracts the CTE name from a CTEStmt, the Expr field is the name of the CTE
-func (e *DatastoreFilterExtractor) extractCTEName(cte *datastore.CTEStmt) string {
+// extractCTEName extracts the CTE name from a CTEStmt, the Expr field is the name of the CTE.
+func (e *ClickHouseFilterExtractor) extractCTEName(cte *clickhouse.CTEStmt) string {
 	if cte == nil || cte.Expr == nil {
 		return ""
 	}
 
 	switch name := cte.Expr.(type) {
-	case *datastore.Ident:
+	case *clickhouse.Ident:
 		return name.Name
 	default:
 		return cte.Expr.String()
 	}
 }
 
-// extractCTEQuery extracts the SelectQuery from a CTEStmt, the Alias field is the SelectQuery
-func (e *DatastoreFilterExtractor) extractCTEQuery(cte *datastore.CTEStmt) *datastore.SelectQuery {
+// extractCTEQuery extracts the SelectQuery from a CTEStmt, the Alias field is the SelectQuery.
+func (e *ClickHouseFilterExtractor) extractCTEQuery(cte *clickhouse.CTEStmt) *clickhouse.SelectQuery {
 	if cte == nil || cte.Alias == nil {
 		return nil
 	}
 
 	// The Alias field should contain a SelectQuery
-	if selectQuery, ok := cte.Alias.(*datastore.SelectQuery); ok {
+	if selectQuery, ok := cte.Alias.(*clickhouse.SelectQuery); ok {
 		return selectQuery
 	}
 
 	return nil
 }
 
-// buildCTEMapFromExpr recursively extracts CTEs from various expression types
-func (e *DatastoreFilterExtractor) buildCTEMapFromExpr(expr datastore.Expr, cteMap map[string]*datastore.SelectQuery) {
+// buildCTEMapFromExpr recursively extracts CTEs from various expression types.
+func (e *ClickHouseFilterExtractor) buildCTEMapFromExpr(expr clickhouse.Expr, cteMap map[string]*clickhouse.SelectQuery) {
 
 	// Walk through all nodes to find SelectQuery nodes that might contain CTEs
-	datastore.Walk(expr, func(node datastore.Expr) bool {
+	clickhouse.Walk(expr, func(node clickhouse.Expr) bool {
 		switch n := node.(type) {
-		case *datastore.SelectQuery:
+		case *clickhouse.SelectQuery:
 			// Don't process the same query we started with to avoid infinite recursion
 			if n != expr {
 				e.buildCTEMap(n, cteMap)
 			}
-		case *datastore.TableExpr:
+		case *clickhouse.TableExpr:
 			if n.Expr != nil {
 				e.buildCTEMapFromExpr(n.Expr, cteMap)
 			}
-		case *datastore.JoinTableExpr:
+		case *clickhouse.JoinTableExpr:
 			if n.Table != nil {
 				e.buildCTEMapFromExpr(n.Table, cteMap)
 			}

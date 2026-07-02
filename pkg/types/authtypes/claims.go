@@ -5,7 +5,6 @@ import (
 	"log/slog"
 
 	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/types"
 )
 
 type claimsKey struct{}

@@ -19,7 +19,7 @@ func BuildQueryRangeParams(messagingQueue *MessagingQueue, queryContext string, 
 	// ToDo: propagate this through APIs when there are different handlers
 	queueType := KafkaQueue
 
-	chq, err := BuildDatastoreQuery(messagingQueue, queueType, queryContext)
+	chq, err := BuildClickHouseQuery(messagingQueue, queueType, queryContext)
 
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func BuildQueryRangeParams(messagingQueue *MessagingQueue, queryContext string, 
 	return queryRangeParams, nil
 }
 
-func buildDatastoreQueryNetwork(messagingQueue *MessagingQueue, queueType string) (*v3.DatastoreQuery, error) {
+func buildClickHouseQueryNetwork(messagingQueue *MessagingQueue, queueType string) (*v3.ClickHouseQuery, error) {
 	start := messagingQueue.Start
 	end := messagingQueue.End
 
@@ -57,7 +57,7 @@ func buildDatastoreQueryNetwork(messagingQueue *MessagingQueue, queueType string
 	}
 
 	query := generateNetworkLatencyThroughputSQL(start, end, consumerGroup, partitionID, queueType)
-	return &v3.DatastoreQuery{
+	return &v3.ClickHouseQuery{
 		Query: query,
 	}, nil
 }
@@ -286,7 +286,7 @@ func BuildQRParamsWithCache(
 	var err error
 
 	if queryContext == "throughput" {
-		chq, err := buildDatastoreQueryNetwork(messagingQueue, queueType)
+		chq, err := buildClickHouseQueryNetwork(messagingQueue, queueType)
 		if err != nil {
 			return nil, err
 		}
@@ -307,7 +307,7 @@ func BuildQRParamsWithCache(
 		start := messagingQueue.Start
 		end := messagingQueue.End
 		query := generateProducerPartitionThroughputSQL(start, end, queueType)
-		cq, err = buildCompositeQuery(&v3.DatastoreQuery{
+		cq, err = buildCompositeQuery(&v3.ClickHouseQuery{
 			Query: query,
 		}, queryContext)
 
@@ -336,11 +336,11 @@ func BuildQRParamsWithCache(
 	return queryRangeParams, err
 }
 
-func BuildDatastoreQuery(
+func BuildClickHouseQuery(
 	messagingQueue *MessagingQueue,
 	queueType string,
 	queryContext string,
-) (*v3.DatastoreQuery, error) {
+) (*v3.ClickHouseQuery, error) {
 
 	start := messagingQueue.Start
 	end := messagingQueue.End
@@ -406,24 +406,24 @@ func BuildDatastoreQuery(
 		query = onboardConsumerSQL(start, end, queueType)
 	}
 
-	return &v3.DatastoreQuery{
+	return &v3.ClickHouseQuery{
 		Query: query,
 	}, nil
 }
 
-func buildCompositeQuery(chq *v3.DatastoreQuery, queryContext string) (*v3.CompositeQuery, error) {
+func buildCompositeQuery(chq *v3.ClickHouseQuery, queryContext string) (*v3.CompositeQuery, error) {
 
 	if queryContext == "producer-consumer-eval" {
 		return &v3.CompositeQuery{
-			QueryType:         v3.QueryTypeDatastoreSQL,
-			DatastoreQueries: map[string]*v3.DatastoreQuery{queryContext: chq},
+			QueryType:         v3.QueryTypeClickHouseSQL,
+			ClickHouseQueries: map[string]*v3.ClickHouseQuery{queryContext: chq},
 			PanelType:         v3.PanelTypeList,
 		}, nil
 	}
 
 	return &v3.CompositeQuery{
-		QueryType:         v3.QueryTypeDatastoreSQL,
-		DatastoreQueries: map[string]*v3.DatastoreQuery{queryContext: chq},
+		QueryType:         v3.QueryTypeClickHouseSQL,
+		ClickHouseQueries: map[string]*v3.ClickHouseQuery{queryContext: chq},
 		PanelType:         v3.PanelTypeTable,
 	}, nil
 }

@@ -6,14 +6,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
-	"github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes/telemetrytypestest"
 	"github.com/stretchr/testify/assert"
-	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/stretchr/testify/require"
 )
 
@@ -47,8 +46,10 @@ func TestTraceTimeRangeOptimization(t *testing.T) {
 		fm,
 		cb,
 		aggExprRewriter,
-		nil, // telemetryStore is nil - optimization won't happen but code path is tested
+		nil, // telemetryStore is nil - adaptive path is disabled
 		fl,
+		false,
+		100000,
 	)
 
 	tests := []struct {
@@ -138,7 +139,7 @@ func TestTraceTimeRangeFinderQuery(t *testing.T) {
 		SELECT 
 			toUnixTimestamp64Nano(min(timestamp)) as start_time,
 			toUnixTimestamp64Nano(max(timestamp)) as end_time
-		FROM observe_traces.distributed_signoz_spans
+		FROM signoz_traces.distributed_signoz_spans
 		WHERE traceID = ?
 		AND timestamp >= now() - INTERVAL 30 DAY
 	`
@@ -149,7 +150,7 @@ func TestTraceTimeRangeFinderQuery(t *testing.T) {
 		SELECT 
 			toUnixTimestamp64Nano(min(timestamp)) as start_time,
 			toUnixTimestamp64Nano(max(timestamp)) as end_time
-		FROM observe_traces.distributed_signoz_spans
+		FROM signoz_traces.distributed_signoz_spans
 		WHERE traceID = ?
 		AND timestamp >= now() - INTERVAL 30 DAY
 	`

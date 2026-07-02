@@ -101,14 +101,14 @@ func TestPrepareFiltersV5(t *testing.T) {
 			name: "special_characters_in_values",
 			labels: map[string]string{
 				"message": "Error: Connection failed",
-				"path":    "/v1/o11y/v1/users",
+				"path":    "/api/v1/users",
 			},
 			whereClause: "",
 			groupByItems: []qbtypes.GroupByKey{
 				{TelemetryFieldKey: telemetrytypes.TelemetryFieldKey{Name: "message"}},
 				{TelemetryFieldKey: telemetrytypes.TelemetryFieldKey{Name: "path"}},
 			},
-			expected:    "message='Error: Connection failed' AND path='/v1/o11y/v1/users'",
+			expected:    "message='Error: Connection failed' AND path='/api/v1/users'",
 			description: "Should quote values with special characters",
 		},
 		{

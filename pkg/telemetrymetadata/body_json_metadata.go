@@ -37,32 +37,14 @@ var (
 // and JSON access plans. parentTypeCache contains parent array types (ArrayJSON/ArrayDynamic)
 // pre-fetched in the main UNION query.
 //
-// searchOperator: LIKE for pattern matching, EQUAL for exact match
-func (t *telemetryMetaStore) fetchBodyJSONPaths(ctx context.Context,
-	fieldKeySelectors []*telemetrytypes.FieldKeySelector) ([]*telemetrytypes.TelemetryFieldKey, []string, bool, error) {
-	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
-		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalLogs.StringValue(),
-		instrumentationtypes.CodeNamespace:    "metadata",
-		instrumentationtypes.CodeFunctionName: "fetchBodyJSONPaths",
-	})
-	query, args, limit := buildGetBodyJSONPathsQuery(fieldKeySelectors)
-	rows, err := t.telemetrystore.ClickhouseDB().Query(ctx, query, args...)
-	if err != nil {
-		return nil, nil, false, errors.WrapInternalf(err, CodeFailExtractBodyJSONKeys, "failed to extract body JSON keys")
-	}
-	defer rows.Close()
-
-	fieldKeys := []*telemetrytypes.TelemetryFieldKey{}
-	paths := []string{}
-	rowCount := 0
-	for rows.Next() {
-		var path string
-		var typesArray []string // Datastore returns array as []string
-		var lastSeen uint64
-
-		err = rows.Scan(&path, &typesArray, &lastSeen)
-		if err != nil {
-			return nil, nil, false, errors.WrapInternalf(err, CodeFailExtractBodyJSONKeys, "failed to scan body JSON key row")
+// NOTE: enrichment can not work with FuzzySelectors; QB requests exact matches for query building so
+// parentTypeCache will actually have proper matches and
+// FuzzyMatching is for Suggestions API so enrichment is not needed.
+func (t *telemetryMetaStore) enrichJSONKeys(ctx context.Context, selectors []*telemetrytypes.FieldKeySelector, keys []*telemetrytypes.TelemetryFieldKey, parentTypeCache map[string][]telemetrytypes.FieldDataType) error {
+	mapOfExactSelectors := make(map[string]*telemetrytypes.FieldKeySelector)
+	for _, selector := range selectors {
+		if selector.SelectorMatchType != telemetrytypes.FieldSelectorMatchTypeExact {
+			continue
 		}
 
 		mapOfExactSelectors[selector.Name] = selector
@@ -456,7 +438,7 @@ func CleanPathPrefixes(path string) string {
 	return path
 }
 
-// PromotePaths inserts promoted paths into the Column Evolution table (same schema as o11y-otel-collector metadata_migrations).
+// PromotePaths inserts promoted paths into the Column Evolution table (same schema as signoz-otel-collector metadata_migrations).
 func (t *telemetryMetaStore) PromotePaths(ctx context.Context, paths ...string) error {
 	ctx = withTelemetryContext(ctx, "PromotePaths")
 	batch, err := t.telemetrystore.ClickhouseDB().PrepareBatch(ctx,

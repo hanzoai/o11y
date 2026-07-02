@@ -110,7 +110,7 @@ func NewPublicDashboardDataFromDashboard(dashboard *Dashboard, publicDashboard *
 					QueryFormulas      []map[string]any `json:"queryFormulas"`
 					QueryTraceOperator []map[string]any `json:"queryTraceOperator"`
 				} `json:"builder"`
-				ClickhouseSQL []map[string]any `json:"datastore_sql"`
+				ClickhouseSQL []map[string]any `json:"clickhouse_sql"`
 				PromQL        []map[string]any `json:"promql"`
 				QueryType     string           `json:"queryType"`
 			} `json:"query"`
@@ -166,10 +166,10 @@ func NewPublicDashboardDataFromDashboard(dashboard *Dashboard, publicDashboard *
 		widget.Query.Builder.QueryTraceOperator = updatedQueryTraceOperator
 
 		updatedClickhouseSQLQuery := []map[string]any{}
-		for _, datastoreSQLQuery := range widget.Query.ClickhouseSQL {
+		for _, clickhouseSQLQuery := range widget.Query.ClickhouseSQL {
 			updatedClickhouseSQLQueryMap := make(map[string]any)
-			updatedClickhouseSQLQueryMap["legend"] = datastoreSQLQuery["legend"]
-			updatedClickhouseSQLQueryMap["name"] = datastoreSQLQuery["name"]
+			updatedClickhouseSQLQueryMap["legend"] = clickhouseSQLQuery["legend"]
+			updatedClickhouseSQLQueryMap["name"] = clickhouseSQLQuery["name"]
 			updatedClickhouseSQLQuery = append(updatedClickhouseSQLQuery, updatedClickhouseSQLQueryMap)
 		}
 		widget.Query.ClickhouseSQL = updatedClickhouseSQLQuery

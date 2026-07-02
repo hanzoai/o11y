@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -8,9 +10,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
+	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
-	"github.com/hanzoai/o11y/pkg/types/roletypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/gorilla/mux"
 )
@@ -19,18 +21,6 @@ const (
 	authzDeniedMessage string = "::AUTHZ-DENIED::"
 )
 
-type AuthZCheckDef struct {
-	Relation         authtypes.Relation
-	Resource         coretypes.Resource
-	SelectorCallback selectorCallbackWithClaimsFn
-	Roles            []string
-}
-
-// AuthZCheckGroup is a set of checks OR'd together.
-// At least one check in the group must pass for the group to pass.
-type AuthZCheckGroup []AuthZCheckDef
-
-type selectorCallbackWithClaimsFn func(*http.Request, authtypes.Claims) ([]coretypes.Selector, error)
 type selectorCallbackWithoutClaimsFn func(*http.Request, []*types.Organization) ([]coretypes.Selector, valuer.UUID, error)
 
 type AuthZ struct {
@@ -56,23 +46,10 @@ func (middleware *AuthZ) ViewAccess(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		commentCtx := ctxtypes.CommentFromContext(ctx)
-		authtype, ok := commentCtx.Map()["auth_type"]
-		if ok && authtype == ctxtypes.AuthTypeAPIKey.StringValue() {
-			if err := claims.IsViewer(); err != nil {
-				middleware.logger.WarnContext(ctx, authzDeniedMessage, "claims", claims)
-				render.Error(rw, err)
-				return
-			}
-
-			next(rw, req)
-			return
-		}
-
-		selectors := []authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yAdminRoleName),
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yEditorRoleName),
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yViewerRoleName),
+		selectors := []coretypes.Selector{
+			coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.SigNozEditorRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.SigNozViewerRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -108,22 +85,9 @@ func (middleware *AuthZ) EditAccess(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		commentCtx := ctxtypes.CommentFromContext(ctx)
-		authtype, ok := commentCtx.Map()["auth_type"]
-		if ok && authtype == ctxtypes.AuthTypeAPIKey.StringValue() {
-			if err := claims.IsEditor(); err != nil {
-				middleware.logger.WarnContext(ctx, authzDeniedMessage, "claims", claims)
-				render.Error(rw, err)
-				return
-			}
-
-			next(rw, req)
-			return
-		}
-
-		selectors := []authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yAdminRoleName),
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yEditorRoleName),
+		selectors := []coretypes.Selector{
+			coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.SigNozEditorRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -159,21 +123,8 @@ func (middleware *AuthZ) AdminAccess(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		commentCtx := ctxtypes.CommentFromContext(ctx)
-		authtype, ok := commentCtx.Map()["auth_type"]
-		if ok && authtype == ctxtypes.AuthTypeAPIKey.StringValue() {
-			if err := claims.IsAdmin(); err != nil {
-				middleware.logger.WarnContext(ctx, authzDeniedMessage, "claims", claims)
-				render.Error(rw, err)
-				return
-			}
-
-			next(rw, req)
-			return
-		}
-
-		selectors := []authtypes.Selector{
-			authtypes.MustNewSelector(authtypes.TypeRole, roletypes.HanzoO11yAdminRoleName),
+		selectors := []coretypes.Selector{
+			coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -240,7 +191,9 @@ func (middleware *AuthZ) OpenAccess(next http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-func (middleware *AuthZ) Check(next http.HandlerFunc, relation authtypes.Relation, typeable coretypes.Resource, cb selectorCallbackWithClaimsFn, roles []string) http.HandlerFunc {
+// CheckResources authorizes every resolved resource for the route. roles are the
+// allowed role names (the OSS role-gate); the resource selectors drive the EE check.
+func (middleware *AuthZ) CheckResources(next http.HandlerFunc, roles ...string) http.HandlerFunc {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
 		claims, err := authtypes.ClaimsFromContext(ctx)
@@ -249,40 +202,7 @@ func (middleware *AuthZ) Check(next http.HandlerFunc, relation authtypes.Relatio
 			return
 		}
 
-		selectors, err := cb(req, claims)
-		if err != nil {
-			render.Error(rw, err)
-			return
-		}
-
-		roleSelectors := []coretypes.Selector{}
-		for _, role := range roles {
-			roleSelectors = append(roleSelectors, coretypes.TypeRole.MustSelector(role))
-		}
-
-		err = middleware.authzService.CheckWithTupleCreation(ctx, claims, valuer.MustNewUUID(claims.OrgID), relation, typeable, selectors, roleSelectors)
-		if err != nil {
-			render.Error(rw, err)
-			return
-		}
-
-		next(rw, req)
-	})
-}
-
-// CheckAll verifies groups of permission checks.
-// Within each group, checks are OR'd (any check passing = group passes).
-// Across groups, results are AND'd (all groups must pass).
-//
-// This model expresses any combination:
-//   - Single check:          []AuthZCheckGroup{{checkA}}
-//   - Pure AND:              []AuthZCheckGroup{{checkA}, {checkB}}
-//   - Cross-resource OR:     []AuthZCheckGroup{{checkA, checkB}}
-//   - Mixed (A OR B) AND C:  []AuthZCheckGroup{{checkA, checkB}, {checkC}}
-func (middleware *AuthZ) CheckAll(next http.HandlerFunc, groups []AuthZCheckGroup) http.HandlerFunc {
-	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
-		ctx := req.Context()
-		claims, err := authtypes.ClaimsFromContext(ctx)
+		resolved, err := coretypes.ResolvedResourcesFromContext(ctx)
 		if err != nil {
 			render.Error(rw, err)
 			return
@@ -290,38 +210,90 @@ func (middleware *AuthZ) CheckAll(next http.HandlerFunc, groups []AuthZCheckGrou
 
 		orgID := valuer.MustNewUUID(claims.OrgID)
 
-		for _, group := range groups {
-			groupPassed := false
-			var lastErr error
+		roleSelectors := make([]coretypes.Selector, len(roles))
+		for idx, role := range roles {
+			roleSelectors[idx] = coretypes.TypeRole.MustSelector(role)
+		}
 
-			for _, check := range group {
-				selectors, err := check.SelectorCallback(req, claims)
-				if err != nil {
+		for _, resource := range resolved {
+			if err := middleware.checkResource(ctx, claims, orgID, resource.Verb(), resource.SourceResource(), resource.SourceIDs(), resource.SourceSelector(), roleSelectors); err != nil {
+				render.Error(rw, err)
+				return
+			}
+
+			target, ok := resource.(coretypes.ResolvedResourceWithTargetResource)
+			if ok && !target.IsParentChild() {
+				if err := middleware.checkResource(ctx, claims, orgID, target.Verb(), target.TargetResource(), target.TargetIDs(), target.TargetSelector(), roleSelectors); err != nil {
 					render.Error(rw, err)
 					return
 				}
-
-				roleSelectors := make([]coretypes.Selector, len(check.Roles))
-				for idx, role := range check.Roles {
-					roleSelectors[idx] = coretypes.TypeRole.MustSelector(role)
-				}
-
-				err = middleware.authzService.CheckWithTupleCreation(ctx, claims, orgID, check.Relation, check.Resource, selectors, roleSelectors)
-				if err == nil {
-					groupPassed = true
-					break
-				}
-				lastErr = err
-			}
-
-			if !groupPassed {
-				render.Error(rw, lastErr)
-				return
 			}
 		}
 
 		next(rw, req)
 	})
+}
+
+func (middleware *AuthZ) checkResource(
+	ctx context.Context,
+	claims authtypes.Claims,
+	orgID valuer.UUID,
+	verb coretypes.Verb,
+	resource coretypes.Resource,
+	ids []string,
+	selector coretypes.SelectorFunc,
+	roleSelectors []coretypes.Selector,
+) error {
+	if selector == nil {
+		return errors.New(errors.TypeInternal, errors.CodeInternal, "resolved resource is missing a selector")
+	}
+
+	for _, id := range ids {
+		selectors, err := selector(ctx, resource, id, orgID)
+		if err != nil {
+			return err
+		}
+
+		err = middleware.authzService.CheckWithTupleCreation(
+			ctx,
+			claims,
+			orgID,
+			authtypes.Relation{Verb: verb},
+			resource,
+			selectors,
+			roleSelectors,
+		)
+		if err == nil {
+			continue
+		}
+
+		if !errors.Asc(err, authtypes.ErrCodeAuthZForbidden) {
+			return err
+		}
+
+		middleware.logger.WarnContext(ctx, authzDeniedMessage, slog.Any("claims", claims))
+		principal := fmt.Sprintf("%s/%s", claims.Principal.StringValue(), claims.IdentityID())
+		if id != "" {
+			return errors.Newf(
+				errors.TypeForbidden,
+				authtypes.ErrCodeAuthZForbidden,
+				"%s is not authorized to perform %s on resource %q",
+				principal,
+				resource.Scope(verb),
+				id,
+			)
+		}
+
+		return errors.Newf(
+			errors.TypeForbidden,
+			authtypes.ErrCodeAuthZForbidden,
+			"%s is not authorized to perform %s",
+			principal,
+			resource.Scope(verb),
+		)
+	}
+
+	return nil
 }
 
 func (middleware *AuthZ) CheckWithoutClaims(next http.HandlerFunc, relation authtypes.Relation, typeable coretypes.Resource, cb selectorCallbackWithoutClaimsFn, roles []string) http.HandlerFunc {

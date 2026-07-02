@@ -1,1 +1,1 @@
-# Hanzo O11y integrations
+# SigNoz integrations

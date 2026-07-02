@@ -4,7 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/hanzoai/o11y/pkg/factory"
-	luxmetric "github.com/luxfi/metric"
+	"github.com/prometheus/client_golang/prometheus"
 	sdkmetric "go.opentelemetry.io/otel/metric"
 	sdkresource "go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/trace"
@@ -13,7 +13,7 @@ import (
 
 // Instrumentation provides the core components for application instrumentation.
 type Instrumentation interface {
-	// Logger returns the slog logger.
+	// Logger returns the Slog logger.
 	Logger() *slog.Logger
 
 	// MeterProvider returns the OpenTelemetry meter provider.
@@ -21,8 +21,10 @@ type Instrumentation interface {
 
 	// TracerProvider returns the OpenTelemetry tracer provider.
 	TracerProvider() sdktrace.TracerProvider
-	// MetricsRegisterer returns the luxfi/metric registerer for application metrics.
-	MetricsRegisterer() luxmetric.Registerer
+
+	// PrometheusRegisterer returns the Prometheus registerer.
+	PrometheusRegisterer() prometheus.Registerer
+
 	// ToProviderSettings converts instrumentation to provider settings.
 	ToProviderSettings() factory.ProviderSettings
 }

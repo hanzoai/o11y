@@ -6,6 +6,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/valuer"
+	"github.com/swaggest/jsonschema-go"
 )
 
 type EvaluationKind struct {

@@ -5,7 +5,7 @@ import (
 	"context"
 
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/common/model"
 )
 
 // NotificationManager defines how alerts should be grouped and configured for notification.

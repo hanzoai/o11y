@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/hanzoai/o11y/pkg/instrumentation"
-	"github.com/hanzoai/o11y"
+	"github.com/hanzoai/o11y/pkg/signoz"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/spf13/cobra"
 )
@@ -13,7 +13,7 @@ import (
 func registerGenerateOpenAPI(parentCmd *cobra.Command) {
 	openapiCmd := &cobra.Command{
 		Use:   "openapi",
-		Short: "Generate OpenAPI schema for HanzoO11y",
+		Short: "Generate OpenAPI schema for SigNoz",
 		RunE: func(currCmd *cobra.Command, args []string) error {
 			return runGenerateOpenAPI(currCmd.Context())
 		},
@@ -23,12 +23,12 @@ func registerGenerateOpenAPI(parentCmd *cobra.Command) {
 }
 
 func runGenerateOpenAPI(ctx context.Context) error {
-	instrumentation, err := instrumentation.New(ctx, instrumentation.Config{Logs: instrumentation.LogsConfig{Level: slog.LevelInfo}}, version.Info, "observe")
+	instrumentation, err := instrumentation.New(ctx, instrumentation.Config{Logs: instrumentation.LogsConfig{Level: slog.LevelInfo}}, version.Info, "signoz")
 	if err != nil {
 		return err
 	}
 
-	openapi, err := o11y.NewOpenAPI(ctx, instrumentation)
+	openapi, err := signoz.NewOpenAPI(ctx, instrumentation)
 	if err != nil {
 		return err
 	}

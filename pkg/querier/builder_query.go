@@ -9,15 +9,14 @@ import (
 	"strings"
 	"time"
 
-	datastore "github.com/ClickHouse/clickhouse-go/v2"
+	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/telemetrylogs"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/bytedance/sonic"
 )
 
 const traceOutsideRangeWarn = "Query %s references a trace_id that exists between %s and %s (UTC) but lies outside the selected time range; adjust the time range to see results"
@@ -32,9 +31,16 @@ type builderQuery[T any] struct {
 	fromMS uint64
 	toMS   uint64
 	kind   qbtypes.RequestType
+
+	builderConfig builderConfig
 }
 
 var _ qbtypes.Query = (*builderQuery[any])(nil)
+var _ qbtypes.StatementProvider = (*builderQuery[any])(nil)
+
+type builderConfig struct {
+	logTraceIDWindowPaddingMS uint64
+}
 
 func newBuilderQuery[T any](
 	logger *slog.Logger,
@@ -44,6 +50,7 @@ func newBuilderQuery[T any](
 	tr qbtypes.TimeRange,
 	kind qbtypes.RequestType,
 	variables map[string]qbtypes.VariableItem,
+	cfg builderConfig,
 ) *builderQuery[T] {
 	return &builderQuery[T]{
 		logger:         logger,
@@ -54,6 +61,7 @@ func newBuilderQuery[T any](
 		fromMS:         tr.From,
 		toMS:           tr.To,
 		kind:           kind,
+		builderConfig:  cfg,
 	}
 }
 
@@ -92,13 +100,22 @@ func (q *builderQuery[T]) Fingerprint() string {
 				if a.ComparisonSpaceAggregationParam != nil {
 					spaceAggParamStr = a.ComparisonSpaceAggregationParam.StringValue()
 				}
-				aggParts = append(aggParts, fmt.Sprintf("%s:%s:%s:%s:%s",
+				part := fmt.Sprintf("%s:%s:%s:%s:%s",
 					a.MetricName,
 					a.Temporality.StringValue(),
 					a.TimeAggregation.StringValue(),
 					a.SpaceAggregation.StringValue(),
 					spaceAggParamStr,
-				))
+				)
+				if a.Reduced {
+					oneDay := uint64(24 * time.Hour.Milliseconds())
+					route := "reduced"
+					if q.toMS-q.fromMS < oneDay && q.fromMS >= uint64(time.Now().UnixMilli())-oneDay {
+						route = "buffer"
+					}
+					part += ":" + route
+				}
+				aggParts = append(aggParts, part)
 			}
 		}
 		parts = append(parts, fmt.Sprintf("aggs=[%s]", strings.Join(aggParts, ",")))
@@ -195,6 +212,11 @@ func (q *builderQuery[T]) isWindowList() bool {
 	return true
 }
 
+// Statement renders the SQL without executing it, for the preview path.
+func (q *builderQuery[T]) Statement(ctx context.Context) (*qbtypes.Statement, error) {
+	return q.stmtBuilder.Build(ctx, q.fromMS, q.toMS, q.kind, q.spec, q.variables)
+}
+
 func (q *builderQuery[T]) Execute(ctx context.Context) (*qbtypes.Result, error) {
 
 	// can we do window based pagination?
@@ -278,9 +300,20 @@ func (q *builderQuery[T]) narrowWindowByTraceID(ctx context.Context, fromMS, toM
 		return fromMS, toMS, true, ""
 	}
 
+	// Logs can be flushed slightly after the span ends. The trace
+	// time range comes from the spans table, so for logs we widen it by the
+	// configured padding before clamping. Keep the actual recorded bounds for
+	// the user-facing warning so it reports where the trace truly lies, not the
+	// padded range.
+	actualStartMS, actualEndMS := traceStartMS, traceEndMS
+	if q.spec.Signal == telemetrytypes.SignalLogs {
+		traceStartMS -= q.builderConfig.logTraceIDWindowPaddingMS
+		traceEndMS += q.builderConfig.logTraceIDWindowPaddingMS
+	}
+
 	if traceStartMS > toMS || traceEndMS < fromMS {
-		traceStartUTC := time.UnixMilli(int64(traceStartMS)).UTC().Format(time.RFC3339)
-		traceEndUTC := time.UnixMilli(int64(traceEndMS)).UTC().Format(time.RFC3339)
+		traceStartUTC := time.UnixMilli(int64(actualStartMS)).UTC().Format(time.RFC3339)
+		traceEndUTC := time.UnixMilli(int64(actualEndMS)).UTC().Format(time.RFC3339)
 		return fromMS, toMS, false, fmt.Sprintf(traceOutsideRangeWarn, q.spec.Name, traceStartUTC, traceEndUTC)
 	}
 	if traceStartMS > fromMS {
@@ -325,7 +358,7 @@ func (q *builderQuery[T]) executeWithContext(ctx context.Context, query string, 
 	totalBytes := uint64(0)
 	elapsed := time.Duration(0)
 
-	ctx = datastore.Context(ctx, datastore.WithProgress(func(p *datastore.Progress) {
+	ctx = clickhouse.Context(ctx, clickhouse.WithProgress(func(p *clickhouse.Progress) {
 		totalRows += p.Rows
 		totalBytes += p.Bytes
 		elapsed += p.Elapsed
@@ -362,6 +395,15 @@ func (q *builderQuery[T]) executeWithContext(ctx context.Context, query string, 
 	payload, err := consume(rows, kind, queryWindow, q.spec.StepInterval, q.spec.Name)
 	if err != nil {
 		return nil, err
+	}
+
+	// TODO: This should move to readAsRaw function in consume.go but for now we are keeping it here since it's only relevant for traces
+	if q.spec.Signal == telemetrytypes.SignalTraces {
+		if raw, ok := payload.(*qbtypes.RawData); ok {
+			for _, rr := range raw.Rows {
+				mergeSpanAttributeColumns(rr.Data)
+			}
+		}
 	}
 
 	return &qbtypes.Result{
@@ -401,7 +443,7 @@ func (q *builderQuery[T]) executeWindowList(ctx context.Context) (*qbtypes.Resul
 		reqLimit = 10_000 // sane upper-bound default
 	}
 	offsetLeft := q.spec.Offset
-	need := reqLimit + offsetLeft // rows to fetch from Datastore
+	need := reqLimit + offsetLeft // rows to fetch from ClickHouse
 
 	var rows []*qbtypes.RawRow
 

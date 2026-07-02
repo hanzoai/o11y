@@ -28,19 +28,27 @@ type SettingsConfig struct {
 }
 
 type PosthogConfig struct {
-	Enabled bool `mapstructure:"enabled"`
+	Enabled bool   `mapstructure:"enabled"`
+	Key     string `mapstructure:"key"`
+	APIHost string `mapstructure:"api_host"`
+	UIHost  string `mapstructure:"ui_host"`
 }
 
 type AppcuesConfig struct {
-	Enabled bool `mapstructure:"enabled"`
+	Enabled bool   `mapstructure:"enabled"`
+	AppID   string `mapstructure:"app_id"`
 }
 
 type SentryConfig struct {
-	Enabled bool `mapstructure:"enabled"`
+	Enabled bool   `mapstructure:"enabled"`
+	DSN     string `mapstructure:"dsn"`
+	Tunnel  string `mapstructure:"tunnel"`
 }
 
 type PylonConfig struct {
-	Enabled bool `mapstructure:"enabled"`
+	Enabled        bool   `mapstructure:"enabled"`
+	AppID          string `mapstructure:"app_id"`
+	IdentitySecret string `mapstructure:"identity_secret"`
 }
 
 func NewConfigFactory() factory.ConfigFactory {
@@ -50,8 +58,22 @@ func NewConfigFactory() factory.ConfigFactory {
 func newConfig() factory.Config {
 	return &Config{
 		Enabled:   true,
-		Prefix:    "/",
-		Directory: "/etc/o11y/web",
+		Index:     "index.html",
+		Directory: "/etc/signoz/web",
+		Settings: SettingsConfig{
+			Posthog: PosthogConfig{
+				Enabled: false,
+			},
+			Appcues: AppcuesConfig{
+				Enabled: false,
+			},
+			Sentry: SentryConfig{
+				Enabled: false,
+			},
+			Pylon: PylonConfig{
+				Enabled: false,
+			},
+		},
 	}
 }
 

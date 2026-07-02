@@ -18,9 +18,6 @@ import (
 	texttpl "text/template"
 
 	"golang.org/x/text/cases"
-
-	"github.com/hanzoai/o11y/pkg/query-service/common"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/times"
 )
 
 // this file contains all the methods and structs

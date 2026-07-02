@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/prometheus/alertmanager/notify"

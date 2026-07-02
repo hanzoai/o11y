@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes/telemetrytypestest"
-	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/stretchr/testify/require"
 )
 

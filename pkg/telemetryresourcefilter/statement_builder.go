@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/huandu/go-sqlbuilder"
 )
 
@@ -37,30 +39,19 @@ var (
 
 func New[T any](
 	settings factory.ProviderSettings,
-	fieldMapper qbtypes.FieldMapper,
-	conditionBuilder qbtypes.ConditionBuilder,
-	metadataStore telemetrytypes.MetadataStore,
-) *resourceFilterStatementBuilder[qbtypes.TraceAggregation] {
-	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter")
-	return &resourceFilterStatementBuilder[qbtypes.TraceAggregation]{
-		logger:           set.Logger(),
-		fieldMapper:      fieldMapper,
-		conditionBuilder: conditionBuilder,
-		metadataStore:    metadataStore,
-		signal:           telemetrytypes.SignalTraces,
-	}
-}
-
-func NewLogResourceFilterStatementBuilder(
-	settings factory.ProviderSettings,
-	fieldMapper qbtypes.FieldMapper,
-	conditionBuilder qbtypes.ConditionBuilder,
+	dbName string,
+	tableName string,
+	signal telemetrytypes.Signal,
+	source telemetrytypes.Source,
 	metadataStore telemetrytypes.MetadataStore,
 	fullTextColumn *telemetrytypes.TelemetryFieldKey,
 	jsonKeyToKey qbtypes.JsonKeyToFieldFunc,
-) *resourceFilterStatementBuilder[qbtypes.LogAggregation] {
-	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querybuilder/resourcefilter")
-	return &resourceFilterStatementBuilder[qbtypes.LogAggregation]{
+	fl flagger.Flagger,
+) *resourceFilterStatementBuilder[T] {
+	set := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/telemetryresourcefilter")
+	fm := NewFieldMapper()
+	cb := NewConditionBuilder(fm)
+	return &resourceFilterStatementBuilder[T]{
 		logger:           set.Logger(),
 		dbName:           dbName,
 		tableName:        tableName,
@@ -133,6 +124,25 @@ func (b *resourceFilterStatementBuilder[T]) Build(
 	return &qbtypes.Statement{
 		Query: stmt,
 		Args:  args,
+	}, nil
+}
+
+// BuildCount returns a statement that counts the distinct fingerprints matching
+// the resource filter. Returns (nil, nil) when the filter is a no-op.
+func (b *resourceFilterStatementBuilder[T]) BuildCount(
+	ctx context.Context,
+	start uint64,
+	end uint64,
+	query qbtypes.QueryBuilderQuery[T],
+	variables map[string]qbtypes.VariableItem,
+) (*qbtypes.Statement, error) {
+	inner, err := b.Build(ctx, start, end, qbtypes.RequestTypeRaw, query, variables)
+	if err != nil || inner == nil {
+		return nil, err
+	}
+	return &qbtypes.Statement{
+		Query: fmt.Sprintf("SELECT count() FROM (%s)", inner.Query),
+		Args:  inner.Args,
 	}, nil
 }
 

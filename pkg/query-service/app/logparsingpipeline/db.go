@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"log/slog"
+
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
@@ -13,7 +15,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"go.uber.org/zap"
 )
 
 // Repo handles DDL and DML ops on ingestion pipeline

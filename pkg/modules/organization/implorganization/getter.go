@@ -3,6 +3,7 @@ package implorganization
 import (
 	"context"
 
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/sharder"
 	"github.com/hanzoai/o11y/pkg/types"

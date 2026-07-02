@@ -2,8 +2,9 @@ package tracefunnel
 
 import (
 	"context"
-	"github.com/hanzoai/o11y/pkg/valuer"
 	"net/http"
+
+	"github.com/hanzoai/o11y/pkg/valuer"
 
 	traceFunnels "github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
 )

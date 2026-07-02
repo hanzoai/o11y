@@ -34,14 +34,14 @@ var tracesOperatorMappingV3 = map[v3.FilterOperator]string{
 	v3.FilterOperatorNotILike:        "NOT ILIKE",
 }
 
-func getDatastoreTracesColumnType(columnType v3.AttributeKeyType) string {
+func getClickHouseTracesColumnType(columnType v3.AttributeKeyType) string {
 	if columnType == v3.AttributeKeyTypeResource {
 		return "resources"
 	}
 	return "attributes"
 }
 
-func getDatastoreTracesColumnDataType(columnDataType v3.AttributeKeyDataType) string {
+func getClickHouseTracesColumnDataType(columnDataType v3.AttributeKeyDataType) string {
 	if columnDataType == v3.AttributeKeyDataTypeFloat64 || columnDataType == v3.AttributeKeyDataTypeInt64 {
 		return "number"
 	}
@@ -71,8 +71,8 @@ func getColumnName(key v3.AttributeKey, replaceAlias bool) string {
 	}
 
 	if !key.IsColumn {
-		keyType := getDatastoreTracesColumnType(key.Type)
-		keyDType := getDatastoreTracesColumnDataType(key.DataType)
+		keyType := getClickHouseTracesColumnType(key.Type)
+		keyDType := getClickHouseTracesColumnDataType(key.DataType)
 		return fmt.Sprintf("%s_%s['%s']", keyType, keyDType, key.Key)
 	}
 
@@ -127,7 +127,7 @@ func BuildTracesFilterQuery(fs *v3.FilterSet, skipAllowed bool) (string, error) 
 				}
 			}
 			if val != nil {
-				fmtVal = utils.DatastoreFormattedValue(val)
+				fmtVal = utils.ClickHouseFormattedValue(val)
 			}
 			if operator, ok := tracesOperatorMappingV3[item.Operator]; ok {
 				switch item.Operator {
@@ -145,8 +145,8 @@ func BuildTracesFilterQuery(fs *v3.FilterSet, skipAllowed bool) (string, error) 
 						}
 						conditions = append(conditions, subQuery)
 					} else {
-						cType := getDatastoreTracesColumnType(item.Key.Type)
-						cDataType := getDatastoreTracesColumnDataType(item.Key.DataType)
+						cType := getClickHouseTracesColumnType(item.Key.Type)
+						cDataType := getClickHouseTracesColumnDataType(item.Key.DataType)
 						col := fmt.Sprintf("%s_%s", cType, cDataType)
 						conditions = append(conditions, fmt.Sprintf(operator, col, item.Key.Key))
 					}
@@ -195,7 +195,7 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 	var orderBy []string
 
 	for _, item := range items {
-		if item.ColumnName == constants.HanzoO11yOrderByValue {
+		if item.ColumnName == constants.SigNozOrderByValue {
 			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order))
 		} else if _, ok := tagLookup[item.ColumnName]; ok {
 			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
@@ -247,7 +247,7 @@ func buildSpanScopeQuery(fs *v3.FilterSet) (string, error) {
 			query = "parent_span_id = '' "
 			return query, nil
 		} else if keyName == constants.SpanSearchScopeEntryPoint {
-			query = "((name, `resource_string_service$$name`) GLOBAL IN ( SELECT DISTINCT name, serviceName from " + constants.O11Y_TRACE_DBNAME + "." + constants.O11Y_TOP_LEVEL_OPERATIONS_TABLENAME + " )) AND parent_span_id != '' "
+			query = "((name, `resource_string_service$$name`) GLOBAL IN ( SELECT DISTINCT name, serviceName from " + constants.SIGNOZ_TRACE_DBNAME + "." + constants.SIGNOZ_TOP_LEVEL_OPERATIONS_TABLENAME + " )) AND parent_span_id != '' "
 			return query, nil
 		} else {
 			return "", fmt.Errorf("invalid scope item type: %s", item.Key.Type)
@@ -282,7 +282,7 @@ func buildTracesQuery(start, end, step int64, mq *v3.BuilderQuery, panelType v3.
 		filterSubQuery = filterSubQuery + " AND " + emptyValuesInGroupByFilter
 	}
 
-	resourceSubQuery, err := resource.BuildResourceSubQuery("observe_traces", "distributed_traces_v3_resource", bucketStart, bucketEnd, mq.Filters, mq.GroupBy, mq.AggregateAttribute, false)
+	resourceSubQuery, err := resource.BuildResourceSubQuery("signoz_traces", "distributed_traces_v3_resource", bucketStart, bucketEnd, mq.Filters, mq.GroupBy, mq.AggregateAttribute, false)
 	if err != nil {
 		return "", err
 	}
@@ -320,20 +320,20 @@ func buildTracesQuery(start, end, step int64, mq *v3.BuilderQuery, panelType v3.
 				orderBySpanCount = true
 			}
 			if !orderBySpanCount {
-				withSubQuery := fmt.Sprintf(constants.TracesExplorerViewSQLSelectWithSubQuery, constants.O11Y_TRACE_DBNAME, constants.O11Y_SPAN_INDEX_V3_LOCAL_TABLENAME, timeFilter)
+				withSubQuery := fmt.Sprintf(constants.TracesExplorerViewSQLSelectWithSubQuery, constants.SIGNOZ_TRACE_DBNAME, constants.SIGNOZ_SPAN_INDEX_V3_LOCAL_TABLENAME, timeFilter)
 				afterSubQuery := tracesV3.AddLimitToQuery(constants.TracesExplorerViewSQLSelectAfterSubQuery, mq.Limit)
 				if mq.Offset != 0 {
 					afterSubQuery = tracesV3.AddOffsetToQuery(afterSubQuery, mq.Offset)
 				}
-				query = fmt.Sprintf(constants.TracesExplorerViewSQLSelectBeforeSubQuery, constants.O11Y_TRACE_DBNAME, constants.O11Y_SPAN_INDEX_V3, timeFilter, filterSubQuery) + withSubQuery + ")" + afterSubQuery
+				query = fmt.Sprintf(constants.TracesExplorerViewSQLSelectBeforeSubQuery, constants.SIGNOZ_TRACE_DBNAME, constants.SIGNOZ_SPAN_INDEX_V3, timeFilter, filterSubQuery) + withSubQuery + ")" + afterSubQuery
 			} else {
 				withSubQueryWithLimits := tracesV3.AddLimitToQuery(constants.TracesExplorerSpanCountWithSubQuery, mq.Limit)
-				withSubQuery := fmt.Sprintf(withSubQueryWithLimits, constants.O11Y_TRACE_DBNAME, constants.O11Y_SPAN_INDEX_V3_LOCAL_TABLENAME, timeFilter, filterSubQuery)
+				withSubQuery := fmt.Sprintf(withSubQueryWithLimits, constants.SIGNOZ_TRACE_DBNAME, constants.SIGNOZ_SPAN_INDEX_V3_LOCAL_TABLENAME, timeFilter, filterSubQuery)
 				afterSubQuery := tracesV3.AddLimitToQuery(constants.TraceExplorerSpanCountAfterSubQuery, mq.Limit)
 				if mq.Offset != 0 {
 					afterSubQuery = tracesV3.AddOffsetToQuery(afterSubQuery, mq.Offset)
 				}
-				query = fmt.Sprintf(constants.TraceExplorerSpanCountBeforeSubQuery, constants.O11Y_TRACE_DBNAME, constants.O11Y_SPAN_INDEX_V3) + withSubQuery + ") " + fmt.Sprintf(afterSubQuery, constants.O11Y_TRACE_DBNAME, constants.O11Y_SPAN_INDEX_V3, timeFilter)
+				query = fmt.Sprintf(constants.TraceExplorerSpanCountBeforeSubQuery, constants.SIGNOZ_TRACE_DBNAME, constants.SIGNOZ_SPAN_INDEX_V3) + withSubQuery + ") " + fmt.Sprintf(afterSubQuery, constants.SIGNOZ_TRACE_DBNAME, constants.SIGNOZ_SPAN_INDEX_V3, timeFilter)
 			}
 			// adding this to avoid the distributed product mode error which doesn't allow global in
 			query += " settings distributed_product_mode='allow', max_memory_usage=10000000000"
@@ -343,7 +343,7 @@ func buildTracesQuery(start, end, step int64, mq *v3.BuilderQuery, panelType v3.
 			}
 			selectLabels = getSelectLabels(mq.SelectColumns)
 			// add it to the select labels
-			queryNoOpTmpl := fmt.Sprintf("SELECT timestamp as timestamp_datetime, span_id as spanID, trace_id as traceID,%s ", selectLabels) + "from " + constants.O11Y_TRACE_DBNAME + "." + constants.O11Y_SPAN_INDEX_V3 + " where %s %s" + "%s"
+			queryNoOpTmpl := fmt.Sprintf("SELECT timestamp as timestamp_datetime, span_id as spanID, trace_id as traceID,%s ", selectLabels) + "from " + constants.SIGNOZ_TRACE_DBNAME + "." + constants.SIGNOZ_SPAN_INDEX_V3 + " where %s %s" + "%s"
 			query = fmt.Sprintf(queryNoOpTmpl, timeFilter, filterSubQuery, orderBy)
 		} else {
 			return "", fmt.Errorf("unsupported aggregate operator %s for panelType %s", mq.AggregateOperator, panelType)
@@ -384,7 +384,7 @@ func buildTracesQuery(start, end, step int64, mq *v3.BuilderQuery, panelType v3.
 
 	queryTmpl = queryTmpl + selectLabels +
 		" %s as value " +
-		"from " + constants.O11Y_TRACE_DBNAME + "." + constants.O11Y_SPAN_INDEX_V3 +
+		"from " + constants.SIGNOZ_TRACE_DBNAME + "." + constants.SIGNOZ_SPAN_INDEX_V3 +
 		" where " + timeFilter + "%s" +
 		"%s%s" +
 		"%s"
@@ -441,8 +441,8 @@ func buildTracesQuery(start, end, step int64, mq *v3.BuilderQuery, panelType v3.
 					filterSubQuery = fmt.Sprintf("%s AND %s", filterSubQuery, subQuery)
 				}
 			} else {
-				cType := getDatastoreTracesColumnType(mq.AggregateAttribute.Type)
-				cDataType := getDatastoreTracesColumnDataType(mq.AggregateAttribute.DataType)
+				cType := getClickHouseTracesColumnType(mq.AggregateAttribute.Type)
+				cDataType := getClickHouseTracesColumnDataType(mq.AggregateAttribute.DataType)
 				filterSubQuery = fmt.Sprintf("%s AND mapContains(%s_%s, '%s')", filterSubQuery, cType, cDataType, mq.AggregateAttribute.Key)
 			}
 		}

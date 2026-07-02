@@ -7,9 +7,10 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/errors"
 
+	"github.com/uptrace/bun/migrate"
+
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
-	"github.com/uptrace/bun/migrate"
 )
 
 var (

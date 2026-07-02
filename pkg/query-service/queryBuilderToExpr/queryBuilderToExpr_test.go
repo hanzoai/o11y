@@ -334,7 +334,7 @@ func TestExpressionVSEntry(t *testing.T) {
 			ExpectedMatches: []int{0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17},
 		},
 		// body.log.message exists/nexists: expr checks "log.message" in fromJSON(body); nested key
-		// semantics depend on o11y stanza helper. Omitted here to avoid coupling to env shape.
+		// semantics depend on signoz stanza helper. Omitted here to avoid coupling to env shape.
 		{
 			Name: "body top-level key exists (body.msg)",
 			Query: &v3.FilterSet{Operator: "AND", Items: []v3.FilterItem{

@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"strconv"
 
+	signozerrors "github.com/hanzoai/o11y/pkg/errors"
 	basemodel "github.com/hanzoai/o11y/pkg/query-service/model"
-	"go.uber.org/zap"
 )
 
 // SmartTraceAlgorithm is an algorithm to find the target span and build a tree of spans around it with the given levelUp and levelDown parameters and the given spanLimit

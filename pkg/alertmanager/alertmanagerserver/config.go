@@ -6,7 +6,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/prometheus/alertmanager/config"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/common/model"
 )
 
 type Config struct {
@@ -81,7 +81,7 @@ func NewConfig() Config {
 			// Corresponds to the default in upstream (https://github.com/prometheus/alertmanager/blob/3b06b97af4d146e141af92885a185891eb79a5b0/config/config.go#L727)
 			ResolveTimeout: model.Duration(5 * time.Minute),
 			SMTPHello:      "localhost",
-			SMTPFrom:       "alertmanager@observe.hanzo.ai",
+			SMTPFrom:       "alertmanager@signoz.io",
 			SMTPSmarthost:  config.HostPort{Host: "localhost", Port: "25"},
 			SMTPRequireTLS: true,
 		},

@@ -3,7 +3,7 @@ package telemetrytraces
 import (
 	"strings"
 
-	grammar "github.com/hanzoai/o11y/pkg/parser/grammar"
+	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	"github.com/antlr4-go/antlr/v4"
 )
 

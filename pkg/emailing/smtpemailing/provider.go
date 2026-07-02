@@ -6,6 +6,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/emailing"
 	"github.com/hanzoai/o11y/pkg/emailing/templatestore/filetemplatestore"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/smtp/client"
 	"github.com/hanzoai/o11y/pkg/types/emailtypes"

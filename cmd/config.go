@@ -7,11 +7,17 @@ import (
 	"github.com/hanzoai/o11y/pkg/config"
 	"github.com/hanzoai/o11y/pkg/config/envprovider"
 	"github.com/hanzoai/o11y/pkg/config/fileprovider"
-	"github.com/hanzoai/o11y"
+	"github.com/hanzoai/o11y/pkg/signoz"
 )
 
-func NewHanzoO11yConfig(ctx context.Context, logger *slog.Logger, flags o11y.DeprecatedFlags) (o11y.Config, error) {
-	config, err := o11y.NewConfig(
+func NewSigNozConfig(ctx context.Context, logger *slog.Logger, configFiles []string) (signoz.Config, error) {
+	uris := make([]string, 0, len(configFiles)+1)
+	for _, f := range configFiles {
+		uris = append(uris, "file:"+f)
+	}
+	uris = append(uris, "env:")
+
+	config, err := signoz.NewConfig(
 		ctx,
 		logger,
 		config.ResolverConfig{
@@ -23,7 +29,7 @@ func NewHanzoO11yConfig(ctx context.Context, logger *slog.Logger, flags o11y.Dep
 		},
 	)
 	if err != nil {
-		return o11y.Config{}, err
+		return signoz.Config{}, err
 	}
 
 	return config, nil

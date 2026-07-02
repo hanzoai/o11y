@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/hanzoai/o11y/pkg/errors"
-	grammar "github.com/hanzoai/o11y/pkg/parser/grammar"
+	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/antlr4-go/antlr/v4"
 )

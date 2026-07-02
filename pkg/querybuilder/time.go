@@ -209,8 +209,8 @@ func AssignReservedVars(vars map[string]any, start, end uint64) {
 	vars["end_timestamp"] = end / 1_000_000_000
 	vars["start_timestamp_ms"] = start / 1_000_000
 	vars["end_timestamp_ms"] = end / 1_000_000
-	vars["O11Y_START_TIME"] = start / 1_000_000
-	vars["O11Y_END_TIME"] = end / 1_000_000
+	vars["SIGNOZ_START_TIME"] = start / 1_000_000
+	vars["SIGNOZ_END_TIME"] = end / 1_000_000
 	vars["start_timestamp_nano"] = start
 	vars["end_timestamp_nano"] = end
 	vars["start_datetime"] = fmt.Sprintf("toDateTime(%d)", start/1_000_000_000)

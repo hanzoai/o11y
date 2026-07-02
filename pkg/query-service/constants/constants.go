@@ -23,10 +23,7 @@ const SpanSearchScopeRoot = "isroot"
 const SpanSearchScopeEntryPoint = "isentrypoint"
 const OrderBySpanCount = "span_count"
 
-// Deprecated: Use the new emailing service instead
-var InviteEmailTemplate = GetOrDefaultEnv("INVITE_EMAIL_TEMPLATE", "/root/templates/invitation_email.gotmpl")
-
-var MetricsExplorerClickhouseThreads = GetOrDefaultEnvInt("METRICS_EXPLORER_DATASTORE_THREADS", 8)
+var MetricsExplorerClickhouseThreads = GetOrDefaultEnvInt("METRICS_EXPLORER_CLICKHOUSE_THREADS", 8)
 var UpdatedMetricsMetadataCachePrefix = GetOrDefaultEnv("METRICS_UPDATED_METADATA_CACHE_KEY", "UPDATED_METRICS_METADATA")
 
 const NormalizedMetricsMapCacheKey = "NORMALIZED_METRICS_MAP_CACHE_KEY"
@@ -96,38 +93,38 @@ var GroupByColMap = map[string]struct{}{
 }
 
 const (
-	O11Y_METRIC_DBNAME                       = "observe_metrics"
-	O11Y_SAMPLES_V4_LOCAL_TABLENAME          = "samples_v4"
-	O11Y_SAMPLES_V4_TABLENAME                = "distributed_samples_v4"
-	O11Y_SAMPLES_V4_AGG_5M_TABLENAME         = "distributed_samples_v4_agg_5m"
-	O11Y_SAMPLES_V4_AGG_30M_TABLENAME        = "distributed_samples_v4_agg_30m"
-	O11Y_EXP_HISTOGRAM_TABLENAME             = "distributed_exp_hist"
-	O11Y_EXP_HISTOGRAM_LOCAL_TABLENAME       = "exp_hist"
-	O11Y_TRACE_DBNAME                        = "observe_traces"
-	O11Y_SPAN_INDEX_TABLENAME                = "distributed_observe_index_v2"
-	O11Y_SPAN_INDEX_V3                       = "distributed_observe_index_v3"
-	O11Y_SPAN_INDEX_LOCAL_TABLENAME          = "observe_index_v2"
-	O11Y_SPAN_INDEX_V3_LOCAL_TABLENAME       = "observe_index_v3"
-	O11Y_TIMESERIES_v4_LOCAL_TABLENAME       = "time_series_v4"
-	O11Y_TIMESERIES_V4_TABLENAME             = "distributed_time_series_v4"
-	O11Y_TIMESERIES_v4_6HRS_LOCAL_TABLENAME  = "time_series_v4_6hrs"
-	O11Y_TIMESERIES_v4_1DAY_LOCAL_TABLENAME  = "time_series_v4_1day"
-	O11Y_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME = "time_series_v4_1week"
-	O11Y_TIMESERIES_v4_1DAY_TABLENAME        = "distributed_time_series_v4_1day"
-	O11Y_TOP_LEVEL_OPERATIONS_TABLENAME      = "distributed_top_level_operations"
-	O11Y_TIMESERIES_v4_TABLENAME             = "distributed_time_series_v4"
-	O11Y_TIMESERIES_v4_1WEEK_TABLENAME       = "distributed_time_series_v4_1week"
-	O11Y_TIMESERIES_v4_6HRS_TABLENAME        = "distributed_time_series_v4_6hrs"
-	O11Y_ATTRIBUTES_METADATA_TABLENAME       = "distributed_attributes_metadata"
-	O11Y_ATTRIBUTES_METADATA_LOCAL_TABLENAME = "attributes_metadata"
-	O11Y_METADATA_TABLENAME                  = "distributed_metadata"
-	O11Y_METADATA_LOCAL_TABLENAME            = "metadata"
+	SIGNOZ_METRIC_DBNAME                       = "signoz_metrics"
+	SIGNOZ_SAMPLES_V4_LOCAL_TABLENAME          = "samples_v4"
+	SIGNOZ_SAMPLES_V4_TABLENAME                = "distributed_samples_v4"
+	SIGNOZ_SAMPLES_V4_AGG_5M_TABLENAME         = "distributed_samples_v4_agg_5m"
+	SIGNOZ_SAMPLES_V4_AGG_30M_TABLENAME        = "distributed_samples_v4_agg_30m"
+	SIGNOZ_EXP_HISTOGRAM_TABLENAME             = "distributed_exp_hist"
+	SIGNOZ_EXP_HISTOGRAM_LOCAL_TABLENAME       = "exp_hist"
+	SIGNOZ_TRACE_DBNAME                        = "signoz_traces"
+	SIGNOZ_SPAN_INDEX_TABLENAME                = "distributed_signoz_index_v2"
+	SIGNOZ_SPAN_INDEX_V3                       = "distributed_signoz_index_v3"
+	SIGNOZ_SPAN_INDEX_LOCAL_TABLENAME          = "signoz_index_v2"
+	SIGNOZ_SPAN_INDEX_V3_LOCAL_TABLENAME       = "signoz_index_v3"
+	SIGNOZ_TIMESERIES_v4_LOCAL_TABLENAME       = "time_series_v4"
+	SIGNOZ_TIMESERIES_V4_TABLENAME             = "distributed_time_series_v4"
+	SIGNOZ_TIMESERIES_v4_6HRS_LOCAL_TABLENAME  = "time_series_v4_6hrs"
+	SIGNOZ_TIMESERIES_v4_1DAY_LOCAL_TABLENAME  = "time_series_v4_1day"
+	SIGNOZ_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME = "time_series_v4_1week"
+	SIGNOZ_TIMESERIES_v4_1DAY_TABLENAME        = "distributed_time_series_v4_1day"
+	SIGNOZ_TOP_LEVEL_OPERATIONS_TABLENAME      = "distributed_top_level_operations"
+	SIGNOZ_TIMESERIES_v4_TABLENAME             = "distributed_time_series_v4"
+	SIGNOZ_TIMESERIES_v4_1WEEK_TABLENAME       = "distributed_time_series_v4_1week"
+	SIGNOZ_TIMESERIES_v4_6HRS_TABLENAME        = "distributed_time_series_v4_6hrs"
+	SIGNOZ_ATTRIBUTES_METADATA_TABLENAME       = "distributed_attributes_metadata"
+	SIGNOZ_ATTRIBUTES_METADATA_LOCAL_TABLENAME = "attributes_metadata"
+	SIGNOZ_METADATA_TABLENAME                  = "distributed_metadata"
+	SIGNOZ_METADATA_LOCAL_TABLENAME            = "metadata"
 )
 
 // alert related constants
 const (
 	// AlertHelpPage is used in case default alert repo url is not set
-	AlertHelpPage   = "https://observe.hanzo.ai/docs/userguide/alerts-management/#generator-url"
+	AlertHelpPage   = "https://signoz.io/docs/userguide/alerts-management/#generator-url"
 	AlertTimeFormat = "2006-01-02 15:04:05"
 )
 
@@ -227,7 +224,7 @@ const (
 )
 
 // ReservedColumnTargetAliases identifies result value from a user
-// written datastore query. The column alias indcate which value is
+// written clickhouse query. The column alias indcate which value is
 // to be considered as final result (or target)
 var ReservedColumnTargetAliases = map[string]struct{}{
 	"__result": {},
@@ -239,7 +236,7 @@ var ReservedColumnTargetAliases = map[string]struct{}{
 
 // logsPPLPfx is a short constant for logsPipelinePrefix
 // TODO(Raj): Remove old prefix after new processor based pipelines have been rolled out
-const LogsPPLPfx = "o11ylogspipeline/pipeline_"
+const LogsPPLPfx = "signozlogspipeline/pipeline_"
 const OldLogsPPLPfx = "logstransform/pipeline_"
 
 const IntegrationPipelineIdPrefix = "integration"
@@ -305,7 +302,7 @@ var StaticFieldsLogsV3 = map[string]v3.AttributeKey{
 	},
 }
 
-const HanzoO11yOrderByValue = "#O11Y_VALUE"
+const SigNozOrderByValue = "#SIGNOZ_VALUE"
 
 const TIMESTAMP = "timestamp"
 

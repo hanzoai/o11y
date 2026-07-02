@@ -4,9 +4,9 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/http/binding"
+	"github.com/hanzoai/o11y/pkg/types/exporttypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/stretchr/testify/assert"
 )
 

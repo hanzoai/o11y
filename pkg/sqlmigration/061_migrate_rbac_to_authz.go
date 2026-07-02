@@ -8,7 +8,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
-	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/oklog/ulid/v2"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect"
@@ -20,10 +20,10 @@ type migrateRbacToAuthz struct {
 }
 
 var (
-	existingRoleToHanzoO11yManagedRoleMap = map[string]string{
-		"ADMIN":  "o11y-admin",
-		"EDITOR": "o11y-editor",
-		"VIEWER": "o11y-viewer",
+	existingRoleToSigNozManagedRoleMap = map[string]string{
+		"ADMIN":  "signoz-admin",
+		"EDITOR": "signoz-editor",
+		"VIEWER": "signoz-viewer",
 	}
 )
 
@@ -59,7 +59,7 @@ func (migration *migrateRbacToAuthz) Up(ctx context.Context, db *bun.DB) error {
 
 	// for upgrades from version where authz service wasn't introduced the store won't be present, hence we need to ensure store exists.
 	var storeID string
-	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "observe").Scan(&storeID)
+	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "signoz").Scan(&storeID)
 	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
@@ -67,7 +67,7 @@ func (migration *migrateRbacToAuthz) Up(ctx context.Context, db *bun.DB) error {
 		// based on openfga ids to avoid any scan issues.
 		// ref: https://github.com/openfga/openfga/blob/main/pkg/server/commands/create_store.go#L45
 		storeID = ulid.Make().String()
-		_, err := tx.ExecContext(ctx, `INSERT INTO store (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)`, storeID, "observe", time.Now().UTC(), time.Now().UTC())
+		_, err := tx.ExecContext(ctx, `INSERT INTO store (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)`, storeID, "signoz", time.Now().UTC(), time.Now().UTC())
 		if err != nil {
 			return err
 		}
@@ -111,7 +111,7 @@ func (migration *migrateRbacToAuthz) Up(ctx context.Context, db *bun.DB) error {
 				return err
 			}
 
-			managedRole, ok := existingRoleToHanzoO11yManagedRoleMap[role]
+			managedRole, ok := existingRoleToSigNozManagedRoleMap[role]
 			if !ok {
 				return errors.Newf(errors.TypeInternal, errors.CodeInternal, "invalid role assignment: %s for user_id: %s", role, id)
 			}
@@ -127,7 +127,7 @@ func (migration *migrateRbacToAuthz) Up(ctx context.Context, db *bun.DB) error {
 			OrgID:    orgID,
 			ID:       coretypes.AnonymousUser.StringValue(),
 			Type:     "anonymous",
-			RoleName: "o11y-anonymous",
+			RoleName: "signoz-anonymous",
 		})
 
 	}

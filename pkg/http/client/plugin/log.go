@@ -89,7 +89,7 @@ func redactSensitiveHeaders(headers http.Header) http.Header {
 	sensitiveHeaders := map[string]bool{
 		"Authorization":          true,
 		"Cookie":                 true,
-		"X-O11y-Cloud-Api-Key": true,
+		"X-Signoz-Cloud-Api-Key": true,
 	}
 
 	safeHeaders := make(http.Header)
