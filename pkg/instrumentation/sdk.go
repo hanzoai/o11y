@@ -57,7 +57,15 @@ func New(ctx context.Context, cfg Config, build version.Build, serviceName strin
 
 	// Prepare the resource configuration by merging
 	// resource and attributes.
-	sch := semconv.SchemaURL
+	//
+	// Derive the schema URL from the detected resource itself rather than a
+	// hard-pinned semconv version: contrib's NewSDK merges this against
+	// resource.Default(), and OTEL rejects a merge of two non-empty, differing
+	// schema URLs. Pinning semconv/vX here silently conflicts with whatever
+	// schema the otel/sdk in go.mod ships (skewed by the SigNoz re-sync), which
+	// crashes New() with "conflicting Schema URL". Sourcing it from the resource
+	// we actually built keeps it correct across otel bumps.
+	sch := resource.SchemaURL()
 	configResource := contribsdkconfig.Resource{
 		Attributes: mergeAttributes(cfg.Resource.Attributes, resource),
 		Detectors:  nil,
