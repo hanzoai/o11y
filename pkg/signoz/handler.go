@@ -22,6 +22,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/fields/implfields"
 	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
 	"github.com/hanzoai/o11y/pkg/modules/inframonitoring/implinframonitoring"
+	"github.com/hanzoai/o11y/pkg/modules/llmobs"
+	"github.com/hanzoai/o11y/pkg/modules/llmobs/impllmobs"
 	"github.com/hanzoai/o11y/pkg/modules/llmpricingrule"
 	"github.com/hanzoai/o11y/pkg/modules/llmpricingrule/impllmpricingrule"
 	"github.com/hanzoai/o11y/pkg/modules/metricreductionrule"
@@ -84,6 +86,7 @@ type Handlers struct {
 	TraceDetail             tracedetail.Handler
 	RulerHandler            ruler.Handler
 	LLMPricingRuleHandler   llmpricingrule.Handler
+	LLMObsHandler           llmobs.Handler
 	StatsHandler            statsreporter.Handler
 }
 
@@ -132,6 +135,7 @@ func NewHandlers(
 		TraceDetail:             impltracedetail.NewHandler(modules.TraceDetail),
 		RulerHandler:            signozruler.NewHandler(rulerService),
 		LLMPricingRuleHandler:   impllmpricingrule.NewHandler(modules.LLMPricingRule),
+		LLMObsHandler:           impllmobs.NewHandler(modules.LLMObs),
 		StatsHandler:            statsreporter.NewHandler(statsAggregator),
 	}
 }

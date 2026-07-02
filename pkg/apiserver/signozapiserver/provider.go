@@ -17,6 +17,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/fields"
 	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
+	"github.com/hanzoai/o11y/pkg/modules/llmobs"
 	"github.com/hanzoai/o11y/pkg/modules/llmpricingrule"
 	"github.com/hanzoai/o11y/pkg/modules/metricreductionrule"
 	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer"
@@ -73,6 +74,7 @@ type provider struct {
 	traceDetailHandler         tracedetail.Handler
 	rulerHandler               ruler.Handler
 	llmPricingRuleHandler      llmpricingrule.Handler
+	llmObsHandler              llmobs.Handler
 	statsHandler               statsreporter.Handler
 }
 
@@ -108,6 +110,7 @@ func NewFactory(
 	traceDetailHandler tracedetail.Handler,
 	rulerHandler ruler.Handler,
 	statsHandler statsreporter.Handler,
+	llmObsHandler llmobs.Handler,
 ) factory.ProviderFactory[apiserver.APIServer, apiserver.Config] {
 	return factory.NewProviderFactory(factory.MustNewName("signoz"), func(ctx context.Context, providerSettings factory.ProviderSettings, config apiserver.Config) (apiserver.APIServer, error) {
 		return newProvider(
@@ -145,6 +148,7 @@ func NewFactory(
 			traceDetailHandler,
 			rulerHandler,
 			statsHandler,
+			llmObsHandler,
 		)
 	})
 }
@@ -184,6 +188,7 @@ func newProvider(
 	traceDetailHandler tracedetail.Handler,
 	rulerHandler ruler.Handler,
 	statsHandler statsreporter.Handler,
+	llmObsHandler llmobs.Handler,
 ) (apiserver.APIServer, error) {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/apiserver/signozapiserver")
 	router := mux.NewRouter().UseEncodedPath()
@@ -221,6 +226,7 @@ func newProvider(
 		traceDetailHandler:         traceDetailHandler,
 		rulerHandler:               rulerHandler,
 		llmPricingRuleHandler:      llmPricingRuleHandler,
+		llmObsHandler:              llmObsHandler,
 		statsHandler:               statsHandler,
 	}
 
@@ -339,6 +345,10 @@ func (provider *provider) AddToRouter(router *mux.Router) error {
 	}
 
 	if err := provider.addLLMPricingRuleRoutes(router); err != nil {
+		return err
+	}
+
+	if err := provider.addLLMObsRoutes(router); err != nil {
 		return err
 	}
 
