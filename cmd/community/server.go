@@ -12,9 +12,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/auditor"
 	"github.com/hanzoai/o11y/pkg/authn"
 	"github.com/hanzoai/o11y/pkg/authz"
-	"github.com/hanzoai/o11y/pkg/authz/openfgaauthz"
-	"github.com/hanzoai/o11y/pkg/authz/openfgaschema"
-	"github.com/hanzoai/o11y/pkg/authz/openfgaserver"
+	"github.com/hanzoai/o11y/pkg/authz/iamauthz"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
@@ -95,13 +93,10 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		func(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
 			return signoz.NewAuthNs(ctx, providerSettings, store, licensing, config.Global)
 		},
-		func(ctx context.Context, sqlstore sqlstore.SQLStore, config authz.Config, _ licensing.Licensing, _ []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error) {
-			openfgaDataStore, err := openfgaserver.NewSQLStore(sqlstore, config)
-			if err != nil {
-				return nil, err
-			}
-
-			return openfgaauthz.NewProviderFactory(sqlstore, openfgaschema.NewSchema().Get(ctx), openfgaDataStore, authtypes.NewRegistry()), nil
+		func(_ context.Context, sqlstore sqlstore.SQLStore, _ authz.Config, _ licensing.Licensing, _ []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error) {
+			// Hanzo IAM is the sole authorization provider — every decision is
+			// delegated to IAM's Casbin enforce endpoint. No OpenFGA, no fallback.
+			return iamauthz.NewProviderFactory(sqlstore), nil
 		},
 		func(store sqlstore.SQLStore, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser, _ querier.Querier, _ licensing.Licensing, tagModule tag.Module) dashboard.Module {
 			return impldashboard.NewModule(impldashboard.NewStore(store), settings, analytics, orgGetter, queryParser, tagModule)

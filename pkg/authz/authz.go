@@ -8,7 +8,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 )
 
 type AuthZ interface {
@@ -21,14 +20,14 @@ type AuthZ interface {
 	CheckWithTupleCreationWithoutClaims(context.Context, valuer.UUID, authtypes.Relation, coretypes.Resource, []coretypes.Selector, []coretypes.Selector) error
 
 	// BatchCheck accepts a map of ID → tuple and returns a map of ID → authorization result.
-	BatchCheck(context.Context, map[string]*openfgav1.TupleKey) (map[string]*authtypes.TupleKeyAuthorization, error)
+	BatchCheck(context.Context, map[string]*authtypes.TupleKey) (map[string]*authtypes.TupleKeyAuthorization, error)
 
 	// CheckTransactions checks whether the given subject is authorized for the given transactions.
 	// Returns results in the same order as the input transactions.
 	CheckTransactions(ctx context.Context, subject string, orgID valuer.UUID, transactions []*authtypes.Transaction) ([]*authtypes.TransactionWithAuthorization, error)
 
 	// Write accepts the insertion tuples and the deletion tuples.
-	Write(context.Context, []*openfgav1.TupleKey, []*openfgav1.TupleKey) error
+	Write(context.Context, []*authtypes.TupleKey, []*authtypes.TupleKey) error
 
 	// Lists the selectors for objects assigned to subject (s) with relation (r) on resource (s)
 	ListObjects(context.Context, string, authtypes.Relation, coretypes.Type) ([]*coretypes.Object, error)
@@ -82,7 +81,7 @@ type AuthZ interface {
 	CreateManagedUserRoleTransactions(context.Context, valuer.UUID, valuer.UUID) error
 
 	// ReadTuples reads tuples from the authorization server matching the given tuple key filter.
-	ReadTuples(context.Context, *openfgav1.ReadRequestTupleKey) ([]*openfgav1.TupleKey, error)
+	ReadTuples(context.Context, *authtypes.ReadRequestTupleKey) ([]*authtypes.TupleKey, error)
 }
 
 // OnBeforeRoleDelete is a callback invoked before a role is deleted.
