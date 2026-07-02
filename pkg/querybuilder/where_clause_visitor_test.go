@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	grammar "github.com/hanzoai/o11y/pkg/parser/grammar"
+	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/antlr4-go/antlr/v4"
@@ -171,7 +171,7 @@ func TestVisitKey(t *testing.T) {
 			},
 			expectedKeys:       []telemetrytypes.TelemetryFieldKey{},
 			expectedErrors:     []string{"key `unknown_key` not found"},
-			expectedMainErrURL: "https://observe.hanzo.ai/docs/userguide/search-troubleshooting/#key-fieldname-not-found",
+			expectedMainErrURL: "https://signoz.io/docs/userguide/search-troubleshooting/#key-fieldname-not-found",
 			expectedWarnings:   nil,
 			expectedMainWrnURL: "",
 		},
@@ -202,7 +202,7 @@ func TestVisitKey(t *testing.T) {
 			expectedErrors:     nil,
 			expectedMainErrURL: "",
 			expectedWarnings:   []string{"ambiguous"},
-			expectedMainWrnURL: "https://observe.hanzo.ai/docs/userguide/field-context-data-types/",
+			expectedMainWrnURL: "https://signoz.io/docs/userguide/field-context-data-types/",
 		},
 		// Context prefixed keys tests
 		{
@@ -353,7 +353,7 @@ func TestVisitKey(t *testing.T) {
 			ignoreNotFoundKeys: false,
 			expectedKeys:       []telemetrytypes.TelemetryFieldKey{},
 			expectedErrors:     []string{"key `unknown_key` not found"},
-			expectedMainErrURL: "https://observe.hanzo.ai/docs/userguide/search-troubleshooting/#key-fieldname-not-found",
+			expectedMainErrURL: "https://signoz.io/docs/userguide/search-troubleshooting/#key-fieldname-not-found",
 			expectedWarnings:   nil,
 			expectedMainWrnURL: "",
 		},
@@ -405,7 +405,7 @@ func TestVisitKey(t *testing.T) {
 			expectedErrors:     nil,
 			expectedMainErrURL: "",
 			expectedWarnings:   []string{"ambiguous"},
-			expectedMainWrnURL: "https://observe.hanzo.ai/docs/userguide/field-context-data-types/",
+			expectedMainWrnURL: "https://signoz.io/docs/userguide/field-context-data-types/",
 		},
 		{
 			name:    "Ambiguous key with different data types",
@@ -439,7 +439,7 @@ func TestVisitKey(t *testing.T) {
 			expectedErrors:     nil,
 			expectedMainErrURL: "",
 			expectedWarnings:   []string{"ambiguous"},
-			expectedMainWrnURL: "https://observe.hanzo.ai/docs/userguide/field-context-data-types/",
+			expectedMainWrnURL: "https://signoz.io/docs/userguide/field-context-data-types/",
 		},
 		// These 3 unit tests have both attibute.custom_field and custom_field in the map
 		{
@@ -538,7 +538,7 @@ func TestVisitKey(t *testing.T) {
 			expectedErrors:     nil,
 			expectedMainErrURL: "",
 			expectedWarnings:   []string{"ambiguous"},
-			expectedMainWrnURL: "https://observe.hanzo.ai/docs/userguide/field-context-data-types/",
+			expectedMainWrnURL: "https://signoz.io/docs/userguide/field-context-data-types/",
 		},
 		// Resource attribute ambiguity - resource context is preferred
 		{
@@ -568,7 +568,7 @@ func TestVisitKey(t *testing.T) {
 			expectedErrors:     nil,
 			expectedMainErrURL: "",
 			expectedWarnings:   []string{"ambiguous", "attribute.deployment.environment"},
-			expectedMainWrnURL: "https://observe.hanzo.ai/docs/userguide/field-context-data-types/",
+			expectedMainWrnURL: "https://signoz.io/docs/userguide/field-context-data-types/",
 		},
 	}
 

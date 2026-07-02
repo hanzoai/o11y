@@ -1,3 +1,3 @@
-### Monitor AWS Lambda with Hanzo O11y
+### Monitor AWS Lambda with SigNoz
 
 Collect key AWS Lambda metrics and view them with an out of the box dashboard.

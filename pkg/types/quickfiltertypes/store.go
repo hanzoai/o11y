@@ -2,6 +2,7 @@ package quickfiltertypes
 
 import (
 	"context"
+
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 

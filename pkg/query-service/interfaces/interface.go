@@ -5,17 +5,17 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/query-service/model"
-	"github.com/hanzoai/o11y/pkg/query-service/model/metrics_explorer"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/querycache"
+	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
+	"github.com/prometheus/prometheus/promql"
+	"github.com/prometheus/prometheus/util/stats"
 )
 
 type Reader interface {
-	// PromQL entrypoints — retained for ABI shape; this build returns
-	// ErrorBadData ("promql not supported; use datastore SQL").
-	GetInstantQueryMetricsResult(ctx context.Context, query *model.InstantQueryMetricsParams) (any, any, *model.ApiError)
-	GetQueryRangeResult(ctx context.Context, query *model.QueryRangeParams) (any, any, *model.ApiError)
+	GetInstantQueryMetricsResult(ctx context.Context, query *model.InstantQueryMetricsParams) (*promql.Result, *stats.QueryStats, *model.ApiError)
+	GetQueryRangeResult(ctx context.Context, query *model.QueryRangeParams) (*promql.Result, *stats.QueryStats, *model.ApiError)
 	GetTopLevelOperations(ctx context.Context, start, end time.Time, services []string) (*map[string][]string, *model.ApiError)
 	GetEntryPointOperations(ctx context.Context, query *model.GetTopOperationsParams) (*[]model.TopOperationsItem, error)
 	GetServices(ctx context.Context, query *model.GetServicesParams) (*[]model.ServiceItem, *model.ApiError)
@@ -28,7 +28,7 @@ type Reader interface {
 	GetCustomRetentionTTL(ctx context.Context, orgID string) (*retentiontypes.GetCustomRetentionTTLResponse, error)
 
 	// GetDisks returns a list of disks configured in the underlying DB. It is supported by
-	// datastore only.
+	// clickhouse only.
 	GetDisks(ctx context.Context) (*[]model.DiskItem, *model.ApiError)
 	GetTraceAggregateAttributes(ctx context.Context, req *v3.AggregateAttributeRequest) (*v3.AggregateAttributeResponse, error)
 	GetTraceAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error)
@@ -43,23 +43,20 @@ type Reader interface {
 
 	// Search Interfaces
 	SearchTraces(ctx context.Context, params *model.SearchTracesParams) (*[]model.SearchSpansResult, error)
-	GetWaterfallSpansForTraceWithMetadata(ctx context.Context, orgID valuer.UUID, traceID string, req *model.GetWaterfallSpansForTraceWithMetadataParams) (*model.GetWaterfallSpansForTraceWithMetadataResponse, error)
-	GetFlamegraphSpansForTrace(ctx context.Context, orgID valuer.UUID, traceID string, req *model.GetFlamegraphSpansForTraceParams) (*model.GetFlamegraphSpansForTraceResponse, error)
-
 	// Setter Interfaces
 	SetTTL(ctx context.Context, orgID string, ttlParams *retentiontypes.TTLParams) (*retentiontypes.SetTTLResponseItem, *model.ApiError)
 	SetTTLV2(ctx context.Context, orgID string, params *retentiontypes.CustomRetentionTTLParams) (*retentiontypes.CustomRetentionTTLResponse, error)
 
 	FetchTemporality(ctx context.Context, orgID valuer.UUID, metricNames []string) (map[string]map[v3.Temporality]bool, error)
-	GetMetricAggregateAttributes(ctx context.Context, orgID valuer.UUID, req *v3.AggregateAttributeRequest, skipO11yMetrics bool) (*v3.AggregateAttributeResponse, error)
+	GetMetricAggregateAttributes(ctx context.Context, orgID valuer.UUID, req *v3.AggregateAttributeRequest, skipSignozMetrics bool) (*v3.AggregateAttributeResponse, error)
 	GetMeterAggregateAttributes(ctx context.Context, orgID valuer.UUID, req *v3.AggregateAttributeRequest) (*v3.AggregateAttributeResponse, error)
-	GetMetricAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error)
+	GetMetricAttributeKeys(ctx context.Context, orgID valuer.UUID, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error)
 	GetMeterAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error)
-	GetMetricAttributeValues(ctx context.Context, req *v3.FilterAttributeValueRequest) (*v3.FilterAttributeValueResponse, error)
+	GetMetricAttributeValues(ctx context.Context, orgID valuer.UUID, req *v3.FilterAttributeValueRequest) (*v3.FilterAttributeValueResponse, error)
 
 	// Returns `MetricStatus` for latest received metric among `metricNames`. Useful for status calculations
 	GetLatestReceivedMetric(
-		ctx context.Context, metricNames []string, labelValues map[string]string,
+		ctx context.Context, orgID valuer.UUID, metricNames []string, labelValues map[string]string,
 	) (*model.MetricStatus, *model.ApiError)
 
 	// QB V3 metrics/traces/logs
@@ -78,7 +75,7 @@ type Reader interface {
 	) (*v3.QBFilterSuggestionsResponse, *model.ApiError)
 
 	QueryDashboardVars(ctx context.Context, query string) (*model.DashboardVar, error)
-	CheckDatastore(ctx context.Context) error
+	CheckClickHouse(ctx context.Context) error
 
 	GetMetricMetadata(context.Context, valuer.UUID, string, string) (*v3.MetricMetadataResponse, error)
 
@@ -110,7 +107,7 @@ type Reader interface {
 	UpdateMetricsMetadata(ctx context.Context, orgID valuer.UUID, req *model.UpdateMetricsMetadata) *model.ApiError
 	GetUpdatedMetricsMetadata(ctx context.Context, orgID valuer.UUID, metricNames ...string) (map[string]*model.UpdateMetricsMetadata, *model.ApiError)
 
-	CheckForLabelsInMetric(ctx context.Context, metricName string, labels []string) (bool, *model.ApiError)
+	CheckForLabelsInMetric(ctx context.Context, orgID valuer.UUID, metricName string, labels []string) (bool, *model.ApiError)
 	GetNormalizedStatus(ctx context.Context, orgID valuer.UUID, metricNames []string) (map[string]bool, error)
 }
 

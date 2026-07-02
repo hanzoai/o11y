@@ -31,7 +31,7 @@ func TestSortRows(t *testing.T) {
 				{Name: "A"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "asc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "asc"}}},
 			},
 			queryNames: []string{"A"},
 			expected: []*v3.TableRow{
@@ -52,7 +52,7 @@ func TestSortRows(t *testing.T) {
 				{Name: "A"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "desc"}}},
 			},
 			queryNames: []string{"A"},
 			expected: []*v3.TableRow{
@@ -96,8 +96,8 @@ func TestSortRows(t *testing.T) {
 				{Name: "B"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "asc"}}},
-				"B": {OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "asc"}}},
+				"B": {OrderBy: []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "desc"}}},
 			},
 			queryNames: []string{"A", "B"},
 			expected: []*v3.TableRow{
@@ -108,7 +108,7 @@ func TestSortRows(t *testing.T) {
 			},
 		},
 		{
-			name: "Sort with HanzoO11yOrderByValue",
+			name: "Sort with SigNozOrderByValue",
 			rows: []*v3.TableRow{
 				{Data: map[string]interface{}{"service": "service1", "A": 20.0}},
 				{Data: map[string]interface{}{"service": "service2", "A": 10.0}},
@@ -119,7 +119,7 @@ func TestSortRows(t *testing.T) {
 				{Name: "A"},
 			},
 			builderQueries: map[string]*v3.BuilderQuery{
-				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.HanzoO11yOrderByValue, Order: "desc"}}},
+				"A": {OrderBy: []v3.OrderBy{{ColumnName: constants.SigNozOrderByValue, Order: "desc"}}},
 			},
 			queryNames: []string{"A"},
 			expected: []*v3.TableRow{
@@ -307,7 +307,7 @@ func TestSortRowsStability(t *testing.T) {
 	}
 }
 
-func TestTransformToTableForDatastoreQueries(t *testing.T) {
+func TestTransformToTableForClickHouseQueries(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    []*v3.Result
@@ -547,17 +547,17 @@ func TestTransformToTableForDatastoreQueries(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := TransformToTableForDatastoreQueries(tt.input)
+			result := TransformToTableForClickHouseQueries(tt.input)
 			exp, _ := json.Marshal(tt.expected)
 			got, _ := json.Marshal(result)
 			if !bytes.Equal(got, exp) {
-				t.Errorf("TransformToTableForDatastoreQueries() = %v, want %v", string(got), string(exp))
+				t.Errorf("TransformToTableForClickHouseQueries() = %v, want %v", string(got), string(exp))
 			}
 		})
 	}
 }
 
-func TestTransformToTableForDatastoreQueriesSorting(t *testing.T) {
+func TestTransformToTableForClickHouseQueriesSorting(t *testing.T) {
 	input := []*v3.Result{
 		{
 			QueryName: "B",
@@ -603,10 +603,10 @@ func TestTransformToTableForDatastoreQueriesSorting(t *testing.T) {
 		},
 	}
 
-	result := TransformToTableForDatastoreQueries(input)
+	result := TransformToTableForClickHouseQueries(input)
 	exp, _ := json.Marshal(expected)
 	got, _ := json.Marshal(result)
 	if !bytes.Equal(got, exp) {
-		t.Errorf("TransformToTableForDatastoreQueries() sorting test failed. Got %v, want %v", string(got), string(exp))
+		t.Errorf("TransformToTableForClickHouseQueries() sorting test failed. Got %v, want %v", string(got), string(exp))
 	}
 }

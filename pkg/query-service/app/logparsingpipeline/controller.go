@@ -8,19 +8,22 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/google/uuid"
+
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
-	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	"github.com/hanzoai/o11y/pkg/types/opamptypes"
 	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/google/uuid"
 
 	"log/slog"
 )
@@ -212,7 +215,7 @@ func (ic *LogParsingPipelineController) ValidatePipelines(ctx context.Context,
 		})
 	}
 
-	sampleLogs := []model.O11yLog{{Body: ""}}
+	sampleLogs := []model.SignozLog{{Body: ""}}
 	_, _, err := SimulatePipelinesProcessing(ctx, gettablePipelines, sampleLogs)
 	return err
 }
@@ -329,11 +332,11 @@ func (ic *LogParsingPipelineController) GetPipelinesByVersion(
 
 type PipelinesPreviewRequest struct {
 	Pipelines []pipelinetypes.GettablePipeline `json:"pipelines"`
-	Logs      []model.O11yLog                `json:"logs"`
+	Logs      []model.SignozLog                `json:"logs"`
 }
 
 type PipelinesPreviewResponse struct {
-	OutputLogs    []model.O11yLog `json:"logs"`
+	OutputLogs    []model.SignozLog `json:"logs"`
 	CollectorLogs []string          `json:"collectorLogs"`
 }
 

@@ -7,87 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
-
-func TestIsAllQueriesDisabled(t *testing.T) {
-	testCases := []*v3.CompositeQuery{
-		{
-			BuilderQueries: map[string]*v3.BuilderQuery{
-				"query1": {
-					Disabled: true,
-				},
-				"query2": {
-					Disabled: true,
-				},
-			},
-			QueryType: v3.QueryTypeBuilder,
-		},
-		nil,
-		{
-			QueryType: v3.QueryTypeBuilder,
-		},
-		{
-			QueryType: v3.QueryTypeBuilder,
-			BuilderQueries: map[string]*v3.BuilderQuery{
-				"query1": {
-					Disabled: true,
-				},
-				"query2": {
-					Disabled: false,
-				},
-			},
-		},
-		{
-			QueryType: v3.QueryTypePromQL,
-		},
-		{
-			QueryType: v3.QueryTypePromQL,
-			PromQueries: map[string]*v3.PromQuery{
-				"query3": {
-					Disabled: false,
-				},
-			},
-		},
-		{
-			QueryType: v3.QueryTypePromQL,
-			PromQueries: map[string]*v3.PromQuery{
-				"query3": {
-					Disabled: true,
-				},
-			},
-		},
-		{
-			QueryType: v3.QueryTypeDatastoreSQL,
-		},
-		{
-			QueryType: v3.QueryTypeDatastoreSQL,
-			DatastoreQueries: map[string]*v3.DatastoreQuery{
-				"query4": {
-					Disabled: false,
-				},
-			},
-		},
-		{
-			QueryType: v3.QueryTypeDatastoreSQL,
-			DatastoreQueries: map[string]*v3.DatastoreQuery{
-				"query4": {
-					Disabled: true,
-				},
-			},
-		},
-	}
-
-	expectedResult := []bool{true, false, false, false, false, false, true, false, false, true}
-
-	for index, compositeQuery := range testCases {
-		expected := expectedResult[index]
-		actual := isAllQueriesDisabled(compositeQuery)
-		if actual != expected {
-			t.Errorf("Expected %v, but got %v", expected, actual)
-		}
-	}
-}
 
 func TestParseIntoRule(t *testing.T) {
 	tests := []struct {

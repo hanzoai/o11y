@@ -10,12 +10,10 @@ import (
 
 	"github.com/prometheus/alertmanager/config"
 
-	o11yError "github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/query-service/model"
-	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/times"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/timestamp"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -207,8 +205,8 @@ func (ns *NotificationSettings) UnmarshalJSON(data []byte) error {
 
 	// Validate states after unmarshaling
 	for _, state := range ns.Renotify.AlertStates {
-		if state != model.StateFiring && state != model.StateNoData {
-			return o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "invalid alert state: %s", state)
+		if state != StateFiring && state != StateNoData {
+			return errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid alert state: %s", state)
 
 		}
 	}
@@ -315,7 +313,7 @@ func (r *PostableRule) UnmarshalJSON(bytes []byte) error {
 	type Alias PostableRule
 	aux := (*Alias)(r)
 	if err := json.Unmarshal(bytes, aux); err != nil {
-		return o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "failed to parse json: %v", err)
+		return errors.NewInvalidInputf(errors.CodeInvalidInput, "failed to parse json: %v", err)
 	}
 	r.processRuleDefaults()
 	return r.validate()
@@ -337,81 +335,226 @@ func isValidLabelValue(v string) bool {
 	return utf8.ValidString(v)
 }
 
-func isAllQueriesDisabled(compositeQuery *v3.CompositeQuery) bool {
-	if compositeQuery == nil {
-		return false
-	}
-	if compositeQuery.BuilderQueries == nil && compositeQuery.PromQueries == nil && compositeQuery.DatastoreQueries == nil {
-		return false
-	}
-	switch compositeQuery.QueryType {
-	case v3.QueryTypeBuilder:
-		if len(compositeQuery.BuilderQueries) == 0 {
-			return false
-		}
-		for _, query := range compositeQuery.BuilderQueries {
-			if !query.Disabled {
-				return false
-			}
-		}
-	case v3.QueryTypePromQL:
-		if len(compositeQuery.PromQueries) == 0 {
-			return false
-		}
-		for _, query := range compositeQuery.PromQueries {
-			if !query.Disabled {
-				return false
-			}
-		}
-	case v3.QueryTypeDatastoreSQL:
-		if len(compositeQuery.DatastoreQueries) == 0 {
-			return false
-		}
-		for _, query := range compositeQuery.DatastoreQueries {
-			if !query.Disabled {
-				return false
-			}
-		}
-	}
-	return true
-}
-
+// validate runs during UnmarshalJSON (read + write path).
+// Preserves the original pre-existing checks only so that stored rules
+// continue to load without errors.
 func (r *PostableRule) validate() error {
 	var errs []error
 
 	if r.RuleCondition == nil {
-		// will get panic if we try to access CompositeQuery, so return here
-		return o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "rule condition is required")
-	}
-	if r.RuleCondition.CompositeQuery == nil {
-		errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "composite query is required"))
+		return errors.NewInvalidInputf(errors.CodeInvalidInput, "condition: field is required")
 	}
 
 	if r.Version != "v5" {
-		errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "only version v5 is supported, got %q", r.Version))
-	}
-
-	if isAllQueriesDisabled(r.RuleCondition.CompositeQuery) {
-		errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "all queries are disabled in rule condition"))
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "version: only v5 is supported, got %q", r.Version))
 	}
 
 	for k, v := range r.Labels {
 		if !isValidLabelName(k) {
-			errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "invalid label name: %s", k))
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid label name: %s", k))
 		}
 		if !isValidLabelValue(v) {
-			errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "invalid label value: %s", v))
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid label value: %s", v))
 		}
 	}
 
 	for k := range r.Annotations {
 		if !isValidLabelName(k) {
-			errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "invalid annotation name: %s", k))
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid annotation name: %s", k))
 		}
 	}
 
 	errs = append(errs, testTemplateParsing(r)...)
-	return o11yError.Join(errs...)
+
+	joined := errors.Join(errs...)
+	if joined != nil {
+		return errors.WrapInvalidInputf(joined, errors.CodeInvalidInput, "validation failed")
+	}
+	return nil
+}
+
+// Validate enforces all validation rules. For now, this is invoked on the write path
+// (create, update, patch, test) before persisting. This is intentionally
+// not called from UnmarshalJSON so that existing stored rules can always
+// be loaded regardless of new validation rules.
+func (r *PostableRule) Validate() error {
+	var errs []error
+
+	if r.AlertName == "" {
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "alert: field is required"))
+	}
+
+	if r.RuleCondition == nil {
+		return errors.NewInvalidInputf(errors.CodeInvalidInput, "condition: field is required")
+	}
+
+	if r.Version != "v5" {
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "version: only v5 is supported, got %q", r.Version))
+	}
+
+	if r.AlertType != "" {
+		switch r.AlertType {
+		case AlertTypeMetric, AlertTypeTraces, AlertTypeLogs, AlertTypeExceptions:
+		default:
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+				"alertType: unsupported value %q; must be one of %q, %q, %q, %q",
+				r.AlertType, AlertTypeMetric, AlertTypeTraces, AlertTypeLogs, AlertTypeExceptions))
+		}
+	}
+
+	if !r.RuleType.IsZero() {
+		if err := r.RuleType.Validate(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if r.RuleType == RuleTypeAnomaly && !r.RuleCondition.Seasonality.IsZero() {
+		if err := r.RuleCondition.Seasonality.Validate(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if r.RuleCondition.CompositeQuery == nil {
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "condition.compositeQuery: field is required"))
+	} else {
+		if len(r.RuleCondition.CompositeQuery.Queries) == 0 {
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "condition.compositeQuery.queries: must have at least one query"))
+		} else {
+			cq := &qbtypes.CompositeQuery{Queries: r.RuleCondition.CompositeQuery.Queries}
+			if err := cq.Validate(qbtypes.GetValidationOptions(qbtypes.RequestTypeTimeSeries)...); err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	if r.RuleCondition.SelectedQuery != "" && r.RuleCondition.CompositeQuery != nil && len(r.RuleCondition.CompositeQuery.Queries) > 0 {
+		found := false
+		for _, query := range r.RuleCondition.CompositeQuery.Queries {
+			if query.GetQueryName() == r.RuleCondition.SelectedQuery {
+				found = true
+				break
+			}
+		}
+		if !found {
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+				"condition.selectedQueryName: %q does not match any query in compositeQuery",
+				r.RuleCondition.SelectedQuery))
+		}
+	}
+
+	if r.RuleCondition.RequireMinPoints && r.RuleCondition.RequiredNumPoints <= 0 {
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+			"condition.requiredNumPoints: must be greater than 0 when requireMinPoints is enabled"))
+	}
+
+	errs = append(errs, r.validateSchemaVersion()...)
+
+	for k, v := range r.Labels {
+		if !isValidLabelName(k) {
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid label name: %s", k))
+		}
+		if !isValidLabelValue(v) {
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid label value: %s", v))
+		}
+	}
+
+	for k := range r.Annotations {
+		if !isValidLabelName(k) {
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid annotation name: %s", k))
+		}
+	}
+
+	errs = append(errs, testTemplateParsing(r)...)
+
+	joined := errors.Join(errs...)
+	if joined != nil {
+		return errors.WrapInvalidInputf(joined, errors.CodeInvalidInput, "validation failed")
+	}
+	return nil
+}
+
+func (r *PostableRule) validateSchemaVersion() []error {
+	switch r.SchemaVersion {
+	case DefaultSchemaVersion:
+		return r.validateV1()
+	case SchemaVersionV2Alpha1:
+		return r.validateV2Alpha1()
+	default:
+		return []error{errors.NewInvalidInputf(errors.CodeInvalidInput,
+			"schemaVersion: unsupported value %q; must be one of %q, %q",
+			r.SchemaVersion, DefaultSchemaVersion, SchemaVersionV2Alpha1)}
+	}
+}
+
+func (r *PostableRule) validateV1() []error {
+	var errs []error
+
+	if r.RuleCondition.Target == nil {
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+			"condition.target: field is required for schemaVersion %q", DefaultSchemaVersion))
+	}
+	if r.RuleCondition.CompareOperator.IsZero() {
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+			"condition.op: field is required for schemaVersion %q", DefaultSchemaVersion))
+	} else if err := r.RuleCondition.CompareOperator.Validate(); err != nil {
+		errs = append(errs, err)
+	}
+	if r.RuleCondition.MatchType.IsZero() {
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+			"condition.matchType: field is required for schemaVersion %q", DefaultSchemaVersion))
+	} else if err := r.RuleCondition.MatchType.Validate(); err != nil {
+		errs = append(errs, err)
+	}
+
+	return errs
+}
+
+func (r *PostableRule) validateV2Alpha1() []error {
+	var errs []error
+
+	// TODO(srikanthccv): reject v1-only fields?
+	// if r.RuleCondition.Target != nil {
+	// 	errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+	// 		"condition.target: field is not used in schemaVersion %q; set target in condition.thresholds entries instead",
+	// 		SchemaVersionV2Alpha1))
+	// }
+	// if !r.RuleCondition.CompareOperator.IsZero() {
+	// 	errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+	// 		"condition.op: field is not used in schemaVersion %q; set op in condition.thresholds entries instead",
+	// 		SchemaVersionV2Alpha1))
+	// }
+	// if !r.RuleCondition.MatchType.IsZero() {
+	// 	errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+	// 		"condition.matchType: field is not used in schemaVersion %q; set matchType in condition.thresholds entries instead",
+	// 		SchemaVersionV2Alpha1))
+	// }
+	// if len(r.PreferredChannels) > 0 {
+	// 	errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+	// 		"preferredChannels: field is not used in schemaVersion %q; set channels in condition.thresholds entries instead",
+	// 		SchemaVersionV2Alpha1))
+	// }
+
+	// Require v2alpha1-specific fields
+	if r.RuleCondition.Thresholds == nil {
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+			"condition.thresholds: field is required for schemaVersion %q", SchemaVersionV2Alpha1))
+	}
+
+	if r.Evaluation == nil {
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+			"evaluation: field is required for schemaVersion %q", SchemaVersionV2Alpha1))
+	}
+	if r.NotificationSettings == nil {
+		errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+			"notificationSettings: field is required for schemaVersion %q", SchemaVersionV2Alpha1))
+	} else {
+		if r.NotificationSettings.Renotify.Enabled && !r.NotificationSettings.Renotify.ReNotifyInterval.IsPositive() {
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput,
+				"notificationSettings.renotify.interval: must be a positive duration when renotify is enabled"))
+		}
+	}
+
+	return errs
 }
 
 func testTemplateParsing(rl *PostableRule) (errs []error) {
@@ -438,7 +581,7 @@ func testTemplateParsing(rl *PostableRule) (errs []error) {
 	for _, val := range rl.Labels {
 		err := parseTest(val)
 		if err != nil {
-			errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "template parsing error: %s", err.Error()))
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "template parsing error: %s", err.Error()))
 		}
 	}
 
@@ -446,7 +589,7 @@ func testTemplateParsing(rl *PostableRule) (errs []error) {
 	for _, val := range rl.Annotations {
 		err := parseTest(val)
 		if err != nil {
-			errs = append(errs, o11yError.NewInvalidInputf(o11yError.CodeInvalidInput, "template parsing error: %s", err.Error()))
+			errs = append(errs, errors.NewInvalidInputf(errors.CodeInvalidInput, "template parsing error: %s", err.Error()))
 		}
 	}
 

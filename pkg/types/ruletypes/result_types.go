@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-
-	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
 )
 
 // common result format of query

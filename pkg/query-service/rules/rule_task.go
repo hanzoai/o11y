@@ -8,10 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
-	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
-	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
-	"github.com/hanzoai/o11y/pkg/valuer"
 	opentracing "github.com/opentracing/opentracing-go"
 
 	"github.com/hanzoai/o11y/pkg/errors"

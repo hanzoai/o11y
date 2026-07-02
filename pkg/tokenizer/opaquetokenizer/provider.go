@@ -6,6 +6,10 @@ import (
 	"slices"
 	"time"
 
+	"github.com/dgraph-io/ristretto/v2"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
@@ -15,9 +19,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/cachetypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/dgraph-io/ristretto/v2"
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 )
 
 var (

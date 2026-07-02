@@ -54,7 +54,7 @@ func PreparePipelineProcessor(gettablePipelines []pipelinetypes.GettablePipeline
 
 		router := []pipelinetypes.PipelineOperator{
 			{
-				ID:   "router_o11y",
+				ID:   "router_signoz",
 				Type: "router",
 				Routes: &[]pipelinetypes.Route{
 					{

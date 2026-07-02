@@ -1,10 +1,12 @@
 package querybuildertypesv5
 
 import (
+	"bytes"
 	"regexp"
 	"strings"
 
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
@@ -372,8 +374,8 @@ func (q *QueryBuilderTraceOperator) UnmarshalJSON(data []byte) error {
 	type Alias QueryBuilderTraceOperator
 
 	var temp Alias
-	// Use UnmarshalJSONWithContext for better error messages
-	if err := UnmarshalJSONWithContext(data, &temp, "query spec"); err != nil {
+	// Strict-decode the alias so unknown fields surface with field-name suggestions.
+	if err := binding.JSON.BindBody(bytes.NewReader(data), &temp, binding.WithDisallowUnknownFields(true), binding.WithUnknownFieldContext("query spec")); err != nil {
 		return err
 	}
 

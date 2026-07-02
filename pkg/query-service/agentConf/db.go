@@ -7,14 +7,16 @@ import (
 	"strings"
 	"time"
 
+	"log/slog"
+
+	"golang.org/x/exp/slices"
+
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/opamptypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"go.uber.org/zap"
-	"golang.org/x/exp/slices"
 )
 
 var (

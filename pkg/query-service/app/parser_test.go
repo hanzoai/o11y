@@ -80,7 +80,7 @@ func TestParseAggregateAttrReques(t *testing.T) {
 	}
 
 	for _, reqCase := range reqCases {
-		r := httptest.NewRequest("GET", "/v1/o11y/v3/autocomplete/aggregate_attributes?"+reqCase.queryString, nil)
+		r := httptest.NewRequest("GET", "/api/v3/autocomplete/aggregate_attributes?"+reqCase.queryString, nil)
 		aggregateAttrRequest, err := parseAggregateAttributeRequest(r)
 		if reqCase.expectErr {
 			if err == nil {
@@ -204,7 +204,7 @@ func TestParseFilterAttributeKeyRequest(t *testing.T) {
 	}
 
 	for _, reqCase := range reqCases {
-		r := httptest.NewRequest("GET", "/v1/o11y/v3/autocomplete/filter_attributes?"+reqCase.queryString, nil)
+		r := httptest.NewRequest("GET", "/api/v3/autocomplete/filter_attributes?"+reqCase.queryString, nil)
 		filterAttrRequest, err := parseFilterAttributeKeyRequest(r)
 		if reqCase.expectErr {
 			if err == nil {
@@ -301,7 +301,7 @@ func TestParseFilterAttributeValueRequest(t *testing.T) {
 	}
 
 	for _, reqCase := range reqCases {
-		r := httptest.NewRequest("GET", "/v1/o11y/v3/autocomplete/filter_attribute_values?"+reqCase.queryString, nil)
+		r := httptest.NewRequest("GET", "/api/v3/autocomplete/filter_attribute_values?"+reqCase.queryString, nil)
 		filterAttrRequest, err := parseFilterAttributeValueRequest(r)
 		if reqCase.expectErr {
 			if err == nil {
@@ -337,7 +337,7 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			desc: "no query in request",
 			compositeQuery: v3.CompositeQuery{
 				PanelType: v3.PanelTypeGraph,
-				QueryType: v3.QueryTypeDatastoreSQL,
+				QueryType: v3.QueryTypeClickHouseSQL,
 			},
 			expectErr: true,
 			errMsg:    "composite query must contain at least one query",
@@ -346,8 +346,8 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			desc: "invalid panel type",
 			compositeQuery: v3.CompositeQuery{
 				PanelType: "invalid",
-				QueryType: v3.QueryTypeDatastoreSQL,
-				DatastoreQueries: map[string]*v3.DatastoreQuery{
+				QueryType: v3.QueryTypeClickHouseSQL,
+				ClickHouseQueries: map[string]*v3.ClickHouseQuery{
 					"A": {
 						Query:    "query",
 						Disabled: false,
@@ -362,7 +362,7 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			compositeQuery: v3.CompositeQuery{
 				PanelType: v3.PanelTypeGraph,
 				QueryType: "invalid",
-				DatastoreQueries: map[string]*v3.DatastoreQuery{
+				ClickHouseQueries: map[string]*v3.ClickHouseQuery{
 					"A": {
 						Query:    "query",
 						Disabled: false,
@@ -388,11 +388,11 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			errMsg:    "query is empty",
 		},
 		{
-			desc: "invalid datastore query",
+			desc: "invalid clickhouse query",
 			compositeQuery: v3.CompositeQuery{
 				PanelType: v3.PanelTypeGraph,
-				QueryType: v3.QueryTypeDatastoreSQL,
-				DatastoreQueries: map[string]*v3.DatastoreQuery{
+				QueryType: v3.QueryTypeClickHouseSQL,
+				ClickHouseQueries: map[string]*v3.ClickHouseQuery{
 					"A": {
 						Query:    "",
 						Disabled: false,
@@ -418,11 +418,11 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			errMsg:    "query is empty",
 		},
 		{
-			desc: "invalid datastore query with disabled query",
+			desc: "invalid clickhouse query with disabled query",
 			compositeQuery: v3.CompositeQuery{
 				PanelType: v3.PanelTypeGraph,
-				QueryType: v3.QueryTypeDatastoreSQL,
-				DatastoreQueries: map[string]*v3.DatastoreQuery{
+				QueryType: v3.QueryTypeClickHouseSQL,
+				ClickHouseQueries: map[string]*v3.ClickHouseQuery{
 					"A": {
 						Query:    "",
 						Disabled: true,
@@ -597,7 +597,7 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/v3/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/api/v3/query_range", body)
 
 			params, apiErr := ParseQueryRangeParams(req)
 			if tc.expectErr {
@@ -698,7 +698,7 @@ func TestParseQueryRangeParamsExpressions(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/v3/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/api/v3/query_range", body)
 
 			_, apiErr := ParseQueryRangeParams(req)
 			if tc.expectErr {
@@ -934,7 +934,7 @@ func TestParseQueryRangeParamsDashboardVarsSubstitution(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/v3/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/api/v3/query_range", body)
 
 			parsedQueryRangeParams, apiErr := ParseQueryRangeParams(req)
 			if tc.expectErr {
@@ -1106,7 +1106,7 @@ func TestParseQueryRangeParamsPromQLVars(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/v3/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/api/v3/query_range", body)
 
 			parsedQueryRangeParams, apiErr := ParseQueryRangeParams(req)
 			if tc.expectErr {
@@ -1138,7 +1138,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "A",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}},
 
 						Expression: "A",
@@ -1147,7 +1147,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "B",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "operation_name"}},
 						Expression:         "B",
 					},
@@ -1170,7 +1170,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "A",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}},
 						Expression:         "A",
 					},
@@ -1178,7 +1178,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "B",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}},
 						Expression:         "B",
 					},
@@ -1200,7 +1200,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "A",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}},
 						Expression:         "A",
 					},
@@ -1208,7 +1208,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "B",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}},
 						Expression:         "B",
 					},
@@ -1230,7 +1230,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "A",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}},
 						Expression:         "A",
 					},
@@ -1238,7 +1238,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "B",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "operation_name"}, {Key: "service_name"}},
 						Expression:         "B",
 					},
@@ -1260,7 +1260,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "A",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}},
 						Expression:         "A",
 					},
@@ -1268,7 +1268,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "B",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}},
 						Expression:         "B",
 					},
@@ -1290,7 +1290,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "A",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}},
 						Expression:         "A",
 					},
@@ -1298,7 +1298,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "B",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						Expression:         "B",
 					},
 					"F1": {
@@ -1319,14 +1319,14 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "A",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						Expression:         "A",
 					},
 					"B": {
 						QueryName:          "B",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						Expression:         "B",
 					},
 					"F1": {
@@ -1347,7 +1347,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "A",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}},
 						Expression:         "A",
 					},
@@ -1355,7 +1355,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "B",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "operation_name"}, {Key: "status_code"}},
 						Expression:         "B",
 					},
@@ -1378,7 +1378,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "A",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}},
 						Expression:         "A",
 					},
@@ -1386,7 +1386,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "B",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}},
 						Expression:         "B",
 					},
@@ -1408,7 +1408,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "A",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}},
 						Expression:         "A",
 					},
@@ -1416,7 +1416,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "B",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}},
 						Expression:         "B",
 					},
@@ -1424,7 +1424,7 @@ func TestQueryRangeFormula(t *testing.T) {
 						QueryName:          "C",
 						DataSource:         v3.DataSourceMetrics,
 						AggregateOperator:  v3.AggregateOperatorSum,
-						AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+						AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 						GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}, {Key: "status_code"}},
 						Expression:         "C",
 					},
@@ -1467,7 +1467,7 @@ func TestQueryRangeFormula(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/v4/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/api/v4/query_range", body)
 
 			_, apiErr := ParseQueryRangeParams(req)
 			if tc.expectErr {
@@ -1551,7 +1551,7 @@ func TestParseQueryRangeParamsStepIntervalAdjustment(t *testing.T) {
 							QueryName:          "A",
 							DataSource:         v3.DataSourceMetrics,
 							AggregateOperator:  v3.AggregateOperatorSum,
-							AggregateAttribute: v3.AttributeKey{Key: "observe_calls_total"},
+							AggregateAttribute: v3.AttributeKey{Key: "signoz_calls_total"},
 							GroupBy:            []v3.AttributeKey{{Key: "service_name"}, {Key: "operation_name"}},
 							Expression:         "A",
 							StepInterval:       tc.step,
@@ -1564,7 +1564,7 @@ func TestParseQueryRangeParamsStepIntervalAdjustment(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/v3/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/api/v3/query_range", body)
 
 			p, apiErr := ParseQueryRangeParams(req)
 			if apiErr != nil && apiErr.Err != nil {

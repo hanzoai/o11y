@@ -1,5 +1,3 @@
-//go:build grpc
-
 package opamp
 
 import (
@@ -14,10 +12,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	model "github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
 	"github.com/hanzoai/o11y/pkg/query-service/app/opamp/otelconfig"
-	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/open-telemetry/opamp-go/protobufs"
-	"go.opentelemetry.io/collector/confmap"
-	"go.uber.org/zap"
 )
 
 var (

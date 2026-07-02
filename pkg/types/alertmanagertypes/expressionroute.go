@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/expr-lang/expr"
+
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/valuer"

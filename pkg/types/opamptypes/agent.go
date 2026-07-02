@@ -6,6 +6,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/valuer"
+	"github.com/open-telemetry/opamp-go/protobufs"
 	"github.com/uptrace/bun"
 )
 

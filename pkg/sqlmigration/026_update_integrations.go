@@ -365,7 +365,7 @@ func (migration *updateIntegrations) copyOldAwsIntegrationUser(tx bun.IDB, orgID
 	}
 
 	user := &oldUser{}
-	err := tx.NewSelect().Model(user).Where("email = ?", "aws-integration@observe.hanzo.ai").Scan(context.Background())
+	err := tx.NewSelect().Model(user).Where("email = ?", "aws-integration@signoz.io").Scan(context.Background())
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil

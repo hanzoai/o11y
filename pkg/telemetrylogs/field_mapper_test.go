@@ -6,6 +6,7 @@ import (
 	"time"
 
 	schema "github.com/hanzoai/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
+	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/stretchr/testify/assert"

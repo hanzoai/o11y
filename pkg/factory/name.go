@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/swaggest/jsonschema-go"
 )
 
 var _ slog.LogValuer = (Name{})

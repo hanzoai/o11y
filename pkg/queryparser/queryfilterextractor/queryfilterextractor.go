@@ -14,7 +14,7 @@ type ExtractorType struct {
 }
 
 var (
-	ExtractorTypeDatastoreSQL = ExtractorType{valuer.NewString("qfe_ch")}
+	ExtractorTypeClickHouseSQL = ExtractorType{valuer.NewString("qfe_ch")}
 	ExtractorTypePromQL        = ExtractorType{valuer.NewString("qfe_promql")}
 )
 
@@ -55,10 +55,10 @@ type FilterExtractor interface {
 
 func NewExtractor(extractorType ExtractorType) (FilterExtractor, error) {
 	switch extractorType {
-	case ExtractorTypeDatastoreSQL:
-		return NewDatastoreFilterExtractor(), nil
+	case ExtractorTypeClickHouseSQL:
+		return NewClickHouseFilterExtractor(), nil
 	case ExtractorTypePromQL:
-		return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "promql filter extractor is not supported on this o11y build; use datastore SQL filters instead")
+		return NewPromQLFilterExtractor(), nil
 	default:
 		return nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid extractor type: %s", extractorType)
 	}

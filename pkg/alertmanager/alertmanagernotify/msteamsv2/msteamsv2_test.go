@@ -16,9 +16,12 @@ import (
 	"testing"
 	"time"
 
-	commoncfg "github.com/hanzoai/common/config"
-	"github.com/hanzoai/common/model"
-	"github.com/hanzoai/common/promslog"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertemplate"
+	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
+	commoncfg "github.com/prometheus/common/config"
+	"github.com/prometheus/common/model"
+	"github.com/prometheus/common/promslog"
 	"github.com/stretchr/testify/require"
 
 	test "github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify/alertmanagernotifytest"

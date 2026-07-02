@@ -71,7 +71,7 @@ func NewPodsRepo(reader interfaces.Reader, querierV2 interfaces.Querier) *PodsRe
 	return &PodsRepo{reader: reader, querierV2: querierV2}
 }
 
-func (p *PodsRepo) GetPodAttributeKeys(ctx context.Context, req v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error) {
+func (p *PodsRepo) GetPodAttributeKeys(ctx context.Context, orgID valuer.UUID, req v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error) {
 	// TODO(srikanthccv): remove hardcoded metric name and support keys from any pod metric
 	req.DataSource = v3.DataSourceMetrics
 	req.AggregateAttribute = metricToUseForPods
@@ -79,7 +79,7 @@ func (p *PodsRepo) GetPodAttributeKeys(ctx context.Context, req v3.FilterAttribu
 		req.Limit = 50
 	}
 
-	attributeKeysResponse, err := p.reader.GetMetricAttributeKeys(ctx, &req)
+	attributeKeysResponse, err := p.reader.GetMetricAttributeKeys(ctx, orgID, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -97,14 +97,14 @@ func (p *PodsRepo) GetPodAttributeKeys(ctx context.Context, req v3.FilterAttribu
 	return &v3.FilterAttributeKeyResponse{AttributeKeys: filteredKeys}, nil
 }
 
-func (p *PodsRepo) GetPodAttributeValues(ctx context.Context, req v3.FilterAttributeValueRequest) (*v3.FilterAttributeValueResponse, error) {
+func (p *PodsRepo) GetPodAttributeValues(ctx context.Context, orgID valuer.UUID, req v3.FilterAttributeValueRequest) (*v3.FilterAttributeValueResponse, error) {
 	req.DataSource = v3.DataSourceMetrics
 	req.AggregateAttribute = metricToUseForPods
 	if req.Limit == 0 {
 		req.Limit = 50
 	}
 
-	attributeValuesResponse, err := p.reader.GetMetricAttributeValues(ctx, &req)
+	attributeValuesResponse, err := p.reader.GetMetricAttributeValues(ctx, orgID, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (p *PodsRepo) DidSendPodMetrics(ctx context.Context) (bool, error) {
 	namesStr := "'" + strings.Join(podMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(didSendPodMetricsQuery,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
+		constants.SIGNOZ_METRIC_DBNAME, constants.SIGNOZ_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
 
 	count, err := p.reader.GetCountOfThings(ctx, query)
 	if err != nil {
@@ -129,7 +129,7 @@ func (p *PodsRepo) DidSendClusterMetrics(ctx context.Context) (bool, error) {
 	namesStr := "'" + strings.Join(clusterMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(didSendClusterMetricsQuery,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
+		constants.SIGNOZ_METRIC_DBNAME, constants.SIGNOZ_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
 
 	count, err := p.reader.GetCountOfThings(ctx, query)
 	if err != nil {
@@ -143,7 +143,7 @@ func (p *PodsRepo) IsSendingOptionalPodMetrics(ctx context.Context) (bool, error
 	namesStr := "'" + strings.Join(optionalPodMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(isSendingOptionalPodMetricsQuery,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
+		constants.SIGNOZ_METRIC_DBNAME, constants.SIGNOZ_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
 
 	count, err := p.reader.GetCountOfThings(ctx, query)
 	if err != nil {
@@ -157,7 +157,7 @@ func (p *PodsRepo) SendingRequiredMetadata(ctx context.Context) ([]model.PodOnbo
 	namesStr := "'" + strings.Join(podMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(isSendingRequiredMetadataQuery,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_V4_TABLENAME, namesStr)
+		constants.SIGNOZ_METRIC_DBNAME, constants.SIGNOZ_TIMESERIES_V4_TABLENAME, namesStr)
 
 	result, err := p.reader.GetListResultV3(ctx, query)
 	if err != nil {

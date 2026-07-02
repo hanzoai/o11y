@@ -4,7 +4,12 @@ import (
 	"log/slog"
 	"slices"
 
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify/email"
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify/msteamsv2"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify/opsgenie"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify/pagerduty"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify/slack"
+	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagernotify/webhook"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/prometheus/alertmanager/config/receiver"
 	"github.com/prometheus/alertmanager/notify"
@@ -21,8 +26,8 @@ var customNotifierIntegrations = []string{
 	msteamsv2.Integration,
 }
 
-func NewReceiverIntegrations(nc alertmanagertypes.Receiver, tmpl *template.Template, logger *slog.Logger, templater alertmanagertypes.Templater) ([]notify.Integration, error) {
-	upstreamIntegrations, err := receiver.BuildReceiverIntegrations(nc, tmpl, logger)
+func NewReceiverIntegrations(nc *alertmanagertypes.Receiver, tmpl *template.Template, logger *slog.Logger, templater alertmanagertypes.Templater) ([]notify.Integration, error) {
+	upstreamIntegrations, err := receiver.BuildReceiverIntegrations(*nc.Receiver, tmpl, logger)
 	if err != nil {
 		return nil, err
 	}
