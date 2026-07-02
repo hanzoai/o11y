@@ -8,7 +8,7 @@ import (
 
 	"github.com/hanzoai/cloud"
 	"github.com/hanzoai/o11y"
-	"github.com/hanzoai/zip"
+	"github.com/zap-proto/zip"
 )
 
 func TestMountWithoutHandlerReturns503(t *testing.T) {
