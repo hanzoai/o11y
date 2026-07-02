@@ -4,7 +4,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	openfgav1 "github.com/openfga/api/proto/openfga/v1"
 )
 
 var (
@@ -14,24 +13,65 @@ var (
 	ErrCodeTypeableNotFound = errors.MustNewCode("typeable_not_found")
 )
 
+// TupleKey is a relationship tuple: subject User has Relation on Object.
+//
+// This is o11y's Hanzo-native authorization primitive — a plain (user,
+// relation, object) triple. It replaces the OpenFGA proto TupleKey: o11y no
+// longer embeds an OpenFGA engine, and the enforcement decision is delegated to
+// Hanzo IAM (see pkg/authz/iamauthz). The triple maps directly onto a Casbin
+// request — (User, Object, Relation) → (sub, obj, act).
+type TupleKey struct {
+	User     string
+	Relation string
+	Object   string
+}
+
+func (t *TupleKey) GetUser() string {
+	if t == nil {
+		return ""
+	}
+	return t.User
+}
+
+func (t *TupleKey) GetRelation() string {
+	if t == nil {
+		return ""
+	}
+	return t.Relation
+}
+
+func (t *TupleKey) GetObject() string {
+	if t == nil {
+		return ""
+	}
+	return t.Object
+}
+
+// ReadRequestTupleKey is a filter over stored tuples; empty fields match any.
+type ReadRequestTupleKey struct {
+	User     string
+	Relation string
+	Object   string
+}
+
 type TupleKeyAuthorization struct {
-	Tuple      *openfgav1.TupleKey
+	Tuple      *TupleKey
 	Authorized bool
 }
 
-func NewTuples(resource coretypes.Resource, subject string, relation Relation, selectors []coretypes.Selector, orgID valuer.UUID) []*openfgav1.TupleKey {
-	tuples := make([]*openfgav1.TupleKey, 0)
+func NewTuples(resource coretypes.Resource, subject string, relation Relation, selectors []coretypes.Selector, orgID valuer.UUID) []*TupleKey {
+	tuples := make([]*TupleKey, 0)
 
 	for _, selector := range selectors {
 		object := resource.Object(orgID, selector.String())
-		tuples = append(tuples, &openfgav1.TupleKey{User: subject, Relation: relation.StringValue(), Object: object})
+		tuples = append(tuples, &TupleKey{User: subject, Relation: relation.StringValue(), Object: object})
 	}
 
 	return tuples
 }
 
-func NewTuplesFromTransactions(transactions []*Transaction, subject string, orgID valuer.UUID) (map[string]*openfgav1.TupleKey, error) {
-	tuples := make(map[string]*openfgav1.TupleKey, len(transactions))
+func NewTuplesFromTransactions(transactions []*Transaction, subject string, orgID valuer.UUID) (map[string]*TupleKey, error) {
+	tuples := make(map[string]*TupleKey, len(transactions))
 	for _, txn := range transactions {
 		resource, err := coretypes.NewResourceFromTypeAndKind(txn.Object.Resource.Type, txn.Object.Resource.Kind)
 		if err != nil {
@@ -47,8 +87,8 @@ func NewTuplesFromTransactions(transactions []*Transaction, subject string, orgI
 	return tuples, nil
 }
 
-func NewTuplesFromTransactionGroups(name string, orgID valuer.UUID, transactionGroups []*TransactionGroup) ([]*openfgav1.TupleKey, error) {
-	tuples := make([]*openfgav1.TupleKey, 0)
+func NewTuplesFromTransactionGroups(name string, orgID valuer.UUID, transactionGroups []*TransactionGroup) ([]*TupleKey, error) {
+	tuples := make([]*TupleKey, 0)
 	subject := MustNewSubject(coretypes.NewResourceRole(), name, orgID, &coretypes.VerbAssignee)
 
 	for _, transactionGroup := range transactionGroups {
@@ -68,7 +108,7 @@ func NewTuplesFromTransactionGroups(name string, orgID valuer.UUID, transactionG
 	return tuples, nil
 }
 
-func MustNewTransactionGroupsFromTuples(tuples []*openfgav1.TupleKey) []*TransactionGroup {
+func MustNewTransactionGroupsFromTuples(tuples []*TupleKey) []*TransactionGroup {
 	objectsByRelation := make(map[string][]*coretypes.Object)
 
 	for _, tuple := range tuples {
@@ -99,8 +139,8 @@ func MustNewTransactionGroupsFromTuples(tuples []*openfgav1.TupleKey) []*Transac
 	return transactionGroups
 }
 
-func NewTuplesFromTransactionsWithCorrelations(transactions []*Transaction, subject string, orgID valuer.UUID) (tuples map[string]*openfgav1.TupleKey, correlations map[string][]string, err error) {
-	tuples = make(map[string]*openfgav1.TupleKey)
+func NewTuplesFromTransactionsWithCorrelations(transactions []*Transaction, subject string, orgID valuer.UUID) (tuples map[string]*TupleKey, correlations map[string][]string, err error) {
+	tuples = make(map[string]*TupleKey)
 	correlations = make(map[string][]string)
 
 	for _, txn := range transactions {
@@ -132,8 +172,8 @@ func NewTuplesFromTransactionsWithManagedRoles(
 	subject string,
 	orgID valuer.UUID,
 	managedRolesByTransaction map[string][]string,
-) (tuples map[string]*openfgav1.TupleKey, preResolved map[string]bool, roleCorrelations map[string][]string, err error) {
-	tuples = make(map[string]*openfgav1.TupleKey)
+) (tuples map[string]*TupleKey, preResolved map[string]bool, roleCorrelations map[string][]string, err error) {
+	tuples = make(map[string]*TupleKey)
 	preResolved = make(map[string]bool)
 	roleCorrelations = make(map[string][]string)
 
