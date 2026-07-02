@@ -17,6 +17,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
 	"github.com/hanzoai/o11y/pkg/modules/inframonitoring/implinframonitoring"
+	"github.com/hanzoai/o11y/pkg/modules/llmobs"
+	"github.com/hanzoai/o11y/pkg/modules/llmobs/impllmobs"
 	"github.com/hanzoai/o11y/pkg/modules/llmpricingrule"
 	"github.com/hanzoai/o11y/pkg/modules/llmpricingrule/impllmpricingrule"
 	"github.com/hanzoai/o11y/pkg/modules/logspipeline"
@@ -94,6 +96,7 @@ type Modules struct {
 	TraceDetail         tracedetail.Module
 	SpanMapper          spanmapper.Module
 	LLMPricingRule      llmpricingrule.Module
+	LLMObs              llmobs.Module
 	Tag                 tag.Module
 }
 
@@ -161,6 +164,7 @@ func NewModules(
 		TraceDetail:         impltracedetail.NewModule(impltracedetail.NewTraceStore(telemetryStore), providerSettings, config.TraceDetail),
 		SpanMapper:          implspanmapper.NewModule(implspanmapper.NewStore(sqlstore), fl),
 		LLMPricingRule:      impllmpricingrule.NewModule(impllmpricingrule.NewStore(sqlstore), fl),
+		LLMObs:              impllmobs.NewModule(querier, impllmobs.NewStore(sqlstore)),
 		Tag:                 tagModule,
 	}
 }
