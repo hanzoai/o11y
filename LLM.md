@@ -37,6 +37,37 @@ SigNoz eras); it dissolved when the whole `pkg/ cmd/` tree was re-synced to one
 consistent upstream version. Keep it that way: bump by re-syncing to a newer SigNoz
 `main`, not by piecemeal-porting individual packages.
 
+The real server binary is `./cmd/community` (NOT `./cmd/server`, which does not
+exist). Build check: `GOPRIVATE='github.com/hanzoai/*' GOSUMDB=off go build ./cmd/community`.
+
+## Container image (`ghcr.io/hanzoai/o11y`)
+
+Root `Dockerfile` + `.github/workflows/docker.yaml` build a standalone community
+server image on push to `main` and `v*` tags → `ghcr.io/hanzoai/o11y:<sha>` (+ `:main`).
+This replaces the unrelated **Langfuse** image that previously squatted the tags.
+
+- Builds ONLY `./cmd/community`. It does NOT import `github.com/hanzoai/cloud`, so
+  go.mod's `replace github.com/hanzoai/cloud => ../cloud` is inert for the image and
+  no cloud sibling is checked out. (Cloud lives only in root `mount.go`, compiled by
+  the `go build ./...` CI job — so `ci.yaml` still needs the sibling; the container
+  does not.) A bare `go mod download` WOULD fail (cloud→../cloud); build the one pkg.
+- All external deps in its graph are PUBLIC hanzoai/* forks (signoz-otel-collector,
+  govaluate, clickhouse-go-mock, expr) → no private git auth, just
+  `GOPRIVATE=github.com/hanzoai/* GOSUMDB=off`. GHCR push uses `GH_PAT || GITHUB_TOKEN`
+  (the package is linked to hanzoai/o11y, so GITHUB_TOKEN+`packages: write` suffices).
+- Runs headless: `O11Y_WEB_ENABLED=false`. `routerweb` os.Stat()s its web dir at
+  boot and fatals if missing; the SPA is served by hanzoai/static at the edge. The
+  `frontend/` tree is NOT bundled — its `pnpm-lock.yaml` is STALE vs `package.json`
+  (mid rolldown-vite/oxlint migration), fails `--frozen-lockfile`. TODO: regen lockfile.
+- Listens on `0.0.0.0:8080` (constants.HTTPHostPort); sqlstore default = sqlite at
+  `/var/lib/signoz/signoz.db`; needs an external ClickHouse for telemetry.
+
+Boot fix: `pkg/instrumentation/sdk.go` hard-pinned `semconv/v1.40.0.SchemaURL`,
+which contrib `NewSDK` merges against `resource.Default()` (schema 1.41.0, from the
+re-synced otel/sdk) — OTEL rejects differing non-empty schema URLs, so `signoz.New`
+crashed at boot with "conflicting Schema URL". Now sourced from the detected resource
+(`resource.SchemaURL()`), version-agnostic. Verified: boots, runs migrations, serves :8080.
+
 ## Hanzo layer to re-apply on the green base
 
 The re-sync reverted these Hanzo-original packages to SigNoz canonical to kill the
@@ -46,3 +77,37 @@ OpenFGA is the current default and must be replaced), `pkg/zapreceiver` +
 `pkg/zapmetricreceiver` (ZAP-native OTLP receivers), `pkg/billing` + `pkg/types/billingtypes`.
 Preserved through the sync: module path, `mount.go` (the `cloud.Register`/zip mount
 adapter), `NOTICE`, `LICENSE`.
+
+## Config env naming (debranded — no SIGNOZ/CLICKHOUSE)
+
+Operator-facing env vars and config keys are Hanzo-branded, never SigNoz/ClickHouse.
+Naming-only: the store is still ClickHouse wire-protocol under the hood — the
+`clickhouse-go` driver, `db.system=clickhouse` semconv, and the `clickhouse`
+telemetrystore provider registration all stay (implementation, not surface).
+
+- **Env prefix `O11Y_`** (was `SIGNOZ_`): set once at `pkg/config/envprovider/provider.go`
+  (`prefix`). The koanf env provider derives every structured key from it. Single `_`
+  is the `::` path delimiter, double `__` is a literal `_`.
+- **Store key segment `datastore`** (was `clickhouse`): the `mapstructure` tag on
+  `telemetrystore.Config.Clickhouse` is `datastore` (the Go field/type keep the
+  `Clickhouse` name — internal). YAML key `telemetrystore.datastore`. Provider
+  selector value stays `clickhouse`.
+- **Canonical DSN key `O11Y_DATASTORE_DSN`** (flat — THE operator knob): wired as an
+  override alias in `pkg/signoz/config.go` (`mergeAndEnsureBackwardCompatibility`),
+  mapping into `telemetrystore.datastore.dsn`. Value → Hanzo Datastore
+  (`tcp://datastore.hanzo.svc:9000/?database=o11y`, set at deploy time). It takes
+  precedence over the structured `O11Y_TELEMETRYSTORE_DATASTORE_DSN`, which stays as
+  an internal fallback (don't document/set the long form). Keep operator knobs flat and
+  short — no `O11Y_A_B_C_D` compounds where a flat alias reads better.
+- **Legacy override aliases** in `pkg/signoz/config.go` (`mergeAndEnsureBackwardCompatibility`)
+  debranded too: `O11Y_LOCAL_DB_PATH`, `DatastoreUrl`, `O11Y_SAAS_SEGMENT_KEY`,
+  `O11Y_JWT_SECRET`; and headless web via `O11Y_WEB_ENABLED` / `O11Y_WEB_DIRECTORY`.
+- **Deliberately NOT renamed** (implementation / not app-config surface): the `clickhouse`
+  provider value + `MustNewName("clickhouse")` registration, `clickhouse-go` driver + mock,
+  SQL/table/DB names (`signoz_traces` etc.) and query-template vars
+  (`SIGNOZ_START_TIME`/`SIGNOZ_END_TIME`), the ClickHouse **server** container in `deploy/`
+  (service/volume names, its own `CLICKHOUSE_SKIP_USER_SETUP` env), the `SIGNOZ_E2E_*`
+  Playwright test-harness vars (separate `tests/e2e` subsystem). The
+  `O11Y_OTEL_COLLECTOR_DATASTORE_*` keys in `deploy/` are consumed by the
+  `hanzoai/signoz-otel-collector` fork — renamed here for consistency; that fork must
+  accept the `_DATASTORE_` segment (coordinated cross-repo rename).

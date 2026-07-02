@@ -13,7 +13,7 @@
 # fetch needs no private git auth — only GOPRIVATE + GOSUMDB=off.
 #
 # The browser SPA is served at the edge by hanzoai/static (house-native static
-# plugin), not bundled here, so the server runs headless (SIGNOZ_WEB_ENABLED=false).
+# plugin), not bundled here, so the server runs headless (O11Y_WEB_ENABLED=false).
 # The frontend/ tree is a separate concern — its pnpm-lock.yaml is mid-migration
 # and not build-ready; bundle it back once that is resolved.
 
@@ -76,9 +76,9 @@ COPY --from=backend /out/o11y /usr/local/bin/o11y
 COPY templates/ /root/templates/
 
 # The browser SPA is served by hanzoai/static at the edge; run headless. When a
-# deployment bundles/mounts web assets, set SIGNOZ_WEB_ENABLED=true and
-# SIGNOZ_WEB_DIRECTORY to their path.
-ENV SIGNOZ_WEB_ENABLED=false
+# deployment bundles/mounts web assets, set O11Y_WEB_ENABLED=true and
+# O11Y_WEB_DIRECTORY to their path.
+ENV O11Y_WEB_ENABLED=false
 
 # Public query-service HTTP + query API (constants.HTTPHostPort = 0.0.0.0:8080).
 EXPOSE 8080
