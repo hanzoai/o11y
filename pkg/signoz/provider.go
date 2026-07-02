@@ -218,6 +218,7 @@ func NewSQLMigrationProviderFactories(
 		sqlmigration.NewMigrateSSORoleMappingNamesFactory(sqlstore),
 		sqlmigration.NewAddMetricReductionRulesFactory(sqlstore, sqlschema),
 		sqlmigration.NewRemoveOrganizationTuplesFactory(sqlstore),
+		sqlmigration.NewAddLLMObsFactory(sqlstore, sqlschema),
 	)
 }
 
@@ -316,6 +317,7 @@ func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.Au
 			handlers.TraceDetail,
 			handlers.RulerHandler,
 			handlers.StatsHandler,
+			handlers.LLMObsHandler,
 		),
 	)
 }
