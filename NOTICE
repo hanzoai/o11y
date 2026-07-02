@@ -6,9 +6,7 @@ licensed under the MIT Expat license:
 
     Copyright (c) 2020-present SigNoz Inc.
 
-SigNoz is dual-licensed. All content outside the "ee/" and "cmd/enterprise/"
-directories is available under the MIT Expat license (see LICENSE). Content
-under "ee/" and "cmd/enterprise/" (if present) is governed by the separate,
-source-available SigNoz Enterprise License -- not MIT -- which restricts
-redistribution and production use without a valid SigNoz Enterprise license.
-See LICENSE and the upstream ee/LICENSE for the full terms.
+Only the MIT Expat-licensed portions of SigNoz are used here. SigNoz's
+source-available "ee/" and "cmd/enterprise/" code (governed by the separate,
+non-OSS SigNoz Enterprise License) is NOT included in this repository and is
+never redistributed.
