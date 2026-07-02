@@ -221,13 +221,13 @@ func validateConfig(config Config) error {
 }
 
 func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logger, config *Config) {
-	if os.Getenv("SIGNOZ_LOCAL_DB_PATH") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env SIGNOZ_LOCAL_DB_PATH is deprecated and scheduled for removal. Please use SIGNOZ_SQLSTORE_SQLITE_PATH instead.")
-		config.SQLStore.Sqlite.Path = os.Getenv("SIGNOZ_LOCAL_DB_PATH")
+	if os.Getenv("O11Y_LOCAL_DB_PATH") != "" {
+		logger.WarnContext(ctx, "[Deprecated] env O11Y_LOCAL_DB_PATH is deprecated and scheduled for removal. Please use O11Y_SQLSTORE_SQLITE_PATH instead.")
+		config.SQLStore.Sqlite.Path = os.Getenv("O11Y_LOCAL_DB_PATH")
 	}
 
 	if os.Getenv("CONTEXT_TIMEOUT") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env CONTEXT_TIMEOUT is deprecated and scheduled for removal. Please use SIGNOZ_APISERVER_TIMEOUT_DEFAULT instead.")
+		logger.WarnContext(ctx, "[Deprecated] env CONTEXT_TIMEOUT is deprecated and scheduled for removal. Please use O11Y_APISERVER_TIMEOUT_DEFAULT instead.")
 		contextTimeoutDuration, err := time.ParseDuration(os.Getenv("CONTEXT_TIMEOUT") + "s")
 		if err == nil {
 			config.APIServer.Timeout.Default = contextTimeoutDuration
@@ -237,7 +237,7 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 	}
 
 	if os.Getenv("CONTEXT_TIMEOUT_MAX_ALLOWED") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env CONTEXT_TIMEOUT_MAX_ALLOWED is deprecated and scheduled for removal. Please use SIGNOZ_APISERVER_TIMEOUT_MAX instead.")
+		logger.WarnContext(ctx, "[Deprecated] env CONTEXT_TIMEOUT_MAX_ALLOWED is deprecated and scheduled for removal. Please use O11Y_APISERVER_TIMEOUT_MAX instead.")
 
 		contextTimeoutDuration, err := time.ParseDuration(os.Getenv("CONTEXT_TIMEOUT_MAX_ALLOWED") + "s")
 		if err == nil {
@@ -248,27 +248,35 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 	}
 
 	if os.Getenv("STORAGE") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env STORAGE is deprecated and scheduled for removal. Please use SIGNOZ_TELEMETRYSTORE_PROVIDER instead.")
+		logger.WarnContext(ctx, "[Deprecated] env STORAGE is deprecated and scheduled for removal. Please use O11Y_TELEMETRYSTORE_PROVIDER instead.")
 		config.TelemetryStore.Provider = os.Getenv("STORAGE")
 	}
 
-	if os.Getenv("ClickHouseUrl") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env ClickHouseUrl is deprecated and scheduled for removal. Please use SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN instead.")
-		config.TelemetryStore.Clickhouse.DSN = os.Getenv("ClickHouseUrl")
+	if os.Getenv("DatastoreUrl") != "" {
+		logger.WarnContext(ctx, "[Deprecated] env DatastoreUrl is deprecated and scheduled for removal. Please use O11Y_DATASTORE_DSN instead.")
+		config.TelemetryStore.Clickhouse.DSN = os.Getenv("DatastoreUrl")
+	}
+
+	// O11Y_DATASTORE_DSN is the canonical, flat operator-facing key for the Hanzo
+	// Datastore connection. It takes precedence over the structured
+	// O11Y_TELEMETRYSTORE_DATASTORE_DSN (telemetrystore.datastore.dsn), which stays
+	// as an internal fallback.
+	if dsn := os.Getenv("O11Y_DATASTORE_DSN"); dsn != "" {
+		config.TelemetryStore.Clickhouse.DSN = dsn
 	}
 
 	if os.Getenv("INVITE_EMAIL_TEMPLATE") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env INVITE_EMAIL_TEMPLATE is deprecated and scheduled for removal. Please use SIGNOZ_EMAILING_TEMPLATES_DIRECTORY instead.")
+		logger.WarnContext(ctx, "[Deprecated] env INVITE_EMAIL_TEMPLATE is deprecated and scheduled for removal. Please use O11Y_EMAILING_TEMPLATES_DIRECTORY instead.")
 		config.Emailing.Templates.Directory = path.Dir(os.Getenv("INVITE_EMAIL_TEMPLATE"))
 	}
 
 	if os.Getenv("SMTP_ENABLED") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env SMTP_ENABLED is deprecated and scheduled for removal. Please use SIGNOZ_EMAILING_ENABLED instead.")
+		logger.WarnContext(ctx, "[Deprecated] env SMTP_ENABLED is deprecated and scheduled for removal. Please use O11Y_EMAILING_ENABLED instead.")
 		config.Emailing.Enabled = os.Getenv("SMTP_ENABLED") == "true"
 	}
 
 	if os.Getenv("SMTP_HOST") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env SMTP_HOST is deprecated and scheduled for removal. Please use SIGNOZ_EMAILING_ADDRESS instead.")
+		logger.WarnContext(ctx, "[Deprecated] env SMTP_HOST is deprecated and scheduled for removal. Please use O11Y_EMAILING_ADDRESS instead.")
 		if os.Getenv("SMTP_PORT") != "" {
 			config.Emailing.SMTP.Address = os.Getenv("SMTP_HOST") + ":" + os.Getenv("SMTP_PORT")
 		} else {
@@ -277,49 +285,49 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 	}
 
 	if os.Getenv("SMTP_PORT") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env SMTP_PORT is deprecated and scheduled for removal. Please use SIGNOZ_EMAILING_ADDRESS instead.")
+		logger.WarnContext(ctx, "[Deprecated] env SMTP_PORT is deprecated and scheduled for removal. Please use O11Y_EMAILING_ADDRESS instead.")
 	}
 
 	if os.Getenv("SMTP_USERNAME") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env SMTP_USERNAME is deprecated and scheduled for removal. Please use SIGNOZ_EMAILING_AUTH_USERNAME instead.")
+		logger.WarnContext(ctx, "[Deprecated] env SMTP_USERNAME is deprecated and scheduled for removal. Please use O11Y_EMAILING_AUTH_USERNAME instead.")
 		config.Emailing.SMTP.Auth.Username = os.Getenv("SMTP_USERNAME")
 	}
 
 	if os.Getenv("SMTP_PASSWORD") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env SMTP_PASSWORD is deprecated and scheduled for removal. Please use SIGNOZ_EMAILING_AUTH_PASSWORD instead.")
+		logger.WarnContext(ctx, "[Deprecated] env SMTP_PASSWORD is deprecated and scheduled for removal. Please use O11Y_EMAILING_AUTH_PASSWORD instead.")
 		config.Emailing.SMTP.Auth.Password = os.Getenv("SMTP_PASSWORD")
 	}
 
 	if os.Getenv("SMTP_FROM") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env SMTP_FROM is deprecated and scheduled for removal. Please use SIGNOZ_EMAILING_FROM instead.")
+		logger.WarnContext(ctx, "[Deprecated] env SMTP_FROM is deprecated and scheduled for removal. Please use O11Y_EMAILING_FROM instead.")
 		config.Emailing.SMTP.From = os.Getenv("SMTP_FROM")
 	}
 
-	if os.Getenv("SIGNOZ_SAAS_SEGMENT_KEY") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env SIGNOZ_SAAS_SEGMENT_KEY is deprecated and scheduled for removal. Please use SIGNOZ_ANALYTICS_SEGMENT_KEY instead.")
-		config.Analytics.Segment.Key = os.Getenv("SIGNOZ_SAAS_SEGMENT_KEY")
+	if os.Getenv("O11Y_SAAS_SEGMENT_KEY") != "" {
+		logger.WarnContext(ctx, "[Deprecated] env O11Y_SAAS_SEGMENT_KEY is deprecated and scheduled for removal. Please use O11Y_ANALYTICS_SEGMENT_KEY instead.")
+		config.Analytics.Segment.Key = os.Getenv("O11Y_SAAS_SEGMENT_KEY")
 	}
 
 	if os.Getenv("TELEMETRY_ENABLED") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env TELEMETRY_ENABLED is deprecated and scheduled for removal. Please use SIGNOZ_ANALYTICS_ENABLED instead.")
+		logger.WarnContext(ctx, "[Deprecated] env TELEMETRY_ENABLED is deprecated and scheduled for removal. Please use O11Y_ANALYTICS_ENABLED instead.")
 		config.Analytics.Enabled = os.Getenv("TELEMETRY_ENABLED") == "true"
 	}
 
 	if os.Getenv("USE_SPAN_METRICS") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env USE_SPAN_METRICS is deprecated and scheduled for removal. Please use SIGNOZ_FLAGGER_CONFIG_BOOLEAN_USE__SPAN__METRICS instead.")
+		logger.WarnContext(ctx, "[Deprecated] env USE_SPAN_METRICS is deprecated and scheduled for removal. Please use O11Y_FLAGGER_CONFIG_BOOLEAN_USE__SPAN__METRICS instead.")
 		if config.Flagger.Config.Boolean == nil {
 			config.Flagger.Config.Boolean = make(map[string]bool)
 		}
 		config.Flagger.Config.Boolean[flagger.FeatureUseSpanMetrics.String()] = os.Getenv("USE_SPAN_METRICS") == "true"
 	}
 
-	if os.Getenv("SIGNOZ_JWT_SECRET") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env SIGNOZ_JWT_SECRET is deprecated and scheduled for removal. Please use SIGNOZ_TOKENIZER_JWT_SECRET instead.")
-		config.Tokenizer.JWT.Secret = os.Getenv("SIGNOZ_JWT_SECRET")
+	if os.Getenv("O11Y_JWT_SECRET") != "" {
+		logger.WarnContext(ctx, "[Deprecated] env O11Y_JWT_SECRET is deprecated and scheduled for removal. Please use O11Y_TOKENIZER_JWT_SECRET instead.")
+		config.Tokenizer.JWT.Secret = os.Getenv("O11Y_JWT_SECRET")
 	}
 
 	if os.Getenv("KAFKA_SPAN_EVAL") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env KAFKA_SPAN_EVAL is deprecated and scheduled for removal. Please use SIGNOZ_FLAGGER_CONFIG_BOOLEAN_KAFKA__SPAN__EVAL instead.")
+		logger.WarnContext(ctx, "[Deprecated] env KAFKA_SPAN_EVAL is deprecated and scheduled for removal. Please use O11Y_FLAGGER_CONFIG_BOOLEAN_KAFKA__SPAN__EVAL instead.")
 		if config.Flagger.Config.Boolean == nil {
 			config.Flagger.Config.Boolean = make(map[string]bool)
 		}
@@ -327,7 +335,7 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 	}
 
 	if os.Getenv("RULES_EVAL_DELAY") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env RULES_EVAL_DELAY is deprecated and scheduled for removal. Please use SIGNOZ_RULER_EVAL__DELAY instead.")
+		logger.WarnContext(ctx, "[Deprecated] env RULES_EVAL_DELAY is deprecated and scheduled for removal. Please use O11Y_RULER_EVAL__DELAY instead.")
 		if d, err := time.ParseDuration(os.Getenv("RULES_EVAL_DELAY")); err == nil {
 			config.Ruler.EvalDelay = d
 		} else {
