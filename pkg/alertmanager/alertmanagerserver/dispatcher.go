@@ -18,7 +18,7 @@ import (
 	"github.com/prometheus/alertmanager/provider"
 	"github.com/prometheus/alertmanager/store"
 	"github.com/prometheus/alertmanager/types"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/common/model"
 )
 
 // Dispatcher sorts incoming alerts into aggregation groups and
@@ -74,7 +74,7 @@ func NewDispatcher(
 		route:               r,
 		marker:              mk,
 		timeout:             to,
-		logger:              l.With("component", "o11y-dispatcher"),
+		logger:              l.With(slog.String("component", "signoz-dispatcher")),
 		metrics:             m,
 		limits:              lim,
 		notificationManager: n,
@@ -117,7 +117,7 @@ func (d *Dispatcher) run(it provider.AlertIterator) {
 			}
 			alert := alertWrapper.Data
 
-			d.logger.DebugContext(d.ctx, "HanzoO11y Custom Dispatcher: Received alert", "alert", alert)
+			d.logger.DebugContext(d.ctx, "SigNoz Custom Dispatcher: Received alert", slog.Any("alert", alert))
 
 			// Log errors but keep trying.
 			if err := it.Err(); err != nil {
@@ -516,7 +516,7 @@ func (ag *aggrGroup) flush(notify func(...*types.Alert) bool) {
 	}
 }
 
-// unlimitedLimits provides unlimited aggregation groups for HanzoO11y
+// unlimitedLimits provides unlimited aggregation groups for SigNoz.
 type unlimitedLimits struct{}
 
 func (u *unlimitedLimits) MaxNumberOfAggregationGroups() int { return 0 }

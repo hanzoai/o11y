@@ -1,6 +1,11 @@
 package model
 
-import "github.com/hanzoai/o11y/pkg/valuer"
+import (
+	"context"
+
+	"github.com/hanzoai/o11y/pkg/types/opamptypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
+)
 
 // Interface for source of otel collector config recommendations.
 type AgentConfigProvider interface {

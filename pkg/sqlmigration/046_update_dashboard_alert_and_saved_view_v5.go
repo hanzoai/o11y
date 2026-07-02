@@ -6,12 +6,14 @@ import (
 	"encoding/json"
 	"log/slog"
 
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/migrate"
+
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/transition"
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/migrate"
 )
 
 type queryBuilderV5Migration struct {
@@ -50,7 +52,7 @@ func (migration *queryBuilderV5Migration) Register(migrations *migrate.Migration
 func (migration *queryBuilderV5Migration) getTraceDuplicateKeys(ctx context.Context) ([]string, error) {
 	query := `
 		SELECT tagKey
-		FROM observe_traces.distributed_span_attributes_keys
+		FROM signoz_traces.distributed_span_attributes_keys
 		WHERE tagType IN ('tag', 'resource')
 		GROUP BY tagKey
 		HAVING COUNT(DISTINCT tagType) > 1
@@ -81,9 +83,9 @@ func (migration *queryBuilderV5Migration) getLogDuplicateKeys(ctx context.Contex
 	query := `
 		SELECT name
 		FROM (
-			SELECT DISTINCT name FROM observe_logs.distributed_logs_attribute_keys
+			SELECT DISTINCT name FROM signoz_logs.distributed_logs_attribute_keys
 			INTERSECT
-			SELECT DISTINCT name FROM observe_logs.distributed_logs_resource_keys
+			SELECT DISTINCT name FROM signoz_logs.distributed_logs_resource_keys
 		)
 		ORDER BY name
 	`

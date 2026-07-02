@@ -18,7 +18,7 @@ import (
 	"github.com/prometheus/alertmanager/pkg/labels"
 	"github.com/prometheus/alertmanager/provider"
 	"github.com/prometheus/alertmanager/types"
-	"github.com/hanzoai/common/model"
+	"github.com/prometheus/common/model"
 )
 
 type (
@@ -134,7 +134,7 @@ func NewAlertsFromPostableAlerts(ctx context.Context, postableAlerts PostableAle
 	return validAlerts, errs
 }
 
-func NewTestAlert(receiver Receiver, startsAt time.Time, updatedAt time.Time) *Alert {
+func NewTestAlert(receiver *Receiver, startsAt time.Time, updatedAt time.Time) *Alert {
 	return &Alert{
 		Alert: model.Alert{
 			StartsAt: startsAt,
@@ -143,9 +143,9 @@ func NewTestAlert(receiver Receiver, startsAt time.Time, updatedAt time.Time) *A
 				"severity":  "critical",
 			},
 			Annotations: model.LabelSet{
-				"description": "Test alert fired from HanzoO11y",
-				"summary":     "Test alert fired from HanzoO11y",
-				"message":     "Test alert fired from HanzoO11y",
+				"description": "Test alert fired from SigNoz",
+				"summary":     "Test alert fired from SigNoz",
+				"message":     "Test alert fired from SigNoz",
 			},
 		},
 		UpdatedAt: updatedAt,

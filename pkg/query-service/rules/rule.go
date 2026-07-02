@@ -4,8 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/query-service/model"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
+	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	ruletypes "github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )

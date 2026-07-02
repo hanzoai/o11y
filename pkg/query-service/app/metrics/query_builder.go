@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"go.uber.org/zap"
 )
 
 func AddMetricValueFilter(mq *v3.BuilderQuery) *v3.MetricValueFilter {
@@ -83,7 +82,7 @@ func AddMetricValueFilter(mq *v3.BuilderQuery) *v3.MetricValueFilter {
 	return metricValueFilter
 }
 
-// FormattedValue formats the value to be used in datastore query
+// FormattedValue formats the value to be used in clickhouse query
 func FormattedValue(v interface{}) string {
 	switch x := v.(type) {
 	case int:

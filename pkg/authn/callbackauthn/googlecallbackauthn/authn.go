@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/url"
+	"path"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"golang.org/x/oauth2"
@@ -14,6 +15,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/authn"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/http/client"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
@@ -21,7 +23,7 @@ import (
 
 const (
 	issuerURL    string = "https://accounts.google.com"
-	redirectPath string = "/v1/o11y/v1/complete/google"
+	redirectPath string = "/api/v1/complete/google"
 )
 
 var scopes []string = []string{"email", "profile"}
@@ -29,12 +31,13 @@ var scopes []string = []string{"email", "profile"}
 var _ authn.CallbackAuthN = (*AuthN)(nil)
 
 type AuthN struct {
-	store      authtypes.AuthNStore
-	settings   factory.ScopedProviderSettings
-	httpClient *client.Client
+	store        authtypes.AuthNStore
+	settings     factory.ScopedProviderSettings
+	httpClient   *client.Client
+	globalConfig global.Config
 }
 
-func New(ctx context.Context, store authtypes.AuthNStore, providerSettings factory.ProviderSettings) (*AuthN, error) {
+func New(ctx context.Context, store authtypes.AuthNStore, providerSettings factory.ProviderSettings, globalConfig global.Config) (*AuthN, error) {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/authn/callbackauthn/googlecallbackauthn")
 
 	httpClient, err := client.New(settings.Logger(), providerSettings.TracerProvider, providerSettings.MeterProvider)
@@ -43,9 +46,10 @@ func New(ctx context.Context, store authtypes.AuthNStore, providerSettings facto
 	}
 
 	return &AuthN{
-		store:      store,
-		settings:   settings,
-		httpClient: httpClient,
+		store:        store,
+		settings:     settings,
+		httpClient:   httpClient,
+		globalConfig: globalConfig,
 	}, nil
 }
 
@@ -178,7 +182,7 @@ func (a *AuthN) oauth2Config(siteURL *url.URL, authDomain *authtypes.AuthDomain,
 		RedirectURL: (&url.URL{
 			Scheme: siteURL.Scheme,
 			Host:   siteURL.Host,
-			Path:   redirectPath,
+			Path:   path.Join(a.globalConfig.ExternalPath(), redirectPath),
 		}).String(),
 	}
 }

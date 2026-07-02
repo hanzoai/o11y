@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	datastore "github.com/ClickHouse/clickhouse-go/v2"
+	"github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -23,7 +23,7 @@ type chSQLQuery struct {
 	logger         *slog.Logger
 	telemetryStore telemetrystore.TelemetryStore
 
-	query  qbtypes.DatastoreQuery
+	query  qbtypes.ClickHouseQuery
 	args   []any
 	fromMS uint64
 	toMS   uint64
@@ -32,11 +32,12 @@ type chSQLQuery struct {
 }
 
 var _ qbtypes.Query = (*chSQLQuery)(nil)
+var _ qbtypes.StatementProvider = (*chSQLQuery)(nil)
 
 func newchSQLQuery(
 	logger *slog.Logger,
 	telemetryStore telemetrystore.TelemetryStore,
-	query qbtypes.DatastoreQuery,
+	query qbtypes.ClickHouseQuery,
 	args []any,
 	tr qbtypes.TimeRange,
 	kind qbtypes.RequestType,
@@ -84,7 +85,7 @@ func (q *chSQLQuery) renderVars(query string, vars map[string]qbtypes.VariableIt
 		query = strings.ReplaceAll(query, fmt.Sprintf("$%s", k), fmt.Sprint(varsData[k]))
 	}
 
-	tmpl := template.New("datastore-query")
+	tmpl := template.New("clickhouse-query")
 	tmpl, err := tmpl.Parse(query)
 	if err != nil {
 		return "", errors.WrapInternalf(err, errors.CodeInternal, "error while replacing template variables")
@@ -99,6 +100,15 @@ func (q *chSQLQuery) renderVars(query string, vars map[string]qbtypes.VariableIt
 	return newQuery.String(), nil
 }
 
+// Statement renders the SQL without executing it, for the preview path.
+func (q *chSQLQuery) Statement(_ context.Context) (*qbtypes.Statement, error) {
+	rendered, err := q.renderVars(q.query.Query, q.vars, q.fromMS, q.toMS)
+	if err != nil {
+		return nil, err
+	}
+	return &qbtypes.Statement{Query: rendered, Args: q.args}, nil
+}
+
 func (q *chSQLQuery) Execute(ctx context.Context) (*qbtypes.Result, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.QueryDuration: instrumentationtypes.DurationBucket(q.fromMS, q.toMS),
@@ -108,7 +118,7 @@ func (q *chSQLQuery) Execute(ctx context.Context) (*qbtypes.Result, error) {
 	totalBytes := uint64(0)
 	elapsed := time.Duration(0)
 
-	ctx = datastore.Context(ctx, datastore.WithProgress(func(p *datastore.Progress) {
+	ctx = clickhouse.Context(ctx, clickhouse.WithProgress(func(p *clickhouse.Progress) {
 		totalRows += p.Rows
 		totalBytes += p.Bytes
 		elapsed += p.Elapsed
@@ -125,7 +135,7 @@ func (q *chSQLQuery) Execute(ctx context.Context) (*qbtypes.Result, error) {
 	}
 	defer rows.Close()
 
-	// TODO: map the errors from Datastore to our error types
+	// TODO: map the errors from ClickHouse to our error types
 	payload, err := consume(rows, q.kind, nil, qbtypes.Step{}, q.query.Name)
 	if err != nil {
 		return nil, err

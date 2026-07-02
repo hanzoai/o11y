@@ -4,9 +4,11 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/open-feature/go-sdk/openfeature"
+
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
-	"github.com/open-feature/go-sdk/openfeature"
 )
 
 // Any feature flag provider has to implement this interface.

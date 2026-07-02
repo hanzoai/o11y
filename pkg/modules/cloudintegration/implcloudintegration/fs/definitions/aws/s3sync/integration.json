@@ -36,14 +36,16 @@
       }
     ]
   },
-  "telemetry_collection_strategy": {
-    "aws_logs": {
-      "cloudwatch_logs_subscriptions": [
-        {
-          "log_group_name_prefix": "x/o11y/forwarder",
-          "filter_pattern": ""
-        }
-      ]
+  "telemetryCollectionStrategy": {
+    "aws": {
+      "logs": {
+        "subscriptions": [
+          {
+            "logGroupNamePrefix": "x/signoz/forwarder",
+            "filterPattern": ""
+          }
+        ]
+      }
     }
   },
   "assets": {

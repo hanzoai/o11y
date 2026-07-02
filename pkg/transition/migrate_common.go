@@ -168,7 +168,7 @@ func (mc *migrateCommon) updateQueryData(ctx context.Context, queryData map[stri
 					columnName, _ := orderMap["columnName"].(string)
 					// skip timestamp, id (logs, traces), samples(metrics) ordering for aggregation queries
 					if columnName != "timestamp" && columnName != "samples" && columnName != "id" {
-						if columnName == "#O11Y_VALUE" {
+						if columnName == "#SIGNOZ_VALUE" {
 							if expr, has := mc.orderByExpr(queryData); has {
 								orderMap["columnName"] = expr
 							}

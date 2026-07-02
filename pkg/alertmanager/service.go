@@ -7,7 +7,6 @@ import (
 
 	"github.com/prometheus/alertmanager/featurecontrol"
 	"github.com/prometheus/alertmanager/matcher/compat"
-	"github.com/luxfi/metric"
 
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerserver"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager"
@@ -32,13 +31,6 @@ type Service struct {
 
 	// settings is the settings for the alertmanager service
 	settings factory.ScopedProviderSettings
-
-	// promRegistry is the alertmanager-library boundary: prometheus/alertmanager
-	// (dispatch, silence, notify, mem) requires a metric.Registerer. The
-	// rest of o11y emits through luxfi/metric — this registry lives here only
-	// because the upstream alertmanager library is hard-bound to metric.
-	// Replace when the alertmanager rip ships.
-	promRegistry metric.Registry
 
 	// Map of organization id to alertmanager server
 	servers map[string]*alertmanagerserver.Server
@@ -66,7 +58,6 @@ func New(
 		configStore:         configStore,
 		orgGetter:           orgGetter,
 		settings:            settings,
-		promRegistry:        metric.NewRegistry(),
 		servers:             make(map[string]*alertmanagerserver.Server),
 		serversMtx:          sync.RWMutex{},
 		notificationManager: nfManager,
@@ -147,7 +138,7 @@ func (service *Service) PutAlerts(ctx context.Context, orgID string, alerts aler
 	return server.PutAlerts(ctx, alerts)
 }
 
-func (service *Service) TestReceiver(ctx context.Context, orgID string, receiver alertmanagertypes.Receiver) error {
+func (service *Service) TestReceiver(ctx context.Context, orgID string, receiver *alertmanagertypes.Receiver) error {
 	service.serversMtx.RLock()
 	defer service.serversMtx.RUnlock()
 
@@ -189,7 +180,10 @@ func (service *Service) newServer(ctx context.Context, orgID string) (*alertmana
 		return nil, err
 	}
 
-	server, err := alertmanagerserver.New(ctx, service.settings.Logger(), service.promRegistry, service.config, orgID, service.stateStore, service.notificationManager)
+	server, err := alertmanagerserver.New(
+		ctx, service.settings.Logger(), service.settings.PrometheusRegisterer(), service.config, orgID,
+		service.stateStore, service.notificationManager, service.maintenanceStore,
+	)
 	if err != nil {
 		return nil, err
 	}

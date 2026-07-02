@@ -1,4 +1,4 @@
-### Monitor AWS ElastiCache (redis) with Hanzo O11y
+### Monitor AWS ElastiCache (redis) with SigNoz
 
 Collect key AWS ElastiCache (redis) metrics and view them with an out of the box dashboard.  
 

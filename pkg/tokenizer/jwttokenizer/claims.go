@@ -2,7 +2,6 @@ package jwttokenizer
 
 import (
 	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/golang-jwt/jwt/v5"
 )
 

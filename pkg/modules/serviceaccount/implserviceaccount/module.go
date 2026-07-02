@@ -4,12 +4,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/analytics"
 	"github.com/hanzoai/o11y/pkg/authz"
-	"github.com/hanzoai/o11y/pkg/emailing"
+	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/types/emailtypes"
+	"github.com/hanzoai/o11y/pkg/types/cachetypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/serviceaccounttypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
@@ -27,9 +30,9 @@ type module struct {
 	config    serviceaccount.Config
 }
 
-func NewModule(store serviceaccounttypes.Store, authz authz.AuthZ, emailing emailing.Emailing, providerSettings factory.ProviderSettings) serviceaccount.Module {
+func NewModule(store serviceaccounttypes.Store, authz authz.AuthZ, cache cache.Cache, analytics analytics.Analytics, providerSettings factory.ProviderSettings, config serviceaccount.Config) serviceaccount.Module {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/modules/serviceaccount/implserviceaccount")
-	return &module{store: store, authz: authz, emailing: emailing, settings: settings}
+	return &module{store: store, authz: authz, cache: cache, analytics: analytics, settings: settings, config: config}
 }
 
 func (module *module) Create(ctx context.Context, orgID valuer.UUID, serviceAccount *serviceaccounttypes.ServiceAccount) error {
@@ -205,17 +208,8 @@ func (module *module) CreateFactorAPIKey(ctx context.Context, factorAPIKey *serv
 	}
 
 	serviceAccount, err := module.store.GetByID(ctx, factorAPIKey.ServiceAccountID)
-	if err != nil {
-		return err
-	}
-
-	if err := module.emailing.SendHTML(ctx, serviceAccount.Email, "New API Key created for your HanzoO11y account", emailtypes.TemplateNameAPIKeyEvent, map[string]any{
-		"Name":         serviceAccount.Name,
-		"KeyName":      factorAPIKey.Name,
-		"KeyID":        factorAPIKey.ID.String(),
-		"KeyCreatedAt": factorAPIKey.CreatedAt.String(),
-	}); err != nil {
-		module.settings.Logger().ErrorContext(ctx, "failed to send email", "error", err)
+	if err == nil {
+		module.trackUser(ctx, serviceAccount.OrgID.StringValue(), serviceAccount.ID.String(), "API Key created", factorAPIKey.Traits())
 	}
 
 	return nil
@@ -285,15 +279,9 @@ func (module *module) RevokeFactorAPIKey(ctx context.Context, serviceAccountID v
 		return err
 	}
 
-	if err := module.emailing.SendHTML(ctx, serviceAccount.Email, "API Key revoked for your HanzoO11y account", emailtypes.TemplateNameAPIKeyEvent, map[string]any{
-		"Name":         serviceAccount.Name,
-		"KeyName":      factorAPIKey.Name,
-		"KeyID":        factorAPIKey.ID.String(),
-		"KeyCreatedAt": factorAPIKey.CreatedAt.String(),
-	}); err != nil {
-		module.settings.Logger().ErrorContext(ctx, "failed to send email", "error", err)
-	}
-
+	// delete the cache when revoking the factor api key
+	module.cache.Delete(ctx, emptyOrgID, apiKeyCacheKey(factorAPIKey.Key))
+	module.trackUser(ctx, serviceAccount.OrgID.StringValue(), serviceAccountID.String(), "API Key revoked", factorAPIKey.Traits())
 	return nil
 }
 

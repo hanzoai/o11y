@@ -3,7 +3,9 @@ package rules
 import (
 	"time"
 
-	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/ruletypes"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
 type recoveryTestCase struct {

@@ -19,8 +19,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 
 	"github.com/go-openapi/strfmt"
-	"github.com/hanzoai/common/model"
-	metric "github.com/luxfi/metric"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/model"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -110,7 +110,7 @@ func TestEndToEndAlertManagerFlow(t *testing.T) {
 
 	srvCfg := NewConfig()
 	stateStore := alertmanagertypestest.NewStateStore()
-	registry := metric.NewRegistry()
+	registry := prometheus.NewRegistry()
 	logger := slog.New(slog.DiscardHandler)
 	server, err := New(context.Background(), logger, registry, srvCfg, orgID, stateStore, notificationManager, maintenanceStore)
 	require.NoError(t, err)

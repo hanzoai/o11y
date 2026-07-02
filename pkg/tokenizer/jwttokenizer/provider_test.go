@@ -14,7 +14,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstoretest"
 	"github.com/hanzoai/o11y/pkg/tokenizer"
 	"github.com/hanzoai/o11y/pkg/tokenizer/tokenizerstore/sqltokenizerstore"
-	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/stretchr/testify/assert"

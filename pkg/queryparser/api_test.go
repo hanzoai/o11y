@@ -67,7 +67,7 @@ func TestAPI_AnalyzeQueryFilter(t *testing.T) {
 			expectedGroups:    []parsertypes.ColumnInfoResponse{{Name: "pod", Alias: ""}},
 		},
 		{
-			name: "Datastore - Simple CTE with GROUP BY",
+			name: "ClickHouse - Simple CTE with GROUP BY",
 			requestBody: parsertypes.QueryFilterAnalyzeRequest{
 				Query: `WITH aggregated AS (
 					SELECT region as region_alias, sum(value) AS total
@@ -76,7 +76,7 @@ func TestAPI_AnalyzeQueryFilter(t *testing.T) {
 					GROUP BY region
 				)
 				SELECT * FROM aggregated`,
-				QueryType: querybuildertypesv5.QueryTypeDatastoreSQL,
+				QueryType: querybuildertypesv5.QueryTypeClickHouseSQL,
 			},
 			expectedStatus:    http.StatusOK,
 			expectedStatusStr: "success",
@@ -85,7 +85,7 @@ func TestAPI_AnalyzeQueryFilter(t *testing.T) {
 			expectedGroups:    []parsertypes.ColumnInfoResponse{{Name: "region", Alias: "region_alias"}},
 		},
 		{
-			name: "Datastore - CTE chain with last GROUP BY + Alias should be returned if exists",
+			name: "ClickHouse - CTE chain with last GROUP BY + Alias should be returned if exists",
 			requestBody: parsertypes.QueryFilterAnalyzeRequest{
 				Query: `WITH step1 AS (
 					SELECT service as service_alias, timestamp as ts, value
@@ -99,7 +99,7 @@ func TestAPI_AnalyzeQueryFilter(t *testing.T) {
 					GROUP BY ts
 				)
 				SELECT * FROM step2`,
-				QueryType: querybuildertypesv5.QueryTypeDatastoreSQL,
+				QueryType: querybuildertypesv5.QueryTypeClickHouseSQL,
 			},
 			expectedStatus:    http.StatusOK,
 			expectedStatusStr: "success",
@@ -108,7 +108,7 @@ func TestAPI_AnalyzeQueryFilter(t *testing.T) {
 			expectedGroups:    []parsertypes.ColumnInfoResponse{{Name: "ts", Alias: ""}},
 		},
 		{
-			name: "Datastore - Outer GROUP BY overrides CTE GROUP BY + Alias should be returned if exists",
+			name: "ClickHouse - Outer GROUP BY overrides CTE GROUP BY + Alias should be returned if exists",
 			requestBody: parsertypes.QueryFilterAnalyzeRequest{
 				Query: `WITH cte AS (
 					SELECT region, service, value
@@ -119,7 +119,7 @@ func TestAPI_AnalyzeQueryFilter(t *testing.T) {
 				SELECT region as region_alias, sum(value) as total
 				FROM cte
 				GROUP BY region`,
-				QueryType: querybuildertypesv5.QueryTypeDatastoreSQL,
+				QueryType: querybuildertypesv5.QueryTypeClickHouseSQL,
 			},
 			expectedStatus:    http.StatusOK,
 			expectedStatusStr: "success",
@@ -128,15 +128,15 @@ func TestAPI_AnalyzeQueryFilter(t *testing.T) {
 			expectedGroups:    []parsertypes.ColumnInfoResponse{{Name: "region", Alias: "region_alias"}},
 		},
 		{
-			name: "Datastore - Invalid query should return error",
+			name: "ClickHouse - Invalid query should return error",
 			requestBody: parsertypes.QueryFilterAnalyzeRequest{
 				Query:     `SELECT WHERE metric_name = 'memory' GROUP BY region, service`,
-				QueryType: querybuildertypesv5.QueryTypeDatastoreSQL,
+				QueryType: querybuildertypesv5.QueryTypeClickHouseSQL,
 			},
 			expectedStatus:    http.StatusBadRequest,
 			expectedStatusStr: "error",
 			expectedError:     true,
-			errorContains:     "failed to parse datastore query",
+			errorContains:     "failed to parse clickhouse query",
 		},
 		{
 			name: "Empty query should return error",
@@ -182,7 +182,7 @@ func TestAPI_AnalyzeQueryFilter(t *testing.T) {
 			}
 
 			// Create HTTP request
-			req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/o11y/v1/query_filter/analyze", bytes.NewBuffer(reqBody))
+			req := httptest.NewRequestWithContext(context.Background(), http.MethodPost, "/api/v1/query_filter/analyze", bytes.NewBuffer(reqBody))
 			req.Header.Set("Content-Type", "application/json")
 
 			// Create response recorder

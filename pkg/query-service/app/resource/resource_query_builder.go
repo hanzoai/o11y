@@ -29,7 +29,7 @@ var resourceLogOperators = map[v3.FilterOperator]string{
 	v3.FilterOperatorNotILike:        "NOT ILIKE",
 }
 
-// buildResourceFilter builds a datastore filter string for resource labels
+// buildResourceFilter builds a clickhouse filter string for resource labels
 func buildResourceFilter(logsOp string, key string, op v3.FilterOperator, value interface{}) string {
 	// for all operators except contains and like
 	searchKey := fmt.Sprintf("simpleJSONExtractString(labels, '%s')", key)
@@ -37,7 +37,7 @@ func buildResourceFilter(logsOp string, key string, op v3.FilterOperator, value 
 	// for contains and like it will be case insensitive
 	lowerSearchKey := fmt.Sprintf("simpleJSONExtractString(lower(labels), '%s')", key)
 
-	chFmtVal := utils.DatastoreFormattedValue(value)
+	chFmtVal := utils.ClickHouseFormattedValue(value)
 
 	lowerValue := strings.ToLower(fmt.Sprintf("%s", value))
 
@@ -49,12 +49,12 @@ func buildResourceFilter(logsOp string, key string, op v3.FilterOperator, value 
 	case v3.FilterOperatorRegex, v3.FilterOperatorNotRegex:
 		return fmt.Sprintf(logsOp, searchKey, chFmtVal)
 	case v3.FilterOperatorContains, v3.FilterOperatorNotContains:
-		// this is required as datastoreFormattedValue add's quotes to the string
+		// this is required as clickhouseFormattedValue add's quotes to the string
 		// we also want to treat %, _ as literals for contains
 		escapedStringValue := utils.QuoteEscapedStringForContains(lowerValue, false)
 		return fmt.Sprintf("%s %s '%%%s%%'", lowerSearchKey, logsOp, escapedStringValue)
 	case v3.FilterOperatorLike, v3.FilterOperatorNotLike, v3.FilterOperatorILike, v3.FilterOperatorNotILike:
-		// this is required as datastoreFormattedValue add's quotes to the string
+		// this is required as clickhouseFormattedValue add's quotes to the string
 		escapedStringValue := utils.QuoteEscapedString(lowerValue)
 		return fmt.Sprintf("%s %s '%s'", lowerSearchKey, logsOp, escapedStringValue)
 	default:
@@ -62,7 +62,7 @@ func buildResourceFilter(logsOp string, key string, op v3.FilterOperator, value 
 	}
 }
 
-// buildIndexFilterForInOperator builds a datastore filter string for in operator
+// buildIndexFilterForInOperator builds a clickhouse filter string for in operator
 // example:= x in a,b,c = (labels like '%"x"%"a"%' or labels like '%"x":"b"%' or labels like '%"x"="c"%')
 // example:= x nin a,b,c = (labels nlike '%"x"%"a"%' AND labels nlike '%"x"="b"' AND labels nlike '%"x"="c"%')
 func buildIndexFilterForInOperator(key string, op v3.FilterOperator, value interface{}) string {
@@ -102,7 +102,7 @@ func buildIndexFilterForInOperator(key string, op v3.FilterOperator, value inter
 	return ""
 }
 
-// buildResourceIndexFilter builds a datastore filter string for resource labels
+// buildResourceIndexFilter builds a clickhouse filter string for resource labels
 // example:= x like '%john%' = labels like '%x%john%'
 // we have two indexes for resource attributes one is lower and one is normal.
 // for all operators other then like/contains we will use normal index
@@ -110,7 +110,7 @@ func buildIndexFilterForInOperator(key string, op v3.FilterOperator, value inter
 // we can use lower index for =, in etc but it's difficult to do it for !=, NIN etc
 // if as x != "ABC" we cannot predict something like "not lower(labels) like '%%x%%abc%%'". It has it be "not lower(labels) like '%%x%%ABC%%'"
 func buildResourceIndexFilter(key string, op v3.FilterOperator, value interface{}) string {
-	// not using datastoreFormattedValue as we don't wan't the quotes
+	// not using clickhouseFormattedValue as we don't wan't the quotes
 	strVal := fmt.Sprintf("%s", value)
 	fmtValEscapedForContains := utils.QuoteEscapedStringForContains(strVal, true)
 	fmtValEscapedForContainsLower := strings.ToLower(fmtValEscapedForContains)
@@ -146,7 +146,7 @@ func buildResourceIndexFilter(key string, op v3.FilterOperator, value interface{
 	}
 }
 
-// buildResourceFiltersFromFilterItems builds a list of datastore filter strings for resource labels from a FilterSet.
+// buildResourceFiltersFromFilterItems builds a list of clickhouse filter strings for resource labels from a FilterSet.
 // It skips any filter items that are not resource attributes and checks that the operator is supported and the data type is correct.
 func buildResourceFiltersFromFilterItems(fs *v3.FilterSet) ([]string, error) {
 	var conditions []string

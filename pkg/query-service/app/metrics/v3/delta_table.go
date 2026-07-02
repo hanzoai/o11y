@@ -49,12 +49,12 @@ func buildDeltaMetricQueryForTable(start, end, _ int64, mq *v3.BuilderQuery) (st
 		return "", err
 	}
 
-	samplesTableTimeFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli <= %d", utils.DatastoreFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
+	samplesTableTimeFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli <= %d", utils.ClickHouseFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
 
 	queryTmpl :=
 		"SELECT %s toStartOfHour(now()) as ts," + // now() has no menaing & used as a placeholder for ts
 			" %s as value" +
-			" FROM " + constants.O11Y_METRIC_DBNAME + "." + constants.O11Y_SAMPLES_V4_TABLENAME +
+			" FROM " + constants.SIGNOZ_METRIC_DBNAME + "." + constants.SIGNOZ_SAMPLES_V4_TABLENAME +
 			" INNER JOIN" +
 			" (%s) as filtered_time_series" +
 			" USING fingerprint" +

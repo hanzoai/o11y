@@ -4,17 +4,17 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"slices"
 	"strings"
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
+	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/telemetryresourcefilter"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/huandu/go-sqlbuilder"
-	"golang.org/x/exp/maps"
 )
 
 var (
@@ -22,13 +22,13 @@ var (
 )
 
 type traceQueryStatementBuilder struct {
-	logger                    *slog.Logger
-	metadataStore             telemetrytypes.MetadataStore
-	fm                        qbtypes.FieldMapper
-	cb                        qbtypes.ConditionBuilder
-	resourceFilterStmtBuilder qbtypes.StatementBuilder[qbtypes.TraceAggregation]
-	aggExprRewriter           qbtypes.AggExprRewriter
-	telemetryStore            telemetrystore.TelemetryStore
+	logger                         *slog.Logger
+	metadataStore                  telemetrytypes.MetadataStore
+	fm                             qbtypes.FieldMapper
+	cb                             qbtypes.ConditionBuilder
+	resourceFilterResolver         *telemetryresourcefilter.ResourceFingerprintResolver[qbtypes.TraceAggregation]
+	aggExprRewriter                qbtypes.AggExprRewriter
+	skipResourceFingerprintEnabled bool
 }
 
 var _ qbtypes.StatementBuilder[qbtypes.TraceAggregation] = (*traceQueryStatementBuilder)(nil)
@@ -41,16 +41,33 @@ func NewTraceQueryStatementBuilder(
 	aggExprRewriter qbtypes.AggExprRewriter,
 	telemetryStore telemetrystore.TelemetryStore,
 	flagger flagger.Flagger,
+	skipResourceFingerprintEnable bool,
+	skipResourceFingerprintThreshold uint64,
 ) *traceQueryStatementBuilder {
 	tracesSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/telemetrytraces")
+
+	resourceFilterResolver := telemetryresourcefilter.NewResolver[qbtypes.TraceAggregation](
+		settings,
+		DBName,
+		TracesResourceV3TableName,
+		telemetrytypes.SignalTraces,
+		telemetrytypes.SourceUnspecified,
+		metadataStore,
+		nil,
+		nil,
+		flagger,
+		telemetryStore,
+		skipResourceFingerprintThreshold,
+	)
+
 	return &traceQueryStatementBuilder{
-		logger:                    tracesSettings.Logger(),
-		metadataStore:             metadataStore,
-		fm:                        fieldMapper,
-		cb:                        conditionBuilder,
-		resourceFilterStmtBuilder: resourceFilterStmtBuilder,
-		aggExprRewriter:           aggExprRewriter,
-		telemetryStore:            telemetryStore,
+		logger:                         tracesSettings.Logger(),
+		metadataStore:                  metadataStore,
+		fm:                             fieldMapper,
+		cb:                             conditionBuilder,
+		resourceFilterResolver:         resourceFilterResolver,
+		aggExprRewriter:                aggExprRewriter,
+		skipResourceFingerprintEnabled: skipResourceFingerprintEnable,
 	}
 }
 
@@ -67,40 +84,13 @@ func (b *traceQueryStatementBuilder) Build(
 	start = querybuilder.ToNanoSecs(start)
 	end = querybuilder.ToNanoSecs(end)
 
-	/*
-		Adding a tech debt note here:
-		This piece of code is a hot fix and should be removed once we close issue: engineering-pod/issues/3622
-	*/
-	/*
-		-------------------------------- Start of tech debt ----------------------------
-	*/
+	isSelectFieldsEmpty := false
 	if requestType == qbtypes.RequestTypeRaw {
-
-		selectedFields := query.SelectFields
-
-		if len(selectedFields) == 0 {
-			sortedKeys := maps.Keys(DefaultFields)
-			slices.Sort(sortedKeys)
-			for _, key := range sortedKeys {
-				selectedFields = append(selectedFields, DefaultFields[key])
-			}
-			query.SelectFields = selectedFields
-		}
-
-		selectFieldKeys := []string{}
-		for _, field := range selectedFields {
-			selectFieldKeys = append(selectFieldKeys, field.Name)
-		}
-
-		for _, x := range []string{"timestamp", "span_id", "trace_id"} {
-			if !slices.Contains(selectFieldKeys, x) {
-				query.SelectFields = append(query.SelectFields, DefaultFields[x])
-			}
-		}
+		isSelectFieldsEmpty = len(query.SelectFields) == 0
+		// we are expanding here to ensure that all the conflicts are taken care in adjustKeys
+		// i.e if there is a conflict we strip away context of the key in adjustKeys
+		query = b.expandRawSelectFields(query)
 	}
-	/*
-		-------------------------------- End of tech debt ----------------------------
-	*/
 
 	// We modify SelectFields above (injecting default fields), and those default
 	// fields can carry keys that need evolutions, so fetch keys after that.
@@ -120,7 +110,7 @@ func (b *traceQueryStatementBuilder) Build(
 
 	switch requestType {
 	case qbtypes.RequestTypeRaw:
-		return b.buildListQuery(ctx, q, query, start, end, keys, variables)
+		return b.buildListQuery(ctx, q, query, start, end, keys, variables, isSelectFieldsEmpty)
 	case qbtypes.RequestTypeTimeSeries:
 		return b.buildTimeSeriesQuery(ctx, q, query, start, end, keys, variables)
 	case qbtypes.RequestTypeScalar:
@@ -286,6 +276,7 @@ func (b *traceQueryStatementBuilder) buildListQuery(
 	start, end uint64,
 	keys map[string][]*telemetrytypes.TelemetryFieldKey,
 	variables map[string]qbtypes.VariableItem,
+	isSelectFieldsEmpty bool,
 ) (*qbtypes.Statement, error) {
 
 	var (
@@ -293,14 +284,15 @@ func (b *traceQueryStatementBuilder) buildListQuery(
 		cteArgs      [][]any
 	)
 
-	if frag, args, err := b.maybeAttachResourceFilter(ctx, sb, query, start, end, variables); err != nil {
+	frag, args, skipResourceFilter, err := b.maybeAttachResourceFilter(ctx, sb, query, start, end, variables)
+	if err != nil {
 		return nil, err
-	} else if frag != "" {
+	}
+	if frag != "" {
 		cteFragments = append(cteFragments, frag)
 		cteArgs = append(cteArgs, args)
 	}
 
-	// TODO: should we deprecate `SelectFields` and return everything from a span like we do for logs?
 	for _, field := range query.SelectFields {
 		colExpr, err := b.fm.ColumnExpressionFor(ctx, start, end, &field, keys)
 		if err != nil {
@@ -309,11 +301,17 @@ func (b *traceQueryStatementBuilder) buildListQuery(
 		sb.SelectMore(colExpr)
 	}
 
+	if isSelectFieldsEmpty {
+		for _, col := range ContextualSpanColumns {
+			sb.SelectMore(col)
+		}
+	}
+
 	// From table
 	sb.From(fmt.Sprintf("%s.%s", DBName, SpanIndexV3TableName))
 
 	// Add filter conditions
-	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables)
+	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
 	if err != nil {
 		return nil, err
 	}
@@ -374,15 +372,17 @@ func (b *traceQueryStatementBuilder) buildTraceQuery(
 		cteArgs      [][]any
 	)
 
-	if frag, args, err := b.maybeAttachResourceFilter(ctx, distSB, query, start, end, variables); err != nil {
+	frag, args, skipResourceFilter, err := b.maybeAttachResourceFilter(ctx, distSB, query, start, end, variables)
+	if err != nil {
 		return nil, err
-	} else if frag != "" {
+	}
+	if frag != "" {
 		cteFragments = append(cteFragments, frag)
 		cteArgs = append(cteArgs, args)
 	}
 
 	// Add filter conditions
-	preparedWhereClause, err := b.addFilterCondition(ctx, distSB, start, end, query, keys, variables)
+	preparedWhereClause, err := b.addFilterCondition(ctx, distSB, start, end, query, keys, variables, skipResourceFilter)
 	if err != nil {
 		return nil, err
 	}
@@ -483,9 +483,11 @@ func (b *traceQueryStatementBuilder) buildTimeSeriesQuery(
 		cteArgs      [][]any
 	)
 
-	if frag, args, err := b.maybeAttachResourceFilter(ctx, sb, query, start, end, variables); err != nil {
+	frag, args, skipResourceFilter, err := b.maybeAttachResourceFilter(ctx, sb, query, start, end, variables)
+	if err != nil {
 		return nil, err
-	} else if frag != "" {
+	}
+	if frag != "" {
 		cteFragments = append(cteFragments, frag)
 		cteArgs = append(cteArgs, args)
 	}
@@ -526,7 +528,7 @@ func (b *traceQueryStatementBuilder) buildTimeSeriesQuery(
 	}
 
 	sb.From(fmt.Sprintf("%s.%s", DBName, SpanIndexV3TableName))
-	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables)
+	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
 	if err != nil {
 		return nil, err
 	}
@@ -635,9 +637,11 @@ func (b *traceQueryStatementBuilder) buildScalarQuery(
 		cteArgs      [][]any
 	)
 
-	if frag, args, err := b.maybeAttachResourceFilter(ctx, sb, query, start, end, variables); err != nil {
+	frag, args, skipResourceFilter, err := b.maybeAttachResourceFilter(ctx, sb, query, start, end, variables)
+	if err != nil {
 		return nil, err
-	} else if frag != "" && !skipResourceCTE {
+	}
+	if frag != "" && !skipResourceCTE {
 		cteFragments = append(cteFragments, frag)
 		cteArgs = append(cteArgs, args)
 	}
@@ -679,7 +683,7 @@ func (b *traceQueryStatementBuilder) buildScalarQuery(
 	sb.From(fmt.Sprintf("%s.%s", DBName, SpanIndexV3TableName))
 
 	// Add filter conditions
-	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables)
+	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
 	if err != nil {
 		return nil, err
 	}
@@ -742,6 +746,7 @@ func (b *traceQueryStatementBuilder) addFilterCondition(
 	query qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation],
 	keys map[string][]*telemetrytypes.TelemetryFieldKey,
 	variables map[string]qbtypes.VariableItem,
+	skipResourceFilter bool,
 ) (querybuilder.PreparedWhereClause, error) {
 
 	var preparedWhereClause querybuilder.PreparedWhereClause
@@ -755,7 +760,7 @@ func (b *traceQueryStatementBuilder) addFilterCondition(
 			FieldMapper:        b.fm,
 			ConditionBuilder:   b.cb,
 			FieldKeys:          keys,
-			SkipResourceFilter: true,
+			SkipResourceFilter: skipResourceFilter,
 			Variables:          variables,
 			StartNs:            start,
 			EndNs:              end,
@@ -796,34 +801,57 @@ func (b *traceQueryStatementBuilder) maybeAttachResourceFilter(
 	query qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation],
 	start, end uint64,
 	variables map[string]qbtypes.VariableItem,
-) (cteSQL string, cteArgs []any, err error) {
+) (cteSQL string, cteArgs []any, skipResourceFilter bool, err error) {
 
-	stmt, err := b.buildResourceFilterCTE(ctx, query, start, end, variables)
+	if b.skipResourceFingerprintEnabled {
+		decision, err := b.resourceFilterResolver.Resolve(ctx, query, start, end, variables)
+		if err != nil {
+			return "", nil, true, err
+		}
+		switch decision {
+		case qbtypes.ResourceFilterResolveKindNoOp:
+			return "", nil, true, nil
+		case qbtypes.ResourceFilterResolveKindFallback:
+			return "", nil, false, nil
+		}
+	}
+
+	stmt, err := b.resourceFilterResolver.StatementBuilder().Build(
+		ctx, start, end, qbtypes.RequestTypeRaw, query, variables,
+	)
 	if err != nil {
-		return "", nil, err
+		return "", nil, true, err
 	}
 	if stmt == nil {
-		return "", nil, nil
+		return "", nil, true, nil
 	}
-
 	sb.Where("resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter)")
-
-	return fmt.Sprintf("__resource_filter AS (%s)", stmt.Query), stmt.Args, nil
+	return fmt.Sprintf("__resource_filter AS (%s)", stmt.Query), stmt.Args, true, nil
 }
 
-func (b *traceQueryStatementBuilder) buildResourceFilterCTE(
-	ctx context.Context,
-	query qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation],
-	start, end uint64,
-	variables map[string]qbtypes.VariableItem,
-) (*qbtypes.Statement, error) {
+// expandRawSelectFields populates SelectFields for raw (list view) queries.
+// It must be called before adjustKeys so that normalization runs over the full set.
+func (b *traceQueryStatementBuilder) expandRawSelectFields(query qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation]) qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation] {
+	if len(query.SelectFields) == 0 {
+		selectFields := make([]telemetrytypes.TelemetryFieldKey, 0, len(IntrinsicSpanFields)+len(CalculatedSpanFields))
+		selectFields = append(selectFields, IntrinsicSpanFields...)
+		selectFields = append(selectFields, CalculatedSpanFields...)
+		query.SelectFields = selectFields
+		return query
+	}
 
-	return b.resourceFilterStmtBuilder.Build(
-		ctx,
-		start,
-		end,
-		qbtypes.RequestTypeRaw,
-		query,
-		variables,
-	)
+	selectFields := []telemetrytypes.TelemetryFieldKey{
+		{Name: SpanTimestampColumn, FieldContext: telemetrytypes.FieldContextSpan},
+		{Name: SpanTraceIDColumn, FieldContext: telemetrytypes.FieldContextSpan},
+		{Name: SpanSpanIDColumn, FieldContext: telemetrytypes.FieldContextSpan},
+	}
+	for _, field := range query.SelectFields {
+		// TODO(tvats): If a user specifies attribute.timestamp in the select fields, this loop will basically ignore it, as we already added a field by default. This can be fixed once we close https://github.com/SigNoz/engineering-pod/issues/3693
+		if field.Name == SpanTimestampColumn || field.Name == SpanTraceIDColumn || field.Name == SpanSpanIDColumn {
+			continue
+		}
+		selectFields = append(selectFields, field)
+	}
+	query.SelectFields = selectFields
+	return query
 }

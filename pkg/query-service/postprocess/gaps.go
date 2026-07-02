@@ -46,7 +46,7 @@ func fillGap(series *v3.Series, start, end, step, shiftBy int64) *v3.Series {
 	return newSeries
 }
 
-// TODO(srikanthccv): can WITH FILL be perfect substitute for all cases https://datastore.com/docs/en/sql-reference/statements/select/order-by#order-by-expr-with-fill-modifier
+// TODO(srikanthccv): can WITH FILL be perfect substitute for all cases https://clickhouse.com/docs/en/sql-reference/statements/select/order-by#order-by-expr-with-fill-modifier
 func FillGaps(results []*v3.Result, params *v3.QueryRangeParamsV3) {
 	if params.CompositeQuery.PanelType != v3.PanelTypeGraph {
 		return

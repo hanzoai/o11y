@@ -3,9 +3,9 @@
   "title": "AWS RDS (MySQL)",
   "description": "Monitor AWS RDS (MySQL) with metrics and logs",
   "author": {
-    "name": "Hanzo O11y",
-    "email": "integrations@o11y.hanzo.ai",
-    "homepage": "https://o11y.hanzo.ai"
+    "name": "SigNoz",
+    "email": "integrations@signoz.io",
+    "homepage": "https://signoz.io"
   },
   "icon": "file://icon.svg",
   "categories": [

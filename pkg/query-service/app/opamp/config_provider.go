@@ -1,6 +1,8 @@
 package opamp
 
-import "github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
+import (
+	"github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
+)
 
 // Interface for a source of otel collector config recommendations.
 type AgentConfigProvider interface {

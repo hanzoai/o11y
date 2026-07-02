@@ -13,7 +13,7 @@ var (
 	QueryTypeSubQuery      = QueryType{valuer.NewString("builder_sub_query")}
 	QueryTypeJoin          = QueryType{valuer.NewString("builder_join")}
 	QueryTypeTraceOperator = QueryType{valuer.NewString("builder_trace_operator")}
-	QueryTypeDatastoreSQL = QueryType{valuer.NewString("datastore_sql")}
+	QueryTypeClickHouseSQL = QueryType{valuer.NewString("clickhouse_sql")}
 	QueryTypePromQL        = QueryType{valuer.NewString("promql")}
 )
 
@@ -26,7 +26,7 @@ func (QueryType) Enum() []any {
 		// QueryTypeSubQuery,
 		// QueryTypeJoin,
 		QueryTypeTraceOperator,
-		QueryTypeDatastoreSQL,
+		QueryTypeClickHouseSQL,
 		QueryTypePromQL,
 	}
 }

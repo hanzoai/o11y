@@ -15,7 +15,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/postprocess"
 	"github.com/hanzoai/o11y/pkg/query-service/querycache"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"go.uber.org/zap"
 )
 
 func prepareLogsQuery(
@@ -103,7 +102,7 @@ func (q *querier) runBuilderQuery(
 				ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 				return
 			}
-			series, err := q.execDatastoreQuery(ctx, query)
+			series, err := q.execClickHouseQuery(ctx, query)
 			ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 			return
 		}
@@ -118,7 +117,7 @@ func (q *querier) runBuilderQuery(
 				ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 				return
 			}
-			series, err := q.execDatastoreQuery(ctx, query)
+			series, err := q.execClickHouseQuery(ctx, query)
 			if err != nil {
 				ch <- channelResult{
 					Err:    err,
@@ -208,7 +207,7 @@ func (q *querier) runBuilderQuery(
 			}
 		}
 
-		series, err := q.execDatastoreQuery(ctx, query)
+		series, err := q.execClickHouseQuery(ctx, query)
 		ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 		return
 	}
@@ -223,7 +222,7 @@ func (q *querier) runBuilderQuery(
 			ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 			return
 		}
-		series, err := q.execDatastoreQuery(ctx, query)
+		series, err := q.execClickHouseQuery(ctx, query)
 		ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 		return
 	}
@@ -250,7 +249,7 @@ func (q *querier) runBuilderQuery(
 			}
 			return
 		}
-		series, err := q.execDatastoreQuery(ctx, query)
+		series, err := q.execClickHouseQuery(ctx, query)
 		if err != nil {
 			ch <- channelResult{
 				Err:    err,
@@ -299,7 +298,7 @@ func (q *querier) runBuilderExpression(
 	if _, ok := cacheKeys[queryName]; !ok || params.NoCache {
 		q.logger.InfoContext(ctx, "skipping cache for expression query", "query_name", queryName, "start", params.Start, "end", params.End, "step", params.Step, "no_cache", params.NoCache, "cache_key", cacheKeys[queryName])
 		query := queries[queryName]
-		series, err := q.execDatastoreQuery(ctx, query)
+		series, err := q.execClickHouseQuery(ctx, query)
 		ch <- channelResult{Err: err, Name: queryName, Query: query, Series: series}
 		return
 	}
@@ -319,7 +318,7 @@ func (q *querier) runBuilderExpression(
 			Variables:      params.Variables,
 		})
 		query := missQueries[queryName]
-		series, err := q.execDatastoreQuery(ctx, query)
+		series, err := q.execClickHouseQuery(ctx, query)
 		if err != nil {
 			ch <- channelResult{Err: err, Name: queryName, Query: query, Series: nil}
 			return

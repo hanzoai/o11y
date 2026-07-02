@@ -247,7 +247,7 @@ func TestNoCollectorErrorsFromProcessorsForMismatchedLogs(t *testing.T) {
 	makeTestLog := func(
 		body string,
 		attributes map[string]string,
-	) model.O11yLog {
+	) model.SignozLog {
 		attributes["method"] = "GET"
 
 		testTraceId, err := utils.RandomHex(16)
@@ -256,7 +256,7 @@ func TestNoCollectorErrorsFromProcessorsForMismatchedLogs(t *testing.T) {
 		testSpanId, err := utils.RandomHex(8)
 		require.Nil(err)
 
-		return model.O11yLog{
+		return model.SignozLog{
 			Timestamp:         uint64(time.Now().UnixNano()),
 			Body:              body,
 			Attributes_string: attributes,
@@ -271,7 +271,7 @@ func TestNoCollectorErrorsFromProcessorsForMismatchedLogs(t *testing.T) {
 	type pipelineTestCase struct {
 		Name           string
 		Operator       pipelinetypes.PipelineOperator
-		NonMatchingLog model.O11yLog
+		NonMatchingLog model.SignozLog
 	}
 
 	testCases := []pipelineTestCase{
@@ -449,7 +449,7 @@ func TestNoCollectorErrorsFromProcessorsForMismatchedLogs(t *testing.T) {
 		result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 			context.Background(),
 			testPipelines,
-			[]model.O11yLog{testCase.NonMatchingLog},
+			[]model.SignozLog{testCase.NonMatchingLog},
 		)
 		require.Nil(err)
 		require.Equal(0, len(collectorWarnAndErrorLogs), strings.Join(collectorWarnAndErrorLogs, "\n"))
@@ -496,7 +496,7 @@ func TestResourceFiltersWork(t *testing.T) {
 		},
 	}
 
-	testLog := model.O11yLog{
+	testLog := model.SignozLog{
 		Timestamp:         uint64(time.Now().UnixNano()),
 		Body:              "test log",
 		Attributes_string: map[string]string{},
@@ -512,7 +512,7 @@ func TestResourceFiltersWork(t *testing.T) {
 	result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 		context.Background(),
 		[]pipelinetypes.GettablePipeline{testPipeline},
-		[]model.O11yLog{testLog},
+		[]model.SignozLog{testLog},
 	)
 	require.Nil(err)
 	require.Equal(0, len(collectorWarnAndErrorLogs), strings.Join(collectorWarnAndErrorLogs, "\n"))
@@ -566,7 +566,7 @@ func TestPipelineFilterWithStringOpsShouldNotSpamWarningsIfAttributeIsMissing(t 
 			},
 		}
 
-		testLog := model.O11yLog{
+		testLog := model.SignozLog{
 			Timestamp:         uint64(time.Now().UnixNano()),
 			Body:              "test log",
 			Attributes_string: map[string]string{},
@@ -580,7 +580,7 @@ func TestPipelineFilterWithStringOpsShouldNotSpamWarningsIfAttributeIsMissing(t 
 		result, collectorWarnAndErrorLogs, err := SimulatePipelinesProcessing(
 			context.Background(),
 			[]pipelinetypes.GettablePipeline{testPipeline},
-			[]model.O11yLog{testLog},
+			[]model.SignozLog{testLog},
 		)
 		require.Nil(err)
 		require.Equal(0, len(collectorWarnAndErrorLogs), strings.Join(collectorWarnAndErrorLogs, "\n"))
@@ -627,8 +627,8 @@ func TestAttributePathsContainingDollarDoNotBreakCollector(t *testing.T) {
 		},
 	}
 
-	testLogs := []model.O11yLog{
-		makeTestO11yLog("test log", map[string]interface{}{
+	testLogs := []model.SignozLog{
+		makeTestSignozLog("test log", map[string]interface{}{
 			"$test": "test",
 		}),
 	}
@@ -647,8 +647,8 @@ func TestAttributePathsContainingDollarDoNotBreakCollector(t *testing.T) {
 func TestMembershipOpInProcessorFieldExpressions(t *testing.T) {
 	require := require.New(t)
 
-	testLogs := []model.O11yLog{
-		makeTestO11yLog("test log", map[string]any{
+	testLogs := []model.SignozLog{
+		makeTestSignozLog("test log", map[string]any{
 			"http.method":    "GET",
 			"order.products": `{"ids": ["pid0", "pid1"]}`,
 		}),
@@ -759,8 +759,8 @@ func TestContainsFilterIsCaseInsensitive(t *testing.T) {
 	// Pipeline filter should also behave in the same way.
 	require := require.New(t)
 
-	testLogs := []model.O11yLog{
-		makeTestO11yLog("test Ecom Log", map[string]interface{}{}),
+	testLogs := []model.SignozLog{
+		makeTestSignozLog("test Ecom Log", map[string]interface{}{}),
 	}
 
 	testPipelines := []pipelinetypes.GettablePipeline{{

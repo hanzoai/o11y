@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
@@ -299,7 +300,7 @@ func TestQueryRangeRequest_ValidateAllQueriesNotDisabled(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "all Datastore queries disabled should return error",
+			name: "all ClickHouse queries disabled should return error",
 			request: QueryRangeRequest{
 				Start:       1640995200000,
 				End:         1640998800000,
@@ -307,8 +308,8 @@ func TestQueryRangeRequest_ValidateAllQueriesNotDisabled(t *testing.T) {
 				CompositeQuery: CompositeQuery{
 					Queries: []QueryEnvelope{
 						{
-							Type: QueryTypeDatastoreSQL,
-							Spec: DatastoreQuery{
+							Type: QueryTypeClickHouseSQL,
+							Spec: ClickHouseQuery{
 								Name:     "CH1",
 								Query:    "SELECT count() FROM logs",
 								Disabled: true,
@@ -541,7 +542,7 @@ func TestQueryRangeRequest_ValidateCompositeQuery(t *testing.T) {
 			errMsg:  "PromQL query is required",
 		},
 		{
-			name: "datastore with empty query should return error",
+			name: "clickhouse with empty query should return error",
 			request: QueryRangeRequest{
 				Start:       1640995200000,
 				End:         1640998800000,
@@ -549,8 +550,8 @@ func TestQueryRangeRequest_ValidateCompositeQuery(t *testing.T) {
 				CompositeQuery: CompositeQuery{
 					Queries: []QueryEnvelope{
 						{
-							Type: QueryTypeDatastoreSQL,
-							Spec: DatastoreQuery{
+							Type: QueryTypeClickHouseSQL,
+							Spec: ClickHouseQuery{
 								Name:  "CH1",
 								Query: "",
 							},
@@ -559,7 +560,7 @@ func TestQueryRangeRequest_ValidateCompositeQuery(t *testing.T) {
 				},
 			},
 			wantErr: true,
-			errMsg:  "Datastore SQL query is required",
+			errMsg:  "ClickHouse SQL query is required",
 		},
 		{
 			name: "trace operator with empty expression should return error",
@@ -603,7 +604,7 @@ func TestQueryRangeRequest_ValidateCompositeQuery(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "valid datastore query should pass",
+			name: "valid clickhouse query should pass",
 			request: QueryRangeRequest{
 				Start:       1640995200000,
 				End:         1640998800000,
@@ -611,8 +612,8 @@ func TestQueryRangeRequest_ValidateCompositeQuery(t *testing.T) {
 				CompositeQuery: CompositeQuery{
 					Queries: []QueryEnvelope{
 						{
-							Type: QueryTypeDatastoreSQL,
-							Spec: DatastoreQuery{
+							Type: QueryTypeClickHouseSQL,
+							Spec: ClickHouseQuery{
 								Name:  "CH1",
 								Query: "SELECT count() FROM logs",
 							},
@@ -888,17 +889,17 @@ func TestValidateQueryEnvelope(t *testing.T) {
 			errMsg:      "PromQL query is required",
 		},
 		{
-			name: "datastore with empty query should fail",
+			name: "clickhouse with empty query should fail",
 			envelope: QueryEnvelope{
-				Type: QueryTypeDatastoreSQL,
-				Spec: DatastoreQuery{
+				Type: QueryTypeClickHouseSQL,
+				Spec: ClickHouseQuery{
 					Name:  "CH1",
 					Query: "",
 				},
 			},
 			requestType: RequestTypeTimeSeries,
 			wantErr:     true,
-			errMsg:      "Datastore SQL query is required",
+			errMsg:      "ClickHouse SQL query is required",
 		},
 	}
 
@@ -955,8 +956,8 @@ func TestQueryEnvelope_Helpers(t *testing.T) {
 				want:     "P1",
 			},
 			{
-				name:     "datastore",
-				envelope: QueryEnvelope{Type: QueryTypeDatastoreSQL, Spec: DatastoreQuery{Name: "CH1"}},
+				name:     "clickhouse",
+				envelope: QueryEnvelope{Type: QueryTypeClickHouseSQL, Spec: ClickHouseQuery{Name: "CH1"}},
 				want:     "CH1",
 			},
 			{
@@ -1012,8 +1013,8 @@ func TestQueryEnvelope_Helpers(t *testing.T) {
 				want:     false,
 			},
 			{
-				name:     "disabled datastore",
-				envelope: QueryEnvelope{Type: QueryTypeDatastoreSQL, Spec: DatastoreQuery{Disabled: true}},
+				name:     "disabled clickhouse",
+				envelope: QueryEnvelope{Type: QueryTypeClickHouseSQL, Spec: ClickHouseQuery{Disabled: true}},
 				want:     true,
 			},
 			{
@@ -1076,10 +1077,10 @@ func TestGetQueryIdentifier(t *testing.T) {
 			want:     "PromQL query 'P1'",
 		},
 		{
-			name:     "datastore with name",
-			envelope: QueryEnvelope{Type: QueryTypeDatastoreSQL, Spec: DatastoreQuery{Name: "CH1"}},
+			name:     "clickhouse with name",
+			envelope: QueryEnvelope{Type: QueryTypeClickHouseSQL, Spec: ClickHouseQuery{Name: "CH1"}},
 			index:    0,
-			want:     "Datastore query 'CH1'",
+			want:     "ClickHouse query 'CH1'",
 		},
 		{
 			name:     "trace operator with name",
@@ -1419,4 +1420,63 @@ func TestNonAggregationFieldsSkipped(t *testing.T) {
 			t.Errorf("expected no error for isRoot in selectFields with timeseries request type, got: %v", err)
 		}
 	})
+}
+
+func TestMetricAggregationValidateForType(t *testing.T) {
+	cases := []struct {
+		name             string
+		metricType       metrictypes.Type
+		spaceAggregation metrictypes.SpaceAggregation
+		comparisonParam  *metrictypes.ComparisonSpaceAggregationParam
+		wantErr          bool
+	}{
+		{
+			name:             "percentile on histogram is allowed",
+			metricType:       metrictypes.HistogramType,
+			spaceAggregation: metrictypes.SpaceAggregationPercentile95,
+			wantErr:          false,
+		},
+		{
+			name:             "percentile on exponential histogram is allowed",
+			metricType:       metrictypes.ExpHistogramType,
+			spaceAggregation: metrictypes.SpaceAggregationPercentile99,
+			wantErr:          false,
+		},
+		{
+			name:             "percentile on summary is not allowed",
+			metricType:       metrictypes.SummaryType,
+			spaceAggregation: metrictypes.SpaceAggregationPercentile95,
+			wantErr:          true,
+		},
+		{
+			name:             "percentile on sum is not allowed",
+			metricType:       metrictypes.SumType,
+			spaceAggregation: metrictypes.SpaceAggregationPercentile95,
+			wantErr:          true,
+		},
+		{
+			name:             "non-percentile space aggregation on sum is allowed",
+			metricType:       metrictypes.SumType,
+			spaceAggregation: metrictypes.SpaceAggregationSum,
+			wantErr:          false,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			agg := MetricAggregation{
+				MetricName:                      "test_metric",
+				Type:                            tc.metricType,
+				SpaceAggregation:                tc.spaceAggregation,
+				ComparisonSpaceAggregationParam: tc.comparisonParam,
+			}
+			err := agg.ValidateForType()
+			if tc.wantErr && err == nil {
+				t.Errorf("expected error, got nil")
+			}
+			if !tc.wantErr && err != nil {
+				t.Errorf("expected no error, got: %v", err)
+			}
+		})
+	}
 }

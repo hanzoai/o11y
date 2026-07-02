@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/hanzoai/o11y/pkg/queryparser/queryfilterextractor"
-	"github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/authn"
+	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/modules/authdomain"
@@ -29,9 +30,10 @@ type module struct {
 	authDomain authdomain.Module
 	tokenizer  tokenizer.Tokenizer
 	orgGetter  organization.Getter
+	authz      authz.AuthZ
 }
 
-func NewModule(providerSettings factory.ProviderSettings, authNs map[authtypes.AuthNProvider]authn.AuthN, userSetter user.Setter, userGetter user.Getter, authDomain authdomain.Module, tokenizer tokenizer.Tokenizer, orgGetter organization.Getter) session.Module {
+func NewModule(providerSettings factory.ProviderSettings, authNs map[authtypes.AuthNProvider]authn.AuthN, userSetter user.Setter, userGetter user.Getter, authDomain authdomain.Module, tokenizer tokenizer.Tokenizer, orgGetter organization.Getter, authz authz.AuthZ) session.Module {
 	return &module{
 		settings:   factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/modules/session/implsession"),
 		authNs:     authNs,
@@ -40,6 +42,7 @@ func NewModule(providerSettings factory.ProviderSettings, authNs map[authtypes.A
 		authDomain: authDomain,
 		tokenizer:  tokenizer,
 		orgGetter:  orgGetter,
+		authz:      authz,
 	}
 }
 
@@ -112,8 +115,17 @@ func (module *module) GetSessionContext(ctx context.Context, email valuer.Email,
 }
 
 func (module *module) CreatePasswordAuthNSession(ctx context.Context, authNProvider authtypes.AuthNProvider, email valuer.Email, password string, orgID valuer.UUID) (*authtypes.Token, error) {
-	// Password authentication is disabled — all auth must go through IAM OIDC (hanzo.id)
-	return nil, errors.New(errors.TypeUnsupported, errors.CodeUnsupported, "password authentication is disabled, use SSO via hanzo.id")
+	passwordAuthN, err := getProvider[authn.PasswordAuthN](authNProvider, module.authNs)
+	if err != nil {
+		return nil, err
+	}
+
+	identity, err := passwordAuthN.Authenticate(ctx, email.String(), password, orgID)
+	if err != nil {
+		return nil, err
+	}
+
+	return module.tokenizer.CreateToken(ctx, identity, map[string]string{})
 }
 
 func (module *module) CreateCallbackAuthNSession(ctx context.Context, authNProvider authtypes.AuthNProvider, values url.Values) (string, error) {
@@ -134,20 +146,32 @@ func (module *module) CreateCallbackAuthNSession(ctx context.Context, authNProvi
 	}
 
 	roleMapping := authDomain.AuthDomainConfig().RoleMapping
-	role := roleMapping.NewRoleFromCallbackIdentity(callbackIdentity)
-	signozManagedRole := authtypes.MustGetSigNozManagedRoleFromExistingRole(role)
+
+	roleAttributeExists := false
+	if roleMapping != nil && roleMapping.UseRoleAttribute && callbackIdentity.Role != "" {
+		_, err := module.authz.GetByOrgIDAndName(ctx, callbackIdentity.OrgID, authtypes.NormalizeRoleName(callbackIdentity.Role))
+		if err == nil {
+			roleAttributeExists = true
+		}
+	}
+
+	roleNames := roleMapping.NewRolesFromCallbackIdentity(callbackIdentity, roleAttributeExists)
 
 	newUser, err := types.NewUser(callbackIdentity.Name, callbackIdentity.Email, callbackIdentity.OrgID, types.UserStatusActive)
 	if err != nil {
 		return "", err
 	}
 
-	newUser, err = module.userSetter.GetOrCreateUser(ctx, newUser, user.WithRoleNames([]string{signozManagedRole}))
+	newUser, err = module.userSetter.GetOrCreateUser(ctx, newUser, user.WithRoleNames(roleNames))
 	if err != nil {
 		return "", err
 	}
 
-	token, err := module.tokenizer.CreateToken(ctx, authtypes.NewIdentity(user.ID, user.OrgID, user.Email, user.Role), map[string]string{})
+	if err := newUser.ErrIfRoot(); err != nil {
+		return "", errors.WithAdditionalf(err, "root user can only authenticate via password")
+	}
+
+	token, err := module.tokenizer.CreateToken(ctx, authtypes.NewPrincipalUserIdentity(newUser.ID, newUser.OrgID, newUser.Email, authtypes.IdentNProviderTokenizer), map[string]string{})
 	if err != nil {
 		return "", err
 	}

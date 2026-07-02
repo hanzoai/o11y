@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	parser "github.com/hanzoai/o11y/pkg/parser/grammar"
+	parser "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	"github.com/antlr4-go/antlr/v4"
 	"golang.org/x/exp/maps"
 

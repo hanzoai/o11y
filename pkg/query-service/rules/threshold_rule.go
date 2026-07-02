@@ -10,31 +10,16 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/contextlinks"
-	"github.com/hanzoai/o11y/pkg/query-service/common"
-	"github.com/hanzoai/o11y/pkg/query-service/model"
-	"github.com/hanzoai/o11y/pkg/query-service/postprocess"
-	"github.com/hanzoai/o11y/pkg/transition"
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
+	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 
-	"github.com/hanzoai/o11y/pkg/query-service/app/querier"
-	querierV2 "github.com/hanzoai/o11y/pkg/query-service/app/querier/v2"
-	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
-	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
-	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/labels"
-	querytemplate "github.com/hanzoai/o11y/pkg/query-service/utils/queryTemplate"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/times"
-	"github.com/hanzoai/o11y/pkg/query-service/utils/timestamp"
-
-	logsv3 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v3"
-	tracesV4 "github.com/hanzoai/o11y/pkg/query-service/app/traces/v4"
 	"github.com/hanzoai/o11y/pkg/units"
-
-	querierV5 "github.com/hanzoai/o11y/pkg/querier"
 
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
@@ -77,167 +62,10 @@ func (r *ThresholdRule) Type() ruletypes.RuleType {
 
 func (r *ThresholdRule) prepareQueryRange(ctx context.Context, ts time.Time) (*qbtypes.QueryRangeRequest, error) {
 	r.logger.InfoContext(
-		ctx, "prepare query range request v4", "ts", ts.UnixMilli(), "eval_window", r.evalWindow.Milliseconds(), "eval_delay", r.evalDelay.Milliseconds(),
-	)
-
-	startTs, endTs := r.Timestamps(ts)
-	start, end := startTs.UnixMilli(), endTs.UnixMilli()
-
-	if r.ruleCondition.QueryType() == v3.QueryTypeDatastoreSQL {
-		params := &v3.QueryRangeParamsV3{
-			Start: start,
-			End:   end,
-			Step:  int64(math.Max(float64(common.MinAllowedStepInterval(start, end)), 60)),
-			CompositeQuery: &v3.CompositeQuery{
-				QueryType:         r.ruleCondition.CompositeQuery.QueryType,
-				PanelType:         r.ruleCondition.CompositeQuery.PanelType,
-				BuilderQueries:    make(map[string]*v3.BuilderQuery),
-				DatastoreQueries: make(map[string]*v3.DatastoreQuery),
-				PromQueries:       make(map[string]*v3.PromQuery),
-				Unit:              r.ruleCondition.CompositeQuery.Unit,
-			},
-			Variables: make(map[string]interface{}),
-			NoCache:   true,
-		}
-		querytemplate.AssignReservedVarsV3(params)
-		for name, chQuery := range r.ruleCondition.CompositeQuery.DatastoreQueries {
-			if chQuery.Disabled {
-				continue
-			}
-			tmpl := template.New("datastore-query")
-			tmpl, err := tmpl.Parse(chQuery.Query)
-			if err != nil {
-				return nil, err
-			}
-			var query bytes.Buffer
-			err = tmpl.Execute(&query, params.Variables)
-			if err != nil {
-				return nil, err
-			}
-			params.CompositeQuery.DatastoreQueries[name] = &v3.DatastoreQuery{
-				Query:    query.String(),
-				Disabled: chQuery.Disabled,
-				Legend:   chQuery.Legend,
-			}
-		}
-		return params, nil
-	}
-
-	if r.ruleCondition.CompositeQuery != nil && r.ruleCondition.CompositeQuery.BuilderQueries != nil {
-		for _, q := range r.ruleCondition.CompositeQuery.BuilderQueries {
-			// If the step interval is less than the minimum allowed step interval, set it to the minimum allowed step interval
-			if minStep := common.MinAllowedStepInterval(start, end); q.StepInterval < minStep {
-				q.StepInterval = minStep
-			}
-
-			q.SetShiftByFromFunc()
-
-			if q.DataSource == v3.DataSourceMetrics {
-				// if the time range is greater than 1 day, and less than 1 week set the step interval to be multiple of 5 minutes
-				// if the time range is greater than 1 week, set the step interval to be multiple of 30 mins
-				if end-start >= 24*time.Hour.Milliseconds() && end-start < 7*24*time.Hour.Milliseconds() {
-					q.StepInterval = int64(math.Round(float64(q.StepInterval)/300)) * 300
-				} else if end-start >= 7*24*time.Hour.Milliseconds() {
-					q.StepInterval = int64(math.Round(float64(q.StepInterval)/1800)) * 1800
-				}
-			}
-		}
-	}
-
-	if r.ruleCondition.CompositeQuery.PanelType != v3.PanelTypeGraph {
-		r.ruleCondition.CompositeQuery.PanelType = v3.PanelTypeGraph
-	}
-
-	// default mode
-	return &v3.QueryRangeParamsV3{
-		Start:          start,
-		End:            end,
-		Step:           int64(math.Max(float64(common.MinAllowedStepInterval(start, end)), 60)),
-		CompositeQuery: r.ruleCondition.CompositeQuery,
-		Variables:      make(map[string]interface{}),
-		NoCache:        true,
-	}, nil
-}
-
-func (r *ThresholdRule) prepareLinksToLogs(ctx context.Context, ts time.Time, lbls labels.Labels) string {
-	if r.version == "v5" {
-		return r.prepareLinksToLogsV5(ctx, ts, lbls)
-	}
-
-	selectedQuery := r.GetSelectedQuery()
-
-	qr, err := r.prepareQueryRange(ctx, ts)
-	if err != nil {
-		return ""
-	}
-	start := time.UnixMilli(qr.Start)
-	end := time.UnixMilli(qr.End)
-
-	// TODO(srikanthccv): handle formula queries
-	if selectedQuery < "A" || selectedQuery > "Z" {
-		return ""
-	}
-
-	q := r.ruleCondition.CompositeQuery.BuilderQueries[selectedQuery]
-	if q == nil {
-		return ""
-	}
-
-	if q.DataSource != v3.DataSourceLogs {
-		return ""
-	}
-
-	queryFilter := []v3.FilterItem{}
-	if q.Filters != nil {
-		queryFilter = q.Filters.Items
-	}
-
-	filterItems := contextlinks.PrepareFilters(lbls.Map(), queryFilter, q.GroupBy, r.logsKeys)
-
-	return contextlinks.PrepareLinksToLogs(start, end, filterItems)
-}
-
-func (r *ThresholdRule) prepareLinksToTraces(ctx context.Context, ts time.Time, lbls labels.Labels) string {
-	if r.version == "v5" {
-		return r.prepareLinksToTracesV5(ctx, ts, lbls)
-	}
-
-	selectedQuery := r.GetSelectedQuery()
-
-	qr, err := r.prepareQueryRange(ctx, ts)
-	if err != nil {
-		return ""
-	}
-	start := time.UnixMilli(qr.Start)
-	end := time.UnixMilli(qr.End)
-
-	// TODO(srikanthccv): handle formula queries
-	if selectedQuery < "A" || selectedQuery > "Z" {
-		return ""
-	}
-
-	q := r.ruleCondition.CompositeQuery.BuilderQueries[selectedQuery]
-	if q == nil {
-		return ""
-	}
-
-	if q.DataSource != v3.DataSourceTraces {
-		return ""
-	}
-
-	queryFilter := []v3.FilterItem{}
-	if q.Filters != nil {
-		queryFilter = q.Filters.Items
-	}
-
-	filterItems := contextlinks.PrepareFilters(lbls.Map(), queryFilter, q.GroupBy, r.spansKeys)
-
-	return contextlinks.PrepareLinksToTraces(start, end, filterItems)
-}
-
-func (r *ThresholdRule) prepareQueryRangeV5(ctx context.Context, ts time.Time) (*qbtypes.QueryRangeRequest, error) {
-	r.logger.InfoContext(
-		ctx, "prepare query range request v5", "ts", ts.UnixMilli(), "eval_window", r.evalWindow.Milliseconds(), "eval_delay", r.evalDelay.Milliseconds(),
+		ctx, "prepare query range request v5",
+		slog.Int64("ts", ts.UnixMilli()),
+		slog.Int64("eval_window", r.evalWindow.Milliseconds()),
+		slog.Int64("eval_delay", r.evalDelay.Milliseconds()),
 	)
 
 	startTs, endTs := r.Timestamps(ts)

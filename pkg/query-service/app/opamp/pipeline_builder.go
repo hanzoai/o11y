@@ -16,7 +16,7 @@ type pipelineStatus struct {
 
 var tracesPipelineSpec = map[int]pipelineStatus{
 	0: {
-		Name:    "o11y_tail_sampling",
+		Name:    "signoz_tail_sampling",
 		Enabled: false,
 	},
 	1: {

@@ -9,7 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/valuer"
+	"log/slog"
+
 	"github.com/pkg/errors"
 
 	signozerrors "github.com/hanzoai/o11y/pkg/errors"
@@ -186,13 +187,13 @@ type QueryType string
 const (
 	QueryTypeUnknown       QueryType = "unknown"
 	QueryTypeBuilder       QueryType = "builder"
-	QueryTypeDatastoreSQL QueryType = "datastore_sql"
+	QueryTypeClickHouseSQL QueryType = "clickhouse_sql"
 	QueryTypePromQL        QueryType = "promql"
 )
 
 func (q QueryType) Validate() error {
 	switch q {
-	case QueryTypeBuilder, QueryTypeDatastoreSQL, QueryTypePromQL:
+	case QueryTypeBuilder, QueryTypeClickHouseSQL, QueryTypePromQL:
 		return nil
 	default:
 		return fmt.Errorf("invalid query type: %s", q)
@@ -483,23 +484,23 @@ func (p *PromQuery) Validate() error {
 	return nil
 }
 
-type DatastoreQuery struct {
+type ClickHouseQuery struct {
 	Query    string `json:"query"`
 	Disabled bool   `json:"disabled"`
 	Legend   string `json:"legend,omitempty"`
 }
 
-func (c *DatastoreQuery) Clone() *DatastoreQuery {
+func (c *ClickHouseQuery) Clone() *ClickHouseQuery {
 	if c == nil {
 		return nil
 	}
-	return &DatastoreQuery{
+	return &ClickHouseQuery{
 		Query:    c.Query,
 		Disabled: c.Disabled,
 		Legend:   c.Legend,
 	}
 }
-func (c *DatastoreQuery) Validate() error {
+func (c *ClickHouseQuery) Validate() error {
 	if c == nil {
 		return nil
 	}
@@ -513,7 +514,7 @@ func (c *DatastoreQuery) Validate() error {
 
 type CompositeQuery struct {
 	BuilderQueries    map[string]*BuilderQuery    `json:"builderQueries,omitempty"`
-	DatastoreQueries map[string]*DatastoreQuery `json:"chQueries,omitempty"`
+	ClickHouseQueries map[string]*ClickHouseQuery `json:"chQueries,omitempty"`
 	PromQueries       map[string]*PromQuery       `json:"promQueries,omitempty"`
 
 	Queries []qbtypes.QueryEnvelope `json:"queries,omitempty"`
@@ -538,10 +539,10 @@ func (c *CompositeQuery) Clone() *CompositeQuery {
 			builderQueries[name] = query.Clone()
 		}
 	}
-	var clickHouseQueries map[string]*DatastoreQuery
-	if c.DatastoreQueries != nil {
-		clickHouseQueries = make(map[string]*DatastoreQuery)
-		for name, query := range c.DatastoreQueries {
+	var clickHouseQueries map[string]*ClickHouseQuery
+	if c.ClickHouseQueries != nil {
+		clickHouseQueries = make(map[string]*ClickHouseQuery)
+		for name, query := range c.ClickHouseQueries {
 			clickHouseQueries[name] = query.Clone()
 		}
 	}
@@ -554,7 +555,7 @@ func (c *CompositeQuery) Clone() *CompositeQuery {
 	}
 	return &CompositeQuery{
 		BuilderQueries:    builderQueries,
-		DatastoreQueries: clickHouseQueries,
+		ClickHouseQueries: clickHouseQueries,
 		PromQueries:       promQueries,
 		PanelType:         c.PanelType,
 		QueryType:         c.QueryType,
@@ -573,8 +574,8 @@ func (c *CompositeQuery) EnabledQueries() int {
 				count++
 			}
 		}
-	case QueryTypeDatastoreSQL:
-		for _, query := range c.DatastoreQueries {
+	case QueryTypeClickHouseSQL:
+		for _, query := range c.ClickHouseQueries {
 			if !query.Disabled {
 				count++
 			}
@@ -606,7 +607,7 @@ func (c *CompositeQuery) Validate() error {
 		return fmt.Errorf("composite query is required")
 	}
 
-	if c.BuilderQueries == nil && c.DatastoreQueries == nil && c.PromQueries == nil && len(c.Queries) == 0 {
+	if c.BuilderQueries == nil && c.ClickHouseQueries == nil && c.PromQueries == nil && len(c.Queries) == 0 {
 		return fmt.Errorf("composite query must contain at least one query type")
 	}
 
@@ -618,10 +619,10 @@ func (c *CompositeQuery) Validate() error {
 		}
 	}
 
-	if c.QueryType == QueryTypeDatastoreSQL {
-		for name, query := range c.DatastoreQueries {
+	if c.QueryType == QueryTypeClickHouseSQL {
+		for name, query := range c.ClickHouseQueries {
 			if err := query.Validate(); err != nil {
-				return fmt.Errorf("datastore query %s is invalid: %w", name, err)
+				return fmt.Errorf("clickhouse query %s is invalid: %w", name, err)
 			}
 		}
 	}

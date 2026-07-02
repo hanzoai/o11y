@@ -45,9 +45,9 @@ func (m *Module) ExportRawData(ctx context.Context, orgID valuer.UUID, rangeRequ
 	errChan := make(chan error, 1)
 
 	go func() {
-		// Set datastore max threads
+		// Set clickhouse max threads
 		ctx := ctxtypes.SetClickhouseMaxThreads(ctx, ClickhouseExportRawDataMaxThreads)
-		// Set datastore timeout
+		// Set clickhouse timeout
 		contextWithTimeout, cancel := context.WithTimeout(ctx, ClickhouseExportRawDataTimeout)
 		defer cancel()
 		defer close(errChan)
@@ -70,12 +70,13 @@ func exportRawDataForSingleQuery(querier querier.Querier, ctx context.Context, o
 
 	queries := rangeRequest.CompositeQuery.Queries
 	rowCountLimit := queries[queryIndex].GetLimit()
+	startingOffset := queries[queryIndex].GetOffset()
 	rowCount := 0
 
 	for rowCount < rowCountLimit {
 		chunkSize := min(ChunkSize, rowCountLimit-rowCount)
 		queries[queryIndex].SetLimit(chunkSize)
-		queries[queryIndex].SetOffset(rowCount)
+		queries[queryIndex].SetOffset(startingOffset + rowCount)
 
 		response, err := querier.QueryRange(ctx, orgID, rangeRequest)
 		if err != nil {

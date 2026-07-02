@@ -15,15 +15,19 @@ import (
 	"text/template"
 	"time"
 
+	signozerrors "github.com/hanzoai/o11y/pkg/errors"
+
 	"github.com/hanzoai/o11y/pkg/types/thirdpartyapitypes"
 
 	"log/slog"
 
 	"github.com/hanzoai/govaluate"
+
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/kafka"
 	queues2 "github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/queues"
+
 	"github.com/gorilla/mux"
-	promModel "github.com/hanzoai/common/model"
+	promModel "github.com/prometheus/common/model"
 	"go.uber.org/multierr"
 
 	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
@@ -36,7 +40,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/postprocess"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 	querytemplate "github.com/hanzoai/o11y/pkg/query-service/utils/queryTemplate"
-	chVariables "github.com/hanzoai/o11y/pkg/variables/datastore"
+	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
+	chVariables "github.com/hanzoai/o11y/pkg/variables/clickhouse"
 )
 
 var allowedFunctions = []string{"count", "ratePerSec", "sum", "avg", "min", "max", "p50", "p90", "p95", "p99"}
@@ -724,7 +729,7 @@ func validateExpressions(expressions []string, funcs map[string]govaluate.Expres
 	return errs
 }
 
-// chTransformQuery transforms the datastore query with the given variables
+// chTransformQuery transforms the clickhouse query with the given variables
 // it is used to check what would be the query if variables are selected as __all__.
 // for now, this is just a pass through, but in the future, we will use it to
 // dashboard variables
@@ -742,9 +747,9 @@ func chTransformQuery(query string, variables map[string]interface{}) {
 	transformer := chVariables.NewQueryTransformer(query, varsForTransform)
 	transformedQuery, err := transformer.Transform()
 	if err != nil {
-		zap.L().Warn("failed to transform datastore query", zap.String("query", query), zap.Error(err))
+		slog.Warn("failed to transform clickhouse query", "query", query, signozerrors.Attr(err))
 	}
-	zap.L().Info("transformed datastore query", zap.String("transformedQuery", transformedQuery), zap.String("originalQuery", query))
+	slog.Info("transformed clickhouse query", "transformed_query", transformedQuery, "original_query", query)
 }
 
 func ParseQueryRangeParams(r *http.Request) (*v3.QueryRangeParamsV3, *model.ApiError) {
@@ -776,8 +781,8 @@ func ParseQueryRangeParams(r *http.Request) (*v3.QueryRangeParamsV3, *model.ApiE
 	for name, value := range queryRangeParams.Variables {
 		if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypePromQL {
 			formattedVars[name] = metrics.PromFormattedValue(value)
-		} else if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeDatastoreSQL {
-			formattedVars[name] = utils.DatastoreFormattedValue(value)
+		} else if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeClickHouseSQL {
+			formattedVars[name] = utils.ClickHouseFormattedValue(value)
 		}
 	}
 
@@ -885,9 +890,9 @@ func ParseQueryRangeParams(r *http.Request) (*v3.QueryRangeParamsV3, *model.ApiE
 		queryRangeParams.Start = queryRangeParams.End
 	}
 
-	// replace go template variables in datastore query
-	if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeDatastoreSQL {
-		for _, chQuery := range queryRangeParams.CompositeQuery.DatastoreQueries {
+	// replace go template variables in clickhouse query
+	if queryRangeParams.CompositeQuery.QueryType == v3.QueryTypeClickHouseSQL {
+		for _, chQuery := range queryRangeParams.CompositeQuery.ClickHouseQueries {
 			if chQuery.Disabled {
 				continue
 			}
@@ -912,7 +917,7 @@ func ParseQueryRangeParams(r *http.Request) (*v3.QueryRangeParamsV3, *model.ApiE
 				chQuery.Query = strings.Replace(chQuery.Query, fmt.Sprintf("$%s", k), fmt.Sprint(queryRangeParams.Variables[k]), -1)
 			}
 
-			tmpl := template.New("datastore-query")
+			tmpl := template.New("clickhouse-query")
 			tmpl, err := tmpl.Parse(chQuery.Query)
 			if err != nil {
 				return nil, &model.ApiError{Typ: model.ErrorBadData, Err: err}

@@ -6,12 +6,14 @@ import (
 	"encoding/json"
 	"log/slog"
 
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/migrate"
+
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/transition"
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/migrate"
 )
 
 type migrateRulesV4ToV5 struct {
@@ -46,9 +48,9 @@ func (migration *migrateRulesV4ToV5) getLogDuplicateKeys(ctx context.Context) ([
 	query := `
 		SELECT name
 		FROM (
-			SELECT DISTINCT name FROM observe_logs.distributed_logs_attribute_keys
+			SELECT DISTINCT name FROM signoz_logs.distributed_logs_attribute_keys
 			INTERSECT
-			SELECT DISTINCT name FROM observe_logs.distributed_logs_resource_keys
+			SELECT DISTINCT name FROM signoz_logs.distributed_logs_resource_keys
 		)
 		ORDER BY name
 	`
@@ -76,7 +78,7 @@ func (migration *migrateRulesV4ToV5) getLogDuplicateKeys(ctx context.Context) ([
 func (migration *migrateRulesV4ToV5) getTraceDuplicateKeys(ctx context.Context) ([]string, error) {
 	query := `
 		SELECT tagKey
-		FROM observe_traces.distributed_span_attributes_keys
+		FROM signoz_traces.distributed_span_attributes_keys
 		WHERE tagType IN ('tag', 'resource')
 		GROUP BY tagKey
 		HAVING COUNT(DISTINCT tagType) > 1

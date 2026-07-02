@@ -1,4 +1,4 @@
-### Monitor Redis with Hanzo O11y
+### Monitor Redis with SigNoz
 
 Collect key Redis metrics and view them with an out of the box dashboard.
 

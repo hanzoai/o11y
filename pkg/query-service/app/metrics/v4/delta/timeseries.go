@@ -24,7 +24,7 @@ func prepareTimeAggregationSubQuery(start, end, step int64, mq *v3.BuilderQuery)
 		return "", err
 	}
 
-	samplesTableFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli < %d", utils.DatastoreFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
+	samplesTableFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli < %d", utils.ClickHouseFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
 	tableName := helpers.WhichSamplesTableToUse(start, end, mq)
 
 	samplesTableFilter = helpers.AddFlagsFilters(samplesTableFilter, tableName)
@@ -34,7 +34,7 @@ func prepareTimeAggregationSubQuery(start, end, step int64, mq *v3.BuilderQuery)
 		"SELECT fingerprint, %s" +
 			" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 			" %s as per_series_value" +
-			" FROM " + constants.O11Y_METRIC_DBNAME + "." + tableName +
+			" FROM " + constants.SIGNOZ_METRIC_DBNAME + "." + tableName +
 			" INNER JOIN" +
 			" (%s) as filtered_time_series" +
 			" USING fingerprint" +
@@ -84,7 +84,7 @@ func prepareQueryOptimized(start, end, step int64, mq *v3.BuilderQuery) (string,
 		return "", err
 	}
 
-	samplesTableFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli < %d", utils.DatastoreFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
+	samplesTableFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli < %d", utils.ClickHouseFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
 
 	tableName := helpers.WhichSamplesTableToUse(start, end, mq)
 
@@ -94,7 +94,7 @@ func prepareQueryOptimized(start, end, step int64, mq *v3.BuilderQuery) (string,
 		"SELECT %s" +
 			" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 			" %s as value" +
-			" FROM " + constants.O11Y_METRIC_DBNAME + "." + tableName +
+			" FROM " + constants.SIGNOZ_METRIC_DBNAME + "." + tableName +
 			" INNER JOIN" +
 			" (%s) as filtered_time_series" +
 			" USING fingerprint" +

@@ -9,7 +9,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/transition"
 	"github.com/hanzoai/o11y/pkg/types"
-	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/uptrace/bun"
@@ -22,6 +21,7 @@ var (
 	ErrCodeDashboardInvalidWidgetQuery = errors.MustNewCode("dashboard_invalid_widget_query")
 	ErrCodeDashboardInvalidSource      = errors.MustNewCode("dashboard_invalid_source")
 	ErrCodeDashboardImmutable          = errors.MustNewCode("dashboard_immutable")
+	ErrCodeDashboardInvalidPatch       = errors.MustNewCode("dashboard_invalid_patch")
 )
 
 type StorableDashboard struct {
@@ -379,7 +379,7 @@ func (dashboard *Dashboard) GetWidgetQuery(startTime, endTime, widgetIndex uint6
 					QueryFormulas      []map[string]any `json:"queryFormulas"`
 					QueryTraceOperator []map[string]any `json:"queryTraceOperator"`
 				} `json:"builder"`
-				ClickhouseSQL []map[string]any `json:"datastore_sql"`
+				ClickhouseSQL []map[string]any `json:"clickhouse_sql"`
 				PromQL        []map[string]any `json:"promql"`
 				QueryType     string           `json:"queryType"`
 			} `json:"query"`
@@ -428,10 +428,10 @@ func (dashboard *Dashboard) GetWidgetQuery(startTime, endTime, widgetIndex uint6
 			}
 			compositeQueries = append(compositeQueries, migrate.WrapInV5Envelope(queryName, query, "builder_trace_operator"))
 		}
-	case "datastore_sql":
+	case "clickhouse_sql":
 		for _, query := range widgetData.Query.ClickhouseSQL {
 			envelope := map[string]any{
-				"type": "datastore_sql",
+				"type": "clickhouse_sql",
 				"spec": map[string]any{
 					"name":     query["name"],
 					"query":    query["query"],
