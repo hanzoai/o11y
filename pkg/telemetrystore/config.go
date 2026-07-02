@@ -13,8 +13,8 @@ type Config struct {
 	// Connection is the connection configuration
 	Connection ConnectionConfig `mapstructure:",squash"`
 
-	// Clickhouse is the clickhouse configuration
-	Clickhouse ClickhouseConfig `mapstructure:"clickhouse"`
+	// Clickhouse is the datastore (ClickHouse-protocol) configuration
+	Clickhouse ClickhouseConfig `mapstructure:"datastore"`
 }
 
 type ConnectionConfig struct {

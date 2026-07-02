@@ -198,7 +198,7 @@ services:
       - ./clickhouse-setup/data/observe/:/var/lib/observe/
     environment:
       - O11Y_ALERTMANAGER_PROVIDER=observe
-      - O11Y_TELEMETRYSTORE_CLICKHOUSE_DSN=tcp://clickhouse:9000
+      - O11Y_DATASTORE_DSN=tcp://clickhouse:9000
       - O11Y_SQLSTORE_SQLITE_PATH=/var/lib/ghcr.io/hanzoai/o11y.db
       - O11Y_TOKENIZER_JWT_SECRET=secret
     healthcheck:
@@ -229,9 +229,9 @@ services:
     environment:
       - OTEL_RESOURCE_ATTRIBUTES=host.name={{.Node.Hostname}},os.type={{.Node.Platform.OS}}
       - LOW_CARDINAL_EXCEPTION_GROUPING=false
-      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
-      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - O11Y_OTEL_COLLECTOR_DATASTORE_DSN=tcp://clickhouse:9000
+      - O11Y_OTEL_COLLECTOR_DATASTORE_CLUSTER=cluster
+      - O11Y_OTEL_COLLECTOR_DATASTORE_REPLICATION=true
       - O11Y_OTEL_COLLECTOR_TIMEOUT=10m
     ports:
       # - "1777:1777"     # pprof extension
@@ -243,9 +243,9 @@ services:
     !!merge <<: *db-depend
     image: ghcr.io/hanzoai/otel-collector:v0.144.2
     environment:
-      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
-      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - O11Y_OTEL_COLLECTOR_DATASTORE_DSN=tcp://clickhouse:9000
+      - O11Y_OTEL_COLLECTOR_DATASTORE_CLUSTER=cluster
+      - O11Y_OTEL_COLLECTOR_DATASTORE_REPLICATION=true
       - O11Y_OTEL_COLLECTOR_TIMEOUT=10m
     entrypoint:
       - /bin/sh
