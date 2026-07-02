@@ -138,12 +138,13 @@ telemetrystore:
   dial_timeout: 5s
   # Specifies the telemetrystore provider to use.
   provider: clickhouse
-  clickhouse:
-    # The DSN for Hanzo Datastore.
+  datastore:
+    # The DSN for Hanzo Datastore. Canonical env override: O11Y_DATASTORE_DSN
+    # (e.g. tcp://datastore.hanzo.svc:9000/?database=o11y).
     dsn: tcp://datastore:9000
     # The cluster name for Hanzo Datastore.
     cluster: cluster
-    # The query settings for clickhouse.
+    # The query settings for the datastore.
     settings:
       max_execution_time: 0
       max_execution_time_leaf: 0
