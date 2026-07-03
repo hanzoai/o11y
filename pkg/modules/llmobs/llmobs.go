@@ -8,7 +8,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
-// Module is the native LLM-observability surface that absorbs Langfuse:
+// Module is the native LLM-observability surface that absorbs the upstream product:
 // observations/traces/sessions/users are views over gen_ai spans, while
 // scores and annotations are CRUD over two net-new tables.
 type Module interface {

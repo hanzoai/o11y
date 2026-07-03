@@ -10,7 +10,7 @@ import (
 )
 
 // addLLMObsRoutes serves the native LLM-observability surface (absorbing
-// Langfuse) under /v1/o11y. Observations/traces/sessions/users are views over
+// the upstream product) under /v1/o11y. Observations/traces/sessions/users are views over
 // gen_ai spans; scores and annotations are CRUD over net-new tables. Every
 // route is behind the shared Hanzo IAM authz middleware.
 func (provider *provider) addLLMObsRoutes(router *mux.Router) error {
