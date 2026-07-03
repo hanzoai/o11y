@@ -804,16 +804,9 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 									to continue using Hanzo features.
 									<span className="refresh-payment-status">
 										{' '}
-										Please{' '}
-										<a className="upgrade-link" onClick={handleUpgrade}>
-											upgrade
-										</a>
-										to continue using SigNoz features.
-										<span className="refresh-payment-status">
-											{' '}
-											| Already upgraded? <RefreshPaymentStatus type="text" />
-										</span>
+										| Already upgraded? <RefreshPaymentStatus type="text" />
 									</span>
+								</span>
 								) : (
 									'Please contact your administrator for upgrading to a paid plan.'
 								)}

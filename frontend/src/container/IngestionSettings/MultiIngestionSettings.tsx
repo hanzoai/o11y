@@ -856,20 +856,9 @@ function MultiIngestionSettings(): JSX.Element {
 		APIKey: GatewaytypesIngestionKeyDTO,
 		signal: LimitProps,
 	): void => {
-		let metricName = '';
-
-		switch (signal.signal) {
-			case 'metrics':
-				metricName = 'o11y.meter.metric.datapoint.count';
-				break;
-			case 'traces':
-				metricName = 'o11y.meter.span.size';
-				break;
-			case 'logs':
-				metricName = 'o11y.meter.log.size';
-				break;
-			default:
-				return;
+		const signalCfg = SIGNALS_CONFIG.find((cfg) => cfg.name === signal.signal);
+		if (!signalCfg) {
+			return;
 		}
 
 		const { metricName, yAxisUnit, thresholdUnit } = signalCfg;

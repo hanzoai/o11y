@@ -45,7 +45,6 @@ import {
 	SettingsNavSection,
 	SidebarItem,
 } from './sideNav.types';
-import { Style } from '@signozhq/design-tokens';
 import Noz from 'components/Noz/Noz';
 import { NOZ_TOOLTIP_TITLE } from 'components/Noz/Noz.constants';
 

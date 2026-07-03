@@ -84,14 +84,29 @@ function DisplayName({ index, id: orgId }: DisplayNameProps): JSX.Element {
 			onSubmit={handleSubmit(onSubmit)}
 			autoComplete="off"
 		>
-			<Form.Item
-				name="displayName"
-				label="Display name"
-				rules={[{ required: true, message: requireErrorMessage('Display name') }]}
-			>
-				<Input size="large" placeholder={t('o11y')} />
-			</Form.Item>
-			<Form.Item>
+			<div className="form-field">
+				<label htmlFor="displayName">Display name</label>
+				<Controller
+					name="displayName"
+					control={control}
+					rules={{ required: requireErrorMessage('Display name') }}
+					render={({ field, fieldState }): JSX.Element => (
+						<>
+							<Input
+								{...field}
+								id="displayName"
+								size="large"
+								placeholder={t('o11y')}
+								status={fieldState.error ? 'error' : ''}
+							/>
+							{fieldState.error && (
+								<div className="field-error">{fieldState.error.message}</div>
+							)}
+						</>
+					)}
+				/>
+			</div>
+			<div>
 				<Button
 					loading={isLoading}
 					disabled={isDisabled}

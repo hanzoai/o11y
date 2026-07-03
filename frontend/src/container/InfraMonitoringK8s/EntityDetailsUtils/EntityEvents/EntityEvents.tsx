@@ -4,7 +4,6 @@ import { Color } from 'constants/designTokens';
 import { Button, Table, TableColumnsType } from 'antd';
 import { VIEWS } from 'components/HostMetricsDetail/constants';
 import { DEFAULT_ENTITY_VERSION } from 'constants/app';
-import { EventContents } from 'container/InfraMonitoringK8s/commonUtils';
 import { K8sCategory } from 'container/InfraMonitoringK8s/constants';
 import LoadingContainer from 'container/InfraMonitoringK8s/LoadingContainer';
 import RunQueryBtn from 'container/QueryBuilder/components/RunQueryBtn/RunQueryBtn';

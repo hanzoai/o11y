@@ -6253,6 +6253,11 @@ export interface MetricsexplorertypesInspectMetricsResponseDTO {
 	series: Querybuildertypesv5TimeSeriesDTO[] | null;
 }
 
+export enum MetrictypesTemporalityDTO {
+	delta = 'delta',
+	cumulative = 'cumulative',
+	unspecified = 'unspecified',
+}
 export enum MetrictypesTypeDTO {
 	gauge = 'gauge',
 	sum = 'sum',

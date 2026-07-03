@@ -75,7 +75,7 @@ export default defineConfig(({ mode }): UserConfig => {
 		}),
 		vitePluginChecker({
 			typescript: true,
-			// this doubles the build tim
+			// this doubles the build time
 			// disabled to use Biome/tsgo (in the future) as alternative
 			enableBuild: false,
 		}),
@@ -91,102 +91,9 @@ export default defineConfig(({ mode }): UserConfig => {
 		);
 	}
 
-		if (env.VITE_SENTRY_AUTH_TOKEN) {
-			plugins.push(
-				sentryVitePlugin({
-					authToken: env.VITE_SENTRY_AUTH_TOKEN,
-					org: env.VITE_SENTRY_ORG,
-					project: env.VITE_SENTRY_PROJECT_ID,
-				}),
-			);
-		}
-
-		if (env.BUNDLE_ANALYSER === 'true') {
-			plugins.push(
-				visualizer({
-					open: true,
-					gzipSize: true,
-					brotliSize: true,
-				}),
-			);
-		}
-
-		if (env.NODE_ENV === 'production') {
-			plugins.push(
-				ViteImageOptimizer({
-					jpeg: { quality: 80 },
-					jpg: { quality: 80 },
-				}),
-			);
-			plugins.push(viteCompression());
-		}
-
-		return {
-			plugins,
-			resolve: {
-				alias: {
-					utils: resolve(__dirname, './src/utils'),
-					types: resolve(__dirname, './src/types'),
-					constants: resolve(__dirname, './src/constants'),
-					parser: resolve(__dirname, './src/parser'),
-					providers: resolve(__dirname, './src/providers'),
-					lib: resolve(__dirname, './src/lib'),
-				},
-			},
-			css: {
-				preprocessorOptions: {
-					less: {
-						javascriptEnabled: true,
-					},
-				},
-			},
-			define: {
-				// TODO: Remove this in favor of import.meta.env
-				'process.env': JSON.stringify({
-					NODE_ENV: mode,
-					FRONTEND_API_ENDPOINT: env.VITE_FRONTEND_API_ENDPOINT,
-					WEBSOCKET_API_ENDPOINT: env.VITE_WEBSOCKET_API_ENDPOINT,
-					PYLON_APP_ID: env.VITE_PYLON_APP_ID,
-					PYLON_IDENTITY_SECRET: env.VITE_PYLON_IDENTITY_SECRET,
-					APPCUES_APP_ID: env.VITE_APPCUES_APP_ID,
-					INSIGHTS_KEY: env.VITE_INSIGHTS_KEY,
-					SENTRY_AUTH_TOKEN: env.VITE_SENTRY_AUTH_TOKEN,
-					SENTRY_ORG: env.VITE_SENTRY_ORG,
-					SENTRY_PROJECT_ID: env.VITE_SENTRY_PROJECT_ID,
-					SENTRY_DSN: env.VITE_SENTRY_DSN,
-					TUNNEL_URL: env.VITE_TUNNEL_URL,
-					TUNNEL_DOMAIN: env.VITE_TUNNEL_DOMAIN,
-					DOCS_BASE_URL: env.VITE_DOCS_BASE_URL,
-				}),
-			},
-			build: {
-				sourcemap: true,
-				outDir: 'build',
-				cssMinify: 'esbuild',
-				rollupOptions: {
-					// @hanzo/ui eagerly imports all optional peer deps at the
-					// module level.  Externalize the ones this o11y app does not
-					// use so the bundler does not error on missing resolution.
-					external: [
-						/^next($|\/)/,
-						'next-themes',
-						'react-hook-form',
-						/^@hookform\//,
-						'chrono-node',
-						'mermaid',
-						'recharts',
-						'sql.js',
-						'react-qrcode-logo',
-						'@rainbow-me/rainbowkit',
-						'wagmi',
-						/^@tanstack\/react-query/,
-						'@modelcontextprotocol/sdk',
-						'@hanzo/docs-core',
-						/^@o11yhq\//,
-					],
-				},
-			},
-			server: {
+	if (env.BUNDLE_ANALYSER === 'true') {
+		plugins.push(
+			visualizer({
 				open: true,
 				gzipSize: true,
 				brotliSize: true,
@@ -256,6 +163,26 @@ export default defineConfig(({ mode }): UserConfig => {
 			sourcemap: true,
 			outDir: 'build',
 			cssMinify: 'esbuild',
+			rollupOptions: {
+				// @hanzo/ui eagerly imports all optional peer deps at the
+				// module level. Externalize the ones this o11y app does not
+				// use so the bundler does not error on missing resolution.
+				external: [
+					/^next($|\/)/,
+					'next-themes',
+					'chrono-node',
+					'mermaid',
+					'recharts',
+					'sql.js',
+					'react-qrcode-logo',
+					'@rainbow-me/rainbowkit',
+					'wagmi',
+					/^@tanstack\/react-query/,
+					'@modelcontextprotocol/sdk',
+					'@hanzo/docs-core',
+					/^@o11yhq\//,
+				],
+			},
 		},
 		server: {
 			open: true,

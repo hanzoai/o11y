@@ -481,6 +481,10 @@ function QueryAddOns({
 									<div className="label" style={{ cursor: 'help' }}>
 										Reduce to
 									</div>
+								</Tooltip>
+								<div className="input">
+									<ReduceToFilter query={query} onChange={handleChangeReduceToV5} />
+								</div>
 
 									<Button
 										className="close-btn periscope-btn ghost"

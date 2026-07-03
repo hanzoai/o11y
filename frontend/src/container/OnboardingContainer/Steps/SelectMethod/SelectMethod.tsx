@@ -23,7 +23,7 @@ export default function SelectMethod(): JSX.Element {
 					<RadioGroupItem value={OnboardingMethods.QUICK_START}>
 						<Typography.Text> Quick Start </Typography.Text> <br />
 						<small>Send data to Hanzo directly from OpenTelemetry SDK.</small>
-					</Radio>
+					</RadioGroupItem>
 
 					<RadioGroupItem value={OnboardingMethods.RECOMMENDED_STEPS}>
 						<Typography.Text> Use Recommended Steps </Typography.Text> <br />

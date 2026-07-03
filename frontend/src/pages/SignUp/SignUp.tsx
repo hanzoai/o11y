@@ -159,7 +159,7 @@ function SignUp(): JSX.Element {
 					<Typography.Text className="signup-header-subtitle">
 						You&apos;re almost in. Create a password to start monitoring your
 						applications.
-					</Typography.Paragraph>
+					</Typography.Text>
 				</div>
 
 				<FormContainer onFinish={handleSubmit} form={form} className="signup-form">

@@ -61,7 +61,7 @@ function AuthnProviderSelector({
 				<Typography.Paragraph italic>
 					Hanzo supports the following single sign-on services (SSO). Get started
 					with setting your project’s SSO below
-				</Typography.Text>
+				</Typography.Paragraph>
 			</section>
 			<section className="selector">
 				{authnProviders.map((provider) => {
