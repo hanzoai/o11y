@@ -70,7 +70,7 @@ cache:
 `), 0644)
 	require.NoError(t, err)
 
-	t.Setenv("SIGNOZ_CACHE_PROVIDER", "fromenv")
+	t.Setenv("O11Y_CACHE_PROVIDER", "fromenv")
 
 	logger := slog.New(slog.DiscardHandler)
 	config, err := NewSigNozConfig(context.Background(), logger, []string{configPath})
