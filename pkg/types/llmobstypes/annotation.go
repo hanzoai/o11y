@@ -11,7 +11,7 @@ import (
 
 // Annotation is a human note (optionally part of a review queue) attached to a
 // trace or observation. It is the second net-new table, backing
-// /v1/o11y/annotation. Langfuse-parity minimal: a note plus an optional queue
+// /v1/o11y/annotation. LLM-observability-parity minimal: a note plus an optional queue
 // and status.
 type Annotation struct {
 	bun.BaseModel `bun:"table:llm_annotations,alias:llm_annotations" json:"-"`
