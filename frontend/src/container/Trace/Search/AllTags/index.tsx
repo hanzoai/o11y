@@ -1,9 +1,9 @@
 import { useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { connect, useSelector } from 'react-redux';
-import { ChevronRight, Plus } from '@signozhq/icons';
+import { ChevronRight, Plus } from 'components/ui/icons';
 import { Button, Space, Flex } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 // eslint-disable-next-line no-restricted-imports
 import { bindActionCreators } from 'redux';
 import { ThunkDispatch } from 'redux-thunk';

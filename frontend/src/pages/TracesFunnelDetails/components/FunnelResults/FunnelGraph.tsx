@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Loader } from '@signozhq/icons';
+import { Loader } from 'components/ui/icons';
 import { Empty, Spin } from 'antd';
 import {
 	BarController,

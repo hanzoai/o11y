@@ -1,6 +1,6 @@
 import { Button, Tabs, Tooltip } from 'antd';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
-import { Braces, Globe, Table } from '@signozhq/icons';
+import { Braces, Globe, Table } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { USER_ROLES } from 'types/roles';
 

@@ -1,8 +1,8 @@
 import { Button } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { handleContactSupport } from 'container/Integrations/utils';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
-import { LifeBuoy, RefreshCw } from '@signozhq/icons';
+import { LifeBuoy, RefreshCw } from 'components/ui/icons';
 
 import broomUrl from '@/assets/Icons/broom.svg';
 import constructionUrl from '@/assets/Icons/construction.svg';

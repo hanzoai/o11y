@@ -1,14 +1,14 @@
 import { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button } from '@signozhq/ui/button';
-import { DialogWrapper } from '@signozhq/ui/dialog';
-import { Input } from '@signozhq/ui/input';
-import { toast } from '@signozhq/ui/sonner';
+import { Button } from 'components/ui/button';
+import { DialogWrapper } from 'components/ui/dialog';
+import { Input } from 'components/ui/input';
+import { toast } from 'components/ui/sonner';
 import { Flex } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import ROUTES from 'constants/routes';
-import { ArrowRight, Cable, Check } from '@signozhq/icons';
+import { ArrowRight, Cable, Check } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { routePermission } from 'utils/permission';
 

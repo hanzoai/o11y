@@ -8,7 +8,7 @@ import { formatBytes } from '../commonUtils';
 import { ValidateColumnValueWrapper } from '../components';
 import { InfraMonitoringEntity } from '../constants';
 import { K8sNamespacesData, K8sNamespacesListPayload } from './api';
-import { FilePenLine } from '@signozhq/icons';
+import { FilePenLine } from 'components/ui/icons';
 
 export function getK8sNamespaceRowKey(namespace: K8sNamespacesData): string {
 	return namespace.namespaceName || namespace.meta.k8s_namespace_name;

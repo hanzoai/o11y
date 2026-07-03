@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
-import { DialogWrapper } from '@signozhq/ui/dialog';
-import { toast } from '@signozhq/ui/sonner';
+import { DialogWrapper } from 'components/ui/dialog';
+import { toast } from 'components/ui/sonner';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {
 	invalidateListServiceAccountKeys,
@@ -12,7 +12,7 @@ import {
 import type {
 	RenderErrorResponseDTO,
 	ServiceaccounttypesGettableFactorAPIKeyDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import { SA_QUERY_PARAMS } from 'container/ServiceAccountsSettings/constants';
 import dayjs from 'dayjs';

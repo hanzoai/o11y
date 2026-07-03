@@ -11,22 +11,4 @@
 // -------------------------------------------------------------------------
 
 import '@hanzo/ui';
-import '@hanzo/ui';
-import '@hanzo/ui';
-import 'components/ui/callout';
-import '@hanzo/ui';
-import '@hanzo/ui';
-import '@hanzo/ui';
-import 'constants/designTokens';
-import 'components/ui/dialog';
-import 'components/ui/drawer';
-import 'lucide-react';
-import 'components/ui/input';
-import '@hanzo/ui';
-import '@hanzo/ui';
-import '@hanzo/ui';
-import '@hanzo/ui';
-import '@hanzo/ui';
-import 'components/ui/table';
-import '@hanzo/ui';
-import '@hanzo/ui';
+import '@hanzo/insights';

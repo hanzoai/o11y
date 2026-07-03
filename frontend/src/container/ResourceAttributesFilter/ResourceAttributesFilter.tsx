@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react';
-import { SolidXCircle } from '@signozhq/icons';
+import { SolidXCircle } from 'components/ui/icons';
 import { Button, Select, Spin } from 'antd';
 import useResourceAttribute, {
 	isResourceEmpty,

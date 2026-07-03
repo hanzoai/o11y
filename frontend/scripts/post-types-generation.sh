@@ -14,6 +14,19 @@ done
 
 echo "\n✅ Tag files renamed to index.ts"
 
+# Stabilize the shared schemas filename to `o11y.schemas.ts`.
+# Orval derives it from the OpenAPI `info.title` ("Hanzo O11y" -> `hanzoO11y.schemas.ts`),
+# but all consumers import `generated/services/o11y.schemas`. Keep the brand in the
+# spec title and the import path stable by renaming the file + its internal imports.
+echo "\n\n---\nStabilizing schemas filename to o11y.schemas.ts...\n"
+if [ -f src/api/generated/services/hanzoO11y.schemas.ts ]; then
+  mv src/api/generated/services/hanzoO11y.schemas.ts src/api/generated/services/o11y.schemas.ts
+  grep -rl "hanzoO11y.schemas" src/api/generated | while read -r f; do
+    perl -i -pe 's/hanzoO11y\.schemas/o11y.schemas/g' "$f"
+  done
+  echo "\n✅ Schemas file stabilized to o11y.schemas.ts"
+fi
+
 # Format generated files
 echo "\n\n---\nRunning prettier...\n"
 if ! pnpm prettify src/api/generated; then

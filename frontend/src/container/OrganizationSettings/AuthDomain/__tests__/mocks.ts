@@ -1,4 +1,7 @@
-import { AuthtypesGettableAuthDomainDTO } from 'api/generated/services/o11y.schemas';
+import {
+	AuthtypesAuthNProviderDTO,
+	AuthtypesGettableAuthDomainDTO,
+} from 'api/generated/services/o11y.schemas';
 
 // API Endpoints
 export const AUTH_DOMAINS_LIST_ENDPOINT = '*/api/v1/domains';
@@ -10,11 +13,13 @@ export const AUTH_DOMAINS_DELETE_ENDPOINT = '*/api/v1/domains/:id';
 export const mockGoogleAuthDomain: AuthtypesGettableAuthDomainDTO = {
 	id: 'domain-1',
 	name: 'o11y.hanzo.ai',
-	ssoEnabled: true,
-	ssoType: 'google_auth',
-	googleAuthConfig: {
-		clientId: 'test-client-id',
-		clientSecret: 'test-client-secret',
+	config: {
+		ssoEnabled: true,
+		ssoType: AuthtypesAuthNProviderDTO.google_auth,
+		googleAuthConfig: {
+			clientId: 'test-client-id',
+			clientSecret: 'test-client-secret',
+		},
 	},
 	authNProviderInfo: {
 		relayStatePath: 'api/v1/sso/relay/domain-1',
@@ -138,17 +143,19 @@ export const mockOidcWithClaimMapping: AuthtypesGettableAuthDomainDTO = {
 export const mockSamlWithAttributeMapping: AuthtypesGettableAuthDomainDTO = {
 	id: 'domain-7',
 	name: 'saml-attrs.com',
-	ssoEnabled: true,
-	ssoType: 'saml',
-	samlConfig: {
-		samlIdp: 'https://idp.saml-attrs.com/sso',
-		samlEntity: 'urn:saml-attrs:idp',
-		samlCert: 'MOCK_CERTIFICATE_ATTRS',
-		insecureSkipAuthNRequestsSigned: true,
-		attributeMapping: {
-			name: 'user_display_name',
-			groups: 'member_of',
-			role: 'o11y_role',
+	config: {
+		ssoEnabled: true,
+		ssoType: AuthtypesAuthNProviderDTO.saml,
+		samlConfig: {
+			samlIdp: 'https://idp.saml-attrs.com/sso',
+			samlEntity: 'urn:saml-attrs:idp',
+			samlCert: 'MOCK_CERTIFICATE_ATTRS',
+			insecureSkipAuthNRequestsSigned: true,
+			attributeMapping: {
+				name: 'user_display_name',
+				groups: 'member_of',
+				role: 'o11y_role',
+			},
 		},
 	},
 	authNProviderInfo: {

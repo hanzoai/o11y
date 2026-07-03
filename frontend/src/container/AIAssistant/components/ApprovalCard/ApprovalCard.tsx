@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import cx from 'classnames';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import {
 	Dialog,
 	DialogCloseButton,
@@ -9,9 +9,9 @@ import {
 	DialogHeader,
 	DialogSubtitle,
 	DialogTitle,
-} from '@signozhq/ui/dialog';
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
+} from 'components/ui/dialog';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
+import { TooltipSimple } from 'components/ui/tooltip';
 import type {
 	ApprovalEventDTO,
 	ApprovalEventDTODiff,
@@ -25,7 +25,7 @@ import {
 	Shield,
 	WrapText,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 import { useAIAssistantStore } from '../../store/useAIAssistantStore';
 

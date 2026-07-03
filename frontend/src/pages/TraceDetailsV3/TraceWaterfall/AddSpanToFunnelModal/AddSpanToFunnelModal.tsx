@@ -1,16 +1,15 @@
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
-import { Button } from '@signozhq/ui/button';
-import { Input } from '@signozhq/ui/input';
-import { Spin } from 'antd';
+import { Button } from 'components/ui/button';
+import { Input, Spin } from 'antd';
 import cx from 'classnames';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
-import SignozModal from 'components/SignozModal/SignozModal';
+import SignozModal from 'components/O11yModal/O11yModal';
 import {
 	useFunnelDetails,
 	useFunnelsList,
 } from 'hooks/TracesFunnels/useFunnels';
 import { isEqual } from 'lodash-es';
-import { ArrowLeft, Check, Plus, Search, LoaderCircle } from '@signozhq/icons';
+import { ArrowLeft, Check, Plus, Search, LoaderCircle } from 'components/ui/icons';
 import FunnelConfiguration from 'pages/TracesFunnelDetails/components/FunnelConfiguration/FunnelConfiguration';
 import { TracesFunnelsContentRenderer } from 'pages/TracesFunnels';
 import CreateFunnel from 'pages/TracesFunnels/components/CreateFunnel/CreateFunnel';

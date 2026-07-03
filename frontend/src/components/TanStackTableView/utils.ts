@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 
 import { RowKeyData, TableColumnDef } from './types';
-import { ComboboxSimpleItem } from '@signozhq/ui/combobox';
+import { ComboboxSimpleItem } from 'components/ui/combobox';
 
 export const getColumnId = <TData>(column: TableColumnDef<TData>): string =>
 	column.id;

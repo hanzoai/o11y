@@ -9,7 +9,7 @@ import APIError from 'types/api/error';
 import ErrorContent from './components/ErrorContent';
 
 import './ErrorModal.styles.scss';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 
 type Props = {
 	error: APIError;

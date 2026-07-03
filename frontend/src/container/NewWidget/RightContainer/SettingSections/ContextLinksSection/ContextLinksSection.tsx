@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { Link } from '@signozhq/icons';
+import { Link } from 'components/ui/icons';
 import { ContextLinksData, Widgets } from 'types/api/dashboard/getAll';
 
 import SettingsSection from '../../components/SettingsSection/SettingsSection';

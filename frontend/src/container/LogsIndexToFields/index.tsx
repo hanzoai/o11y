@@ -1,4 +1,4 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 
 function LogsIndexToFields(): JSX.Element {
 	return <Typography>LogsIndexToFields</Typography>;

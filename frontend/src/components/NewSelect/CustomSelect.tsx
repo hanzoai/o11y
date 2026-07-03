@@ -7,11 +7,14 @@ import React, {
 	useState,
 } from 'react';
 import {
-	CloseOutlined,
-	DownOutlined,
-	LoadingOutlined,
-	ReloadOutlined,
-} from '@ant-design/icons';
+	ArrowDown,
+	ArrowUp,
+	ChevronDown,
+	Info,
+	Loader,
+	RefreshCw,
+	X,
+} from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
 import { Select } from 'antd';
 import cx from 'classnames';
@@ -19,7 +22,7 @@ import TextToolTip from 'components/TextToolTip';
 import { SOMETHING_WENT_WRONG } from 'constants/api';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { capitalize, isEmpty } from 'lodash-es';
-import type { BaseSelectRef } from 'rc-select';
+import type { RefSelectProps } from 'antd';
 import { popupContainer } from 'utils/selectPopupContainer';
 
 import { CustomSelectProps, OptionData } from './types';
@@ -71,7 +74,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 	const isDarkMode = useIsDarkMode();
 
 	// Refs for element access and scroll behavior
-	const selectRef = useRef<BaseSelectRef>(null);
+	const selectRef = useRef<RefSelectProps>(null);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const optionRefs = useRef<Record<number, HTMLDivElement | null>>({});
 	// Flag to track if dropdown just opened

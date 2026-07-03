@@ -1,3 +1,4 @@
+import type { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
 export const Wrapper = styled.ul`
@@ -42,7 +43,7 @@ export const CardContainer = styled.li`
 	position: relative;
 `;
 
-export const CollapseButton = styled.div`
+export const CollapseButton = styled.div<HTMLAttributes<HTMLDivElement>>`
 	position: absolute;
 	top: 0;
 `;

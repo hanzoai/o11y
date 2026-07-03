@@ -13,7 +13,7 @@ import RunQueryBtn from 'container/QueryBuilder/components/RunQueryBtn/RunQueryB
 import { useKeyboardHotkeys } from 'hooks/hotkeys/useKeyboardHotkeys';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { isEmpty } from 'lodash-es';
-import { Atom, Terminal } from '@signozhq/icons';
+import { Atom, Terminal } from 'components/ui/icons';
 import { AlertTypes } from 'types/api/alerts/alertTypes';
 import { AlertDef } from 'types/api/alerts/def';
 import { EQueryType } from 'types/common/dashboard';
@@ -259,13 +259,6 @@ function QuerySection({
 			default:
 				return null;
 		}
-		if (c === EQueryType.CLICKHOUSE && !isAnomalyDetection) {
-			return renderChQueryUI();
-		}
-		if (c === EQueryType.QUERY_BUILDER) {
-			return renderMetricUI();
-		}
-		return null;
 	};
 
 	const step2Label = alertDef.alertType === 'METRIC_BASED_ALERT' ? '2' : '1';

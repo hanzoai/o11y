@@ -10,23 +10,24 @@ import { createHtmlPlugin } from 'vite-plugin-html';
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-// In dev the Go backend is not involved, so replace the [[.BaseHref]] placeholder
-// with the configured base path so relative assets resolve correctly from the Vite dev server.
-// Set VITE_BASE_PATH env var to test with a custom base path (e.g., /signoz/).
-function devBasePathPlugin(basePath: string): Plugin {
+// The `[[.BaseHref]]` / `[[.Settings]]` placeholders in index.html were meant to be
+// filled by the o11y Go backend at serve time. o11y now runs headless and the SPA is
+// served by hanzoai/static (which does no templating), so we resolve them at build
+// time — and in the dev server, where the backend is likewise not involved. Both
+// paths produce identical placeholder-free HTML. Set VITE_BASE_PATH to serve under a
+// URL prefix (e.g. /signoz/); defaults to '/'.
+function baseHrefPlugin(basePath: string): Plugin {
 	return {
-		name: 'dev-base-path',
-		apply: 'serve',
+		name: 'base-href',
 		transformIndexHtml(html): string {
 			return html.replaceAll('[[.BaseHref]]', basePath);
 		},
 	};
 }
 
-function devBootDataPlugin(env: Record<string, string>): Plugin {
+function bootSettingsPlugin(env: Record<string, string>): Plugin {
 	return {
-		name: 'dev-boot-data',
-		apply: 'serve',
+		name: 'boot-settings',
 		transformIndexHtml(html): string {
 			const settings = {
 				posthog: { enabled: env.VITE_POSTHOG_ENABLED !== 'false' },
@@ -62,8 +63,8 @@ export default defineConfig(({ mode }): UserConfig => {
 	const plugins = [
 		tsconfigPaths(),
 		rawMarkdownPlugin(),
-		devBasePathPlugin(basePath),
-		devBootDataPlugin(env),
+		baseHrefPlugin(basePath),
+		bootSettingsPlugin(env),
 		react(),
 		createHtmlPlugin({
 			inject: {
@@ -75,7 +76,7 @@ export default defineConfig(({ mode }): UserConfig => {
 		}),
 		vitePluginChecker({
 			typescript: true,
-			// this doubles the build tim
+			// this doubles the build time
 			// disabled to use Biome/tsgo (in the future) as alternative
 			enableBuild: false,
 		}),
@@ -91,102 +92,9 @@ export default defineConfig(({ mode }): UserConfig => {
 		);
 	}
 
-		if (env.VITE_SENTRY_AUTH_TOKEN) {
-			plugins.push(
-				sentryVitePlugin({
-					authToken: env.VITE_SENTRY_AUTH_TOKEN,
-					org: env.VITE_SENTRY_ORG,
-					project: env.VITE_SENTRY_PROJECT_ID,
-				}),
-			);
-		}
-
-		if (env.BUNDLE_ANALYSER === 'true') {
-			plugins.push(
-				visualizer({
-					open: true,
-					gzipSize: true,
-					brotliSize: true,
-				}),
-			);
-		}
-
-		if (env.NODE_ENV === 'production') {
-			plugins.push(
-				ViteImageOptimizer({
-					jpeg: { quality: 80 },
-					jpg: { quality: 80 },
-				}),
-			);
-			plugins.push(viteCompression());
-		}
-
-		return {
-			plugins,
-			resolve: {
-				alias: {
-					utils: resolve(__dirname, './src/utils'),
-					types: resolve(__dirname, './src/types'),
-					constants: resolve(__dirname, './src/constants'),
-					parser: resolve(__dirname, './src/parser'),
-					providers: resolve(__dirname, './src/providers'),
-					lib: resolve(__dirname, './src/lib'),
-				},
-			},
-			css: {
-				preprocessorOptions: {
-					less: {
-						javascriptEnabled: true,
-					},
-				},
-			},
-			define: {
-				// TODO: Remove this in favor of import.meta.env
-				'process.env': JSON.stringify({
-					NODE_ENV: mode,
-					FRONTEND_API_ENDPOINT: env.VITE_FRONTEND_API_ENDPOINT,
-					WEBSOCKET_API_ENDPOINT: env.VITE_WEBSOCKET_API_ENDPOINT,
-					PYLON_APP_ID: env.VITE_PYLON_APP_ID,
-					PYLON_IDENTITY_SECRET: env.VITE_PYLON_IDENTITY_SECRET,
-					APPCUES_APP_ID: env.VITE_APPCUES_APP_ID,
-					INSIGHTS_KEY: env.VITE_INSIGHTS_KEY,
-					SENTRY_AUTH_TOKEN: env.VITE_SENTRY_AUTH_TOKEN,
-					SENTRY_ORG: env.VITE_SENTRY_ORG,
-					SENTRY_PROJECT_ID: env.VITE_SENTRY_PROJECT_ID,
-					SENTRY_DSN: env.VITE_SENTRY_DSN,
-					TUNNEL_URL: env.VITE_TUNNEL_URL,
-					TUNNEL_DOMAIN: env.VITE_TUNNEL_DOMAIN,
-					DOCS_BASE_URL: env.VITE_DOCS_BASE_URL,
-				}),
-			},
-			build: {
-				sourcemap: true,
-				outDir: 'build',
-				cssMinify: 'esbuild',
-				rollupOptions: {
-					// @hanzo/ui eagerly imports all optional peer deps at the
-					// module level.  Externalize the ones this o11y app does not
-					// use so the bundler does not error on missing resolution.
-					external: [
-						/^next($|\/)/,
-						'next-themes',
-						'react-hook-form',
-						/^@hookform\//,
-						'chrono-node',
-						'mermaid',
-						'recharts',
-						'sql.js',
-						'react-qrcode-logo',
-						'@rainbow-me/rainbowkit',
-						'wagmi',
-						/^@tanstack\/react-query/,
-						'@modelcontextprotocol/sdk',
-						'@hanzo/docs-core',
-						/^@o11yhq\//,
-					],
-				},
-			},
-			server: {
+	if (env.BUNDLE_ANALYSER === 'true') {
+		plugins.push(
+			visualizer({
 				open: true,
 				gzipSize: true,
 				brotliSize: true,
@@ -208,6 +116,14 @@ export default defineConfig(({ mode }): UserConfig => {
 		plugins,
 		resolve: {
 			alias: {
+				// The @hanzo/ui barrel eagerly imports these Next-only modules at the
+				// top level. o11y is not a Next app and uses none of them, but a browser
+				// cannot resolve bare `next-themes` / `next/*` specifiers — externalizing
+				// them leaves bare imports that crash the SPA at load (blank page). Alias
+				// to inert browser stubs so the bundle stays self-contained.
+				'next-themes': resolve(__dirname, './stubs/next-themes.ts'),
+				'next/image': resolve(__dirname, './stubs/next-image.ts'),
+				'next/link': resolve(__dirname, './stubs/next-link.ts'),
 				'@': resolve(__dirname, './src'),
 				utils: resolve(__dirname, './src/utils'),
 				types: resolve(__dirname, './src/types'),
@@ -256,6 +172,28 @@ export default defineConfig(({ mode }): UserConfig => {
 			sourcemap: true,
 			outDir: 'build',
 			cssMinify: 'esbuild',
+			rollupOptions: {
+				// @hanzo/ui eagerly imports all optional peer deps at the module
+				// level. These heavy web3/viz packages are used by @hanzo/ui subpaths
+				// that o11y never imports, so they tree-shake out entirely (0 refs in
+				// the built bundle) — externalizing keeps the bundler from erroring on
+				// missing resolution. (next-themes/next/* are NOT here: they survive
+				// tree-shaking into o11y's used graph, so they are aliased to browser
+				// stubs above instead — a bare import of them would crash the SPA.)
+				external: [
+					'chrono-node',
+					'mermaid',
+					'recharts',
+					'sql.js',
+					'react-qrcode-logo',
+					'@rainbow-me/rainbowkit',
+					'wagmi',
+					/^@tanstack\/react-query/,
+					'@modelcontextprotocol/sdk',
+					'@hanzo/docs-core',
+					/^@o11yhq\//,
+				],
+			},
 		},
 		server: {
 			open: true,

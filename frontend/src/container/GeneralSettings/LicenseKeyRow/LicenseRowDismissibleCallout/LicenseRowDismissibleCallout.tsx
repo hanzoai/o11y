@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Callout } from '@signozhq/ui/callout';
+import { Callout } from 'components/ui/callout';
 import getLocalStorageApi from 'api/browser/localstorage/get';
 import setLocalStorageApi from 'api/browser/localstorage/set';
 import { FeatureKeys } from 'constants/features';
@@ -44,11 +44,11 @@ function LicenseRowDismissibleCallout(): JSX.Element | null {
 			type="info"
 			size="small"
 			showIcon
-			action="dismissible"
-			onClick={handleDismissCallout}
+			dismissable
+			onClose={handleDismissCallout}
 			className="license-key-callout"
-		>
-			<div className="license-key-callout__description">
+			description={
+				<div className="license-key-callout__description">
 				This is <strong>NOT</strong> your ingestion or Service account key.
 				{(hasServiceAccountsAccess || hasIngestionAccess) && (
 					<>
@@ -75,7 +75,8 @@ function LicenseRowDismissibleCallout(): JSX.Element | null {
 					</>
 				)}
 			</div>
-		</Callout>
+			}
+		/>
 	) : null;
 }
 

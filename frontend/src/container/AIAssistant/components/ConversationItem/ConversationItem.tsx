@@ -3,10 +3,10 @@ import { useCopyToClipboard } from 'react-use';
 import cx from 'classnames';
 import ROUTES from 'constants/routes';
 import { getAbsoluteUrl } from 'utils/basePath';
-import { Button } from '@signozhq/ui/button';
-import { Input } from '@signozhq/ui/input';
-import { toast } from '@signozhq/ui/sonner';
-import { DropdownMenuSimple } from '@signozhq/ui/dropdown-menu';
+import { Button } from 'components/ui/button';
+import { Input } from 'components/ui/input';
+import { toast } from 'components/ui/sonner';
+import { DropdownMenuSimple } from 'components/ui/dropdown-menu';
 
 import {
 	Archive,
@@ -15,7 +15,7 @@ import {
 	Link,
 	MessageSquare,
 	Pencil,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 import { Conversation } from '../../types';
 

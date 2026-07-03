@@ -6,7 +6,7 @@ import { useGetRuleByID } from 'api/generated/services/rules';
 import type {
 	RenderErrorResponseDTO,
 	RuletypesRuleDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import Spinner from 'components/Spinner';
 import { QueryParams } from 'constants/query';

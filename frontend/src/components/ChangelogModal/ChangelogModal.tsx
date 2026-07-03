@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
-import { Check, ChevronsDown, ScrollText, X } from '@signozhq/icons';
+import { Check, ChevronsDown, ScrollText, X } from 'components/ui/icons';
 import { Button, Flex, Modal } from 'antd';
 import updateUserPreference from 'api/v1/user/preferences/name/update';
 import cx from 'classnames';

@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'components/ui/design-tokens';
 
 import { LogType } from './LogStateIndicator';
 

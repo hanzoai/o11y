@@ -99,7 +99,7 @@ jest.mock('hooks/dashboard/useGetResolvedText', () => {
 	};
 });
 
-jest.mock('@signozhq/icons', () => {
+jest.mock('components/ui/icons', () => {
 	const { createIconsMock } = jest.requireActual<
 		typeof import('test-mocks/createIconsMock')
 	>('test-mocks/createIconsMock');

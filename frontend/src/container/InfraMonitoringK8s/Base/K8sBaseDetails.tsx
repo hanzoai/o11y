@@ -7,11 +7,11 @@ import React, {
 } from 'react';
 import { useQuery } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
-import { Color, Spacing } from '@signozhq/design-tokens';
+import { Color, Spacing } from 'components/ui/design-tokens';
 import { Button, Drawer, Tooltip } from 'antd';
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
-import { Divider } from '@signozhq/ui/divider';
-import { Typography } from '@signozhq/ui/typography';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
+import { Divider } from 'components/ui/divider';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import { combineInitialAndUserExpression } from 'components/QueryBuilderV2/QueryV2/QuerySearch/utils';
 import { convertFiltersToExpression } from 'components/QueryBuilderV2/utils';
@@ -38,7 +38,7 @@ import {
 	Package2,
 	ScrollText,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { isCustomTimeRange, useGlobalTimeStore } from 'store/globalTime';
 import { NANO_SECOND_MULTIPLIER } from 'store/globalTime/utils';
 import { DataTypes } from 'types/api/queryBuilder/queryAutocompleteResponse';

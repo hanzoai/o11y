@@ -15,7 +15,6 @@ import {
 import {
 	getInvalidValueTooltipText,
 	INFRA_MONITORING_K8S_PARAMS_KEYS,
-	K8sCategory,
 } from './constants';
 
 /**

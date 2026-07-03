@@ -8,9 +8,9 @@ import React, {
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
-import { CircleAlert, Plus } from '@signozhq/icons';
+import { CircleAlert, Plus } from 'components/ui/icons';
 import { Card, Form, Modal, Table } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import type { ExpandableConfig } from 'antd/es/table/interface';
 import logEvent from 'api/common/logEvent';
 import savePipeline from 'api/pipeline/post';

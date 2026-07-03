@@ -6,7 +6,7 @@ import { Empty, Select, Skeleton, Tooltip, Typography } from 'antd';
 import { MetricsexplorertypesTreemapModeDTO } from 'api/generated/services/o11y.schemas';
 import ErrorInPlace from 'components/ErrorInPlace/ErrorInPlace';
 import { HierarchyNode, stratify, treemapBinary } from 'd3-hierarchy';
-import { Info } from '@signozhq/icons';
+import { Info } from 'components/ui/icons';
 
 import {
 	TREEMAP_HEIGHT,

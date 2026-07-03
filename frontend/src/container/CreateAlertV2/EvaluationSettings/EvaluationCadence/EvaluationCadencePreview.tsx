@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Modal } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { Calendar, Info } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { Calendar, Info } from 'components/ui/icons';
 
 import { useCreateAlertState } from '../../context';
 import { TIMEZONE_DATA } from '../constants';

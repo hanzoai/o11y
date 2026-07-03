@@ -1,6 +1,6 @@
 import { Color } from 'constants/designTokens';
 import { Button, Typography } from 'antd';
-import { InfoIcon } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 import { MetricDetailsErrorStateProps } from './types';
 

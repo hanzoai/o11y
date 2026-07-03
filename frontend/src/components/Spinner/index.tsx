@@ -1,5 +1,5 @@
 import { CSSProperties } from 'react';
-import { Loader } from '@signozhq/icons';
+import { Loader } from 'components/ui/icons';
 import { Spin, SpinProps } from 'antd';
 
 import { SpinerStyle } from './styles';

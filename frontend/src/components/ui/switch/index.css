@@ -1,0 +1,77 @@
+[data-slot='switch-wrapper'] {
+	display: flex;
+	align-items: center;
+	gap: var(--spacing-4, 0.5rem);
+}
+
+[data-slot='switch-label'] {
+	cursor: pointer;
+	user-select: none;
+}
+
+[data-slot='switch'] {
+	display: inline-flex;
+	height: var(--switch-height, 1rem);
+	width: var(--switch-width, 1.75rem);
+	flex-shrink: 0;
+	cursor: pointer;
+	align-items: center;
+	border-radius: var(--switch-border-radius, 9999px);
+	border: 2px solid transparent;
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+	transition: background-color 150ms ease-in-out;
+	background-color: var(--l3-background);
+	padding: 0;
+}
+[data-slot='switch'][data-color='robin'] {
+	--switch-checked-background: var(--accent-primary);
+}
+[data-slot='switch'][data-color='forest'] {
+	--switch-checked-background: var(--accent-forest);
+}
+[data-slot='switch'][data-color='amber'] {
+	--switch-checked-background: var(--accent-amber);
+}
+[data-slot='switch'][data-color='sienna'] {
+	--switch-checked-background: var(--accent-sienna);
+}
+[data-slot='switch'][data-color='cherry'] {
+	--switch-checked-background: var(--accent-cherry);
+}
+[data-slot='switch'][data-color='sakura'] {
+	--switch-checked-background: var(--accent-sakura);
+}
+[data-slot='switch'][data-color='aqua'] {
+	--switch-checked-background: var(--accent-aqua);
+}
+[data-slot='switch']:focus-visible {
+	outline-offset: -1px;
+	outline: 2px solid var(--switch-checked-background);
+}
+[data-slot='switch']:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+[data-slot='switch']:disabled ~ [data-slot='switch-label'] {
+	cursor: not-allowed;
+	opacity: 0.7;
+}
+[data-slot='switch-thumb'] {
+	display: block;
+	height: var(--switch-thumb-size, 0.75rem);
+	width: var(--switch-thumb-size, 0.75rem);
+	pointer-events: none;
+	border-radius: 9999px;
+	background-color: var(--base-white);
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+	transition: transform 150ms ease-in-out;
+}
+[data-slot='switch'][data-state='checked'] {
+	background-color: var(--switch-checked-background);
+}
+[data-slot='switch'][data-state='checked'] [data-slot='switch-thumb'] {
+	transform: translateX(var(--switch-thumb-size, 0.75rem));
+}
+[data-slot='switch'][data-state='unchecked'] [data-slot='switch-thumb'] {
+	transform: translateX(0);
+}

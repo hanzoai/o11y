@@ -1,5 +1,5 @@
 import { grey } from '@ant-design/colors';
-import { Typography as TypographyComponent } from '@signozhq/ui/typography';
+import { Typography as TypographyComponent } from 'components/ui/typography';
 import styled from 'styled-components';
 
 export const HeaderContainer = styled.div<{ hover: boolean }>`

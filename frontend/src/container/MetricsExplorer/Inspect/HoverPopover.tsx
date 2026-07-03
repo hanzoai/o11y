@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Card } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 
 import {
 	GraphPopoverOptions,

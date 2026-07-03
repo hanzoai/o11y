@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Info } from '@signozhq/icons';
-import { Input } from '@signozhq/ui/input';
-import { Switch } from '@signozhq/ui/switch';
+import { Info } from 'components/ui/icons';
+import { Input } from 'components/ui/input';
+import { Switch } from 'components/ui/switch';
 import { Flex, Form, Space, Tooltip } from 'antd';
 import { ProcessorData } from 'types/api/pipeline/def';
 

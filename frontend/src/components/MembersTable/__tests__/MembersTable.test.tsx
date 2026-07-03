@@ -8,7 +8,6 @@ const mockActiveMembers: MemberRow[] = [
 		id: 'user-1',
 		name: 'Alice Smith',
 		email: 'alice@o11y.hanzo.ai',
-		role: 'ADMIN' as ROLES,
 		status: MemberStatus.Active,
 		joinedOn: '1700000000000',
 	},
@@ -16,7 +15,6 @@ const mockActiveMembers: MemberRow[] = [
 		id: 'user-2',
 		name: 'Bob Jones',
 		email: 'bob@o11y.hanzo.ai',
-		role: 'VIEWER' as ROLES,
 		status: MemberStatus.Active,
 		joinedOn: null,
 	},
@@ -26,7 +24,6 @@ const mockInvitedMember: MemberRow = {
 	id: 'inv-abc',
 	name: '',
 	email: 'charlie@o11y.hanzo.ai',
-	role: 'EDITOR' as ROLES,
 	status: MemberStatus.Invited,
 	joinedOn: null,
 };
@@ -51,7 +48,6 @@ describe('MembersTable', () => {
 
 		expect(screen.getByText('Alice Smith')).toBeInTheDocument();
 		expect(screen.getByText('alice@o11y.hanzo.ai')).toBeInTheDocument();
-		expect(screen.getByText('Admin')).toBeInTheDocument();
 		expect(screen.getAllByText('ACTIVE')).toHaveLength(2);
 	});
 
@@ -66,7 +62,6 @@ describe('MembersTable', () => {
 
 		expect(screen.getByText('INVITED')).toBeInTheDocument();
 		expect(screen.getByText('charlie@o11y.hanzo.ai')).toBeInTheDocument();
-		expect(screen.getByText('Editor')).toBeInTheDocument();
 	});
 
 	it('calls onRowClick with the member data when a row is clicked', async () => {

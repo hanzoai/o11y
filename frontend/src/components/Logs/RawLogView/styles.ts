@@ -2,7 +2,7 @@ import { blue } from '@ant-design/colors';
 import { Color } from 'constants/designTokens';
 import { Col, Row, Space } from 'antd';
 import { FontSize } from 'container/OptionsMenu/types';
-import { Info } from '@signozhq/icons';
+import { Info } from 'components/ui/icons';
 import styled from 'styled-components';
 import {
 	getActiveLogBackground,

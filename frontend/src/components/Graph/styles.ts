@@ -1,7 +1,8 @@
+import { HTMLAttributes } from 'react';
 import { themeColors } from 'constants/theme';
 import styled from 'styled-components';
 
-export const LegendsContainer = styled.div`
+export const LegendsContainer = styled.div<HTMLAttributes<HTMLDivElement>>`
 	height: 10%;
 
 	* {

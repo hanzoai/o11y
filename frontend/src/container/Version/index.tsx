@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { Button, Form } from 'antd';
-import { CircleCheck, CloudUpload, Info, Wrench } from '@signozhq/icons';
+import { CircleCheck, CloudUpload, Info, Wrench } from 'components/ui/icons';
 import { AppState } from 'store/reducers';
 import AppReducer from 'types/reducer/app';
 import { checkVersionState } from 'utils/app';

@@ -3,7 +3,7 @@ import { Input } from 'antd';
 import O11yModal from 'components/O11yModal/O11yModal';
 import { useUpdateFunnelSteps } from 'hooks/TracesFunnels/useFunnels';
 import { useNotifications } from 'hooks/useNotifications';
-import { Check, X } from '@signozhq/icons';
+import { Check, X } from 'components/ui/icons';
 import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 
 import { FunnelStepPopoverProps } from './FunnelStepPopover';

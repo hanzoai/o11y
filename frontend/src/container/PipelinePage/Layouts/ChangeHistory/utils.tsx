@@ -5,7 +5,7 @@ import {
 	SolidCheckCircle2,
 	SolidAlertOctagon,
 	SolidXCircle,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 export function getDeploymentStage(value: string): string {
 	switch (value) {

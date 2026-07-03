@@ -1,4 +1,4 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { timeItems } from 'container/NewWidget/RightContainer/timeItems';
 
 export const menuItems = timeItems.map((item) => ({

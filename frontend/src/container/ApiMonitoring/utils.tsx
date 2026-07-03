@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Color } from 'constants/designTokens';
 import { Progress, TableColumnType as ColumnType, Tag, Tooltip } from 'antd';
+import { Badge } from 'components/ui/badge';
 import { convertFiltersToExpressionWithExistingQuery } from 'components/QueryBuilderV2/utils';
 import {
 	FiltersType,
@@ -14,7 +15,7 @@ import { convertNanoToMilliseconds } from 'container/MetricsExplorer/Summary/uti
 import dayjs from 'dayjs';
 import { GetQueryResultsProps } from 'lib/dashboard/getQueryResults';
 import { cloneDeep } from 'lodash-es';
-import { ArrowUpDown, ChevronDown, ChevronRight, Info } from '@signozhq/icons';
+import { ArrowUpDown, ChevronDown, ChevronRight, Info } from 'components/ui/icons';
 import { getWidgetQuery } from 'pages/MessagingQueues/MQDetails/MetricPage/MetricPageUtil';
 import { Widgets } from 'types/api/dashboard/getAll';
 import { MetricRangePayloadProps } from 'types/api/metrics/getQueryRange';

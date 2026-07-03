@@ -7,7 +7,7 @@ import {
 	useState,
 } from 'react';
 import { useQueryClient } from 'react-query';
-import { toast } from '@signozhq/ui/sonner';
+import { toast } from 'components/ui/sonner';
 import { Form, FormInstance } from 'antd';
 import {
 	CreateAccountMutationResult,
@@ -19,7 +19,7 @@ import { useGetConnectionCredentials } from 'api/generated/services/cloudintegra
 import {
 	CloudintegrationtypesCredentialsDTO,
 	CloudintegrationtypesPostableAccountDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { INTEGRATION_TYPES } from 'container/Integrations/constants';
 import {
 	ActiveViewEnum,
@@ -193,13 +193,12 @@ export function useIntegrationModal({
 			setIsLoading(true);
 			const values = await form.validateFields();
 
-			const payload: GenerateConnectionUrlPayload = {
-				agent_config: {
-					region: values.region,
-					ingestion_url: connectionParams?.ingestion_url || values.ingestion_url,
-					ingestion_key: connectionParams?.ingestion_key || values.ingestion_key,
-					observe_api_url: connectionParams?.observe_api_url || values.observe_api_url,
-					observe_api_key: connectionParams?.observe_api_key || values.observe_api_key,
+			const payload: CloudintegrationtypesPostableAccountDTO = {
+				config: {
+					aws: {
+						deploymentRegion: values.region,
+						regions: selectedRegions,
+					},
 				},
 				credentials: {
 					ingestionUrl: connectionParams?.data?.ingestionUrl || values.ingestionUrl,

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import cx from 'classnames';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import logEvent from 'api/common/logEvent';
-import { Checkbox } from '@signozhq/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@signozhq/ui/radio-group';
+import { Checkbox } from 'components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
 
 import { AIAssistantEvents } from '../../../events';
 import { useAIAssistantAnalyticsContext } from '../../../hooks/useAIAssistantAnalyticsContext';

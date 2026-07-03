@@ -5,7 +5,7 @@ import {
 	SquareMousePointer,
 	Terminal,
 	Binoculars,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { Button, Tooltip } from 'antd';
 import cx from 'classnames';
 import { ExplorerViews } from 'pages/LogsExplorer/utils';

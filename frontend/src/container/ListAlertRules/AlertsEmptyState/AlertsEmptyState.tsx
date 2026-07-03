@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import { Divider } from '@signozhq/ui/divider';
-import { Plus, RefreshCw } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
-import { Typography } from '@signozhq/ui/typography';
+import { Divider } from 'components/ui/divider';
+import { Plus, RefreshCw } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import ROUTES from 'constants/routes';
 import useComponentPermission from 'hooks/useComponentPermission';

@@ -2,7 +2,7 @@
 import {
 	CloudintegrationtypesDashboardDTO,
 	CloudintegrationtypesServiceDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
 import { withBasePath } from 'utils/basePath';
 

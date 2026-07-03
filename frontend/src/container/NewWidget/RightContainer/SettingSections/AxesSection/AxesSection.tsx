@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
 import { InputNumber, Select } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { Axis3D, ChartLine, Spline } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { Axis3D, ChartLine, Spline } from 'components/ui/icons';
 
 import SettingsSection from '../../components/SettingsSection/SettingsSection';
 

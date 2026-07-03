@@ -8,7 +8,7 @@ import {
 import { useQuery } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import { AutoComplete } from 'antd';
 import getTagFilters from 'api/trace/getTagFilter';
 import { AppState } from 'store/reducers';

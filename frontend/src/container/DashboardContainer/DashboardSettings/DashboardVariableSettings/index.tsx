@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GripVertical, PenLine, Plus, Trash2 } from '@signozhq/icons';
+import { GripVertical, PenLine, Plus, Trash2 } from 'components/ui/icons';
 import type { DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
 import {
 	DndContext,
@@ -12,7 +12,7 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Button, Modal, Row, RowProps, Space, Table, Flex } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { VariablesSettingsTabHandle } from 'container/DashboardContainer/DashboardDescription/types';
 import { convertVariablesToDbFormat } from 'container/DashboardContainer/DashboardVariablesSelection/util';
 import { useAddDynamicVariableToPanels } from 'hooks/dashboard/useAddDynamicVariableToPanels';

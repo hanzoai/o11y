@@ -4,7 +4,7 @@ import {
 	TabsList,
 	TabsRoot,
 	TabsTrigger,
-} from '@signozhq/ui/tabs';
+} from 'components/ui/tabs';
 import cx from 'classnames';
 import { DetailsHeader } from 'components/DetailsPanel';
 import { useIsDarkMode } from 'hooks/useDarkMode';

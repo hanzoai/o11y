@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Input } from 'antd';
-import { Checkbox } from '@signozhq/ui/checkbox';
-import { Typography } from '@signozhq/ui/typography';
+import { Checkbox } from 'components/ui/checkbox';
+import { Typography } from 'components/ui/typography';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import useDebouncedFn from 'hooks/useDebouncedFunction';
 import { useResizeObserver } from 'hooks/useDimensions';
 import getAxes from 'lib/uPlotLib/utils/getAxes';
 import { getUplotChartDataForAnomalyDetection } from 'lib/uPlotLib/utils/getUplotChartData';
 import { getYAxisScaleForAnomalyDetection } from 'lib/uPlotLib/utils/getYAxisScale';
-import { ChartLine } from '@signozhq/icons';
+import { ChartLine } from 'components/ui/icons';
 import { useTimezone } from 'providers/Timezone';
 import uPlot from 'uplot';
 

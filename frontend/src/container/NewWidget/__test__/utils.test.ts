@@ -51,7 +51,7 @@ const buildMetricsQuery = (
 ): Query => ({
 	queryType: EQueryType.QUERY_BUILDER,
 	promql: [],
-	clickhouse_sql: [],
+	datastore_sql: [],
 	id: 'query-id',
 	unit: '',
 	builder: {

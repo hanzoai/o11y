@@ -1,4 +1,5 @@
 import { Button } from 'antd';
+import { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
 export const InputContainer = styled.div`
@@ -18,7 +19,7 @@ export const QueryButton = styled(Button)`
 	}
 `;
 
-export const QueryWrapper = styled.div`
+export const QueryWrapper = styled.div<HTMLAttributes<HTMLDivElement>>`
 	width: 100%;
 	margin: 0;
 	padding: 0.5rem 0;

@@ -1,6 +1,6 @@
 import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Settings } from '@signozhq/icons';
+import { Settings } from 'components/ui/icons';
 import FieldsSelector from 'components/FieldsSelector';
 import Controls, { ControlsProps } from 'container/Controls';
 import { OptionsMenuConfig } from 'container/OptionsMenu/types';

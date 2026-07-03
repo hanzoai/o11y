@@ -32,8 +32,8 @@ const activeAccountResponse = {
 	updatedAt: '2026-01-02T00:00:00Z',
 };
 
-jest.mock('@signozhq/ui/drawer', () => ({
-	...jest.requireActual('@signozhq/ui/drawer'),
+jest.mock('components/ui/drawer', () => ({
+	...jest.requireActual('components/ui/drawer'),
 	DrawerWrapper: ({
 		children,
 		footer,
@@ -51,8 +51,8 @@ jest.mock('@signozhq/ui/drawer', () => ({
 		) : null,
 }));
 
-jest.mock('@signozhq/ui/sonner', () => ({
-	...jest.requireActual('@signozhq/ui/sonner'),
+jest.mock('components/ui/sonner', () => ({
+	...jest.requireActual('components/ui/sonner'),
 	toast: { success: jest.fn(), error: jest.fn() },
 }));
 

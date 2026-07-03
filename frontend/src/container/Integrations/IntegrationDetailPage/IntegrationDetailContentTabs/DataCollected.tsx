@@ -1,6 +1,6 @@
 import { Table } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { BarChart, ScrollText } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { BarChart, ScrollText } from 'components/ui/icons';
 
 import './IntegrationDetailContentTabs.styles.scss';
 

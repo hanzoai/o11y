@@ -21,7 +21,7 @@ import {
 	Option,
 } from 'container/TopNav/DateTimeSelectionV2/types';
 import dayjs from 'dayjs';
-import { Clock, PenLine, TriangleAlert } from '@signozhq/icons';
+import { Clock, PenLine, TriangleAlert } from 'components/ui/icons';
 import { useTimezone } from 'providers/Timezone';
 import { getCustomTimeRanges } from 'utils/customTimeRangeUtils';
 import { TimeRangeValidationResult } from 'utils/timeUtils';

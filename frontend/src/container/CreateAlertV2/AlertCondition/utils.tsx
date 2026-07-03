@@ -1,6 +1,6 @@
 import { Button, Flex, SelectProps } from 'antd';
-import { Switch } from '@signozhq/ui/switch';
-import { Typography } from '@signozhq/ui/typography';
+import { Switch } from 'components/ui/switch';
+import { Typography } from 'components/ui/typography';
 import type { BaseOptionType, DefaultOptionType } from 'antd/es/select';
 import { getInvolvedQueriesInTraceOperator } from 'components/QueryBuilderV2/QueryV2/TraceOperator/utils/utils';
 import { YAxisSource } from 'components/YAxisUnitSelector/types';
@@ -12,7 +12,7 @@ import {
 } from 'container/CreateAlertV2/context/types';
 import { getSelectedQueryOptions } from 'container/FormAlertRules/utils';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
-import { ArrowRight } from '@signozhq/icons';
+import { ArrowRight } from 'components/ui/icons';
 import { IUser } from 'providers/App/types';
 import { Query } from 'types/api/queryBuilder/queryBuilderData';
 import { EQueryType } from 'types/common/dashboard';

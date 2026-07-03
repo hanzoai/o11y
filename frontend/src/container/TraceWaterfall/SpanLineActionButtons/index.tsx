@@ -1,4 +1,4 @@
-import { Link } from '@signozhq/icons';
+import { Link } from 'components/ui/icons';
 import { Button, Tooltip } from 'antd';
 import { useCopySpanLink } from 'hooks/trace/useCopySpanLink';
 import { Span } from 'types/api/trace/getTraceV2';

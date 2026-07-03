@@ -5344,7 +5344,7 @@ components:
             $ref: '#/components/schemas/Querybuildertypesv5OrderBy'
           type: array
       type: object
-    Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation:
+    Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation:
       properties:
         aggregations:
           items:
@@ -5395,7 +5395,7 @@ components:
         stepInterval:
           $ref: '#/components/schemas/Querybuildertypesv5Step'
       type: object
-    Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation:
+    Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation:
       properties:
         aggregations:
           items:
@@ -5446,7 +5446,7 @@ components:
         stepInterval:
           $ref: '#/components/schemas/Querybuildertypesv5Step'
       type: object
-    Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation:
+    Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation:
       properties:
         aggregations:
           items:
@@ -5570,21 +5570,21 @@ components:
     Querybuildertypesv5QueryEnvelopeBuilderLog:
       properties:
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation'
+          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation'
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object
     Querybuildertypesv5QueryEnvelopeBuilderMetric:
       properties:
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation'
+          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation'
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object
     Querybuildertypesv5QueryEnvelopeBuilderTrace:
       properties:
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComHanzo O11yObservePkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation'
+          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation'
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object

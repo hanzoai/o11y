@@ -14,8 +14,8 @@ const SA_KEYS_ENDPOINT = '*/api/v1/service_accounts/:id/keys';
 const SA_ROLES_ENDPOINT = '*/api/v1/service_accounts/:id/roles';
 const ROLES_ENDPOINT = '*/api/v1/roles';
 
-jest.mock('@signozhq/ui/drawer', () => ({
-	...jest.requireActual('@signozhq/ui/drawer'),
+jest.mock('components/ui/drawer', () => ({
+	...jest.requireActual('components/ui/drawer'),
 	DrawerWrapper: ({
 		children,
 		footer,
@@ -33,8 +33,8 @@ jest.mock('@signozhq/ui/drawer', () => ({
 		) : null,
 }));
 
-jest.mock('@signozhq/ui/dialog', () => ({
-	...jest.requireActual('@signozhq/ui/dialog'),
+jest.mock('components/ui/dialog', () => ({
+	...jest.requireActual('components/ui/dialog'),
 	DialogWrapper: ({
 		children,
 		open,

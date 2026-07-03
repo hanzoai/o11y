@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { Button } from '@signozhq/ui/button';
-import { Tabs } from '@signozhq/ui/tabs';
+import { Button } from 'components/ui/button';
+import { Tabs } from 'components/ui/tabs';
 import LearnMore from 'components/LearnMore/LearnMore';
-import { Download } from '@signozhq/icons';
+import { Download } from 'components/ui/icons';
 import { openInNewTab } from 'utils/navigation';
 import CopyIconButton from '../CopyIconButton';
 import { docsUrl, MCP_CLIENTS, McpClient } from '../clients';

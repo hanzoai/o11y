@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Label, RadioGroup, RadioGroupItem } from '@hanzo/ui';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import { Select, Skeleton } from 'antd';
+import { RadioGroupLabel } from 'components/ui/radio-group';
 
 import {
 	buildConfig,
@@ -69,7 +70,9 @@ function ResourceRow({
 				<div className="psp-resource__body">
 					<RadioGroup
 						value={config.scope}
-						onChange={(val): void => onScopeChange(resource.id, val as ScopeType)}
+						onChange={(val: string): void =>
+						onScopeChange(resource.id, val as ScopeType)
+					}
 						color="robin"
 						className="psp-resource__radio-group"
 					>

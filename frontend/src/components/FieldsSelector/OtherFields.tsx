@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import { Skeleton } from 'antd';
 import cx from 'classnames';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';

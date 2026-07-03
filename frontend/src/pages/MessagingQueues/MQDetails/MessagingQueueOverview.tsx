@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useMemo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import { MessagingQueueServicePayload } from 'api/messagingQueues/getConsumerLagDetails';
 import { getKafkaSpanEval } from 'api/messagingQueues/getKafkaSpanEval';
 import { getPartitionLatencyOverview } from 'api/messagingQueues/getPartitionLatencyOverview';

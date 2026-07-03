@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-// eslint-disable-next-line signoz/no-antd-components -- TODO: migrate Dropdown to @signozhq/ui/dropdown-menu
+// eslint-disable-next-line signoz/no-antd-components -- TODO: migrate Dropdown to components/ui/dropdown-menu
 import { Button, Dropdown, MenuProps } from 'antd';
 import cx from 'classnames';
 import logEvent from 'api/common/logEvent';
@@ -9,7 +9,7 @@ import {
 	LayoutGrid,
 	Plus,
 	Radius,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 import styles from './CreateDashboardDropdown.module.scss';
 

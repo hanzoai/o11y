@@ -3,7 +3,7 @@ import {
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '@signozhq/ui/tooltip';
+} from 'components/ui/tooltip';
 import { convertTimeToRelevantUnit } from 'container/TraceDetail/utils';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { useTraceStore } from 'pages/TraceDetailsV3/stores/traceStore';

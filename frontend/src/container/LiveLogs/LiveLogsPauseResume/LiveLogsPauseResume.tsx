@@ -3,7 +3,7 @@ import { Button } from 'antd';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useEventSource } from 'providers/EventSource';
 import { validateQuery } from 'utils/queryValidationUtils';
-import { CirclePause, CirclePlay } from '@signozhq/icons';
+import { CirclePause, CirclePlay } from 'components/ui/icons';
 
 function LiveLogsPauseResume(): JSX.Element {
 	const {

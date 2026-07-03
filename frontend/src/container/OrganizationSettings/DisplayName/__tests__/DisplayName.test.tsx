@@ -1,4 +1,4 @@
-import { toast } from '@signozhq/ui/sonner';
+import { toast } from 'components/ui/sonner';
 import { rest, server } from 'mocks-server/server';
 import {
 	fireEvent,
@@ -10,8 +10,8 @@ import {
 
 import DisplayName from '../index';
 
-jest.mock('@signozhq/ui/sonner', () => ({
-	...jest.requireActual('@signozhq/ui/sonner'),
+jest.mock('components/ui/sonner', () => ({
+	...jest.requireActual('components/ui/sonner'),
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),

@@ -8,7 +8,7 @@ import {
 } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
-import { Slider } from '@signozhq/ui/slider';
+import { Slider } from 'components/ui/slider';
 import getFilters from 'api/trace/getFilters';
 import useDebouncedFn from 'hooks/useDebouncedFunction';
 // eslint-disable-next-line no-restricted-imports

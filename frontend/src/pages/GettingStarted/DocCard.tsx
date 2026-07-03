@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 
 import { DocCardContainer } from './styles';

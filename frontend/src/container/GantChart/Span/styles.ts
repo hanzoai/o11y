@@ -1,7 +1,8 @@
-import { Typography } from '@signozhq/ui/typography';
+import type { HTMLAttributes } from 'react';
+import { Typography } from 'components/ui/typography';
 import styled from 'styled-components';
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
 	width: string;
 	leftOffset: string;
 	bgColor: string;
@@ -27,7 +28,7 @@ export const SpanBorder = styled.div<Props>`
 	position: absolute;
 `;
 
-export const SpanWrapper = styled.div`
+export const SpanWrapper = styled.div<HTMLAttributes<HTMLDivElement>>`
 	display: flex;
 	width: 100%;
 	flex-direction: row;

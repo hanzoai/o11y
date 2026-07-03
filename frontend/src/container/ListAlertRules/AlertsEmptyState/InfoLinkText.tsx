@@ -1,6 +1,6 @@
-import { ArrowRight, CirclePlay } from '@signozhq/icons';
+import { ArrowRight, CirclePlay } from 'components/ui/icons';
 import { Flex } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { openInNewTab } from 'utils/navigation';
 
 import styles from './AlertsEmptyState.module.scss';

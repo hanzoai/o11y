@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from 'antd';
 import cx from 'classnames';
 import { useOnboardingStatus } from 'hooks/messagingQueue/useOnboardingStatus';
-import { Bolt, FolderTree } from '@signozhq/icons';
+import { Bolt, FolderTree } from 'components/ui/icons';
 import { MessagingQueueHealthCheckService } from 'pages/MessagingQueues/MessagingQueuesUtils';
 
 import AttributeCheckList from './AttributeCheckList';

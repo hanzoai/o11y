@@ -1,5 +1,5 @@
-import { Typography } from '@signozhq/ui/typography';
-// TODO(@signozhq/ui-input): migrate this <Input> once @signozhq/ui Input
+import { Typography } from 'components/ui/typography';
+// TODO(components/ui Input): migrate this <Input> once components/ui Input
 // supports the `onWheel` handler (used to blur on scroll for number inputs).
 import { Input, Select } from 'antd';
 import classNames from 'classnames';

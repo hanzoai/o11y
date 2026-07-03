@@ -1,7 +1,7 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import history from 'lib/history';
-import { ArrowRight } from '@signozhq/icons';
+import { ArrowRight } from 'components/ui/icons';
 import { openInNewTab } from 'utils/navigation';
 
 import awwSnapUrl from '@/assets/Icons/awwSnap.svg';

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
-import { ChevronDown, Copy } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
-import { DropdownMenuSimple as Dropdown } from '@signozhq/ui/dropdown-menu';
-import { toast } from '@signozhq/ui/sonner';
+import { ChevronDown, Copy } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { DropdownMenuSimple as Dropdown } from 'components/ui/dropdown-menu';
+import { toast } from 'components/ui/sonner';
 import logEvent from 'api/common/logEvent';
 import { JsonView } from 'periscope/components/JsonView';
 import { PrettyView } from 'periscope/components/PrettyView';

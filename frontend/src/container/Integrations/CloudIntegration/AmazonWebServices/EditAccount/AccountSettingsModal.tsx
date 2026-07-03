@@ -1,14 +1,14 @@
 import { Dispatch, SetStateAction, useCallback } from 'react';
 import { useQueryClient } from 'react-query';
-import { Button } from '@signozhq/ui/button';
-import { DrawerWrapper } from '@signozhq/ui/drawer';
+import { Button } from 'components/ui/button';
+import { DrawerWrapper } from 'components/ui/drawer';
 import { Form } from 'antd';
 import { invalidateListAccounts } from 'api/generated/services/cloudintegration';
 import { INTEGRATION_TYPES } from 'container/Integrations/constants';
 import { useAccountSettingsModal } from 'hooks/integration/aws/useAccountSettingsModal';
 import useUrlQuery from 'hooks/useUrlQuery';
 import history from 'lib/history';
-import { Save } from '@signozhq/icons';
+import { Save } from 'components/ui/icons';
 
 import logEvent from '../../../../../api/common/logEvent';
 import RemoveIntegrationAccount from '../../RemoveAccount/RemoveIntegrationAccount';

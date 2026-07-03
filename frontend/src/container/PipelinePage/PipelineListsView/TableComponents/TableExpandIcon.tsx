@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, ChevronRight } from '@signozhq/icons';
+import { ChevronDown, ChevronRight } from 'components/ui/icons';
 import { PipelineData } from 'types/api/pipeline/def';
 import { Flex } from 'antd';
 

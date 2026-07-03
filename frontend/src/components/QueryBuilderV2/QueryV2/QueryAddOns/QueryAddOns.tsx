@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Tooltip } from 'antd';
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import InputWithLabel from 'components/InputWithLabel/InputWithLabel';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { GroupByFilter } from 'container/QueryBuilder/filters/GroupByFilter/GroupByFilter';
@@ -9,7 +9,7 @@ import { ReduceToFilter } from 'container/QueryBuilder/filters/ReduceToFilter/Re
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useQueryOperations } from 'hooks/queryBuilder/useQueryBuilderOperations';
 import { get, isEmpty } from 'lodash-es';
-import { BarChart, ChevronUp, ExternalLink, ScrollText } from '@signozhq/icons';
+import { BarChart, ChevronUp, ExternalLink, ScrollText } from 'components/ui/icons';
 import { IBuilderQuery } from 'types/api/queryBuilder/queryBuilderData';
 import { MetricAggregation } from 'types/api/v5/queryRange';
 import { DataSource, ReduceOperators } from 'types/common/queryBuilder';
@@ -481,6 +481,10 @@ function QueryAddOns({
 									<div className="label" style={{ cursor: 'help' }}>
 										Reduce to
 									</div>
+								</Tooltip>
+								<div className="input">
+									<ReduceToFilter query={query} onChange={handleChangeReduceToV5} />
+								</div>
 
 									<Button
 										className="close-btn periscope-btn ghost"

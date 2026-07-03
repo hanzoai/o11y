@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Info, Search } from '@signozhq/icons';
+import { Info, Search } from 'components/ui/icons';
 import { Popconfirm, PopconfirmProps } from 'antd';
 import type { ColumnType } from 'antd/es/table';
 import ROUTES from 'constants/routes';

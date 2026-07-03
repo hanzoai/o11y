@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { TooltipProvider } from '@signozhq/ui/tooltip';
+import { TooltipProvider } from 'components/ui/tooltip';
 import * as metricsExplorerHooks from 'api/generated/services/metrics';
 import TimezoneProvider from 'providers/Timezone';
 

@@ -2,7 +2,7 @@ import { Callout } from 'components/ui/callout';
 
 import { PermissionType, TimestampBadge } from '../../utils';
 import PermissionItem from './PermissionItem';
-import { AuthtypesRelationDTO } from 'api/generated/services/sigNoz.schemas';
+import { AuthtypesRelationDTO } from 'api/generated/services/o11y.schemas';
 
 interface OverviewTabProps {
 	role: {

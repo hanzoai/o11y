@@ -3,7 +3,7 @@ import { PANEL_TYPES } from 'constants/queryBuilder';
 // hooks
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import useScrollToTop from 'hooks/useScrollToTop';
-import { ArrowUp } from '@signozhq/icons';
+import { ArrowUp } from 'components/ui/icons';
 
 function GoToTop(): JSX.Element | null {
 	const { isVisible, scrollToTop } = useScrollToTop();

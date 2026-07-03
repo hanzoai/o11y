@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Divider } from '@signozhq/ui/divider';
+import { Divider } from 'components/ui/divider';
 import logEvent from 'api/common/logEvent';
 import classNames from 'classnames';
 import AlertBreadcrumb from 'components/AlertBreadcrumb';

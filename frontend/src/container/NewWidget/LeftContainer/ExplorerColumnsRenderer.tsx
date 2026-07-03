@@ -6,14 +6,15 @@ import {
 	Droppable,
 	DropResult,
 } from 'react-beautiful-dnd';
+import { Button, Input, Tooltip } from 'antd';
 import { Color } from 'constants/designTokens';
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
-} from '@signozhq/ui/dropdown-menu';
-import { Divider } from '@signozhq/ui/divider';
-import { Typography } from '@signozhq/ui/typography';
+} from 'components/ui/dropdown-menu';
+import { Divider } from 'components/ui/divider';
+import { Typography } from 'components/ui/typography';
 import { FieldDataType } from 'api/v5/v5';
 import { SOMETHING_WENT_WRONG } from 'constants/api';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
@@ -26,7 +27,7 @@ import {
 	GripVertical,
 	Search,
 	Trash2,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { DataSource } from 'types/common/queryBuilder';
 
 import { WidgetGraphProps } from '../types';

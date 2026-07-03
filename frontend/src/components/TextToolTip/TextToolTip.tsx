@@ -1,6 +1,6 @@
 import { ReactNode, useMemo } from 'react';
 import { blue, grey } from '@ant-design/colors';
-import { CircleHelp } from '@signozhq/icons';
+import { CircleHelp } from 'components/ui/icons';
 import { Tooltip } from 'antd';
 import { themeColors } from 'constants/theme';
 import { useIsDarkMode } from 'hooks/useDarkMode';

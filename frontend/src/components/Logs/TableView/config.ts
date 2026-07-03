@@ -1,5 +1,5 @@
 import { CSSProperties } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'components/ui/design-tokens';
 import { TableProps } from 'antd';
 
 export function getDefaultCellStyle(isDarkMode?: boolean): CSSProperties {

@@ -49,7 +49,7 @@ const MOCK_QUERY: Query = {
 		queryTraceOperator: [],
 	},
 	promql: [],
-	clickhouse_sql: [],
+	datastore_sql: [],
 };
 
 const MOCK_VIEW_QUERY: Query = {

@@ -1,7 +1,7 @@
 import { Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { Badge } from '@signozhq/ui/badge';
-import { CalendarClock } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { Badge } from 'components/ui/badge';
+import { CalendarClock } from 'components/ui/icons';
 import logEvent from 'api/common/logEvent';
 import { generatePath } from 'react-router-dom';
 import { Base64Icons } from 'container/DashboardContainer/DashboardSettings/General/utils';

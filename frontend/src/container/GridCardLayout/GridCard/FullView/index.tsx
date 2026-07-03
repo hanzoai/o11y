@@ -9,7 +9,7 @@ import React, {
 import { useQueryClient } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux'; // old code, TODO: fix this correctly
-import { Loader, RefreshCw, Search } from '@signozhq/icons';
+import { Loader, RefreshCw, Search } from 'components/ui/icons';
 import { Button, Input, Spin } from 'antd';
 import cx from 'classnames';
 import { ToggleGraphProps } from 'components/Graph/types';

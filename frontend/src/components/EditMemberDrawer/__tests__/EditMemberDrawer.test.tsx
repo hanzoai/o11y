@@ -1,9 +1,17 @@
 import type { ReactNode } from 'react';
 import { toast } from '@hanzo/ui';
-import getResetPasswordToken from 'api/v1/factor_password/getResetPasswordToken';
-import cancelInvite from 'api/v1/invite/id/delete';
-import deleteUser from 'api/v1/user/id/delete';
-import update from 'api/v1/user/id/update';
+import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
+import {
+	useCreateResetPasswordToken,
+	useDeleteUser,
+	useGetResetPasswordToken,
+	useGetRolesByUserID,
+	useGetUser,
+	useRemoveUserRoleByUserIDAndRoleID,
+	useSetRoleByUserID,
+	useUpdateMyUserV2,
+	useUpdateUser,
+} from 'api/generated/services/users';
 import { MemberStatus } from 'container/MembersSettings/utils';
 import {
 	listRolesSuccessResponse,
@@ -11,6 +19,7 @@ import {
 } from 'mocks-server/__mockdata__/roles';
 import { rest, server } from 'mocks-server/server';
 import { render, screen, userEvent, waitFor } from 'tests/test-utils';
+import type { ROLES } from 'types/roles';
 
 import EditMemberDrawer, { EditMemberDrawerProps } from '../EditMemberDrawer';
 
@@ -47,11 +56,19 @@ jest.mock('components/ui/dialog', () => ({
 	),
 }));
 
-jest.mock('api/v1/user/id/update');
-jest.mock('api/v1/user/id/delete');
-jest.mock('api/v1/invite/id/delete');
-jest.mock('api/v1/invite/create');
-jest.mock('api/v1/factor_password/getResetPasswordToken');
+jest.mock('api/generated/services/users', () => ({
+	...jest.requireActual('api/generated/services/users'),
+	useGetUser: jest.fn(),
+	useUpdateUser: jest.fn(),
+	useUpdateMyUserV2: jest.fn(),
+	useDeleteUser: jest.fn(),
+	useGetResetPasswordToken: jest.fn(),
+	useCreateResetPasswordToken: jest.fn(),
+	useGetRolesByUserID: jest.fn(),
+	useSetRoleByUserID: jest.fn(),
+	useRemoveUserRoleByUserIDAndRoleID: jest.fn(),
+}));
+jest.mock('api/ErrorResponseHandlerForGeneratedAPIs');
 jest.mock('@hanzo/ui', () => ({
 	toast: {
 		success: jest.fn(),

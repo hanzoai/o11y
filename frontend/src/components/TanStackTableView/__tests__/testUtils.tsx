@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { VirtuosoMockContext } from 'react-virtuoso';
-import { TooltipProvider } from '@signozhq/ui/tooltip';
+import { TooltipProvider } from 'components/ui/tooltip';
 import { render, RenderResult } from '@testing-library/react';
 import { NuqsTestingAdapter, OnUrlUpdateFunction } from 'nuqs/adapters/testing';
 

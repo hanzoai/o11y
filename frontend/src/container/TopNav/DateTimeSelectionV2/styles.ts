@@ -1,5 +1,6 @@
+import type { HTMLAttributes } from 'react';
 import { Form as FormComponent } from 'antd';
-import { Typography as TypographyComponent } from '@signozhq/ui/typography';
+import { Typography as TypographyComponent } from 'components/ui/typography';
 import styled from 'styled-components';
 
 export const Form = styled(FormComponent)`
@@ -20,7 +21,7 @@ export const FormItem = styled(Form.Item)`
 	}
 `;
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
 	refreshButtonHidden: boolean;
 }
 

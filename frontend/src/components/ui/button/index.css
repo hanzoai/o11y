@@ -1,0 +1,123 @@
+.hz-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	border-radius: 2px;
+	border: 1px solid transparent;
+	font-family: inherit;
+	font-weight: 500;
+	line-height: 1;
+	cursor: pointer;
+	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+	white-space: nowrap;
+	user-select: none;
+}
+.hz-btn:disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+.hz-btn__affix {
+	display: inline-flex;
+	align-items: center;
+}
+.hz-btn__spinner {
+	animation: hz-btn-spin 0.7s linear infinite;
+}
+@keyframes hz-btn-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* sizes */
+.hz-btn--sm {
+	height: 28px;
+	padding: 0 10px;
+	font-size: 0.8125rem;
+}
+.hz-btn--md {
+	height: 32px;
+	padding: 0 14px;
+	font-size: 0.875rem;
+}
+.hz-btn--icon {
+	height: 32px;
+	width: 32px;
+	padding: 0;
+}
+
+/* color tokens (with sane fallbacks; themable via app CSS vars) */
+.hz-btn[data-color='primary'] {
+	--hz-btn-bg: var(--bg-robin-500, #4e74f9);
+	--hz-btn-fg: #fff;
+	--hz-btn-border: var(--bg-robin-500, #4e74f9);
+}
+.hz-btn[data-color='secondary'] {
+	--hz-btn-bg: var(--bg-slate-400, #42506b);
+	--hz-btn-fg: var(--text-vanilla-100, #e6e9ef);
+	--hz-btn-border: var(--bg-slate-400, #42506b);
+}
+.hz-btn[data-color='destructive'] {
+	--hz-btn-bg: var(--bg-cherry-500, #e5484d);
+	--hz-btn-fg: #fff;
+	--hz-btn-border: var(--bg-cherry-500, #e5484d);
+}
+.hz-btn[data-color='warning'] {
+	--hz-btn-bg: var(--bg-amber-500, #f5a623);
+	--hz-btn-fg: #1d1d1d;
+	--hz-btn-border: var(--bg-amber-500, #f5a623);
+}
+.hz-btn[data-color='none'] {
+	--hz-btn-bg: transparent;
+	--hz-btn-fg: inherit;
+	--hz-btn-border: transparent;
+}
+
+/* variants */
+.hz-btn--solid {
+	background: var(--hz-btn-bg);
+	color: var(--hz-btn-fg);
+	border-color: var(--hz-btn-border);
+}
+.hz-btn--solid:hover:not(:disabled) {
+	filter: brightness(1.08);
+}
+.hz-btn--outlined {
+	background: transparent;
+	color: var(--hz-btn-bg);
+	border-color: var(--hz-btn-border);
+}
+.hz-btn--outlined:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--hz-btn-bg) 12%, transparent);
+}
+.hz-btn--dashed {
+	background: transparent;
+	color: var(--hz-btn-bg);
+	border-style: dashed;
+	border-color: var(--hz-btn-border);
+}
+.hz-btn--ghost {
+	background: transparent;
+	color: var(--hz-btn-bg);
+	border-color: transparent;
+}
+.hz-btn--ghost:hover:not(:disabled) {
+	background: color-mix(in srgb, var(--hz-btn-bg) 12%, transparent);
+}
+.hz-btn--link {
+	background: transparent;
+	color: var(--hz-btn-bg);
+	border-color: transparent;
+	padding-left: 0;
+	padding-right: 0;
+	height: auto;
+}
+.hz-btn--link:hover:not(:disabled) {
+	text-decoration: underline;
+}
+.hz-btn--action {
+	background: var(--bg-ink-400, #1d212d);
+	color: var(--text-vanilla-100, #e6e9ef);
+	border-color: var(--bg-slate-500, #303343);
+}

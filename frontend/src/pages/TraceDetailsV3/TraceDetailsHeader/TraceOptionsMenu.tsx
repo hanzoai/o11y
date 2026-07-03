@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import type { MenuItem } from '@signozhq/ui/dropdown-menu';
-import { Button } from '@signozhq/ui/button';
-import { DropdownMenuSimple as Dropdown } from '@signozhq/ui/dropdown-menu';
-import { Settings2 } from '@signozhq/icons';
+import type { MenuItem } from 'components/ui/dropdown-menu';
+import { Button } from 'components/ui/button';
+import { DropdownMenuSimple as Dropdown } from 'components/ui/dropdown-menu';
+import { Settings2 } from 'components/ui/icons';
 
 import { useTraceStore } from '../stores/traceStore';
 

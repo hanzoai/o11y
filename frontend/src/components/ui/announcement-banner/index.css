@@ -1,0 +1,60 @@
+[data-slot='announcement-banner'] {
+	background-color: var(--banner-bg);
+	color: var(--banner-fg);
+}
+
+[data-slot='announcement-banner'][data-type='warning'] {
+	--banner-bg: color-mix(in srgb, var(--bg-amber-500) 16%, transparent);
+	--banner-fg: var(--bg-amber-600);
+	--banner-accent: var(--bg-amber-600);
+	--banner-accent-fg: #ffffff;
+}
+
+.dark [data-slot='announcement-banner'][data-type='warning'] {
+	--banner-bg: color-mix(in srgb, var(--bg-amber-300) 14%, transparent);
+	--banner-fg: var(--bg-amber-300);
+	--banner-accent: var(--bg-amber-300);
+	--banner-accent-fg: #0b0b0b;
+}
+
+[data-slot='announcement-banner'][data-type='info'] {
+	--banner-bg: color-mix(in srgb, var(--bg-robin-500) 16%, transparent);
+	--banner-fg: var(--bg-robin-600);
+	--banner-accent: var(--bg-robin-600);
+	--banner-accent-fg: #ffffff;
+}
+
+.dark [data-slot='announcement-banner'][data-type='info'] {
+	--banner-bg: color-mix(in srgb, var(--bg-robin-300) 14%, transparent);
+	--banner-fg: var(--bg-robin-300);
+	--banner-accent: var(--bg-robin-300);
+	--banner-accent-fg: #0b0b0b;
+}
+
+[data-slot='announcement-banner'][data-type='error'] {
+	--banner-bg: color-mix(in srgb, var(--bg-cherry-500) 16%, transparent);
+	--banner-fg: var(--bg-cherry-600);
+	--banner-accent: var(--bg-cherry-600);
+	--banner-accent-fg: #ffffff;
+}
+
+.dark [data-slot='announcement-banner'][data-type='error'] {
+	--banner-bg: color-mix(in srgb, var(--bg-cherry-300) 14%, transparent);
+	--banner-fg: var(--bg-cherry-300);
+	--banner-accent: var(--bg-cherry-300);
+	--banner-accent-fg: #0b0b0b;
+}
+
+[data-slot='announcement-banner'][data-type='success'] {
+	--banner-bg: color-mix(in srgb, var(--bg-forest-500) 16%, transparent);
+	--banner-fg: var(--bg-forest-600);
+	--banner-accent: var(--bg-forest-600);
+	--banner-accent-fg: #ffffff;
+}
+
+.dark [data-slot='announcement-banner'][data-type='success'] {
+	--banner-bg: color-mix(in srgb, var(--bg-forest-300) 14%, transparent);
+	--banner-fg: var(--bg-forest-300);
+	--banner-accent: var(--bg-forest-300);
+	--banner-accent-fg: #0b0b0b;
+}

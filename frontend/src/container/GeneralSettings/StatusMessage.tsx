@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { green, orange, volcano } from '@ant-design/colors';
-import { SolidInfoCircle } from '@signozhq/icons';
+import { SolidInfoCircle } from 'components/ui/icons';
 import { Card, Col } from 'antd';
 import { TStatus } from 'types/api/settings/getRetention';
 

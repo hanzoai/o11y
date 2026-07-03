@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Button, Modal } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { Switch } from '@signozhq/ui/switch';
-import { CalendarClock, Check, Clock4 } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { Switch } from 'components/ui/switch';
+import { CalendarClock, Check, Clock4 } from 'components/ui/icons';
 import { get } from 'lodash-es';
 import { Base64Icons } from 'container/DashboardContainer/DashboardSettings/General/utils';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';

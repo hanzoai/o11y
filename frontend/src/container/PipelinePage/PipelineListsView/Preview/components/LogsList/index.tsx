@@ -1,4 +1,4 @@
-import { Expand } from '@signozhq/icons';
+import { Expand } from 'components/ui/icons';
 import LogDetail from 'components/LogDetail';
 import { VIEW_TYPES } from 'components/LogDetail/constants';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';

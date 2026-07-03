@@ -1,11 +1,11 @@
 import { Popover } from 'antd';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import {
 	Expand,
 	EllipsisVertical,
 	Link2,
 	SquareArrowOutUpRight,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useCopyToClipboard } from 'react-use';
 import { getAbsoluteUrl } from 'utils/basePath';
 import { openInNewTab } from 'utils/navigation';

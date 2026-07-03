@@ -1,13 +1,13 @@
 import { useQueryClient } from 'react-query';
-import { Trash2, X } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
+import { Trash2, X } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 import AuthZTooltip from 'components/AuthZTooltip/AuthZTooltip';
 import {
 	buildAPIKeyDeletePermission,
 	buildSADetachPermission,
 } from 'hooks/useAuthZ/permissions/service-account.permissions';
-import { DialogWrapper } from '@signozhq/ui/dialog';
-import { toast } from '@signozhq/ui/sonner';
+import { DialogWrapper } from 'components/ui/dialog';
+import { toast } from 'components/ui/sonner';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {
 	getListServiceAccountKeysQueryKey,
@@ -17,7 +17,7 @@ import {
 import type {
 	RenderErrorResponseDTO,
 	ServiceaccounttypesGettableFactorAPIKeyDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import { SA_QUERY_PARAMS } from 'container/ServiceAccountsSettings/constants';
 import { parseAsString, useQueryState } from 'nuqs';

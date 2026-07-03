@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
-import { LockKeyhole } from '@signozhq/icons';
-import { Badge } from '@signozhq/ui/badge';
-import { Input } from '@signozhq/ui/input';
-import type { AuthtypesRoleDTO } from 'api/generated/services/sigNoz.schemas';
+import { LockKeyhole } from 'components/ui/icons';
+import { Badge } from 'components/ui/badge';
+import { Input } from 'components/ui/input';
+import type { AuthtypesRoleDTO } from 'api/generated/services/o11y.schemas';
 import AuthZTooltip from 'components/AuthZTooltip/AuthZTooltip';
 import RolesSelect from 'components/RolesSelect';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';

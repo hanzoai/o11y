@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight } from '@signozhq/icons';
+import { ChevronDown, ChevronRight } from 'components/ui/icons';
 
 import styles from './ThinkingStep.module.scss';
 

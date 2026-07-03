@@ -1,4 +1,5 @@
-import { Typography } from '@signozhq/ui/typography';
+import type { HTMLAttributes } from 'react';
+import { Typography } from 'components/ui/typography';
 import styled from 'styled-components';
 
 export const Span = styled(Typography.Text)`
@@ -29,7 +30,7 @@ export const SpanConnector = styled.div`
 	height: 0;
 `;
 
-export const Container = styled.div`
+export const Container = styled.div<HTMLAttributes<HTMLDivElement>>`
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;

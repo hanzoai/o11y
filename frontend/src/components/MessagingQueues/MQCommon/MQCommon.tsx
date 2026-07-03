@@ -1,7 +1,7 @@
 import { Color } from 'constants/designTokens';
 import { Tooltip } from 'antd';
 import type { DefaultOptionType } from 'antd/es/select';
-import { Info } from '@signozhq/icons';
+import { Info } from 'components/ui/icons';
 
 import './MQCommon.styles.scss';
 

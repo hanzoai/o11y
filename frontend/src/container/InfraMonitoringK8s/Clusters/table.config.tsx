@@ -9,7 +9,7 @@ import { formatBytes } from '../commonUtils';
 import { ValidateColumnValueWrapper } from '../components';
 import { InfraMonitoringEntity } from '../constants';
 import { K8sClusterData, K8sClustersListPayload } from './api';
-import { Boxes } from '@signozhq/icons';
+import { Boxes } from 'components/ui/icons';
 
 export function getK8sClusterRowKey(cluster: K8sClusterData): string {
 	return (

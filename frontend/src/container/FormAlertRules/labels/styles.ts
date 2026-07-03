@@ -1,8 +1,9 @@
 import { grey } from '@ant-design/colors';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
+import type { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
-interface SearchContainerProps {
+interface SearchContainerProps extends HTMLAttributes<HTMLDivElement> {
 	isDarkMode: boolean;
 	disabled: boolean;
 }
@@ -18,7 +19,7 @@ export const SearchContainer = styled.div<SearchContainerProps>`
 	${({ disabled }): string => (disabled ? `cursor: not-allowed;` : '')}
 `;
 
-export const QueryChipContainer = styled.span`
+export const QueryChipContainer = styled.span<HTMLAttributes<HTMLSpanElement>>`
 	display: flex;
 	align-items: center;
 	margin-right: 0.5rem;

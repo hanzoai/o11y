@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import cx from 'classnames';
-import { ChevronDown, ChevronRight, Sparkles } from '@signozhq/icons';
+import { ChevronDown, ChevronRight, Sparkles } from 'components/ui/icons';
 
 import { formatTime } from 'utils/timeUtils';
 

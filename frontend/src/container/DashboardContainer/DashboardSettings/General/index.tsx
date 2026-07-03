@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Col, Input, Select, Space, Tooltip } from 'antd';
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
-import { Typography } from '@signozhq/ui/typography';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
+import { Typography } from 'components/ui/typography';
 import AddTags from 'container/DashboardContainer/DashboardSettings/General/AddBadges';
 import { useDashboardCursorSyncMode } from 'hooks/dashboard/useDashboardCursorSyncMode';
 import { useSyncTooltipFilterMode } from 'hooks/dashboard/useSyncTooltipFilterMode';
@@ -12,7 +12,7 @@ import {
 	SyncTooltipFilterMode,
 } from 'lib/uPlotV2/plugins/TooltipPlugin/types';
 import { isEqual } from 'lodash-es';
-import { Check, ExternalLink, SolidInfoCircle, X } from '@signozhq/icons';
+import { Check, ExternalLink, SolidInfoCircle, X } from 'components/ui/icons';
 import { useDashboardStore } from 'providers/Dashboard/store/useDashboardStore';
 
 import styles from './GeneralSettings.module.scss';

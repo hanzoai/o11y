@@ -1,8 +1,8 @@
 import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import { Button } from '@signozhq/ui/button';
-import { Input } from '@signozhq/ui/input';
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
+import { Button } from 'components/ui/button';
+import { Input } from 'components/ui/input';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import { DatePicker } from 'antd';
 import AuthZTooltip from 'components/AuthZTooltip/AuthZTooltip';
 import {

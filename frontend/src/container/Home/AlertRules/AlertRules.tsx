@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button, Skeleton } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import logEvent from 'api/common/logEvent';
 import { useListRules } from 'api/generated/services/rules';
-import type { RuletypesRuleDTO } from 'api/generated/services/sigNoz.schemas';
+import type { RuletypesRuleDTO } from 'api/generated/services/o11y.schemas';
 import { QueryParams } from 'constants/query';
 import ROUTES from 'constants/routes';
 import history from 'lib/history';
 import { mapQueryDataFromApi } from 'lib/newQueryBuilder/queryBuilderMappers/mapQueryDataFromApi';
-import { ArrowRight, ArrowUpRight, Plus } from '@signozhq/icons';
+import { ArrowRight, ArrowUpRight, Plus } from 'components/ui/icons';
 import Card from 'periscope/components/Card/Card';
 import { useAppContext } from 'providers/App/App';
 import { toCompositeMetricQuery } from 'types/api/alerts/convert';

@@ -122,7 +122,7 @@ describe('useCreateAlerts', () => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} as any);
 
-		const widget = buildWidget(EQueryType.CLICKHOUSE);
+		const widget = buildWidget(EQueryType.DATASTORE);
 		const { result } = renderHook(() => useCreateAlerts(widget));
 
 		act(() => {
@@ -136,7 +136,7 @@ describe('useCreateAlerts', () => {
 		});
 
 		const composite = getCompositeQueryFromLastOpen();
-		expect(composite.queryType).toBe(EQueryType.CLICKHOUSE);
+		expect(composite.queryType).toBe(EQueryType.DATASTORE);
 	});
 
 	it('preserves promql queryType through the alert navigation URL', () => {

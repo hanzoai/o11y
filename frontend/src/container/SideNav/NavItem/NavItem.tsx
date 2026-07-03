@@ -1,7 +1,7 @@
 import { Tooltip } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import cx from 'classnames';
-import { Pin, PinOff } from '@signozhq/icons';
+import { Pin, PinOff } from 'components/ui/icons';
 
 import { SidebarItem } from '../sideNav.types';
 

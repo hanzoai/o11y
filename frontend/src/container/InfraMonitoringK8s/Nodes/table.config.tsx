@@ -9,7 +9,7 @@ import { formatBytes } from '../commonUtils';
 import { ValidateColumnValueWrapper } from '../components';
 import { InfraMonitoringEntity } from '../constants';
 import { K8sNodeData, K8sNodesListPayload } from './api';
-import { Workflow } from '@signozhq/icons';
+import { Workflow } from 'components/ui/icons';
 
 export function getK8sNodeRowKey(node: K8sNodeData): string {
 	return node.nodeUID || node.meta.k8s_node_uid || node.meta.k8s_node_name;

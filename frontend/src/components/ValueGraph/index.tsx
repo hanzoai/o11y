@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { CircleAlert } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { CircleAlert } from 'components/ui/icons';
 import { ThresholdProps } from 'container/NewWidget/RightContainer/Threshold/types';
 
 import { getBackgroundColorAndThresholdCheck } from './utils';

@@ -1,4 +1,4 @@
-import { DrawerWrapper } from '@signozhq/ui/drawer';
+import { DrawerWrapper } from 'components/ui/drawer';
 
 import './DetailsPanelDrawer.styles.scss';
 

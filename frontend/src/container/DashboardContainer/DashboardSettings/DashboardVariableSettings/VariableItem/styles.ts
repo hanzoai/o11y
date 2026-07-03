@@ -1,4 +1,5 @@
 import { Row } from 'antd';
+import { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
 export const VariableItemRow = styled(Row)`
@@ -6,6 +7,6 @@ export const VariableItemRow = styled(Row)`
 	margin-bottom: 1rem;
 `;
 
-export const LabelContainer = styled.div`
+export const LabelContainer = styled.div<HTMLAttributes<HTMLDivElement>>`
 	width: 200px;
 `;

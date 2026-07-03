@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
 import { Button } from '@hanzo/ui';
-import { Trash2, X } from 'lucide-react';
+import { Plus, Trash2, X } from 'lucide-react';
 import { toast } from '@hanzo/ui';
 import { Modal, Table, TableColumnsType as ColumnsType } from 'antd';
 import { ErrorResponseHandlerForGeneratedAPIs } from 'api/ErrorResponseHandlerForGeneratedAPIs';

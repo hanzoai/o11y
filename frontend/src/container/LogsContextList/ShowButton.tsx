@@ -2,7 +2,7 @@ import { Color } from 'constants/designTokens';
 import { Button } from 'antd';
 import cx from 'classnames';
 import { ORDERBY_FILTERS } from 'container/QueryBuilder/filters/OrderByFilter/config';
-import { ArrowDown, ArrowUp, Ban } from '@signozhq/icons';
+import { ArrowDown, ArrowUp, Ban } from 'components/ui/icons';
 
 import './ShowButton.styles.scss';
 

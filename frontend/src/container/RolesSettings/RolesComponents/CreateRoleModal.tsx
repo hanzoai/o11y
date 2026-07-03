@@ -15,7 +15,6 @@ import {
 import {
 	AuthtypesPostableRoleDTO,
 	RenderErrorResponseDTO,
-	RoletypesPostableRoleDTO,
 } from 'api/generated/services/o11y.schemas';
 import { ErrorType } from 'api/generatedAPIInstance';
 import ROUTES from 'constants/routes';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { CloudDownload } from '@signozhq/icons';
-import { DropdownMenuSimple, type MenuProps } from '@signozhq/ui/dropdown-menu';
+import { CloudDownload } from 'components/ui/icons';
+import { DropdownMenuSimple, type MenuProps } from 'components/ui/dropdown-menu';
 import { Button, Flex } from 'antd';
 import { unparse } from 'papaparse';
 

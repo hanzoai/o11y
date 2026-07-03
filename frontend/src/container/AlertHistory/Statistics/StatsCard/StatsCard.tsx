@@ -2,7 +2,7 @@ import { Color } from 'constants/designTokens';
 import { Tooltip } from 'antd';
 import { QueryParams } from 'constants/query';
 import useUrlQuery from 'hooks/useUrlQuery';
-import { ArrowDownLeft, ArrowUpRight, Calendar } from '@signozhq/icons';
+import { ArrowDownLeft, ArrowUpRight, Calendar } from 'components/ui/icons';
 import { AlertRuleStats } from 'types/api/alerts/def';
 import { calculateChange } from 'utils/calculateChange';
 

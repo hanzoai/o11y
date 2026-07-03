@@ -1,6 +1,6 @@
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import { Form } from 'antd';
-import { CloudintegrationtypesCredentialsDTO } from 'api/generated/services/sigNoz.schemas';
+import { CloudintegrationtypesCredentialsDTO } from 'api/generated/services/o11y.schemas';
 
 function RenderConnectionFields({
 	isConnectionParamsLoading,
@@ -13,10 +13,10 @@ function RenderConnectionFields({
 }): JSX.Element | null {
 	if (
 		isConnectionParamsLoading ||
-		(!!connectionParams?.ingestion_url &&
-			!!connectionParams?.ingestion_key &&
-			!!connectionParams?.observe_api_url &&
-			!!connectionParams?.observe_api_key)
+		(!!connectionParams?.ingestionUrl &&
+			!!connectionParams?.ingestionKey &&
+			!!connectionParams?.sigNozApiUrl &&
+			!!connectionParams?.sigNozApiKey)
 	) {
 		return null;
 	}
@@ -41,7 +41,7 @@ function RenderConnectionFields({
 					<Input placeholder="Enter ingestion key" disabled={isFormDisabled} />
 				</Form.Item>
 			)}
-			{!connectionParams?.observe_api_url && (
+			{!connectionParams?.sigNozApiUrl && (
 				<Form.Item
 					name="observe_api_url"
 					label="Hanzo API URL"
@@ -50,7 +50,7 @@ function RenderConnectionFields({
 					<Input placeholder="Enter Hanzo API URL" disabled={isFormDisabled} />
 				</Form.Item>
 			)}
-			{!connectionParams?.observe_api_key && (
+			{!connectionParams?.sigNozApiKey && (
 				<Form.Item
 					name="observe_api_key"
 					label="Hanzo API KEY"

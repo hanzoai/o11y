@@ -1,5 +1,5 @@
 import { Col, Row, Space } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 
 interface InfoItem {
 	title: string;

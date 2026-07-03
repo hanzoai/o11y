@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react';
 import { JSONTree, KeyPath } from 'react-json-tree';
 import { useCopyToClipboard } from 'react-use';
-import { Copy, Ellipsis, Pin, PinOff } from '@signozhq/icons';
-import { DropdownMenuSimple as Dropdown } from '@signozhq/ui/dropdown-menu';
-import { Input } from '@signozhq/ui/input';
-import { toast } from '@signozhq/ui/sonner';
+import { Copy, Ellipsis, Pin, PinOff } from 'components/ui/icons';
+import { DropdownMenuSimple as Dropdown } from 'components/ui/dropdown-menu';
+import { Input } from 'components/ui/input';
+import { toast } from 'components/ui/sonner';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 
 import { darkTheme, lightTheme, themeExtension } from './constants';

@@ -1,12 +1,12 @@
 import { useCallback, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import {
 	TooltipRoot,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '@signozhq/ui/tooltip';
+} from 'components/ui/tooltip';
 import { Skeleton } from 'antd';
 import setLocalStorageKey from 'api/browser/localstorage/set';
 import cx from 'classnames';
@@ -24,7 +24,7 @@ import {
 	CornerUpLeft,
 	Server,
 	Timer,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import KeyValueLabel from 'periscope/components/KeyValueLabel';
 import { TraceDetailV2URLProps } from 'types/api/trace/getTraceV2';
 import { DataSource } from 'types/common/queryBuilder';

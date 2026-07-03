@@ -1,4 +1,4 @@
-import type { MenuItem as DropdownMenuItem } from '@signozhq/ui/dropdown-menu';
+import type { MenuItem as DropdownMenuItem } from 'components/ui/dropdown-menu';
 
 import { MenuItemKeys } from './contants';
 import { MenuItem } from './types';

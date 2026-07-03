@@ -1,11 +1,28 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
-import { Color } from 'constants/designTokens';
 import { Button, Table, TableColumnsType } from 'antd';
-import { VIEWS } from 'components/HostMetricsDetail/constants';
+import logEvent from 'api/common/logEvent';
+import {
+	QuerySearchV2Provider,
+	useExpression,
+	useInitialExpression,
+	useInputExpression,
+	useQuerySearchInitialExpressionProp,
+	useQuerySearchOnChange,
+	useQuerySearchOnRun,
+	useUserExpression,
+} from 'components/QueryBuilderV2';
+import QuerySearch from 'components/QueryBuilderV2/QueryV2/QuerySearch/QuerySearch';
+import {
+	combineInitialAndUserExpression,
+	getUserExpressionFromCombined,
+} from 'components/QueryBuilderV2/QueryV2/QuerySearch/utils';
+import { ChevronDown, ChevronRight } from 'components/ui/icons';
 import { DEFAULT_ENTITY_VERSION } from 'constants/app';
-import { EventContents } from 'container/InfraMonitoringK8s/commonUtils';
-import { K8sCategory } from 'container/InfraMonitoringK8s/constants';
+import { Color } from 'constants/designTokens';
+import { InfraMonitoringEvents } from 'constants/events';
+import Controls from 'container/Controls';
+import { InfraMonitoringEntity } from 'container/InfraMonitoringK8s/constants';
 import LoadingContainer from 'container/InfraMonitoringK8s/LoadingContainer';
 import RunQueryBtn from 'container/QueryBuilder/components/RunQueryBtn/RunQueryBtn';
 import DateTimeSelectionV2 from 'container/TopNav/DateTimeSelectionV2';
@@ -13,7 +30,6 @@ import {
 	CustomTimeType,
 	Time,
 } from 'container/TopNav/DateTimeSelectionV2/types';
-import { ChevronDown, ChevronRight } from '@signozhq/icons';
 import { useQueryState } from 'nuqs';
 import { DataSource } from 'types/common/queryBuilder';
 import { parseAsJsonNoValidate } from 'utils/nuqsParsers';
