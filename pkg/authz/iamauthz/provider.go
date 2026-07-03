@@ -34,6 +34,7 @@ type provider struct {
 	store    authtypes.RoleStore
 	registry *authtypes.Registry
 	healthy  chan struct{}
+	stopC    chan struct{}
 }
 
 // NewProviderFactory wires an IAM-backed AuthZ. It is the single authorization
@@ -55,6 +56,7 @@ func newProvider(config authz.Config, store sqlstore.SQLStore) authz.AuthZ {
 		store:    sqlauthzstore.NewSqlAuthzStore(store),
 		registry: authtypes.NewRegistry(),
 		healthy:  healthy,
+		stopC:    make(chan struct{}),
 	}
 }
 
@@ -62,9 +64,21 @@ func newProvider(config authz.Config, store sqlstore.SQLStore) authz.AuthZ {
 // factory.ServiceWithHealthy
 // =============================================================================
 
-func (p *provider) Start(_ context.Context) error { return nil }
-func (p *provider) Stop(_ context.Context) error  { return nil }
-func (p *provider) Healthy() <-chan struct{}      { return p.healthy }
+// Start blocks until shutdown. IAM authz has no background loop — it is ready
+// immediately (healthy is closed at construction) — but the service supervisor
+// (factory.Registry.Wait) treats ANY Start return as a service exit and tears
+// the process down. So Start must block until Stop (or context cancellation),
+// mirroring the other no-loop providers (auditor, meterreporter, licensing,
+// analytics). Returning nil early here crashed the whole server at boot.
+func (p *provider) Start(ctx context.Context) error {
+	select {
+	case <-ctx.Done():
+	case <-p.stopC:
+	}
+	return nil
+}
+func (p *provider) Stop(_ context.Context) error { close(p.stopC); return nil }
+func (p *provider) Healthy() <-chan struct{}     { return p.healthy }
 
 // =============================================================================
 // Authorization decisions — delegated to Hanzo IAM /enforce.
