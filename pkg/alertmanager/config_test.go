@@ -16,10 +16,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const prefix = "SIGNOZ_"
+const prefix = "O11Y_"
 
-// clearSignozEnv unsets all existing SIGNOZ_* env vars for the duration of the test.
-func clearSignozEnv(t *testing.T) {
+// clearEnv unsets all existing O11Y_* env vars for the duration of the test.
+func clearEnv(t *testing.T) {
 	t.Helper()
 	for _, kv := range os.Environ() {
 		if strings.HasPrefix(kv, prefix) {
@@ -32,12 +32,12 @@ func clearSignozEnv(t *testing.T) {
 }
 
 func TestNewWithEnvProvider(t *testing.T) {
-	clearSignozEnv(t)
-	t.Setenv("SIGNOZ_ALERTMANAGER_PROVIDER", "signoz")
-	t.Setenv("SIGNOZ_ALERTMANAGER_LEGACY_API__URL", "http://localhost:9093/api")
-	t.Setenv("SIGNOZ_ALERTMANAGER_SIGNOZ_ROUTE_REPEAT__INTERVAL", "5m")
-	t.Setenv("SIGNOZ_ALERTMANAGER_SIGNOZ_EXTERNAL__URL", "https://example.com/test")
-	t.Setenv("SIGNOZ_ALERTMANAGER_SIGNOZ_GLOBAL_RESOLVE__TIMEOUT", "10s")
+	clearEnv(t)
+	t.Setenv("O11Y_ALERTMANAGER_PROVIDER", "signoz")
+	t.Setenv("O11Y_ALERTMANAGER_LEGACY_API__URL", "http://localhost:9093/api")
+	t.Setenv("O11Y_ALERTMANAGER_SIGNOZ_ROUTE_REPEAT__INTERVAL", "5m")
+	t.Setenv("O11Y_ALERTMANAGER_SIGNOZ_EXTERNAL__URL", "https://example.com/test")
+	t.Setenv("O11Y_ALERTMANAGER_SIGNOZ_GLOBAL_RESOLVE__TIMEOUT", "10s")
 
 	conf, err := config.New(
 		context.Background(),
