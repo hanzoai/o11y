@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import QuickFilters from 'components/QuickFilters/QuickFilters';
 import { QuickFiltersSource } from 'components/QuickFilters/types';
@@ -38,7 +38,7 @@ import {
 import { getHostsQuickFiltersConfig } from './utils';
 
 import styles from './InfraMonitoringHosts.module.scss';
-import { ArrowUpToLine, Filter } from '@signozhq/icons';
+import { ArrowUpToLine, Filter } from 'components/ui/icons';
 
 function Hosts(): JSX.Element {
 	const [showFilters, setShowFilters] = useState(true);

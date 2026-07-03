@@ -1,7 +1,7 @@
 import { Button } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import classNames from 'classnames';
-import { Check } from '@signozhq/icons';
+import { Check } from 'components/ui/icons';
 
 import {
 	EVALUATION_WINDOW_TIMEFRAME,

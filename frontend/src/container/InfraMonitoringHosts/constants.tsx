@@ -1,8 +1,8 @@
 import React from 'react';
-import { Color } from '@signozhq/design-tokens';
-import { Badge } from '@signozhq/ui/badge';
-import { Progress } from '@signozhq/ui/progress';
-import { Typography } from '@signozhq/ui/typography';
+import { Color } from 'components/ui/design-tokens';
+import { Badge } from 'components/ui/badge';
+import { Progress } from 'components/ui/progress';
+import { Typography } from 'components/ui/typography';
 import {
 	getHostLists,
 	HostData,

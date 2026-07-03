@@ -1,4 +1,4 @@
-import { SolidInfoCircle } from '@signozhq/icons';
+import { SolidInfoCircle } from 'components/ui/icons';
 
 import {
 	DisplayThresholdContainer,

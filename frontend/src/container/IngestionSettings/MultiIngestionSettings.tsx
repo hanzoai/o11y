@@ -8,6 +8,7 @@ import {
 	Collapse,
 	DatePicker,
 	Form,
+	Input,
 	InputNumber,
 	Modal,
 	Row,
@@ -17,8 +18,10 @@ import {
 	TableProps as AntDTableProps,
 	Tooltip,
 } from 'antd';
-import { Switch } from '@signozhq/ui/switch';
-import { Typography } from '@signozhq/ui/typography';
+import { Badge } from 'components/ui/badge';
+import { Button } from 'components/ui/button';
+import { Switch } from 'components/ui/switch';
+import { Typography } from 'components/ui/typography';
 import type { NotificationInstance } from 'antd/es/notification/interface';
 import type { CollapseProps } from 'antd/lib';
 import {
@@ -65,7 +68,7 @@ import {
 	Trash2,
 	TriangleAlert,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { useTimezone } from 'providers/Timezone';
 import {
@@ -856,20 +859,9 @@ function MultiIngestionSettings(): JSX.Element {
 		APIKey: GatewaytypesIngestionKeyDTO,
 		signal: LimitProps,
 	): void => {
-		let metricName = '';
-
-		switch (signal.signal) {
-			case 'metrics':
-				metricName = 'o11y.meter.metric.datapoint.count';
-				break;
-			case 'traces':
-				metricName = 'o11y.meter.span.size';
-				break;
-			case 'logs':
-				metricName = 'o11y.meter.log.size';
-				break;
-			default:
-				return;
+		const signalCfg = SIGNALS_CONFIG.find((cfg) => cfg.name === signal.signal);
+		if (!signalCfg) {
+			return;
 		}
 
 		const { metricName, yAxisUnit, thresholdUnit } = signalCfg;

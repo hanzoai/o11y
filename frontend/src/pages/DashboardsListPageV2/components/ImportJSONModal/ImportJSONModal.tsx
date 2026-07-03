@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { red } from '@ant-design/colors';
 import MEditor, { Monaco } from '@monaco-editor/react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'components/ui/design-tokens';
 import { Button, Flex, Modal, Upload, UploadProps } from 'antd';
-import { toast } from '@signozhq/ui/sonner';
-import { Typography } from '@signozhq/ui/typography';
+import { toast } from 'components/ui/sonner';
+import { Typography } from 'components/ui/typography';
 import {
 	CircleAlert,
 	ExternalLink,
@@ -14,7 +14,7 @@ import {
 	MonitorDot,
 	MoveRight,
 	Sparkles,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import logEvent from 'api/common/logEvent';
 import { createDashboardV2 } from 'api/generated/services/dashboard';
 import ROUTES from 'constants/routes';

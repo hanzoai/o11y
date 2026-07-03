@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react';
 import type {
 	ListDowntimeSchedules200,
 	RenderErrorResponseDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import type { ErrorType } from 'api/generatedAPIInstance';
 import {
 	mockLocation,

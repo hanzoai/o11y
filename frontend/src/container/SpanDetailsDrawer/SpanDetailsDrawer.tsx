@@ -1,4 +1,4 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import {
 	Dispatch,
 	SetStateAction,
@@ -9,7 +9,7 @@ import {
 	useState,
 } from 'react';
 import { useMutation, useQuery } from 'react-query';
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import {
 	Button,
 	Checkbox,
@@ -45,7 +45,7 @@ import {
 	PanelRight,
 	Plus,
 	Search,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { AnimatePresence, motion } from 'motion/react';
 import { Span } from 'types/api/trace/getTraceV2';
 import { formatEpochTimestamp } from 'utils/timeUtils';

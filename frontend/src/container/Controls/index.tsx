@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from '@signozhq/icons';
+import { ChevronLeft, ChevronRight } from 'components/ui/icons';
 import { Button, Flex, Select } from 'antd';
 import { DEFAULT_PER_PAGE_OPTIONS, Pagination } from 'hooks/queryPagination';
 import { popupContainer } from 'utils/selectPopupContainer';

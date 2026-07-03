@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import cx from 'classnames';
-import { Button } from '@signozhq/ui/button';
-import { Input } from '@signozhq/ui/input';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
-import { Plus, Search } from '@signozhq/icons';
+import { Button } from 'components/ui/button';
+import { Input } from 'antd';
+import { TooltipSimple } from 'components/ui/tooltip';
+import { Plus, Search } from 'components/ui/icons';
 
 import logEvent from 'api/common/logEvent';
 

@@ -2,8 +2,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { Color } from 'constants/designTokens';
-import { Compass, Dot, House, Plus, Wrench } from 'lucide-react';
-import { Button, Popover } from 'antd';
+import { ClipboardList, Compass, Dot, House, Plus, Wrench } from 'lucide-react';
+import { Popover } from 'antd';
+import { Button } from 'components/ui/button';
 import logEvent from 'api/common/logEvent';
 import { useGetMetricsOnboardingStatus } from 'api/generated/services/metrics';
 import listUserPreferences from 'api/v1/user/preferences/list';

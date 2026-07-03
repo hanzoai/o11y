@@ -10,8 +10,8 @@ import {
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, Select, Spin, Tooltip } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
-import { Typography } from '@signozhq/ui/typography';
+import { Badge } from 'components/ui/badge';
+import { Typography } from 'components/ui/typography';
 import cx from 'classnames';
 import {
 	INFRA_LONG_TO_SHORT_OPERATOR_MAP,
@@ -38,8 +38,8 @@ import {
 	CornerDownLeft,
 	Filter,
 	Slash,
-} from '@signozhq/icons';
-import type { BaseSelectRef } from 'rc-select';
+} from 'components/ui/icons';
+import type { RefSelectProps } from 'antd';
 import {
 	BaseAutocompleteData,
 	DataTypes,
@@ -140,7 +140,7 @@ function QueryBuilderSearch({
 	const [dynamicPlacholder, setDynamicPlaceholder] = useState<string>(
 		placeholder || '',
 	);
-	const selectRef = useRef<BaseSelectRef>(null);
+	const selectRef = useRef<RefSelectProps>(null);
 
 	const { sourceKeys, handleRemoveSourceKey } = useFetchKeysAndValues(
 		searchValue,

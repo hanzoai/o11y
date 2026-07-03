@@ -1,5 +1,6 @@
+import { HTMLAttributes } from 'react';
 import { Button as ButtonComponent } from 'antd';
-import { Typography as TypographyComponent } from '@signozhq/ui/typography';
+import { Typography as TypographyComponent } from 'components/ui/typography';
 import styled from 'styled-components';
 
 export const Button = styled(ButtonComponent)`
@@ -26,7 +27,7 @@ export const Typography = styled(TypographyComponent)`
 	}
 `;
 
-export const SaveAndCancelContainer = styled.div`
+export const SaveAndCancelContainer = styled.div<HTMLAttributes<HTMLDivElement>>`
 	display: flex;
 	justify-content: flex-end;
 	margin-right: 1rem;

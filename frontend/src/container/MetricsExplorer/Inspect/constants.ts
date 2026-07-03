@@ -1,14 +1,16 @@
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
 import { Color } from 'constants/designTokens';
-import { MetricType } from 'api/metricsExplorer/getMetricsList';
+import { MetrictypesTypeDTO } from 'api/generated/services/o11y.schemas';
 import {
 	BarChart,
 	BarChart2,
 	BarChartHorizontal,
+	ChartBar,
 	Diff,
 	Gauge,
 	LucideProps,
 } from 'lucide-react';
+import { Histogram } from 'components/ui/icons';
 
 import {
 	MetricInspectionState,

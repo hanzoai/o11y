@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { Button, Card } from 'antd';
 import RunQueryBtn from 'container/QueryBuilder/components/RunQueryBtn/RunQueryBtn';
-import { Atom } from '@signozhq/icons';
+import { Atom } from 'components/ui/icons';
 
 import MetricFilters from './MetricFilters';
 import MetricNameSearch from './MetricNameSearch';

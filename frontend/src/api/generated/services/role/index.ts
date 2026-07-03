@@ -31,8 +31,6 @@ import type {
 	PatchObjectsPathParameters,
 	PatchRolePathParameters,
 	RenderErrorResponseDTO,
-	RoletypesPatchableRoleDTO,
-	RoletypesPostableRoleDTO,
 } from '../o11y.schemas';
 
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';

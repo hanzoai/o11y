@@ -1,10 +1,10 @@
 import { memo, useState } from 'react';
 import { Button, Tooltip } from 'antd';
-import { Divider } from '@signozhq/ui/divider';
+import { Divider } from 'components/ui/divider';
 import cx from 'classnames';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
 import useFunnelConfiguration from 'hooks/TracesFunnels/useFunnelConfiguration';
-import { PencilLine } from '@signozhq/icons';
+import { PencilLine } from 'components/ui/icons';
 import FunnelItemPopover from 'pages/TracesFunnels/components/FunnelsList/FunnelItemPopover';
 import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 import CopyToClipboard from 'periscope/components/CopyToClipboard';

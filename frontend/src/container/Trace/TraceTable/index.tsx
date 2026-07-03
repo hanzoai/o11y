@@ -2,8 +2,8 @@ import { HTMLAttributes } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { TableColumnsType as ColumnsType, TableProps } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
-import { Typography } from '@signozhq/ui/typography';
+import { Badge } from 'components/ui/badge';
+import { Typography } from 'components/ui/typography';
 import { ResizeTable } from 'components/ResizeTable';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import ROUTES from 'constants/routes';

@@ -4,7 +4,7 @@ import {
 	TabsList,
 	TabsRoot,
 	TabsTrigger,
-} from '@signozhq/ui/tabs';
+} from 'components/ui/tabs';
 import {
 	Bookmark,
 	CalendarClock,
@@ -13,7 +13,7 @@ import {
 	List,
 	ScrollText,
 	Timer,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { Skeleton } from 'antd';
 import { DetailsHeader, DetailsPanelDrawer } from 'components/DetailsPanel';
 import { HeaderAction } from 'components/DetailsPanel/DetailsHeader/DetailsHeader';

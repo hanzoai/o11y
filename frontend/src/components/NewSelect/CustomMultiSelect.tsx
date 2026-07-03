@@ -8,18 +8,24 @@ import React, {
 } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import {
-	DownOutlined,
-	LoadingOutlined,
-	ReloadOutlined,
-} from '@ant-design/icons';
+	ArrowDown,
+	ArrowLeft,
+	ArrowRight,
+	ArrowUp,
+	ChevronDown,
+	Info,
+	Loader,
+	RefreshCw,
+} from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
-import { Button, Checkbox, Select, Typography } from 'antd';
+import { Button, Checkbox, Select } from 'antd';
+import { Typography } from 'components/ui/typography';
 import cx from 'classnames';
 import TextToolTip from 'components/TextToolTip/TextToolTip';
 import { SOMETHING_WENT_WRONG } from 'constants/api';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { capitalize, isEmpty } from 'lodash-es';
-import type { BaseSelectRef } from 'rc-select';
+import type { RefSelectProps } from 'antd';
 import { popupContainer } from 'utils/selectPopupContainer';
 
 import { CustomMultiSelectProps, CustomTagProps, OptionData } from './types';
@@ -73,7 +79,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
 	// ===== State & Refs =====
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchText, setSearchText] = useState('');
-	const selectRef = useRef<BaseSelectRef>(null);
+	const selectRef = useRef<RefSelectProps>(null);
 	const [activeIndex, setActiveIndex] = useState<number>(-1);
 	const [activeChipIndex, setActiveChipIndex] = useState<number>(-1); // For tracking active chip/tag
 	const [selectionStart, setSelectionStart] = useState<number>(-1);

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { Key, LayoutGrid, Plus, Trash2, X } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
-import { DrawerWrapper } from '@signozhq/ui/drawer';
-import { toast } from '@signozhq/ui/sonner';
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
+import { Key, LayoutGrid, Plus, Trash2, X } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { DrawerWrapper } from 'components/ui/drawer';
+import { toast } from 'components/ui/sonner';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import { Pagination, Skeleton } from 'antd';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {
@@ -13,7 +13,7 @@ import {
 	useListServiceAccountKeys,
 	useUpdateServiceAccount,
 } from 'api/generated/services/serviceaccount';
-import type { RenderErrorResponseDTO } from 'api/generated/services/sigNoz.schemas';
+import type { RenderErrorResponseDTO } from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import ErrorInPlace from 'components/ErrorInPlace/ErrorInPlace';
 import { GuardAuthZ } from 'components/GuardAuthZ/GuardAuthZ';

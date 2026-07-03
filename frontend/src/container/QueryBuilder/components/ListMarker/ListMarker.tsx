@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { EyeClosed, EyeOpen } from '@signozhq/icons';
+import { EyeClosed, EyeOpen } from 'components/ui/icons';
 import { ButtonProps } from 'antd';
 
 // ** Types

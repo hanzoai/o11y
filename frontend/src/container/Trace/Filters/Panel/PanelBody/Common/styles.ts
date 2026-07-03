@@ -1,4 +1,4 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import styled from 'styled-components';
 
 export const CheckBoxContainer = styled.div`

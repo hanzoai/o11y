@@ -1,4 +1,6 @@
 import { Color } from 'constants/designTokens';
+import getLocalStorageKey from 'api/browser/localstorage/get';
+import setLocalStorageKey from 'api/browser/localstorage/set';
 import { showErrorNotification } from 'components/ExplorerCard/utils';
 import { LOCALSTORAGE } from 'constants/localStorage';
 import { QueryParams } from 'constants/query';

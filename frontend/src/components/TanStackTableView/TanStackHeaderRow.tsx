@@ -11,9 +11,9 @@ import {
 	Ellipsis,
 	GripVertical,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useSortable } from '@dnd-kit/sortable';
-import { Popover, PopoverContent, PopoverTrigger } from '@signozhq/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { flexRender, Header as TanStackHeader } from '@tanstack/react-table';
 import cx from 'classnames';
 

@@ -1,9 +1,9 @@
-import { CircleAlert, RefreshCw } from '@signozhq/icons';
+import { CircleAlert, RefreshCw } from 'components/ui/icons';
 import { Select } from 'antd';
-import { Checkbox } from '@signozhq/ui/checkbox';
+import { Checkbox } from 'components/ui/checkbox';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import { useListRoles } from 'api/generated/services/role';
-import type { AuthtypesRoleDTO } from 'api/generated/services/sigNoz.schemas';
+import type { AuthtypesRoleDTO } from 'api/generated/services/o11y.schemas';
 import cx from 'classnames';
 import APIError from 'types/api/error';
 import { popupContainer } from 'utils/selectPopupContainer';

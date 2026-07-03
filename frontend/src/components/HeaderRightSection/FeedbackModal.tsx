@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { toast } from '@hanzo/ui';
 import { Button, Input, Radio, RadioChangeEvent, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import { handleContactSupport } from 'container/Integrations/utils';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 

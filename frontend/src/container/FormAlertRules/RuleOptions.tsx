@@ -9,7 +9,7 @@ import {
 	SelectProps,
 	Space,
 } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import type { DefaultOptionType } from 'antd/es/select';
 import {
 	getCategoryByOptionId,

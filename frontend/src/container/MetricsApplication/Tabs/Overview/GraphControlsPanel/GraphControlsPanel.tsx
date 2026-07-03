@@ -1,6 +1,6 @@
 import { Color } from 'constants/designTokens';
 import { Button } from 'antd';
-import { DraftingCompass, ScrollText, Binoculars } from '@signozhq/icons';
+import { DraftingCompass, ScrollText, Binoculars } from 'components/ui/icons';
 
 import './GraphControlsPanel.styles.scss';
 

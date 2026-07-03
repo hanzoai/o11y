@@ -5,7 +5,9 @@ import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
 import { orange } from '@ant-design/colors';
 import { Color } from 'constants/designTokens';
-import { Button, Collapse, Input, Select, Switch, Tag, Typography } from 'antd';
+import { Button, Collapse, Input, Select, Tag, Typography } from 'antd';
+import { Badge } from 'components/ui/badge';
+import { Switch } from 'components/ui/switch';
 import dashboardVariablesQuery from 'api/dashboard/variables/dashboardVariablesQuery';
 import cx from 'classnames';
 import Editor from 'components/Editor';
@@ -29,7 +31,7 @@ import {
 	LayoutList,
 	Pyramid,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useDashboardStore } from 'providers/Dashboard/store/useDashboardStore';
 import { AppState } from 'store/reducers';
 import {

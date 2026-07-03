@@ -1,5 +1,5 @@
-import { toast } from '@signozhq/ui/sonner';
-import { ServiceaccounttypesGettableFactorAPIKeyDTO } from 'api/generated/services/sigNoz.schemas';
+import { toast } from 'components/ui/sonner';
+import { ServiceaccounttypesGettableFactorAPIKeyDTO } from 'api/generated/services/o11y.schemas';
 import { rest, server } from 'mocks-server/server';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 import { render, screen, userEvent, waitFor } from 'tests/test-utils';
@@ -15,8 +15,8 @@ jest.mock('components/AuthZTooltip/AuthZTooltip', () => ({
 	}): React.ReactElement => children,
 }));
 
-jest.mock('@signozhq/ui/sonner', () => ({
-	...jest.requireActual('@signozhq/ui/sonner'),
+jest.mock('components/ui/sonner', () => ({
+	...jest.requireActual('components/ui/sonner'),
 	toast: { success: jest.fn(), error: jest.fn() },
 }));
 

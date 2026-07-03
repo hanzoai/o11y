@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for SigNoz
- * * regenerate with 'pnpm generate:api'
- * SigNoz
+ * * The file has been auto-generated using Orval for Hanzo O11y
+ * * regenerate with 'yarn generate:api'
+ * Hanzo O11y
  */
 import { useMutation, useQuery } from 'react-query';
 import type {
@@ -34,7 +34,7 @@ import type {
 	SpantypesUpdatableSpanMapperGroupDTO,
 	UpdateSpanMapperGroupPathParameters,
 	UpdateSpanMapperPathParameters,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type { ErrorType, BodyType } from '../../../generatedAPIInstance';

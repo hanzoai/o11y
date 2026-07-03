@@ -1,4 +1,4 @@
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import styled from 'styled-components';
 
 export const TagContainer = styled(Badge)`

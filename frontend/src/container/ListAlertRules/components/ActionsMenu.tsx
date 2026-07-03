@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from 'react';
 import { useQueryClient } from 'react-query';
-import { Ellipsis } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
-import { DropdownMenuSimple } from '@signozhq/ui/dropdown-menu';
-import { toast } from '@signozhq/ui/sonner';
+import { Ellipsis } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { DropdownMenuSimple } from 'components/ui/dropdown-menu';
+import { toast } from 'components/ui/sonner';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {
 	createRule,
@@ -14,7 +14,7 @@ import {
 import type {
 	RenderErrorResponseDTO,
 	RuletypesPostableRuleDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import type { AxiosError } from 'axios';
 
 import type { AlertRule } from '../types';
@@ -44,7 +44,7 @@ function ActionsMenu({
 			{
 				loading: newDisabled ? 'Disabling alert...' : 'Enabling alert...',
 				success: newDisabled ? 'Alert disabled' : 'Alert enabled',
-				error: (error): string => {
+				error: (error: unknown): string => {
 					const apiError = convertToApiError(
 						error as AxiosError<RenderErrorResponseDTO>,
 					);
@@ -81,7 +81,7 @@ function ActionsMenu({
 			{
 				loading: 'Cloning alert...',
 				success: 'Alert cloned successfully',
-				error: (error): string => {
+				error: (error: unknown): string => {
 					const apiError = convertToApiError(
 						error as AxiosError<RenderErrorResponseDTO>,
 					);
@@ -101,7 +101,7 @@ function ActionsMenu({
 			{
 				loading: 'Deleting alert...',
 				success: 'Alert deleted successfully',
-				error: (error): string => {
+				error: (error: unknown): string => {
 					const apiError = convertToApiError(
 						error as AxiosError<RenderErrorResponseDTO>,
 					);

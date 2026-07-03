@@ -28,7 +28,7 @@ import {
 	Sparkles,
 	User,
 	Users,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import ChannelsEdit from 'pages/ChannelsEdit';
 import MembersSettings from 'pages/MembersSettings';
 import ServiceAccountsSettings from 'pages/ServiceAccountsSettings';

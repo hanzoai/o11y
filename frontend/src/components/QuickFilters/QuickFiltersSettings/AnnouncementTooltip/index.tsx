@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import classNames from 'classnames';
-import { Check, X } from '@signozhq/icons';
+import { Check, X } from 'components/ui/icons';
 
 import './AnnouncementTooltip.styles.scss';
 

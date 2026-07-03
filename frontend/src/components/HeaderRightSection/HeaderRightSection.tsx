@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Dot } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
+import { Dot } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { TooltipSimple } from 'components/ui/tooltip';
 import Noz from 'components/Noz/Noz';
 import { NOZ_TOOLTIP_TITLE } from 'components/Noz/Noz.constants';
 import { Popover } from 'antd';
@@ -16,14 +16,14 @@ import {
 import { selectPendingUserInputStreamCount } from 'container/AIAssistant/store/pendingInputSelectors';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import { useIsAIAssistantEnabled } from 'hooks/useIsAIAssistantEnabled';
-import { Globe, Inbox, SquarePen } from '@signozhq/icons';
+import { Globe, Inbox, SquarePen } from 'components/ui/icons';
 
 import AnnouncementsModal from './AnnouncementsModal';
 import FeedbackModal from './FeedbackModal';
 import ShareURLModal from './ShareURLModal';
 
 import './HeaderRightSection.styles.scss';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 
 interface HeaderRightSectionProps {
 	enableAnnouncements: boolean;

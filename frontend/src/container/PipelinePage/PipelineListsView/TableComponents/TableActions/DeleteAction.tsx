@@ -1,4 +1,4 @@
-import { Trash2 } from '@signozhq/icons';
+import { Trash2 } from 'components/ui/icons';
 
 import { iconStyle, smallIconStyle } from '../../config';
 

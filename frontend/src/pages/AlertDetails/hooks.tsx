@@ -23,7 +23,7 @@ import type {
 	GetRuleByID200,
 	RenderErrorResponseDTO,
 	RuletypesPostableRuleDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import { TabRoutes } from 'components/RouteTab/types';
 import { QueryParams } from 'constants/query';
@@ -40,7 +40,7 @@ import useUrlQuery from 'hooks/useUrlQuery';
 import createQueryParams from 'lib/createQueryParams';
 import GetMinMax from 'lib/getMinMax';
 import history from 'lib/history';
-import { History, Table } from '@signozhq/icons';
+import { History, Table } from 'components/ui/icons';
 import EditRules from 'pages/EditRules';
 import { OrderPreferenceItems } from 'pages/Logs/config';
 import BetaTag from 'periscope/components/BetaTag/BetaTag';

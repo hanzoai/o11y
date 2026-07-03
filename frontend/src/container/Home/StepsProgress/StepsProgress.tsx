@@ -1,4 +1,4 @@
-import { Progress } from '@signozhq/ui/progress';
+import { Progress } from 'components/ui/progress';
 
 import { ChecklistItem } from '../HomeChecklist/HomeChecklist';
 

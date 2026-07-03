@@ -1,7 +1,7 @@
 import { Skeleton } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
-import { Button } from '@signozhq/ui/button';
-import { Info, KeyRound } from '@signozhq/icons';
+import { Badge } from 'components/ui/badge';
+import { Button } from 'components/ui/button';
+import { Info, KeyRound } from 'components/ui/icons';
 import CopyIconButton from '../CopyIconButton';
 
 import './AuthCard.styles.scss';

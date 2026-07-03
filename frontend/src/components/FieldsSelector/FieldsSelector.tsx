@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
-import { toast } from '@signozhq/ui/sonner';
-import { Button } from '@signozhq/ui/button';
-import { Input } from '@signozhq/ui/input';
+import { toast } from 'components/ui/sonner';
+import { Button } from 'components/ui/button';
+import { Input } from 'components/ui/input';
 import useDebouncedFn from 'hooks/useDebouncedFunction';
-import { Check, TableColumnsSplit, X } from '@signozhq/icons';
+import { Check, TableColumnsSplit, X } from 'components/ui/icons';
 import { FloatingPanel } from 'periscope/components/FloatingPanel';
 import { buildCompositeKey } from 'container/OptionsMenu/utils';
 import { TelemetryFieldKey } from 'types/api/v5/queryRange';

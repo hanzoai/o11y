@@ -1,5 +1,5 @@
-import { Typography } from '@signozhq/ui/typography';
-import { ConciergeBell, Plus, SquareArrowOutUpRight } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { ConciergeBell, Plus, SquareArrowOutUpRight } from 'components/ui/icons';
 
 import './AlertsSection.styles.scss';
 

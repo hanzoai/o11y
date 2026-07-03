@@ -8,7 +8,7 @@ import {
 	useState,
 } from 'react';
 import { Input } from 'antd';
-import { Slider } from '@signozhq/ui/slider';
+import { Slider } from 'components/ui/slider';
 import { getMs } from 'container/Trace/Filters/Panel/PanelBody/Duration/util';
 import useDebouncedFn from 'hooks/useDebouncedFunction';
 

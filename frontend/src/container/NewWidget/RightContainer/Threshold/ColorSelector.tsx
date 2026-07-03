@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { ChevronDown } from '@signozhq/icons';
-import { DropdownMenuSimple, type MenuItem } from '@signozhq/ui/dropdown-menu';
+import { ChevronDown } from 'components/ui/icons';
+import { DropdownMenuSimple, type MenuItem } from 'components/ui/dropdown-menu';
 import { Button, ColorPicker, Space } from 'antd';
 import type { Color } from 'antd/es/color-picker';
 import useDebounce from 'hooks/useDebounce';

@@ -1,4 +1,4 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueries } from 'react-query';
@@ -6,7 +6,7 @@ import { useQueries } from 'react-query';
 import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { Button, Card, Input, Space, TableProps, Tooltip, Flex } from 'antd';
-import { Search } from '@signozhq/icons';
+import { Search } from 'components/ui/icons';
 import type { ColumnType, TablePaginationConfig } from 'antd/es/table';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import type { ColumnsType } from 'antd/lib/table';

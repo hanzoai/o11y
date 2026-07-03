@@ -1,4 +1,8 @@
-import { AuthtypesTransactionDTO } from '../../api/generated/services/o11y.schemas';
+import {
+	AuthtypesRelationDTO,
+	AuthtypesTransactionDTO,
+	CoretypesTypeDTO,
+} from '../../api/generated/services/o11y.schemas';
 import permissionsType from './permissions.type';
 import {
 	AuthZObject,

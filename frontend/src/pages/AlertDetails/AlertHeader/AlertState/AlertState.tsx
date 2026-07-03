@@ -1,6 +1,6 @@
 import { Color } from 'constants/designTokens';
 import { useIsDarkMode } from 'hooks/useDarkMode';
-import { BellOff, CircleCheck, CircleOff, Flame } from '@signozhq/icons';
+import { BellOff, CircleCheck, CircleOff, Flame } from 'components/ui/icons';
 
 import './AlertState.styles.scss';
 

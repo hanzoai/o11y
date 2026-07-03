@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Check, Goal, Search, UserPlus, X } from '@signozhq/icons';
+import { Check, Goal, Search, UserPlus, X } from 'components/ui/icons';
 import {
 	Button,
 	Flex,
@@ -10,7 +10,7 @@ import {
 	Space,
 	Steps,
 } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import LaunchChatSupport from 'components/LaunchChatSupport/LaunchChatSupport';
 import { DOCS_BASE_URL } from 'constants/app';

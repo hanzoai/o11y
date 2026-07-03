@@ -1,4 +1,4 @@
-import type { TypesUserDTO } from 'api/generated/services/sigNoz.schemas';
+import type { TypesUserDTO } from 'api/generated/services/o11y.schemas';
 import userEvent from '@testing-library/user-event';
 import { rest, server } from 'mocks-server/server';
 import { fireEvent, render, screen } from 'tests/test-utils';
@@ -19,27 +19,20 @@ const mockUsers: TypesUserDTO[] = [
 		id: 'user-1',
 		displayName: 'Alice Smith',
 		email: 'alice@o11y.hanzo.ai',
-		role: 'ADMIN',
-		createdAt: 1700000000,
-		organization: 'TestOrg',
+		createdAt: '2023-11-14T22:13:20Z',
 		orgId: 'org-1',
 	},
 	{
 		id: 'user-2',
 		displayName: 'Bob Jones',
 		email: 'bob@o11y.hanzo.ai',
-		role: 'VIEWER',
-		createdAt: 1700000001,
-		organization: 'TestOrg',
+		createdAt: '2023-11-14T22:13:21Z',
 		orgId: 'org-1',
 	},
 	{
 		id: 'inv-1',
 		email: 'charlie@o11y.hanzo.ai',
-		name: 'Charlie',
-		role: 'EDITOR',
-		createdAt: 1700000002,
-		token: 'tok-abc',
+		createdAt: '2023-11-14T22:13:22Z',
 	},
 ];
 

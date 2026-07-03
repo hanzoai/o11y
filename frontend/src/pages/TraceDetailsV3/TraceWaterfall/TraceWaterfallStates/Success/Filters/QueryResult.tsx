@@ -1,11 +1,11 @@
-import { ChevronDown, ChevronUp, Info, Loader } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
+import { ChevronDown, ChevronUp, Info, Loader } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 import {
 	TooltipContent,
 	TooltipRoot,
 	TooltipTrigger,
-} from '@signozhq/ui/tooltip';
-import { Typography } from '@signozhq/ui/typography';
+} from 'components/ui/tooltip';
+import { Typography } from 'components/ui/typography';
 import { AxiosError } from 'axios';
 import cx from 'classnames';
 

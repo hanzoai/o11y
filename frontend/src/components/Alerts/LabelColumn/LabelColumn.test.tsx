@@ -1,4 +1,4 @@
-import { TooltipProvider } from '@signozhq/ui/tooltip';
+import { TooltipProvider } from 'components/ui/tooltip';
 import { act, render, screen } from '@testing-library/react';
 
 import LabelColumn from './LabelColumn';

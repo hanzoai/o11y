@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { matchPath, useLocation } from 'react-router-dom';
-import { Button } from '@signozhq/ui/button';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
+import { Button } from 'components/ui/button';
+import { TooltipSimple } from 'components/ui/tooltip';
 import logEvent from 'api/common/logEvent';
 import ROUTES from 'constants/routes';
 import Noz from 'components/Noz/Noz';

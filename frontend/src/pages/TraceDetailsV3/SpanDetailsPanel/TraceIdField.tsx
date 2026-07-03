@@ -1,7 +1,7 @@
 import { Link, useRouteMatch } from 'react-router-dom';
 import { useCopyToClipboard } from 'react-use';
-import { Button } from '@signozhq/ui/button';
-import { toast } from '@signozhq/ui/sonner';
+import { Button } from 'components/ui/button';
+import { toast } from 'components/ui/sonner';
 import ROUTES from 'constants/routes';
 import { SpanV3 } from 'types/api/trace/getTraceV3';
 

@@ -1,4 +1,4 @@
-import { MouseEvent } from 'react';
+import { HTMLAttributes, MouseEvent } from 'react';
 import { VIEW_TYPES } from 'components/LogDetail/constants';
 import { ChangeViewFunctionType } from 'container/ExplorerOptions/types';
 import { FontSize } from 'container/OptionsMenu/types';
@@ -24,7 +24,7 @@ export interface RawLogViewProps {
 	onClearActiveLog?: () => void;
 }
 
-export interface RawLogContentProps {
+export interface RawLogContentProps extends HTMLAttributes<HTMLDivElement> {
 	linesPerRow: number;
 	fontSize: FontSize;
 	$isReadOnly?: boolean;

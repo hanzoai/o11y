@@ -1,12 +1,12 @@
 import { ReactNode } from 'react';
-import { Dock, PanelBottom, PanelRight } from '@signozhq/icons';
-import { ToggleGroup, ToggleGroupItem } from '@signozhq/ui/toggle-group';
+import { Dock, PanelBottom, PanelRight } from 'components/ui/icons';
+import { ToggleGroup, ToggleGroupItem } from 'components/ui/toggle-group';
 import {
 	TooltipContent,
 	TooltipProvider,
 	TooltipRoot,
 	TooltipTrigger,
-} from '@signozhq/ui/tooltip';
+} from 'components/ui/tooltip';
 
 import { SpanDetailVariant } from './constants';
 

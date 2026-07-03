@@ -9,7 +9,15 @@ import {
 	useState,
 } from 'react';
 import { useHistory } from 'react-router-dom';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import {
+	Check,
+	ConciergeBell,
+	Disc3,
+	Info,
+	PanelBottomClose,
+	Plus,
+	X,
+} from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
 import {
 	Button,
@@ -19,9 +27,9 @@ import {
 	Select,
 	Tooltip,
 } from 'antd';
-import { Divider } from '@signozhq/ui/divider';
-import { Typography } from '@signozhq/ui/typography';
-import { Input } from '@signozhq/ui/input';
+import { Divider } from 'components/ui/divider';
+import { Typography } from 'components/ui/typography';
+import { Input } from 'components/ui/input';
 import getLocalStorageKey from 'api/browser/localstorage/get';
 import setLocalStorageKey from 'api/browser/localstorage/set';
 import logEvent from 'api/common/logEvent';

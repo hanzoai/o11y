@@ -1,8 +1,8 @@
-import { Check, Copy } from '@signozhq/icons';
-import { Badge } from '@signozhq/ui/badge';
-import { Button } from '@signozhq/ui/button';
-import { Callout } from '@signozhq/ui/callout';
-import type { ServiceaccounttypesGettableFactorAPIKeyWithKeyDTO } from 'api/generated/services/sigNoz.schemas';
+import { Check, Copy } from 'components/ui/icons';
+import { Badge } from 'components/ui/badge';
+import { Button } from 'components/ui/button';
+import { Callout } from 'components/ui/callout';
+import type { ServiceaccounttypesGettableFactorAPIKeyWithKeyDTO } from 'api/generated/services/o11y.schemas';
 
 export interface KeyCreatedPhaseProps {
 	createdKey: ServiceaccounttypesGettableFactorAPIKeyWithKeyDTO;

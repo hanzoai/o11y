@@ -1,4 +1,4 @@
-import type { AlertmanagertypesDeprecatedGettableAlertDTO } from 'api/generated/services/sigNoz.schemas';
+import type { AlertmanagertypesDeprecatedGettableAlertDTO } from 'api/generated/services/o11y.schemas';
 
 export type Alert = AlertmanagertypesDeprecatedGettableAlertDTO;
 

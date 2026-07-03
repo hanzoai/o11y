@@ -3,13 +3,13 @@ import type {
 	RuletypesPostableRuleDTO,
 	RuletypesPostableRuleDTOLabels,
 	RuletypesRuleDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import {
 	RuletypesAlertTypeDTO,
 	RuletypesPanelTypeDTO,
 	RuletypesQueryTypeDTO,
 	RuletypesRuleTypeDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { EQueryType } from 'types/common/dashboard';
 
@@ -121,7 +121,7 @@ function toEQueryType(queryType: RuletypesQueryTypeDTO): EQueryType {
 		case RuletypesQueryTypeDTO.builder:
 			return EQueryType.QUERY_BUILDER;
 		case RuletypesQueryTypeDTO.clickhouse_sql:
-			return EQueryType.CLICKHOUSE;
+			return EQueryType.DATASTORE;
 		case RuletypesQueryTypeDTO.promql:
 			return EQueryType.PROM;
 		default:

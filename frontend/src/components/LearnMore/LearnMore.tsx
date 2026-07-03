@@ -1,6 +1,6 @@
 import { Color } from 'constants/designTokens';
 import { Button } from 'antd';
-import { ArrowUpRight } from '@signozhq/icons';
+import { ArrowUpRight } from 'components/ui/icons';
 import { openInNewTab } from 'utils/navigation';
 
 import './LearnMore.styles.scss';
