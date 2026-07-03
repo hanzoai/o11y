@@ -1,5 +1,5 @@
-import { Check } from '@signozhq/icons';
-import { Badge } from '@signozhq/ui/badge';
+import { Check } from 'components/ui/icons';
+import { Badge } from 'components/ui/badge';
 import styled from 'styled-components';
 
 export const TypographyText = styled.span<{

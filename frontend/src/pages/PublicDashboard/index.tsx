@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { Typography } from 'antd';
 import BrandMark from 'components/BrandMark';
 import { useGetPublicDashboardData } from 'hooks/dashboard/useGetPublicDashboardData';
-import { Frown } from '@signozhq/icons';
+import { Frown } from 'components/ui/icons';
 
 import signozBrandLogoUrl from '@/assets/Logos/signoz-brand-logo.svg';
 

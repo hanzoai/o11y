@@ -1,4 +1,4 @@
-import { Avatar } from '@signozhq/ui/avatar';
+import { Avatar } from 'components/ui/avatar';
 import { Card, Space } from 'antd';
 
 import './customerStoryCard.styles.scss';

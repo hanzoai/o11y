@@ -3,7 +3,7 @@ import { Color } from 'constants/designTokens';
 import { Tooltip, Typography } from 'antd';
 import cx from 'classnames';
 import { isEmpty, isObject } from 'lodash-es';
-import { Check, Zap } from '@signozhq/icons';
+import { Check, Zap } from 'components/ui/icons';
 import { BaseAutocompleteData } from 'types/api/queryBuilder/queryAutocompleteResponse';
 
 import { getTagToken } from '../QueryBuilderSearch/utils';

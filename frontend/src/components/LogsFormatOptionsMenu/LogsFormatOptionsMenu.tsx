@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Button, InputNumber, Popover, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import cx from 'classnames';
 import { LogViewMode } from 'container/LogsTable';
 import { FontSize, OptionsMenuConfig } from 'container/OptionsMenu/types';
@@ -11,7 +11,7 @@ import {
 	Minus,
 	Plus,
 	SlidersVertical,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 import './LogsFormatOptionsMenu.styles.scss';
 

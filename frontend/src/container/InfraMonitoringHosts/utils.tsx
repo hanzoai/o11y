@@ -12,7 +12,7 @@ import {
 	FiltersType,
 	IQuickFiltersConfig,
 } from 'components/QuickFilters/types';
-import { TriangleAlert } from '@signozhq/icons';
+import { TriangleAlert } from 'components/ui/icons';
 import { DataTypes } from 'types/api/queryBuilder/queryAutocompleteResponse';
 import { DataSource } from 'types/common/queryBuilder';
 

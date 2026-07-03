@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Color } from 'constants/designTokens';
 import { Tooltip, Typography } from 'antd';
 import cx from 'classnames';
-import { Zap } from '@signozhq/icons';
+import { Zap } from 'components/ui/icons';
 
 import { getOptionType } from './utils';
 

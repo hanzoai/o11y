@@ -29,7 +29,7 @@ import {
 	LayoutList,
 	Pyramid,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useDashboardStore } from 'providers/Dashboard/store/useDashboardStore';
 import { AppState } from 'store/reducers';
 import {

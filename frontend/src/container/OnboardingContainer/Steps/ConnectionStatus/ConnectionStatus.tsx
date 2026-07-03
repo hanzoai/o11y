@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
-import { CircleCheck, CircleX, LoaderCircle } from '@signozhq/icons';
+import { CircleCheck, CircleX, LoaderCircle } from 'components/ui/icons';
 import logEvent from 'api/common/logEvent';
 import MessagingQueueHealthCheck from 'components/MessagingQueueHealthCheck/MessagingQueueHealthCheck';
 import { QueryParams } from 'constants/query';

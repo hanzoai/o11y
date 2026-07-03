@@ -10,8 +10,8 @@ import {
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, Select, Spin, Tooltip } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
-import { Typography } from '@signozhq/ui/typography';
+import { Badge } from 'components/ui/badge';
+import { Typography } from 'components/ui/typography';
 import cx from 'classnames';
 import {
 	INFRA_LONG_TO_SHORT_OPERATOR_MAP,
@@ -38,7 +38,7 @@ import {
 	CornerDownLeft,
 	Filter,
 	Slash,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import type { BaseSelectRef } from 'rc-select';
 import {
 	BaseAutocompleteData,

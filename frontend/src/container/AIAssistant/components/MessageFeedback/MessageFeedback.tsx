@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import cx from 'classnames';
 import { useCopyToClipboard } from 'react-use';
-import { Button } from '@signozhq/ui/button';
-import { DialogWrapper } from '@signozhq/ui/dialog';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
+import { Button } from 'components/ui/button';
+import { DialogWrapper } from 'components/ui/dialog';
+import { TooltipSimple } from 'components/ui/tooltip';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
-import { Check, Copy, RefreshCw, ThumbsDown, ThumbsUp } from '@signozhq/icons';
+import { Check, Copy, RefreshCw, ThumbsDown, ThumbsUp } from 'components/ui/icons';
 import { useTimezone } from 'providers/Timezone';
 
 import logEvent from 'api/common/logEvent';

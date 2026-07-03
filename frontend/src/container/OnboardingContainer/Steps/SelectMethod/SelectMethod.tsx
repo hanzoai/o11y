@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Space } from 'antd';
-import { RadioGroup, RadioGroupItem } from '@signozhq/ui/radio-group';
-import { Typography } from '@signozhq/ui/typography';
+import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
+import { Typography } from 'components/ui/typography';
 import {
 	OnboardingMethods,
 	useOnboardingContext,

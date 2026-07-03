@@ -1,5 +1,5 @@
 import { convertTimeToRelevantUnit } from 'container/TraceDetail/utils';
-import { Diamond } from '@signozhq/icons';
+import { Diamond } from 'components/ui/icons';
 import cx from 'classnames';
 import { toFixed } from 'utils/toFixed';
 

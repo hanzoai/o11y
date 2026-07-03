@@ -38,7 +38,7 @@ import {
 	UserPlus,
 	Users,
 	Binoculars,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 import {
 	SecondaryMenuItemKey,

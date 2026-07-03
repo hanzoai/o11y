@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { useCallback, useMemo } from 'react';
-import { Search } from '@signozhq/icons';
-import { Input } from '@signozhq/ui/input';
-import { ComboboxSimple, ComboboxSimpleItem } from '@signozhq/ui/combobox';
+import { Search } from 'components/ui/icons';
+import { Input } from 'components/ui/input';
+import { ComboboxSimple, ComboboxSimpleItem } from 'components/ui/combobox';
 import ErrorEmptyState from 'components/Alerts/ErrorEmptyState';
 import NoResultsEmptyState from 'components/Alerts/NoResultsEmptyState';
 import type { FilterValue } from 'components/Alerts/types';

@@ -17,8 +17,8 @@ import {
 	TableProps as AntDTableProps,
 	Tooltip,
 } from 'antd';
-import { Switch } from '@signozhq/ui/switch';
-import { Typography } from '@signozhq/ui/typography';
+import { Switch } from 'components/ui/switch';
+import { Typography } from 'components/ui/typography';
 import type { NotificationInstance } from 'antd/es/notification/interface';
 import type { CollapseProps } from 'antd/lib';
 import {
@@ -65,7 +65,7 @@ import {
 	Trash2,
 	TriangleAlert,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { useTimezone } from 'providers/Timezone';
 import {

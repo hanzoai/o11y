@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { toast } from '@signozhq/ui/sonner';
+import { toast } from 'components/ui/sonner';
 import { Button, Input } from 'antd';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {
 	useGetMyOrganization,
 	useUpdateMyOrganization,
 } from 'api/generated/services/orgs';
-import type { RenderErrorResponseDTO } from 'api/generated/services/sigNoz.schemas';
+import type { RenderErrorResponseDTO } from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import { useAppContext } from 'providers/App/App';
 import { IUser } from 'providers/App/types';

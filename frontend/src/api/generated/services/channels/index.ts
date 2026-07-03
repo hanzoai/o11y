@@ -27,7 +27,7 @@ import type {
 	ListChannels200,
 	RenderErrorResponseDTO,
 	UpdateChannelByIDPathParameters,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type { ErrorType, BodyType } from '../../../generatedAPIInstance';

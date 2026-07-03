@@ -1,5 +1,5 @@
-import { ScanSearch } from '@signozhq/icons';
-import { Badge } from '@signozhq/ui/badge';
+import { ScanSearch } from 'components/ui/icons';
+import { Badge } from 'components/ui/badge';
 import { Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table/interface';
 import { ServiceAccountRow } from 'container/ServiceAccountsSettings/utils';

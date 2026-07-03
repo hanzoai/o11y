@@ -10,7 +10,7 @@ import { QueryParams } from 'constants/query';
 import ROUTES from 'constants/routes';
 import useUrlQuery from 'hooks/useUrlQuery';
 import GetMinMax from 'lib/getMinMax';
-import { Check, Info, Link2 } from '@signozhq/icons';
+import { Check, Info, Link2 } from 'components/ui/icons';
 import { AppState } from 'store/reducers';
 import { GlobalReducer } from 'types/reducer/globalTime';
 import { getAbsoluteUrl } from 'utils/basePath';

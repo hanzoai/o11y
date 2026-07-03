@@ -1,5 +1,5 @@
 import { patchRuleByID } from 'api/generated/services/rules';
-import type { RuletypesPostableRuleDTO } from 'api/generated/services/sigNoz.schemas';
+import type { RuletypesPostableRuleDTO } from 'api/generated/services/o11y.schemas';
 
 // why: patchRuleByID's generated body type is the full RuletypesPostableRuleDTO
 // because the backend OpenAPI spec currently advertises PostableRule. The

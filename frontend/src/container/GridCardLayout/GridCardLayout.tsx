@@ -31,7 +31,7 @@ import {
 	GripVertical,
 	LockKeyhole,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import {
 	selectIsDashboardLocked,

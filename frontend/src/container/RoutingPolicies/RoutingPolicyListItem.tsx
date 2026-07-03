@@ -1,7 +1,7 @@
 import { Color } from 'constants/designTokens';
 import { Button, Collapse, Flex, Tag, Typography } from 'antd';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
-import { PenLine, Trash2 } from '@signozhq/icons';
+import { PenLine, Trash2 } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { useTimezone } from 'providers/Timezone';
 import { USER_ROLES } from 'types/roles';

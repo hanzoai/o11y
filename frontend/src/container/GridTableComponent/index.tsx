@@ -1,6 +1,6 @@
 import { memo, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CircleAlert, Compass } from '@signozhq/icons';
+import { CircleAlert, Compass } from 'components/ui/icons';
 import { Space, Tooltip } from 'antd';
 import { TableColumnType as ColumnType } from 'antd';
 import { getYAxisFormattedValue } from 'components/Graph/yAxisConfig';

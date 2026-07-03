@@ -7,12 +7,12 @@ import {
 } from 'react';
 import { useQueryClient } from 'react-query';
 import cx from 'classnames';
-import { Badge } from '@signozhq/ui/badge';
-import { Button } from '@signozhq/ui/button';
-import { Input } from '@signozhq/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@signozhq/ui/popover';
-import { toast } from '@signozhq/ui/sonner';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
+import { Badge } from 'components/ui/badge';
+import { Button } from 'components/ui/button';
+import { Input } from 'components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
+import { toast } from 'components/ui/sonner';
+import { TooltipSimple } from 'components/ui/tooltip';
 import type { UploadFile } from 'antd';
 import getSessionStorage from 'api/browser/sessionstorage/get';
 import setSessionStorage from 'api/browser/sessionstorage/set';
@@ -20,7 +20,7 @@ import {
 	getListRulesQueryKey,
 	useListRules,
 } from 'api/generated/services/rules';
-import type { ListRules200 } from 'api/generated/services/sigNoz.schemas';
+import type { ListRules200 } from 'api/generated/services/o11y.schemas';
 import logEvent from 'api/common/logEvent';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import { useGetAllDashboard } from 'hooks/dashboard/useGetAllDashboard';
@@ -52,7 +52,7 @@ import {
 	Square,
 	TriangleAlert,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 import styles from './ChatInput.module.scss';
 

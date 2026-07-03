@@ -13,7 +13,7 @@ import AuthError from 'components/AuthError/AuthError';
 import AuthPageContainer from 'components/AuthPageContainer';
 import BrandMark from 'components/BrandMark';
 import { useNotifications } from 'hooks/useNotifications';
-import { ArrowRight } from '@signozhq/icons';
+import { ArrowRight } from 'components/ui/icons';
 import APIError from 'types/api/error';
 
 import tvUrl from '@/assets/svgs/tv.svg';

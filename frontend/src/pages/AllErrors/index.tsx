@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useLocation } from 'react-router-dom';
-import { Filter } from '@signozhq/icons';
+import { Filter } from 'components/ui/icons';
 import { Button, Tooltip } from 'antd';
 import getLocalStorageKey from 'api/browser/localstorage/get';
 import setLocalStorageApi from 'api/browser/localstorage/set';

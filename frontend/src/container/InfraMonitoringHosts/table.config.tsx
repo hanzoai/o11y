@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tooltip } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import { HostData } from 'api/infraMonitoring/getHostLists';
 import TanStackTable, { TableColumnDef } from 'components/TanStackTableView';
 import { getGroupByEl } from 'container/InfraMonitoringK8s/Base/utils';
@@ -16,7 +16,7 @@ import EntityGroupHeader from 'container/InfraMonitoringK8s/Base/EntityGroupHead
 import { HostnameCell } from './utils';
 
 import styles from './table.module.scss';
-import { Container, Info } from '@signozhq/icons';
+import { Container, Info } from 'components/ui/icons';
 
 function hostRowSource(host: HostData): { meta: Record<string, string> } {
 	return {

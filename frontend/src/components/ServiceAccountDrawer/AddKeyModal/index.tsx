@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
 import { useCopyToClipboard } from 'react-use';
-import { DialogWrapper } from '@signozhq/ui/dialog';
-import { toast } from '@signozhq/ui/sonner';
+import { DialogWrapper } from 'components/ui/dialog';
+import { toast } from 'components/ui/sonner';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {
 	invalidateListServiceAccountKeys,
@@ -12,7 +12,7 @@ import {
 import type {
 	RenderErrorResponseDTO,
 	ServiceaccounttypesGettableFactorAPIKeyWithKeyDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import { SA_QUERY_PARAMS } from 'container/ServiceAccountsSettings/constants';

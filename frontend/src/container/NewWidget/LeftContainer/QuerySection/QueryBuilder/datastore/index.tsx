@@ -1,5 +1,5 @@
-import { Plus } from '@signozhq/icons';
-import { Callout } from '@signozhq/ui/callout';
+import { Plus } from 'components/ui/icons';
+import { Callout } from 'components/ui/callout';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { EQueryType } from 'types/common/dashboard';
 import DOCLINKS from 'utils/docLinks';

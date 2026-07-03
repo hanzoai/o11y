@@ -1,18 +1,18 @@
 import { useCallback, useRef, useState } from 'react';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'components/ui/design-tokens';
 import {
 	ChevronDown,
 	ChevronRight,
 	LoaderCircle,
 	SquareArrowOutUpRight,
-} from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
-import { Callout } from '@signozhq/ui/callout';
-import { DrawerWrapper } from '@signozhq/ui/drawer';
-import { Tabs } from '@signozhq/ui/tabs';
+} from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { Callout } from 'components/ui/callout';
+import { DrawerWrapper } from 'components/ui/drawer';
+import { Tabs } from 'components/ui/tabs';
 import { Form, Select, Spin } from 'antd';
 import { useGetAccount } from 'api/generated/services/cloudintegration';
-import { CloudintegrationtypesAccountDTO } from 'api/generated/services/sigNoz.schemas';
+import { CloudintegrationtypesAccountDTO } from 'api/generated/services/o11y.schemas';
 import CodeBlock from 'components/CodeBlock/CodeBlock';
 import {
 	AZURE_REGIONS,

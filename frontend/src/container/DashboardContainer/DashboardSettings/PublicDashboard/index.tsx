@@ -17,7 +17,7 @@ import {
 	Info,
 	LoaderCircle,
 	Trash,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { useDashboardStore } from 'providers/Dashboard/store/useDashboardStore';
 import { PublicDashboardMetaProps } from 'types/api/dashboard/public/getMeta';

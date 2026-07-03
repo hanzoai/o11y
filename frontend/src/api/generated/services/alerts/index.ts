@@ -14,7 +14,7 @@ import type {
 	UseQueryResult,
 } from 'react-query';
 
-import type { GetAlerts200, RenderErrorResponseDTO } from '../sigNoz.schemas';
+import type { GetAlerts200, RenderErrorResponseDTO } from '../o11y.schemas';
 
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type { ErrorType } from '../../../generatedAPIInstance';

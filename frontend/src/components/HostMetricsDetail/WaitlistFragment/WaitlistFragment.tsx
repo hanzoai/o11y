@@ -4,7 +4,7 @@ import { Color } from 'constants/designTokens';
 import { Button, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { useNotifications } from 'hooks/useNotifications';
-import { CircleCheckBig, HandPlatter } from '@signozhq/icons';
+import { CircleCheckBig, HandPlatter } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 
 import './WaitListFragment.styles.scss';

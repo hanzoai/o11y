@@ -37,7 +37,7 @@ import { validationMapper } from 'hooks/queryBuilder/useIsValidTag';
 import { operatorTypeMapper } from 'hooks/queryBuilder/useOperatorType';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { isArray, isEmpty, isEqual, isObject } from 'lodash-es';
-import { ChevronDown, ChevronUp } from '@signozhq/icons';
+import { ChevronDown, ChevronUp } from 'components/ui/icons';
 import type { BaseSelectRef } from 'rc-select';
 import {
 	BaseAutocompleteData,
@@ -51,7 +51,7 @@ import { popupContainer } from 'utils/selectPopupContainer';
 import { v4 as uuid } from 'uuid';
 
 import './ClientSideQBSearch.styles.scss';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 
 export interface AttributeKey {
 	key: string;

@@ -1,6 +1,6 @@
-import { Divider } from '@signozhq/ui/divider';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
-import { Typography } from '@signozhq/ui/typography';
+import { Divider } from 'components/ui/divider';
+import { TooltipSimple } from 'components/ui/tooltip';
+import { Typography } from 'components/ui/typography';
 
 import { TagContainer, TagLabel, TagValue } from './FieldRenderer.styles';
 import { FieldRendererProps } from './LogDetailedView.types';

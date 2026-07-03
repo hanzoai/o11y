@@ -3,7 +3,7 @@ import { toast } from '@hanzo/ui';
 import { Button, Tooltip, Typography } from 'antd';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
-import { Check, Loader, Send, X } from '@signozhq/icons';
+import { Check, Loader, Send, X } from 'components/ui/icons';
 import { useErrorModal } from 'providers/ErrorModalProvider';
 import { toPostableRuleDTO } from 'types/api/alerts/convert';
 import APIError from 'types/api/error';

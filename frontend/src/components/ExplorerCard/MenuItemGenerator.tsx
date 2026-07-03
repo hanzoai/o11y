@@ -1,7 +1,7 @@
 import { MouseEvent, useCallback } from 'react';
-import { Trash2 } from '@signozhq/icons';
+import { Trash2 } from 'components/ui/icons';
 import { Col, Row, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useDeleteView } from 'hooks/saveViews/useDeleteView';
 import { useHandleExplorerTabChange } from 'hooks/useHandleExplorerTabChange';

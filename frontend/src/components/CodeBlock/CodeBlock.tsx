@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
-import { Check, Copy } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
+import { Check, Copy } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 import SyntaxHighlighter, {
 	a11yDark,
 } from 'components/MarkdownRenderer/syntaxHighlighter';

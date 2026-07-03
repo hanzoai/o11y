@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
-import { Button } from '@signozhq/ui/button';
-import { X } from '@signozhq/icons';
+import { Button } from 'components/ui/button';
+import { X } from 'components/ui/icons';
 
 import './DetailsHeader.styles.scss';
 

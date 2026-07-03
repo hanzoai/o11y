@@ -1,9 +1,9 @@
 import { Button } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { AuthtypesAuthNProviderDTO } from 'api/generated/services/sigNoz.schemas';
+import { Typography } from 'components/ui/typography';
+import { AuthtypesAuthNProviderDTO } from 'api/generated/services/o11y.schemas';
 
 import './CreateEdit.styles.scss';
-import { Key, SolidGoogle } from '@signozhq/icons';
+import { Key, SolidGoogle } from 'components/ui/icons';
 
 interface AuthNProvider {
 	key: AuthtypesAuthNProviderDTO;

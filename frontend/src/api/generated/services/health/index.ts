@@ -21,7 +21,7 @@ import type {
 	Readyz200,
 	Readyz503,
 	RenderErrorResponseDTO,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type { ErrorType } from '../../../generatedAPIInstance';

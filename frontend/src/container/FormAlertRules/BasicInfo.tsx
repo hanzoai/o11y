@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
-import { Plus } from '@signozhq/icons';
+import { Plus } from 'components/ui/icons';
 import { Button, Flex, Form, Select, Tooltip } from 'antd';
-import { Switch } from '@signozhq/ui/switch';
+import { Switch } from 'components/ui/switch';
 import getAll from 'api/channels/getAll';
 import logEvent from 'api/common/logEvent';
 import { ALERTS_DATA_SOURCE_MAP } from 'constants/alerts';

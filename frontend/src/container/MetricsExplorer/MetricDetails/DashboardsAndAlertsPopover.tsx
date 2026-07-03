@@ -8,7 +8,7 @@ import {
 } from 'api/generated/services/metrics';
 import { QueryParams } from 'constants/query';
 import ROUTES from 'constants/routes';
-import { Bell, Grid2X2 } from '@signozhq/icons';
+import { Bell, Grid2X2 } from 'components/ui/icons';
 import { openInNewTab } from 'utils/navigation';
 import { pluralize } from 'utils/pluralize';
 

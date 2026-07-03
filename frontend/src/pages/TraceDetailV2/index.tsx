@@ -3,7 +3,7 @@ import logEvent from 'api/common/logEvent';
 import HeaderRightSection from 'components/HeaderRightSection/HeaderRightSection';
 import ROUTES from 'constants/routes';
 import history from 'lib/history';
-import { Compass, Cone, TowerControl } from '@signozhq/icons';
+import { Compass, Cone, TowerControl } from 'components/ui/icons';
 
 import TraceDetailsV2 from './TraceDetailV2';
 

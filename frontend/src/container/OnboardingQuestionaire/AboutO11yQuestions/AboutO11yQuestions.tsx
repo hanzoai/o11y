@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@o11yhq/button';
-import { Checkbox } from '@o11yhq/checkbox';
-import { Input } from '@o11yhq/input';
+import { Button } from 'components/ui/button';
+import { Checkbox } from 'components/ui/checkbox';
+import { Input } from 'components/ui/input';
 import { Input as AntdInput } from 'antd';
 import logEvent from 'api/common/logEvent';
-import { ArrowRight } from '@signozhq/icons';
+import { ArrowRight } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 
 import { OnboardingQuestionHeader } from '../OnboardingQuestionHeader';

@@ -1,12 +1,12 @@
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import {
 	TooltipRoot,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '@signozhq/ui/tooltip';
+} from 'components/ui/tooltip';
 import { useCopySpanLink } from 'hooks/trace/useCopySpanLink';
-import { Link } from '@signozhq/icons';
+import { Link } from 'components/ui/icons';
 import { Span } from 'types/api/trace/getTraceV2';
 
 import styles from './SpanLineActionButtons.module.scss';

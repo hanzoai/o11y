@@ -3,12 +3,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { Color } from 'constants/designTokens';
 import type { TableColumnsType as ColumnsType } from 'antd';
 import { Card, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import classNames from 'classnames';
 import ResizeTable from 'components/ResizeTable/ResizeTable';
 import { DataType } from 'container/LogDetailedView/TableView';
-import { CircleArrowDown, CircleArrowRight, Focus } from '@signozhq/icons';
+import { CircleArrowDown, CircleArrowRight, Focus } from 'components/ui/icons';
 
 import { MetricsExplorerEventKeys, MetricsExplorerEvents } from '../events';
 import {

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
-import { Button } from '@signozhq/ui/button';
-import { Typography } from '@signozhq/ui/typography';
-import { ArrowUpRight } from '@signozhq/icons';
+import { Button } from 'components/ui/button';
+import { Typography } from 'components/ui/typography';
+import { ArrowUpRight } from 'components/ui/icons';
 import logEvent from 'api/common/logEvent';
 
 import dashboardsUrl from '@/assets/Icons/dashboards.svg';

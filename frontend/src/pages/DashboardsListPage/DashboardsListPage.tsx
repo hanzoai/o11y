@@ -1,8 +1,8 @@
 import { Space } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import HeaderRightSection from 'components/HeaderRightSection/HeaderRightSection';
 import ListOfAllDashboard from 'container/ListOfDashboard';
-import { LayoutGrid } from '@signozhq/icons';
+import { LayoutGrid } from 'components/ui/icons';
 
 import './DashboardsListPage.styles.scss';
 

@@ -1,4 +1,4 @@
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
 
 import './O11yRadioGroup.styles.scss';
 

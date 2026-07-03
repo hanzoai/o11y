@@ -25,7 +25,7 @@ import type {
 	ListLLMPricingRulesParams,
 	LlmpricingruletypesUpdatableLLMPricingRulesDTO,
 	RenderErrorResponseDTO,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type { ErrorType, BodyType } from '../../../generatedAPIInstance';

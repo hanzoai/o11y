@@ -15,11 +15,11 @@ import {
 	PenLine,
 	Plus,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { Button, Card, Modal, Popover, Tooltip } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
-import { Typography } from '@signozhq/ui/typography';
-import { Input } from '@signozhq/ui/input';
+import { Badge } from 'components/ui/badge';
+import { Typography } from 'components/ui/typography';
+import { Input } from 'components/ui/input';
 import logEvent from 'api/common/logEvent';
 import ConfigureIcon from 'assets/Integrations/ConfigureIcon';
 import { PANEL_GROUP_TYPES, PANEL_TYPES } from 'constants/queryBuilder';

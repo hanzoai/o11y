@@ -1,4 +1,4 @@
-import { CircleX } from '@signozhq/icons';
+import { CircleX } from 'components/ui/icons';
 import { Row } from 'antd';
 import styled from 'styled-components';
 

@@ -1,6 +1,6 @@
-import { Button } from '@signozhq/ui/button';
-import { Typography } from '@signozhq/ui/typography';
-import { ArrowUpRight, RotateCw } from '@signozhq/icons';
+import { Button } from 'components/ui/button';
+import { Typography } from 'components/ui/typography';
+import { ArrowUpRight, RotateCw } from 'components/ui/icons';
 import { handleContactSupport } from 'container/Integrations/utils';
 
 import awwSnapUrl from '@/assets/Icons/awwSnap.svg';

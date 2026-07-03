@@ -4,15 +4,15 @@ import { UseQueryResult } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { generatePath } from 'react-router-dom';
-import { Check, X } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
+import { Check, X } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 import {
 	ResizableHandle,
 	ResizablePanel,
 	ResizablePanelGroup,
-} from '@signozhq/ui/resizable';
+} from 'components/ui/resizable';
 import { Flex } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import { PrecisionOption, PrecisionOptionsEnum } from 'components/Graph/types';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';

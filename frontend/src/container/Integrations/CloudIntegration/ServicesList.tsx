@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { Skeleton } from 'antd';
 import { useListServicesMetadata } from 'api/generated/services/cloudintegration';
-import type { CloudintegrationtypesServiceMetadataDTO } from 'api/generated/services/sigNoz.schemas';
+import type { CloudintegrationtypesServiceMetadataDTO } from 'api/generated/services/o11y.schemas';
 import cx from 'classnames';
 import { IntegrationType } from 'container/Integrations/types';
 import useUrlQuery from 'hooks/useUrlQuery';

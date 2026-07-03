@@ -1,4 +1,4 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import Slack from 'container/SideNav/Slack';
 import store from 'store';
 
@@ -20,7 +20,7 @@ import {
 	LayoutDashboard,
 	Volume2,
 	Unplug,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 export const GetStartedContent = (): TGetStartedContentSection[] => {
 	const {

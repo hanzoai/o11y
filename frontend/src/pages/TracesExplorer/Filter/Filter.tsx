@@ -10,9 +10,9 @@ import {
 	ArrowUpToLine,
 	Filter as FilterIcon,
 	RefreshCw,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { Button, Flex, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import { getMs } from 'container/Trace/Filters/Panel/PanelBody/Duration/util';
 import { useGetCompositeQueryParam } from 'hooks/queryBuilder/useGetCompositeQueryParam';

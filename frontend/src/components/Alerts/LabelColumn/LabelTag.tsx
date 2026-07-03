@@ -1,11 +1,11 @@
-import { Copy } from '@signozhq/icons';
-import { Badge } from '@signozhq/ui/badge';
-import { toast } from '@signozhq/ui/sonner';
+import { Copy } from 'components/ui/icons';
+import { Badge } from 'components/ui/badge';
+import { toast } from 'components/ui/sonner';
 import {
 	TooltipContent,
 	TooltipRoot,
 	TooltipTrigger,
-} from '@signozhq/ui/tooltip';
+} from 'components/ui/tooltip';
 import { useCopyToClipboard } from 'react-use';
 
 import styles from './LabelTag.module.scss';

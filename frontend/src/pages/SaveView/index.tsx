@@ -40,7 +40,7 @@ import {
 	Search,
 	Trash2,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { useTimezone } from 'providers/Timezone';
 import { ICompositeMetricQuery } from 'types/api/alerts/compositeQuery';

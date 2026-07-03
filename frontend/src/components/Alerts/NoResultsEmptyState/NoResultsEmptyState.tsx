@@ -1,5 +1,5 @@
-import { RefreshCw, Search } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
+import { RefreshCw, Search } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 
 import styles from './NoResultsEmptyState.module.scss';
 

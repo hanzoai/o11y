@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus } from '@signozhq/icons';
+import { Plus } from 'components/ui/icons';
 import { Select, Spin } from 'antd';
 import useComponentPermission from 'hooks/useComponentPermission';
 import { useNotifications } from 'hooks/useNotifications';

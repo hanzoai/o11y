@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Color } from 'constants/designTokens';
 import { Divider, Dropdown, MenuProps, Switch, Tooltip } from 'antd';
 import { useIsDarkMode } from 'hooks/useDarkMode';
-import { Copy, Ellipsis, PenLine, Trash2 } from '@signozhq/icons';
+import { Copy, Ellipsis, PenLine, Trash2 } from 'components/ui/icons';
 import {
 	useAlertRuleDelete,
 	useAlertRuleDuplicate,

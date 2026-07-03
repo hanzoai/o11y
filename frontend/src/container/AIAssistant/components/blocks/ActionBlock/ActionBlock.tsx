@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import cx from 'classnames';
-import { Button } from '@signozhq/ui/button';
-import { Check, LoaderCircle, TriangleAlert, X, Zap } from '@signozhq/icons';
+import { Button } from 'components/ui/button';
+import { Check, LoaderCircle, TriangleAlert, X, Zap } from 'components/ui/icons';
 
 import { PageActionRegistry } from '../../../pageActions/PageActionRegistry';
 import { AIActionBlock } from '../../../pageActions/types';

@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { UseQueryResult } from 'react-query';
 import { Button, Collapse, ColorPicker, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { themeColors } from 'constants/theme';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useIsDarkMode } from 'hooks/useDarkMode';
@@ -16,7 +16,7 @@ import { getLegend } from 'lib/dashboard/getQueryResults';
 import getLabelName from 'lib/getLabelName';
 import { generateColor } from 'lib/uPlotLib/utils/generateColor';
 import throttle from 'lodash-es/throttle';
-import { Palette } from '@signozhq/icons';
+import { Palette } from 'components/ui/icons';
 import { SuccessResponse } from 'types/api';
 import { MetricRangePayloadProps } from 'types/api/metrics/getQueryRange';
 

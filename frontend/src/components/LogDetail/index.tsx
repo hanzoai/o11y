@@ -44,7 +44,7 @@ import {
 	Table,
 	TextSelect,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { JsonView } from 'periscope/components/JsonView';
 import { useAppContext } from 'providers/App/App';
 import { AppState } from 'store/reducers';

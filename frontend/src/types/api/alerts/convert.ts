@@ -3,13 +3,13 @@ import type {
 	RuletypesPostableRuleDTO,
 	RuletypesPostableRuleDTOLabels,
 	RuletypesRuleDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import {
 	RuletypesAlertTypeDTO,
 	RuletypesPanelTypeDTO,
 	RuletypesQueryTypeDTO,
 	RuletypesRuleTypeDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { EQueryType } from 'types/common/dashboard';
 

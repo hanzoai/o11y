@@ -15,8 +15,8 @@ import {
 	TableColumnType,
 	Tooltip,
 } from 'antd';
-import { Progress } from '@signozhq/ui/progress';
-import { Typography } from '@signozhq/ui/typography';
+import { Progress } from 'components/ui/progress';
+import { Typography } from 'components/ui/typography';
 import type { FilterDropdownProps } from 'antd/lib/table/interface';
 import logEvent from 'api/common/logEvent';
 import {

@@ -1,4 +1,4 @@
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'components/ui/design-tokens';
 import { FontSize } from 'container/OptionsMenu/types';
 import styled from 'styled-components';
 

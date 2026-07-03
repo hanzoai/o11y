@@ -1,10 +1,10 @@
 import { MouseEventHandler, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
-import { ChevronDown, ChevronRight } from '@signozhq/icons';
+import { ChevronDown, ChevronRight } from 'components/ui/icons';
 import { Card } from 'antd';
-import { Divider } from '@signozhq/ui/divider';
-import { Typography } from '@signozhq/ui/typography';
+import { Divider } from 'components/ui/divider';
+import { Typography } from 'components/ui/typography';
 import getFilters from 'api/trace/getFilters';
 import { AxiosError } from 'axios';
 import { useNotifications } from 'hooks/useNotifications';

@@ -14,7 +14,7 @@ import { AddToQueryHOCProps } from 'components/Logs/AddToQueryHOC';
 import { ChangeViewFunctionType } from 'container/ExplorerOptions/types';
 import { OptionsQuery } from 'container/OptionsMenu/types';
 import { useIsDarkMode } from 'hooks/useDarkMode';
-import { ChevronDown, ChevronRight, Search } from '@signozhq/icons';
+import { ChevronDown, ChevronRight, Search } from 'components/ui/icons';
 import { IField } from 'types/api/logs/fields';
 import { ILog } from 'types/api/logs/log';
 

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@o11yhq/button';
+import { Button } from 'components/ui/button';
 import { Slider, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
-import { ArrowRight, LoaderCircle, Minus } from '@signozhq/icons';
+import { ArrowRight, LoaderCircle, Minus } from 'components/ui/icons';
 
 import { OnboardingQuestionHeader } from '../OnboardingQuestionHeader';
 

@@ -9,14 +9,14 @@ import {
 	useRef,
 	useState,
 } from 'react';
-import { Badge } from '@signozhq/ui/badge';
-import { Button } from '@signozhq/ui/button';
+import { Badge } from 'components/ui/badge';
+import { Button } from 'components/ui/button';
 import {
 	TooltipRoot,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '@signozhq/ui/tooltip';
+} from 'components/ui/tooltip';
 import {
 	createColumnHelper,
 	flexRender,
@@ -40,7 +40,7 @@ import {
 	CircleAlert,
 	Link,
 	ListPlus,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useTraceStore } from 'pages/TraceDetailsV3/stores/traceStore';
 import { resolveSpanColor } from 'pages/TraceDetailsV3/utils';
 import { useBoundaryPagination } from 'pages/TraceDetailsV3/TraceWaterfall/hooks/useBoundaryPagination';

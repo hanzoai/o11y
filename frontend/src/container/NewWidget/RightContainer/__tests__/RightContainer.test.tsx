@@ -113,7 +113,7 @@ jest.mock('hooks/queryBuilder/useCreateAlerts', () => ({
 	default: jest.fn(() => jest.fn()),
 }));
 
-jest.mock('@signozhq/icons', () => {
+jest.mock('components/ui/icons', () => {
 	const { createIconsMock } = jest.requireActual<
 		typeof import('test-mocks/createIconsMock')
 	>('test-mocks/createIconsMock');

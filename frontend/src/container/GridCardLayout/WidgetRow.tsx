@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Layout } from 'react-grid-layout';
 import { Button, Popover } from 'antd';
 import useComponentPermission from 'hooks/useComponentPermission';
-import { Ellipsis, PenLine, Plus, X } from '@signozhq/icons';
+import { Ellipsis, PenLine, Plus, X } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { usePanelTypeSelectionModalStore } from 'providers/Dashboard/helpers/panelTypeSelectionModalHelper';
 import { setSelectedRowWidgetId } from 'providers/Dashboard/helpers/selectedRowWidgetIdHelper';

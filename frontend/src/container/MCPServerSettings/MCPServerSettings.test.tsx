@@ -34,8 +34,8 @@ jest.mock('react-use', () => ({
 	useCopyToClipboard: (): [unknown, jest.Mock] => [null, mockCopyToClipboard],
 }));
 
-jest.mock('@signozhq/ui/sonner', () => ({
-	...jest.requireActual('@signozhq/ui/sonner'),
+jest.mock('components/ui/sonner', () => ({
+	...jest.requireActual('components/ui/sonner'),
 	toast: {
 		success: (...args: unknown[]): unknown => mockToastSuccess(...args),
 		warning: (...args: unknown[]): unknown => mockToastWarning(...args),

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Button } from '@signozhq/ui/button';
-import { DrawerWrapper } from '@signozhq/ui/drawer';
+import { Button } from 'components/ui/button';
+import { DrawerWrapper } from 'components/ui/drawer';
 import {
 	hideColumn,
 	showColumn,

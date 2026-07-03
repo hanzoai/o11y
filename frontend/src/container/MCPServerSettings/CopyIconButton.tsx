@@ -1,6 +1,6 @@
-import { Button } from '@signozhq/ui/button';
-import { TooltipSimple, TooltipProvider } from '@signozhq/ui/tooltip';
-import { Copy } from '@signozhq/icons';
+import { Button } from 'components/ui/button';
+import { TooltipSimple, TooltipProvider } from 'components/ui/tooltip';
+import { Copy } from 'components/ui/icons';
 import './CopyIconButton.styles.scss';
 
 interface CopyIconButtonProps {

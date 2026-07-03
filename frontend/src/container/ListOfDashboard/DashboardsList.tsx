@@ -73,7 +73,7 @@ import {
 	RotateCw,
 	Search,
 	SquareArrowOutUpRight,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { useErrorModal } from 'providers/ErrorModalProvider';
 import { useTimezone } from 'providers/Timezone';

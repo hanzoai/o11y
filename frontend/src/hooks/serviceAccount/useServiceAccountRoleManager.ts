@@ -6,7 +6,7 @@ import {
 	useDeleteServiceAccountRole,
 	useGetServiceAccountRoles,
 } from 'api/generated/services/serviceaccount';
-import type { AuthtypesRoleDTO } from 'api/generated/services/sigNoz.schemas';
+import type { AuthtypesRoleDTO } from 'api/generated/services/o11y.schemas';
 import { retryOn429 } from 'utils/errorUtils';
 
 const enum PromiseStatus {

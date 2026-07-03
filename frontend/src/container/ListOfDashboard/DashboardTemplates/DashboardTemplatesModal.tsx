@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { ChangeEvent, useState } from 'react';
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import { Button, Modal } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import ApacheIcon from 'assets/CustomIcons/ApacheIcon';
 import DockerIcon from 'assets/CustomIcons/DockerIcon';
 import ElasticSearchIcon from 'assets/CustomIcons/ElasticSearchIcon';
@@ -20,7 +20,7 @@ import {
 	Drill,
 	Plus,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { DashboardTemplate } from 'types/api/dashboard/getAll';
 
 import blankDashboardTemplatePreviewUrl from '@/assets/Images/blankDashboardTemplatePreview.svg';

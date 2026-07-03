@@ -2,7 +2,7 @@ import './FormatField.styles.scss';
 
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import { LogViewMode } from 'container/LogsTable';
 
 import { FieldTitle } from '../styles';

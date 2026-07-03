@@ -1,4 +1,4 @@
-import { Callout } from '@signozhq/ui/callout';
+import { Callout } from 'components/ui/callout';
 import ClickHouseQueryBuilder from 'container/NewWidget/LeftContainer/QuerySection/QueryBuilder/ClickHouse/query';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { AlertTypes } from 'types/api/alerts/alertTypes';
