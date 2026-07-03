@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1
+#
+# o11y-site — the o11y browser SPA served by hanzoai/static (house-native static
+# plugin, scratch + Go binary), NOT nginx. The main server image (Dockerfile) is
+# HEADLESS (O11Y_WEB_ENABLED=false, serves only /api/*); this image serves the
+# dashboard SPA at the edge, and the ingress routes o11y.hanzo.ai / here while
+# /api/* goes to the backend (universe infra/k8s/o11y/ingress.yaml).
+#
+# CONTENT: re-serves the PROVEN, in-production built SPA from the last bundled
+# server image (0.1.0 / ad3566b), byte-identical — the same commerce-site did
+# when its from-source SPA build was broken. The from-source frontend/ build is
+# mid-migration (rolldown-vite/oxlint) with source damaged by a debrand
+# find/replace; once `frontend/ && pnpm build` is green, replace the `content`
+# stage with a `node:22` build stage (COPY frontend/ ; pnpm install
+# --frozen-lockfile ; pnpm build) and COPY --from=build /src/frontend/build /srv.
+# The served bytes stay identical to today's live dashboard.
+
+# 1) The proven, in-production built SPA (o11y 0.1.0 bundled it at /etc/o11y/web).
+FROM ghcr.io/hanzoai/o11y:0.1.0 AS content
+
+# 2) Serve it with hanzoai/static. --spa rewrites unknown routes to index.html
+#    (SigNoz client-side routing); :3000 is the static default, and the o11y-site
+#    Service maps servicePort 80 -> targetPort 3000. index.html is placeholder-free
+#    (no [[.BaseHref]]/[[.Settings]] Go templating), assets are relative (base
+#    './'), and the SPA calls same-origin /api/* — so a static --spa serve is faithful.
+FROM ghcr.io/hanzoai/static:0.4.1
+COPY --from=content /etc/o11y/web /srv
+EXPOSE 3000
+ENTRYPOINT ["/static", "--root=/srv", "--spa", "--port=3000"]
