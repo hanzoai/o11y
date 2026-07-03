@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { Button, Select, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import classNames from 'classnames';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import getRandomColor from 'lib/getRandomColor';
-import { Plus } from '@signozhq/icons';
+import { Plus } from 'components/ui/icons';
 import { v4 } from 'uuid';
 
 import { useCreateAlertState } from '../context';

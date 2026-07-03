@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import { Collapse, Modal } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { getYAxisFormattedValue } from 'components/Graph/yAxisConfig';
-import { Diamond } from '@signozhq/icons';
+import { Diamond } from 'components/ui/icons';
 import { Span } from 'types/api/trace/getTraceV2';
 
 import NoData from '../NoData/NoData';

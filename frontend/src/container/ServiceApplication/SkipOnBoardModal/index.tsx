@@ -1,5 +1,5 @@
 import { Button } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import Modal from 'components/Modal';
 
 function SkipOnBoardingModal({ onContinueClick }: Props): JSX.Element {

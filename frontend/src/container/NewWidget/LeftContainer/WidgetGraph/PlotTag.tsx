@@ -1,5 +1,5 @@
 import { PANEL_TYPES } from 'constants/queryBuilder';
-import { Spline } from '@signozhq/icons';
+import { Spline } from 'components/ui/icons';
 import { EQueryType } from 'types/common/dashboard';
 
 import QueryTypeTag from '../QueryTypeTag';

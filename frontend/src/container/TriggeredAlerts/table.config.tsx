@@ -1,5 +1,5 @@
-import { BellDot } from '@signozhq/icons';
-import { Badge } from '@signozhq/ui/badge';
+import { BellDot } from 'components/ui/icons';
+import { Badge } from 'components/ui/badge';
 import { SEVERITY_BADGE_COLORS } from 'components/Alerts/constants';
 import type { TableColumnDef } from 'components/TanStackTableView';
 import TanStackTable from 'components/TanStackTableView';

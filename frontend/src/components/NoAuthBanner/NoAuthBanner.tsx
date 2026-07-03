@@ -1,4 +1,4 @@
-import { PersistedAnnouncementBanner } from '@signozhq/ui/announcement-banner';
+import { PersistedAnnouncementBanner } from 'components/ui/announcement-banner';
 
 import styles from './NoAuthBanner.module.scss';
 

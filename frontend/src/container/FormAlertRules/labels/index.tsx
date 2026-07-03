@@ -1,13 +1,13 @@
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CircleAlert, CircleX } from '@signozhq/icons';
+import { CircleAlert, CircleX } from 'components/ui/icons';
 import { Button, Input, message, Modal } from 'antd';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { map } from 'lodash-es';
 import { Labels } from 'types/api/alerts/def';
 import { v4 as uuid } from 'uuid';
 
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import { QueryChipContainer, QueryChipItem, SearchContainer } from './styles';
 import { ILabelRecord } from './types';
 import { createQuery, flattenLabels, prepareLabels } from './utils';

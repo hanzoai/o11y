@@ -1,10 +1,10 @@
 import { useCallback, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
-import { Button } from '@signozhq/ui/button';
-import { toast } from '@signozhq/ui/sonner';
-import { Switch } from '@signozhq/ui/switch';
-import { Tabs } from '@signozhq/ui/tabs';
+import { Button } from 'components/ui/button';
+import { toast } from 'components/ui/sonner';
+import { Switch } from 'components/ui/switch';
+import { Tabs } from 'components/ui/tabs';
 import { Skeleton } from 'antd';
 import logEvent from 'api/common/logEvent';
 import {
@@ -18,13 +18,13 @@ import {
 	CloudintegrationtypesServiceConfigDTO,
 	CloudintegrationtypesServiceDTO,
 	ListServicesMetadata200,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import CloudServiceDataCollected from 'components/CloudIntegrations/CloudServiceDataCollected/CloudServiceDataCollected';
 import { MarkdownRenderer } from 'components/MarkdownRenderer/MarkdownRenderer';
 import ServiceDashboards from 'container/Integrations/CloudIntegration/ServiceDashboards/ServiceDashboards';
 import { IntegrationType, IServiceStatus } from 'container/Integrations/types';
 import useUrlQuery from 'hooks/useUrlQuery';
-import { Save, X } from '@signozhq/icons';
+import { Save, X } from 'components/ui/icons';
 
 import S3BucketsSelector from '../S3BucketsSelector/S3BucketsSelector';
 

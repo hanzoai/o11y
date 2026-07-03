@@ -6,7 +6,6 @@ import {
 	MetricsexplorertypesTreemapEntryDTO,
 	MetricsexplorertypesTreemapModeDTO,
 } from 'api/generated/services/o11y.schemas';
-import { MetricsListPayload } from 'api/metricsExplorer/getMetricsList';
 import { Filter } from 'api/v5/v5';
 import { getUniversalNameFromMetricUnit } from 'components/YAxisUnitSelector/utils';
 

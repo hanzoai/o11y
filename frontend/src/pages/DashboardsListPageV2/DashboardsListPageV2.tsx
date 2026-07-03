@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { AnnouncementBanner } from '@signozhq/ui/announcement-banner';
-import { Typography } from '@signozhq/ui/typography';
-import { LayoutGrid } from '@signozhq/icons';
+import { AnnouncementBanner } from 'components/ui/announcement-banner';
+import { Typography } from 'components/ui/typography';
+import { LayoutGrid } from 'components/ui/icons';
 
 import HeaderRightSection from 'components/HeaderRightSection/HeaderRightSection';
 import DashboardsList from './components/DashboardsList';

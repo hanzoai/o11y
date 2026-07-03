@@ -9,7 +9,7 @@ import { QueryParams } from 'constants/query';
 import { History, Location } from 'history';
 import useDebouncedFn from 'hooks/useDebouncedFunction';
 import useUrlQuery from 'hooks/useUrlQuery';
-import { Check, Share2 } from '@signozhq/icons';
+import { Check, Share2 } from 'components/ui/icons';
 
 import { FeatureKeys } from '../../../constants/features';
 import { useAppContext } from '../../../providers/App/App';

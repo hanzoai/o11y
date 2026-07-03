@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { Ellipsis, Search } from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
 import { Button, TableColumnsType as ColumnsType } from 'antd';
 import ClientSideQBSearch, {

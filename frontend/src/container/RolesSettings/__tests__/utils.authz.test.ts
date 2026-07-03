@@ -1,7 +1,7 @@
 import type {
 	CoretypesObjectGroupDTO,
 	CoretypesTypeDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 
 import type {
 	PermissionConfig,

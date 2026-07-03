@@ -4,10 +4,10 @@ import { useQueryClient } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { BellDot, CircleAlert, ExternalLink, Save } from '@signozhq/icons';
+import { BellDot, CircleAlert, ExternalLink, Save } from 'components/ui/icons';
 import { Button, FormInstance, SelectProps } from 'antd';
-import { ConfirmDialog } from '@signozhq/ui/dialog';
-import { Typography } from '@signozhq/ui/typography';
+import { ConfirmDialog } from 'components/ui/dialog';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {
@@ -15,7 +15,7 @@ import {
 	testRule,
 	updateRuleByID,
 } from 'api/generated/services/rules';
-import type { RenderErrorResponseDTO } from 'api/generated/services/sigNoz.schemas';
+import type { RenderErrorResponseDTO } from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import { getInvolvedQueriesInTraceOperator } from 'components/QueryBuilderV2/QueryV2/TraceOperator/utils/utils';
 import YAxisUnitSelector from 'components/YAxisUnitSelector';

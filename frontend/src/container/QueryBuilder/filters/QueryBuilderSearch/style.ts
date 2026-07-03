@@ -1,12 +1,13 @@
-import { Check } from '@signozhq/icons';
-import { Badge } from '@signozhq/ui/badge';
+import { HTMLAttributes } from 'react';
+import { Check } from 'components/ui/icons';
+import { Badge } from 'components/ui/badge';
 import styled from 'styled-components';
 
 export const TypographyText = styled.span<{
 	$isInNin: boolean;
 	$isEnabled: boolean;
 	$disabled?: boolean;
-}>`
+} & HTMLAttributes<HTMLSpanElement>>`
 	width: ${({ $isInNin }): string => ($isInNin ? '10rem' : 'auto')};
 	cursor: ${({ $isEnabled }): string =>
 		$isEnabled ? 'not-allowed' : 'pointer'};

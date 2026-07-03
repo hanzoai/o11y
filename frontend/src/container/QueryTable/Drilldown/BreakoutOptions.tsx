@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import { Skeleton } from 'antd';
 import { getKeySuggestions } from 'api/querySuggestions/getKeySuggestions';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';

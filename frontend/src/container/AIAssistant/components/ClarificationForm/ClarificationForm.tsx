@@ -1,21 +1,21 @@
 import { useState } from 'react';
 import cx from 'classnames';
-import { Button } from '@signozhq/ui/button';
-import { Checkbox } from '@signozhq/ui/checkbox';
-import { Input } from '@signozhq/ui/input';
+import { Button } from 'components/ui/button';
+import { Checkbox } from 'components/ui/checkbox';
+import { Input } from 'components/ui/input';
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
-} from '@signozhq/ui/select';
+} from 'components/ui/select';
 import logEvent from 'api/common/logEvent';
 import { ClarificationFieldTypeDTO } from 'api/ai-assistant/sigNozAIAssistantAPI.schemas';
 import type {
 	ClarificationEventDTO,
 	ClarificationFieldEventDTO,
 } from 'api/ai-assistant/sigNozAIAssistantAPI.schemas';
-import { CircleHelp, Send, X } from '@signozhq/icons';
+import { CircleHelp, Send, X } from 'components/ui/icons';
 
 import { AIAssistantEvents } from '../../events';
 import { useAIAssistantAnalyticsContext } from '../../hooks/useAIAssistantAnalyticsContext';

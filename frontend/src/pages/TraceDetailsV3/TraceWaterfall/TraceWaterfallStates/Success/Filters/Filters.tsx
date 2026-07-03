@@ -1,18 +1,18 @@
 import { useCallback, useRef, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useCopyToClipboard } from 'react-use';
-import { ChevronsRight, Copy, Search, X } from '@signozhq/icons';
-import { Switch } from '@signozhq/ui/switch';
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
-import { toast } from '@signozhq/ui/sonner';
-import { Button } from '@signozhq/ui/button';
+import { ChevronsRight, Copy, Search, X } from 'components/ui/icons';
+import { Switch } from 'components/ui/switch';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
+import { toast } from 'components/ui/sonner';
+import { Button } from 'components/ui/button';
 import {
 	TooltipRoot,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '@signozhq/ui/tooltip';
-import { Typography } from '@signozhq/ui/typography';
+} from 'components/ui/tooltip';
+import { Typography } from 'components/ui/typography';
 import cx from 'classnames';
 import QuerySearch from 'components/QueryBuilderV2/QueryV2/QuerySearch/QuerySearch';
 import { convertExpressionToFilters } from 'components/QueryBuilderV2/utils';

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Link, Loader } from '@signozhq/icons';
+import { Link, Loader } from 'components/ui/icons';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import useUpdatedQuery from 'container/GridCardLayout/useResolveQuery';

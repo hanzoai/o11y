@@ -41,7 +41,6 @@ import type {
 	ServiceaccounttypesUpdatableFactorAPIKeyDTO,
 	UpdateServiceAccountKeyPathParameters,
 	UpdateServiceAccountPathParameters,
-	UpdateServiceAccountStatusPathParameters,
 } from '../o11y.schemas';
 
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';

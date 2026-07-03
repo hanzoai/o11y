@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Button, Popover, Tooltip } from 'antd';
-import { RadioGroup, RadioGroupItem } from '@signozhq/ui/radio-group';
-import { Typography } from '@signozhq/ui/typography';
+import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
+import { Typography } from 'components/ui/typography';
 import { TelemetryFieldKey } from 'api/v5/v5';
 import { useExportRawData } from 'hooks/useDownloadOptionsMenu/useDownloadOptionsMenu';
-import { Download, LoaderCircle } from '@signozhq/icons';
+import { Download, LoaderCircle } from 'components/ui/icons';
 import { DataSource } from 'types/common/queryBuilder';
 
 import {

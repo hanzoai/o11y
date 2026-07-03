@@ -172,6 +172,8 @@ interface DialogWrapperProps {
 	disableOutsideClick?: boolean;
 	width?: 'narrow' | 'base' | 'wide' | 'extra-wide';
 	titleIcon?: React.ReactNode;
+	footer?: React.ReactNode;
+	style?: React.CSSProperties;
 }
 
 function DialogWrapper({
@@ -185,12 +187,15 @@ function DialogWrapper({
 	disableOutsideClick = false,
 	width = 'base',
 	titleIcon,
+	footer,
+	style,
 }: DialogWrapperProps) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			{trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 			<DialogContent
 				className={className}
+				style={style}
 				showCloseButton={showCloseButton}
 				onPointerDownOutside={disableOutsideClick ? (e) => e.preventDefault() : undefined}
 				width={width}
@@ -201,6 +206,7 @@ function DialogWrapper({
 					</DialogHeader>
 				)}
 				{children && <DialogDescription>{children}</DialogDescription>}
+				{footer && <DialogFooter className="px-4 pb-4">{footer}</DialogFooter>}
 			</DialogContent>
 		</Dialog>
 	);

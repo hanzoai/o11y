@@ -1,11 +1,11 @@
 import React from 'react';
 import { Button } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import ROUTES from 'constants/routes';
 import { handleContactSupport } from 'container/Integrations/utils';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
-import { LifeBuoy, List } from '@signozhq/icons';
+import { LifeBuoy, List } from 'components/ui/icons';
 import { isModifierKeyPressed } from 'utils/app';
 
 import broomUrl from '@/assets/Icons/broom.svg';

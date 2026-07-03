@@ -17,7 +17,7 @@ import {
 	Settings,
 	TowerControl,
 	Workflow,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import Noz from 'components/Noz/Noz';
 import { ROLES } from 'types/roles';
 

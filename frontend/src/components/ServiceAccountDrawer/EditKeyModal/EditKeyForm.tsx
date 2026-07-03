@@ -1,12 +1,12 @@
 import type { Control, UseFormRegister } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
-import { LockKeyhole, Trash2, X } from '@signozhq/icons';
-import { Badge } from '@signozhq/ui/badge';
-import { Button } from '@signozhq/ui/button';
-import { Input } from '@signozhq/ui/input';
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
+import { LockKeyhole, Trash2, X } from 'components/ui/icons';
+import { Badge } from 'components/ui/badge';
+import { Button } from 'components/ui/button';
+import { Input } from 'components/ui/input';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import { DatePicker } from 'antd';
-import type { ServiceaccounttypesGettableFactorAPIKeyDTO } from 'api/generated/services/sigNoz.schemas';
+import type { ServiceaccounttypesGettableFactorAPIKeyDTO } from 'api/generated/services/o11y.schemas';
 import AuthZTooltip from 'components/AuthZTooltip/AuthZTooltip';
 import {
 	buildAPIKeyDeletePermission,

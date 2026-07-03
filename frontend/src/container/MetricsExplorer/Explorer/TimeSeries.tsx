@@ -22,7 +22,7 @@ import TimeSeriesView from 'container/TimeSeriesView/TimeSeriesView';
 import { convertDataValueToMs } from 'container/TimeSeriesView/utils';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { GetMetricQueryRange } from 'lib/dashboard/getQueryResults';
-import { TriangleAlert } from '@signozhq/icons';
+import { TriangleAlert } from 'components/ui/icons';
 import { AppState } from 'store/reducers';
 import { SuccessResponse } from 'types/api';
 import APIError from 'types/api/error';

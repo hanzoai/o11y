@@ -1,7 +1,7 @@
 import { ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
-import { Input } from '@signozhq/ui/input';
-import { Color } from '@signozhq/design-tokens';
-import { CornerDownLeft, Search } from '@signozhq/icons';
+import { Input } from 'components/ui/input';
+import { Color } from 'components/ui/design-tokens';
+import { CornerDownLeft, Search } from 'components/ui/icons';
 
 import styles from './SearchBar.module.scss';
 

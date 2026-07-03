@@ -1,11 +1,11 @@
 import { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import cx from 'classnames';
 import { CardContainer } from 'container/GridCardLayout/styles';
 import { useIsDarkMode } from 'hooks/useDarkMode';
-import { ChevronDown, ChevronUp } from '@signozhq/icons';
+import { ChevronDown, ChevronUp } from 'components/ui/icons';
 import { Widgets } from 'types/api/dashboard/getAll';
 
 import { FeatureKeys } from '../../../../constants/features';

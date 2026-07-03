@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import Spinner from 'components/Spinner';
-import { Wrench } from '@signozhq/icons';
+import { Wrench } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 
 import ApplyLicenseForm from './ApplyLicenseForm';

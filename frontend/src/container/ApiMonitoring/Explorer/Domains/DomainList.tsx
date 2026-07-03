@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
-import { Loader, MoveUpRight } from '@signozhq/icons';
+import { Loader, MoveUpRight } from 'components/ui/icons';
 import { Spin, Table } from 'antd';
 import logEvent from 'api/common/logEvent';
 import emptyStateUrl from 'assets/Icons/emptyState.svg';

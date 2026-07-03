@@ -14,12 +14,12 @@ import {
 	verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import cx from 'classnames';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
-import { GripVertical } from '@signozhq/icons';
+import { GripVertical } from 'components/ui/icons';
 import { TelemetryFieldKey } from 'types/api/v5/queryRange';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 
 import styles from './FieldsSelector.module.scss';
 

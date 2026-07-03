@@ -1,16 +1,14 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { PlusOutlined } from '@ant-design/icons';
 import { Color } from 'constants/designTokens';
 import { Button, Flex, Form, Input, Tooltip, Typography } from 'antd';
-import getAll from 'api/alerts/getAll';
-import { useDeleteDowntimeSchedule } from 'api/plannedDowntime/deleteDowntimeSchedule';
+import { Plus, Search } from 'components/ui/icons';
 import {
 	useDeleteDowntimeScheduleByID,
 	useListDowntimeSchedules,
 } from 'api/generated/services/downtimeschedules';
 import { useListRules } from 'api/generated/services/rules';
-import type { AlertmanagertypesPlannedMaintenanceDTO } from 'api/generated/services/sigNoz.schemas';
+import type { AlertmanagertypesPlannedMaintenanceDTO } from 'api/generated/services/o11y.schemas';
 import dayjs from 'dayjs';
 import useDebouncedFn from 'hooks/useDebouncedFunction';
 import { useNotifications } from 'hooks/useNotifications';

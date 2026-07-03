@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Settings } from '@signozhq/icons';
+import { Settings } from 'components/ui/icons';
 import { Flex, Popover } from 'antd';
 import { OptionFormatTypes } from 'constants/optionsFormatTypes';
 

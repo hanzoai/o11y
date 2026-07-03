@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
-import { Button } from '@signozhq/ui/button';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
-import { Check, Copy } from '@signozhq/icons';
+import { Button } from 'components/ui/button';
+import { TooltipSimple } from 'components/ui/tooltip';
+import { Check, Copy } from 'components/ui/icons';
 import SyntaxHighlighter, {
 	a11yDark,
 	oneLight,

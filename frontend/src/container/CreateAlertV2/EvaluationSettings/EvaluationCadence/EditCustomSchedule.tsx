@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import { Button } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { useCreateAlertState } from 'container/CreateAlertV2/context';
 import { INITIAL_ADVANCED_OPTIONS_STATE } from 'container/CreateAlertV2/context/constants';
 import { IEditCustomScheduleProps } from 'container/CreateAlertV2/EvaluationSettings/types';
-import { Calendar1, Pencil, Trash } from '@signozhq/icons';
+import { Calendar1, Pencil, Trash } from 'components/ui/icons';
 
 function EditCustomSchedule({
 	setIsEvaluationCadenceDetailsVisible,

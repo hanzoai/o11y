@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { useQueryClient } from 'react-query';
-import { toast } from '@signozhq/ui/sonner';
+import { toast } from 'components/ui/sonner';
 import { getAggregateKeys } from 'api/queryBuilder/getAttributeKeys';
 import GroupByIcon from 'assets/CustomIcons/GroupByIcon';
 import { convertFiltersToExpressionWithExistingQuery } from 'components/QueryBuilderV2/utils';
@@ -10,7 +10,7 @@ import ROUTES from 'constants/routes';
 import { getOperatorValue } from 'container/QueryBuilder/filters/QueryBuilderSearch/utils';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { chooseAutocompleteFromCustomValue } from 'lib/newQueryBuilder/chooseAutocompleteFromCustomValue';
-import { ArrowDownToDot, ArrowUpFromDot } from '@signozhq/icons';
+import { ArrowDownToDot, ArrowUpFromDot } from 'components/ui/icons';
 import {
 	BaseAutocompleteData,
 	DataTypes,

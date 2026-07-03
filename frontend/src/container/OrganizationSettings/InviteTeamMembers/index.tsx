@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2 } from '@signozhq/icons';
-import { Input } from '@signozhq/ui/input';
+import { Plus, Trash2 } from 'components/ui/icons';
+import { Input } from 'components/ui/input';
 import { Button, Form, FormInstance, Select, Space } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { requireErrorMessage } from 'utils/form/requireErrorMessage';
 
 import { InviteMemberFormValues } from '../utils';

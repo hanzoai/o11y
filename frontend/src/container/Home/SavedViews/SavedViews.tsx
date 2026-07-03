@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Skeleton } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import logEvent from 'api/common/logEvent';
 import { getViewDetailsUsingViewKey } from 'components/ExplorerCard/utils';
 import ROUTES from 'constants/routes';
@@ -24,7 +24,7 @@ import {
 	Compass,
 	DraftingCompass,
 	ScrollText,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 export default function SavedViews({
 	onUpdateChecklistDoneItem,

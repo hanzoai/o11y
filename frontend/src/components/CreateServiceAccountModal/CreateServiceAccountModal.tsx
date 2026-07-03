@@ -1,18 +1,18 @@
 import { Controller, useForm } from 'react-hook-form';
 import { useQueryClient } from 'react-query';
-import { X } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
+import { X } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 import AuthZTooltip from 'components/AuthZTooltip/AuthZTooltip';
 import { SACreatePermission } from 'hooks/useAuthZ/permissions/service-account.permissions';
-import { DialogFooter, DialogWrapper } from '@signozhq/ui/dialog';
-import { Input } from '@signozhq/ui/input';
-import { toast } from '@signozhq/ui/sonner';
+import { DialogFooter, DialogWrapper } from 'components/ui/dialog';
+import { Input } from 'components/ui/input';
+import { toast } from 'components/ui/sonner';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {
 	invalidateListServiceAccounts,
 	useCreateServiceAccount,
 } from 'api/generated/services/serviceaccount';
-import type { RenderErrorResponseDTO } from 'api/generated/services/sigNoz.schemas';
+import type { RenderErrorResponseDTO } from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import { SA_QUERY_PARAMS } from 'container/ServiceAccountsSettings/constants';
 import { parseAsBoolean, useQueryState } from 'nuqs';

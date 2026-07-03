@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
-import { KeyRound, X } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
+import { KeyRound, X } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 import { Skeleton, Table, Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table/interface';
-import type { ServiceaccounttypesGettableFactorAPIKeyDTO } from 'api/generated/services/sigNoz.schemas';
+import type { ServiceaccounttypesGettableFactorAPIKeyDTO } from 'api/generated/services/o11y.schemas';
 import AuthZTooltip from 'components/AuthZTooltip/AuthZTooltip';
 import {
 	APIKeyCreatePermission,

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Button, Table, TableProps } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { RotateCw } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { RotateCw } from 'components/ui/icons';
 
 import awwSnapUrl from '@/assets/Icons/awwSnap.svg';
 import emptyStateUrl from '@/assets/Icons/emptyState.svg';

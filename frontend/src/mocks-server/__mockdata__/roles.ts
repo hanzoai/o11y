@@ -1,12 +1,12 @@
-import { RoletypesRoleDTO } from 'api/generated/services/o11y.schemas';
+import { AuthtypesRoleDTO } from 'api/generated/services/o11y.schemas';
 
 const orgId = '019ba2bb-2fa1-7b24-8159-cfca08617ef9';
 
 export const managedRoles: AuthtypesRoleDTO[] = [
 	{
 		id: '019c24aa-2248-756f-9833-984f1ab63819',
-		createdAt: new Date('2026-02-03T18:00:55.624356Z'),
-		updatedAt: new Date('2026-02-03T18:00:55.624356Z'),
+		createdAt: '2026-02-03T18:00:55.624356Z',
+		updatedAt: '2026-02-03T18:00:55.624356Z',
 		name: 'observe-admin',
 		description:
 			'Role assigned to users who have full administrative access to Hanzo resources.',
@@ -15,8 +15,8 @@ export const managedRoles: AuthtypesRoleDTO[] = [
 	},
 	{
 		id: '019c24aa-2248-757c-9faf-7b1e899751e0',
-		createdAt: new Date('2026-02-03T18:00:55.624359Z'),
-		updatedAt: new Date('2026-02-03T18:00:55.624359Z'),
+		createdAt: '2026-02-03T18:00:55.624359Z',
+		updatedAt: '2026-02-03T18:00:55.624359Z',
 		name: 'o11y-editor',
 		description:
 			'Role assigned to users who can create, edit, and manage Hanzo resources but do not have full administrative privileges.',
@@ -25,8 +25,8 @@ export const managedRoles: AuthtypesRoleDTO[] = [
 	},
 	{
 		id: '019c24aa-2248-7585-a129-4188b3473c27',
-		createdAt: new Date('2026-02-03T18:00:55.624362Z'),
-		updatedAt: new Date('2026-02-03T18:00:55.624362Z'),
+		createdAt: '2026-02-03T18:00:55.624362Z',
+		updatedAt: '2026-02-03T18:00:55.624362Z',
 		name: 'o11y-viewer',
 		description:
 			'Role assigned to users who have read-only access to Hanzo resources.',

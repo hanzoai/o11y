@@ -6,6 +6,7 @@ import {
 	BarChart,
 	BarChart2,
 	BarChartHorizontal,
+	ChartBar,
 	Diff,
 	Gauge,
 } from 'lucide-react';

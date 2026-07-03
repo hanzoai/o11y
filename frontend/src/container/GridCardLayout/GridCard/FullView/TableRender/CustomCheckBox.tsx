@@ -1,5 +1,5 @@
 import { grey } from '@ant-design/colors';
-import { Checkbox } from '@signozhq/ui/checkbox';
+import { Checkbox } from 'components/ui/checkbox';
 import { CSSProperties } from 'react';
 
 import { CheckBoxProps } from '../types';

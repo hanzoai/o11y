@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { LifeBuoy, RefreshCw, TriangleAlert } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
+import { LifeBuoy, RefreshCw, TriangleAlert } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 import { handleContactSupport } from 'container/Integrations/utils';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 

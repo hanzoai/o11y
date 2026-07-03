@@ -1,8 +1,9 @@
+import type { HTMLAttributes } from 'react';
 import { Button } from 'antd';
 import { StyledCSS } from 'container/GantChart/Trace/styles';
 import styled, { css } from 'styled-components';
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
 	disabled: boolean;
 }
 
@@ -30,7 +31,7 @@ export const IconContainer = styled.div`
 	}
 `;
 
-export const TextContainer = styled.div`
+export const TextContainer = styled.div<HTMLAttributes<HTMLDivElement>>`
 	&&& {
 		display: flex;
 		cursor: pointer;

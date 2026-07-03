@@ -1,4 +1,4 @@
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 
 function Tags({ tags }: TagsProps): JSX.Element {
 	return (

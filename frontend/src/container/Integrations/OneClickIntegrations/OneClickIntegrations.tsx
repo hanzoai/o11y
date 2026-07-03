@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import { IntegrationsProps } from 'types/api/integrations/types';
 
 import awwSnapIconUrl from '@/assets/Icons/awwSnap.svg';

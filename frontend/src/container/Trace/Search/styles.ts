@@ -1,9 +1,12 @@
+import type { HTMLAttributes, RefAttributes } from 'react';
 import { Input } from 'antd';
 import styled from 'styled-components';
 
 const { Search } = Input;
 
-export const Container = styled.div`
+export const Container = styled.div<
+	HTMLAttributes<HTMLDivElement> & RefAttributes<HTMLDivElement>
+>`
 	display: flex;
 	position: relative;
 	width: 100%;

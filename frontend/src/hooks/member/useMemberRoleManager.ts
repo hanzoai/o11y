@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { useQueryClient } from 'react-query';
-import type { AuthtypesRoleDTO } from 'api/generated/services/sigNoz.schemas';
+import type { AuthtypesRoleDTO } from 'api/generated/services/o11y.schemas';
 import {
 	getGetRolesByUserIDQueryKey,
 	useGetRolesByUserID,

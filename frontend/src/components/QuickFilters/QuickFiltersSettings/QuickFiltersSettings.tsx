@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import { Button } from 'antd';
-import { Check, TableColumnsSplit, X } from '@signozhq/icons';
+import { Check, TableColumnsSplit, X } from 'components/ui/icons';
 import { Filter as FilterType } from 'types/api/quickFilters/getCustomFilters';
 
 import { SignalType } from '../types';

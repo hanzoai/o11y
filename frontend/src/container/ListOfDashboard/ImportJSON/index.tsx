@@ -10,7 +10,7 @@ import {
 	Github,
 	MonitorDot,
 	MoveRight,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import MEditor, { Monaco } from '@monaco-editor/react';
 import { Color } from 'constants/designTokens';
 import {

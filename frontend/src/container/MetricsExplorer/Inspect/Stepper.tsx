@@ -1,7 +1,7 @@
 import { Color } from 'constants/designTokens';
 import { Button, Typography } from 'antd';
 import classNames from 'classnames';
-import { RefreshCcw, SquareArrowOutUpRight } from '@signozhq/icons';
+import { RefreshCcw, SquareArrowOutUpRight } from 'components/ui/icons';
 
 import { SPACE_AGGREGATION_LINK, TEMPORAL_AGGREGATION_LINK } from './constants';
 import { InspectionStep, StepperProps } from './types';

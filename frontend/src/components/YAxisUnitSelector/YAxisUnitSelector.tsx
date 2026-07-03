@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { SolidAlertTriangle } from '@signozhq/icons';
+import { SolidAlertTriangle } from 'components/ui/icons';
 import { Select, Tooltip } from 'antd';
 import type { DefaultOptionType } from 'antd/es/select';
 import classNames from 'classnames';

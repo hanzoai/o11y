@@ -1,7 +1,7 @@
 import { Button, Tabs, TabsProps } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import ConfigureIcon from 'assets/Integrations/ConfigureIcon';
-import { CableCar, Group } from '@signozhq/icons';
+import { CableCar, Group } from 'components/ui/icons';
 import { IntegrationDetailedProps } from 'types/api/integrations/types';
 
 import Configure from './IntegrationDetailContentTabs/Configure';

@@ -5,7 +5,6 @@ import {
 	MetrictypesTemporalityDTO,
 	MetrictypesTypeDTO,
 } from 'api/generated/services/o11y.schemas';
-import { Temporality } from 'api/metricsExplorer/getMetricDetails';
 import {
 	UniversalYAxisUnit,
 	YAxisUnitSelectorProps,

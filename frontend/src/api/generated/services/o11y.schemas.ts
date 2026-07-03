@@ -2623,62 +2623,7 @@ export interface CloudintegrationtypesCollectedMetricDTO {
 	/**
 	 * @type string
 	 */
-	unit?: string;
-};
-
-export interface Querybuildertypesv5AggregationBucketDTO {
-	/**
-	 * @type string
-	 */
-	alias?: string;
-	/**
-	 * @type array
-	 */
-	anomalyScores?: Querybuildertypesv5TimeSeriesDTO[];
-	/**
-	 * @type integer
-	 */
-	index?: number;
-	/**
-	 * @type array
-	 */
-	lowerBoundSeries?: Querybuildertypesv5TimeSeriesDTO[];
-	/**
-	 * @type object
-	 */
-	meta?: Querybuildertypesv5AggregationBucketDTOMeta;
-	/**
-	 * @type array
-	 */
-	predictedSeries?: Querybuildertypesv5TimeSeriesDTO[];
-	/**
-	 * @type array
-	 * @nullable true
-	 */
-	series?: Querybuildertypesv5TimeSeriesDTO[] | null;
-	/**
-	 * @type array
-	 */
-	upperBoundSeries?: Querybuildertypesv5TimeSeriesDTO[];
-}
-
-export interface Querybuildertypesv5BucketDTO {
-	/**
-	 * @type number
-	 * @format double
-	 */
-	step?: number;
-}
-
-export interface Querybuildertypesv5DatastoreQueryDTO {
-	/**
-	 * @type boolean
-	 */
-	disabled?: boolean;
-	/**
-	 * @type string
-	 */
-	legend?: string;
+	description?: string;
 	/**
 	 * @type string
 	 */
@@ -3454,7 +3399,28 @@ export interface Querybuildertypesv5SecondaryAggregationDTO {
 	stepInterval?: Querybuildertypesv5StepDTO;
 }
 
-export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregationDTO {
+export interface TelemetrytypesTelemetryFieldKeyDTO {
+	/**
+	 * @type string
+	 */
+	description?: string;
+	fieldContext?: TelemetrytypesFieldContextDTO;
+	fieldDataType?: TelemetrytypesFieldDataTypeDTO;
+	/**
+	 * @type string
+	 */
+	name: string;
+	signal?: TelemetrytypesSignalDTO;
+	/**
+	 * @type string
+	 */
+	unit?: string;
+}
+
+export enum TelemetrytypesSourceDTO {
+	meter = 'meter',
+}
+export interface Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregationDTO {
 	/**
 	 * @type array
 	 */
@@ -3511,7 +3477,68 @@ export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgType
 	stepInterval?: Querybuildertypesv5StepDTO;
 }
 
-export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregationDTO {
+export interface MetrictypesComparisonSpaceAggregationParamDTO {
+	/**
+	 * @type string
+	 */
+	operator: string;
+	/**
+	 * @type number
+	 * @format double
+	 */
+	threshold: number;
+}
+
+export enum Querybuildertypesv5ReduceToDTO {
+	sum = 'sum',
+	count = 'count',
+	avg = 'avg',
+	min = 'min',
+	max = 'max',
+	last = 'last',
+	median = 'median',
+}
+export enum MetrictypesSpaceAggregationDTO {
+	sum = 'sum',
+	avg = 'avg',
+	min = 'min',
+	max = 'max',
+	count = 'count',
+	p50 = 'p50',
+	p75 = 'p75',
+	p90 = 'p90',
+	p95 = 'p95',
+	p99 = 'p99',
+}
+export enum MetrictypesTemporalityDTO {
+	delta = 'delta',
+	cumulative = 'cumulative',
+	unspecified = 'unspecified',
+}
+export enum MetrictypesTimeAggregationDTO {
+	latest = 'latest',
+	sum = 'sum',
+	avg = 'avg',
+	min = 'min',
+	max = 'max',
+	count = 'count',
+	count_distinct = 'count_distinct',
+	rate = 'rate',
+	increase = 'increase',
+}
+export interface Querybuildertypesv5MetricAggregationDTO {
+	comparisonSpaceAggregationParam?: MetrictypesComparisonSpaceAggregationParamDTO;
+	/**
+	 * @type string
+	 */
+	metricName?: string;
+	reduceTo?: Querybuildertypesv5ReduceToDTO;
+	spaceAggregation?: MetrictypesSpaceAggregationDTO;
+	temporality?: MetrictypesTemporalityDTO;
+	timeAggregation?: MetrictypesTimeAggregationDTO;
+}
+
+export interface Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregationDTO {
 	/**
 	 * @type array
 	 */
@@ -3568,7 +3595,18 @@ export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgType
 	stepInterval?: Querybuildertypesv5StepDTO;
 }
 
-export interface Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregationDTO {
+export interface Querybuildertypesv5TraceAggregationDTO {
+	/**
+	 * @type string
+	 */
+	alias?: string;
+	/**
+	 * @type string
+	 */
+	expression?: string;
+}
+
+export interface Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregationDTO {
 	/**
 	 * @type array
 	 */
@@ -4238,29 +4276,52 @@ export type Querybuildertypesv5QueryEnvelopeDTO =
 			spec?: unknown;
 			type?: Querybuildertypesv5QueryTypeDTO;
 	  })
-	| (Querybuildertypesv5QueryEnvelopeDatastoreSQLDTO & {
+	| (Querybuildertypesv5QueryEnvelopeClickHouseSQLDTO & {
 			spec?: unknown;
 			type?: Querybuildertypesv5QueryTypeDTO;
 	  });
 
-export interface Querybuildertypesv5QueryEnvelopeBuilderLogDTO {
-	spec?: Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregationDTO;
-	type?: Querybuildertypesv5QueryTypeDTO;
+/**
+ * Composite query containing one or more query envelopes. Each query envelope specifies its type and corresponding spec.
+ */
+export interface Querybuildertypesv5CompositeQueryDTO {
+	/**
+	 * @type array,null
+	 */
+	queries?: Querybuildertypesv5QueryEnvelopeDTO[] | null;
 }
 
-export interface Querybuildertypesv5QueryEnvelopeBuilderMetricDTO {
-	spec?: Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregationDTO;
-	type?: Querybuildertypesv5QueryTypeDTO;
+export interface DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5CompositeQueryDTO {
+	/**
+	 * @enum signoz/CompositeQuery
+	 * @type string
+	 */
+	kind: DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5CompositeQueryDTOKind;
+	spec: Querybuildertypesv5CompositeQueryDTO;
 }
 
-export interface Querybuildertypesv5QueryEnvelopeBuilderTraceDTO {
-	spec?: Querybuildertypesv5QueryBuilderQueryGithubComHanzoaiO11yPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregationDTO;
-	type?: Querybuildertypesv5QueryTypeDTO;
+export enum DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormulaDTOKind {
+	'signoz/Formula' = 'signoz/Formula',
+}
+export interface DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormulaDTO {
+	/**
+	 * @enum signoz/Formula
+	 * @type string
+	 */
+	kind: DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormulaDTOKind;
+	spec: Querybuildertypesv5QueryBuilderFormulaDTO;
 }
 
-export interface Querybuildertypesv5QueryEnvelopeDatastoreSQLDTO {
-	spec?: Querybuildertypesv5DatastoreQueryDTO;
-	type?: Querybuildertypesv5QueryTypeDTO;
+export enum DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5PromQueryDTOKind {
+	'signoz/PromQLQuery' = 'signoz/PromQLQuery',
+}
+export interface DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5PromQueryDTO {
+	/**
+	 * @enum signoz/PromQLQuery
+	 * @type string
+	 */
+	kind: DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5PromQueryDTOKind;
+	spec: Querybuildertypesv5PromQueryDTO;
 }
 
 export enum DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQueryDTOKind {
@@ -6829,7 +6890,7 @@ export enum Querybuildertypesv5RequestTypeDTO {
 	trace = 'trace',
 }
 /**
- * Request body for the v5 query range endpoint. Supports builder queries (traces, logs, metrics), formulas, joins, trace operators, PromQL, and Datastore SQL queries.
+ * Request body for the v5 query range endpoint. Supports builder queries (traces, logs, metrics), formulas, joins, trace operators, PromQL, and ClickHouse SQL queries.
  */
 export interface Querybuildertypesv5QueryRangeRequestDTO {
 	compositeQuery?: Querybuildertypesv5CompositeQueryDTO;
@@ -6869,202 +6930,6 @@ export interface Querybuildertypesv5QueryRangeResponseDTO {
 	warning?: Querybuildertypesv5QueryWarnDataDTO;
 }
 
-export enum Querybuildertypesv5QueryTypeDTO {
-	builder_query = 'builder_query',
-	builder_formula = 'builder_formula',
-	builder_trace_operator = 'builder_trace_operator',
-	datastore_sql = 'datastore_sql',
-	promql = 'promql',
-}
-export interface Querybuildertypesv5QueryWarnDataDTO {
-	/**
-	 * @type string
-	 */
-	message?: string;
-	/**
-	 * @type string
-	 */
-	url?: string;
-	/**
-	 * @type array
-	 */
-	warnings?: Querybuildertypesv5QueryWarnDataAdditionalDTO[];
-}
-
-export interface Querybuildertypesv5QueryWarnDataAdditionalDTO {
-	/**
-	 * @type string
-	 */
-	message?: string;
-}
-
-export interface Querybuildertypesv5RawDataDTO {
-	/**
-	 * @type string
-	 */
-	nextCursor?: string;
-	/**
-	 * @type string
-	 */
-	queryName?: string;
-	/**
-	 * @type array
-	 * @nullable true
-	 */
-	rows?: Querybuildertypesv5RawRowDTO[] | null;
-}
-
-/**
- * @nullable
- */
-export type Querybuildertypesv5RawRowDTOData = {
-	[key: string]: unknown;
-} | null;
-
-export interface Querybuildertypesv5RawRowDTO {
-	/**
-	 * @type object
-	 * @nullable true
-	 */
-	data?: Querybuildertypesv5RawRowDTOData;
-	/**
-	 * @type string
-	 * @format date-time
-	 */
-	timestamp?: Date;
-}
-
-export enum Querybuildertypesv5ReduceToDTO {
-	sum = 'sum',
-	count = 'count',
-	avg = 'avg',
-	min = 'min',
-	max = 'max',
-	last = 'last',
-	median = 'median',
-}
-export enum Querybuildertypesv5RequestTypeDTO {
-	scalar = 'scalar',
-	time_series = 'time_series',
-	raw = 'raw',
-	raw_stream = 'raw_stream',
-	trace = 'trace',
-}
-export interface Querybuildertypesv5ScalarDataDTO {
-	/**
-	 * @type array
-	 * @nullable true
-	 */
-	columns?: Querybuildertypesv5ColumnDescriptorDTO[] | null;
-	/**
-	 * @type array
-	 * @nullable true
-	 */
-	data?: unknown[][] | null;
-	/**
-	 * @type string
-	 */
-	queryName?: string;
-}
-
-export interface Querybuildertypesv5SecondaryAggregationDTO {
-	/**
-	 * @type string
-	 */
-	alias?: string;
-	/**
-	 * @type string
-	 */
-	expression?: string;
-	/**
-	 * @type array
-	 */
-	groupBy?: Querybuildertypesv5GroupByKeyDTO[];
-	/**
-	 * @type integer
-	 */
-	limit?: number;
-	limitBy?: Querybuildertypesv5LimitByDTO;
-	/**
-	 * @type array
-	 */
-	order?: Querybuildertypesv5OrderByDTO[];
-	stepInterval?: Querybuildertypesv5StepDTO;
-}
-
-/**
- * Step interval. Accepts a Go duration string (e.g., "60s", "1m", "1h") or a number representing seconds (e.g., 60).
- */
-export type Querybuildertypesv5StepDTO = string | number;
-
-export interface Querybuildertypesv5TimeSeriesDTO {
-	/**
-	 * @type array
-	 */
-	labels?: Querybuildertypesv5LabelDTO[];
-	/**
-	 * @type array
-	 * @nullable true
-	 */
-	values?: Querybuildertypesv5TimeSeriesValueDTO[] | null;
-}
-
-export interface Querybuildertypesv5TimeSeriesDataDTO {
-	/**
-	 * @type array
-	 * @nullable true
-	 */
-	aggregations?: Querybuildertypesv5AggregationBucketDTO[] | null;
-	/**
-	 * @type string
-	 */
-	queryName?: string;
-}
-
-export interface Querybuildertypesv5TimeSeriesValueDTO {
-	bucket?: Querybuildertypesv5BucketDTO;
-	/**
-	 * @type boolean
-	 */
-	partial?: boolean;
-	/**
-	 * @type integer
-	 * @format int64
-	 */
-	timestamp?: number;
-	/**
-	 * @type number
-	 * @format double
-	 */
-	value?: number;
-	/**
-	 * @type array
-	 */
-	values?: number[];
-}
-
-export interface Querybuildertypesv5TraceAggregationDTO {
-	/**
-	 * @type string
-	 */
-	alias?: string;
-	/**
-	 * @type string
-	 */
-	expression?: string;
-}
-
-export interface Querybuildertypesv5VariableItemDTO {
-	type?: Querybuildertypesv5VariableTypeDTO;
-	value?: unknown;
-}
-
-export enum Querybuildertypesv5VariableTypeDTO {
-	query = 'query',
-	dynamic = 'dynamic',
-	custom = 'custom',
-	text = 'text',
-}
 export interface RenderErrorResponseDTO {
 	error: ErrorsJSONDTO;
 	/**
@@ -8632,11 +8497,11 @@ export interface ZeustypesPostableProfileDTO {
 	/**
 	 * @type array,null
 	 */
-	reasons_for_interest_in_o11y: string[] | null;
+	reasons_for_interest_in_observe: string[] | null;
 	/**
 	 * @type string
 	 */
-	timeline_for_migrating_to_o11y: string;
+	timeline_for_migrating_to_observe: string;
 	/**
 	 * @type boolean
 	 */
@@ -8644,7 +8509,7 @@ export interface ZeustypesPostableProfileDTO {
 	/**
 	 * @type string
 	 */
-	where_did_you_discover_o11y: string;
+	where_did_you_discover_observe: string;
 }
 
 export type GetAlerts200 = {

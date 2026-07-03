@@ -11,8 +11,8 @@ import {
 } from 'types/api/queryBuilder/queryBuilderData';
 import cx from 'classnames';
 import { v4 as uuidv4 } from 'uuid';
-import { Button } from '@signozhq/ui/button';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
+import { Button } from 'components/ui/button';
+import { TooltipSimple } from 'components/ui/tooltip';
 import type { MessageActionDTO } from 'api/ai-assistant/sigNozAIAssistantAPI.schemas';
 import {
 	ApplyFilterSignalDTO,
@@ -39,7 +39,7 @@ import {
 	Sparkles,
 	TriangleAlert,
 	Undo,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 import logEvent from 'api/common/logEvent';
 

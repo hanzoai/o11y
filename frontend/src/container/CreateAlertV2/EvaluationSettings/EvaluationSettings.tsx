@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, Popover } from 'antd';
-import { ChevronDown, ChevronUp } from '@signozhq/icons';
+import { ChevronDown, ChevronUp } from 'components/ui/icons';
 
 import { useCreateAlertState } from '../context';
 import EvaluationWindowPopover from './EvaluationWindowPopover';

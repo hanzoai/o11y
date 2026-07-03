@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import { Button, Form } from 'antd';
 import apply from 'api/v3/licenses/post';
 import { useNotifications } from 'hooks/useNotifications';

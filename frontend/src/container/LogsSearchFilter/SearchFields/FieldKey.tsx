@@ -1,4 +1,4 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 
 interface FieldKeyProps {
 	name: string;

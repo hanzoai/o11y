@@ -1,14 +1,14 @@
 import { useCallback } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { orange } from '@ant-design/colors';
-import { Settings } from '@signozhq/icons';
+import { Settings } from 'components/ui/icons';
 import {
 	type BaseMenuItem,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from '@signozhq/ui/dropdown-menu';
+} from 'components/ui/dropdown-menu';
 import {
 	negateOperator,
 	OPERATORS,

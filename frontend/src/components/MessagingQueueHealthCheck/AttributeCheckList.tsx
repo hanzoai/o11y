@@ -1,4 +1,4 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { ReactNode, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
@@ -9,7 +9,7 @@ import {
 	ChevronRight,
 	Loader,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { Modal, Select, Spin, Tooltip, Tree, TreeDataNode } from 'antd';
 import { OnboardingStatusResponse } from 'api/messagingQueues/onboarding/getOnboardingStatus';
 import { QueryParams } from 'constants/query';

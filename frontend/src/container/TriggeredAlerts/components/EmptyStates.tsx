@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { CircleCheck, Plus, RefreshCw } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
+import { CircleCheck, Plus, RefreshCw } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 import ROUTES from 'constants/routes';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
 

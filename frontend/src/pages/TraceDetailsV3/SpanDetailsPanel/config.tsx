@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import ExpandableValue from 'periscope/components/ExpandableValue';
 import { SpanV3 } from 'types/api/trace/getTraceV3';
 

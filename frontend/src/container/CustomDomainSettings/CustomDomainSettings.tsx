@@ -2,6 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@hanzo/ui';
 import { Callout } from 'components/ui/callout';
 import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuTrigger,
+} from 'components/ui/dropdown-menu';
+import {
 	Check,
 	ChevronDown,
 	Clock,
@@ -12,7 +17,7 @@ import {
 	X,
 } from 'lucide-react';
 import { toast } from '@hanzo/ui';
-import { Dropdown, Skeleton } from 'antd';
+import { Skeleton } from 'antd';
 import {
 	RenderErrorResponseDTO,
 	ZeustypesHostDTO,
@@ -141,7 +146,9 @@ export default function CustomDomainSettings(): JSX.Element {
 					setCustomDomainSubdomain(subdomain);
 					const newUrl = `https://${subdomain}.${dnsSuffix}`;
 					toast.custom(
-						(toastId) => <DomainUpdateToast toastId={toastId} url={newUrl} />,
+						(toastId: string | number) => (
+							<DomainUpdateToast toastId={toastId} url={newUrl} />
+						),
 						{ duration: 5000, position: 'bottom-right' }, // this 5 sec is as per design
 					);
 				},
@@ -175,6 +182,8 @@ export default function CustomDomainSettings(): JSX.Element {
 
 	const workspaceName =
 		org?.[0]?.displayName || customDomainSubdomain || activeHost?.name;
+
+	const planName = hostsData?.data?.tier;
 
 	if (isLoadingHosts) {
 		return (
@@ -278,7 +287,7 @@ export default function CustomDomainSettings(): JSX.Element {
 					showIcon
 					className="custom-domain-callout"
 					size="small"
-					icon={<SolidAlertCircle size={13} color="primary" />}
+					icon={<CircleAlert size={13} color="primary" />}
 					title={`Updating your URL to ⎯ ${customDomainSubdomain}.${dnsSuffix}. This may take a few mins.`}
 				/>
 			)}

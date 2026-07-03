@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
-import { Button } from '@signozhq/ui/button';
-import { Input } from '@signozhq/ui/input';
+import { Button } from 'components/ui/button';
+import { Input } from 'components/ui/input';
 import logEvent from 'api/common/logEvent';
 import classNames from 'classnames';
 import { QueryParams } from 'constants/query';
@@ -8,7 +8,7 @@ import ROUTES from 'constants/routes';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
 import useUrlQuery from 'hooks/useUrlQuery';
-import { RotateCcw } from '@signozhq/icons';
+import { RotateCcw } from 'components/ui/icons';
 import { useAlertRuleOptional } from 'providers/Alert';
 import { Labels } from 'types/api/alerts/def';
 

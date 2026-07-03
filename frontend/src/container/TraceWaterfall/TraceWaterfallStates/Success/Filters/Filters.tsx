@@ -5,9 +5,9 @@ import {
 	ChevronUp,
 	Loader,
 	SolidInfoCircle,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { Button, Spin, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { AxiosError } from 'axios';
 import { DEFAULT_ENTITY_VERSION } from 'constants/app';
 import { initialQueriesMap, PANEL_TYPES } from 'constants/queryBuilder';

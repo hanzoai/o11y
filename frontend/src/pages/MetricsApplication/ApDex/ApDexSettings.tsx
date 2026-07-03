@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X } from '@signozhq/icons';
+import { X } from 'components/ui/icons';
 import { Card, InputNumber } from 'antd';
 import Spinner from 'components/Spinner';
 import TextToolTip from 'components/TextToolTip';

@@ -150,9 +150,9 @@ function OnboardingQuestionaire(): JSX.Element {
 						orgDetails?.observabilityTool === 'Others'
 							? (orgDetails?.otherTool as string)
 							: (orgDetails?.observabilityTool as string),
-					where_did_you_discover_o11y: o11yDetails?.discoverO11y as string,
-					timeline_for_migrating_to_o11y: orgDetails?.migrationTimeline as string,
-					reasons_for_interest_in_o11y: o11yDetails?.interestInO11y?.includes(
+					where_did_you_discover_observe: o11yDetails?.discoverO11y as string,
+					timeline_for_migrating_to_observe: orgDetails?.migrationTimeline as string,
+					reasons_for_interest_in_observe: o11yDetails?.interestInO11y?.includes(
 						'Others',
 					)
 						? ([

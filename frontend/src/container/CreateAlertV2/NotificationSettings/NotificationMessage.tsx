@@ -1,6 +1,6 @@
 import { Input, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { Info } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { Info } from 'components/ui/icons';
 
 import { useCreateAlertState } from '../context';
 

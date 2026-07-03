@@ -1,4 +1,4 @@
-import { Group } from '@signozhq/icons';
+import { Group } from 'components/ui/icons';
 
 import styles from './EntityGroupHeader.module.scss';
 

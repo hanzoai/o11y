@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Copy } from '@signozhq/icons';
+import { Check, Copy } from 'components/ui/icons';
 import cx from 'classnames';
 
 import './CodeCopyBtn.scss';

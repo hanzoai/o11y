@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CircleCheck, Info, TriangleAlert, Filter } from '@signozhq/icons';
+import { CircleCheck, Info, TriangleAlert, Filter } from 'components/ui/icons';
 import {
 	autocompletion,
 	closeCompletion,
@@ -15,7 +15,7 @@ import { copilot } from '@uiw/codemirror-theme-copilot';
 import { githubLight } from '@uiw/codemirror-theme-github';
 import CodeMirror, { EditorView, keymap, Prec } from '@uiw/react-codemirror';
 import { Button, Card, Collapse, Popover, Tooltip } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import { getKeySuggestions } from 'api/querySuggestions/getKeySuggestions';
 import { getValueSuggestions } from 'api/querySuggestions/getValueSuggestion';
 import cx from 'classnames';

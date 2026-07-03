@@ -1,11 +1,11 @@
 import { Button, Popover, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import {
 	ArrowDownWideNarrow,
 	Check,
 	Ellipsis,
 	HdmiPort,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 import type {
 	SortColumn,

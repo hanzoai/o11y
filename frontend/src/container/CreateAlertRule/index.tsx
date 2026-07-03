@@ -14,7 +14,7 @@ import { useGetCompositeQueryParam } from 'hooks/queryBuilder/useGetCompositeQue
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
 import useUrlQuery from 'hooks/useUrlQuery';
 import { AlertListTabs } from 'pages/AlertList/types';
-import { GalleryVerticalEnd, Pyramid } from '@signozhq/icons';
+import { GalleryVerticalEnd, Pyramid } from 'components/ui/icons';
 import { AlertTypes } from 'types/api/alerts/alertTypes';
 import { AlertDef } from 'types/api/alerts/def';
 

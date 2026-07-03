@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { Check, ChevronDown, Plus } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
-import { DropdownMenuSimple, type MenuItem } from '@signozhq/ui/dropdown-menu';
-import { Input } from '@signozhq/ui/input';
+import { Check, ChevronDown, Plus } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { DropdownMenuSimple, type MenuItem } from 'components/ui/dropdown-menu';
+import { Input } from 'components/ui/input';
 import { useListServiceAccounts } from 'api/generated/services/serviceaccount';
 import AuthZTooltip from 'components/AuthZTooltip/AuthZTooltip';
 import CreateServiceAccountModal from 'components/CreateServiceAccountModal/CreateServiceAccountModal';

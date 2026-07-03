@@ -1,6 +1,7 @@
+import type { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
-export const WrapperStyled = styled.div`
+export const WrapperStyled = styled.div<HTMLAttributes<HTMLDivElement>>`
 	height: 95%;
 	overflow: hidden;
 

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import MEditor, { EditorProps, Monaco } from '@monaco-editor/react';
-import { Color } from '@signozhq/design-tokens';
-import { Switch } from '@signozhq/ui/switch';
-import { Typography } from '@signozhq/ui/typography';
+import { Color } from 'components/ui/design-tokens';
+import { Switch } from 'components/ui/switch';
+import { Typography } from 'components/ui/typography';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 
 import './JsonView.styles.scss';

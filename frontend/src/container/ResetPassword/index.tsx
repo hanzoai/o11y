@@ -12,7 +12,7 @@ import ROUTES from 'constants/routes';
 import useDebouncedFn from 'hooks/useDebouncedFunction';
 import { useNotifications } from 'hooks/useNotifications';
 import history from 'lib/history';
-import { ArrowRight, CircleAlert, KeyRound } from '@signozhq/icons';
+import { ArrowRight, CircleAlert, KeyRound } from 'components/ui/icons';
 import { Label } from 'pages/SignUp/styles';
 import APIError from 'types/api/error';
 

@@ -1,7 +1,7 @@
 import cx from 'classnames';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import logEvent from 'api/common/logEvent';
-import { Check, X } from '@signozhq/icons';
+import { Check, X } from 'components/ui/icons';
 
 import { AIAssistantEvents } from '../../../events';
 import { useAIAssistantAnalyticsContext } from '../../../hooks/useAIAssistantAnalyticsContext';

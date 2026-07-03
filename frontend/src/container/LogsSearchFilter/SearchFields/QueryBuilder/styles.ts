@@ -1,6 +1,7 @@
+import type { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
 	isMargin: boolean;
 }
 export const Container = styled.div<Props>`
@@ -10,7 +11,7 @@ export const Container = styled.div<Props>`
 	margin-bottom: ${(props): string => (props.isMargin ? '2rem' : '0')};
 `;
 
-export const QueryWrapper = styled.div`
+export const QueryWrapper = styled.div<HTMLAttributes<HTMLDivElement>>`
 	display: grid;
 	grid-template-columns: 80px 1fr;
 	margin: 0.5rem 0px;

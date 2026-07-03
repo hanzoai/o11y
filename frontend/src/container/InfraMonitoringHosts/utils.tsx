@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction } from 'react';
-import { InfoCircleOutlined } from '@ant-design/icons';
 import { Color } from 'constants/designTokens';
 import { Progress, TabsProps, Tag, Tooltip, Typography } from 'antd';
 import { TableColumnType as ColumnType } from 'antd';
@@ -12,7 +11,7 @@ import {
 	FiltersType,
 	IQuickFiltersConfig,
 } from 'components/QuickFilters/types';
-import { TriangleAlert } from '@signozhq/icons';
+import { TriangleAlert } from 'components/ui/icons';
 import { DataTypes } from 'types/api/queryBuilder/queryAutocompleteResponse';
 import { DataSource } from 'types/common/queryBuilder';
 

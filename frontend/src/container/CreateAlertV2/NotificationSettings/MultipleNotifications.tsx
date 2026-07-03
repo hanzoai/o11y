@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { Select, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
-import { Info } from '@signozhq/icons';
+import { Info } from 'components/ui/icons';
 
 import { ALL_SELECTED_VALUE } from '../constants';
 import { useCreateAlertState } from '../context';

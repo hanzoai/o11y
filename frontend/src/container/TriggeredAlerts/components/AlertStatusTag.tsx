@@ -1,4 +1,4 @@
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 
 interface AlertStatusTagProps {
 	state: string;

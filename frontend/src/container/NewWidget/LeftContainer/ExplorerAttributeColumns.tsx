@@ -1,5 +1,5 @@
 import { Empty } from 'antd';
-import { Checkbox } from '@signozhq/ui/checkbox';
+import { Checkbox } from 'components/ui/checkbox';
 import { AxiosResponse } from 'axios';
 import Spinner from 'components/Spinner';
 import { EXCLUDED_COLUMNS } from 'container/OptionsMenu/constants';

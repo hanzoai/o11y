@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { Button, Col, Popover, Row, Select, Space } from 'antd';
-import { Divider } from '@signozhq/ui/divider';
+import { Divider } from 'components/ui/divider';
 import { QueryParams } from 'constants/query';
 import LogControls from 'container/LogControls';
 import LogDetailedView from 'container/LogDetailedView';

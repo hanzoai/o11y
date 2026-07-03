@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction } from 'react';
 import type { UseQueryResult } from 'react-query';
 import { Select } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { Layers } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { Layers } from 'components/ui/icons';
 import { SuccessResponse } from 'types/api';
 import { LegendPosition } from 'types/api/dashboard/getAll';
 import { MetricRangePayloadProps } from 'types/api/metrics/getQueryRange';

@@ -1,8 +1,8 @@
 import { memo } from 'react';
 import { Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { IDashboardVariable } from 'types/api/dashboard/getAll';
-import { SolidInfoCircle } from '@signozhq/icons';
+import { SolidInfoCircle } from 'components/ui/icons';
 
 import CustomVariableInput from './CustomVariableInput';
 import DynamicVariableInput from './DynamicVariableInput';

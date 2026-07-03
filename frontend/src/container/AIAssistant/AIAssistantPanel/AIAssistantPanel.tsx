@@ -1,9 +1,9 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { matchPath, useHistory, useLocation } from 'react-router-dom';
-import { Button } from '@signozhq/ui/button';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
+import { Button } from 'components/ui/button';
+import { TooltipSimple } from 'components/ui/tooltip';
 import ROUTES from 'constants/routes';
-import { History, Maximize2, Plus, X } from '@signozhq/icons';
+import { History, Maximize2, Plus, X } from 'components/ui/icons';
 import Noz from 'components/Noz/Noz';
 
 import logEvent from 'api/common/logEvent';

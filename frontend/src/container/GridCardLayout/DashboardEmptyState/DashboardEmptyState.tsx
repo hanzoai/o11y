@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
-import { Plus } from '@signozhq/icons';
+import { Plus } from 'components/ui/icons';
 import { Button } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import ConfigureIcon from 'assets/Integrations/ConfigureIcon';
 import SettingsDrawer from 'container/DashboardContainer/DashboardDescription/SettingsDrawer';

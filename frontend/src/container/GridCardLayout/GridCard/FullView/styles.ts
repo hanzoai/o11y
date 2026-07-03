@@ -1,5 +1,6 @@
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { themeColors } from 'constants/theme';
+import { HTMLAttributes } from 'react';
 import styled, { css, FlattenSimpleInterpolation } from 'styled-components';
 
 import { GraphContainerProps } from './types';
@@ -15,7 +16,7 @@ export const NotFoundContainer = styled.div`
 	min-height: 55vh;
 `;
 
-export const TimeContainer = styled.div<Props>`
+export const TimeContainer = styled.div<Props & HTMLAttributes<HTMLDivElement>>`
 	display: flex;
 	justify-content: flex-end;
 	gap: 16px;
@@ -36,7 +37,7 @@ export const TimeContainer = styled.div<Props>`
 	}
 `;
 
-export const GraphContainer = styled.div<GraphContainerProps>`
+export const GraphContainer = styled.div<GraphContainerProps & HTMLAttributes<HTMLDivElement>>`
 	height: ${({ isGraphLegendToggleAvailable }): string =>
 		isGraphLegendToggleAvailable ? '50%' : '100%'};
 `;

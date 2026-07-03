@@ -1,5 +1,6 @@
 // ** Helpers
 import { MetrictypesTypeDTO } from 'api/generated/services/o11y.schemas';
+import { defaultTraceSelectedColumns } from 'container/OptionsMenu/constants';
 import { createIdFromObjectFields } from 'lib/createIdFromObjectFields';
 import { createNewBuilderItemName } from 'lib/newQueryBuilder/createNewBuilderItemName';
 import { IAttributeValuesResponse } from 'types/api/queryBuilder/getAttributesValues';

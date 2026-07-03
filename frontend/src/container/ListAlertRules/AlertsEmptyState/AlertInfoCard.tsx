@@ -1,5 +1,5 @@
-import { ArrowRight } from '@signozhq/icons';
-import { Typography } from '@signozhq/ui/typography';
+import { ArrowRight } from 'components/ui/icons';
+import { Typography } from 'components/ui/typography';
 import { openInNewTab } from 'utils/navigation';
 
 import styles from './AlertsEmptyState.module.scss';

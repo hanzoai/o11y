@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Button, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import cx from 'classnames';
 import { cloneDeep, pullAt } from 'lodash-es';
-import { Plus } from '@signozhq/icons';
+import { Plus } from 'components/ui/icons';
 import { IBuilderQuery } from 'types/api/queryBuilder/queryBuilderData';
 import { QueryFunction } from 'types/api/v5/queryRange';
 import { DataSource, QueryFunctionsTypes } from 'types/common/queryBuilder';

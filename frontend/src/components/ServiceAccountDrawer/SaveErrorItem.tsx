@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Color } from '@signozhq/design-tokens';
-import { ChevronDown, ChevronUp, CircleAlert, RotateCw } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
+import { Color } from 'components/ui/design-tokens';
+import { ChevronDown, ChevronUp, CircleAlert, RotateCw } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 import ErrorContent from 'components/ErrorModal/components/ErrorContent';
 import APIError from 'types/api/error';
 

@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import { Button, Select, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { CircleX, Trash } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { CircleX, Trash } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 
 import { useCreateAlertState } from '../context';

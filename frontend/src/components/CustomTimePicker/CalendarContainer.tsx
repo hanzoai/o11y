@@ -2,7 +2,7 @@ import { Calendar } from '@hanzo/ui';
 import { Button } from 'antd';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import dayjs from 'dayjs';
-import { Calendar as CalendarIcon, Check, X } from '@signozhq/icons';
+import { Calendar as CalendarIcon, Check, X } from 'components/ui/icons';
 import { useTimezone } from 'providers/Timezone';
 
 import { DateRange } from './CustomTimePickerPopoverContent';

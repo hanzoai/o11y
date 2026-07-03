@@ -85,8 +85,6 @@ describe('RolesSettings', () => {
 			target: { value: 'billing' },
 		});
 
-		await user.type(searchInput, 'billing');
-
 		expect(await screen.findByText('billing-manager')).toBeInTheDocument();
 		expect(screen.queryByText('observe-admin')).not.toBeInTheDocument();
 		expect(screen.queryByText('o11y-editor')).not.toBeInTheDocument();
@@ -101,8 +99,6 @@ describe('RolesSettings', () => {
 		fireEvent.change(screen.getByPlaceholderText('Search for roles...'), {
 			target: { value: 'read-only' },
 		});
-
-		await user.type(searchInput, 'read-only');
 
 		expect(await screen.findByText('o11y-viewer')).toBeInTheDocument();
 		expect(screen.queryByText('observe-admin')).not.toBeInTheDocument();

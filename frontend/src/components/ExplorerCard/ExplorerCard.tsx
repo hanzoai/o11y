@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Button, Col, Popover, Row, Select, Space } from 'antd';
-import { DropdownMenuSimple, type MenuProps } from '@signozhq/ui/dropdown-menu';
-import { Typography } from '@signozhq/ui/typography';
+import { DropdownMenuSimple, type MenuProps } from 'components/ui/dropdown-menu';
+import { Typography } from 'components/ui/typography';
 import axios from 'axios';
 import TextToolTip from 'components/TextToolTip';
 import { SOMETHING_WENT_WRONG } from 'constants/api';
@@ -30,7 +30,7 @@ import {
 } from './styles';
 import { ExplorerCardProps } from './types';
 import { deleteViewHandler } from './utils';
-import { Ellipsis, Save, Share2, Trash2 } from '@signozhq/icons';
+import { Ellipsis, Save, Share2, Trash2 } from 'components/ui/icons';
 
 function ExplorerCard({
 	sourcepage,

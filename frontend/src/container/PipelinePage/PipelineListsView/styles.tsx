@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import { Button, Table, TableProps } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { themeColors } from 'constants/theme';
 import { StyledCSS } from 'container/GantChart/Trace/styles';
 import styled from 'styled-components';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Switch } from '@signozhq/ui/switch';
-import { Typography } from '@signozhq/ui/typography';
+import { Switch } from 'components/ui/switch';
+import { Typography } from 'components/ui/typography';
 import DownloadOptionsMenu from 'components/DownloadOptionsMenu/DownloadOptionsMenu';
 import FieldsSelector from 'components/FieldsSelector';
 import LogsFormatOptionsMenu from 'components/LogsFormatOptionsMenu/LogsFormatOptionsMenu';
@@ -9,7 +9,7 @@ import { LOCALSTORAGE } from 'constants/localStorage';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { useOptionsMenu } from 'container/OptionsMenu';
 import { LOGS_REQUIRED_COLUMNS } from 'container/OptionsMenu/constants';
-import { ArrowUp10, Minus } from '@signozhq/icons';
+import { ArrowUp10, Minus } from 'components/ui/icons';
 import { DataSource, StringOperators } from 'types/common/queryBuilder';
 
 function LogsActionsContainer({

@@ -1,5 +1,5 @@
-import { ReactChild, useCallback, useMemo } from 'react';
-import { matchPath, Redirect, useLocation } from 'react-router-dom';
+import { ReactChild, useCallback, useEffect, useMemo } from 'react';
+import { matchPath, Redirect, useHistory, useLocation } from 'react-router-dom';
 import getLocalStorageApi from 'api/browser/localstorage/get';
 import setLocalStorageApi from 'api/browser/localstorage/set';
 import { useListUsers } from 'api/generated/services/users';
@@ -27,6 +27,7 @@ import routes, {
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 	const location = useLocation();
+	const history = useHistory();
 	const { pathname } = location;
 	const {
 		org,
@@ -210,12 +211,6 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 			}
 		}
 	}, [isFetchingActiveLicense, activeLicense, mapRoutes, pathname]);
-
-	useEffect(() => {
-		if (org && org.length > 0 && org[0].id !== undefined) {
-			setOrgData(org[0]);
-		}
-	}, [org]);
 
 	// if the feature flag is enabled and the current route is /get-started then redirect to /get-started-with-o11y-cloud
 	useEffect(() => {

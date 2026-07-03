@@ -1,7 +1,7 @@
-import { CSSProperties } from 'react';
+import { CSSProperties, HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
 	height: CSSProperties['height'];
 }
 

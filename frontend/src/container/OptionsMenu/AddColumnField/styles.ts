@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { Trash2 } from '@signozhq/icons';
+import { Trash2 } from 'components/ui/icons';
 import { Card, Select, SelectProps, Space } from 'antd';
 import { themeColors } from 'constants/theme';
 import styled from 'styled-components';

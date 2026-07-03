@@ -7,9 +7,9 @@ import {
 	useRef,
 	useState,
 } from 'react';
-import { ChevronDown, ChevronRight } from '@signozhq/icons';
+import { ChevronDown, ChevronRight } from 'components/ui/icons';
 import { Col } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { StyledCol, StyledRow } from 'components/Styled';
 import {
 	IIntervalUnit,

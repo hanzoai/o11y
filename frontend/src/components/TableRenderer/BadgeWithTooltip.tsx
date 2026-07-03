@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 
 import { getLabelRenderingValue } from './utils';
 

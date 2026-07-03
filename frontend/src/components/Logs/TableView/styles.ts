@@ -1,8 +1,9 @@
-import { Color } from '@signozhq/design-tokens';
+import { HTMLAttributes } from 'react';
+import { Color } from 'components/ui/design-tokens';
 import { FontSize } from 'container/OptionsMenu/types';
 import styled from 'styled-components';
 
-interface TableBodyContentProps {
+interface TableBodyContentProps extends HTMLAttributes<HTMLDivElement> {
 	linesPerRow: number;
 	fontSize: FontSize;
 	isDarkMode?: boolean;

@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react';
 import {
-	FilterOutlined,
-	SyncOutlined,
-	VerticalAlignTopOutlined,
-} from '@ant-design/icons';
-import { Select, Skeleton, Switch, Tooltip, Typography } from 'antd';
+	ArrowUpToLine,
+	Filter,
+	Frown,
+	RefreshCw,
+	SettingsIcon,
+} from 'components/ui/icons';
+import { Select, Skeleton, Tooltip, Typography } from 'antd';
+import { Switch } from 'components/ui/switch';
 import getLocalStorageKey from 'api/browser/localstorage/get';
 import setLocalStorageKey from 'api/browser/localstorage/set';
 import logEvent from 'api/common/logEvent';

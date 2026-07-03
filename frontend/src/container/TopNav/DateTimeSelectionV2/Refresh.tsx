@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Tooltip } from 'antd';
-import { Clock } from '@signozhq/icons';
+import { Clock } from 'components/ui/icons';
 
 import { RefreshTextContainer } from './styles';
 

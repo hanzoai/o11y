@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Skeleton } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import logEvent from 'api/common/logEvent';
 import ROUTES from 'constants/routes';
 import { useGetAllDashboard } from 'hooks/dashboard/useGetAllDashboard';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
-import { ArrowRight, ArrowUpRight, Plus } from '@signozhq/icons';
+import { ArrowRight, ArrowUpRight, Plus } from 'components/ui/icons';
 import Card from 'periscope/components/Card/Card';
 import { useAppContext } from 'providers/App/App';
 import { Dashboard } from 'types/api/dashboard/getAll';

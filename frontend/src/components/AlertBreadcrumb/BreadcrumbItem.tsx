@@ -1,4 +1,4 @@
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
 import { isModifierKeyPressed } from 'utils/app';
 

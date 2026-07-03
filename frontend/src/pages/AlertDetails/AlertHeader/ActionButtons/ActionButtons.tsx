@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Color } from 'constants/designTokens';
-import { Divider, Dropdown, MenuProps, Switch, Tooltip } from 'antd';
+import { Button, Divider, Tooltip } from 'antd';
 import { useIsDarkMode } from 'hooks/useDarkMode';
-import { Copy, Ellipsis, PenLine, Trash2 } from '@signozhq/icons';
+import { DropdownMenuSimple, type MenuItem } from 'components/ui/dropdown-menu';
+import { Copy, Ellipsis, PenLine, Trash2 } from 'components/ui/icons';
+import { Switch } from 'components/ui/switch';
 import {
 	useAlertRuleDelete,
 	useAlertRuleDuplicate,

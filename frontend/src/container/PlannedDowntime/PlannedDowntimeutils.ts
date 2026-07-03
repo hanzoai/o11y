@@ -7,7 +7,7 @@ import type {
 	RenderErrorResponseDTO,
 	AlertmanagertypesPlannedMaintenanceDTO,
 	AlertmanagertypesRecurrenceDTO,
-} from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
 import type { ErrorType } from 'api/generatedAPIInstance';
 import { AxiosError } from 'axios';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
