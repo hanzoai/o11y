@@ -2,8 +2,8 @@
 // DropdownMenuTrigger preventDefaults pointerdown, breaking input focus and
 // dismissing on every keystroke. PopoverAnchor is a passive positioning element.
 import { ReactNode, useRef, useState } from 'react';
-import { Popover, PopoverAnchor, PopoverContent } from '@signozhq/ui/popover';
-import { Typography } from '@signozhq/ui/typography';
+import { Popover, PopoverAnchor, PopoverContent } from 'components/ui/popover';
+import { Typography } from 'components/ui/typography';
 
 import './VariablesPopover.styles.scss';
 

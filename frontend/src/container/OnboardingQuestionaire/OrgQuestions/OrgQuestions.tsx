@@ -3,7 +3,7 @@ import { Button, Label, RadioGroup, RadioGroupItem } from '@hanzo/ui';
 import { Input } from 'components/ui/input';
 import { Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
-import { ArrowRight } from '@signozhq/icons';
+import { ArrowRight } from 'components/ui/icons';
 
 import '../OnboardingQuestionaire.styles.scss';
 

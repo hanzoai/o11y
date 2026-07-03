@@ -178,7 +178,7 @@ function VirtualizedTableBody<TData>({
 				if (!row) return null;
 
 				return (
-					<React.Fragment key={virtualRow.key}>
+					<React.Fragment key={String(virtualRow.key)}>
 						<TableRow
 							data-index={virtualRow.index}
 							ref={enableDynamicRowHeights ? virtualizer.measureElement : undefined}

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { ArrowUp, ChevronUp, Command, Option } from '@signozhq/icons';
+import { ArrowUp, ChevronUp, Command, Option } from 'components/ui/icons';
 
 import './shiftOverlay.scss';
 

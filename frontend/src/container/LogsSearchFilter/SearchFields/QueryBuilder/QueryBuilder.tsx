@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
-import { SquareX, X } from '@signozhq/icons';
-import { Input } from '@signozhq/ui/input';
+import { SquareX, X } from 'components/ui/icons';
+import { Input } from 'components/ui/input';
 import { Button, Select } from 'antd';
 import CategoryHeading from 'components/Logs/CategoryHeading';
 import {

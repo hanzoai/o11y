@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { SquareMinus, SquarePlus } from '@signozhq/icons';
+import { SquareMinus, SquarePlus } from 'components/ui/icons';
 import { IIntervalUnit } from 'container/TraceDetail/utils';
 import { ITraceTree } from 'types/api/trace/getTraceItem';
 

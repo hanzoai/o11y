@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search } from '@signozhq/icons';
+import { Search } from 'components/ui/icons';
 import type { ColumnType } from 'antd/es/table';
 import ROUTES from 'constants/routes';
 import { routeConfig } from 'container/SideNav/config';

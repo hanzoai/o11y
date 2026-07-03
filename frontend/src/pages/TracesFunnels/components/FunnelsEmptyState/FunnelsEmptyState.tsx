@@ -1,6 +1,6 @@
 import { Button } from 'antd';
 import LearnMore from 'components/LearnMore/LearnMore';
-import { Plus } from '@signozhq/icons';
+import { Plus } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 
 import alertEmojiUrl from '@/assets/Icons/alert_emoji.svg';

@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { SolidInfoCircle, Undo2, X } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
-import { DialogWrapper } from '@signozhq/ui/dialog';
-import { Input } from '@signozhq/ui/input';
+import { SolidInfoCircle, Undo2, X } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { DialogWrapper } from 'components/ui/dialog';
+import { Input } from 'components/ui/input';
 import logEvent from 'api/common/logEvent';
 import { pick } from 'lodash-es';
 import { useAppContext } from 'providers/App/App';
 import { getBaseUrl } from 'utils/basePath';
 
 import styles from './CancelSubscriptionBanner.module.scss';
-import { Color } from '@signozhq/design-tokens';
+import { Color } from 'components/ui/design-tokens';
 
 function CancelSubscriptionBanner(): JSX.Element {
 	const [open, setOpen] = useState(false);

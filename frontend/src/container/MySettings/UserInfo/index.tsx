@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Button, Input, Modal } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import { ErrorResponseHandlerV2 } from 'api/ErrorResponseHandlerV2';
 import {
 	updateMyPassword,
 	useUpdateMyUserV2,
 } from 'api/generated/services/users';
-import { toast } from '@signozhq/ui/sonner';
-import { Check, FileTerminal, Mail, User } from '@signozhq/icons';
+import { toast } from 'components/ui/sonner';
+import { Check, FileTerminal, Mail, User } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { useErrorModal } from 'providers/ErrorModalProvider';
 import APIError from 'types/api/error';

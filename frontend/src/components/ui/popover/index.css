@@ -1,0 +1,70 @@
+/*
+ * Popover styling — ported verbatim from the Periscope popover
+ * CSS module, re-keyed from hashed class names onto the `data-slot` attributes
+ * the components already emit. The `--popover-*` custom-property API is
+ * preserved so consumers can theme individual popovers.
+ */
+
+@keyframes pp-in {
+	from {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes pp-out {
+	from {
+		opacity: 1;
+		transform: scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+}
+
+[data-slot='popover-content'] {
+	--radix-popover-content-available-width: var(--radix-popover-trigger-width);
+	--radix-popover-content-available-height: var(--radix-popover-trigger-height);
+	min-width: var(--radix-popover-trigger-width);
+	background-color: var(--popover-background, var(--l2-background));
+	color: var(--popover-foreground, var(--l1-foreground));
+	width: var(--popover-width, fit-content);
+	transform-origin: var(--popover-transform-origin, var(--radix-popover-content-transform-origin));
+	border-radius: var(--popover-border-radius, var(--radius-2, 4px));
+	padding: var(--popover-padding, var(--spacing-8));
+	border-width: var(--popover-border-width, 1px);
+	border-style: var(--popover-border-style, solid);
+	border-color: var(--popover-border-color, var(--l2-border));
+	box-shadow: var(
+		--popover-box-shadow,
+		0 4px 6px -1px rgba(0, 0, 0, 0.1),
+		0 2px 4px -2px rgba(0, 0, 0, 0.1)
+	);
+	outline: none;
+}
+
+[data-slot='popover-content'][data-state='open'] {
+	animation: pp-in 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+[data-slot='popover-content'][data-state='closed'] {
+	animation: pp-out 0.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+[data-slot='popover-arrow'] {
+	width: var(--popover-arrow-width, 10px);
+	height: var(--popover-arrow-height, 10px);
+	border-radius: var(--popover-arrow-border-radius, 2px);
+	transform: translateY(-1.5px);
+}
+
+[data-slot='popover-arrow-path'] {
+	fill: var(--popover-background, var(--l2-background));
+	stroke: var(--popover-border-color, var(--l2-border));
+	stroke-width: var(--popover-border-width, 2px);
+}

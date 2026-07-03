@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { AxiosError } from 'axios';
 import logEvent from 'api/common/logEvent';
 import {
@@ -11,7 +11,7 @@ import {
 import ROUTES from 'constants/routes';
 import { RequestDashboardBtn } from 'container/ListOfDashboard/RequestDashboardBtn';
 import useComponentPermission from 'hooks/useComponentPermission';
-import { toast } from '@signozhq/ui/sonner';
+import { toast } from 'components/ui/sonner';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
 import { useAppContext } from 'providers/App/App';

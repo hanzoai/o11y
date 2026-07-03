@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import type { TableColumnsType as ColumnsType } from 'antd';
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import { Button, Collapse, Select, Spin } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import {
 	invalidateGetMetricMetadata,
@@ -23,7 +23,7 @@ import { getUniversalNameFromMetricUnit } from 'components/YAxisUnitSelector/uti
 import FieldRenderer from 'container/LogDetailedView/FieldRenderer';
 import { DataType } from 'container/LogDetailedView/TableView';
 import { useNotifications } from 'hooks/useNotifications';
-import { PenLine, Save, X } from '@signozhq/icons';
+import { PenLine, Save, X } from 'components/ui/icons';
 
 import { MetricsExplorerEventKeys, MetricsExplorerEvents } from '../events';
 import MetricTypeRendererV2 from '../Summary/MetricTypeViewRenderer';

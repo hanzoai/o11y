@@ -1,0 +1,114 @@
+[data-slot='avatar'] {
+	display: var(--avatar-display, inline-flex);
+	align-items: var(--avatar-align-items, center);
+	justify-content: var(--avatar-justify-content, center);
+	overflow: var(--avatar-overflow, hidden);
+	position: relative;
+	vertical-align: middle;
+	user-select: none;
+	flex-shrink: 0;
+}
+
+[data-slot='avatar'][data-size='sm'] {
+	width: 24px;
+	height: 24px;
+	font-size: 12px;
+}
+
+[data-slot='avatar'][data-size='md'] {
+	width: 32px;
+	height: 32px;
+	font-size: 14px;
+}
+
+[data-slot='avatar'][data-size='lg'] {
+	width: 40px;
+	height: 40px;
+	font-size: 16px;
+}
+
+[data-slot='avatar'][data-size='xl'] {
+	width: 48px;
+	height: 48px;
+	font-size: 18px;
+}
+
+[data-slot='avatar'][data-shape='circle'] {
+	border-radius: 9999px;
+}
+
+[data-slot='avatar'][data-shape='square'] {
+	border-radius: var(--radius-md, 6px);
+}
+
+[data-slot='avatar'][data-color='vanilla'] {
+	background-color: var(--l2-background);
+	color: var(--l2-foreground);
+}
+
+[data-slot='avatar'][data-color='robin'] {
+	background-color: var(--primary);
+	color: var(--primary-foreground);
+}
+
+[data-slot='avatar'][data-color='forest'] {
+	background-color: var(--accent-forest);
+	color: var(--accent-forest-foreground);
+}
+
+[data-slot='avatar'][data-color='amber'] {
+	background-color: var(--accent-amber);
+	color: var(--accent-amber-foreground);
+}
+
+[data-slot='avatar'][data-color='sienna'] {
+	background-color: var(--accent-sienna);
+	color: var(--accent-sienna-foreground);
+}
+
+[data-slot='avatar'][data-color='cherry'] {
+	background-color: var(--accent-cherry);
+	color: var(--accent-cherry-foreground);
+}
+
+[data-slot='avatar'][data-color='sakura'] {
+	background-color: var(--accent-sakura);
+	color: var(--accent-sakura-foreground);
+}
+
+[data-slot='avatar'][data-color='aqua'] {
+	background-color: var(--accent-aqua);
+	color: var(--accent-aqua-foreground);
+}
+
+[data-slot='avatar-image'] {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+[data-slot='avatar-fallback'] {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+}
+
+[data-slot='avatar-skeleton'] {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background-color: var(--l2-background, #e5e7eb);
+	animation: avatar-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes avatar-shimmer {
+	0%,
+	100% {
+		opacity: 0.4;
+	}
+	50% {
+		opacity: 1;
+	}
+}

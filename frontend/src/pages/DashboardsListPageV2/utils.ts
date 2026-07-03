@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash-es';
-import type { DashboardtypesGettableDashboardWithPinDTO } from 'api/generated/services/sigNoz.schemas';
+import type { DashboardtypesGettableDashboardWithPinDTO } from 'api/generated/services/o11y.schemas';
 
 export type DashboardListItem = DashboardtypesGettableDashboardWithPinDTO;
 

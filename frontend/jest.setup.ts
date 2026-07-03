@@ -41,7 +41,7 @@ if (typeof window.IntersectionObserver === 'undefined') {
 	(window as any).IntersectionObserver = IntersectionObserverMock;
 }
 
-// Patch getComputedStyle to handle CSS parsing errors from @signozhq/* packages.
+// Patch getComputedStyle to handle CSS parsing errors from third-party UI packages.
 // These packages inject CSS at import time via style-inject / vite-plugin-css-injected-by-js.
 // jsdom's nwsapi cannot parse some of the injected selectors (e.g. Tailwind's :animate-in),
 // causing SyntaxErrors during getComputedStyle / getByRole calls.

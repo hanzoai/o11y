@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { Flex } from 'antd';
-import { SolidAlertTriangle } from '@signozhq/icons';
-import { Typography } from '@signozhq/ui/typography';
+import { SolidAlertTriangle } from 'components/ui/icons';
+import { Typography } from 'components/ui/typography';
 import { ResizeTable } from 'components/ResizeTable';
 import { MAX_RPS_LIMIT } from 'constants/global';
 import ResourceAttributesFilter from 'container/ResourceAttributesFilter';
@@ -57,8 +57,8 @@ function ServiceTraceTable({
 		<div className="service-traces-table-container">
 			{RPS > MAX_RPS_LIMIT && (
 				<Flex justify="left">
-					<Typography.Title level={5} type="warning" style={{ marginTop: 0 }}>
-						<WarningFilled /> {getText('rps_over_100')}
+					<Typography.Title level={5} color="warning" style={{ marginTop: 0 }}>
+						<SolidAlertTriangle /> {getText('rps_over_100')}
 						<a href="mailto:cloud-support@o11y.hanzo.ai">email</a>
 					</Typography.Title>
 				</Flex>

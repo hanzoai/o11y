@@ -1,7 +1,7 @@
 import { ReactNode, useCallback, useMemo, useState } from 'react';
-import { Loader } from '@signozhq/icons';
+import { Loader } from 'components/ui/icons';
 import { Button, Popover, Spin } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import {
 	IField,

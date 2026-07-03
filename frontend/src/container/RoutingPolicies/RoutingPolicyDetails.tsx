@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { Button, Flex, Form, Input, Modal, Select } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import ROUTES from 'constants/routes';
 import { ModalTitle } from 'container/PipelinePage/PipelineListsView/styles';
-import { Check, Loader, X } from '@signozhq/icons';
+import { Check, Loader, X } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { USER_ROLES } from 'types/roles';
 import { openInNewTab } from 'utils/navigation';

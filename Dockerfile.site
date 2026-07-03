@@ -3,27 +3,32 @@
 # o11y-site — the o11y browser SPA served by hanzoai/static (house-native static
 # plugin, scratch + Go binary), NOT nginx. The main server image (Dockerfile) is
 # HEADLESS (O11Y_WEB_ENABLED=false, serves only /api/*); this image serves the
-# dashboard SPA at the edge, and the ingress routes o11y.hanzo.ai / here while
+# dashboard SPA at the edge, and the ingress routes o11y.hanzo.ai here while
 # /api/* goes to the backend (universe infra/k8s/o11y/ingress.yaml).
 #
-# CONTENT: re-serves the PROVEN, in-production built SPA from the last bundled
-# server image (0.1.0 / ad3566b), byte-identical — the same commerce-site did
-# when its from-source SPA build was broken. The from-source frontend/ build is
-# mid-migration (rolldown-vite/oxlint) with source damaged by a debrand
-# find/replace; once `frontend/ && pnpm build` is green, replace the `content`
-# stage with a `node:22` build stage (COPY frontend/ ; pnpm install
-# --frozen-lockfile ; pnpm build) and COPY --from=build /src/frontend/build /srv.
-# The served bytes stay identical to today's live dashboard.
+# CONTENT: built FROM SOURCE (frontend/) now that the @signozhq -> @hanzo/ui
+# migration is complete, tsgo --noEmit is clean, and `pnpm build` is green. The
+# production build resolves the [[.BaseHref]]/[[.Settings]] Go-template placeholders
+# at build time (vite.config.ts) so index.html is placeholder-free; assets are
+# relative (base './') under <base href="/">, and the SPA calls same-origin /api/*
+# — so a static --spa serve is faithful with no backend templating.
 
-# 1) The proven, in-production built SPA (o11y 0.1.0 bundled it at /etc/o11y/web).
-FROM ghcr.io/hanzoai/o11y:0.1.0 AS content
+# 1) Build the SPA from source.
+FROM node:22-slim AS build
+# CI=true skips husky (postinstall is-ci guard); no interactive corepack prompt so
+# the pnpm version pinned in package.json (packageManager) is fetched deterministically.
+ENV CI=true
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable
+WORKDIR /src/frontend
+COPY frontend/ ./
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
 
 # 2) Serve it with hanzoai/static. --spa rewrites unknown routes to index.html
-#    (SigNoz client-side routing); :3000 is the static default, and the o11y-site
-#    Service maps servicePort 80 -> targetPort 3000. index.html is placeholder-free
-#    (no [[.BaseHref]]/[[.Settings]] Go templating), assets are relative (base
-#    './'), and the SPA calls same-origin /api/* — so a static --spa serve is faithful.
+#    (client-side routing); :3000 is the static default, and the o11y-site
+#    Service maps servicePort 80 -> targetPort 3000.
 FROM ghcr.io/hanzoai/static:0.4.1
-COPY --from=content /etc/o11y/web /srv
+COPY --from=build /src/frontend/build /srv
 EXPOSE 3000
 ENTRYPOINT ["/static", "--root=/srv", "--spa", "--port=3000"]

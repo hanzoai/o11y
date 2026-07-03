@@ -2,7 +2,7 @@ import { memo, useMemo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Flex } from 'antd';
-import { Divider } from '@signozhq/ui/divider';
+import { Divider } from 'components/ui/divider';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import Controls from 'container/Controls';
 import Download from 'container/Download/Download';
@@ -26,7 +26,7 @@ import { GlobalReducer } from 'types/reducer/globalTime';
 import { ILogsReducer } from 'types/reducer/logs';
 
 import { Container } from './styles';
-import { SkipBack } from '@signozhq/icons';
+import { SkipBack } from 'components/ui/icons';
 
 function LogControls(): JSX.Element | null {
 	const {

@@ -15,17 +15,17 @@
 
 const BANNED_COMPONENTS = {
 	Typography:
-		'Use @signozhq/ui/typography Typography instead of antd Typography.',
-	Switch: 'Use @signozhq/ui/switch Switch instead of antd Switch.',
+		'Use components/ui/typography Typography instead of antd Typography.',
+	Switch: 'Use components/ui/switch Switch instead of antd Switch.',
 	Dropdown:
-		'Use @signozhq/ui DropdownMenuSimple (or the composable DropdownMenu primitives) from @signozhq/ui/dropdown-menu instead of antd Dropdown.',
-	Badge: 'Use @signozhq/ui/badge instead of antd Badge.',
+		'Use components/ui DropdownMenuSimple (or the composable DropdownMenu primitives) from components/ui/dropdown-menu instead of antd Dropdown.',
+	Badge: 'Use components/ui/badge instead of antd Badge.',
 	Radio:
-		'Use @signozhq/ui/radio-group RadioGroup (dots) or @signozhq/ui/toggle-group ToggleGroup (segmented buttons) instead of antd Radio.',
-	Progress: 'Use @signozhq/ui/progress instead of antd Progress.',
-	Avatar: 'Use @signozhq/ui/avatar instead of antd Avatar.',
-	Divider: 'Use @signozhq/ui/divider Divider instead of antd Divider.',
-	Tag: 'Use @signozhq/ui/badge Bagde instead of antd Tag.',
+		'Use components/ui/radio-group RadioGroup (dots) or components/ui/toggle-group ToggleGroup (segmented buttons) instead of antd Radio.',
+	Progress: 'Use components/ui/progress instead of antd Progress.',
+	Avatar: 'Use components/ui/avatar instead of antd Avatar.',
+	Divider: 'Use components/ui/divider Divider instead of antd Divider.',
+	Tag: 'Use components/ui/badge Bagde instead of antd Tag.',
 };
 
 export default {

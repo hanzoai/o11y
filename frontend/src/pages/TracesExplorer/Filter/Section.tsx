@@ -7,7 +7,7 @@ import {
 	useState,
 } from 'react';
 import { Button, Collapse } from 'antd';
-import { Divider } from '@signozhq/ui/divider';
+import { Divider } from 'components/ui/divider';
 
 import { DurationSection } from './DurationSection';
 import {

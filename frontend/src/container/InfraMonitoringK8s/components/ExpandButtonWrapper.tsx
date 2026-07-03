@@ -1,5 +1,5 @@
-import { Button } from '@signozhq/ui/button';
-import { ChevronDown, ChevronRight } from '@signozhq/icons';
+import { Button } from 'components/ui/button';
+import { ChevronDown, ChevronRight } from 'components/ui/icons';
 import styles from './ExpandedButtonWrapper.module.scss';
 import { useEffect, useState } from 'react';
 

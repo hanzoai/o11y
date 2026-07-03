@@ -1,3 +1,4 @@
+import type { HTMLAttributes } from 'react';
 import { Select, Space } from 'antd';
 import styled from 'styled-components';
 
@@ -22,7 +23,7 @@ export const Container = styled(Space)`
 	}
 `;
 
-export const IconContainer = styled.div`
+export const IconContainer = styled.div<HTMLAttributes<HTMLDivElement>>`
 	display: flex;
 	justify-content: center;
 	align-items: center;

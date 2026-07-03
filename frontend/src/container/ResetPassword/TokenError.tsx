@@ -1,5 +1,5 @@
-import { CircleAlert } from '@signozhq/icons';
-import { Typography } from '@signozhq/ui/typography';
+import { CircleAlert } from 'components/ui/icons';
+import { Typography } from 'components/ui/typography';
 import AuthError from 'components/AuthError/AuthError';
 import AuthPageContainer from 'components/AuthPageContainer';
 import APIError from 'types/api/error';

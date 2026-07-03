@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { useNavigationType } from 'react-router-dom-v5-compat';
-import { RefreshCw, Undo } from '@signozhq/icons';
+import { RefreshCw, Undo } from 'components/ui/icons';
 import { Button } from 'antd';
 import getLocalStorageKey from 'api/browser/localstorage/get';
 import setLocalStorageKey from 'api/browser/localstorage/set';

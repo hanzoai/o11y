@@ -9,7 +9,7 @@ import {
 	within,
 } from 'tests/test-utils';
 import APIError from 'types/api/error';
-import { toast } from '@signozhq/ui/sonner';
+import { toast } from 'components/ui/sonner';
 
 const toggleThemeFunction = jest.fn();
 const logEventFunction = jest.fn();
@@ -18,8 +18,8 @@ const editUserFn = jest.fn();
 const updateMyPasswordFn = jest.fn();
 const showErrorModalFn = jest.fn();
 
-jest.mock('@signozhq/ui/sonner', () => ({
-	...jest.requireActual('@signozhq/ui/sonner'),
+jest.mock('components/ui/sonner', () => ({
+	...jest.requireActual('components/ui/sonner'),
 	toast: {
 		success: jest.fn(),
 		error: jest.fn(),

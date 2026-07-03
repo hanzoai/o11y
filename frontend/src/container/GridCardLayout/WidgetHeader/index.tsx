@@ -1,18 +1,23 @@
 import { ReactNode, useCallback, useMemo, useState } from 'react';
 import { UseQueryResult } from 'react-query';
-import {
-	AlertOutlined,
-	CloudDownloadOutlined,
-	CopyOutlined,
-	DeleteOutlined,
-	EditFilled,
-	FullscreenOutlined,
-	InfoCircleOutlined,
-	MoreOutlined,
-	SearchOutlined,
-} from '@ant-design/icons';
 import { Color } from 'constants/designTokens';
-import { Dropdown, Input, MenuProps, Tooltip, Typography } from 'antd';
+import { Button, Input, Tooltip } from 'antd';
+import { DropdownMenuSimple } from 'components/ui/dropdown-menu';
+import {
+	Bell,
+	CircleX,
+	CloudDownload,
+	Copy,
+	EllipsisVertical,
+	Fullscreen,
+	Pencil,
+	Search,
+	SolidInfoCircle,
+	SquareArrowOutUpRight,
+	Trash2,
+	X,
+} from 'components/ui/icons';
+import { Typography } from 'components/ui/typography';
 import ErrorContent from 'components/ErrorModal/components/ErrorContent';
 import ErrorPopover from 'components/ErrorPopover/ErrorPopover';
 import Spinner from 'components/Spinner';

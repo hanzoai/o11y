@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Button } from '@signozhq/ui/button';
-import { TooltipSimple } from '@signozhq/ui/tooltip';
+import { Button } from 'components/ui/button';
+import { TooltipSimple } from 'components/ui/tooltip';
 import { Drawer } from 'antd';
 import ROUTES from 'constants/routes';
-import { Maximize2, Plus, X } from '@signozhq/icons';
+import { Maximize2, Plus, X } from 'components/ui/icons';
 import Noz from 'components/Noz/Noz';
 
 import ConversationView from '../ConversationView';

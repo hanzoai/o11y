@@ -1,4 +1,4 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import eyesEmojiUrl from 'assets/Images/eyesEmoji.svg';
 
 import styles from './QueryCancelledPlaceholder.module.scss';

@@ -1,13 +1,13 @@
 import { ReactNode, useState } from 'react';
-import { Button } from '@signozhq/ui/button';
-import { DialogWrapper } from '@signozhq/ui/dialog';
+import { Button } from 'components/ui/button';
+import { DialogWrapper } from 'components/ui/dialog';
 import {
 	TooltipContent,
 	TooltipProvider,
 	TooltipRoot,
 	TooltipTrigger,
-} from '@signozhq/ui/tooltip';
-import { Fullscreen } from '@signozhq/icons';
+} from 'components/ui/tooltip';
+import { Fullscreen } from 'components/ui/icons';
 
 import styles from './ExpandableValue.module.scss';
 

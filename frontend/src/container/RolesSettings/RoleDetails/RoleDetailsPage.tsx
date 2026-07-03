@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Redirect, useHistory, useLocation } from 'react-router-dom';
 import { Button } from '@hanzo/ui';
 import { Table2, Trash2, Users } from 'lucide-react';
 import { toast } from '@hanzo/ui';

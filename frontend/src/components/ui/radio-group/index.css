@@ -1,0 +1,77 @@
+[data-slot='radio-group'] {
+	display: grid;
+	gap: 0.5rem;
+}
+[data-slot='radio-group'][data-color='robin'] {
+	--radio-checked-background: var(--accent-primary);
+}
+[data-slot='radio-group'][data-color='forest'] {
+	--radio-checked-background: var(--accent-forest);
+}
+[data-slot='radio-group'][data-color='amber'] {
+	--radio-checked-background: var(--accent-amber);
+}
+[data-slot='radio-group'][data-color='sienna'] {
+	--radio-checked-background: var(--accent-sienna);
+}
+[data-slot='radio-group'][data-color='cherry'] {
+	--radio-checked-background: var(--accent-cherry);
+}
+[data-slot='radio-group'][data-color='sakura'] {
+	--radio-checked-background: var(--accent-sakura);
+}
+[data-slot='radio-group'][data-color='aqua'] {
+	--radio-checked-background: var(--accent-aqua);
+}
+
+[data-slot='radio-group-item-wrapper'] {
+	display: flex;
+	gap: var(--spacing-4, 0.5rem);
+	align-items: center;
+	justify-content: flex-start;
+}
+
+[data-slot='radio-group-item'] {
+	display: flex;
+	height: var(--radio-group-item-size, 1rem);
+	width: var(--radio-group-item-size, 1rem);
+	align-items: center;
+	justify-content: center;
+	border-radius: 9999px;
+	border: 2px solid var(--radio-group-item-border-color, var(--l3-background));
+	cursor: pointer;
+	background-color: transparent;
+	padding: 0;
+	transition: border-color 150ms ease;
+}
+[data-slot='radio-group-item'][data-state='checked'] {
+	border-width: calc(var(--radio-group-item-size, 1rem) / 3);
+	border-color: var(--radio-checked-background);
+}
+[data-slot='radio-group-item']:focus-visible {
+	outline-offset: -1px;
+	outline: 2px solid var(--radio-checked-background);
+}
+[data-slot='radio-group-item']:hover {
+	border-color: var(--radio-checked-background);
+}
+[data-slot='radio-group-item']:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+[data-slot='radio-group-indicator'] {
+	height: 100%;
+	width: 100%;
+	background-color: var(--radio-checked-indicator-background, var(--base-white));
+	border-radius: 9999px;
+}
+
+[data-slot='radio-group-label'] {
+	cursor: pointer;
+	user-select: none;
+}
+[data-slot='radio-group-item']:disabled ~ [data-slot='radio-group-label'] {
+	cursor: not-allowed;
+	opacity: 0.7;
+}

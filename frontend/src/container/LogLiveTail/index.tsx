@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { green } from '@ant-design/colors';
-import { Pause, Play, EllipsisVertical } from '@signozhq/icons';
+import { Pause, Play, EllipsisVertical } from 'components/ui/icons';
 import { Button, Flex, Popover, Select, Space } from 'antd';
 import { LiveTail } from 'api/logs/livetail';
 import dayjs from 'dayjs';

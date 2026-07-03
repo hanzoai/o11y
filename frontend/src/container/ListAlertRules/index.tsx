@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { Plus, Search } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
-import { Input } from '@signozhq/ui/input';
+import { Plus, Search } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { Input } from 'antd';
 import ErrorEmptyState from 'components/Alerts/ErrorEmptyState';
 import NoResultsEmptyState from 'components/Alerts/NoResultsEmptyState';
 import TanStackTable from 'components/TanStackTableView';

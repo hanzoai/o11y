@@ -1,4 +1,4 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 
 import emptyStateUrl from '@/assets/Icons/emptyState.svg';
 

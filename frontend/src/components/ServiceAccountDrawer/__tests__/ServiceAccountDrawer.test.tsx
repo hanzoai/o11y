@@ -7,8 +7,8 @@ import { setupAuthzAdmin } from 'tests/authz-test-utils';
 
 import ServiceAccountDrawer from '../ServiceAccountDrawer';
 
-jest.mock('@signozhq/ui/drawer', () => ({
-	...jest.requireActual('@signozhq/ui/drawer'),
+jest.mock('components/ui/drawer', () => ({
+	...jest.requireActual('components/ui/drawer'),
 	DrawerWrapper: ({
 		children,
 		footer,
@@ -26,8 +26,8 @@ jest.mock('@signozhq/ui/drawer', () => ({
 		) : null,
 }));
 
-jest.mock('@signozhq/ui/sonner', () => ({
-	...jest.requireActual('@signozhq/ui/sonner'),
+jest.mock('components/ui/sonner', () => ({
+	...jest.requireActual('components/ui/sonner'),
 	toast: { success: jest.fn(), error: jest.fn() },
 }));
 

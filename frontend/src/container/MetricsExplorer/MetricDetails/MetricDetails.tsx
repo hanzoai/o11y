@@ -6,7 +6,7 @@ import { Button, Divider, Drawer, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { useGetMetricMetadata } from 'api/generated/services/metrics';
 import { useIsDarkMode } from 'hooks/useDarkMode';
-import { Compass, Crosshair, X } from '@signozhq/icons';
+import { Compass, Crosshair, X } from 'components/ui/icons';
 import { AppState } from 'store/reducers';
 import { GlobalReducer } from 'types/reducer/globalTime';
 

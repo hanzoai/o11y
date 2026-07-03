@@ -31,7 +31,7 @@ import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { Pagination } from 'hooks/queryPagination';
 import { getDefaultPaginationConfig } from 'hooks/queryPagination/utils';
 import useUrlQueryData from 'hooks/useUrlQueryData';
-import { ArrowUp10, Minus } from '@signozhq/icons';
+import { ArrowUp10, Minus } from 'components/ui/icons';
 import { useTimezone } from 'providers/Timezone';
 import { AppState } from 'store/reducers';
 import { Warning } from 'types/api';

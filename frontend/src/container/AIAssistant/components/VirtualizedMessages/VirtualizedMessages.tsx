@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import {
 	Activity,
@@ -7,7 +7,7 @@ import {
 	ChartBar,
 	Search,
 	Zap,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import Noz from 'components/Noz/Noz';
 
 import logEvent from 'api/common/logEvent';

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Pagination, Skeleton } from 'antd';
 import { useListRoles } from 'api/generated/services/role';
-import { RoletypesRoleDTO } from 'api/generated/services/o11y.schemas';
+import { AuthtypesRoleDTO } from 'api/generated/services/o11y.schemas';
 import ErrorInPlace from 'components/ErrorInPlace/ErrorInPlace';
 import PermissionDeniedFullPage from 'components/PermissionDeniedFullPage/PermissionDeniedFullPage';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';

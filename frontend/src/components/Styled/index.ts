@@ -13,7 +13,7 @@ import {
 	Typography,
 	TypographyTextProps,
 	TypographyTitleProps,
-} from '@signozhq/ui/typography';
+} from 'components/ui/typography';
 import styled, { FlattenSimpleInterpolation } from 'styled-components';
 
 import { IStyledClass } from './types';

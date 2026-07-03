@@ -2,7 +2,7 @@ import { useCopyToClipboard } from 'react-use';
 import { Button } from '@hanzo/ui';
 import { Typography } from 'antd';
 import { useNotifications } from 'hooks/useNotifications';
-import { Copy } from '@signozhq/icons';
+import { Copy } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { getMaskedKey } from 'utils/maskedKey';
 

@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@hanzo/ui';
 import { Plus } from 'lucide-react';
+import AuthZTooltip from 'components/AuthZTooltip/AuthZTooltip';
 import { Input } from 'components/ui/input';
+import { RoleCreatePermission } from 'hooks/useAuthZ/permissions/role.permissions';
+import { useRolesFeatureGate } from 'hooks/useRolesFeatureGate';
 
 import CreateRoleModal from './RolesComponents/CreateRoleModal';
 import RolesListingTable from './RolesComponents/RolesListingTable';

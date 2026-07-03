@@ -1,10 +1,10 @@
 import React, { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import ROUTES from 'constants/routes';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
-import { Undo } from '@signozhq/icons';
+import { Undo } from 'components/ui/icons';
 import { isModifierKeyPressed } from 'utils/app';
 
 import { buttonText } from './config';

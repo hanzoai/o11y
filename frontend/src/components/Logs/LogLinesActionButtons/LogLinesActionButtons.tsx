@@ -1,5 +1,5 @@
 import { memo, MouseEventHandler } from 'react';
-import { Link, TextSelect } from '@signozhq/icons';
+import { Link, TextSelect } from 'components/ui/icons';
 import { Button, Tooltip } from 'antd';
 
 import './LogLinesActionButtons.styles.scss';

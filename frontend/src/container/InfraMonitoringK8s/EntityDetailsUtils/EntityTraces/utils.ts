@@ -86,7 +86,7 @@ export function getEntityTracesQueryPayload({
 			graphType: PANEL_TYPES.LIST,
 			selectedTime: 'GLOBAL_TIME',
 			query: {
-				clickhouse_sql: [],
+				datastore_sql: [],
 				promql: [],
 				builder: {
 					queryData: [queryData],

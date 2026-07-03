@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import history from 'lib/history';
-import { LifeBuoy, TriangleAlert } from '@signozhq/icons';
+import { LifeBuoy, TriangleAlert } from 'components/ui/icons';
 
 import emptyStateUrl from '@/assets/Icons/emptyState.svg';
 import eyesEmojiUrl from '@/assets/Images/eyesEmoji.svg';

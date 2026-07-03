@@ -1,4 +1,4 @@
-import { PencilLine } from '@signozhq/icons';
+import { PencilLine } from 'components/ui/icons';
 import { iconStyle, smallIconStyle } from '../../config';
 
 function EditAction({

@@ -1,3 +1,4 @@
+import type { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
 const SPAN_HEIGHT = 10;
@@ -7,14 +8,16 @@ export const TOTAL_SPAN_HEIGHT = SPAN_HEIGHT + 2 * SPAN_V_PADDING;
 /**
  * An individual span for traces flame graph
  */
-export const SpanItemContainer = styled.div<{
-	topOffset: number;
-	leftOffset: number;
-	width: number;
-	spanColor: string;
-	selected: boolean;
-	zIdx: number;
-}>`
+export const SpanItemContainer = styled.div<
+	{
+		topOffset: number;
+		leftOffset: number;
+		width: number;
+		spanColor: string;
+		selected: boolean;
+		zIdx: number;
+	} & HTMLAttributes<HTMLDivElement>
+>`
 	position: absolute;
 	top: ${(props): string | number => props.topOffset}px;
 	left: ${(props): string | number => props.leftOffset}%;
@@ -29,9 +32,9 @@ export const SpanItemContainer = styled.div<{
 /**
  * Container for spans, for traces flame graph.
  */
-export const TraceFlameGraphContainer = styled.div<{
-	height: number;
-}>`
+export const TraceFlameGraphContainer = styled.div<
+	{ height: number } & HTMLAttributes<HTMLDivElement>
+>`
 	position: relative;
 	width: 100%;
 	height: ${({ height }): string | number => height || 120}px;

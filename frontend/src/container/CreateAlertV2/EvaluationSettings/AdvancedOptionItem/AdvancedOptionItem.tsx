@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Tooltip } from 'antd';
-import { Switch } from '@signozhq/ui/switch';
-import { Typography } from '@signozhq/ui/typography';
-import { Info } from '@signozhq/icons';
+import { Switch } from 'components/ui/switch';
+import { Typography } from 'components/ui/typography';
+import { Info } from 'components/ui/icons';
 
 import { IAdvancedOptionItemProps } from '../types';
 

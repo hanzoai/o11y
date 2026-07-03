@@ -5,7 +5,7 @@ import {
 	EyeClosed,
 	EyeOpen,
 	Trash2,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { Button, Row } from 'antd';
 
 import { QueryWrapper } from '../styles';

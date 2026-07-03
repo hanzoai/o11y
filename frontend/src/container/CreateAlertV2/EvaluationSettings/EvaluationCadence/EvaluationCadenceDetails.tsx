@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, DatePicker, Input, Select } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import classNames from 'classnames';
 import { useCreateAlertState } from 'container/CreateAlertV2/context';
 import { AdvancedOptionsState } from 'container/CreateAlertV2/context/types';
 import dayjs from 'dayjs';
-import { Code, PencilLine } from '@signozhq/icons';
+import { Code, PencilLine } from 'components/ui/icons';
 
 import {
 	EVALUATION_CADENCE_REPEAT_EVERY_MONTH_OPTIONS,

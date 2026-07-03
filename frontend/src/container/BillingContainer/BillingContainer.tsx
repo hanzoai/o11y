@@ -1,8 +1,8 @@
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from 'react-query';
-import { CheckCircleOutlined, CloudDownloadOutlined } from '@ant-design/icons';
+import { CircleCheck, CloudDownload } from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
 import {
 	Alert,
@@ -15,7 +15,7 @@ import {
 	Table,
 	TableColumnsType as ColumnsType,
 } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import getUsage, { UsageResponsePayloadProps } from 'api/billing/getUsage';
 import logEvent from 'api/common/logEvent';
 import updateCreditCardApi from 'api/v1/checkout/create';
@@ -372,7 +372,7 @@ export default function BillingContainer(): JSX.Element {
 				{t('here')}
 			</Typography.Link>
 			{` if your payment information has changed. Email us at `}
-			<Text type="secondary">cloud-support@o11y.hanzo.ai</Text>
+			<Typography.Text color="muted">cloud-support@o11y.hanzo.ai</Typography.Text>
 			{` otherwise. Be sure to provide this information immediately to avoid interruption to your service.`}
 		</Typography>
 	);

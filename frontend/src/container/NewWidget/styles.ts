@@ -1,6 +1,7 @@
+import { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
-export const Container = styled.div`
+export const Container = styled.div<HTMLAttributes<HTMLDivElement>>`
 	min-height: 78vh;
 	display: flex;
 	flex-direction: column;

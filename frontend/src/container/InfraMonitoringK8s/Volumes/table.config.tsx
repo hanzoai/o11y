@@ -9,7 +9,7 @@ import { formatBytes } from '../commonUtils';
 import { ValidateColumnValueWrapper } from '../components';
 import { InfraMonitoringEntity } from '../constants';
 import { K8sVolumesData } from './api';
-import { HardDrive } from '@signozhq/icons';
+import { HardDrive } from 'components/ui/icons';
 
 export function getK8sVolumeRowKey(volume: K8sVolumesData): string {
 	return (

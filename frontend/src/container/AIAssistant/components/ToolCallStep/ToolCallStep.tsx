@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import cx from 'classnames';
-import { ChevronDown, ChevronRight, LoaderCircle } from '@signozhq/icons';
+import { ChevronDown, ChevronRight, LoaderCircle } from 'components/ui/icons';
 
 import { StreamingToolCall } from '../../types';
 

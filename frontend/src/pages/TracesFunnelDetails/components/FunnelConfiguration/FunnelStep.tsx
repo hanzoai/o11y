@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react';
 import { Button, Form, Space, Tooltip } from 'antd';
-import { DropdownMenuSimple, type MenuItem } from '@signozhq/ui/dropdown-menu';
-import { Divider } from '@signozhq/ui/divider';
-import { Switch } from '@signozhq/ui/switch';
+import { DropdownMenuSimple, type MenuItem } from 'components/ui/dropdown-menu';
+import { Divider } from 'components/ui/divider';
+import { Switch } from 'components/ui/switch';
 import cx from 'classnames';
 import { FilterSelect } from 'components/CeleryOverview/CeleryOverviewConfigOptions/CeleryOverviewConfigOptions';
 import { QueryParams } from 'constants/query';
 import { initialQueriesMap } from 'constants/queryBuilder';
 import QueryBuilderSearchV2 from 'container/QueryBuilder/filters/QueryBuilderSearchV2/QueryBuilderSearchV2';
-import { ChevronDown, PencilLine } from '@signozhq/icons';
+import { ChevronDown, PencilLine } from 'components/ui/icons';
 import { LatencyPointers } from 'pages/TracesFunnelDetails/constants';
 import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 import { useAppContext } from 'providers/App/App';

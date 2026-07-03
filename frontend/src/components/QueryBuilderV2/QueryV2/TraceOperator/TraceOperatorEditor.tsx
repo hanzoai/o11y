@@ -33,7 +33,7 @@ import { getTraceOperatorContextAtCursor } from './utils/traceOperatorContextUti
 import { getInvolvedQueriesInTraceOperator } from './utils/utils';
 
 import '../QuerySearch/QuerySearch.styles.scss';
-import { CircleCheck, TriangleAlert } from '@signozhq/icons';
+import { CircleCheck, TriangleAlert } from 'components/ui/icons';
 
 // Custom extension to stop events
 const stopEventsExtension = EditorView.domEventHandlers({

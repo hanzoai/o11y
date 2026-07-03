@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Loader } from '@signozhq/icons';
+import { ChevronDown, ChevronUp, Loader } from 'components/ui/icons';
 import KeyValueLabel from 'periscope/components/KeyValueLabel';
 
 import { UseSpanPercentileReturn } from './useSpanPercentile';

@@ -53,8 +53,16 @@ export const prepareQueryRangePayload = ({
 			break;
 		}
 		case EQueryType.DATASTORE: {
-			const chQueries = query[query.queryType].reduce((acc, query) => {
-				if (!query.query) {
+			const chQueries = query[query.queryType].reduce(
+				(acc, query) => {
+					if (!query.query) {
+						return acc;
+					}
+
+					acc[query.name] = query;
+
+					legendMap[query.name] = query.legend;
+
 					return acc;
 				},
 				{} as NonNullable<QueryRangePayload['compositeQuery']['chQueries']>,

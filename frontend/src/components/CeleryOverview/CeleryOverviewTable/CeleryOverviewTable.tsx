@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
-import { LoadingOutlined, SearchOutlined } from '@ant-design/icons';
+import { Loader, Search } from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
 import {
 	Button,
@@ -15,8 +15,8 @@ import {
 	TableColumnType,
 	Tooltip,
 } from 'antd';
-import { Progress } from '@signozhq/ui/progress';
-import { Typography } from '@signozhq/ui/typography';
+import { Progress } from 'components/ui/progress';
+import { Typography } from 'components/ui/typography';
 import type { FilterDropdownProps } from 'antd/lib/table/interface';
 import logEvent from 'api/common/logEvent';
 import {

@@ -1,7 +1,7 @@
-import { Badge } from '@signozhq/ui/badge';
-import ChevronDown from '@signozhq/icons/ChevronDown';
-import ChevronRight from '@signozhq/icons/ChevronRight';
-import { Button } from '@signozhq/ui/button';
+import { Badge } from 'components/ui/badge';
+import { ChevronDown } from 'components/ui/icons';
+import { ChevronRight } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
 import { GroupedAlert } from 'container/TriggeredAlerts/types';
 import { useEffect, useState } from 'react';
 import styles from '../TriggeredAlerts.module.scss';

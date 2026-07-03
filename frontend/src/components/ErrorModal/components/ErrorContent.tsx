@@ -3,7 +3,7 @@ import { Color } from 'constants/designTokens';
 import { Button } from 'antd';
 import ErrorIcon from 'assets/Error';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
-import { BookOpenText, ChevronsDown } from '@signozhq/icons';
+import { BookOpenText, ChevronsDown } from 'components/ui/icons';
 import KeyValueLabel from 'periscope/components/KeyValueLabel';
 import APIError from 'types/api/error';
 

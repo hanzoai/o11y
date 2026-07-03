@@ -1,4 +1,3 @@
-import { RocketOutlined } from '@ant-design/icons';
 import { Style } from 'constants/designTokens';
 import { MenuProps } from 'antd';
 import ROUTES from 'constants/routes';
@@ -38,14 +37,13 @@ import {
 	UserPlus,
 	Users,
 	Binoculars,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 import {
 	SecondaryMenuItemKey,
 	SettingsNavSection,
 	SidebarItem,
 } from './sideNav.types';
-import { Style } from '@signozhq/design-tokens';
 import Noz from 'components/Noz/Noz';
 import { NOZ_TOOLTIP_TITLE } from 'components/Noz/Noz.constants';
 

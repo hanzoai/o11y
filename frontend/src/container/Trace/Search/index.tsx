@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { ChevronRight } from '@signozhq/icons';
+import { ChevronRight } from 'components/ui/icons';
 import { Flex, Popover } from 'antd';
 // eslint-disable-next-line no-restricted-imports
 import { bindActionCreators, Dispatch } from 'redux';

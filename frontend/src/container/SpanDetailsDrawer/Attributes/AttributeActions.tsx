@@ -10,7 +10,7 @@ import {
 	Copy,
 	Ellipsis,
 	Pin,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 interface AttributeRecord {
 	field: string;

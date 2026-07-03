@@ -5,13 +5,13 @@ import type {
 	TableColumnType as ColumnType,
 } from 'antd';
 import { Button, Flex } from 'antd';
-import { DropdownMenuSimple, type MenuItem } from '@signozhq/ui/dropdown-menu';
-import { Switch } from '@signozhq/ui/switch';
+import { DropdownMenuSimple, type MenuItem } from 'components/ui/dropdown-menu';
+import { Switch } from 'components/ui/switch';
 import logEvent from 'api/common/logEvent';
 import LaunchChatSupport from 'components/LaunchChatSupport/LaunchChatSupport';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
 import useUrlQuery from 'hooks/useUrlQuery';
-import { SlidersHorizontal } from '@signozhq/icons';
+import { SlidersHorizontal } from 'components/ui/icons';
 
 import ResizeTable from './ResizeTable';
 import { DynamicColumnTableProps } from './types';

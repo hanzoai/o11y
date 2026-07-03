@@ -7,7 +7,7 @@ import {
 	List,
 	SquareSigma,
 	Table,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 
 export const PanelTypesWithData: ItemsProps[] = [
 	{

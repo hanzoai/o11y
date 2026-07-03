@@ -1,6 +1,6 @@
 import { Color } from 'constants/designTokens';
 import cx from 'classnames';
-import { ArrowDown, ArrowUp } from '@signozhq/icons';
+import { ArrowDown, ArrowUp } from 'components/ui/icons';
 
 import './ChangePercentagePill.styles.scss';
 

@@ -15,6 +15,7 @@ import { useLocation } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { Toaster } from '@hanzo/ui';
 import { Flex } from 'antd';
+import { TooltipProvider } from 'components/ui/tooltip';
 import getLocalStorageApi from 'api/browser/localstorage/get';
 import setLocalStorageApi from 'api/browser/localstorage/set';
 import getChangelogByVersion from 'api/changelog/getChangelogByVersion';
@@ -804,16 +805,9 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 									to continue using Hanzo features.
 									<span className="refresh-payment-status">
 										{' '}
-										Please{' '}
-										<a className="upgrade-link" onClick={handleUpgrade}>
-											upgrade
-										</a>
-										to continue using SigNoz features.
-										<span className="refresh-payment-status">
-											{' '}
-											| Already upgraded? <RefreshPaymentStatus type="text" />
-										</span>
+										| Already upgraded? <RefreshPaymentStatus type="text" />
 									</span>
+								</span>
 								) : (
 									'Please contact your administrator for upgrading to a paid plan.'
 								)}

@@ -4,7 +4,7 @@ import {
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '@signozhq/ui/tooltip';
+} from 'components/ui/tooltip';
 import type { BrandedPermission } from 'hooks/useAuthZ/types';
 import { useAuthZ } from 'hooks/useAuthZ/useAuthZ';
 import { parsePermission } from 'hooks/useAuthZ/utils';

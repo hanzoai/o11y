@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Button } from '@signozhq/ui/button';
+import { Button } from 'components/ui/button';
 import Breadcrumb from 'antd/es/breadcrumb';
 import ROUTES from 'constants/routes';
 import { IntegrationType } from 'container/Integrations/types';
-import { Blocks, LifeBuoy } from '@signozhq/icons';
+import { Blocks, LifeBuoy } from 'components/ui/icons';
 
 import './Header.styles.scss';
 

@@ -1,8 +1,9 @@
 import React from 'react';
 import { Badge } from '@hanzo/ui';
 import type {
-	AuthtypesGettableObjectsDTO,
-	AuthtypesGettableResourcesDTO,
+	CoretypesObjectGroupDTO,
+	CoretypesResourceRefDTO,
+	CoretypesTypeDTO,
 } from 'api/generated/services/o11y.schemas';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import { capitalize } from 'lodash-es';

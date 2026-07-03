@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Check, Info } from '@signozhq/icons';
+import { Check, Info } from 'components/ui/icons';
 import {
 	Button,
 	DatePicker,
@@ -13,7 +13,7 @@ import {
 	Spin,
 	Tooltip,
 } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import type { DefaultOptionType } from 'antd/es/select';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {
@@ -24,8 +24,8 @@ import type {
 	AlertmanagertypesPlannedMaintenanceDTO,
 	AlertmanagertypesPostablePlannedMaintenanceDTO,
 	AlertmanagertypesRecurrenceDTO,
-} from 'api/generated/services/sigNoz.schemas';
-import { RenderErrorResponseDTO } from 'api/generated/services/sigNoz.schemas';
+} from 'api/generated/services/o11y.schemas';
+import { RenderErrorResponseDTO } from 'api/generated/services/o11y.schemas';
 import { AxiosError } from 'axios';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import {
@@ -54,8 +54,8 @@ import {
 } from './PlannedDowntimeutils';
 
 import './PlannedDowntime.styles.scss';
-import { RadioGroupItem } from '@signozhq/ui/radio-group';
-import { RadioGroup } from '@signozhq/ui/radio-group';
+import { RadioGroupItem } from 'components/ui/radio-group';
+import { RadioGroup } from 'components/ui/radio-group';
 
 dayjs.locale('en');
 dayjs.extend(utc);

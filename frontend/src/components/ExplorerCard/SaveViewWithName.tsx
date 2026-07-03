@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Input } from '@signozhq/ui/input';
+import { Input } from 'components/ui/input';
 import { Card, Form } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useSaveView } from 'hooks/saveViews/useSaveView';

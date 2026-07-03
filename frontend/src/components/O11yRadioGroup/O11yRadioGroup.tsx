@@ -1,4 +1,4 @@
-import { ToggleGroupSimple } from '@signozhq/ui/toggle-group';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
 
 import './O11yRadioGroup.styles.scss';
 
@@ -27,7 +27,6 @@ function O11yRadioGroup({
 		<ToggleGroupSimple
 			type="single"
 			value={value}
-			buttonStyle="solid"
 			className={`o11y-radio-group ${className}`}
 			onChange={onChange}
 			disabled={disabled}

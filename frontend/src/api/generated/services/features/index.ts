@@ -14,8 +14,6 @@ import type {
 	UseQueryResult,
 } from 'react-query';
 
-import type { ErrorType } from '../../../generatedAPIInstance';
-import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type { GetFeatures200, RenderErrorResponseDTO } from '../o11y.schemas';
 
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';

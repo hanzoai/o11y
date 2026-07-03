@@ -1,6 +1,6 @@
-import { SolidAlertTriangle } from '@signozhq/icons';
-import { ConfirmDialog } from '@signozhq/ui/dialog';
-import { Typography } from '@signozhq/ui/typography';
+import { SolidAlertTriangle } from 'components/ui/icons';
+import { ConfirmDialog } from 'components/ui/dialog';
+import { Typography } from 'components/ui/typography';
 
 export interface DiscardChangesModalProps {
 	open: boolean;

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Search } from '@signozhq/icons';
+import { Search } from 'components/ui/icons';
 import { Input, Spin } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 
 import { FieldTitle } from '../styles';

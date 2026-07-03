@@ -2,11 +2,11 @@ import { useMemo, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { Card } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
-import { CardContainer } from 'container/GridCardLayout/styles';
+import { CardContainer as CardContainerBase } from 'container/GridCardLayout/styles';
 import { useIsDarkMode } from 'hooks/useDarkMode';
-import { ChevronDown, ChevronUp } from '@signozhq/icons';
+import { ChevronDown, ChevronUp } from 'components/ui/icons';
 import { AppState } from 'store/reducers';
 import { DataTypes } from 'types/api/queryBuilder/queryAutocompleteResponse';
 import { DataSource } from 'types/common/queryBuilder';
@@ -25,6 +25,12 @@ import {
 import CeleryTaskLatencyGraph from './CeleryTaskLatencyGraph';
 
 import './CeleryTaskGraph.style.scss';
+
+// styled-components v5's callable type drops base DOM props (className/children) under
+// @types/react 18.0.x; CardContainer is a styled.div that accepts them at runtime.
+const CardContainer = CardContainerBase as unknown as React.ComponentType<
+	React.PropsWithChildren<{ isDarkMode: boolean; className?: string }>
+>;
 
 export default function CeleryTaskGraphGrid({
 	onClick,

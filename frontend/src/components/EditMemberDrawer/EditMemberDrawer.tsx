@@ -1,26 +1,24 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { AxiosError } from 'axios';
+import { useCopyToClipboard } from 'react-use';
 import { Badge } from '@hanzo/ui';
 import { Button } from '@hanzo/ui';
-import { DialogFooter, DialogWrapper } from 'components/ui/dialog';
+import { DialogWrapper } from 'components/ui/dialog';
 import { DrawerWrapper } from 'components/ui/drawer';
-import {
-	Check,
-	ChevronDown,
-	Copy,
-	Link,
-	LockKeyhole,
-	RefreshCw,
-	Trash2,
-	X,
-} from 'lucide-react';
+import { Check, Copy, LockKeyhole, RefreshCw, Trash2, X } from 'lucide-react';
 import { Input } from 'components/ui/input';
 import { toast } from '@hanzo/ui';
-import { Select } from 'antd';
-import getResetPasswordToken from 'api/v1/factor_password/getResetPasswordToken';
-import sendInvite from 'api/v1/invite/create';
-import cancelInvite from 'api/v1/invite/id/delete';
-import deleteUser from 'api/v1/user/id/delete';
-import update from 'api/v1/user/id/update';
+import { Skeleton, Tooltip } from 'antd';
+import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
+import type { RenderErrorResponseDTO } from 'api/generated/services/o11y.schemas';
+import {
+	useCreateResetPasswordToken,
+	useDeleteUser,
+	useGetResetPasswordToken,
+	useGetUser,
+	useUpdateMyUserV2,
+	useUpdateUser,
+} from 'api/generated/services/users';
 import { MemberRow } from 'components/MembersTable/MembersTable';
 import RolesSelect, { useRoles } from 'components/RolesSelect';
 import SaveErrorItem from 'components/ServiceAccountDrawer/SaveErrorItem';
@@ -742,7 +740,7 @@ function EditMemberDrawer({
 				</div>
 			</DialogWrapper>
 
-			<DialogWrapper
+			<DeleteMemberDialog
 				open={showDeleteConfirm}
 				isInvited={isInvited}
 				member={member}

@@ -16,7 +16,7 @@ import {
 	LoaderCircle,
 	Plus,
 	Trash2,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import APIError from 'types/api/error';
 import { getBaseUrl } from 'utils/basePath';
 import { v4 as uuid } from 'uuid';

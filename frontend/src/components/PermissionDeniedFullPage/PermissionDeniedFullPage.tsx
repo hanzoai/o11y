@@ -1,7 +1,7 @@
-import { CircleSlash2 } from '@signozhq/icons';
+import { CircleSlash2 } from 'components/ui/icons';
 
 import styles from './PermissionDeniedFullPage.module.scss';
-import { Style } from '@signozhq/design-tokens';
+import { Style } from 'components/ui/design-tokens';
 
 interface PermissionDeniedFullPageProps {
 	permissionName: string;

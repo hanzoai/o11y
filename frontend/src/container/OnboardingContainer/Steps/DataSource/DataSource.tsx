@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Blocks, Check, LoaderCircle } from '@signozhq/icons';
-import { Input } from '@signozhq/ui/input';
+import { Blocks, Check, LoaderCircle } from 'components/ui/icons';
+import { Input } from 'components/ui/input';
 import { Button, Card, Form, Select, Space } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import cx from 'classnames';
 import { QueryParams } from 'constants/query';

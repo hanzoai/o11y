@@ -1,10 +1,11 @@
+import type { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
 	isDashboardPage: boolean;
 }
 
-interface ValueContainerProps {
+interface ValueContainerProps extends HTMLAttributes<HTMLDivElement> {
 	showClickable?: boolean;
 }
 

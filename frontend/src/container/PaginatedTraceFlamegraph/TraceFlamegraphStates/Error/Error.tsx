@@ -1,5 +1,5 @@
 import { Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import { AxiosError } from 'axios';
 
 import noDataUrl from '@/assets/Icons/no-data.svg';

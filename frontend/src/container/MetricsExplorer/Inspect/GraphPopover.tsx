@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Button, Card } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { ArrowRight } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { ArrowRight } from 'components/ui/icons';
 
 import { GraphPopoverProps } from './types';
 import { formatTimestampToFullDateTime } from './utils';

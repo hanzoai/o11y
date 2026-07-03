@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { Color } from 'constants/designTokens';
 import {
-	Button,
 	ColorPicker,
 	Input,
 	Modal,
@@ -11,6 +10,7 @@ import {
 	TableProps,
 	Typography,
 } from 'antd';
+import { Button } from 'components/ui/button';
 import logEvent from 'api/common/logEvent';
 import {
 	getViewDetailsUsingViewKey,
@@ -40,7 +40,7 @@ import {
 	Search,
 	Trash2,
 	X,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { useTimezone } from 'providers/Timezone';
 import { ICompositeMetricQuery } from 'types/api/alerts/compositeQuery';

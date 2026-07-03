@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { Color } from 'constants/designTokens';
-import { Button, Skeleton, Switch, Typography } from 'antd';
+import { Button, Skeleton, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import Uplot from 'components/Uplot';
+import { Switch } from 'components/ui/switch';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { useResizeObserver } from 'hooks/useDimensions';
 import { AppState } from 'store/reducers';

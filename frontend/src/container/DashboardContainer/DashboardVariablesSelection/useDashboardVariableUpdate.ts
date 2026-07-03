@@ -1,7 +1,7 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toast } from '@signozhq/ui/sonner';
+import { toast } from 'components/ui/sonner';
 import { useAddDynamicVariableToPanels } from 'hooks/dashboard/useAddDynamicVariableToPanels';
 import { updateLocalStorageDashboardVariable } from 'hooks/dashboard/useDashboardFromLocalStorage';
 import { useUpdateDashboard } from 'hooks/dashboard/useUpdateDashboard';

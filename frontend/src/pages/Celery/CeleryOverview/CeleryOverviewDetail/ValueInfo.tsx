@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { useQueries } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
-import { FileSearch } from '@signozhq/icons';
+import { FileSearch } from 'components/ui/icons';
 import { Button, Card, Col, Row } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { useNavigateToExplorer } from 'components/CeleryTask/useNavigateToExplorer';

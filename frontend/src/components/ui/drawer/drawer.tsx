@@ -113,6 +113,15 @@ function DrawerDescription({
 	);
 }
 
+type DrawerWidth = 'narrow' | 'base' | 'wide' | 'extra-wide';
+
+const DRAWER_WIDTH_PX: Record<DrawerWidth, string> = {
+	narrow: '400px',
+	base: '560px',
+	wide: '720px',
+	'extra-wide': '920px',
+};
+
 interface DrawerWrapperProps {
 	/** Element that opens the drawer. Optional when using controlled mode (open/onOpenChange). */
 	trigger?: React.ReactNode;
@@ -120,7 +129,13 @@ interface DrawerWrapperProps {
 		title: string;
 		description?: string;
 	};
-	content: React.ReactNode;
+	/** Body of the drawer. Use `content` or pass JSX children — they are equivalent. */
+	content?: React.ReactNode;
+	children?: React.ReactNode;
+	/** Convenience shorthand for `header.title` (antd-Drawer-compatible). */
+	title?: string;
+	/** Named width variant applied to the panel (antd-Drawer-compatible). */
+	width?: DrawerWidth;
 	footer?: React.ReactNode;
 	direction?: 'top' | 'right' | 'bottom' | 'left';
 	showCloseButton?: boolean;
@@ -151,6 +166,9 @@ function DrawerWrapper({
 	trigger,
 	header,
 	content,
+	children,
+	title,
+	width,
 	footer,
 	direction = 'right',
 	showCloseButton = true,
@@ -161,6 +179,9 @@ function DrawerWrapper({
 	open,
 	onOpenChange,
 }: DrawerWrapperProps) {
+	const resolvedHeader = header ?? (title ? { title } : undefined);
+	const body = content ?? children;
+	const panelWidth = width ? DRAWER_WIDTH_PX[width] : type === 'panel' ? '720px' : 'auto';
 	return (
 		<Drawer direction={direction} modal={allowOutsideClick} open={open} onOpenChange={onOpenChange}>
 			{trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
@@ -168,25 +189,27 @@ function DrawerWrapper({
 				<div
 					className="w-full max-w-3xl"
 					style={{
-						width: type === 'panel' ? '720px' : 'auto',
-						height: type === 'panel' ? '100vh' : 'auto',
+						width: panelWidth,
+						height: type === 'panel' || width ? '100vh' : 'auto',
 					}}
 				>
-					{header && (
+					{resolvedHeader && (
 						<div className="flex h-12 items-center justify-between border-b border-[var(--drawer-border)] px-4">
 							{type === 'panel' && showCloseButton && <CloseButton type={type} />}
 							<div className="flex items-center gap-2 flex-1">
-								<DrawerTitle className="font-sans text-sm font-normal">{header.title}</DrawerTitle>
+								<DrawerTitle className="font-sans text-sm font-normal">
+									{resolvedHeader.title}
+								</DrawerTitle>
 							</div>
 							{type === 'drawer' && showCloseButton && <CloseButton type={type} />}
 						</div>
 					)}
-					{header?.description && (
+					{resolvedHeader?.description && (
 						<DrawerHeader>
-							<DrawerDescription>{header.description}</DrawerDescription>
+							<DrawerDescription>{resolvedHeader.description}</DrawerDescription>
 						</DrawerHeader>
 					)}
-					{content}
+					{body}
 					{footer && <DrawerFooter>{footer}</DrawerFooter>}
 				</div>
 			</DrawerContent>

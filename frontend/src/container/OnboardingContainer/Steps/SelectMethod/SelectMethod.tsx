@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Space } from 'antd';
-import { RadioGroup, RadioGroupItem } from '@signozhq/ui/radio-group';
-import { Typography } from '@signozhq/ui/typography';
+import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
+import { Typography } from 'components/ui/typography';
 import {
 	OnboardingMethods,
 	useOnboardingContext,
@@ -23,7 +23,7 @@ export default function SelectMethod(): JSX.Element {
 					<RadioGroupItem value={OnboardingMethods.QUICK_START}>
 						<Typography.Text> Quick Start </Typography.Text> <br />
 						<small>Send data to Hanzo directly from OpenTelemetry SDK.</small>
-					</Radio>
+					</RadioGroupItem>
 
 					<RadioGroupItem value={OnboardingMethods.RECOMMENDED_STEPS}>
 						<Typography.Text> Use Recommended Steps </Typography.Text> <br />

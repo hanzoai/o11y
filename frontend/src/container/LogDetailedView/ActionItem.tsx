@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from 'react';
-import { CircleMinus, CirclePlus } from '@signozhq/icons';
+import { CircleMinus, CirclePlus } from 'components/ui/icons';
 import { Button, Col, Popover } from 'antd';
 import { OPERATORS } from 'constants/queryBuilder';
 import { removeJSONStringifyQuotes } from 'lib/removeJSONStringifyQuotes';

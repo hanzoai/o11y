@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import { Skeleton, Tooltip } from 'antd';
-import { Button } from '@signozhq/ui/button';
-import { Typography } from '@signozhq/ui/typography';
+import { Button } from 'components/ui/button';
+import { Typography } from 'components/ui/typography';
 import removeLocalStorageKey from 'api/browser/localstorage/remove';
 import { getYAxisFormattedValue } from 'components/Graph/yAxisConfig';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
@@ -16,7 +16,7 @@ import {
 	CalendarClock,
 	DraftingCompass,
 	Timer,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { useTimezone } from 'providers/Timezone';
 
 import './TraceMetadata.styles.scss';

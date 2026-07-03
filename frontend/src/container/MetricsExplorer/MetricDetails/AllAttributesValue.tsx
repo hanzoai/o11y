@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Button, Input, Menu, Popover, Tooltip } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
-import { Check, Copy, Search, SquareArrowOutUpRight } from '@signozhq/icons';
+import { Typography } from 'components/ui/typography';
+import { Check, Copy, Search, SquareArrowOutUpRight } from 'components/ui/icons';
 
 import MetricDetailsErrorState from './MetricDetailsErrorState';
 import { AllAttributesEmptyTextProps, AllAttributesValueProps } from './types';

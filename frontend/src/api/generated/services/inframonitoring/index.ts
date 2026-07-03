@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for SigNoz
- * * regenerate with 'pnpm generate:api'
- * SigNoz
+ * * The file has been auto-generated using Orval for Hanzo O11y
+ * * regenerate with 'yarn generate:api'
+ * Hanzo O11y
  */
 import { useMutation } from 'react-query';
 import type {
@@ -33,7 +33,7 @@ import type {
 	ListStatefulSets200,
 	ListVolumes200,
 	RenderErrorResponseDTO,
-} from '../sigNoz.schemas';
+} from '../o11y.schemas';
 
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type { ErrorType, BodyType } from '../../../generatedAPIInstance';

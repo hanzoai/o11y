@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { Color } from 'constants/designTokens';
-import { Switch } from 'antd';
+import { Switch } from 'components/ui/switch';
 import logEvent from 'api/common/logEvent';
-import { Delete } from '@signozhq/icons';
+import { Delete } from 'components/ui/icons';
 import { useTimezone } from 'providers/Timezone';
 
 import './TimezoneAdaptation.styles.scss';

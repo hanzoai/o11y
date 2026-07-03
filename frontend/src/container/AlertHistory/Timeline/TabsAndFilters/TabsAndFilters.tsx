@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Color } from 'constants/designTokens';
 import { TimelineFilter, TimelineTab } from 'container/AlertHistory/types';
 import history from 'lib/history';
-import { Info } from '@signozhq/icons';
+import { Info } from 'components/ui/icons';
 import Tabs2 from 'periscope/components/Tabs2';
 
 import './TabsAndFilters.styles.scss';

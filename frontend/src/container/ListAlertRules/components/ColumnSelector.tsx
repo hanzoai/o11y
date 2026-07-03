@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { Columns3 } from '@signozhq/icons';
-import { Button } from '@signozhq/ui/button';
-import { Checkbox } from '@signozhq/ui/checkbox';
-import { Popover, PopoverContent, PopoverTrigger } from '@signozhq/ui/popover';
+import { Columns3 } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { Checkbox } from 'components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import type { TableColumnDef } from 'components/TanStackTableView';
 import {
 	hideColumn,

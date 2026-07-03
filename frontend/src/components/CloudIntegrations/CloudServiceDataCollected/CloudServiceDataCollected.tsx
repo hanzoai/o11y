@@ -2,8 +2,8 @@ import { Table } from 'antd';
 import {
 	CloudintegrationtypesCollectedLogAttributeDTO,
 	CloudintegrationtypesCollectedMetricDTO,
-} from 'api/generated/services/sigNoz.schemas';
-import { BarChart, ScrollText } from '@signozhq/icons';
+} from 'api/generated/services/o11y.schemas';
+import { BarChart, ScrollText } from 'components/ui/icons';
 
 import './CloudServiceDataCollected.styles.scss';
 

@@ -1,7 +1,7 @@
 import { memo, useCallback } from 'react';
 import { Button, Steps, Tooltip } from 'antd';
 import logEvent from 'api/common/logEvent';
-import { Plus, Undo2 } from '@signozhq/icons';
+import { Plus, Undo2 } from 'components/ui/icons';
 import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 import { useAppContext } from 'providers/App/App';
 import { Span } from 'types/api/trace/getTraceV2';

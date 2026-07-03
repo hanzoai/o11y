@@ -4,9 +4,9 @@ import {
 	ArrowRight,
 	CircleArrowLeft,
 	UserPlus,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { Button, Space, Steps } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import BrandMark from 'components/BrandMark';
 import LaunchChatSupport from 'components/LaunchChatSupport/LaunchChatSupport';

@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 import { Select } from 'antd';
 import styled from 'styled-components';
 

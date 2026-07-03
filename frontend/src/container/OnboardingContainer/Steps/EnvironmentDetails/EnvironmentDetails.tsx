@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, Server, LoaderCircle } from '@signozhq/icons';
-import { Input } from '@signozhq/ui/input';
+import { Check, Server, LoaderCircle } from 'components/ui/icons';
+import { Input } from 'components/ui/input';
 import { Button, Card, Form, Space } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import cx from 'classnames';
 import { useOnboardingContext } from 'container/OnboardingContainer/context/OnboardingContext';

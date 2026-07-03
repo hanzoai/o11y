@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
-import { LinkOutlined } from '@ant-design/icons';
+import { Link, Pin } from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
 import {
 	Button,

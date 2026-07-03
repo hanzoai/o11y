@@ -2,9 +2,9 @@ import { ReactNode, useEffect, useMemo, useState } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { Histogram, RefreshCw } from '@signozhq/icons';
+import { Histogram, RefreshCw } from 'components/ui/icons';
 import { Alert, Table } from 'antd';
-import { Typography } from '@signozhq/ui/typography';
+import { Typography } from 'components/ui/typography';
 import ROUTES from 'constants/routes';
 import { IServiceName } from 'container/MetricsApplication/Tabs/types';
 import useErrorNotification from 'hooks/useErrorNotification';

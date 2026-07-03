@@ -1,5 +1,5 @@
 import { Popover } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 
 import { LabelColumnProps } from './TableRenderer.types';
 import BadgeWithTooltip from './BadgeWithTooltip';

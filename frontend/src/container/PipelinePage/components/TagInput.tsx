@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CircleAlert, CircleX } from '@signozhq/icons';
+import { CircleAlert, CircleX } from 'components/ui/icons';
 import { Button, Input, InputRef, message, Modal, Tooltip } from 'antd';
-import { Badge } from '@signozhq/ui/badge';
+import { Badge } from 'components/ui/badge';
 
 import { tagInputStyle } from '../PipelineListsView/config';
 import { TagInputWrapper } from './styles';

@@ -18,9 +18,9 @@ const allDeps = {
 	...packageJson.devDependencies,
 };
 
-// 4. Filter for @signozhq packages (external component library)
+// 4. Filter for @hanzo packages (design system + libs)
 const signozPackages = Object.keys(allDeps).filter((dep) =>
-	dep.startsWith('@signozhq/'),
+	dep.startsWith('@hanzo/'),
 );
 
 // 5. Generate file content
@@ -43,7 +43,7 @@ ${signozPackages.map((pkg) => `import '${pkg}';`).join('\n')}
 try {
 	fs.writeFileSync(registryPath, fileContent);
 	console.log(
-		`✅ Auto-import registry updated with ${signozPackages.length} @signozhq packages.`,
+		`✅ Auto-import registry updated with ${signozPackages.length} @hanzo packages.`,
 	);
 } catch (err) {
 	console.error('❌ Failed to update auto-import registry:', err);

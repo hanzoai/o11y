@@ -1,5 +1,5 @@
 import { Col, Input as InputComponent } from 'antd';
-import { Typography as TypographyComponent } from '@signozhq/ui/typography';
+import { Typography as TypographyComponent } from 'components/ui/typography';
 import styled from 'styled-components';
 
 export const RetentionContainer = styled(Col)`

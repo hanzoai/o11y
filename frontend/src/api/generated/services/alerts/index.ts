@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for SigNoz
- * * regenerate with 'pnpm generate:api'
- * SigNoz
+ * * The file has been auto-generated using Orval for Hanzo O11y
+ * * regenerate with 'yarn generate:api'
+ * Hanzo O11y
  */
 import { useQuery } from 'react-query';
 import type {
@@ -14,7 +14,7 @@ import type {
 	UseQueryResult,
 } from 'react-query';
 
-import type { GetAlerts200, RenderErrorResponseDTO } from '../sigNoz.schemas';
+import type { GetAlerts200, RenderErrorResponseDTO } from '../o11y.schemas';
 
 import { GeneratedAPIInstance } from '../../../generatedAPIInstance';
 import type { ErrorType } from '../../../generatedAPIInstance';

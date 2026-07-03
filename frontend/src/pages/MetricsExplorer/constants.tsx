@@ -2,7 +2,7 @@ import { TabRoutes } from 'components/RouteTab/types';
 import ROUTES from 'constants/routes';
 import ExplorerPage from 'container/MetricsExplorer/Explorer';
 import SummaryPage from 'container/MetricsExplorer/Summary';
-import { BarChart, Compass, TowerControl } from '@signozhq/icons';
+import { BarChart, Compass, TowerControl } from 'components/ui/icons';
 import SaveView from 'pages/SaveView';
 
 export const Summary: TabRoutes = {

@@ -1,7 +1,6 @@
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Check, Loader, Plus, Search } from '@signozhq/icons';
-import { Input } from '@signozhq/ui/input';
-import { Button, Spin } from 'antd';
+import { ArrowLeft, Check, Loader, Plus, Search } from 'components/ui/icons';
+import { Button, Input, Spin } from 'antd';
 import cx from 'classnames';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
 import O11yModal from 'components/O11yModal/O11yModal';

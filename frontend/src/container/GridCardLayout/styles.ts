@@ -2,6 +2,7 @@ import RGL, { WidthProvider } from 'react-grid-layout';
 import { Button as ButtonComponent, Card as CardComponent, Space } from 'antd';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { StyledCSS } from 'container/GantChart/Trace/styles';
+import { HTMLAttributes } from 'react';
 import styled, { css } from 'styled-components';
 
 const ReactGridLayoutComponent = WidthProvider(RGL);
@@ -43,7 +44,7 @@ interface Props {
 	isDarkMode: boolean;
 }
 
-export const CardContainer = styled.div<Props>`
+export const CardContainer = styled.div<Props & HTMLAttributes<HTMLDivElement>>`
 	overflow: auto;
 
 	&.row-card {

@@ -1,4 +1,4 @@
-import { Plus } from '@signozhq/icons';
+import { Plus } from 'components/ui/icons';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { IPromQLQuery } from 'types/api/queryBuilder/queryBuilderData';
 import { EQueryType } from 'types/common/dashboard';

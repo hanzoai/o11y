@@ -1,4 +1,4 @@
-import { Search } from '@signozhq/icons';
+import { Search } from 'components/ui/icons';
 import { Button, Card, Input, Space } from 'antd';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 

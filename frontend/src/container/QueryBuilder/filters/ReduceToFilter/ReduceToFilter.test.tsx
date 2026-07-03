@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { MetrictypesTypeDTO } from 'api/generated/services/sigNoz.schemas';
+import { MetrictypesTypeDTO } from 'api/generated/services/o11y.schemas';
 import { IBuilderQuery } from 'types/api/queryBuilder/queryBuilderData';
 import { ReduceOperators } from 'types/common/queryBuilder';
 

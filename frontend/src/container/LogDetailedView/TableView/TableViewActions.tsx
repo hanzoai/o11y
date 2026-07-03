@@ -21,7 +21,7 @@ import {
 	ArrowUpFromDot,
 	Ellipsis,
 	RefreshCw,
-} from '@signozhq/icons';
+} from 'components/ui/icons';
 import { ExplorerViews } from 'pages/LogsExplorer/utils';
 import { useTimezone } from 'providers/Timezone';
 import {

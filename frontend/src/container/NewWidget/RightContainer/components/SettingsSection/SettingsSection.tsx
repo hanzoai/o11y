@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react';
-import { ChevronDown } from '@signozhq/icons';
+import { ChevronDown } from 'components/ui/icons';
 
 import './SettingsSection.styles.scss';
 

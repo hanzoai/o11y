@@ -10,15 +10,15 @@ import {
 } from 'react';
 import type { TableComponents } from 'react-virtuoso';
 import { TableVirtuoso, TableVirtuosoHandle } from 'react-virtuoso';
-import { Loader } from '@signozhq/icons';
+import { Loader } from 'components/ui/icons';
 import { DndContext, pointerWithin } from '@dnd-kit/core';
 import {
 	horizontalListSortingStrategy,
 	SortableContext,
 } from '@dnd-kit/sortable';
-import { ComboboxSimple } from '@signozhq/ui/combobox';
-import { TooltipProvider } from '@signozhq/ui/tooltip';
-import { Pagination } from '@signozhq/ui/pagination';
+import { ComboboxSimple } from 'components/ui/combobox';
+import { TooltipProvider } from 'components/ui/tooltip';
+import { Pagination } from 'components/ui/pagination';
 import type { Row } from '@tanstack/react-table';
 import {
 	ColumnDef,

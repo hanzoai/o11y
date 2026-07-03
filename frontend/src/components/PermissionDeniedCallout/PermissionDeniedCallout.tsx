@@ -1,4 +1,4 @@
-import { Callout } from '@signozhq/ui/callout';
+import { Callout } from 'components/ui/callout';
 import cx from 'classnames';
 import styles from './PermissionDeniedCallout.module.scss';
 
