@@ -106,12 +106,12 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 			items: [
 				{
 					title: 'Send metrics to Hanzo',
-					icon: <BarChartOutlined style={{ fontSize: '3.5rem' }} />,
+					icon: <ChartBar style={{ fontSize: '3.5rem' }} />,
 					url: 'https://o11y.hanzo.ai/docs/userguide/send-metrics/',
 				},
 				{
 					title: 'Create and Manage Dashboards',
-					icon: <DashboardFilled style={{ fontSize: '3.5rem' }} />,
+					icon: <LayoutDashboard style={{ fontSize: '3.5rem' }} />,
 					url: 'https://o11y.hanzo.ai/docs/userguide/manage-dashboards-and-panels/',
 				},
 			],
@@ -121,12 +121,12 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 			items: [
 				{
 					title: 'Send your logs to Hanzo',
-					icon: <AlignLeftOutlined style={{ fontSize: '3.5rem' }} />,
+					icon: <AlignLeft style={{ fontSize: '3.5rem' }} />,
 					url: 'https://o11y.hanzo.ai/docs/userguide/logs/',
 				},
 				{
 					title: 'Existing log collectors to Hanzo',
-					icon: <ApiFilled style={{ fontSize: '3.5rem' }} />,
+					icon: <Unplug style={{ fontSize: '3.5rem' }} />,
 					url: 'https://o11y.hanzo.ai/docs/userguide/fluentbit_to_o11y/',
 				},
 			],
@@ -136,12 +136,12 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 			items: [
 				{
 					title: 'Create alert rules on metrics',
-					icon: <AlertFilled style={{ fontSize: '3.5rem' }} />,
+					icon: <BellRing style={{ fontSize: '3.5rem' }} />,
 					url: 'https://o11y.hanzo.ai/docs/userguide/alerts-management/',
 				},
 				{
 					title: 'Configure alert notification channels',
-					icon: <SoundFilled style={{ fontSize: '3.5rem' }} />,
+					icon: <Volume2 style={{ fontSize: '3.5rem' }} />,
 					url:
 						'https://o11y.hanzo.ai/docs/userguide/alerts-management/#setting-up-a-notification-channel',
 				},

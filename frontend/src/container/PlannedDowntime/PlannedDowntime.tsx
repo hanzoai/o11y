@@ -1,10 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { PlusOutlined } from '@ant-design/icons';
 import { Color } from 'constants/designTokens';
 import { Button, Flex, Form, Input, Tooltip, Typography } from 'antd';
-import getAll from 'api/alerts/getAll';
-import { useDeleteDowntimeSchedule } from 'api/plannedDowntime/deleteDowntimeSchedule';
+import { Plus, Search } from 'components/ui/icons';
 import {
 	useDeleteDowntimeScheduleByID,
 	useListDowntimeSchedules,

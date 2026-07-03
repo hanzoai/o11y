@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
 import { generatePath } from 'react-router-dom';
 import { Color } from 'constants/designTokens';
-import { Dropdown, Skeleton, Typography } from 'antd';
+import { Skeleton, Typography } from 'antd';
 import {
 	useGetMetricAlerts,
 	useGetMetricDashboards,
 } from 'api/generated/services/metrics';
 import { QueryParams } from 'constants/query';
 import ROUTES from 'constants/routes';
+import { DropdownMenuSimple } from 'components/ui/dropdown-menu';
 import { Bell, Grid2X2 } from 'components/ui/icons';
 import { openInNewTab } from 'utils/navigation';
 import { pluralize } from 'utils/pluralize';

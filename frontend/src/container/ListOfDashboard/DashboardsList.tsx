@@ -17,11 +17,9 @@ import {
 	Dropdown,
 	Flex,
 	Input,
-	MenuProps,
 	Modal,
 	Popover,
 	Skeleton,
-	Switch,
 	Table,
 	Tag,
 	Tooltip,
@@ -74,6 +72,9 @@ import {
 	Search,
 	SquareArrowOutUpRight,
 } from 'components/ui/icons';
+import { Badge } from 'components/ui/badge';
+import { DropdownMenuSimple, type MenuItem } from 'components/ui/dropdown-menu';
+import { Switch } from 'components/ui/switch';
 import { useAppContext } from 'providers/App/App';
 import { useErrorModal } from 'providers/ErrorModalProvider';
 import { useTimezone } from 'providers/Timezone';

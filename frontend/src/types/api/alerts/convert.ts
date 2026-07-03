@@ -121,7 +121,7 @@ function toEQueryType(queryType: RuletypesQueryTypeDTO): EQueryType {
 		case RuletypesQueryTypeDTO.builder:
 			return EQueryType.QUERY_BUILDER;
 		case RuletypesQueryTypeDTO.clickhouse_sql:
-			return EQueryType.CLICKHOUSE;
+			return EQueryType.DATASTORE;
 		case RuletypesQueryTypeDTO.promql:
 			return EQueryType.PROM;
 		default:

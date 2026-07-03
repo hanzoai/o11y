@@ -2,7 +2,7 @@ import { Typography } from 'components/ui/typography';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from 'react-query';
-import { CheckCircleOutlined, CloudDownloadOutlined } from '@ant-design/icons';
+import { CircleCheck, CloudDownload } from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
 import {
 	Alert,
@@ -372,7 +372,7 @@ export default function BillingContainer(): JSX.Element {
 				{t('here')}
 			</Typography.Link>
 			{` if your payment information has changed. Email us at `}
-			<Text type="secondary">cloud-support@o11y.hanzo.ai</Text>
+			<Typography.Text color="muted">cloud-support@o11y.hanzo.ai</Typography.Text>
 			{` otherwise. Be sure to provide this information immediately to avoid interruption to your service.`}
 		</Typography>
 	);

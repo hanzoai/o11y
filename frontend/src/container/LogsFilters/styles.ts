@@ -1,3 +1,4 @@
+import type { HTMLAttributes } from 'react';
 import { blue, grey } from '@ant-design/colors';
 import { Typography } from 'components/ui/typography';
 import styled from 'styled-components';
@@ -12,7 +13,9 @@ export const FieldContainer = styled(Typography.Text)`
 	color: ${blue[4]};
 `;
 
-export const Field = styled.div<{ isDarkMode: boolean }>`
+export const Field = styled.div<
+	{ isDarkMode: boolean } & HTMLAttributes<HTMLDivElement>
+>`
 	border-radius: 0.5rem;
 	padding: 0.3rem 0.5rem;
 	height: 2rem;

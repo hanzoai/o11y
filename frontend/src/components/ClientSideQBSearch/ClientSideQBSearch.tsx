@@ -38,7 +38,7 @@ import { operatorTypeMapper } from 'hooks/queryBuilder/useOperatorType';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { isArray, isEmpty, isEqual, isObject } from 'lodash-es';
 import { ChevronDown, ChevronUp } from 'components/ui/icons';
-import type { BaseSelectRef } from 'rc-select';
+import type { RefSelectProps } from 'antd';
 import {
 	BaseAutocompleteData,
 	DataTypes,
@@ -78,6 +78,18 @@ interface AttributeValue {
 	boolAttributeValues: boolean[] | [];
 }
 
+// styled-components' generated props type drops the intrinsic <span> DOM
+// attributes under the current type-checker, so re-widen the imported chip
+// label to the props it actually renders (onClick et al.). Runtime is
+// unchanged — styled.span forwards these straight to the DOM span.
+const ChipLabel = TypographyText as unknown as React.FC<
+	React.HTMLAttributes<HTMLSpanElement> & {
+		$isInNin: boolean;
+		$isEnabled: boolean;
+		$disabled?: boolean;
+	}
+>;
+
 function ClientSideQBSearch(
 	props: ClientSideQBSearchProps,
 ): React.ReactElement {
@@ -94,7 +106,7 @@ function ClientSideQBSearch(
 
 	const isDarkMode = useIsDarkMode();
 
-	const selectRef = useRef<BaseSelectRef>(null);
+	const selectRef = useRef<RefSelectProps>(null);
 
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -558,7 +570,7 @@ function ClientSideQBSearch(
 					}}
 				>
 					<Tooltip title={chipValue}>
-						<TypographyText
+						<ChipLabel
 							$isInNin={isInNin}
 							$isEnabled={!!searchValue}
 							$disabled={isDisabled}
@@ -569,7 +581,7 @@ function ClientSideQBSearch(
 							}}
 						>
 							{chipValue}
-						</TypographyText>
+						</ChipLabel>
 					</Tooltip>
 				</Badge>
 			</span>

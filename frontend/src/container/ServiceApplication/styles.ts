@@ -1,7 +1,8 @@
+import type { HTMLAttributes } from 'react';
 import { Typography } from 'components/ui/typography';
 import styled from 'styled-components';
 
-export const Container = styled.div`
+export const Container = styled.div<HTMLAttributes<HTMLDivElement>>`
 	margin-top: 2rem;
 `;
 

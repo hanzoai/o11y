@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from 'components/ui/button';
 import { Checkbox } from 'components/ui/checkbox';
 import { Input } from 'components/ui/input';
@@ -8,6 +8,8 @@ import { ArrowRight } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 
 import { OnboardingQuestionHeader } from '../OnboardingQuestionHeader';
+
+import { seededShuffle } from './utils';
 
 import '../OnboardingQuestionaire.styles.scss';
 
@@ -48,6 +50,8 @@ export function AboutHanzoQuestions({
 		o11yDetails?.discoverO11y || '',
 	);
 	const [isNextDisabled, setIsNextDisabled] = useState<boolean>(true);
+
+	const { versionData } = useAppContext();
 
 	const shuffledOptionKeys = useMemo(
 		() =>
@@ -126,20 +130,22 @@ export function AboutHanzoQuestions({
 								<div key={option} className="checkbox-item">
 									<Checkbox
 										id={`checkbox-${option}`}
-										checked={interestInO11y.includes(option)}
-										onCheckedChange={createInterestChangeHandler(option)}
-										labelName={interestedInOptions[option]}
-									/>
+										value={interestInO11y.includes(option)}
+										onChange={createInterestChangeHandler(option)}
+									>
+										{interestedInOptions[option]}
+									</Checkbox>
 								</div>
 							))}
 
 							<div className="checkbox-item checkbox-item-others">
 								<Checkbox
 									id="others-checkbox"
-									checked={interestInO11y.includes('Others')}
-									onCheckedChange={createInterestChangeHandler('Others')}
-									labelName={interestInO11y.includes('Others') ? '' : 'Others'}
-								/>
+									value={interestInO11y.includes('Others')}
+									onChange={createInterestChangeHandler('Others')}
+								>
+									{interestInO11y.includes('Others') ? '' : 'Others'}
+								</Checkbox>
 								{interestInO11y.includes('Others') && (
 									<Input
 										type="text"

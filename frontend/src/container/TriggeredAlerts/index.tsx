@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useCallback, useMemo } from 'react';
 import { Search } from 'components/ui/icons';
-import { Input } from 'components/ui/input';
+import { Input } from 'antd';
 import { ComboboxSimple, ComboboxSimpleItem } from 'components/ui/combobox';
 import ErrorEmptyState from 'components/Alerts/ErrorEmptyState';
 import NoResultsEmptyState from 'components/Alerts/NoResultsEmptyState';

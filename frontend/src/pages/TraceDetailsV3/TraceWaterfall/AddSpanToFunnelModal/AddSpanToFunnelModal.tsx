@@ -1,7 +1,6 @@
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
-import { Spin } from 'antd';
+import { Input, Spin } from 'antd';
 import cx from 'classnames';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
 import SignozModal from 'components/O11yModal/O11yModal';

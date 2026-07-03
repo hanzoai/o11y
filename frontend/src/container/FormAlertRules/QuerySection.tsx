@@ -259,13 +259,6 @@ function QuerySection({
 			default:
 				return null;
 		}
-		if (c === EQueryType.CLICKHOUSE && !isAnomalyDetection) {
-			return renderChQueryUI();
-		}
-		if (c === EQueryType.QUERY_BUILDER) {
-			return renderMetricUI();
-		}
-		return null;
 	};
 
 	const step2Label = alertDef.alertType === 'METRIC_BASED_ALERT' ? '2' : '1';

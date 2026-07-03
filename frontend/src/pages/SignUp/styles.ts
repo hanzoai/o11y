@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import { CSSProperties, LabelHTMLAttributes } from 'react';
 import { Card, Form } from 'antd';
 import styled from 'styled-components';
 
@@ -9,7 +9,7 @@ export const FormWrapper = styled(Card)`
 	flex: 1;
 `;
 
-export const Label = styled.label`
+export const Label = styled.label<LabelHTMLAttributes<HTMLLabelElement>>`
 	margin-bottom: 0;
 	margin-top: 0;
 	display: inline-block;

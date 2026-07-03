@@ -1,8 +1,8 @@
-import { useCallback } from 'react';
+import { ComponentType, PropsWithChildren, useCallback } from 'react';
 import { Space } from 'antd';
 import { Typography } from 'components/ui/typography';
 import UnAuthorized from 'assets/UnAuthorized';
-import { Container } from 'components/NotFound/styles';
+import { Container as ContainerBase } from 'components/NotFound/styles';
 import { handleContactSupport } from 'container/Integrations/utils';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import { useQueryState } from 'nuqs';
@@ -11,6 +11,10 @@ import { useAppContext } from '../../providers/App/App';
 import { USER_ROLES } from '../../types/roles';
 
 import './index.styles.scss';
+
+const Container = ContainerBase as unknown as ComponentType<
+	PropsWithChildren<{ className?: string }>
+>;
 
 function UnAuthorizePage(): JSX.Element {
 	const [debugCurrentRole] = useQueryState('currentRole');

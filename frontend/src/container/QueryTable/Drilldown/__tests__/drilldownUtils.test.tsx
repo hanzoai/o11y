@@ -532,7 +532,7 @@ describe('drilldownUtils', () => {
 				queryTraceOperator: [],
 			},
 			promql: [],
-			clickhouse_sql: [],
+			datastore_sql: [],
 		});
 
 		it('rewrites serviceName -> service.name when drilling to logs', () => {
@@ -633,7 +633,7 @@ describe('drilldownUtils', () => {
 					queryTraceOperator: [],
 				},
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 			};
 			const result = getViewQuery(metricsQuery, [], 'view_traces', 'm');
 			const expr = result?.builder.queryData[0]?.filter?.expression || '';
@@ -667,7 +667,7 @@ describe('drilldownUtils', () => {
 					queryTraceOperator: [],
 				},
 				promql: [],
-				clickhouse_sql: [],
+				datastore_sql: [],
 			};
 			const result = getViewQuery(metricsQuery, [], 'view_logs', 'm');
 			const expr = result?.builder.queryData[0]?.filter?.expression || '';

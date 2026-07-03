@@ -23,6 +23,7 @@ import cx from 'classnames';
 import dayjs from 'dayjs';
 import { useNotifications } from 'hooks/useNotifications';
 import { defaultTo } from 'lodash-es';
+import { Badge } from 'components/ui/badge';
 import { CalendarClock, PenLine, Trash2 } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { USER_ROLES } from 'types/roles';

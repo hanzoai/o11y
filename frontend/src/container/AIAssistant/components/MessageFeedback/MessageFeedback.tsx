@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import cx from 'classnames';
 import { useCopyToClipboard } from 'react-use';
 import { Button } from 'components/ui/button';
-import { DialogWrapper } from 'components/ui/dialog';
+import { DialogSubtitle, DialogWrapper } from 'components/ui/dialog';
 import { TooltipSimple } from 'components/ui/tooltip';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import { Check, Copy, RefreshCw, ThumbsDown, ThumbsUp } from 'components/ui/icons';
@@ -244,7 +244,6 @@ export default function MessageFeedback({
 				open={isNegativeDialogOpen}
 				onOpenChange={setIsNegativeDialogOpen}
 				title="What went wrong?"
-				subTitle="Your feedback helps us improve the assistant. Comments are optional."
 				width="base"
 				footer={
 					<div className={styles.feedbackDialogFooter}>
@@ -261,6 +260,9 @@ export default function MessageFeedback({
 					</div>
 				}
 			>
+				<DialogSubtitle>
+					Your feedback helps us improve the assistant. Comments are optional.
+				</DialogSubtitle>
 				<textarea
 					className={styles.feedbackTextarea}
 					placeholder="Tell us what was unhelpful, inaccurate, or unsafe…"

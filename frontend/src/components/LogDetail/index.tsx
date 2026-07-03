@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux'; // old code, TODO: fix this correctly
 import { useCopyToClipboard, useLocation } from 'react-use';
 import { Color, Spacing } from 'constants/designTokens';
-import { Button, Divider, Drawer, Radio, Tooltip, Typography } from 'antd';
+import { Divider, Drawer, Radio, Tooltip, Typography } from 'antd';
 import type { RadioChangeEvent } from 'antd/lib';
 import cx from 'classnames';
 import { LogType } from 'components/Logs/LogStateIndicator/LogStateIndicator';
@@ -45,6 +45,8 @@ import {
 	TextSelect,
 	X,
 } from 'components/ui/icons';
+import { Button } from 'components/ui/button';
+import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import { JsonView } from 'periscope/components/JsonView';
 import { useAppContext } from 'providers/App/App';
 import { AppState } from 'store/reducers';

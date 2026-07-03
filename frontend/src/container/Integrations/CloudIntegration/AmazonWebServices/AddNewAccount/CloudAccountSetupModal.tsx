@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
 import { useQueryClient } from 'react-query';
 import { Color } from 'constants/designTokens';
-import O11yModal from 'components/O11yModal/O11yModal';
+import { Button } from 'components/ui/button';
+import { DrawerWrapper } from 'components/ui/drawer';
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 import { useIntegrationModal } from 'hooks/integration/aws/useIntegrationModal';
 import { SquareArrowOutUpRight } from 'components/ui/icons';
@@ -150,7 +151,7 @@ function CloudAccountSetupModal({
 	};
 
 	return (
-		<O11yModal
+		<DrawerWrapper
 			open
 			className="cloud-account-setup-modal"
 			onOpenChange={handleDrawerOpenChange}
@@ -161,7 +162,7 @@ function CloudAccountSetupModal({
 			footer={footer}
 		>
 			{renderContent()}
-		</O11yModal>
+		</DrawerWrapper>
 	);
 }
 

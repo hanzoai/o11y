@@ -15,6 +15,7 @@ import { useLocation } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { Toaster } from '@hanzo/ui';
 import { Flex } from 'antd';
+import { TooltipProvider } from 'components/ui/tooltip';
 import getLocalStorageApi from 'api/browser/localstorage/get';
 import setLocalStorageApi from 'api/browser/localstorage/set';
 import getChangelogByVersion from 'api/changelog/getChangelogByVersion';

@@ -94,7 +94,7 @@ function CloudAccountSetupModal({
 			return (
 				<div className="cloud-account-setup-form__alert">
 					<Callout
-						title={
+						message={
 							<div className="cloud-account-setup-form__alert-message">
 								<Spin
 									indicator={
@@ -119,7 +119,7 @@ function CloudAccountSetupModal({
 			return (
 				<div className="cloud-account-setup-form__alert">
 					<Callout
-						title={
+						message={
 							<div className="cloud-account-setup-form__alert-message">
 								We couldn&apos;t establish a connection to your Azure account. Please
 								try again

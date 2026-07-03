@@ -58,10 +58,10 @@ function AuthnProviderSelector({
 				<Typography.Title level={4}>
 					Configure Authentication Method
 				</Typography.Title>
-				<Typography.Paragraph italic>
+				<Typography.Text as="p" italic>
 					Hanzo supports the following single sign-on services (SSO). Get started
 					with setting your project’s SSO below
-				</Typography.Paragraph>
+				</Typography.Text>
 			</section>
 			<section className="selector">
 				{authnProviders.map((provider) => {

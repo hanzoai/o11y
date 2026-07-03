@@ -44,7 +44,7 @@ function ActionsMenu({
 			{
 				loading: newDisabled ? 'Disabling alert...' : 'Enabling alert...',
 				success: newDisabled ? 'Alert disabled' : 'Alert enabled',
-				error: (error): string => {
+				error: (error: unknown): string => {
 					const apiError = convertToApiError(
 						error as AxiosError<RenderErrorResponseDTO>,
 					);
@@ -81,7 +81,7 @@ function ActionsMenu({
 			{
 				loading: 'Cloning alert...',
 				success: 'Alert cloned successfully',
-				error: (error): string => {
+				error: (error: unknown): string => {
 					const apiError = convertToApiError(
 						error as AxiosError<RenderErrorResponseDTO>,
 					);
@@ -101,7 +101,7 @@ function ActionsMenu({
 			{
 				loading: 'Deleting alert...',
 				success: 'Alert deleted successfully',
-				error: (error): string => {
+				error: (error: unknown): string => {
 					const apiError = convertToApiError(
 						error as AxiosError<RenderErrorResponseDTO>,
 					);

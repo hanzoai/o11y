@@ -214,7 +214,7 @@ function OptimiseO11yNeeds({
 										handleSliderChange('logsPerDay', value as number)
 									}
 									styles={{
-										range: {
+										track: {
 											backgroundColor: '#4E74F8',
 										},
 									}}
@@ -241,7 +241,7 @@ function OptimiseO11yNeeds({
 										handleSliderChange('hostsPerDay', value as number)
 									}
 									styles={{
-										range: {
+										track: {
 											backgroundColor: '#4E74F8',
 										},
 									}}
@@ -268,7 +268,7 @@ function OptimiseO11yNeeds({
 										handleSliderChange('services', value as number)
 									}
 									styles={{
-										range: {
+										track: {
 											backgroundColor: '#4E74F8',
 										},
 									}}

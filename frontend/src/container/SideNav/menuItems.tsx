@@ -1,4 +1,3 @@
-import { RocketOutlined } from '@ant-design/icons';
 import { Style } from 'constants/designTokens';
 import { MenuProps } from 'antd';
 import ROUTES from 'constants/routes';

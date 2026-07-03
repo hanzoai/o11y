@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { Color } from 'constants/designTokens';
 import {
-	Button,
 	ColorPicker,
 	Input,
 	Modal,
@@ -11,6 +10,7 @@ import {
 	TableProps,
 	Typography,
 } from 'antd';
+import { Button } from 'components/ui/button';
 import logEvent from 'api/common/logEvent';
 import {
 	getViewDetailsUsingViewKey,

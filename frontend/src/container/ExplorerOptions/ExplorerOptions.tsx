@@ -9,7 +9,15 @@ import {
 	useState,
 } from 'react';
 import { useHistory } from 'react-router-dom';
-import { InfoCircleOutlined } from '@ant-design/icons';
+import {
+	Check,
+	ConciergeBell,
+	Disc3,
+	Info,
+	PanelBottomClose,
+	Plus,
+	X,
+} from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
 import {
 	Button,

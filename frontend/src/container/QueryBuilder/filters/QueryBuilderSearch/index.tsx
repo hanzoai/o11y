@@ -39,7 +39,7 @@ import {
 	Filter,
 	Slash,
 } from 'components/ui/icons';
-import type { BaseSelectRef } from 'rc-select';
+import type { RefSelectProps } from 'antd';
 import {
 	BaseAutocompleteData,
 	DataTypes,
@@ -140,7 +140,7 @@ function QueryBuilderSearch({
 	const [dynamicPlacholder, setDynamicPlaceholder] = useState<string>(
 		placeholder || '',
 	);
-	const selectRef = useRef<BaseSelectRef>(null);
+	const selectRef = useRef<RefSelectProps>(null);
 
 	const { sourceKeys, handleRemoveSourceKey } = useFetchKeysAndValues(
 		searchValue,

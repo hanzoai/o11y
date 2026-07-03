@@ -1,6 +1,7 @@
 import { Color } from 'constants/designTokens';
 import { Alert, Spin } from 'antd';
 import { LoaderCircle, TriangleAlert } from 'lucide-react';
+import { Callout } from 'components/ui/callout';
 
 import { ModalStateEnum } from '../HeroSection/types';
 
@@ -13,7 +14,7 @@ function AlertMessage({
 		case ModalStateEnum.WAITING:
 			return (
 				<Callout
-					title={
+					message={
 						<div className="cloud-account-setup-form__alert-message">
 							<Spin
 								indicator={
@@ -34,7 +35,7 @@ function AlertMessage({
 		case ModalStateEnum.ERROR:
 			return (
 				<Callout
-					title={
+					message={
 						<div className="cloud-account-setup-form__alert-message">
 							{`We couldn't establish a connection to your AWS account. Please try again`}
 						</div>

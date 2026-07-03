@@ -11,7 +11,8 @@ import { FormattingOptions, Preferences } from '../types';
 const migrateColumns = (columns: any): any =>
 	columns.map((column: any) => {
 		if (has(column, 'key') && !has(column, 'name')) {
-			return { ...column, name: column.key };
+			const col = column as Record<string, unknown>;
+			return { ...col, name: col.key };
 		}
 		return column;
 	});

@@ -1,20 +1,15 @@
 import { ReactNode, useState } from 'react';
 import MEditor, { EditorProps, Monaco } from '@monaco-editor/react';
 import { Color } from 'constants/designTokens';
-import {
-	Button,
-	Collapse,
-	Divider,
-	Input,
-	Switch,
-	Tag,
-	Typography,
-} from 'antd';
+import { Collapse, Divider, Input, Tag, Typography } from 'antd';
 import { AddToQueryHOCProps } from 'components/Logs/AddToQueryHOC';
 import { ChangeViewFunctionType } from 'container/ExplorerOptions/types';
 import { OptionsQuery } from 'container/OptionsMenu/types';
 import { useIsDarkMode } from 'hooks/useDarkMode';
+import { Badge } from 'components/ui/badge';
+import { Button } from 'components/ui/button';
 import { ChevronDown, ChevronRight, Search } from 'components/ui/icons';
+import { Switch } from 'components/ui/switch';
 import { IField } from 'types/api/logs/fields';
 import { ILog } from 'types/api/logs/log';
 

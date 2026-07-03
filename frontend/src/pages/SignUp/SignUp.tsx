@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useQuery } from 'react-query';
-import { useLocation } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import { Button } from '@hanzo/ui';
 import { Callout } from 'components/ui/callout';
 import { Input } from 'components/ui/input';
@@ -15,8 +13,6 @@ import BrandMark from 'components/BrandMark';
 import { useNotifications } from 'hooks/useNotifications';
 import { ArrowRight } from 'components/ui/icons';
 import APIError from 'types/api/error';
-
-import tvUrl from '@/assets/svgs/tv.svg';
 
 import { FormContainer, Label } from './styles';
 
@@ -44,49 +40,6 @@ function SignUp(): JSX.Element {
 	const email = Form.useWatch('email', form);
 	const password = Form.useWatch('password', form);
 	const confirmPassword = Form.useWatch('confirmPassword', form);
-
-	useEffect(() => {
-		if (
-			getInviteDetailsResponse.status === 'success' &&
-			getInviteDetailsResponse.data.data
-		) {
-			const responseDetails = getInviteDetailsResponse.data.data;
-			form.setFieldValue('email', responseDetails.email);
-			form.setFieldValue('organizationName', responseDetails.organization);
-			setIsDetailsDisable(true);
-
-			logEvent('Account Creation Page Visited', {
-				email: responseDetails.email,
-				name: responseDetails.name,
-				company_name: responseDetails.organization,
-				source: 'O11y',
-			});
-		}
-	}, [
-		getInviteDetailsResponse.data?.data,
-		form,
-		getInviteDetailsResponse.status,
-	]);
-
-	useEffect(() => {
-		if (
-			getInviteDetailsResponse.status === 'success' &&
-			getInviteDetailsResponse?.error
-		) {
-			const { error } = getInviteDetailsResponse;
-			notifications.error({
-				message: (error as APIError).getErrorCode(),
-				description: (error as APIError).getErrorMessage(),
-			});
-		}
-	}, [
-		getInviteDetailsResponse,
-		getInviteDetailsResponse.data,
-		getInviteDetailsResponse.status,
-		notifications,
-	]);
-
-	const isSignUp = token === null;
 
 	const signUp = async (values: FormValues): Promise<void> => {
 		try {
@@ -222,10 +175,13 @@ function SignUp(): JSX.Element {
 						</div>
 					</div>
 
-					<Callout type="info" size="small" showIcon className="signup-info-callout">
-						This will create an admin account. If you are not an admin, please ask
-						your admin for an invite link
-					</Callout>
+					<Callout
+						type="info"
+						size="small"
+						showIcon
+						className="signup-info-callout"
+						description="This will create an admin account. If you are not an admin, please ask your admin for an invite link"
+					/>
 
 					{formError && <AuthError error={formError} />}
 

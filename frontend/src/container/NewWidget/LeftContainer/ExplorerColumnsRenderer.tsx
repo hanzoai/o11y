@@ -6,6 +6,7 @@ import {
 	Droppable,
 	DropResult,
 } from 'react-beautiful-dnd';
+import { Button, Input, Tooltip } from 'antd';
 import { Color } from 'constants/designTokens';
 import {
 	DropdownMenu,

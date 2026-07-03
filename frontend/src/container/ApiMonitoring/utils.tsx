@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Color } from 'constants/designTokens';
 import { Progress, TableColumnType as ColumnType, Tag, Tooltip } from 'antd';
+import { Badge } from 'components/ui/badge';
 import { convertFiltersToExpressionWithExistingQuery } from 'components/QueryBuilderV2/utils';
 import {
 	FiltersType,

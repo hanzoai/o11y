@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import cx from 'classnames';
 import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
+import { Input } from 'antd';
 import { TooltipSimple } from 'components/ui/tooltip';
 import { Plus, Search } from 'components/ui/icons';
 

@@ -193,13 +193,12 @@ export function useIntegrationModal({
 			setIsLoading(true);
 			const values = await form.validateFields();
 
-			const payload: GenerateConnectionUrlPayload = {
-				agent_config: {
-					region: values.region,
-					ingestion_url: connectionParams?.ingestion_url || values.ingestion_url,
-					ingestion_key: connectionParams?.ingestion_key || values.ingestion_key,
-					observe_api_url: connectionParams?.observe_api_url || values.observe_api_url,
-					observe_api_key: connectionParams?.observe_api_key || values.observe_api_key,
+			const payload: CloudintegrationtypesPostableAccountDTO = {
+				config: {
+					aws: {
+						deploymentRegion: values.region,
+						regions: selectedRegions,
+					},
 				},
 				credentials: {
 					ingestionUrl: connectionParams?.data?.ingestionUrl || values.ingestionUrl,

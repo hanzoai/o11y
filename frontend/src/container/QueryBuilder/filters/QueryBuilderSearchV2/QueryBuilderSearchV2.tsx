@@ -40,7 +40,7 @@ import {
 	unset,
 } from 'lodash-es';
 import { ChevronDown, ChevronUp } from 'components/ui/icons';
-import type { BaseSelectRef } from 'rc-select';
+import type { RefSelectProps } from 'antd';
 import {
 	BaseAutocompleteData,
 	DataTypes,
@@ -161,7 +161,7 @@ function QueryBuilderSearchV2(
 
 	const { handleRunQuery, currentQuery } = useQueryBuilder();
 
-	const selectRef = useRef<BaseSelectRef>(null);
+	const selectRef = useRef<RefSelectProps>(null);
 
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 

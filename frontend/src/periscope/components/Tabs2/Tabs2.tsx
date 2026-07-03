@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Color } from 'constants/designTokens';
 import { Button, Tag } from 'antd';
+import { Badge } from 'components/ui/badge';
 import { TimelineFilter } from 'container/AlertHistory/types';
 import { Undo } from 'components/ui/icons';
 

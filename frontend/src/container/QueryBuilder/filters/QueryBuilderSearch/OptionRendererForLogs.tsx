@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Color } from 'constants/designTokens';
-import { Tooltip, Typography } from 'antd';
+import { Tooltip } from 'antd';
 import cx from 'classnames';
 import { Zap } from 'components/ui/icons';
+import { Typography } from 'components/ui/typography';
 
 import { getOptionType } from './utils';
 

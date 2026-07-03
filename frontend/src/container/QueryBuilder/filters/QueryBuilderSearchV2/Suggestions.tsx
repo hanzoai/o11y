@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Color } from 'constants/designTokens';
-import { Tooltip, Typography } from 'antd';
+import { Tooltip } from 'antd';
 import cx from 'classnames';
 import { isEmpty, isObject } from 'lodash-es';
 import { Check, Zap } from 'components/ui/icons';
+import { Typography } from 'components/ui/typography';
 import { BaseAutocompleteData } from 'types/api/queryBuilder/queryAutocompleteResponse';
 
 import { getTagToken } from '../QueryBuilderSearch/utils';

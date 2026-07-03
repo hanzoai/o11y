@@ -1,3 +1,4 @@
+import type { HTMLAttributes, RefAttributes } from 'react';
 import { volcano } from '@ant-design/colors';
 import styled, {
 	css,
@@ -9,7 +10,9 @@ interface Props {
 	isOnlyChild: boolean;
 }
 
-export const Wrapper = styled.ul<Props>`
+export const Wrapper = styled.ul<
+	Props & HTMLAttributes<HTMLUListElement> & RefAttributes<HTMLUListElement>
+>`
 	display: flex;
 	flex-direction: column;
 	padding-bottom: 0.5rem;
@@ -36,7 +39,9 @@ export const Wrapper = styled.ul<Props>`
 	}
 `;
 
-export const CardContainer = styled.li<{ isMissing?: boolean }>`
+export const CardContainer = styled.li<
+	{ isMissing?: boolean } & HTMLAttributes<HTMLLIElement>
+>`
 	display: flex;
 	width: 100%;
 	cursor: pointer;
@@ -56,7 +61,7 @@ export type StyledCSS =
 	| false
 	| undefined;
 
-export const CardComponent = styled.div<Props>`
+export const CardComponent = styled.div<Props & HTMLAttributes<HTMLDivElement>>`
 	border: 1px solid
 		${({ isDarkMode }): StyledCSS => (isDarkMode ? '#434343' : '#333')};
 	box-sizing: border-box;

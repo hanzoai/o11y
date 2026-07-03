@@ -9,11 +9,10 @@ import { useQueryClient } from 'react-query';
 import cx from 'classnames';
 import { Badge } from 'components/ui/badge';
 import { Button } from 'components/ui/button';
-import { Input } from 'components/ui/input';
+import { Input, type UploadFile } from 'antd';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/ui/popover';
 import { toast } from 'components/ui/sonner';
 import { TooltipSimple } from 'components/ui/tooltip';
-import type { UploadFile } from 'antd';
 import getSessionStorage from 'api/browser/sessionstorage/get';
 import setSessionStorage from 'api/browser/sessionstorage/set';
 import {

@@ -102,8 +102,8 @@ function ServiceMetricTable({
 		<div className="service-metric-table-container">
 			{RPS > MAX_RPS_LIMIT && (
 				<Flex justify="left">
-					<Typography.Title level={5} type="warning" style={{ marginTop: 0 }}>
-						<WarningFilled /> {getText('rps_over_100')}
+					<Typography.Title level={5} color="warning" style={{ marginTop: 0 }}>
+						<SolidAlertTriangle /> {getText('rps_over_100')}
 						<a href="mailto:cloud-support@o11y.hanzo.ai">email</a>
 					</Typography.Title>
 				</Flex>

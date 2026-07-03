@@ -1,8 +1,9 @@
 import { Color } from 'constants/designTokens';
-import { Button, Spin, Tooltip, Typography } from 'antd';
+import { Button, Spin, Typography } from 'antd';
 import { useGetMetricHighlights } from 'api/generated/services/metrics';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import { Info } from 'components/ui/icons';
+import { TooltipSimple } from 'components/ui/tooltip';
 import { useTimezone } from 'providers/Timezone';
 
 import { formatNumberIntoHumanReadableFormat } from '../Summary/utils';

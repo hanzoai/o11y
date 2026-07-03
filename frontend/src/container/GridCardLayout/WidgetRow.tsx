@@ -87,7 +87,7 @@ export function WidgetRowHeader(props: WidgetRowHeaderProps): JSX.Element {
 							icon={<Plus size={14} />}
 							onClick={(): void => {
 								// TODO: @AshwinBhatkal Simplify this check in cleanup of https://github.com/hanzoai/o11y/issues/3953
-								if (!selectedDashboard?.id) {
+								if (!dashboardData?.id) {
 									return;
 								}
 

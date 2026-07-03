@@ -1,13 +1,14 @@
+import { HTMLAttributes } from 'react';
 import { Card } from 'antd';
 import { FontSize } from 'container/OptionsMenu/types';
 import styled from 'styled-components';
 import { getActiveLogBackground } from 'utils/logs';
 
-interface LogTextProps {
+interface LogTextProps extends HTMLAttributes<HTMLDivElement> {
 	linesPerRow?: number;
 }
 
-interface LogContainerProps {
+interface LogContainerProps extends HTMLAttributes<HTMLDivElement> {
 	fontSize: FontSize;
 }
 
