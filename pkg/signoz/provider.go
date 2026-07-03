@@ -26,6 +26,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/global/signozglobal"
 	"github.com/hanzoai/o11y/pkg/identn"
 	"github.com/hanzoai/o11y/pkg/identn/apikeyidentn"
+	"github.com/hanzoai/o11y/pkg/identn/iamidentn"
 	"github.com/hanzoai/o11y/pkg/identn/impersonationidentn"
 	"github.com/hanzoai/o11y/pkg/identn/tokenizeridentn"
 	"github.com/hanzoai/o11y/pkg/meterreporter"
@@ -330,8 +331,9 @@ func NewTokenizerProviderFactories(cache cache.Cache, sqlstore sqlstore.SQLStore
 	)
 }
 
-func NewIdentNProviderFactories(tokenizer tokenizer.Tokenizer, serviceAccount serviceaccount.Module, orgGetter organization.Getter, userGetter user.Getter, userConfig user.Config) factory.NamedMap[factory.ProviderFactory[identn.IdentN, identn.Config]] {
+func NewIdentNProviderFactories(tokenizer tokenizer.Tokenizer, serviceAccount serviceaccount.Module, orgGetter organization.Getter, orgSetter organization.Setter, authz authz.AuthZ, userGetter user.Getter, userConfig user.Config) factory.NamedMap[factory.ProviderFactory[identn.IdentN, identn.Config]] {
 	return factory.MustNewNamedMap(
+		iamidentn.NewFactory(orgGetter, orgSetter, authz),
 		impersonationidentn.NewFactory(orgGetter, userGetter, userConfig),
 		tokenizeridentn.NewFactory(tokenizer),
 		apikeyidentn.NewFactory(serviceAccount),

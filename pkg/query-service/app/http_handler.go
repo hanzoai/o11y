@@ -228,27 +228,11 @@ func NewAPIHandler(opts APIHandlerOpts, config signoz.Config) (*APIHandler, erro
 	}
 	aH.queryBuilder = queryBuilder.NewQueryBuilder(builderOpts)
 
-	// TODO(nitya): remote this in later for multitenancy.
-	orgs, err := opts.Signoz.Modules.OrgGetter.ListByOwnedKeyRange(context.Background())
-	if err != nil {
-		aH.logger.Warn("unexpected error while fetching orgs while initializing base api handler", errors.Attr(err))
-	}
-	// if the first org with the first user is created then the setup is complete.
-	if len(orgs) == 1 {
-		count, err := opts.Signoz.Modules.UserGetter.CountByOrgID(context.Background(), orgs[0].ID)
-		if err != nil {
-			aH.logger.Warn("unexpected error while fetching user count while initializing base api handler", errors.Attr(err))
-		}
-
-		if count > 0 {
-			aH.SetupCompleted = true
-		}
-	}
-
-	// If the root user is enabled, the setup is complete
-	if config.User.Root.Enabled {
-		aH.SetupCompleted = true
-	}
+	// Zero-onboarding: o11y holds no native identity or first-run setup. Identity
+	// is asserted by the Hanzo IAM session (pkg/identn/iamidentn) and the tenant
+	// org is auto-provisioned on first request, so o11y is always "set up" — there
+	// is no first-user/registration gate and the data APIs are on from boot.
+	aH.SetupCompleted = true
 
 	aH.Upgrader = &websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
