@@ -78,6 +78,52 @@ OpenFGA is the current default and must be replaced), `pkg/zapreceiver` +
 Preserved through the sync: module path, `mount.go` (the `cloud.Register`/zip mount
 adapter), `NOTICE`, `LICENSE`.
 
+## Zero-onboarding identity — Hanzo IAM session only (no native auth)
+
+o11y holds **no identity of its own**: no native users, no login/register/invite,
+no first-run "setup" wizard, no token minting. It is a pure resource server that
+trusts the **Hanzo IAM session** exactly like every other Hanzo service (cloud,
+ai, commerce) — one IAM validates once at the edge, every service trusts it.
+
+**The seam is `pkg/identn/iamidentn`** (pairs with `pkg/authz/iamauthz`). It is the
+primary human identN resolver (registered first in `pkg/identn/resolver.go`,
+`identn.iam.enabled=true` by default). It reads the identity headers the edge
+gateway (`hanzoai/gateway`) injects after it validates the hanzo.id JWT against
+IAM's JWKS and strips any client-supplied copies (HIP-0026):
+
+- `X-Org-Id`     — JWT `owner` claim (org **slug**, e.g. `hanzo`) → the tenant
+- `X-User-Id`    — JWT `sub` (user UUID)
+- `X-User-Email` — email
+
+On first sight of an `(org, user)` pair it **auto-provisions the tenant with zero
+onboarding**: the o11y org row is created if absent (`types.NewOrganizationWithID`
++ managed roles + default configs, mirroring first-user creation) and the user is
+granted the org-scoped admin role in Hanzo IAM. The Hanzo org slug maps to a
+stable o11y org UUID via UUIDv5 (`iamidentn.toUUID`), so the mapping is
+deterministic and stateless. Authorization is unchanged — **every access check is
+still an iamauthz batch-enforce**; the founding grant just makes a logged-in Hanzo
+user authorized for their own org. Cross-org is denied by org scoping
+(`claims.OrgID` drives every data query).
+
+**The setup gate is gone.** `NewAPIHandler` (`pkg/query-service/app/http_handler.go`)
+now sets `SetupCompleted = true` unconditionally — no org/user counting, no root
+gate. So `/api/v1/register` is inert ("self-registration is disabled") and the SPA
+never shows an onboarding wizard. Native login/session/invite endpoints remain
+compiled but are dead: no native users are ever created, so nothing can log in
+through them. `apikeyidentn` (service-account API keys, `SIGNOZ-API-KEY`) stays for
+machine/OTLP identity — that is not human auth.
+
+**Security boundary (important):** trusting `X-Org-Id`/`X-User-Id` is safe **only
+because o11y sits behind `hanzoai/gateway`**, which is the sole authority that sets
+those headers (HIP-0026) and strips client copies. o11y must be reachable only via
+the gateway (ClusterIP + network policy), exactly like cloud/ai/commerce. Default
+sharder is `noop` (owns all org keys), so dynamically-provisioned tenants pass the
+identn middleware's `IsMyOwnedKey` check — do **not** switch to `singlesharder`
+(it owns one org key and would 403 every other tenant). Multi-tenancy: SQL-stored
+data (llmobs observations/scores/sessions, dashboards, …) is scoped by
+`claims.OrgID`; ClickHouse telemetry is isolated only insofar as the emit path tags
+the same org id via resource attributes.
+
 ## Config env naming (debranded — no SIGNOZ/CLICKHOUSE)
 
 Operator-facing env vars and config keys are Hanzo-branded, never SigNoz/ClickHouse.
