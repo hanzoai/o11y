@@ -3,7 +3,7 @@ package llmobstypes
 import "github.com/hanzoai/o11y/pkg/errors"
 
 // OTel GenAI semantic-convention attribute keys used to project SigNoz spans
-// into Langfuse-style LLM observations. The pricing-owned keys
+// into LLM observations. The pricing-owned keys
 // (gen_ai.request.model, gen_ai.usage.*, _signoz.gen_ai.total_cost) live in
 // llmpricingruletypes and are referenced from there to stay DRY; only the
 // keys unique to the observability views are declared here.
@@ -15,7 +15,7 @@ const (
 	// GenAIResponseModel is the model the provider actually served.
 	GenAIResponseModel = "gen_ai.response.model"
 
-	// SessionID and UserID are the standard OTel keys Langfuse groups on.
+	// SessionID and UserID are the standard OTel keys observations group on.
 	SessionID = "session.id"
 	UserID    = "user.id"
 

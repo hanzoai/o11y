@@ -44,7 +44,7 @@ exist). Build check: `GOPRIVATE='github.com/hanzoai/*' GOSUMDB=off go build ./cm
 
 Root `Dockerfile` + `.github/workflows/docker.yaml` build a standalone community
 server image on push to `main` and `v*` tags → `ghcr.io/hanzoai/o11y:<sha>` (+ `:main`).
-This replaces the unrelated **Langfuse** image that previously squatted the tags.
+This replaces an unrelated upstream image that previously squatted the tags.
 
 - Builds ONLY `./cmd/community`. It does NOT import `github.com/hanzoai/cloud`, so
   go.mod's `replace github.com/hanzoai/cloud => ../cloud` is inert for the image and

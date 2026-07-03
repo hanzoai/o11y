@@ -13,7 +13,7 @@ import (
 
 // This file is the whole span-view engine: pure builders that turn a ViewQuery
 // into a QueryRangeRequest and pure mappers that turn the QueryRangeResponse
-// back into Langfuse-shaped DTOs. Keeping them free of the querier makes them
+// back into observation-shaped DTOs. Keeping them free of the querier makes them
 // unit-testable without ClickHouse. Observations are raw gen_ai spans; traces,
 // sessions and users are scalar aggregations grouped by trace_id / session.id /
 // user.id.
