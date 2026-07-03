@@ -12,8 +12,8 @@ import (
 )
 
 func TestNewWithEnvProvider(t *testing.T) {
-	t.Setenv("SIGNOZ_PPROF_ENABLED", "false")
-	t.Setenv("SIGNOZ_PPROF_ADDRESS", "127.0.0.1:6061")
+	t.Setenv("O11Y_PPROF_ENABLED", "false")
+	t.Setenv("O11Y_PPROF_ADDRESS", "127.0.0.1:6061")
 
 	conf, err := config.New(
 		context.Background(),
