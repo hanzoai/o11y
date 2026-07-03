@@ -7,7 +7,7 @@ import "time"
 // sessions and users are span aggregations grouped by trace_id / session.id /
 // user.id respectively.
 
-// Observation is a single gen_ai span rendered Langfuse-style.
+// Observation is a single gen_ai span rendered as an LLM observation.
 type Observation struct {
 	ID               string    `json:"id"`
 	TraceID          string    `json:"traceId"`
