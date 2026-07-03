@@ -353,6 +353,13 @@ user:
 
 ##################### IdentN #####################
 identn:
+  iam:
+    # toggle the Hanzo IAM session identN — the sole human identity. Identity is
+    # taken from the gateway-injected Hanzo IAM session headers (X-Org-Id from the
+    # JWT "owner" claim, X-User-Id from "sub", X-User-Email), which the edge
+    # gateway sets after validating the hanzo.id JWT and stripping client copies.
+    # The tenant org is auto-provisioned on first request — zero onboarding.
+    enabled: true
   tokenizer:
     # toggle tokenizer identN
     enabled: true

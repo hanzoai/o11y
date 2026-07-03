@@ -6,6 +6,9 @@ import (
 )
 
 type Config struct {
+	// Config for the Hanzo IAM session identN resolver (the sole human identity)
+	IAM IAMConfig `mapstructure:"iam"`
+
 	// Config for tokenizer identN resolver
 	Tokenizer TokenizerConfig `mapstructure:"tokenizer"`
 
@@ -14,6 +17,14 @@ type Config struct {
 
 	// Config for impersonation identN resolver
 	Impersonation ImpersonationConfig `mapstructure:"impersonation"`
+}
+
+// IAMConfig toggles the Hanzo IAM session identN resolver. Identity is taken
+// from the gateway-injected Hanzo IAM session headers (X-Org-Id/X-User-Id/
+// X-User-Email); there are no headers to configure — they are a fixed contract.
+type IAMConfig struct {
+	// Toggles the identN resolver
+	Enabled bool `mapstructure:"enabled"`
 }
 
 type ImpersonationConfig struct {
@@ -43,6 +54,9 @@ func NewConfigFactory() factory.ConfigFactory {
 
 func newConfig() factory.Config {
 	return &Config{
+		IAM: IAMConfig{
+			Enabled: true,
+		},
 		Tokenizer: TokenizerConfig{
 			Enabled: true,
 			Headers: []string{"Authorization", "Sec-WebSocket-Protocol"},
@@ -59,6 +73,10 @@ func newConfig() factory.Config {
 
 func (c Config) Validate() error {
 	if c.Impersonation.Enabled {
+		if c.IAM.Enabled {
+			return errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "identn::impersonation cannot be enabled if identn::iam is enabled")
+		}
+
 		if c.Tokenizer.Enabled {
 			return errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "identn::impersonation cannot be enabled if identn::tokenizer is enabled")
 		}

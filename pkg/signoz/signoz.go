@@ -482,7 +482,7 @@ func New(
 	}
 
 	// Initialize identN resolver
-	identNFactories := NewIdentNProviderFactories(tokenizer, serviceAccount, orgGetter, userGetter, config.User)
+	identNFactories := NewIdentNProviderFactories(tokenizer, serviceAccount, orgGetter, modules.OrgSetter, authz, userGetter, config.User)
 	identNResolver, err := identn.NewIdentNResolver(ctx, providerSettings, config.IdentN, identNFactories)
 	if err != nil {
 		return nil, err
