@@ -3244,8 +3244,42 @@ func (aH *APIHandler) logFieldUpdate(w http.ResponseWriter, r *http.Request) {
 	aH.WriteJSON(w, r, field)
 }
 
+// getLogs serves the classic GET /api/v1/logs — the most recent logs over the
+// query window, newest first. Reads the configured logs table via the reader
+// (real ClickHouse rows), replacing the former {"results":[]} stub. Params:
+// limit (default 100, max 1000), timestampStart / timestampEnd (nanosecond
+// epochs; default the last 15 minutes). Honest: a read error surfaces as an
+// error, never a fabricated empty list.
 func (aH *APIHandler) getLogs(w http.ResponseWriter, r *http.Request) {
-	aH.WriteJSON(w, r, map[string]interface{}{"results": []interface{}{}})
+	q := r.URL.Query()
+	limit := 100
+	if v, err := strconv.Atoi(strings.TrimSpace(q.Get("limit"))); err == nil && v > 0 {
+		limit = v
+	}
+	end := time.Now().UnixNano()
+	if v, err := strconv.ParseInt(strings.TrimSpace(q.Get("timestampEnd")), 10, 64); err == nil && v > 0 {
+		end = v
+	}
+	start := end - int64(15*time.Minute)
+	if v, err := strconv.ParseInt(strings.TrimSpace(q.Get("timestampStart")), 10, 64); err == nil && v > 0 {
+		start = v
+	}
+
+	rows, err := aH.reader.GetRecentLogs(r.Context(), start, end, limit)
+	if err != nil {
+		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, "Failed to fetch logs from the DB")
+		return
+	}
+
+	results := make([]map[string]interface{}, 0, len(rows))
+	for _, row := range rows {
+		item := map[string]interface{}{"timestamp": row.Timestamp.UnixNano()}
+		for k, v := range row.Data {
+			item[k] = v
+		}
+		results = append(results, item)
+	}
+	aH.WriteJSON(w, r, map[string]interface{}{"results": results})
 }
 
 func (aH *APIHandler) logAggregate(w http.ResponseWriter, r *http.Request) {
