@@ -5565,3 +5565,38 @@ func (r *ClickHouseReader) GetNormalizedStatus(
 
 	return result, nil
 }
+
+// GetRecentLogs reads the most recent logs in [startNano, endNano], newest first,
+// capped at limit, from the configured logs table (r.logsDB.r.logsTableV2) — the
+// real read behind the classic GET /api/v1/logs endpoint, replacing the empty
+// {"results":[]} stub. The bounds are int64 nanosecond epochs and limit is an int
+// (never user strings), so the fmt.Sprintf interpolation is injection-safe. It
+// selects the core log columns plus service.name and the k8s namespace/pod/
+// container the OTel collector tags each line with, and reuses the shared
+// GetListResultV3 row scanner (one row-reading path).
+func (r *ClickHouseReader) GetRecentLogs(ctx context.Context, startNano, endNano int64, limit int) ([]*v3.Row, error) {
+	if limit <= 0 {
+		limit = 100
+	}
+	if limit > 1000 {
+		limit = 1000
+	}
+	if endNano <= 0 {
+		endNano = time.Now().UnixNano()
+	}
+	if startNano <= 0 || startNano >= endNano {
+		startNano = endNano - int64(15*time.Minute)
+	}
+	table := r.logsDB + "." + r.logsTableV2
+	query := fmt.Sprintf(
+		"SELECT timestamp, id, trace_id, span_id, severity_text, severity_number, body, "+
+			"resources_string['service.name'] AS service, "+
+			"resource.`service.name`::String AS service_name, "+
+			"resource.`k8s.namespace.name`::String AS k8s_namespace, "+
+			"resource.`k8s.pod.name`::String AS k8s_pod, "+
+			"resource.`k8s.container.name`::String AS k8s_container "+
+			"FROM %s WHERE timestamp >= %d AND timestamp <= %d "+
+			"ORDER BY timestamp DESC LIMIT %d",
+		table, startNano, endNano, limit)
+	return r.GetListResultV3(ctx, query)
+}
