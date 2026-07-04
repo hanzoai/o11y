@@ -1,5 +1,5 @@
 # Stage 1: Build frontend
-FROM node:22-alpine AS frontend
+FROM ghcr.io/hanzoai/nodejs:v24.18.0 AS frontend
 RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
