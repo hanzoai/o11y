@@ -26,8 +26,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/uptrace/bun"
 
-	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
 	"github.com/google/uuid"
+	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
 	"github.com/pkg/errors"
 
 	"github.com/prometheus/prometheus/promql"
@@ -57,19 +57,19 @@ import (
 const (
 	primaryNamespace          = "datastore"
 	archiveNamespace          = "datastore-archive"
-	o11yTraceDBName         = "observe_traces"
-	observeHistoryDBName       = "signoz_analytics"
+	o11yTraceDBName           = "observe_traces"
+	observeHistoryDBName      = "signoz_analytics"
 	ruleStateHistoryTableName = "distributed_rule_state_history_v0"
-	o11yDurationMVTable     = "distributed_durationSort"
-	o11yUsageExplorerTable  = "distributed_usage_explorer"
-	o11ySpansTable          = "distributed_signoz_spans"
-	o11yErrorIndexTable     = "distributed_signoz_error_index_v2"
-	o11yTraceTableName      = "distributed_observe_index_v2"
-	o11yTraceLocalTableName = "observe_index_v2"
-	observeMetricDBName        = "observe_metrics"
-	o11yMetadataDbName      = "observe_metadata"
-	o11yMeterDBName         = "signoz_meter"
-	o11yMeterSamplesName    = "samples_agg_1d"
+	o11yDurationMVTable       = "distributed_durationSort"
+	o11yUsageExplorerTable    = "distributed_usage_explorer"
+	o11ySpansTable            = "distributed_signoz_spans"
+	o11yErrorIndexTable       = "distributed_signoz_error_index_v2"
+	o11yTraceTableName        = "distributed_observe_index_v2"
+	o11yTraceLocalTableName   = "observe_index_v2"
+	observeMetricDBName       = "observe_metrics"
+	o11yMetadataDbName        = "observe_metadata"
+	o11yMeterDBName           = "signoz_meter"
+	o11yMeterSamplesName      = "samples_agg_1d"
 
 	o11ySampleLocalTableName = "samples_v4"
 	o11ySampleTableName      = "distributed_samples_v4"
@@ -98,12 +98,12 @@ const (
 	o11yTableAttributesMetadata      = "distributed_attributes_metadata"
 	o11yLocalTableAttributesMetadata = "attributes_metadata"
 
-	o11yUpdatedMetricsMetadataLocalTable = "updated_metadata"
-	o11yUpdatedMetricsMetadataTable      = "distributed_updated_metadata"
-	minTimespanForProgressiveSearch        = time.Hour
-	minTimespanForProgressiveSearchMargin  = time.Minute
-	maxProgressiveSteps                    = 4
-	charset                                = "abcdefghijklmnopqrstuvwxyz" +
+	o11yUpdatedMetricsMetadataLocalTable  = "updated_metadata"
+	o11yUpdatedMetricsMetadataTable       = "distributed_updated_metadata"
+	minTimespanForProgressiveSearch       = time.Hour
+	minTimespanForProgressiveSearchMargin = time.Minute
+	maxProgressiveSteps                   = 4
+	charset                               = "abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	NANOSECOND = 1000000000
 )
@@ -4554,6 +4554,41 @@ func (r *DatastoreReader) GetListResultV3(ctx context.Context, query string) ([]
 
 	return rowList, getPersonalisedError(rows.Err())
 
+}
+
+// GetRecentLogs reads the most recent logs in [startNano, endNano], newest first,
+// capped at limit, from the configured logs table (r.logsDB.r.logsTableV2) — the
+// real read behind the classic GET /api/v1/logs endpoint, replacing the empty
+// {"results":[]} stub. The bounds are int64 nanosecond epochs and limit is an int
+// (never user strings), so the fmt.Sprintf interpolation is injection-safe. It
+// selects the core log columns plus service.name and the k8s namespace/pod/
+// container the OTel collector tags each line with, and reuses the shared
+// GetListResultV3 row scanner (one row-reading path).
+func (r *DatastoreReader) GetRecentLogs(ctx context.Context, startNano, endNano int64, limit int) ([]*v3.Row, error) {
+	if limit <= 0 {
+		limit = 100
+	}
+	if limit > 1000 {
+		limit = 1000
+	}
+	if endNano <= 0 {
+		endNano = time.Now().UnixNano()
+	}
+	if startNano <= 0 || startNano >= endNano {
+		startNano = endNano - int64(15*time.Minute)
+	}
+	table := r.logsDB + "." + r.logsTableV2
+	query := fmt.Sprintf(
+		"SELECT timestamp, id, trace_id, span_id, severity_text, severity_number, body, "+
+			"resources_string['service.name'] AS service, "+
+			"resource.`service.name`::String AS service_name, "+
+			"resource.`k8s.namespace.name`::String AS k8s_namespace, "+
+			"resource.`k8s.pod.name`::String AS k8s_pod, "+
+			"resource.`k8s.container.name`::String AS k8s_container "+
+			"FROM %s WHERE timestamp >= %d AND timestamp <= %d "+
+			"ORDER BY timestamp DESC LIMIT %d",
+		table, startNano, endNano, limit)
+	return r.GetListResultV3(ctx, query)
 }
 
 // GetHostMetricsExistenceAndEarliestTime returns (count, minFirstReportedUnixMilli, error) for the given host metric names
