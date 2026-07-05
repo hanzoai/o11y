@@ -137,6 +137,16 @@ func (s Server) HealthCheckStatus() chan healthcheck.Status {
 	return s.unavailableChannel
 }
 
+// PublicHandler returns the fully-wired public HTTP handler — every middleware
+// (IdentN identity resolution over the gateway-injected Hanzo IAM session
+// headers X-Org-Id/X-User-Id/X-User-Email, AuthZ, audit, timeout, recovery) and
+// the ExternalPath strip — WITHOUT binding a listener. It lets an embedding host
+// (the unified cloud binary) serve /v1/o11y/* on its own HTTP stack instead of
+// running a second Deployment; Start/initListeners stay the standalone entrypoints.
+func (s *Server) PublicHandler() http.Handler {
+	return s.httpServer.Handler
+}
+
 func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server, error) {
 	r := NewRouter()
 
