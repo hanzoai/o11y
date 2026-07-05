@@ -4,33 +4,15 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/hanzoai/o11y/pkg/config"
-	"github.com/hanzoai/o11y/pkg/config/envprovider"
-	"github.com/hanzoai/o11y/pkg/config/fileprovider"
+	"github.com/hanzoai/o11y/pkg/community"
 	"github.com/hanzoai/o11y/pkg/signoz"
 )
 
+// NewSigNozConfig resolves the SigNoz config from the given YAML files plus the
+// process environment. It delegates to community.NewConfig — the ONE config path
+// shared by the standalone binary and the hanzoai/cloud embed — so both read
+// configuration (and the Hanzo operator-facing aliases like O11Y_DATASTORE_DSN)
+// identically.
 func NewSigNozConfig(ctx context.Context, logger *slog.Logger, configFiles []string) (signoz.Config, error) {
-	uris := make([]string, 0, len(configFiles)+1)
-	for _, f := range configFiles {
-		uris = append(uris, "file:"+f)
-	}
-	uris = append(uris, "env:")
-
-	config, err := signoz.NewConfig(
-		ctx,
-		logger,
-		config.ResolverConfig{
-			Uris: uris,
-			ProviderFactories: []config.ProviderFactory{
-				envprovider.NewFactory(),
-				fileprovider.NewFactory(),
-			},
-		},
-	)
-	if err != nil {
-		return signoz.Config{}, err
-	}
-
-	return config, nil
+	return community.NewConfig(ctx, logger, configFiles)
 }
