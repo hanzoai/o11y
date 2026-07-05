@@ -180,6 +180,35 @@ func (s Server) HealthCheckStatus() chan healthcheck.Status {
 	return s.unavailableChannel
 }
 
+// PublicHandler returns the fully-wired public HTTP handler for /v1/o11y/*:
+// the router with all middleware (AuthN/AuthZ, timeout, api-key, CORS, compress)
+// and every registered route, exactly as built by createPublicServer. It is the
+// value the standalone server binds on the query HTTP listener.
+//
+// The unified cloud binary constructs the same runtime in-process and installs
+// this handler via o11y.SetHandler (see mount.go), serving /v1/o11y/* through
+// cloud's own HTTP stack instead of binding this listener. One handler, one way:
+// standalone and cloud serve byte-identical middleware+routes.
+func (s *Server) PublicHandler() http.Handler {
+	return s.httpServer.Handler
+}
+
+// StartBackground starts the alert rule manager WITHOUT binding the standalone
+// query HTTP listener, the pprof debug port, or the OpAMP websocket. The unified
+// cloud binary calls this after installing PublicHandler so alert evaluation runs
+// in-process while cloud's HTTP stack serves /v1/o11y/*.
+//
+// This is the embedded-mode counterpart to Start: Start owns the process (it
+// binds listeners and blocks in goroutines), whereas an embedding host owns its
+// own listeners and only needs o11y's background evaluation loop. OpAMP collector
+// management (a second websocket listener on constants.OpAmpWsEndpoint) is
+// intentionally NOT started here — telemetry ingest continues via the existing
+// collector→telemetrystore path, independent of this control loop.
+func (s *Server) StartBackground(ctx context.Context) error {
+	s.ruleManager.Start(ctx)
+	return nil
+}
+
 func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server, error) {
 	r := NewRouter()
 
