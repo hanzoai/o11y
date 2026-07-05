@@ -7,47 +7,10 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/hanzoai/o11y/cmd"
-	"github.com/hanzoai/o11y/pkg/alertmanager"
-	"github.com/hanzoai/o11y/pkg/analytics"
-	"github.com/hanzoai/o11y/pkg/auditor"
-	"github.com/hanzoai/o11y/pkg/authn"
-	"github.com/hanzoai/o11y/pkg/authz"
-	"github.com/hanzoai/o11y/pkg/authz/iamauthz"
-	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/community"
 	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/factory"
-	"github.com/hanzoai/o11y/pkg/flagger"
-	"github.com/hanzoai/o11y/pkg/gateway"
-	"github.com/hanzoai/o11y/pkg/gateway/noopgateway"
-	"github.com/hanzoai/o11y/pkg/global"
-	"github.com/hanzoai/o11y/pkg/licensing"
-	"github.com/hanzoai/o11y/pkg/licensing/nooplicensing"
-	"github.com/hanzoai/o11y/pkg/meterreporter"
-	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
-	"github.com/hanzoai/o11y/pkg/modules/cloudintegration/implcloudintegration"
-	"github.com/hanzoai/o11y/pkg/modules/dashboard"
-	"github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard"
-	"github.com/hanzoai/o11y/pkg/modules/metricreductionrule"
-	"github.com/hanzoai/o11y/pkg/modules/metricreductionrule/implmetricreductionrule"
-	"github.com/hanzoai/o11y/pkg/modules/organization"
-	"github.com/hanzoai/o11y/pkg/modules/retention"
-	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
-	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
-	"github.com/hanzoai/o11y/pkg/modules/tag"
-	"github.com/hanzoai/o11y/pkg/prometheus"
-	"github.com/hanzoai/o11y/pkg/querier"
-	"github.com/hanzoai/o11y/pkg/query-service/app"
-	"github.com/hanzoai/o11y/pkg/queryparser"
-	"github.com/hanzoai/o11y/pkg/ruler"
-	"github.com/hanzoai/o11y/pkg/ruler/signozruler"
 	"github.com/hanzoai/o11y/pkg/signoz"
-	"github.com/hanzoai/o11y/pkg/sqlstore"
-	"github.com/hanzoai/o11y/pkg/telemetrystore"
-	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/version"
-	"github.com/hanzoai/o11y/pkg/zeus"
-	"github.com/hanzoai/o11y/pkg/zeus/noopzeus"
 )
 
 func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
@@ -75,62 +38,13 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 	// print the version
 	version.Info.PrettyPrint(config.Version)
 
-	signoz, err := signoz.New(
-		ctx,
-		config,
-		zeus.Config{},
-		noopzeus.NewProviderFactory(),
-		licensing.Config{},
-		func(_ sqlstore.SQLStore, _ zeus.Zeus, _ organization.Getter, _ analytics.Analytics) factory.ProviderFactory[licensing.Licensing, licensing.Config] {
-			return nooplicensing.NewFactory()
-		},
-		signoz.NewEmailingProviderFactories(),
-		signoz.NewCacheProviderFactories(),
-		signoz.NewWebProviderFactories(config.Global),
-		sqlschemaProviderFactories,
-		sqlstoreProviderFactories(),
-		signoz.NewTelemetryStoreProviderFactories(),
-		func(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
-			return signoz.NewAuthNs(ctx, providerSettings, store, licensing, config.Global)
-		},
-		func(_ context.Context, sqlstore sqlstore.SQLStore, _ authz.Config, _ licensing.Licensing, _ []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error) {
-			// Hanzo IAM is the sole authorization provider — every decision is
-			// delegated to IAM's Casbin enforce endpoint. No OpenFGA, no fallback.
-			return iamauthz.NewProviderFactory(sqlstore), nil
-		},
-		func(store sqlstore.SQLStore, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser, _ querier.Querier, _ licensing.Licensing, tagModule tag.Module) dashboard.Module {
-			return impldashboard.NewModule(impldashboard.NewStore(store), settings, analytics, orgGetter, queryParser, tagModule)
-		},
-		func(_ licensing.Licensing) factory.ProviderFactory[gateway.Gateway, gateway.Config] {
-			return noopgateway.NewProviderFactory()
-		},
-		func(_ licensing.Licensing) factory.NamedMap[factory.ProviderFactory[auditor.Auditor, auditor.Config]] {
-			return signoz.NewAuditorProviderFactories()
-		},
-		func(_ context.Context, _ factory.ProviderSettings, _ flagger.Flagger, _ licensing.Licensing, _ telemetrystore.TelemetryStore, _ retention.Getter, _ organization.Getter, _ zeus.Zeus) (factory.NamedMap[factory.ProviderFactory[meterreporter.Reporter, meterreporter.Config]], string) {
-			return signoz.NewMeterReporterProviderFactories(), "noop"
-		},
-		func(ps factory.ProviderSettings, q querier.Querier, a analytics.Analytics) querier.Handler {
-			return querier.NewHandler(ps, q, a)
-		},
-		func(_ sqlstore.SQLStore, _ dashboard.Module, _ global.Global, _ zeus.Zeus, _ gateway.Gateway, _ licensing.Licensing, _ serviceaccount.Module, _ cloudintegration.Config) (cloudintegration.Module, error) {
-			return implcloudintegration.NewModule(), nil
-		},
-		func(_ sqlstore.SQLStore, _ telemetrystore.TelemetryStore, _ dashboard.Module, _ queryparser.QueryParser, _ licensing.Licensing, _ flagger.Flagger, _ telemetrytypes.MetadataStore, _ factory.ProviderSettings, _ int) metricreductionrule.Module {
-			return implmetricreductionrule.NewModule()
-		},
-		func(c cache.Cache, am alertmanager.Alertmanager, ss sqlstore.SQLStore, ts telemetrystore.TelemetryStore, ms telemetrytypes.MetadataStore, p prometheus.Prometheus, og organization.Getter, rsh rulestatehistory.Module, q querier.Querier, qp queryparser.QueryParser) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]] {
-			return factory.MustNewNamedMap(signozruler.NewFactory(c, am, ss, ts, ms, p, og, rsh, q, qp, nil, nil))
-		},
-	)
+	// community.NewServer is the ONE construction shared with the hanzoai/cloud
+	// embed — same providers, same identity (iamidentn gateway-header auth), same
+	// wiring. Standalone owns the process: bind listeners, run background
+	// evaluation, block until shutdown.
+	server, signoz, err := community.NewServer(ctx, config)
 	if err != nil {
-		logger.ErrorContext(ctx, "failed to create signoz", errors.Attr(err))
-		return err
-	}
-
-	server, err := app.NewServer(config, signoz)
-	if err != nil {
-		logger.ErrorContext(ctx, "failed to create server", errors.Attr(err))
+		logger.ErrorContext(ctx, "failed to create signoz server", errors.Attr(err))
 		return err
 	}
 
@@ -146,14 +60,12 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		return err
 	}
 
-	err = server.Stop(ctx)
-	if err != nil {
+	if err := server.Stop(ctx); err != nil {
 		logger.ErrorContext(ctx, "failed to stop server", errors.Attr(err))
 		return err
 	}
 
-	err = signoz.Stop(ctx)
-	if err != nil {
+	if err := signoz.Stop(ctx); err != nil {
 		logger.ErrorContext(ctx, "failed to stop signoz", errors.Attr(err))
 		return err
 	}

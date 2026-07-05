@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/hanzoai/o11y/cmd"
+	"github.com/hanzoai/o11y/pkg/community"
 	"github.com/hanzoai/o11y/pkg/instrumentation"
 )
 
@@ -14,7 +15,7 @@ func main() {
 	// register a list of commands to the root command
 	registerServer(cmd.RootCmd, logger)
 	cmd.RegisterGenerate(cmd.RootCmd, logger)
-	cmd.RegisterMetastore(cmd.RootCmd, logger, sqlstoreProviderFactories, sqlschemaProviderFactories)
+	cmd.RegisterMetastore(cmd.RootCmd, logger, community.SQLStoreProviderFactories, community.SQLSchemaProviderFactories)
 
 	cmd.Execute(logger)
 }
