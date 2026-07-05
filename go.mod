@@ -151,7 +151,6 @@ require (
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/luxfi/accel v1.2.4 // indirect
-	github.com/luxfi/age v1.5.0 // indirect
 	github.com/luxfi/crypto v1.19.20 // indirect
 	github.com/luxfi/kms v1.11.6 // indirect
 	github.com/luxfi/mdns v0.1.1 // indirect
