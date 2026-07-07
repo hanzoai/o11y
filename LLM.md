@@ -157,3 +157,31 @@ telemetrystore provider registration all stay (implementation, not surface).
   `O11Y_OTEL_COLLECTOR_DATASTORE_*` keys in `deploy/` are consumed by the
   `hanzoai/signoz-otel-collector` fork — renamed here for consistency; that fork must
   accept the `_DATASTORE_` segment (coordinated cross-repo rename).
+
+## Native datastore metrics driver (`pkg/datastoremetrics`) — the fork unblock
+
+- **What**: the o11y-native write path for metrics. `Writer.WriteMetrics` satisfies
+  `zapmetricreceiver.Handler`, decoding a ZAP `MetricBatch` straight into the datastore
+  `time_series_v4` + `samples_v4` tables over **upstream** `clickhouse-go` v2 (via
+  `telemetrystore.TelemetryStore.ClickhouseDB()`), reusing the `telemetrymetrics`
+  table-name constants so a series written here is immediately queryable.
+- **Why it exists**: the stock `signozclickhousemetrics` exporter serialises OTLP
+  exponential histograms as a DDSketch into `exp_hist.sketch`, which needs the FORKED
+  ch-go (`proto.DD/.Store/.IndexMapping`). That fork conflicts with the upstream ch-go
+  the query plane pins — the reason metrics ingest could not move in-process. This driver
+  sidesteps the fork: the ZAP wire carries CLASSIC Prometheus shapes, so histograms
+  decompose into `<name>.bucket{le=…}` / `.count` / `.sum` samples and summaries into
+  `.quantile{quantile=…}` — no sketch, no `exp_hist`, NO fork. Only the two tables the
+  query plane already reads.
+- **Fingerprint parity**: the labels→fingerprint hash (FNV-1a, hierarchical
+  resource→scope→point, salted with `__name__`) is ported verbatim from the fork's
+  `internal/common/fingerprint` (which is import-walled), so join keys are byte-identical
+  and the existing reader joins samples to series unchanged. Column strings match too:
+  temporality `Cumulative`/`Unspecified`, type `Sum`/`Gauge`/`Histogram`/`Summary`.
+- **Wire-in**: `datastoremetrics.NewWriter(store.ClickhouseDB())` +
+  `zapmetricreceiver.New(Config{OnBatch: w.WriteMetrics})`. Consumed by `hanzoai/cloud`'s
+  embedded o11y runtime (opt-in `O11Y_METRICS_ZAP_LISTEN`, fail-soft) so the standalone
+  `signoz-otel-collector` metrics path can later repoint to cloud (verify-then-cutover).
+- **Boundary unchanged**: the physical `signoz_metrics.*_v4` names still live in
+  `telemetrymetrics` (the source of truth this driver reuses) — renaming them is a
+  datastore migration, out of scope here.
