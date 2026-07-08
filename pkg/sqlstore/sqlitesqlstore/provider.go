@@ -3,9 +3,9 @@ package sqlitesqlstore
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log/slog"
 	"net/url"
+	"strconv"
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
@@ -13,8 +13,12 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/sqlitedialect"
 
-	"modernc.org/sqlite"
-	sqlite3 "modernc.org/sqlite/lib"
+	// hanzoai/sqlite is the one dual-backend driver: importing it registers the
+	// "sqlite" database/sql driver (mattn/SQLCipher under cgo, modernc pure-Go
+	// otherwise) AND exposes backend-neutral constraint-error classification, so
+	// this package no longer imports modernc directly (which would double-register
+	// "sqlite" in the cgo cloud binary).
+	"github.com/hanzoai/sqlite"
 )
 
 type provider struct {
@@ -44,13 +48,20 @@ func NewFactory(hookFactories ...factory.ProviderFactory[sqlstore.SQLStoreHook, 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config sqlstore.Config, hooks ...sqlstore.SQLStoreHook) (sqlstore.SQLStore, error) {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/sqlitesqlstore")
 
-	connectionParams := url.Values{}
-	// do not update the order of the connection params as busy_timeout doesn't work if it's not the first parameter
-	connectionParams.Add("_pragma", fmt.Sprintf("busy_timeout(%d)", config.Sqlite.BusyTimeout.Milliseconds()))
-	connectionParams.Add("_pragma", fmt.Sprintf("journal_mode(%s)", config.Sqlite.Mode))
-	connectionParams.Add("_pragma", "foreign_keys(1)")
-	connectionParams.Set("_txlock", config.Sqlite.TransactionMode)
-	sqldb, err := sql.Open("sqlite", "file:"+config.Sqlite.Path+"?"+connectionParams.Encode())
+	// Build the DSN with backend-correct pragma syntax. hanzoai/sqlite.PragmaDSN
+	// emits `_pragma=journal_mode(wal)` under the modernc backend and
+	// `_journal_mode=wal` under the mattn/SQLCipher backend, so the pragmas
+	// actually apply whichever backend the binary links — this package is built
+	// CGO=0 standalone but CGO=1 inside the cloud binary, and a single hardcoded
+	// syntax is silently dropped by the other backend. busy_timeout MUST lead
+	// (WAL cannot be enabled while another connection holds the db). _txlock is a
+	// driver connection param (not a pragma) that both backends honor; append it.
+	dsn := sqlite.PragmaDSN(config.Sqlite.Path, []sqlite.Pragma{
+		{Name: "busy_timeout", Value: strconv.FormatInt(config.Sqlite.BusyTimeout.Milliseconds(), 10)},
+		{Name: "journal_mode", Value: config.Sqlite.Mode},
+		{Name: "foreign_keys", Value: "1"},
+	}) + "&_txlock=" + url.QueryEscape(config.Sqlite.TransactionMode)
+	sqldb, err := sql.Open("sqlite", dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -102,10 +113,8 @@ func (provider *provider) WrapNotFoundErrf(err error, code errors.Code, format s
 }
 
 func (provider *provider) WrapAlreadyExistsErrf(err error, code errors.Code, format string, args ...any) error {
-	if sqlite3Err, ok := err.(*sqlite.Error); ok {
-		if sqlite3Err.Code() == sqlite3.SQLITE_CONSTRAINT_UNIQUE || sqlite3Err.Code() == sqlite3.SQLITE_CONSTRAINT_PRIMARYKEY || sqlite3Err.Code() == sqlite3.SQLITE_CONSTRAINT_FOREIGNKEY {
-			return errors.Wrapf(err, errors.TypeAlreadyExists, code, format, args...)
-		}
+	if sqlite.IsConstraintUnique(err) || sqlite.IsConstraintPrimaryKey(err) || sqlite.IsConstraintForeignKey(err) {
+		return errors.Wrapf(err, errors.TypeAlreadyExists, code, format, args...)
 	}
 
 	return err
