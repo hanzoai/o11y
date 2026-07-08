@@ -8,8 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"google.golang.org/protobuf/proto"
-
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types/opamptypes"
@@ -17,6 +15,7 @@ import (
 
 	"github.com/open-telemetry/opamp-go/protobufs"
 	opampTypes "github.com/open-telemetry/opamp-go/server/types"
+	"github.com/zap-proto/zap2pb"
 )
 
 type Agent struct {
@@ -125,7 +124,7 @@ func (agent *Agent) agentDescriptionChanged(newStatus *protobufs.AgentToServer) 
 	if newStatus.AgentDescription == nil {
 		return false
 	}
-	if proto.Equal(agent.Status.AgentDescription, newStatus.AgentDescription) {
+	if zap2pb.Equal(agent.Status.AgentDescription, newStatus.AgentDescription) {
 		return false
 	}
 	agent.CanLB = ExtractLbFlag(newStatus.AgentDescription)
@@ -136,7 +135,7 @@ func (agent *Agent) agentDescriptionChanged(newStatus *protobufs.AgentToServer) 
 // subscribers if the status has changed relative to what we have stored.
 func (agent *Agent) updateRemoteConfigStatus(newStatus *protobufs.AgentToServer) {
 	if newStatus.RemoteConfigStatus == nil ||
-		proto.Equal(agent.Status.RemoteConfigStatus, newStatus.RemoteConfigStatus) {
+		zap2pb.Equal(agent.Status.RemoteConfigStatus, newStatus.RemoteConfigStatus) {
 		return
 	}
 
