@@ -28,8 +28,9 @@ func TestMountWithoutHandlerReturns503(t *testing.T) {
 }
 
 // TestMountNormalizesExternalPath proves the one public contract /v1/o11y/<resource>
-// (one /v1/, no /api/) is normalized at the mount seam onto the two internal route
-// families: SigNoz native (/api/vN/*) and Hanzo llmobs (/v1/o11y/*, passed through).
+// (one /v1/, no nested version, no /api/) is normalized at the mount seam onto o11y's
+// internal /api/ namespace — where a version-less alias (SigNoz, highest-version) or an
+// llmobs route answers.
 func TestMountNormalizesExternalPath(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
@@ -46,16 +47,17 @@ func TestMountNormalizesExternalPath(t *testing.T) {
 	cases := []struct {
 		name, external, internal string
 	}{
-		// SigNoz native — canonical Hanzo form; the /api/ never surfaces externally.
-		{"signoz canonical v1", "/v1/o11y/v1/health", "/api/v1/health"},
-		{"signoz canonical v3", "/v1/o11y/v3/query_range", "/api/v3/query_range"},
-		{"signoz canonical v5", "/v1/o11y/v5/query_range", "/api/v5/query_range"},
-		// SigNoz native — deprecated /api/ alias still resolves during migration.
-		{"signoz legacy alias", "/v1/o11y/api/v1/health", "/api/v1/health"},
-		// Hanzo llmobs — registered natively at /v1/o11y/*, passed through untouched.
-		{"llmobs traces", "/v1/o11y/traces", "/v1/o11y/traces"},
-		{"llmobs observations", "/v1/o11y/observations", "/v1/o11y/observations"},
-		{"llmobs score by id", "/v1/o11y/score/abc123", "/v1/o11y/score/abc123"},
+		// Canonical version-less contract → internal /api/<resource> (no nested version).
+		{"versionless health", "/v1/o11y/health", "/api/health"},
+		{"versionless query_range", "/v1/o11y/query_range", "/api/query_range"},
+		// Hanzo llmobs resources (own their version-less names).
+		{"llmobs traces", "/v1/o11y/traces", "/api/traces"},
+		{"llmobs observations", "/v1/o11y/observations", "/api/observations"},
+		{"llmobs score by id", "/v1/o11y/score/abc123", "/api/score/abc123"},
+		// Explicit-version form still resolves to its exact version route.
+		{"explicit version", "/v1/o11y/v3/query_range", "/api/v3/query_range"},
+		// Leaked /api/ form kept working for the not-yet-migrated SigNoz SPA.
+		{"legacy api alias", "/v1/o11y/api/v1/health", "/api/v1/health"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
