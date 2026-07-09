@@ -8,6 +8,9 @@ node_modules
 .idea
 
 deploy/docker/environment_tiny/common_test
+# standalone server binaries dropped by `go build ./cmd/community` / Dockerfile output
+/community
+/o11y
 frontend/node_modules
 frontend/.pnp
 frontend/i18n-translations-hash.json

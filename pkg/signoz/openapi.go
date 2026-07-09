@@ -9,7 +9,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/apiserver"
-	"github.com/hanzoai/o11y/pkg/apiserver/signozapiserver"
+	"github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver"
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
@@ -56,7 +56,7 @@ type OpenAPI struct {
 }
 
 func NewOpenAPI(ctx context.Context, instrumentation instrumentation.Instrumentation) (*OpenAPI, error) {
-	apiserver, err := signozapiserver.NewFactory(
+	apiserver, err := o11yapiserver.NewFactory(
 		struct{ organization.Getter }{},
 		struct{ authz.AuthZ }{},
 		struct{ organization.Handler }{},

@@ -21,7 +21,7 @@ Each route wraps a module handler method with the following:
 - A generic HTTP `handler.Handler` (from `pkg/http/handler`)
 - An `OpenAPIDef` that describes the operation for OpenAPI generation
 
-For example, in `pkg/apiserver/signozapiserver`:
+For example, in `pkg/apiserver/o11yapiserver`:
 
 ```go
 if err := router.Handle("/api/v1/invite", handler.New(
@@ -57,7 +57,7 @@ When adding a new endpoint:
 
 1. Add a method to the appropriate module `Handler` interface.
 2. Implement that method in the module.
-3. Register the method in `signozapiserver` with the correct route, HTTP method, auth, and `OpenAPIDef`.
+3. Register the method in `o11yapiserver` with the correct route, HTTP method, auth, and `OpenAPIDef`.
 
 ### 1. Extend an existing `Handler` interface or create a new one
 
@@ -109,9 +109,9 @@ func (h *handler) CreateThing(rw http.ResponseWriter, req *http.Request) {
 }
 ```
 
-### 3. Register the handler in `signozapiserver`
+### 3. Register the handler in `o11yapiserver`
 
-In `pkg/apiserver/signozapiserver`, add a route in the appropriate `add*Routes` function (`addUserRoutes`, `addSessionRoutes`, `addOrgRoutes`, etc.). The pattern is:
+In `pkg/apiserver/o11yapiserver`, add a route in the appropriate `add*Routes` function (`addUserRoutes`, `addSessionRoutes`, `addOrgRoutes`, etc.). The pattern is:
 
 ```go
 if err := router.Handle("/api/v1/things", handler.New(
@@ -193,7 +193,7 @@ type OpenAPIExample struct {
 }
 ```
 
-For reference, see `pkg/apiserver/signozapiserver/querier.go` which defines examples inline for the `/api/v5/query_range` endpoint:
+For reference, see `pkg/apiserver/o11yapiserver/querier.go` which defines examples inline for the `/api/v5/query_range` endpoint:
 
 ```go
 if err := router.Handle("/api/v5/query_range", handler.New(provider.authZ.ViewAccess(provider.querierHandler.QueryRange), handler.OpenAPIDef{
@@ -337,9 +337,9 @@ func (Step) JSONSchema() (jsonschema.Schema, error) {
 ## What should I remember?
 
 - **Keep handlers thin**: focus on HTTP concerns and delegate logic to modules/services.
-- **Always register routes through `signozapiserver`** using `handler.New` and a complete `OpenAPIDef`.
+- **Always register routes through `o11yapiserver`** using `handler.New` and a complete `OpenAPIDef`.
 - **Choose accurate request/response types** from the `types` packages so OpenAPI schemas are correct.
 - **Add `required:"true"`** on fields where the key must be present in the JSON (this is about key presence, not about the zero value).
 - **Add `nullable:"true"`** on fields that can be `null`. Pay special attention to slices and maps -- in Go these default to `nil` which serializes to `null`. If the field should always be an array, initialize it and do not mark it nullable.
 - **Implement `Enum()`** on every type that has a fixed set of acceptable values so the JSON schema generates proper `enum` constraints.
-- **Add request examples** via `RequestExamples` in `OpenAPIDef` for any non-trivial endpoint. See `pkg/apiserver/signozapiserver/querier.go` for reference.
+- **Add request examples** via `RequestExamples` in `OpenAPIDef` for any non-trivial endpoint. See `pkg/apiserver/o11yapiserver/querier.go` for reference.
