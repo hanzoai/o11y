@@ -11,7 +11,7 @@ from fixtures.logs import Logs
 
 
 def test_logs_json_body_simple_searches(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -90,7 +90,7 @@ def test_logs_json_body_simple_searches(
 
     # Test 1: Search by body.message = "User logged in successfully"
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -131,7 +131,7 @@ def test_logs_json_body_simple_searches(
 
     # Test 2: Search by body.status = 200
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -173,7 +173,7 @@ def test_logs_json_body_simple_searches(
 
     # Test 3: Search by body.active = true
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -215,7 +215,7 @@ def test_logs_json_body_simple_searches(
 
     # Test 4: Search by body.level CONTAINS "error"
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -256,7 +256,7 @@ def test_logs_json_body_simple_searches(
 
     # Test 5: Search by body.code > 100
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -298,7 +298,7 @@ def test_logs_json_body_simple_searches(
 
 
 def test_logs_json_body_nested_keys(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -396,7 +396,7 @@ def test_logs_json_body_nested_keys(
 
     # Test 1: Search by body.user.name = "john_doe"
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -438,7 +438,7 @@ def test_logs_json_body_nested_keys(
 
     # Test 2: Search by body.request.secure = true
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -480,7 +480,7 @@ def test_logs_json_body_nested_keys(
 
     # Test 3: Search by body.response.latency = 123.45
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -522,7 +522,7 @@ def test_logs_json_body_nested_keys(
 
     # Test 4: Search by body.response.status.code = 200
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -564,7 +564,7 @@ def test_logs_json_body_nested_keys(
 
 
 def test_logs_json_body_array_membership(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -646,7 +646,7 @@ def test_logs_json_body_array_membership(
 
     # Test 1: Search by has(body.tags[*], "production")
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -688,7 +688,7 @@ def test_logs_json_body_array_membership(
 
     # Test 2: Search by has(body.ids[*], 200)
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -730,7 +730,7 @@ def test_logs_json_body_array_membership(
 
     # Test 3: Search by has(body.flags[*], true)
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -772,7 +772,7 @@ def test_logs_json_body_array_membership(
 
 
 def test_logs_json_body_listing(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -875,7 +875,7 @@ def test_logs_json_body_listing(
 
     # Test 1: List all logs with JSON bodies
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -915,7 +915,7 @@ def test_logs_json_body_listing(
     # Test 2: List logs with pagination (limit=2, offset=0)
     # Should return the 1st and 2nd logs (log-5 and log-4) when ordered by timestamp desc
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -958,7 +958,7 @@ def test_logs_json_body_listing(
     # Test 3: List logs with pagination (limit=2, offset=2)
     # Should return the 3rd and 4th logs (log-3 and log-2) when ordered by timestamp desc
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1000,7 +1000,7 @@ def test_logs_json_body_listing(
 
     # Test 4: List logs with multiple filters combined (AND)
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1044,7 +1044,7 @@ def test_logs_json_body_listing(
 
     # Test 5: List logs with OR filter
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1087,7 +1087,7 @@ def test_logs_json_body_listing(
 
     # Test 6: Count logs matching JSON body filters
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={"authorization": f"Bearer {token}"},
         json={

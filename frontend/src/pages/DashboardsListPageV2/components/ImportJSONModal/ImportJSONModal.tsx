@@ -165,7 +165,7 @@ function ImportJSONModal({ open, onClose }: Props): JSX.Element {
 								Load sample
 							</Button>
 							<a
-								href="https://signoz.io/docs/dashboards/dashboard-templates/overview/"
+								href="https://o11y.io/docs/dashboards/dashboard-templates/overview/"
 								target="_blank"
 								rel="noopener noreferrer"
 							>

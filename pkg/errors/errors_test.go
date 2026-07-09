@@ -189,7 +189,7 @@ func TestWithStacktrace(t *testing.T) {
 
 // Wrapped context sentinels must remain detectable via errors.Is so callers
 // that branch on context.Canceled / context.DeadlineExceeded keep working
-// after the error passes through one of the signoz Wrap* helpers.
+// after the error passes through one of the o11y Wrap* helpers.
 func TestWrapPreservesContextSentinels(t *testing.T) {
 	canceled := WrapCanceledf(context.Canceled, MustNewCode("canceled"), "op canceled")
 	assert.True(t, Is(canceled, context.Canceled))

@@ -8,7 +8,7 @@ import {
 } from '../usePreferredPageSize.store';
 
 const STORAGE_KEY = 'test-table';
-const FULL_STORAGE_KEY = '@signoz/table-columns/test-table-preferred-page-size';
+const FULL_STORAGE_KEY = '@o11y/table-columns/test-table-preferred-page-size';
 
 describe('usePreferredPageSize', () => {
 	beforeEach(() => {

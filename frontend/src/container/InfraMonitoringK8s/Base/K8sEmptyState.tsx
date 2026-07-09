@@ -23,7 +23,7 @@ const handleContactSupport = (isCloudUser: boolean): void => {
 	if (isCloudUser) {
 		history.push('/support');
 	} else {
-		window.open('https://signoz.io/slack', '_blank');
+		window.open('https://o11y.io/slack', '_blank');
 	}
 };
 
@@ -82,7 +82,7 @@ export function K8sEmptyState({
 						<span className={styles.message}>
 							Please refer to{' '}
 							<a
-								href="https://signoz.io/docs/userguide/hostmetrics/"
+								href="https://o11y.io/docs/userguide/hostmetrics/"
 								target="_blank"
 								rel="noreferrer"
 							>
@@ -102,7 +102,7 @@ export function K8sEmptyState({
 				<div className={styles.content}>
 					<img className={styles.eyesEmoji} src={eyesEmojiUrl} alt="eyes emoji" />
 					<span className={styles.message}>
-						To see K8s metrics, upgrade to the latest version of SigNoz k8s-infra
+						To see K8s metrics, upgrade to the latest version of O11y k8s-infra
 						chart. Please contact support if you need help.
 					</span>
 				</div>

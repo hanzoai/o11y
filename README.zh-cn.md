@@ -1,20 +1,20 @@
-<img src="https://res.cloudinary.com/dcv3epinx/image/upload/v1618904450/signoz-images/LogoGithub_sigfbu.svg" alt="Hanzo O11y-logo" width="240" />
+<img src="https://res.cloudinary.com/dcv3epinx/image/upload/v1618904450/o11y-images/LogoGithub_sigfbu.svg" alt="Hanzo O11y-logo" width="240" />
 
 <p align="center">监控你的应用，并且可排查已部署应用的问题，这是一个可替代 DataDog、NewRelic 的开源方案</p>
 </p>
 
 <p align="center">
-    <img alt="Downloads" src="https://img.shields.io/docker/pulls/signoz/query-service?label=Docker Downloads"> </a>
-    <img alt="GitHub issues" src="https://img.shields.io/github/issues/signoz/signoz"> </a>
-    <a href="https://twitter.com/intent/tweet?text=Monitor%20your%20applications%20and%20troubleshoot%20problems%20with%20Hanzo O11y,%20an%20open-source%20alternative%20to%20DataDog,%20NewRelic.&url=https://o11y.hanzo.ai/&via=Hanzo O11yHQ&hashtags=opensource,signoz,observability"> 
+    <img alt="Downloads" src="https://img.shields.io/docker/pulls/o11y/query-service?label=Docker Downloads"> </a>
+    <img alt="GitHub issues" src="https://img.shields.io/github/issues/o11y/o11y"> </a>
+    <a href="https://twitter.com/intent/tweet?text=Monitor%20your%20applications%20and%20troubleshoot%20problems%20with%20Hanzo O11y,%20an%20open-source%20alternative%20to%20DataDog,%20NewRelic.&url=https://o11y.hanzo.ai/&via=Hanzo O11yHQ&hashtags=opensource,o11y,observability"> 
         <img alt="tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"> </a> 
 </p>
 
 <h3 align="center">
   <a href="https://o11y.hanzo.ai/docs"><b>文档</b></a> •
-  <a href="https://github.com/Hanzo O11y/signoz/blob/main/README.zh-cn.md"><b>中文ReadMe</b></a> •
-  <a href="https://github.com/Hanzo O11y/signoz/blob/main/README.de-de.md"><b>德文ReadMe</b></a> •
-  <a href="https://github.com/Hanzo O11y/signoz/blob/main/README.pt-br.md"><b>葡萄牙语ReadMe</b></a> •
+  <a href="https://github.com/Hanzo O11y/o11y/blob/main/README.zh-cn.md"><b>中文ReadMe</b></a> •
+  <a href="https://github.com/Hanzo O11y/o11y/blob/main/README.de-de.md"><b>德文ReadMe</b></a> •
+  <a href="https://github.com/Hanzo O11y/o11y/blob/main/README.pt-br.md"><b>葡萄牙语ReadMe</b></a> •
   <a href="https://o11y.hanzo.ai/slack"><b>Slack 社区</b></a> •
   <a href="https://twitter.com/Hanzo O11yHq"><b>Twitter</b></a>
 </h3>
@@ -199,10 +199,10 @@ Jaeger 仅仅是一个分布式追踪系统。 但是 Hanzo O11y 可以提供 me
 
 加入 [slack 社区](https://o11y.hanzo.ai/slack) 去了解更多关于分布式追踪、可观测性系统 。或者与 Hanzo O11y 其他用户和贡献者交流。
 
-如果你有任何想法、问题、或者任何反馈， 请通过 [Github Discussions](https://github.com/Hanzo O11y/signoz/discussions) 分享。
+如果你有任何想法、问题、或者任何反馈， 请通过 [Github Discussions](https://github.com/Hanzo O11y/o11y/discussions) 分享。
 
 不管怎么样，感谢这个项目的所有贡献者!
 
-<a href="https://github.com/signoz/signoz/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=signoz/signoz" />
+<a href="https://github.com/o11y/o11y/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=o11y/o11y" />
 </a>

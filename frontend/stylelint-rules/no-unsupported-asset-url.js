@@ -2,7 +2,7 @@
  * Stylelint rule: local/no-unsupported-asset-url
  *
  * Disallows asset URLs in CSS `url()` declarations that are not base-path-safe.
- * When SigNoz is served from a sub-path (e.g. /app/), absolute and public-dir
+ * When O11y is served from a sub-path (e.g. /app/), absolute and public-dir
  * relative paths break because they bypass Vite's module pipeline and don't get
  * the runtime base-path prefix.
  *

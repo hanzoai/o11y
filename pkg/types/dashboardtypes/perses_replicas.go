@@ -40,7 +40,7 @@ type Panel struct {
 }
 
 // PanelKind is the panel envelope discriminator. Perses leaves it a free
-// string; SigNoz locks it to the single valid value.
+// string; O11y locks it to the single valid value.
 type PanelKind string
 
 const PanelKindPanel PanelKind = "Panel"
@@ -95,8 +95,8 @@ type Variable struct {
 
 func (Variable) PrepareJSONSchema(s *jsonschema.Schema) error {
 	return markDiscriminator(s, "kind", map[string]string{
-		string(variable.KindList): schemaRef("DashboardtypesVariableEnvelopeGithubComSigNozSignozPkgTypesDashboardtypesListVariableSpec"),
-		string(variable.KindText): schemaRef("DashboardtypesVariableEnvelopeGithubComSigNozSignozPkgTypesDashboardtypesTextVariableSpec"),
+		string(variable.KindList): schemaRef("DashboardtypesVariableEnvelopeGithubComO11yO11yPkgTypesDashboardtypesListVariableSpec"),
+		string(variable.KindText): schemaRef("DashboardtypesVariableEnvelopeGithubComO11yO11yPkgTypesDashboardtypesTextVariableSpec"),
 	})
 }
 
@@ -158,7 +158,7 @@ type ListVariableSpec struct {
 
 // VariableDefaultValue is a list variable's defaultValue: the string | []string
 // union. It subclasses the perses variable.DefaultValue (which marshals as a
-// scalar-or-array) so SigNoz can attach the oneOf schema to it as a named
+// scalar-or-array) so O11y can attach the oneOf schema to it as a named
 // component.
 //
 // Emitting it as a named oneOf component (and having defaultValue $ref it),

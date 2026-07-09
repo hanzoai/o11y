@@ -56,27 +56,27 @@ describe('at basePath="/"', () => {
 	});
 });
 
-describe('at basePath="/signoz/"', () => {
+describe('at basePath="/o11y/"', () => {
 	let m: BasePath;
 	beforeEach(() => {
-		m = loadModule('/signoz/');
+		m = loadModule('/o11y/');
 	});
 
-	it('getBasePath returns "/signoz/"', () => {
-		expect(m.getBasePath()).toBe('/signoz/');
+	it('getBasePath returns "/o11y/"', () => {
+		expect(m.getBasePath()).toBe('/o11y/');
 	});
 
 	it('withBasePath prepends the prefix', () => {
-		expect(m.withBasePath('/logs')).toBe('/signoz/logs');
-		expect(m.withBasePath('/logs/explorer')).toBe('/signoz/logs/explorer');
+		expect(m.withBasePath('/logs')).toBe('/o11y/logs');
+		expect(m.withBasePath('/logs/explorer')).toBe('/o11y/logs/explorer');
 	});
 
 	it('withBasePath is idempotent — safe to call twice', () => {
-		expect(m.withBasePath('/signoz/logs')).toBe('/signoz/logs');
+		expect(m.withBasePath('/o11y/logs')).toBe('/o11y/logs');
 	});
 
 	it('withBasePath is idempotent when path equals the prefix without trailing slash', () => {
-		expect(m.withBasePath('/signoz')).toBe('/signoz');
+		expect(m.withBasePath('/o11y')).toBe('/o11y');
 	});
 
 	it('withBasePath passes through external URLs', () => {
@@ -87,12 +87,12 @@ describe('at basePath="/signoz/"', () => {
 
 	it('getAbsoluteUrl returns origin + prefixed path', () => {
 		expect(m.getAbsoluteUrl('/logs')).toBe(
-			`${window.location.origin}/signoz/logs`,
+			`${window.location.origin}/o11y/logs`,
 		);
 	});
 
 	it('getBaseUrl returns origin + prefix without trailing slash', () => {
-		expect(m.getBaseUrl()).toBe(`${window.location.origin}/signoz`);
+		expect(m.getBaseUrl()).toBe(`${window.location.origin}/o11y`);
 	});
 });
 
@@ -105,9 +105,9 @@ describe('no <base> tag', () => {
 
 describe('href without trailing slash', () => {
 	it('normalises to trailing slash', () => {
-		const m = loadModule('/signoz');
-		expect(m.getBasePath()).toBe('/signoz/');
-		expect(m.withBasePath('/logs')).toBe('/signoz/logs');
+		const m = loadModule('/o11y');
+		expect(m.getBasePath()).toBe('/o11y/');
+		expect(m.withBasePath('/logs')).toBe('/o11y/logs');
 	});
 });
 

@@ -315,7 +315,7 @@ def export_json_types(
         data: list[JSONPathType] | list[str] | list[Any],  # List[Logs] but avoiding circular import
     ) -> None:
         """
-        Export JSON type metadata to signoz_metadata.distributed_field_keys table.
+        Export JSON type metadata to o11y_metadata.distributed_field_keys table.
         This table stores signal, context, path, and type information for body JSON fields.
         """
         path_types: list[JSONPathType] = []
@@ -355,7 +355,7 @@ def export_json_types(
             return
 
         clickhouse.conn.insert(
-            database="signoz_metadata",
+            database="o11y_metadata",
             table="distributed_field_keys",
             data=[path_type.np_arr() for path_type in path_types],
             column_names=[
@@ -370,12 +370,12 @@ def export_json_types(
     yield _export_json_types
 
     # Cleanup - truncate the local table after tests (following pattern from logs fixture)
-    clickhouse.conn.query(f"TRUNCATE TABLE signoz_metadata.field_keys ON CLUSTER '{clickhouse.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' SYNC")
+    clickhouse.conn.query(f"TRUNCATE TABLE o11y_metadata.field_keys ON CLUSTER '{clickhouse.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' SYNC")
 
 
 @pytest.fixture(name="create_json_index", scope="function")
 def create_json_index(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
 ) -> Generator[Callable[[str, list[dict[str, Any]]], None]]:
     """
     Create ClickHouse data-skipping indexes on body_v2 JSON sub-columns via
@@ -401,7 +401,7 @@ def create_json_index(
 
     Example::
 
-        def test_foo(signoz, get_token, insert_logs, export_json_types, create_json_body_index):
+        def test_foo(o11y, get_token, insert_logs, export_json_types, create_json_body_index):
             token = get_token(...)
             export_json_types(logs_list)
             create_json_body_index(token, [
@@ -416,7 +416,7 @@ def create_json_index(
 
     def _create_json_body_index(token: str, paths: list[dict[str, Any]]) -> None:
         response = requests.post(
-            signoz.self.host_configs["8080"].get("/api/v1/logs/promote_paths"),
+            o11y.self.host_configs["8080"].get("/api/v1/logs/promote_paths"),
             headers={"authorization": f"Bearer {token}"},
             json=paths,
             timeout=30,
@@ -434,8 +434,8 @@ def create_json_index(
     if not created_paths:
         return
 
-    cluster = signoz.telemetrystore.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
+    cluster = o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
     for path in created_paths:
-        result = signoz.telemetrystore.conn.query(f"SELECT name FROM system.data_skipping_indices WHERE database = 'signoz_logs' AND table = 'logs_v2' AND expr LIKE '%{path}%'")
+        result = o11y.telemetrystore.conn.query(f"SELECT name FROM system.data_skipping_indices WHERE database = 'o11y_logs' AND table = 'logs_v2' AND expr LIKE '%{path}%'")
         for (index_name,) in result.result_rows:
-            signoz.telemetrystore.conn.query(f"ALTER TABLE signoz_logs.logs_v2 ON CLUSTER '{cluster}' DROP INDEX IF EXISTS `{index_name}`")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_logs.logs_v2 ON CLUSTER '{cluster}' DROP INDEX IF EXISTS `{index_name}`")

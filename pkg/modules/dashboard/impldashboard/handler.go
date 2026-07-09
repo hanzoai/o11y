@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
@@ -19,7 +20,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -160,7 +160,7 @@ func (handler *handler) LockUnlock(rw http.ResponseWriter, r *http.Request) {
 
 	isAdmin := false
 	selectors := []coretypes.Selector{
-		coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName),
+		coretypes.TypeRole.MustSelector(authtypes.O11yAdminRoleName),
 	}
 	err = handler.authz.CheckWithTupleCreation(
 		ctx,

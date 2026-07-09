@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	cmock "github.com/hanzoai/clickhouse-go-mock"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/cache/cachetest"
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
@@ -27,7 +28,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	cmock "github.com/hanzoai/clickhouse-go-mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -1127,7 +1127,7 @@ func TestV2QueryRangeValueTypePromQL(t *testing.T) {
 				PanelType: v3.PanelTypeValue,
 				PromQueries: map[string]*v3.PromQuery{
 					"A": {
-						Query: "signoz_calls_total",
+						Query: "o11y_calls_total",
 					},
 				},
 			},
@@ -1142,7 +1142,7 @@ func TestV2QueryRangeValueTypePromQL(t *testing.T) {
 				PanelType: v3.PanelTypeValue,
 				PromQueries: map[string]*v3.PromQuery{
 					"A": {
-						Query: "signoz_latency_bucket",
+						Query: "o11y_latency_bucket",
 					},
 				},
 			},
@@ -1183,13 +1183,13 @@ func TestV2QueryRangeValueTypePromQL(t *testing.T) {
 		ranges []querycache.MissInterval
 	}{
 		{
-			query: "signoz_calls_total",
+			query: "o11y_calls_total",
 			ranges: []querycache.MissInterval{
 				{Start: 1675115596722, End: 1675115596722 + 120*60*1000},
 			},
 		},
 		{
-			query: "signoz_latency_bucket",
+			query: "o11y_latency_bucket",
 			ranges: []querycache.MissInterval{
 				{Start: 1675115596722 + 60*60*1000, End: 1675115596722 + 180*60*1000},
 			},

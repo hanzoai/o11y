@@ -116,9 +116,9 @@ func TestCompile_CreatedByLocked(t *testing.T) {
 	runCompileCases(t, []compileCase{
 		{
 			subtestName:       "created_by LIKE",
-			dslQueryToCompile: `created_by LIKE '%@signoz.io'`,
+			dslQueryToCompile: `created_by LIKE '%@o11y.io'`,
 			expectedSQL:       `dashboard.created_by LIKE ? ESCAPE '\'`,
-			expectedArgs:      []any{"%@signoz.io"},
+			expectedArgs:      []any{"%@o11y.io"},
 		},
 		{
 			subtestName:       "locked = true",
@@ -389,7 +389,7 @@ func TestCompile_ComplexExamples(t *testing.T) {
 	runCompileCases(t, []compileCase{
 		{
 			subtestName:       "name CONTAINS + tag LIKE + created_by + database =",
-			dslQueryToCompile: `name CONTAINS 'overview' AND tag LIKE 'prod%' AND created_by = 'naman.verma@signoz.io' AND database = 'mongo'`,
+			dslQueryToCompile: `name CONTAINS 'overview' AND tag LIKE 'prod%' AND created_by = 'naman.verma@o11y.io' AND database = 'mongo'`,
 			expectedSQL: `
 				(
 				json_extract("dashboard"."data", '$.spec.display.name') LIKE ? ESCAPE '\'
@@ -408,7 +408,7 @@ func TestCompile_ComplexExamples(t *testing.T) {
 					AND LOWER(t.key) = LOWER(?)
 					AND t.value = ?
 				))`,
-			expectedArgs: []any{"%overview%", kindArg, "tag", "prod%", "naman.verma@signoz.io", kindArg, "database", "mongo"},
+			expectedArgs: []any{"%overview%", kindArg, "tag", "prod%", "naman.verma@o11y.io", kindArg, "database", "mongo"},
 		},
 		{
 			subtestName:       "team IN AND database EXISTS",

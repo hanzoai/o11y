@@ -142,7 +142,7 @@ function ListAlertRules(): JSX.Element {
 						)}
 						<TextToolTip
 							text="More details on how to create alerts"
-							url="https://signoz.io/docs/alerts/?utm_source=product&utm_medium=list-alerts"
+							url="https://o11y.io/docs/alerts/?utm_source=product&utm_medium=list-alerts"
 							urlText="Learn More"
 						/>
 					</div>

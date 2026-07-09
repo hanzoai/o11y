@@ -11,7 +11,7 @@
  * to resume, which each return a new executionId to open a fresh SSE stream.
  *
  * Types in this file re-use the OpenAPI-generated DTOs in
- * `src/api/ai-assistant/sigNozAIAssistantAPI.schemas.ts`.
+ * `src/api/ai-assistant/o11yAIAssistantAPI.schemas.ts`.
  * Local types are defined only when the UI needs a different shape — for
  * example, the SSE event union adds a literal `type` discriminator that the
  * generated event DTOs leave loose.
@@ -57,15 +57,15 @@ import type {
 	ThreadSummaryDTO,
 	ToolCallEventDTO,
 	ToolResultEventDTO,
-} from './sigNozAIAssistantAPI.schemas';
+} from './o11yAIAssistantAPI.schemas';
 import { LOCALSTORAGE } from 'constants/localStorage';
 
 import {
 	AIAssistantInstance,
 	getAIBaseUrl,
-	SIGNOZ_URL_HEADER,
+	O11Y_URL_HEADER,
 } from '../AIAPIInstance';
-import { getSigNozInstanceUrl } from 'utils/signozInstanceUrl';
+import { getO11yInstanceUrl } from 'utils/o11yInstanceUrl';
 
 // ---------------------------------------------------------------------------
 // SSE-only auth wrapper.
@@ -134,7 +134,7 @@ async function fetchSSEWithAuth(
 ): Promise<Response> {
 	const send = async (token: string | null): Promise<Response> => {
 		const headers: Record<string, string> = {
-			[SIGNOZ_URL_HEADER]: getSigNozInstanceUrl(),
+			[O11Y_URL_HEADER]: getO11yInstanceUrl(),
 		};
 		if (token) {
 			headers.Authorization = `Bearer ${token}`;

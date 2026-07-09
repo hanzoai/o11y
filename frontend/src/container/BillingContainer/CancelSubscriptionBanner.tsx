@@ -29,17 +29,17 @@ function CancelSubscriptionBanner(): JSX.Element {
 			user: pick(user, ['email', 'displayName', 'role', 'organization']),
 			role: user?.role,
 		});
-		const subject = encodeURIComponent('Cancel My SigNoz Subscription');
+		const subject = encodeURIComponent('Cancel My O11y Subscription');
 		const orgName = org?.[0]?.displayName ?? '';
 		const body = encodeURIComponent(
 			[
-				'Hi SigNoz Team,',
+				'Hi O11y Team,',
 				'',
-				'I would like to cancel my SigNoz Cloud subscription.',
+				'I would like to cancel my O11y Cloud subscription.',
 				'Please find my account details below.',
 				'',
 				'Account Details:',
-				`  • SigNoz URL: ${getBaseUrl()}`,
+				`  • O11y URL: ${getBaseUrl()}`,
 				...(orgName ? [`  • Organization: ${orgName}`] : []),
 				`  • Account Email: ${user?.email ?? ''}`,
 				'',
@@ -54,7 +54,7 @@ function CancelSubscriptionBanner(): JSX.Element {
 			].join('\n'),
 		);
 		const link = document.createElement('a');
-		link.href = `mailto:cloud-support@signoz.io?subject=${subject}&body=${body}`;
+		link.href = `mailto:cloud-support@o11y.io?subject=${subject}&body=${body}`;
 		link.click();
 		setOpen(false);
 		setConfirmText('');
@@ -96,7 +96,7 @@ function CancelSubscriptionBanner(): JSX.Element {
 						<span className={styles.title}>Cancel your subscription</span>
 					</div>
 					<span className={styles.subtitle}>
-						When you cancel your SigNoz subscription, all your data will be deleted
+						When you cancel your O11y subscription, all your data will be deleted
 						immediately and removed from our servers.
 					</span>
 				</div>
@@ -121,7 +121,7 @@ function CancelSubscriptionBanner(): JSX.Element {
 				<div className={styles.dialogBody}>
 					<p className={styles.dialogDescription}>
 						Cancelling your subscription would stop your data from being ingested to
-						SigNoz. All the data that has been already sent will also be deleted.
+						O11y. All the data that has been already sent will also be deleted.
 					</p>
 					<p className={styles.dialogConfirmLabel}>
 						Type <code>cancel</code> to confirm the cancellation.

@@ -9,25 +9,25 @@ import (
 )
 
 var (
-	AgentArmTemplateStorePath = "https://signoz-integrations.s3.us-east-1.amazonaws.com/azure-arm-template-%s.json"
-	AgentDeploymentStackName  = "signoz-integration"
+	AgentArmTemplateStorePath = "https://o11y-integrations.s3.us-east-1.amazonaws.com/azure-arm-template-%s.json"
+	AgentDeploymentStackName  = "o11y-integration"
 
 	// Default values for fixed ARM template parameters.
-	armDefaultRgName           = "signoz-integration-rg"
-	armDefaultContainerEnvName = "signoz-integration-agent-env"
+	armDefaultRgName           = "o11y-integration-rg"
+	armDefaultContainerEnvName = "o11y-integration-agent-env"
 	armDefaultDeploymentEnv    = "production"
 
 	// ARM template parameter key names used in both CLI and PowerShell deployment commands.
-	armParamLocation           = "location"
-	armParamSignozAPIKey       = "signozApiKey"
-	armParamSignozAPIUrl       = "signozApiUrl"
-	armParamSignozIngestionURL = "signozIngestionUrl"
-	armParamSignozIngestionKey = "signozIngestionKey"
-	armParamAccountID          = "signozIntegrationAccountId"
-	armParamAgentVersion       = "signozIntegrationAgentVersion"
-	armParamRgName             = "rgName"
-	armParamContainerEnvName   = "containerEnvName"
-	armParamDeploymentEnv      = "deploymentEnv"
+	armParamLocation         = "location"
+	armParamO11yAPIKey       = "o11yApiKey"
+	armParamO11yAPIUrl       = "o11yApiUrl"
+	armParamO11yIngestionURL = "o11yIngestionUrl"
+	armParamO11yIngestionKey = "o11yIngestionKey"
+	armParamAccountID        = "o11yIntegrationAccountId"
+	armParamAgentVersion     = "o11yIntegrationAgentVersion"
+	armParamRgName           = "rgName"
+	armParamContainerEnvName = "containerEnvName"
+	armParamDeploymentEnv    = "deploymentEnv"
 
 	// command templates.
 	azureCLITemplate        = template.Must(template.New("azureCLI").Parse(azureCLITemplateStr()))
@@ -89,26 +89,26 @@ type AzureIntegrationConfig struct {
 // All fields are exported so text/template can access them.
 type azureTemplateData struct {
 	// Deploy parameter values.
-	TemplateURL        string
-	Location           string
-	SignozAPIKey       string
-	SignozAPIUrl       string
-	SignozIngestionURL string
-	SignozIngestionKey string
-	AccountID          string
-	AgentVersion       string
+	TemplateURL      string
+	Location         string
+	O11yAPIKey       string
+	O11yAPIUrl       string
+	O11yIngestionURL string
+	O11yIngestionKey string
+	AccountID        string
+	AgentVersion     string
 	// ARM parameter key names (from package-level vars).
-	StackName               string
-	ParamLocation           string
-	ParamSignozAPIKey       string
-	ParamSignozAPIUrl       string
-	ParamSignozIngestionURL string
-	ParamSignozIngestionKey string
-	ParamAccountID          string
-	ParamAgentVersion       string
-	ParamRgName             string
-	ParamContainerEnvName   string
-	ParamDeploymentEnv      string
+	StackName             string
+	ParamLocation         string
+	ParamO11yAPIKey       string
+	ParamO11yAPIUrl       string
+	ParamO11yIngestionURL string
+	ParamO11yIngestionKey string
+	ParamAccountID        string
+	ParamAgentVersion     string
+	ParamRgName           string
+	ParamContainerEnvName string
+	ParamDeploymentEnv    string
 	// Fixed default values.
 	DefaultRgName           string
 	DefaultContainerEnvName string
@@ -136,18 +136,18 @@ func NewAzureConnectionArtifact(
 	data := azureTemplateData{
 		TemplateURL:             fmt.Sprintf(AgentArmTemplateStorePath, agentVersion),
 		Location:                cfg.DeploymentRegion,
-		SignozAPIKey:            creds.SigNozAPIKey,
-		SignozAPIUrl:            creds.SigNozAPIURL,
-		SignozIngestionURL:      creds.IngestionURL,
-		SignozIngestionKey:      creds.IngestionKey,
+		O11yAPIKey:              creds.O11yAPIKey,
+		O11yAPIUrl:              creds.O11yAPIURL,
+		O11yIngestionURL:        creds.IngestionURL,
+		O11yIngestionKey:        creds.IngestionKey,
 		AccountID:               accountID.StringValue(),
 		AgentVersion:            agentVersion,
 		StackName:               AgentDeploymentStackName,
 		ParamLocation:           armParamLocation,
-		ParamSignozAPIKey:       armParamSignozAPIKey,
-		ParamSignozAPIUrl:       armParamSignozAPIUrl,
-		ParamSignozIngestionURL: armParamSignozIngestionURL,
-		ParamSignozIngestionKey: armParamSignozIngestionKey,
+		ParamO11yAPIKey:         armParamO11yAPIKey,
+		ParamO11yAPIUrl:         armParamO11yAPIUrl,
+		ParamO11yIngestionURL:   armParamO11yIngestionURL,
+		ParamO11yIngestionKey:   armParamO11yIngestionKey,
 		ParamAccountID:          armParamAccountID,
 		ParamAgentVersion:       armParamAgentVersion,
 		ParamRgName:             armParamRgName,
@@ -198,10 +198,10 @@ func azureCLITemplateStr() string {
   --template-uri {{.TemplateURL}} \
   --parameters \
     {{.ParamLocation}}='{{.Location}}' \
-    {{.ParamSignozAPIKey}}='{{.SignozAPIKey}}' \
-    {{.ParamSignozAPIUrl}}='{{.SignozAPIUrl}}' \
-    {{.ParamSignozIngestionURL}}='{{.SignozIngestionURL}}' \
-    {{.ParamSignozIngestionKey}}='{{.SignozIngestionKey}}' \
+    {{.ParamO11yAPIKey}}='{{.O11yAPIKey}}' \
+    {{.ParamO11yAPIUrl}}='{{.O11yAPIUrl}}' \
+    {{.ParamO11yIngestionURL}}='{{.O11yIngestionURL}}' \
+    {{.ParamO11yIngestionKey}}='{{.O11yIngestionKey}}' \
     {{.ParamAccountID}}='{{.AccountID}}' \
     {{.ParamAgentVersion}}='{{.AgentVersion}}' \
   --action-on-unmanage deleteAll \
@@ -215,10 +215,10 @@ func azurePowerShellTemplateStr() string {
 		"  -TemplateUri \"{{.TemplateURL}}\" `\n" +
 		"  -TemplateParameterObject @{\n" +
 		"    {{.ParamLocation}} = \"{{.Location}}\"\n" +
-		"    {{.ParamSignozAPIKey}} = \"{{.SignozAPIKey}}\"\n" +
-		"    {{.ParamSignozAPIUrl}} = \"{{.SignozAPIUrl}}\"\n" +
-		"    {{.ParamSignozIngestionURL}} = \"{{.SignozIngestionURL}}\"\n" +
-		"    {{.ParamSignozIngestionKey}} = \"{{.SignozIngestionKey}}\"\n" +
+		"    {{.ParamO11yAPIKey}} = \"{{.O11yAPIKey}}\"\n" +
+		"    {{.ParamO11yAPIUrl}} = \"{{.O11yAPIUrl}}\"\n" +
+		"    {{.ParamO11yIngestionURL}} = \"{{.O11yIngestionURL}}\"\n" +
+		"    {{.ParamO11yIngestionKey}} = \"{{.O11yIngestionKey}}\"\n" +
 		"    {{.ParamAccountID}} = \"{{.AccountID}}\"\n" +
 		"    {{.ParamAgentVersion}} = \"{{.AgentVersion}}\"\n" +
 		"    {{.ParamRgName}} = \"{{.DefaultRgName}}\"\n" +

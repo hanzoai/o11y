@@ -11,7 +11,7 @@ import (
 
 // Field names map to the HTML attributes they populate in the template:
 //   - BaseHref  → <base href="[[.BaseHref]]" />
-//   - Settings  → window.signozBootData = { settings: [[.Settings]] }
+//   - Settings  → window.o11yBootData = { settings: [[.Settings]] }
 type TemplateData struct {
 	BaseHref string
 

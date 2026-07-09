@@ -3,7 +3,7 @@ receivers:
     protocols:
       grpc:
 processors:
-  signozspanmapper:
+  o11yspanmapper:
     groups:
       - id: llm
         exists_any:
@@ -63,5 +63,5 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [signozspanmapper, batch]
+      processors: [o11yspanmapper, batch]
       exporters: [otlp]

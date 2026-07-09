@@ -31,7 +31,7 @@ const basePostableJSON = `{
 					"allowAllValue": true,
 					"allowMultiple": false,
 					"plugin": {
-						"kind": "signoz/DynamicVariable",
+						"kind": "o11y/DynamicVariable",
 						"spec": {"name": "service.name", "signal": "metrics"}
 					}
 				}
@@ -41,15 +41,15 @@ const basePostableJSON = `{
 			"p1": {
 				"kind": "Panel",
 				"spec": {
-					"plugin": {"kind": "signoz/TimeSeriesPanel", "spec": {}},
+					"plugin": {"kind": "o11y/TimeSeriesPanel", "spec": {}},
 					"queries": [
 						{
 							"kind": "time_series",
-							"spec": {"plugin": {"kind": "signoz/BuilderQuery", "spec": {
+							"spec": {"plugin": {"kind": "o11y/BuilderQuery", "spec": {
 								"name": "A",
 								"signal": "metrics",
 								"aggregations": [{
-									"metricName": "signoz_calls_total",
+									"metricName": "o11y_calls_total",
 									"temporality": "cumulative",
 									"timeAggregation": "rate",
 									"spaceAggregation": "sum"
@@ -64,15 +64,15 @@ const basePostableJSON = `{
 			"p2": {
 				"kind": "Panel",
 				"spec": {
-					"plugin": {"kind": "signoz/NumberPanel", "spec": {}},
+					"plugin": {"kind": "o11y/NumberPanel", "spec": {}},
 					"queries": [
 						{
 							"kind": "time_series",
-							"spec": {"plugin": {"kind": "signoz/BuilderQuery", "spec": {
+							"spec": {"plugin": {"kind": "o11y/BuilderQuery", "spec": {
 								"name": "X",
 								"signal": "metrics",
 								"aggregations": [{
-									"metricName": "signoz_latency_count",
+									"metricName": "o11y_latency_count",
 									"temporality": "cumulative",
 									"timeAggregation": "rate",
 									"spaceAggregation": "sum"
@@ -106,7 +106,7 @@ func TestPatchableDashboardV2_Apply(t *testing.T) {
 	var p PostableDashboardV2
 	require.NoError(t, json.Unmarshal([]byte(basePostableJSON), &p), "base postable JSON must validate")
 	testOrgID := valuer.GenerateUUID()
-	base := p.NewDashboardV2(testOrgID, "somecreatedthisiguess@signoz.io", SourceUser)
+	base := p.NewDashboardV2(testOrgID, "somecreatedthisiguess@o11y.io", SourceUser)
 	base.Tags = []*tagtypes.Tag{
 		{Key: "team", Value: "alpha"},
 		{Key: "env", Value: "prod"},
@@ -182,10 +182,10 @@ func TestPatchableDashboardV2_Apply(t *testing.T) {
 			"value": {
 				"kind": "Panel",
 				"spec": {
-					"plugin": {"kind": "signoz/TablePanel", "spec": {}},
+					"plugin": {"kind": "o11y/TablePanel", "spec": {}},
 					"queries": [{
 						"kind": "time_series",
-						"spec": {"plugin": {"kind": "signoz/BuilderQuery", "spec": {
+						"spec": {"plugin": {"kind": "o11y/BuilderQuery", "spec": {
 							"name": "A",
 							"signal": "logs",
 							"aggregations": [{"expression": "count()"}]
@@ -216,14 +216,14 @@ func TestPatchableDashboardV2_Apply(t *testing.T) {
 			"value": {
 				"kind": "Panel",
 				"spec": {
-					"plugin": {"kind": "signoz/BarChartPanel", "spec": {}},
+					"plugin": {"kind": "o11y/BarChartPanel", "spec": {}},
 					"queries": [{
 						"kind": "time_series",
-						"spec": {"plugin": {"kind": "signoz/BuilderQuery", "spec": {
+						"spec": {"plugin": {"kind": "o11y/BuilderQuery", "spec": {
 							"name": "A",
 							"signal": "metrics",
 							"aggregations": [{
-								"metricName": "signoz_calls_total",
+								"metricName": "o11y_calls_total",
 								"temporality": "cumulative",
 								"timeAggregation": "rate",
 								"spaceAggregation": "sum"
@@ -234,8 +234,8 @@ func TestPatchableDashboardV2_Apply(t *testing.T) {
 			}
 		}]`).Apply(base)
 		require.NoError(t, err)
-		assert.Equal(t, PanelPluginKind("signoz/BarChartPanel"), out.Spec.Panels["p2"].Spec.Plugin.Kind)
-		assert.Equal(t, PanelPluginKind("signoz/TimeSeriesPanel"), out.Spec.Panels["p1"].Spec.Plugin.Kind, "p1 untouched")
+		assert.Equal(t, PanelPluginKind("o11y/BarChartPanel"), out.Spec.Panels["p2"].Spec.Plugin.Kind)
+		assert.Equal(t, PanelPluginKind("o11y/TimeSeriesPanel"), out.Spec.Panels["p1"].Spec.Plugin.Kind, "p1 untouched")
 	})
 
 	// Removing a panel realistically also drops its layout item — exercise
@@ -276,11 +276,11 @@ func TestPatchableDashboardV2_Apply(t *testing.T) {
 			"path": "/spec/panels/p1/spec/queries/0",
 			"value": {
 				"kind": "time_series",
-				"spec": {"plugin": {"kind": "signoz/BuilderQuery", "spec": {
+				"spec": {"plugin": {"kind": "o11y/BuilderQuery", "spec": {
 					"name": "B",
 					"signal": "metrics",
 					"aggregations": [{
-						"metricName": "signoz_db_calls_total",
+						"metricName": "o11y_db_calls_total",
 						"temporality": "cumulative",
 						"timeAggregation": "rate",
 						"spaceAggregation": "sum"
@@ -327,7 +327,7 @@ func TestPatchableDashboardV2_Apply(t *testing.T) {
 		// Appending needs a not-yet-placed panel, so add one in the same patch;
 		// re-placing p1 or p2 would be a duplicate reference.
 		out, err := decode(t, `[
-			{"op": "add", "path": "/spec/panels/p3", "value": {"kind": "Panel", "spec": {"plugin": {"kind": "signoz/TablePanel", "spec": {}}, "queries": [{"kind": "time_series", "spec": {"plugin": {"kind": "signoz/BuilderQuery", "spec": {"name": "A", "signal": "logs", "aggregations": [{"expression": "count()"}]}}}}]}}},
+			{"op": "add", "path": "/spec/panels/p3", "value": {"kind": "Panel", "spec": {"plugin": {"kind": "o11y/TablePanel", "spec": {}}, "queries": [{"kind": "time_series", "spec": {"plugin": {"kind": "o11y/BuilderQuery", "spec": {"name": "A", "signal": "logs", "aggregations": [{"expression": "count()"}]}}}}]}}},
 			{"op": "add", "path": "/spec/layouts/0/spec/items/-", "value": {"x": 0, "y": 6, "width": 12, "height": 6, "content": {"$ref": "#/spec/panels/p3"}}}
 		]`).Apply(base)
 		require.NoError(t, err)
@@ -346,10 +346,10 @@ func TestPatchableDashboardV2_Apply(t *testing.T) {
 				"value": {
 					"kind": "Panel",
 					"spec": {
-						"plugin": {"kind": "signoz/TablePanel", "spec": {}},
+						"plugin": {"kind": "o11y/TablePanel", "spec": {}},
 						"queries": [{
 							"kind": "time_series",
-							"spec": {"plugin": {"kind": "signoz/BuilderQuery", "spec": {
+							"spec": {"plugin": {"kind": "o11y/BuilderQuery", "spec": {
 								"name": "A",
 								"signal": "logs",
 								"aggregations": [{"expression": "count()"}]
@@ -496,7 +496,7 @@ func TestPatchableDashboardV2_Apply(t *testing.T) {
 			"path": "/spec/panels/p1",
 			"value": {
 				"kind": "Panel",
-				"spec": {"plugin": {"kind": "signoz/NotAPanel", "spec": {}}}
+				"spec": {"plugin": {"kind": "o11y/NotAPanel", "spec": {}}}
 			}
 		}]`).Apply(base)
 		require.Error(t, err)
@@ -512,8 +512,8 @@ func TestPatchableDashboardV2_Apply(t *testing.T) {
 			"value": {
 				"kind": "Panel",
 				"spec": {
-					"plugin": {"kind": "signoz/ListPanel", "spec": {}},
-					"queries": [{"kind": "time_series", "spec": {"plugin": {"kind": "signoz/PromQLQuery", "spec": {"name": "A", "query": "up"}}}}]
+					"plugin": {"kind": "o11y/ListPanel", "spec": {}},
+					"queries": [{"kind": "time_series", "spec": {"plugin": {"kind": "o11y/PromQLQuery", "spec": {"name": "A", "query": "up"}}}}]
 				}
 			}
 		}]`).Apply(base)
@@ -537,15 +537,15 @@ func TestPatchableDashboardV2_Apply(t *testing.T) {
 			"value": {
 				"kind": "Panel",
 				"spec": {
-					"plugin": {"kind": "signoz/TimeSeriesPanel", "spec": {}},
+					"plugin": {"kind": "o11y/TimeSeriesPanel", "spec": {}},
 					"queries": [
-						{"kind": "time_series", "spec": {"plugin": {"kind": "signoz/BuilderQuery", "spec": {
+						{"kind": "time_series", "spec": {"plugin": {"kind": "o11y/BuilderQuery", "spec": {
 							"name": "A", "signal": "metrics",
-							"aggregations": [{"metricName": "signoz_calls_total", "temporality": "cumulative", "timeAggregation": "rate", "spaceAggregation": "sum"}]
+							"aggregations": [{"metricName": "o11y_calls_total", "temporality": "cumulative", "timeAggregation": "rate", "spaceAggregation": "sum"}]
 						}}}},
-						{"kind": "time_series", "spec": {"plugin": {"kind": "signoz/BuilderQuery", "spec": {
+						{"kind": "time_series", "spec": {"plugin": {"kind": "o11y/BuilderQuery", "spec": {
 							"name": "B", "signal": "metrics",
-							"aggregations": [{"metricName": "signoz_db_calls_total", "temporality": "cumulative", "timeAggregation": "rate", "spaceAggregation": "sum"}]
+							"aggregations": [{"metricName": "o11y_db_calls_total", "temporality": "cumulative", "timeAggregation": "rate", "spaceAggregation": "sum"}]
 						}}}}
 					]
 				}

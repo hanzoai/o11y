@@ -18,7 +18,7 @@ def zookeeper(network: Network, request: pytest.FixtureRequest, pytestconfig: py
     def create() -> types.TestContainerDocker:
         version = request.config.getoption("--zookeeper-version")
 
-        container = DockerContainer(image=f"signoz/zookeeper:{version}")
+        container = DockerContainer(image=f"o11y/zookeeper:{version}")
         container.with_env("ALLOW_ANONYMOUS_LOGIN", "yes")
         container.with_exposed_ports(2181)
         container.with_network(network=network)

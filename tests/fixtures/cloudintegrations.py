@@ -23,7 +23,7 @@ logger = setup_logger(__name__)
 @pytest.fixture(scope="function")
 def deprecated_create_cloud_integration_account(
     request: pytest.FixtureRequest,
-    signoz: types.SigNoz,
+    o11y: types.O11y,
 ) -> Callable[[str, str], dict]:
     created_accounts: list[tuple[str, str]] = []
 
@@ -37,16 +37,16 @@ def deprecated_create_cloud_integration_account(
             "account_config": {"regions": ["us-east-1"]},
             "agent_config": {
                 "region": "us-east-1",
-                "ingestion_url": "https://ingest.test.signoz.cloud",
+                "ingestion_url": "https://ingest.test.o11y.cloud",
                 "ingestion_key": "test-ingestion-key-123456",
-                "signoz_api_url": "https://test-deployment.test.signoz.cloud",
-                "signoz_api_key": "test-api-key-789",
+                "o11y_api_url": "https://test-deployment.test.o11y.cloud",
+                "o11y_api_key": "test-api-key-789",
                 "version": "v0.0.8",
             },
         }
 
         response = requests.post(
-            signoz.self.host_configs["8080"].get(endpoint),
+            o11y.self.host_configs["8080"].get(endpoint),
             headers={"Authorization": f"Bearer {admin_token}"},
             json=request_payload,
             timeout=10,
@@ -70,7 +70,7 @@ def deprecated_create_cloud_integration_account(
             for account_id, cloud_provider in created_accounts:
                 disconnect_endpoint = f"/api/v1/cloud-integrations/{cloud_provider}/accounts/{account_id}/disconnect"
                 r = requests.post(
-                    signoz.self.host_configs["8080"].get(disconnect_endpoint),
+                    o11y.self.host_configs["8080"].get(disconnect_endpoint),
                     headers={"Authorization": f"Bearer {admin_token}"},
                     timeout=10,
                 )
@@ -88,7 +88,7 @@ def deprecated_create_cloud_integration_account(
 @pytest.fixture(scope="function")
 def create_cloud_integration_account(
     request: pytest.FixtureRequest,
-    signoz: types.SigNoz,
+    o11y: types.O11y,
 ) -> Callable[[str, str], dict]:
     created_accounts: list[tuple[str, str]] = []
 
@@ -111,15 +111,15 @@ def create_cloud_integration_account(
                 }
             },
             "credentials": {
-                "sigNozApiURL": "https://test-deployment.test.signoz.cloud",
-                "sigNozApiKey": "test-api-key-789",
-                "ingestionUrl": "https://ingest.test.signoz.cloud",
+                "o11yApiURL": "https://test-deployment.test.o11y.cloud",
+                "o11yApiKey": "test-api-key-789",
+                "ingestionUrl": "https://ingest.test.o11y.cloud",
                 "ingestionKey": "test-ingestion-key-123456",
             },
         }
 
         response = requests.post(
-            signoz.self.host_configs["8080"].get(endpoint),
+            o11y.self.host_configs["8080"].get(endpoint),
             headers={"Authorization": f"Bearer {admin_token}"},
             json=request_payload,
             timeout=10,
@@ -141,7 +141,7 @@ def create_cloud_integration_account(
             for account_id, cloud_provider in created_accounts:
                 delete_endpoint = f"/api/v1/cloud_integrations/{cloud_provider}/accounts/{account_id}"
                 r = requests.delete(
-                    signoz.self.host_configs["8080"].get(delete_endpoint),
+                    o11y.self.host_configs["8080"].get(delete_endpoint),
                     headers={"Authorization": f"Bearer {admin_token}"},
                     timeout=10,
                 )
@@ -157,7 +157,7 @@ def create_cloud_integration_account(
 
 
 def deprecated_simulate_agent_checkin(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     admin_token: str,
     cloud_provider: str,
     account_id: str,
@@ -172,7 +172,7 @@ def deprecated_simulate_agent_checkin(
     }
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get(endpoint),
+        o11y.self.host_configs["8080"].get(endpoint),
         headers={"Authorization": f"Bearer {admin_token}"},
         json=checkin_payload,
         timeout=10,
@@ -189,18 +189,18 @@ def deprecated_simulate_agent_checkin(
 
 
 def setup_create_account_mocks(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     make_http_mocks: Callable,
 ) -> None:
     """Set up Zeus and Gateway mocks required by the CreateAccount endpoint."""
     make_http_mocks(
-        signoz.zeus,
+        o11y.zeus,
         [
             Mapping(
                 request=MappingRequest(
                     method=HttpMethods.GET,
                     url="/v2/deployments/me",
-                    headers={"X-Signoz-Cloud-Api-Key": {WireMockMatchers.EQUAL_TO: "secret-key"}},
+                    headers={"X-O11y-Cloud-Api-Key": {WireMockMatchers.EQUAL_TO: "secret-key"}},
                 ),
                 response=MappingResponse(
                     status=200,
@@ -208,7 +208,7 @@ def setup_create_account_mocks(
                         "status": "success",
                         "data": {
                             "name": "test-deployment",
-                            "cluster": {"region": {"dns": "test.signoz.cloud"}},
+                            "cluster": {"region": {"dns": "test.o11y.cloud"}},
                         },
                     },
                 ),
@@ -217,7 +217,7 @@ def setup_create_account_mocks(
         ],
     )
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -257,7 +257,7 @@ def setup_create_account_mocks(
 
 
 def simulate_agent_checkin(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     admin_token: str,
     cloud_provider: str,
     account_id: str,
@@ -273,7 +273,7 @@ def simulate_agent_checkin(
     }
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get(endpoint),
+        o11y.self.host_configs["8080"].get(endpoint),
         headers={"Authorization": f"Bearer {admin_token}"},
         json=checkin_payload,
         timeout=10,

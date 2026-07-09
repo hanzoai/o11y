@@ -24,7 +24,7 @@ from fixtures.traces import TraceIdGenerator, Traces, TracesKind, TracesStatusCo
 
 
 def test_logs_list(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -94,7 +94,7 @@ def test_logs_list(
 
     # Query Logs for the last 10 seconds and check if the logs are returned in the correct order
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -176,7 +176,7 @@ def test_logs_list(
 
     # Query values of severity_text attribute from the autocomplete API
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
+        o11y.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -202,7 +202,7 @@ def test_logs_list(
 
     # Query values of severity_text attribute from the fields API
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -224,7 +224,7 @@ def test_logs_list(
 
     # Query values of code.file attribute from the autocomplete API
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
+        o11y.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -250,7 +250,7 @@ def test_logs_list(
 
     # Query values of code.file attribute from the fields API
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -272,7 +272,7 @@ def test_logs_list(
 
     # Query values of code.line attribute from the autocomplete API
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
+        o11y.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -297,7 +297,7 @@ def test_logs_list(
 
     # Query values of code.line attribute from the fields API
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -318,7 +318,7 @@ def test_logs_list(
 
     # Query keys from the fields API with context specified in the key
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/keys"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/keys"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -338,7 +338,7 @@ def test_logs_list(
 
     # Do not treat `metric.` as a context prefix for logs
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/keys"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/keys"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -357,7 +357,7 @@ def test_logs_list(
 
     # Query values of service.name resource attribute using context-prefixed key
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -378,7 +378,7 @@ def test_logs_list(
 
     # Query values of metric.domain_id (string attribute) and ensure context collision doesn't break it
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -412,7 +412,7 @@ def test_logs_list(
     ],
 )
 def test_logs_list_with_order_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -479,7 +479,7 @@ def test_logs_list_with_order_by(
     }
 
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=1)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),
@@ -489,7 +489,7 @@ def test_logs_list_with_order_by(
 
     # Verify that both queries return the same results with specifying context with key name
     response_with_inline_context = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=1)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),
@@ -510,7 +510,7 @@ def test_logs_list_with_order_by(
 
 
 def test_logs_time_series_count(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -607,7 +607,7 @@ def test_logs_time_series_count(
 
     # count() of all logs for the last 5 minutes
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -674,7 +674,7 @@ def test_logs_time_series_count(
 
     # count() of all logs where code.line = 7 for last 5 minutes
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -742,7 +742,7 @@ def test_logs_time_series_count(
 
     # count() of all logs where service.name = "erlang" OR cloud.account.id = "000" for last 5 minutes
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -803,7 +803,7 @@ def test_logs_time_series_count(
 
     # count() of all logs grouped by host.name for the last 5 minutes
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -841,7 +841,7 @@ def test_logs_time_series_count(
     )
 
     response_with_inline_context = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC).replace(second=0, microsecond=0) - timedelta(minutes=5)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).replace(second=0, microsecond=0).timestamp() * 1000),
@@ -926,7 +926,7 @@ def test_logs_time_series_count(
 
 
 def test_datatype_collision(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1035,7 +1035,7 @@ def test_datatype_collision(
 
     # count() of all logs for the where severity_number > '7'
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1076,7 +1076,7 @@ def test_datatype_collision(
 
     # count() of all logs for the where severity_number > '7.0'
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1117,7 +1117,7 @@ def test_datatype_collision(
 
     # Test 2: severity_number comparison with string value
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1159,7 +1159,7 @@ def test_datatype_collision(
 
     # Test 3: http.status_code with numeric value (query contains number, actual value is string "200")
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1201,7 +1201,7 @@ def test_datatype_collision(
 
     # Test 4: http.status_code with string value (query contains string, actual value is numeric 404)
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1243,7 +1243,7 @@ def test_datatype_collision(
 
     # Test 5: Edge case - empty string comparison
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1285,7 +1285,7 @@ def test_datatype_collision(
 
 
 def test_logs_fill_gaps(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1318,7 +1318,7 @@ def test_logs_fill_gaps(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1371,7 +1371,7 @@ def test_logs_fill_gaps(
 
 
 def test_logs_fill_gaps_with_group_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1404,7 +1404,7 @@ def test_logs_fill_gaps_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1472,7 +1472,7 @@ def test_logs_fill_gaps_with_group_by(
 
 
 def test_logs_fill_gaps_formula(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1505,7 +1505,7 @@ def test_logs_fill_gaps_formula(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1579,7 +1579,7 @@ def test_logs_fill_gaps_formula(
 
 
 def test_logs_fill_gaps_formula_with_group_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1612,7 +1612,7 @@ def test_logs_fill_gaps_formula_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1707,7 +1707,7 @@ def test_logs_fill_gaps_formula_with_group_by(
 
 
 def test_logs_fill_zero(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1733,7 +1733,7 @@ def test_logs_fill_zero(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1783,7 +1783,7 @@ def test_logs_fill_zero(
 
 
 def test_logs_fill_zero_with_group_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1816,7 +1816,7 @@ def test_logs_fill_zero_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1883,7 +1883,7 @@ def test_logs_fill_zero_with_group_by(
 
 
 def test_logs_fill_zero_formula(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1916,7 +1916,7 @@ def test_logs_fill_zero_formula(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1991,7 +1991,7 @@ def test_logs_fill_zero_formula(
 
 
 def test_logs_fill_zero_formula_with_group_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -2024,7 +2024,7 @@ def test_logs_fill_zero_formula_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -2120,7 +2120,7 @@ def test_logs_fill_zero_formula_with_group_by(
 
 
 def test_logs_formula_orderby_and_limit(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -2193,7 +2193,7 @@ def test_logs_formula_orderby_and_limit(
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     result = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((now - timedelta(minutes=15)).timestamp() * 1000),
         end_ms=int(now.timestamp() * 1000),
@@ -2297,7 +2297,7 @@ def test_logs_formula_orderby_and_limit(
 
 
 def test_logs_list_filter_by_trace_id(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -2328,7 +2328,7 @@ def test_logs_list_filter_by_trace_id(
         "cloud.provider": "integration",
     }
 
-    # Populate signoz_traces.distributed_trace_summary by inserting spans for
+    # Populate o11y_traces.distributed_trace_summary by inserting spans for
     # the target trace_id. trace_summary records min/max of span timestamps
     # (it ignores span duration), so two spans are inserted to give the trace
     # a non-trivial recorded window of [now-10s, now-5s].
@@ -2395,7 +2395,7 @@ def test_logs_list_filter_by_trace_id(
 
     def _query(start_ms: int, end_ms: int, trace_id: str) -> tuple[list, list[str]]:
         response = make_query_request(
-            signoz,
+            o11y,
             token,
             start_ms=start_ms,
             end_ms=end_ms,
@@ -2465,7 +2465,7 @@ def test_logs_list_filter_by_trace_id(
 
 
 def test_logs_aggregation_filter_by_trace_id(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -2569,7 +2569,7 @@ def test_logs_aggregation_filter_by_trace_id(
 
     def _count(start_ms: int, end_ms: int, trace_id: str) -> tuple[float, list[str]]:
         response = make_query_request(
-            signoz,
+            o11y,
             token,
             start_ms=start_ms,
             end_ms=end_ms,

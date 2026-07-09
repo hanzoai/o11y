@@ -1,4 +1,4 @@
-### Monitor Azure Redis with SigNoz
+### Monitor Azure Redis with O11y
 
 Collect key Azure Redis metrics and view them with an out of the box dashboard.
 

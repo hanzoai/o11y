@@ -369,7 +369,7 @@
             "multiSelect": false,
             "name": "mysql.instance.endpoint",
             "order": 0,
-            "queryValue": "SELECT JSONExtractString(labels, 'mysql.instance.endpoint') as `mysql.instance.endpoint`\nFROM signoz_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'mysql.uptime'\nGROUP BY `mysql.instance.endpoint`",
+            "queryValue": "SELECT JSONExtractString(labels, 'mysql.instance.endpoint') as `mysql.instance.endpoint`\nFROM o11y_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'mysql.uptime'\nGROUP BY `mysql.instance.endpoint`",
             "selectedValue": "",
             "showALLOption": false,
             "sort": "ASC",

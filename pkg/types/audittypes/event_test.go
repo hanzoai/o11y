@@ -194,7 +194,7 @@ func TestNewPLogsFromAuditEvents(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			logs := NewPLogsFromAuditEvents(testCase.events, "signoz", "0.90.0", "signoz.audit")
+			logs := NewPLogsFromAuditEvents(testCase.events, "o11y", "0.90.0", "o11y.audit")
 
 			assert.Equal(t, testCase.expectedResourceLogs, logs.ResourceLogs().Len())
 
@@ -204,29 +204,29 @@ func TestNewPLogsFromAuditEvents(t *testing.T) {
 
 				serviceName, exists := resourceAttrs.Get("service.name")
 				assert.True(t, exists)
-				assert.Equal(t, "signoz", serviceName.Str())
+				assert.Equal(t, "o11y", serviceName.Str())
 
 				serviceVersion, exists := resourceAttrs.Get("service.version")
 				assert.True(t, exists)
 				assert.Equal(t, "0.90.0", serviceVersion.Str())
 
-				kind, exists := resourceAttrs.Get("signoz.audit.resource.kind")
+				kind, exists := resourceAttrs.Get("o11y.audit.resource.kind")
 				assert.True(t, exists)
 				assert.Equal(t, testCase.expectedResourceKinds[i], kind.Str())
 
-				id, exists := resourceAttrs.Get("signoz.audit.resource.id")
+				id, exists := resourceAttrs.Get("o11y.audit.resource.id")
 				assert.True(t, exists)
 				assert.Equal(t, testCase.expectedResourceIDs[i], id.Str())
 
 				assert.Equal(t, 1, resourceLogs.ScopeLogs().Len())
-				assert.Equal(t, "signoz.audit", resourceLogs.ScopeLogs().At(0).Scope().Name())
+				assert.Equal(t, "o11y.audit", resourceLogs.ScopeLogs().At(0).Scope().Name())
 
 				assert.Equal(t, testCase.expectedLogRecordCounts[i], resourceLogs.ScopeLogs().At(0).LogRecords().Len())
 
 				for j := 0; j < resourceLogs.ScopeLogs().At(0).LogRecords().Len(); j++ {
 					recordAttrs := resourceLogs.ScopeLogs().At(0).LogRecords().At(j).Attributes()
-					_, hasKind := recordAttrs.Get("signoz.audit.resource.kind")
-					_, hasID := recordAttrs.Get("signoz.audit.resource.id")
+					_, hasKind := recordAttrs.Get("o11y.audit.resource.kind")
+					_, hasID := recordAttrs.Get("o11y.audit.resource.id")
 					assert.False(t, hasKind, "resource.kind must not be in log record attributes")
 					assert.False(t, hasID, "resource.id must not be in log record attributes")
 				}

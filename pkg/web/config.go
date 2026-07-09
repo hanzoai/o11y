@@ -59,7 +59,7 @@ func newConfig() factory.Config {
 	return &Config{
 		Enabled:   true,
 		Index:     "index.html",
-		Directory: "/etc/signoz/web",
+		Directory: "/etc/o11y/web",
 		Settings: SettingsConfig{
 			Posthog: PosthogConfig{
 				Enabled: false,

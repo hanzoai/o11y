@@ -18,7 +18,7 @@ RUN apt-get update \
 # Install project dependencies from the pytest project's pyproject.toml +
 # uv.lock so the seeder container's Python env matches local dev exactly
 # (single source of truth for versions; no parallel requirements.txt).
-# --no-install-project skips building the signoz-tests project itself
+# --no-install-project skips building the o11y-tests project itself
 # (there is no buildable package here — pyproject is used purely for dep
 # management alongside pythonpath = ["."]).
 COPY pyproject.toml uv.lock /app/

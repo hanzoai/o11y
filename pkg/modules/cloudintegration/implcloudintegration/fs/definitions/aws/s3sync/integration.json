@@ -41,7 +41,7 @@
       "logs": {
         "subscriptions": [
           {
-            "logGroupNamePrefix": "x/signoz/forwarder",
+            "logGroupNamePrefix": "x/o11y/forwarder",
             "filterPattern": ""
           }
         ]

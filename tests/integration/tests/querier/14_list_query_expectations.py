@@ -371,7 +371,7 @@ from fixtures.querier import (
     ],
 )
 def test_logs_list_query_timestamp_expectations(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -391,7 +391,7 @@ def test_logs_list_query_timestamp_expectations(
 
     # Query Logs for the last 10 minute and check if the logs are returned in the correct order
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=10)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),
@@ -641,7 +641,7 @@ def test_logs_list_query_timestamp_expectations(
     ],
 )
 def test_logs_list_query_trace_id_expectations(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -720,7 +720,7 @@ def test_logs_list_query_trace_id_expectations(
 
     # Query Logs for the last 10 minute and check if the logs are returned in the correct order
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=10)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),

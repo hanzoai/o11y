@@ -6,17 +6,17 @@ This guide provides a step-by-step walkthrough for setting up the **OpenTelemetr
 <br/>
 
 __Table of Contents__
-- [Send data to Hanzo O11y Self-hosted with Docker](#send-data-to-signoz-self-hosted-with-docker)
+- [Send data to Hanzo O11y Self-hosted with Docker](#send-data-to-o11y-self-hosted-with-docker)
   - [Prerequisites](#prerequisites)
   - [Clone the OpenTelemetry Demo App Repository](#clone-the-opentelemetry-demo-app-repository)
   - [Modify OpenTelemetry Collector Config](#modify-opentelemetry-collector-config)
   - [Start the OpenTelemetry Demo App](#start-the-opentelemetry-demo-app)
-  - [Monitor with Hanzo O11y (Docker)](#monitor-with-signoz-docker)
-- [Send data to Hanzo O11y Self-hosted with Kubernetes](#send-data-to-signoz-self-hosted-with-kubernetes)
+  - [Monitor with Hanzo O11y (Docker)](#monitor-with-o11y-docker)
+- [Send data to Hanzo O11y Self-hosted with Kubernetes](#send-data-to-o11y-self-hosted-with-kubernetes)
   - [Prerequisites](#prerequisites-1)
   - [Install Helm Repo and Charts](#install-helm-repo-and-charts)
   - [Start the OpenTelemetry Demo App](#start-the-opentelemetry-demo-app-1)
-  - [Monitor with Hanzo O11y (Kubernetes)](#monitor-with-signoz-kubernetes)
+  - [Monitor with Hanzo O11y (Kubernetes)](#monitor-with-o11y-kubernetes)
 - [What's next](#whats-next)
 
 
@@ -66,7 +66,7 @@ service:
       exporters: [otlp]
 ```
 
-The Hanzo O11y OTel collector [sigNoz's otel-collector service] listens at 4317 port on localhost. When the OTel demo app is running within a Docker container and needs to transmit telemetry data to Hanzo O11y, it cannot directly reference 'localhost' as this would refer to the container's own internal network. Instead, Docker provides a special DNS name, `host.docker.internal`, which resolves to the host machine's IP address from within containers. By configuring the OpenTelemetry Demo application to send data to `host.docker.internal:4317`, we establish a network path that allows the containerized application to transmit telemetry data across the container boundary to the Hanzo O11y OTel collector running on the host machine's port 4317.
+The Hanzo O11y OTel collector [o11y's otel-collector service] listens at 4317 port on localhost. When the OTel demo app is running within a Docker container and needs to transmit telemetry data to Hanzo O11y, it cannot directly reference 'localhost' as this would refer to the container's own internal network. Instead, Docker provides a special DNS name, `host.docker.internal`, which resolves to the host machine's IP address from within containers. By configuring the OpenTelemetry Demo application to send data to `host.docker.internal:4317`, we establish a network path that allows the containerized application to transmit telemetry data across the container boundary to the Hanzo O11y OTel collector running on the host machine's port 4317.
 
 >
 > Note: When merging extra configuration values with the existing collector config (`src/otel-collector/otelcol-config.yml`), objects are merged and arrays are replaced resulting in previous pipeline configurations getting overridden.
@@ -83,7 +83,7 @@ exporters:
     tls:
       insecure: false
     headers:
-      signoz-access-token: <SIGNOZ-KEY>
+      o11y-access-token: <O11Y-KEY>
   debug:
     verbosity: detailed
 
@@ -128,7 +128,7 @@ The result should look similar to this,
 Navigate to `http://localhost:8081/` where you can access OTel demo app UI. Generate some traffic to send to Hanzo O11y [Docker].
 
 ## Monitor with Hanzo O11y [Docker]
-Signoz exposes its UI at `http://localhost:8080/`. You should be able to see multiple services listed down as shown in the snapshot below.
+O11y exposes its UI at `http://localhost:8080/`. You should be able to see multiple services listed down as shown in the snapshot below.
 
 
 ![](/docs/img/otel-demo-services.png)
@@ -173,7 +173,7 @@ default:
     - name: OTEL_RESOURCE_ATTRIBUTES
       value: 'service.name=$(OTEL_SERVICE_NAME),service.namespace=opentelemetry-demo'
     - name: OTEL_COLLECTOR_NAME
-      value: signoz-otel-collector.<namespace>.svc.cluster.local
+      value: otel-collector.<namespace>.svc.cluster.local
 ```
 Replace namespace with your appropriate namespace. This file will replace the chart’s existing settings with our new ones, ensuring telemetry data is sent to Hanzo O11y [Kubernetes].
 
@@ -193,7 +193,7 @@ opentelemetry-collector:
         tls:
           insecure: false
         headers:
-          signoz-access-token: <SIGNOZ-KEY>
+          o11y-access-token: <O11Y-KEY>
       debug:
         verbosity: detailed
     service:
@@ -238,7 +238,7 @@ Navigate to `http://localhost:8081/` where you can access OTel demo app UI. Gene
 
 
 ## Monitor with Hanzo O11y [Kubernetes]
-Signoz exposes it's UI at `http://localhost:8080/`. You should be able to see multiple services listed down as shown in the snapshot below.
+O11y exposes it's UI at `http://localhost:8080/`. You should be able to see multiple services listed down as shown in the snapshot below.
 
 
 ![](/docs/img/otel-demo-services.png)
@@ -253,4 +253,4 @@ This verifies that your OTel demo app is successfully sending telemetry data to 
 
 Don't forget to check our OpenTelemetry [track](https://o11y.hanzo.ai/resource-center/opentelemetry/), guaranteed to take you from a newbie to sensei in no time!
 
-Also from a fellow OTel fan to another, we at [Hanzo O11y](https://o11y.hanzo.ai/) are building an open-source, OTel native, observability platform (one of its kind). So, show us love - star us on [GitHub](https://github.com/Hanzo O11y/signoz), nitpick our [docs](https://o11y.hanzo.ai/docs/introduction/), or just tell your app we’re the ones who’ll catch its crashes mid-flight and finally shush all the 3am panic calls!
+Also from a fellow OTel fan to another, we at [Hanzo O11y](https://o11y.hanzo.ai/) are building an open-source, OTel native, observability platform (one of its kind). So, show us love - star us on [GitHub](https://github.com/Hanzo O11y/o11y), nitpick our [docs](https://o11y.hanzo.ai/docs/introduction/), or just tell your app we’re the ones who’ll catch its crashes mid-flight and finally shush all the 3am panic calls!

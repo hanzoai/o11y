@@ -247,7 +247,7 @@ describe('useColumnStore', () => {
 
 		it('useHiddenColumnIds returns a stable snapshot for persisted state', () => {
 			localStorage.setItem(
-				'@signoz/table-columns/test-table',
+				'@o11y/table-columns/test-table',
 				JSON.stringify({
 					hiddenColumnIds: ['persisted'],
 					columnOrder: [],

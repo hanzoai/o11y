@@ -77,8 +77,8 @@ Use the `Flagger` interface to evaluate feature flags. The interface provides ty
 
 ```go
 import (
-    "github.com/Hanzo O11y/signoz/pkg/flagger"
-    "github.com/Hanzo O11y/signoz/pkg/types/featuretypes"
+    "github.com/Hanzo O11y/o11y/pkg/flagger"
+    "github.com/Hanzo O11y/o11y/pkg/types/featuretypes"
 )
 
 func DoSomething(ctx context.Context, flagger flagger.Flagger) error {

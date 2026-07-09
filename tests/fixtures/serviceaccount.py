@@ -13,10 +13,10 @@ logger = setup_logger(__name__)
 SERVICE_ACCOUNT_BASE = "/api/v1/service_accounts"
 
 
-def create_service_account(signoz: types.SigNoz, token: str, name: str, role: str = "signoz-viewer") -> str:
+def create_service_account(o11y: types.O11y, token: str, name: str, role: str = "o11y-viewer") -> str:
     """Create a service account, assign a role, and return its ID."""
     resp = requests.post(
-        signoz.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
+        o11y.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
         json={"name": name},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -24,9 +24,9 @@ def create_service_account(signoz: types.SigNoz, token: str, name: str, role: st
     assert resp.status_code == HTTPStatus.CREATED, resp.text
     service_account_id = resp.json()["data"]["id"]
 
-    role_id = find_role_by_name(signoz, token, role)
+    role_id = find_role_by_name(o11y, token, role)
     role_resp = requests.post(
-        signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}/roles"),
+        o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}/roles"),
         json={"id": role_id},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -36,12 +36,12 @@ def create_service_account(signoz: types.SigNoz, token: str, name: str, role: st
     return service_account_id
 
 
-def create_service_account_with_key(signoz: types.SigNoz, token: str, name: str, role: str = "signoz-admin") -> tuple:
+def create_service_account_with_key(o11y: types.O11y, token: str, name: str, role: str = "o11y-admin") -> tuple:
     """Create a service account with an API key and return (service_account_id, api_key)."""
-    service_account_id = create_service_account(signoz, token, name, role)
+    service_account_id = create_service_account(o11y, token, name, role)
 
     key_resp = requests.post(
-        signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}/keys"),
+        o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}/keys"),
         json={"name": "auth-key", "expiresAt": 0},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -52,20 +52,20 @@ def create_service_account_with_key(signoz: types.SigNoz, token: str, name: str,
     return service_account_id, api_key
 
 
-def delete_service_account(signoz: types.SigNoz, token: str, service_account_id: str) -> None:
+def delete_service_account(o11y: types.O11y, token: str, service_account_id: str) -> None:
     """Soft-delete a service account."""
     resp = requests.delete(
-        signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}"),
+        o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
     assert resp.status_code == HTTPStatus.NO_CONTENT, resp.text
 
 
-def get_first_key_id(signoz: types.SigNoz, token: str, service_account_id: str) -> str:
+def get_first_key_id(o11y: types.O11y, token: str, service_account_id: str) -> str:
     """Return the ID of the first API key for a service account."""
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}/keys"),
+        o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}/keys"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -73,10 +73,10 @@ def get_first_key_id(signoz: types.SigNoz, token: str, service_account_id: str) 
     return resp.json()["data"][0]["id"]
 
 
-def create_service_account_with_roles(signoz: types.SigNoz, token: str, name: str, roles: list[str]) -> str:
+def create_service_account_with_roles(o11y: types.O11y, token: str, name: str, roles: list[str]) -> str:
     """Create a service account and assign multiple roles."""
     resp = requests.post(
-        signoz.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
+        o11y.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
         json={"name": name},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -85,9 +85,9 @@ def create_service_account_with_roles(signoz: types.SigNoz, token: str, name: st
     service_account_id = resp.json()["data"]["id"]
 
     for role in roles:
-        role_id = find_role_by_name(signoz, token, role)
+        role_id = find_role_by_name(o11y, token, role)
         role_resp = requests.post(
-            signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}/roles"),
+            o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}/roles"),
             json={"id": role_id},
             headers={"Authorization": f"Bearer {token}"},
             timeout=5,
@@ -97,10 +97,10 @@ def create_service_account_with_roles(signoz: types.SigNoz, token: str, name: st
     return service_account_id
 
 
-def find_service_account_by_name(signoz: types.SigNoz, token: str, name: str) -> dict:
+def find_service_account_by_name(o11y: types.O11y, token: str, name: str) -> dict:
     """Find a service account by name from the list endpoint."""
     list_resp = requests.get(
-        signoz.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
+        o11y.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )

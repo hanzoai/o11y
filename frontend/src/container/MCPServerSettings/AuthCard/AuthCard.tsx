@@ -30,19 +30,19 @@ function AuthCard({
 				Authenticate from your client
 			</h3>
 			<p className="mcp-auth-card__description">
-				On first connect, your client opens a SigNoz authorization page asking for
+				On first connect, your client opens a O11y authorization page asking for
 				two values:
 			</p>
 
 			<div className="mcp-auth-card__field">
-				<span className="mcp-auth-card__field-label">SigNoz Instance URL</span>
+				<span className="mcp-auth-card__field-label">O11y Instance URL</span>
 				{isLoadingInstanceUrl ? (
 					<Skeleton.Input active size="small" />
 				) : (
 					<div className="mcp-auth-card__endpoint-value">
 						<span data-testid="mcp-instance-url">{instanceUrl}</span>
 						<CopyIconButton
-							ariaLabel="Copy SigNoz instance URL"
+							ariaLabel="Copy O11y instance URL"
 							onCopy={onCopyInstanceUrl}
 							disabled={isLoadingInstanceUrl}
 						/>

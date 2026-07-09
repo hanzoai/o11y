@@ -9,9 +9,9 @@ global:
   external_url: <unset>
   # the url where the Hanzo O11y backend receives telemetry data (traces, metrics, logs) from instrumented applications.
   ingestion_url: <unset>
-  # the url of the SigNoz MCP server. when unset, the MCP settings page is hidden in the frontend.
+  # the url of the O11y MCP server. when unset, the MCP settings page is hidden in the frontend.
   # mcp_url: <unset>
-  # the url of the SigNoz AI Assistant server. when unset, the AI Assistant is hidden in the frontend.
+  # the url of the O11y AI Assistant server. when unset, the AI Assistant is hidden in the frontend.
   # ai_assistant_url: <unset>
 
 ##################### Version #####################
@@ -175,11 +175,11 @@ alertmanager:
     poll_interval: 1m
     # The URL under which Alertmanager is externally reachable (for example, if Alertmanager is served via a reverse proxy). Used for generating relative and absolute links back to Alertmanager itself.
     external_url: http://localhost:8080
-    # The list of globs from which SigNoz's alertmanager notification templates are loaded (e.g. the email.signoz.html layout).
+    # The list of globs from which O11y's alertmanager notification templates are loaded (e.g. the email.o11y.html layout).
     # This mirrors the upstream alertmanager `templates` config option. The upstream default templates (default.tmpl, email.tmpl)
-    # are always loaded from the embedded alertmanager assets, so only SigNoz's own templates need to be listed here.
+    # are always loaded from the embedded alertmanager assets, so only O11y's own templates need to be listed here.
     templates:
-      - /opt/signoz/conf/templates/alertmanager/*.gotmpl
+      - /opt/o11y/conf/templates/alertmanager/*.gotmpl
     # The global configuration for the alertmanager. All the exahustive fields can be found in the upstream: https://github.com/prometheus/alertmanager/blob/efa05feffd644ba4accb526e98a8c6545d26a783/config/config.go#L833
     global:
       # ResolveTimeout is the time after which an alert is declared resolved if it has not been updated.
@@ -372,7 +372,7 @@ identn:
     enabled: true
     # headers to use for apikey identN resolver
     headers:
-      - SIGNOZ-API-KEY
+      - O11Y-API-KEY
   impersonation:
     # toggle impersonation identN, when enabled, all requests will impersonate the root user
     enabled: false
@@ -381,7 +381,7 @@ identn:
 serviceaccount:
   email:
     # email domain for the service account principal
-    domain: signozserviceaccount.com
+    domain: o11yserviceaccount.com
 
   analytics:
     # toggle service account analytics

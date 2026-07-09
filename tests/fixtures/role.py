@@ -12,10 +12,10 @@ logger = setup_logger(__name__)
 ROLES_BASE = "/api/v1/roles"
 
 
-def find_role_by_name(signoz: types.SigNoz, token: str, name: str) -> str:
+def find_role_by_name(o11y: types.O11y, token: str, name: str) -> str:
     """Find a role by name from the roles endpoint and return its UUID."""
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(ROLES_BASE),
+        o11y.self.host_configs["8080"].get(ROLES_BASE),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -25,10 +25,10 @@ def find_role_by_name(signoz: types.SigNoz, token: str, name: str) -> str:
     return role["id"]
 
 
-def create_custom_role(signoz: types.SigNoz, token: str, name: str) -> str:
+def create_custom_role(o11y: types.O11y, token: str, name: str) -> str:
     """Create a custom role and return its ID."""
     resp = requests.post(
-        signoz.self.host_configs["8080"].get(ROLES_BASE),
+        o11y.self.host_configs["8080"].get(ROLES_BASE),
         json={"name": name},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -37,10 +37,10 @@ def create_custom_role(signoz: types.SigNoz, token: str, name: str) -> str:
     return resp.json()["data"]["id"]
 
 
-def delete_custom_role(signoz: types.SigNoz, token: str, role_id: str) -> None:
+def delete_custom_role(o11y: types.O11y, token: str, role_id: str) -> None:
     """Delete a custom role."""
     resp = requests.delete(
-        signoz.self.host_configs["8080"].get(f"{ROLES_BASE}/{role_id}"),
+        o11y.self.host_configs["8080"].get(f"{ROLES_BASE}/{role_id}"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -48,7 +48,7 @@ def delete_custom_role(signoz: types.SigNoz, token: str, role_id: str) -> None:
 
 
 def patch_role_objects(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     token: str,
     role_id: str,
     relation: str,
@@ -63,7 +63,7 @@ def patch_role_objects(
         body["deletions"] = deletions
 
     resp = requests.patch(
-        signoz.self.host_configs["8080"].get(f"{ROLES_BASE}/{role_id}/relations/{relation}/objects"),
+        o11y.self.host_configs["8080"].get(f"{ROLES_BASE}/{role_id}/relations/{relation}/objects"),
         json=body,
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,

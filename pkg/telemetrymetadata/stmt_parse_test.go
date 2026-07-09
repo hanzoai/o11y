@@ -9,7 +9,7 @@ import (
 
 func TestExtractFieldKeysFromTblStatement(t *testing.T) {
 
-	var statement = `CREATE TABLE signoz_logs.logs_v2
+	var statement = `CREATE TABLE o11y_logs.logs_v2
 	(
 		` + "`ts_bucket_start`" + ` UInt64 CODEC(DoubleDelta, LZ4),
 		` + "`resource_fingerprint`" + ` String CODEC(ZSTD(1)),

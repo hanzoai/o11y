@@ -27,13 +27,13 @@ GATEWAY_APIS_EDITOR_PASSWORD = "password123Z$"
 
 
 def test_apply_license(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list[Mapping]], None],
     get_token: Callable[[str, str], str],
 ) -> None:
     """Activate a license so that all subsequent gateway calls succeed."""
-    add_license(signoz, make_http_mocks, get_token)
+    add_license(o11y, make_http_mocks, get_token)
 
 
 # ---------------------------------------------------------------------------
@@ -42,7 +42,7 @@ def test_apply_license(
 
 
 def test_create_ingestion_key_limit_only_size(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -53,7 +53,7 @@ def test_create_ingestion_key_limit_only_size(
     gateway_url = f"/v1/workspaces/me/keys/{TEST_KEY_ID}/limits"
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -74,7 +74,7 @@ def test_create_ingestion_key_limit_only_size(
     )
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
+        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
         json={
             "signal": "logs",
             "config": {"day": {"size": 1000}},
@@ -88,7 +88,7 @@ def test_create_ingestion_key_limit_only_size(
 
     assert response.json()["data"]["id"] == "limit-created-1"
 
-    body = get_latest_gateway_request_body(signoz, "POST", gateway_url)
+    body = get_latest_gateway_request_body(o11y, "POST", gateway_url)
     assert body is not None, "Expected a POST request to reach the gateway"
     assert body["signal"] == "logs"
     assert body["config"]["day"]["size"] == 1000
@@ -98,7 +98,7 @@ def test_create_ingestion_key_limit_only_size(
 
 
 def test_create_ingestion_key_limit_only_count(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -109,7 +109,7 @@ def test_create_ingestion_key_limit_only_count(
     gateway_url = f"/v1/workspaces/me/keys/{TEST_KEY_ID}/limits"
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -130,7 +130,7 @@ def test_create_ingestion_key_limit_only_count(
     )
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
+        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
         json={
             "signal": "traces",
             "config": {"day": {"count": 500}},
@@ -142,7 +142,7 @@ def test_create_ingestion_key_limit_only_count(
 
     assert response.status_code == HTTPStatus.CREATED, f"Expected 201, got {response.status_code}: {response.text}"
 
-    body = get_latest_gateway_request_body(signoz, "POST", gateway_url)
+    body = get_latest_gateway_request_body(o11y, "POST", gateway_url)
     assert body is not None, "Expected a POST request to reach the gateway"
     assert body["signal"] == "traces"
     assert body["config"]["day"]["count"] == 500
@@ -151,7 +151,7 @@ def test_create_ingestion_key_limit_only_count(
 
 
 def test_create_ingestion_key_limit_both_size_and_count(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -162,7 +162,7 @@ def test_create_ingestion_key_limit_both_size_and_count(
     gateway_url = f"/v1/workspaces/me/keys/{TEST_KEY_ID}/limits"
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -183,7 +183,7 @@ def test_create_ingestion_key_limit_both_size_and_count(
     )
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
+        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
         json={
             "signal": "metrics",
             "config": {
@@ -198,7 +198,7 @@ def test_create_ingestion_key_limit_both_size_and_count(
 
     assert response.status_code == HTTPStatus.CREATED, f"Expected 201, got {response.status_code}: {response.text}"
 
-    body = get_latest_gateway_request_body(signoz, "POST", gateway_url)
+    body = get_latest_gateway_request_body(o11y, "POST", gateway_url)
     assert body is not None, "Expected a POST request to reach the gateway"
     assert body["signal"] == "metrics"
     assert body["config"]["day"]["size"] == 2000
@@ -214,7 +214,7 @@ def test_create_ingestion_key_limit_both_size_and_count(
 
 
 def test_update_ingestion_key_limit_only_size(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -225,7 +225,7 @@ def test_update_ingestion_key_limit_only_size(
     gateway_url = f"/v1/workspaces/me/limits/{TEST_LIMIT_ID}"
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -240,7 +240,7 @@ def test_update_ingestion_key_limit_only_size(
     )
 
     response = requests.patch(
-        signoz.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
+        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
         json={
             "config": {"day": {"size": 2000}},
             "tags": ["test"],
@@ -251,7 +251,7 @@ def test_update_ingestion_key_limit_only_size(
 
     assert response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {response.status_code}: {response.text}"
 
-    body = get_latest_gateway_request_body(signoz, "PATCH", gateway_url)
+    body = get_latest_gateway_request_body(o11y, "PATCH", gateway_url)
     assert body is not None, "Expected a PATCH request to reach the gateway"
     assert body["config"]["day"]["size"] == 2000
     assert "count" not in body["config"]["day"], "count should be absent when not set"
@@ -260,7 +260,7 @@ def test_update_ingestion_key_limit_only_size(
 
 
 def test_update_ingestion_key_limit_only_count(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -271,7 +271,7 @@ def test_update_ingestion_key_limit_only_count(
     gateway_url = f"/v1/workspaces/me/limits/{TEST_LIMIT_ID}"
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -286,7 +286,7 @@ def test_update_ingestion_key_limit_only_count(
     )
 
     response = requests.patch(
-        signoz.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
+        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
         json={
             "config": {"day": {"count": 750}},
             "tags": ["test"],
@@ -297,7 +297,7 @@ def test_update_ingestion_key_limit_only_count(
 
     assert response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {response.status_code}: {response.text}"
 
-    body = get_latest_gateway_request_body(signoz, "PATCH", gateway_url)
+    body = get_latest_gateway_request_body(o11y, "PATCH", gateway_url)
     assert body is not None, "Expected a PATCH request to reach the gateway"
     assert body["config"]["day"]["count"] == 750
     assert "size" not in body["config"]["day"], "size should be absent when not set"
@@ -305,7 +305,7 @@ def test_update_ingestion_key_limit_only_count(
 
 
 def test_update_ingestion_key_limit_both_size_and_count(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -316,7 +316,7 @@ def test_update_ingestion_key_limit_both_size_and_count(
     gateway_url = f"/v1/workspaces/me/limits/{TEST_LIMIT_ID}"
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -331,7 +331,7 @@ def test_update_ingestion_key_limit_both_size_and_count(
     )
 
     response = requests.patch(
-        signoz.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
+        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
         json={
             "config": {"day": {"size": 1000, "count": 500}},
             "tags": ["test"],
@@ -342,7 +342,7 @@ def test_update_ingestion_key_limit_both_size_and_count(
 
     assert response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {response.status_code}: {response.text}"
 
-    body = get_latest_gateway_request_body(signoz, "PATCH", gateway_url)
+    body = get_latest_gateway_request_body(o11y, "PATCH", gateway_url)
     assert body is not None, "Expected a PATCH request to reach the gateway"
     assert body["config"]["day"]["size"] == 1000
     assert body["config"]["day"]["count"] == 500
@@ -355,7 +355,7 @@ def test_update_ingestion_key_limit_both_size_and_count(
 
 
 def test_delete_ingestion_key_limit(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -366,7 +366,7 @@ def test_delete_ingestion_key_limit(
     gateway_url = f"/v1/workspaces/me/limits/{TEST_LIMIT_ID}"
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -381,7 +381,7 @@ def test_delete_ingestion_key_limit(
     )
 
     response = requests.delete(
-        signoz.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
+        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )
@@ -389,5 +389,5 @@ def test_delete_ingestion_key_limit(
     assert response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {response.status_code}: {response.text}"
 
     # Verify at least one DELETE reached the gateway
-    matched = get_gateway_requests(signoz, "DELETE", gateway_url)
+    matched = get_gateway_requests(o11y, "DELETE", gateway_url)
     assert len(matched) >= 1, "Expected a DELETE request to reach the gateway"
