@@ -63,41 +63,33 @@ func (handlerAdapter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // rewriteExternalPath maps the ONE public o11y contract — api.hanzo.ai/v1/o11y/<resource>,
-// one /v1/, no /api/ — onto the two internal route families, at this single Hanzo-owned
-// seam. It is done HERE, never by editing the embedded SigNoz route literals: SigNoz's
-// whole frontend and backend speak /api/vN, and rewriting those literals is a fork diff
-// that a later upstream re-sync silently reverts (it already happened once — see
-// o11y/CLAUDE.md).
+// one /v1/, no nested version, no /api/ — onto o11y's internal /api/ namespace, at this
+// single Hanzo-owned seam. It is done HERE, never by editing the embedded SigNoz route
+// literals: SigNoz's whole frontend and backend speak /api/vN, and rewriting those
+// literals is a fork diff a later upstream re-sync silently reverts (it happened once —
+// see o11y/CLAUDE.md).
 //
-//	SigNoz native (registered at /api/vN/*):
-//	  /v1/o11y/vN/…      → /api/vN/…   (canonical — the /api/ never surfaces)
-//	  /v1/o11y/api/vN/…  → /api/vN/…   (deprecated alias: the leaked form callers emit
-//	                                    today. Drop once every consumer emits the
-//	                                    canonical form — one and one way.)
-//	Hanzo llmobs (registered natively at /v1/o11y/{traces,observations,…}): passed
-//	through unchanged.
+//	/v1/o11y/<resource>   → /api/<resource>   (canonical; resolves to a version-less
+//	                                           alias — SigNoz, highest version wins —
+//	                                           or a Hanzo llmobs route)
+//	/v1/o11y/api/vN/…      → /api/vN/…         (leaked form still emitted by the SigNoz
+//	                                           SPA; kept working by dropping the mount
+//	                                           prefix only, until it migrates)
 //
-// This requires the embedded SigNoz StripPrefix wrapper to be OFF — cloud CR
-// O11Y_GLOBAL_EXTERNAL__URL="" — so a /v1/o11y/* llmobs path survives to the router.
+// Because every rewritten path starts with /api/, the embedded SigNoz StripPrefix
+// wrapper (ExternalPath=/v1/o11y) finds nothing to strip and passes through — so no CR
+// change is needed. The version-less /api/<resource> aliases are registered by
+// signozapiserver.AddVersionlessAliases when the router is assembled.
 func rewriteExternalPath(u *url.URL) {
 	rest, ok := strings.CutPrefix(u.Path, "/v1/o11y/")
 	if !ok {
 		return
 	}
-	switch {
-	case strings.HasPrefix(rest, "api/v"): // deprecated leaked alias: /v1/o11y/api/vN/x
-		setPath(u, "/"+rest) // → /api/vN/x
-	case isVersionSegment(rest): // canonical SigNoz form: /v1/o11y/vN/x
-		setPath(u, "/api/"+rest) // → /api/vN/x
-	default: // Hanzo llmobs / native resource — the router owns /v1/o11y/x directly.
+	if strings.HasPrefix(rest, "api/") {
+		setPath(u, "/"+rest) // /v1/o11y/api/vN/x → /api/vN/x (leaked form, kept working)
+		return
 	}
-}
-
-// isVersionSegment reports whether rest begins with a SigNoz API version segment
-// (v followed by a digit — "v1/health", "v3/query_range"): the marker that tells an
-// embedded-SigNoz route apart from a Hanzo-native llmobs resource (traces, sessions, …).
-func isVersionSegment(rest string) bool {
-	return len(rest) >= 2 && rest[0] == 'v' && rest[1] >= '0' && rest[1] <= '9'
+	setPath(u, "/api/"+rest) // /v1/o11y/<resource> → /api/<resource>
 }
 
 // setPath rewrites the request path, clearing RawPath so EscapedPath re-derives from the
