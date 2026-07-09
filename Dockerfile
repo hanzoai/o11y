@@ -9,7 +9,7 @@
 # cloud-embed adapter, which `cmd/community` never pulls in.
 #
 # All external modules in cmd/community's graph are public (hanzoai/* forks of
-# signoz-otel-collector, govaluate, clickhouse-go-mock, expr), so the module
+# otel-collector, govaluate, clickhouse-go-mock, expr), so the module
 # fetch needs no private git auth — only GOPRIVATE + GOSUMDB=off.
 #
 # The browser SPA is served at the edge by hanzoai/static (house-native static
@@ -62,11 +62,11 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 FROM alpine:3.20
 LABEL org.opencontainers.image.source="https://github.com/hanzoai/o11y" \
       org.opencontainers.image.title="hanzo-o11y" \
-      org.opencontainers.image.description="Hanzo O11y — OTLP-native observability (SigNoz fork), standalone community server" \
+      org.opencontainers.image.description="Hanzo O11y — OTLP-native observability (O11y fork), standalone community server" \
       maintainer="hanzoai"
 
 RUN apk add --no-cache ca-certificates && \
-    mkdir -p /var/lib/signoz
+    mkdir -p /var/lib/o11y
 
 WORKDIR /root
 

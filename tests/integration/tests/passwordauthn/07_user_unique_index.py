@@ -8,13 +8,13 @@ from sqlalchemy import sql
 from sqlalchemy.exc import IntegrityError
 
 from fixtures.auth import USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD
-from fixtures.types import SigNoz
+from fixtures.types import O11y
 
 UNIQUE_INDEX_USER_EMAIL = "useruniqueindex@integration.test"
 
 
 def test_unique_index_allows_multiple_deleted_rows(
-    signoz: SigNoz,
+    o11y: O11y,
     get_token: Callable[[str, str], str],
 ):
     """
@@ -41,7 +41,7 @@ def test_unique_index_allows_multiple_deleted_rows(
 
     # Step 1: invite and delete the first user
     resp = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json={
             "email": UNIQUE_INDEX_USER_EMAIL,
             "role": "EDITOR",
@@ -54,7 +54,7 @@ def test_unique_index_allows_multiple_deleted_rows(
     first_user_id = resp.json()["data"]["id"]
 
     resp = requests.delete(
-        signoz.self.host_configs["8080"].get(f"/api/v1/user/{first_user_id}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/user/{first_user_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -62,7 +62,7 @@ def test_unique_index_allows_multiple_deleted_rows(
 
     # Step 2: re-invite and delete the same email (second deleted row)
     resp = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json={
             "email": UNIQUE_INDEX_USER_EMAIL,
             "role": "EDITOR",
@@ -76,14 +76,14 @@ def test_unique_index_allows_multiple_deleted_rows(
     assert second_user_id != first_user_id
 
     resp = requests.delete(
-        signoz.self.host_configs["8080"].get(f"/api/v1/user/{second_user_id}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/user/{second_user_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
     assert resp.status_code == HTTPStatus.NO_CONTENT
 
     # Step 3: assert the DB has exactly two deleted rows for this email
-    with signoz.sqlstore.conn.connect() as conn:
+    with o11y.sqlstore.conn.connect() as conn:
         result = conn.execute(
             sql.text("SELECT id FROM users WHERE email = :email AND status = 'deleted'"),
             {"email": UNIQUE_INDEX_USER_EMAIL},
@@ -96,7 +96,7 @@ def test_unique_index_allows_multiple_deleted_rows(
     assert second_user_id in deleted_ids
 
     # Retrieve org_id for the direct SQL inserts below
-    with signoz.sqlstore.conn.connect() as conn:
+    with o11y.sqlstore.conn.connect() as conn:
         result = conn.execute(
             sql.text("SELECT org_id FROM users WHERE id = :id"),
             {"id": first_user_id},
@@ -109,7 +109,7 @@ def test_unique_index_allows_multiple_deleted_rows(
     # First insert must succeed (only deleted rows exist so far).
     # Second insert for the same (org_id, email) with status='active' must fail.
     active_id = str(uuid.uuid4())
-    with signoz.sqlstore.conn.connect() as conn:
+    with o11y.sqlstore.conn.connect() as conn:
         conn.execute(
             sql.text("INSERT INTO users (id, display_name, email, org_id, is_root, status, created_at, updated_at) VALUES (:id, :display_name, :email, :org_id,         false, 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"),
             {
@@ -121,7 +121,7 @@ def test_unique_index_allows_multiple_deleted_rows(
         )
         conn.commit()
 
-    with signoz.sqlstore.conn.connect() as conn:
+    with o11y.sqlstore.conn.connect() as conn:
         with pytest.raises(IntegrityError):
             conn.execute(
                 sql.text("INSERT INTO users (id, display_name, email, org_id, is_root, status, created_at, updated_at) VALUES (:id, :display_name, :email, :org_id,         false, 'active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"),
@@ -134,7 +134,7 @@ def test_unique_index_allows_multiple_deleted_rows(
             )
 
     # Step 5: a third deleted row must be accepted (excluded from partial index)
-    with signoz.sqlstore.conn.connect() as conn:
+    with o11y.sqlstore.conn.connect() as conn:
         conn.execute(
             sql.text("INSERT INTO users (id, display_name, email, org_id, is_root, status, created_at, updated_at) VALUES (:id, :display_name, :email, :org_id,         false, 'deleted', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"),
             {
@@ -147,7 +147,7 @@ def test_unique_index_allows_multiple_deleted_rows(
         conn.commit()
 
     # Step 6: confirm three deleted rows now exist
-    with signoz.sqlstore.conn.connect() as conn:
+    with o11y.sqlstore.conn.connect() as conn:
         result = conn.execute(
             sql.text("SELECT COUNT(*) FROM users WHERE email = :email AND status = 'deleted'"),
             {"email": UNIQUE_INDEX_USER_EMAIL},

@@ -852,7 +852,7 @@ function Success(props: ISuccessProps): JSX.Element {
 						suffix={<ArrowUpRight size={14} />}
 						onClick={(): WindowProxy | null =>
 							window.open(
-								'https://signoz.io/docs/userguide/traces/#missing-spans',
+								'https://o11y.io/docs/userguide/traces/#missing-spans',
 								'_blank',
 							)
 						}

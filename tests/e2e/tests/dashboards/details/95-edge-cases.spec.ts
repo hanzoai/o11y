@@ -98,7 +98,7 @@ test.describe('Dashboard Detail Page — Edge Cases', () => {
 		// The chrome (sidebar logo) must always render, regardless of whether
 		// the app redirects to /dashboard or shows an in-place error shell.
 		// The bogus-id breadcrumb must never resolve.
-		await expect(page.getByRole('img', { name: 'SigNoz' })).toBeVisible();
+		await expect(page.getByRole('img', { name: 'O11y' })).toBeVisible();
 		await expect(
 			page.getByRole('button', {
 				name: /dashboard-icon nonexistent-id-99999/,
@@ -110,7 +110,7 @@ test.describe('Dashboard Detail Page — Edge Cases', () => {
 		authedPage: page,
 	}) => {
 		await page.goto('/dashboard/nonexistent-id-99999');
-		await expect(page.getByRole('img', { name: 'SigNoz' })).toBeVisible();
+		await expect(page.getByRole('img', { name: 'O11y' })).toBeVisible();
 
 		await page
 			.locator('.nav-item')

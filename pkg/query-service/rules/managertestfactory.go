@@ -15,7 +15,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
 	"github.com/hanzoai/o11y/pkg/querier"
-	"github.com/hanzoai/o11y/pkg/querier/signozquerier"
+	"github.com/hanzoai/o11y/pkg/querier/o11yquerier"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstoretest"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -105,7 +105,7 @@ func NewTestManager(t *testing.T, testOpts *TestManagerOptions) *Manager {
 	}
 
 	// Create querier with test values
-	providerFactory := signozquerier.NewFactory(telemetryStore, prometheus, cache, flagger)
+	providerFactory := o11yquerier.NewFactory(telemetryStore, prometheus, cache, flagger)
 	mockQuerier, err := providerFactory.New(context.Background(), providerSettings, querier.Config{})
 	require.NoError(t, err)
 

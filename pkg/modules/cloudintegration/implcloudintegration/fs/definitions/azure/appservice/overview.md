@@ -1,4 +1,4 @@
-### Monitor Azure App Services with SigNoz
+### Monitor Azure App Services with O11y
 
 Collect key App Services metrics and view them with an out of the box dashboard.
 

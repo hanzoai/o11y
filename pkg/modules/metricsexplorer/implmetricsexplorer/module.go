@@ -529,13 +529,13 @@ func (m *module) CheckMetricExists(ctx context.Context, orgID valuer.UUID, metri
 	return exists, nil
 }
 
-func (m *module) HasNonSigNozMetrics(ctx context.Context) (bool, error) {
-	ctx = m.withMetricsExplorerContext(ctx, "HasNonSigNozMetrics")
+func (m *module) HasNonO11yMetrics(ctx context.Context) (bool, error) {
+	ctx = m.withMetricsExplorerContext(ctx, "HasNonO11yMetrics")
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("count(*) > 0")
 	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV41weekTableName))
-	sb.Where("metric_name NOT LIKE 'signoz_%'")
+	sb.Where("metric_name NOT LIKE 'o11y_%'")
 
 	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
 
@@ -545,7 +545,7 @@ func (m *module) HasNonSigNozMetrics(ctx context.Context) (bool, error) {
 
 	err := db.QueryRow(valueCtx, query, args...).Scan(&hasMetrics)
 	if err != nil {
-		return false, errors.WrapInternalf(err, errors.CodeInternal, "failed to check for non-signoz metrics")
+		return false, errors.WrapInternalf(err, errors.CodeInternal, "failed to check for non-o11y metrics")
 	}
 
 	return hasMetrics, nil
@@ -1028,7 +1028,7 @@ func (m *module) fetchMetricsStatsWithSamples(
 	)
 	tsSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, distributedTsTable))
 	tsSB.Where(tsSB.Between("unix_milli", start, end))
-	tsSB.Where("NOT startsWith(metric_name, 'signoz')")
+	tsSB.Where("NOT startsWith(metric_name, 'o11y')")
 	if filterWhereClause != nil {
 		tsSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
 	}
@@ -1042,7 +1042,7 @@ func (m *module) fetchMetricsStatsWithSamples(
 	)
 	samplesSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, distributedSamplesTable))
 	samplesSB.Where(samplesSB.Between("unix_milli", req.Start, req.End))
-	samplesSB.Where("NOT startsWith(metric_name, 'signoz')")
+	samplesSB.Where("NOT startsWith(metric_name, 'o11y')")
 
 	ctes := []*sqlbuilder.CTEQueryBuilder{
 		sqlbuilder.CTEQuery("__time_series_counts").As(tsSB),
@@ -1055,7 +1055,7 @@ func (m *module) fetchMetricsStatsWithSamples(
 		fingerprintSB.Select("fingerprint")
 		fingerprintSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, localTsTable))
 		fingerprintSB.Where(fingerprintSB.Between("unix_milli", start, end))
-		fingerprintSB.Where("NOT startsWith(metric_name, 'signoz')")
+		fingerprintSB.Where("NOT startsWith(metric_name, 'o11y')")
 		fingerprintSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
 		fingerprintSB.GroupBy("fingerprint")
 
@@ -1066,7 +1066,7 @@ func (m *module) fetchMetricsStatsWithSamples(
 		metricNamesSB.Select("DISTINCT metric_name")
 		metricNamesSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, localTsTable))
 		metricNamesSB.Where(metricNamesSB.Between("unix_milli", start, end))
-		metricNamesSB.Where("NOT startsWith(metric_name, 'signoz')")
+		metricNamesSB.Where("NOT startsWith(metric_name, 'o11y')")
 
 		samplesSB.Where(fmt.Sprintf("metric_name IN (%s)", samplesSB.Var(metricNamesSB)))
 	}
@@ -1092,18 +1092,18 @@ func (m *module) fetchMetricsStatsWithSamples(
 		reducedLastSB.Select("metric_name", "uniq(reduced_fingerprint, unix_milli) AS cnt")
 		reducedLastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedLastTableName))
 		reducedLastSB.Where(reducedLastSB.Between("unix_milli", req.Start, req.End))
-		reducedLastSB.Where("NOT startsWith(metric_name, 'signoz')")
+		reducedLastSB.Where("NOT startsWith(metric_name, 'o11y')")
 
 		reducedSumSB := sqlbuilder.NewSelectBuilder()
 		reducedSumSB.Select("metric_name", "uniq(reduced_fingerprint, unix_milli) AS cnt")
 		reducedSumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedSumTableName))
 		reducedSumSB.Where(reducedSumSB.Between("unix_milli", req.Start, req.End))
-		reducedSumSB.Where("NOT startsWith(metric_name, 'signoz')")
+		reducedSumSB.Where("NOT startsWith(metric_name, 'o11y')")
 
 		// separate query for reduced series counts
 		reducedTsSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
 		reducedTsSB.Where(reducedTsSB.Between("unix_milli", start, end))
-		reducedTsSB.Where("NOT startsWith(metric_name, 'signoz')")
+		reducedTsSB.Where("NOT startsWith(metric_name, 'o11y')")
 		reducedTsSB.GroupBy("metric_name")
 
 		if filterWhereClause != nil {
@@ -1114,7 +1114,7 @@ func (m *module) fetchMetricsStatsWithSamples(
 			reducedFpSB.Select("fingerprint")
 			reducedFpSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedLocalTableName))
 			reducedFpSB.Where(reducedFpSB.Between("unix_milli", start, end))
-			reducedFpSB.Where("NOT startsWith(metric_name, 'signoz')")
+			reducedFpSB.Where("NOT startsWith(metric_name, 'o11y')")
 			reducedFpSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
 			reducedFpSB.GroupBy("fingerprint")
 			ctes = append(ctes, sqlbuilder.CTEQuery("__reduced_filtered_fingerprints").As(reducedFpSB))
@@ -1234,7 +1234,7 @@ func (m *module) computeTimeseriesTreemap(ctx context.Context, orgID valuer.UUID
 	)
 	metricsSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, distributedTsTable))
 	metricsSB.Where(metricsSB.Between("unix_milli", start, end))
-	metricsSB.Where("NOT startsWith(metric_name, 'signoz')")
+	metricsSB.Where("NOT startsWith(metric_name, 'o11y')")
 	if filterWhereClause != nil {
 		metricsSB.WhereClause.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
 	}
@@ -1254,7 +1254,7 @@ func (m *module) computeTimeseriesTreemap(ctx context.Context, orgID valuer.UUID
 		)
 		reducedMetricsSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
 		reducedMetricsSB.Where(reducedMetricsSB.Between("unix_milli", start, end))
-		reducedMetricsSB.Where("NOT startsWith(metric_name, 'signoz')")
+		reducedMetricsSB.Where("NOT startsWith(metric_name, 'o11y')")
 		if filterWhereClause != nil {
 			reducedMetricsSB.WhereClause.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
 		}
@@ -1347,7 +1347,7 @@ func (m *module) computeSamplesTreemap(ctx context.Context, orgID valuer.UUID, r
 	metricCandidatesSB := sqlbuilder.NewSelectBuilder()
 	metricCandidatesSB.Select("metric_name")
 	metricCandidatesSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, distributedTsTable))
-	metricCandidatesSB.Where("NOT startsWith(metric_name, 'signoz')")
+	metricCandidatesSB.Where("NOT startsWith(metric_name, 'o11y')")
 	metricCandidatesSB.Where(metricCandidatesSB.Between("unix_milli", start, end))
 	if filterWhereClause != nil {
 		metricCandidatesSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
@@ -1365,7 +1365,7 @@ func (m *module) computeSamplesTreemap(ctx context.Context, orgID valuer.UUID, r
 		reducedCandidatesSB = sqlbuilder.NewSelectBuilder()
 		reducedCandidatesSB.Select("metric_name")
 		reducedCandidatesSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
-		reducedCandidatesSB.Where("NOT startsWith(metric_name, 'signoz')")
+		reducedCandidatesSB.Where("NOT startsWith(metric_name, 'o11y')")
 		reducedCandidatesSB.Where(reducedCandidatesSB.Between("unix_milli", start, end))
 		if filterWhereClause != nil {
 			reducedCandidatesSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
@@ -1413,7 +1413,7 @@ func (m *module) computeSamplesTreemap(ctx context.Context, orgID valuer.UUID, r
 		fingerprintSB.Select("fingerprint")
 		fingerprintSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, localTsTable))
 		fingerprintSB.Where(fingerprintSB.Between("unix_milli", start, end))
-		fingerprintSB.Where("NOT startsWith(metric_name, 'signoz')")
+		fingerprintSB.Where("NOT startsWith(metric_name, 'o11y')")
 		fingerprintSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
 		fingerprintSB.Where("metric_name GLOBAL IN (SELECT metric_name FROM __metric_candidates)")
 		fingerprintSB.GroupBy("fingerprint")
@@ -1425,7 +1425,7 @@ func (m *module) computeSamplesTreemap(ctx context.Context, orgID valuer.UUID, r
 			reducedFingerprintSB.Select("fingerprint")
 			reducedFingerprintSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedLocalTableName))
 			reducedFingerprintSB.Where(reducedFingerprintSB.Between("unix_milli", start, end))
-			reducedFingerprintSB.Where("NOT startsWith(metric_name, 'signoz')")
+			reducedFingerprintSB.Where("NOT startsWith(metric_name, 'o11y')")
 			reducedFingerprintSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
 			reducedFingerprintSB.Where("metric_name GLOBAL IN (SELECT metric_name FROM __reduced_metric_candidates)")
 			reducedFingerprintSB.GroupBy("fingerprint")

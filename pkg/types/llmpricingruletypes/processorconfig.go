@@ -7,9 +7,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const ProcessorName = "signozllmpricing"
+const ProcessorName = "o11yllmpricing"
 
-// LLMPricingRuleProcessorConfig is the top-level config for the signozllmpricing
+// LLMPricingRuleProcessorConfig is the top-level config for the o11yllmpricing
 // OTel processor that gets deployed to collectors via OpAMP.
 type LLMPricingRuleProcessorConfig struct {
 	Attrs          LLMPricingRuleProcessorAttrs          `yaml:"attrs" json:"attrs"`
@@ -56,7 +56,7 @@ type LLMPricingRuleProcessorOutputAttrs struct {
 	Total      string `yaml:"total" json:"total"`
 }
 
-// buildProcessorConfig converts pricing rules into the signozllmpricing processor config.
+// buildProcessorConfig converts pricing rules into the o11yllmpricing processor config.
 func buildProcessorConfig(rules []*LLMPricingRule) *LLMPricingRuleProcessorConfig {
 	pricingRules := make([]LLMPricingRuleProcessor, 0, len(rules))
 	for _, r := range rules {
@@ -93,16 +93,16 @@ func buildProcessorConfig(rules []*LLMPricingRule) *LLMPricingRuleProcessorConfi
 			Rules: pricingRules,
 		},
 		OutputAttrs: LLMPricingRuleProcessorOutputAttrs{
-			In:         SignozGenAICostInput,
-			Out:        SignozGenAICostOutput,
-			CacheRead:  SignozGenAICostCacheRead,
-			CacheWrite: SignozGenAICostCacheWrite,
-			Total:      SignozGenAITotalCost,
+			In:         O11yGenAICostInput,
+			Out:        O11yGenAICostOutput,
+			CacheRead:  O11yGenAICostCacheRead,
+			CacheWrite: O11yGenAICostCacheWrite,
+			Total:      O11yGenAITotalCost,
 		},
 	}
 }
 
-// GenerateCollectorConfigWithLLMPricingProcessor injects (or replaces) the signozllmpricing
+// GenerateCollectorConfigWithLLMPricingProcessor injects (or replaces) the o11yllmpricing
 // processor block in the collector YAML with one built from the given rules.
 func GenerateCollectorConfigWithLLMPricingProcessor(
 	currentConfYaml []byte,

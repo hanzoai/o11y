@@ -225,7 +225,7 @@ describe('AppProvider user and org data from v2 APIs', () => {
 						data: {
 							id: 'u-123',
 							displayName: 'Test User',
-							email: 'test@signoz.io',
+							email: 'test@o11y.io',
 							orgId: 'org-abc',
 							isRoot: false,
 							status: 'active',
@@ -255,7 +255,7 @@ describe('AppProvider user and org data from v2 APIs', () => {
 			() => {
 				expect(result.current.user.id).toBe('u-123');
 				expect(result.current.user.displayName).toBe('Test User');
-				expect(result.current.user.email).toBe('test@signoz.io');
+				expect(result.current.user.email).toBe('test@o11y.io');
 				expect(result.current.user.orgId).toBe('org-abc');
 			},
 			{ timeout: 2000 },
@@ -306,7 +306,7 @@ describe('AppProvider when authz/check fails', () => {
 						data: {
 							id: 'u-1',
 							displayName: 'Test User',
-							email: 'test@signoz.io',
+							email: 'test@o11y.io',
 							orgId: 'org-1',
 							isRoot: false,
 							status: 'active',

@@ -8,10 +8,10 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/hanzoai/signoz-otel-collector/utils/fingerprint"
 	errorsV2 "github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/otel-collector/utils/fingerprint"
 )
 
 func (r *ClickHouseReader) GetQBFilterSuggestionsForLogs(
@@ -139,14 +139,14 @@ func (r *ClickHouseReader) getValuesForLogAttributes(
 			select * from (
 				(
 					select tag_key, string_value, number_value
-					from signoz_logs.distributed_tag_attributes_v2
+					from o11y_logs.distributed_tag_attributes_v2
 					where tag_key = $1 and (
 						string_value != '' or number_value is not null
 					)
 					limit 2
 				) UNION DISTINCT (
 					select tag_key, string_value, number_value
-					from signoz_logs.distributed_tag_attributes_v2
+					from o11y_logs.distributed_tag_attributes_v2
 					where tag_key = $2 and (
 						string_value != '' or number_value is not null
 					)

@@ -21,17 +21,17 @@ CREDENTIALS_ENDPOINT = f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/credentials
 
 
 def test_apply_license(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
     """Apply a license so that subsequent cloud integration calls succeed."""
-    add_license(signoz, make_http_mocks, get_token)
+    add_license(o11y, make_http_mocks, get_token)
 
 
 def test_get_credentials_success(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -39,10 +39,10 @@ def test_get_credentials_success(
     """Happy path: all four credential fields are returned when Zeus and Gateway respond."""
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
-    setup_create_account_mocks(signoz, make_http_mocks)
+    setup_create_account_mocks(o11y, make_http_mocks)
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(CREDENTIALS_ENDPOINT),
+        o11y.self.host_configs["8080"].get(CREDENTIALS_ENDPOINT),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -50,14 +50,14 @@ def test_get_credentials_success(
     assert response.status_code == HTTPStatus.OK, f"Expected 200, got {response.status_code}: {response.text}"
 
     data = response.json()["data"]
-    for field in ("sigNozApiUrl", "sigNozApiKey", "ingestionUrl", "ingestionKey"):
+    for field in ("o11yApiUrl", "o11yApiKey", "ingestionUrl", "ingestionKey"):
         assert field in data, f"Response should contain '{field}'"
         assert isinstance(data[field], str), f"'{field}' should be a string"
         assert len(data[field]) > 0, f"'{field}' should be non-empty when mocks are set up"
 
 
 def test_get_credentials_partial_when_zeus_unavailable(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -71,15 +71,15 @@ def test_get_credentials_partial_when_zeus_unavailable(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     # Reset Zeus mappings so no prior mock bleeds into this test,
-    # ensuring sigNozApiUrl cannot be resolved and will be returned as empty.
+    # ensuring o11yApiUrl cannot be resolved and will be returned as empty.
     requests.post(
-        signoz.zeus.host_configs["8080"].get("/__admin/reset"),
+        o11y.zeus.host_configs["8080"].get("/__admin/reset"),
         timeout=10,
     )
 
-    # Only set up Gateway mocks — Zeus has no mapping, so sigNozApiUrl will be empty
+    # Only set up Gateway mocks — Zeus has no mapping, so o11yApiUrl will be empty
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -118,7 +118,7 @@ def test_get_credentials_partial_when_zeus_unavailable(
     )
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(CREDENTIALS_ENDPOINT),
+        o11y.self.host_configs["8080"].get(CREDENTIALS_ENDPOINT),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -126,16 +126,16 @@ def test_get_credentials_partial_when_zeus_unavailable(
     assert response.status_code == HTTPStatus.OK, f"Expected 200 even without Zeus, got {response.status_code}: {response.text}"
 
     data = response.json()["data"]
-    for field in ("sigNozApiUrl", "sigNozApiKey", "ingestionUrl", "ingestionKey"):
+    for field in ("o11yApiUrl", "o11yApiKey", "ingestionUrl", "ingestionKey"):
         assert field in data, f"Response should always contain '{field}' key"
         assert isinstance(data[field], str), f"'{field}' should be a string"
 
-    # sigNozApiUrl comes from Zeus, which is unavailable, so it should be empty
-    assert data["sigNozApiUrl"] == "", "sigNozApiUrl should be empty when Zeus is unavailable"
+    # o11yApiUrl comes from Zeus, which is unavailable, so it should be empty
+    assert data["o11yApiUrl"] == "", "o11yApiUrl should be empty when Zeus is unavailable"
 
 
 def test_get_credentials_unsupported_provider(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -143,7 +143,7 @@ def test_get_credentials_unsupported_provider(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/cloud_integrations/gcp/credentials"),
+        o11y.self.host_configs["8080"].get("/api/v1/cloud_integrations/gcp/credentials"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )

@@ -855,8 +855,8 @@ export const useInspectMetrics = <
 	return useMutation(getInspectMetricsMutationOptions(options));
 };
 /**
- * Lightweight endpoint that checks if any non-SigNoz metrics have been ingested, used for onboarding status detection
- * @summary Check if non-SigNoz metrics have been received
+ * Lightweight endpoint that checks if any non-O11y metrics have been ingested, used for onboarding status detection
+ * @summary Check if non-O11y metrics have been received
  */
 export const getMetricsOnboardingStatus = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetMetricsOnboardingStatus200>({
@@ -903,7 +903,7 @@ export type GetMetricsOnboardingStatusQueryError =
 	ErrorType<RenderErrorResponseDTO>;
 
 /**
- * @summary Check if non-SigNoz metrics have been received
+ * @summary Check if non-O11y metrics have been received
  */
 
 export function useGetMetricsOnboardingStatus<
@@ -926,7 +926,7 @@ export function useGetMetricsOnboardingStatus<
 }
 
 /**
- * @summary Check if non-SigNoz metrics have been received
+ * @summary Check if non-O11y metrics have been received
  */
 export const invalidateGetMetricsOnboardingStatus = async (
 	queryClient: QueryClient,

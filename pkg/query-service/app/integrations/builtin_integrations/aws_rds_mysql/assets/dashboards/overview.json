@@ -166,7 +166,7 @@
             "multiSelect": true,
             "name": "dbinstance_identifier",
             "order": 0,
-            "queryValue": "SELECT JSONExtractString(labels, 'dbinstance_identifier') as dbinstance_identifier\nFROM signoz_metrics.distributed_time_series_v4_1day\nWHERE metric_name like 'aws_rds_database_connections_average'\nGROUP BY dbinstance_identifier",
+            "queryValue": "SELECT JSONExtractString(labels, 'dbinstance_identifier') as dbinstance_identifier\nFROM o11y_metrics.distributed_time_series_v4_1day\nWHERE metric_name like 'aws_rds_database_connections_average'\nGROUP BY dbinstance_identifier",
             "selectedValue": "",
             "showALLOption": true,
             "sort": "ASC",

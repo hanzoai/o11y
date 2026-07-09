@@ -31,7 +31,7 @@ func (migration *removeOrganizationTuples) Up(ctx context.Context, db *bun.DB) e
 	defer func() { _ = tx.Rollback() }()
 
 	var storeID string
-	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "signoz").Scan(&storeID)
+	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "o11y").Scan(&storeID)
 	if err != nil {
 		return err
 	}

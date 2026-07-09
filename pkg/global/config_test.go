@@ -30,13 +30,13 @@ func TestExternalPath(t *testing.T) {
 		},
 		{
 			name:     "SingleSegment",
-			config:   Config{ExternalURL: &url.URL{Scheme: "https", Host: "example.com", Path: "/signoz"}},
-			expected: "/signoz",
+			config:   Config{ExternalURL: &url.URL{Scheme: "https", Host: "example.com", Path: "/o11y"}},
+			expected: "/o11y",
 		},
 		{
 			name:     "TrailingSlash",
-			config:   Config{ExternalURL: &url.URL{Scheme: "https", Host: "example.com", Path: "/signoz/"}},
-			expected: "/signoz",
+			config:   Config{ExternalURL: &url.URL{Scheme: "https", Host: "example.com", Path: "/o11y/"}},
+			expected: "/o11y",
 		},
 		{
 			name:     "MultiSegment",
@@ -75,8 +75,8 @@ func TestExternalPathTrailing(t *testing.T) {
 		},
 		{
 			name:     "SingleSegment",
-			config:   Config{ExternalURL: &url.URL{Path: "/signoz"}},
-			expected: "/signoz/",
+			config:   Config{ExternalURL: &url.URL{Path: "/o11y"}},
+			expected: "/o11y/",
 		},
 		{
 			name:     "MultiSegment",
@@ -115,12 +115,12 @@ func TestValidate(t *testing.T) {
 		},
 		{
 			name:   "ValidPath",
-			config: Config{ExternalURL: &url.URL{Path: "/signoz"}},
+			config: Config{ExternalURL: &url.URL{Path: "/o11y"}},
 			fail:   false,
 		},
 		{
 			name:   "NoLeadingSlash",
-			config: Config{ExternalURL: &url.URL{Path: "signoz"}},
+			config: Config{ExternalURL: &url.URL{Path: "o11y"}},
 			fail:   true,
 		},
 	}

@@ -41,8 +41,8 @@ const SA_ROLE_DELETE_ENDPOINT = '*/api/v1/service_accounts/:id/roles/:rid';
 const activeAccountResponse = {
 	id: 'sa-1',
 	name: 'CI Bot',
-	email: 'ci-bot@signoz.io',
-	roles: ['signoz-admin'],
+	email: 'ci-bot@o11y.io',
+	roles: ['o11y-admin'],
 	status: 'ACTIVE',
 	createdAt: '2026-01-01T00:00:00Z',
 	updatedAt: '2026-01-02T00:00:00Z',
@@ -88,7 +88,7 @@ describe('ServiceAccountDrawer', () => {
 					ctx.status(200),
 					ctx.json({
 						data: listRolesSuccessResponse.data.filter(
-							(r) => r.name === 'signoz-admin',
+							(r) => r.name === 'o11y-admin',
 						),
 					}),
 				),
@@ -113,7 +113,7 @@ describe('ServiceAccountDrawer', () => {
 		await expect(
 			screen.findByDisplayValue('CI Bot'),
 		).resolves.toBeInTheDocument();
-		expect(screen.getByText('ci-bot@signoz.io')).toBeInTheDocument();
+		expect(screen.getByText('ci-bot@o11y.io')).toBeInTheDocument();
 		expect(screen.getByRole('button', { name: /Save Changes/i })).toBeDisabled();
 	});
 
@@ -173,9 +173,9 @@ describe('ServiceAccountDrawer', () => {
 
 		await screen.findByDisplayValue('CI Bot');
 
-		// Add signoz-viewer while keeping signoz-admin selected
+		// Add o11y-viewer while keeping o11y-admin selected
 		await user.click(screen.getByLabelText('Roles'));
-		await user.click(await screen.findByTitle('signoz-viewer'));
+		await user.click(await screen.findByTitle('o11y-viewer'));
 
 		const saveBtn = screen.getByRole('button', { name: /Save Changes/i });
 		await waitFor(() => expect(saveBtn).not.toBeDisabled());
@@ -211,8 +211,8 @@ describe('ServiceAccountDrawer', () => {
 
 		await screen.findByDisplayValue('CI Bot');
 
-		// Remove the signoz-admin tag from the multi-select
-		const adminTag = await screen.findByTitle('signoz-admin');
+		// Remove the o11y-admin tag from the multi-select
+		const adminTag = await screen.findByTitle('o11y-admin');
 		const removeBtn = adminTag.querySelector(
 			'.ant-select-selection-item-remove',
 		) as Element;
@@ -343,7 +343,7 @@ describe('ServiceAccountDrawer – save-error UX', () => {
 					ctx.status(200),
 					ctx.json({
 						data: listRolesSuccessResponse.data.filter(
-							(r) => r.name === 'signoz-admin',
+							(r) => r.name === 'o11y-admin',
 						),
 					}),
 				),
@@ -417,16 +417,16 @@ describe('ServiceAccountDrawer – save-error UX', () => {
 
 		await screen.findByDisplayValue('CI Bot');
 
-		// Add the signoz-viewer role (which is not currently assigned)
+		// Add the o11y-viewer role (which is not currently assigned)
 		await user.click(screen.getByLabelText('Roles'));
-		await user.click(await screen.findByTitle('signoz-viewer'));
+		await user.click(await screen.findByTitle('o11y-viewer'));
 
 		const saveBtn = screen.getByRole('button', { name: /Save Changes/i });
 		await waitFor(() => expect(saveBtn).not.toBeDisabled());
 		await user.click(saveBtn);
 
 		await expect(
-			screen.findByText(/Role 'signoz-viewer'.*role assign failed/i, undefined, {
+			screen.findByText(/Role 'o11y-viewer'.*role assign failed/i, undefined, {
 				timeout: 5000,
 			}),
 		).resolves.toBeInTheDocument();
@@ -452,7 +452,7 @@ describe('ServiceAccountDrawer – save-error UX', () => {
 		await screen.findByDisplayValue('CI Bot');
 
 		await user.click(screen.getByLabelText('Roles'));
-		await user.click(await screen.findByTitle('signoz-viewer'));
+		await user.click(await screen.findByTitle('o11y-viewer'));
 
 		const saveBtn = screen.getByRole('button', { name: /Save Changes/i });
 		await waitFor(() => expect(saveBtn).not.toBeDisabled());

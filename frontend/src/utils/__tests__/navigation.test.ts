@@ -99,16 +99,16 @@ describe('navigation utilities', () => {
 			});
 		});
 
-		describe('at basePath="/signoz/"', () => {
+		describe('at basePath="/o11y/"', () => {
 			let m: NavigationModule;
 			beforeEach(() => {
 				jest.spyOn(window, 'open').mockImplementation();
-				m = loadNavigationModule('/signoz/');
+				m = loadNavigationModule('/o11y/');
 			});
 
 			it('prepends base path to internal paths', () => {
 				m.openInNewTab('/dashboard');
-				expect(window.open).toHaveBeenCalledWith('/signoz/dashboard', '_blank');
+				expect(window.open).toHaveBeenCalledWith('/o11y/dashboard', '_blank');
 			});
 
 			it('passes through external URLs unchanged', () => {
@@ -120,8 +120,8 @@ describe('navigation utilities', () => {
 			});
 
 			it('is idempotent — does not double-prefix an already-prefixed path', () => {
-				m.openInNewTab('/signoz/dashboard');
-				expect(window.open).toHaveBeenCalledWith('/signoz/dashboard', '_blank');
+				m.openInNewTab('/o11y/dashboard');
+				expect(window.open).toHaveBeenCalledWith('/o11y/dashboard', '_blank');
 			});
 		});
 	});

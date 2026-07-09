@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	DBName                     = "signoz_meter"
+	DBName                     = "o11y_meter"
 	SamplesTableName           = "distributed_samples"
 	SamplesLocalTableName      = "samples"
 	SamplesAgg1dTableName      = "distributed_samples_agg_1d"

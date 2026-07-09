@@ -8,8 +8,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/hanzoai/o11y/pkg/errors"
 	v2 "github.com/prometheus/alertmanager/api/v2"
 	"github.com/prometheus/alertmanager/api/v2/models"
 	"github.com/prometheus/alertmanager/api/v2/restapi/operations/alert"
@@ -143,9 +143,9 @@ func NewTestAlert(receiver *Receiver, startsAt time.Time, updatedAt time.Time) *
 				"severity":  "critical",
 			},
 			Annotations: model.LabelSet{
-				"description": "Test alert fired from SigNoz",
-				"summary":     "Test alert fired from SigNoz",
-				"message":     "Test alert fired from SigNoz",
+				"description": "Test alert fired from O11y",
+				"summary":     "Test alert fired from O11y",
+				"message":     "Test alert fired from O11y",
 			},
 		},
 		UpdatedAt: updatedAt,

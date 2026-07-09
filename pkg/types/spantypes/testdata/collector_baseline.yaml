@@ -3,7 +3,7 @@ receivers:
     protocols:
       grpc:
 processors:
-  signozspanmapper:
+  o11yspanmapper:
     groups: []
   batch: {}
 exporters:
@@ -13,5 +13,5 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [signozspanmapper, batch]
+      processors: [o11yspanmapper, batch]
       exporters: [otlp]

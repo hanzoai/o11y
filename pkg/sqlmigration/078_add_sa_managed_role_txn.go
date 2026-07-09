@@ -38,13 +38,13 @@ type managedRoleTuple struct {
 func (migration *addServiceAccountManagedRoleTransactions) Up(ctx context.Context, db *bun.DB) error {
 	// All tuples that need to be created for service account FGA managed role permissions.
 	tuples := []managedRoleTuple{
-		{authtypes.SigNozAdminRoleName, "role", "role", "attach"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "attach"},
-		{authtypes.SigNozAdminRoleName, "metaresources", "serviceaccount", "create"},
-		{authtypes.SigNozAdminRoleName, "metaresources", "serviceaccount", "list"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "read"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "update"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "delete"},
+		{authtypes.O11yAdminRoleName, "role", "role", "attach"},
+		{authtypes.O11yAdminRoleName, "serviceaccount", "serviceaccount", "attach"},
+		{authtypes.O11yAdminRoleName, "metaresources", "serviceaccount", "create"},
+		{authtypes.O11yAdminRoleName, "metaresources", "serviceaccount", "list"},
+		{authtypes.O11yAdminRoleName, "serviceaccount", "serviceaccount", "read"},
+		{authtypes.O11yAdminRoleName, "serviceaccount", "serviceaccount", "update"},
+		{authtypes.O11yAdminRoleName, "serviceaccount", "serviceaccount", "delete"},
 	}
 
 	tx, err := db.BeginTx(ctx, nil)
@@ -54,7 +54,7 @@ func (migration *addServiceAccountManagedRoleTransactions) Up(ctx context.Contex
 	defer func() { _ = tx.Rollback() }()
 
 	var storeID string
-	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "signoz").Scan(&storeID)
+	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "o11y").Scan(&storeID)
 	if err != nil {
 		return err
 	}

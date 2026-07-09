@@ -21,7 +21,7 @@ from fixtures.traces import TraceIdGenerator, Traces, TracesKind, TracesStatusCo
 
 
 def test_traces_list(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -153,7 +153,7 @@ def test_traces_list(
 
     # Query all traces for the past 5 minutes
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -220,7 +220,7 @@ def test_traces_list(
 
     # Query results with context appended to key names
     response_with_inline_context = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=5)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),
@@ -328,7 +328,7 @@ def test_traces_list(
 
     # Query root spans for the last 5 minutes and check if the spans are returned in the correct order
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -383,7 +383,7 @@ def test_traces_list(
 
     # Query values of http.request.method attribute from the autocomplete API
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
+        o11y.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -409,7 +409,7 @@ def test_traces_list(
 
     # Query values of http.request.method attribute from the fields API
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -431,7 +431,7 @@ def test_traces_list(
 
     # Query keys from the fields API with context specified in the key
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/keys"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/keys"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -451,7 +451,7 @@ def test_traces_list(
 
     # Query values of service.name resource attribute using context-prefixed key
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -650,7 +650,7 @@ def test_traces_list(
     ],
 )
 def test_traces_list_with_corrupt_data(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -672,7 +672,7 @@ def test_traces_list_with_corrupt_data(
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=5)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),
@@ -743,7 +743,7 @@ def test_traces_list_with_corrupt_data(
     ],
 )
 def test_traces_aggergate_order_by_count(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -889,7 +889,7 @@ def test_traces_aggergate_order_by_count(
     query["spec"]["order"][0]["key"] = order_by
     query["spec"]["aggregations"][0]["alias"] = aggregation_alias
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=5)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),
@@ -912,7 +912,7 @@ def test_traces_aggergate_order_by_count(
 
 
 def test_traces_aggregate_with_mixed_field_selectors(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -1067,7 +1067,7 @@ def test_traces_aggregate_with_mixed_field_selectors(
 
     # Query traces count for spans
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=5)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),
@@ -1085,7 +1085,7 @@ def test_traces_aggregate_with_mixed_field_selectors(
 
 
 def test_traces_fill_gaps(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -1119,7 +1119,7 @@ def test_traces_fill_gaps(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1169,7 +1169,7 @@ def test_traces_fill_gaps(
 
 
 def test_traces_fill_gaps_with_group_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -1215,7 +1215,7 @@ def test_traces_fill_gaps_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1282,7 +1282,7 @@ def test_traces_fill_gaps_with_group_by(
 
 
 def test_traces_fill_gaps_formula(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -1328,7 +1328,7 @@ def test_traces_fill_gaps_formula(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1402,7 +1402,7 @@ def test_traces_fill_gaps_formula(
 
 
 def test_traces_fill_gaps_formula_with_group_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -1448,7 +1448,7 @@ def test_traces_fill_gaps_formula_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1543,7 +1543,7 @@ def test_traces_fill_gaps_formula_with_group_by(
 
 
 def test_traces_fill_zero(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -1576,7 +1576,7 @@ def test_traces_fill_zero(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1626,7 +1626,7 @@ def test_traces_fill_zero(
 
 
 def test_traces_fill_zero_with_group_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -1672,7 +1672,7 @@ def test_traces_fill_zero_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1740,7 +1740,7 @@ def test_traces_fill_zero_with_group_by(
 
 
 def test_traces_fill_zero_formula(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -1786,7 +1786,7 @@ def test_traces_fill_zero_formula(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1860,7 +1860,7 @@ def test_traces_fill_zero_formula(
 
 
 def test_traces_fill_zero_formula_with_group_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -1906,7 +1906,7 @@ def test_traces_fill_zero_formula_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -2001,7 +2001,7 @@ def test_traces_fill_zero_formula_with_group_by(
 
 
 def test_traces_list_filter_by_trace_id(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -2064,7 +2064,7 @@ def test_traces_list_filter_by_trace_id(
 
     def _query(start_ms: int, end_ms: int) -> tuple[list, list[str]]:
         response = make_query_request(
-            signoz,
+            o11y,
             token,
             start_ms=start_ms,
             end_ms=end_ms,
@@ -2134,7 +2134,7 @@ def test_traces_list_filter_by_trace_id(
 
 
 def test_traces_aggregation_filter_by_trace_id(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -2195,7 +2195,7 @@ def test_traces_aggregation_filter_by_trace_id(
 
     def _count(start_ms: int, end_ms: int, trace_id: str) -> tuple[float, list[str]]:
         response = make_query_request(
-            signoz,
+            o11y,
             token,
             start_ms=start_ms,
             end_ms=end_ms,

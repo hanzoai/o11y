@@ -1,4 +1,4 @@
-// Copyright (c) 2026 SigNoz, Inc.
+// Copyright (c) 2026 O11y, Inc.
 // Copyright 2019 Prometheus Team
 // SPDX-License-Identifier: Apache-2.0
 
@@ -45,7 +45,7 @@ const (
 	// wraps the rendered alert bodies. It is loaded into the notification
 	// template (n.tmpl) from the alertmanager templates config and lives at
 	// templates/alertmanager/email.gotmpl.
-	alertEmailLayoutTemplate = "email.signoz.html"
+	alertEmailLayoutTemplate = "email.o11y.html"
 )
 
 // Email implements a Notifier for email notifications.
@@ -57,7 +57,7 @@ type Email struct {
 	templater alertmanagertypes.Templater
 }
 
-// layoutData is the value passed to the email.signoz.html layout
+// layoutData is the value passed to the email.o11y.html layout
 // template. It embeds NotificationTemplateData so templates can reference
 // `.Alert.Status`, `.Alert.TotalFiring`, `.Alert.TotalResolved`,
 // `.NotificationTemplateData.ExternalURL`, etc. alongside the rendered
@@ -70,7 +70,7 @@ type layoutData struct {
 
 var errNoAuthUsernameConfigured = errors.NewInternalf(errors.CodeInternal, "no auth username configured")
 
-// New returns a new Email notifier. When the email.signoz.html layout is
+// New returns a new Email notifier. When the email.o11y.html layout is
 // not defined in t, custom-body alerts fall back to plain <div>-wrapped HTML.
 func New(c *config.EmailConfig, t *template.Template, l *slog.Logger, templater alertmanagertypes.Templater) *Email {
 	if _, ok := c.Headers["Subject"]; !ok {
@@ -435,7 +435,7 @@ func (n *Email) prepareContent(ctx context.Context, alerts []*types.Alert) (stri
 
 	if !result.IsDefaultBody {
 		// Custom-body path: render each expanded markdown body to HTML, then
-		// wrap the whole thing in the email.signoz.html layout (or fall
+		// wrap the whole thing in the email.o11y.html layout (or fall
 		// back to plain <div> wrapping when the layout template is not loaded).
 		for i, body := range result.Body {
 			if body == "" {
@@ -459,7 +459,7 @@ func (n *Email) prepareContent(ctx context.Context, alerts []*types.Alert) (stri
 	return subject, result.Body[0], nil
 }
 
-// renderLayout wraps result in the email.signoz.html HTML layout loaded
+// renderLayout wraps result in the email.o11y.html HTML layout loaded
 // into n.tmpl from the alertmanager templates config. Returns an error when the
 // layout template is not defined (e.g. in tests where no templates are loaded)
 // so prepareContent can fall back to plain <div> wrapping.

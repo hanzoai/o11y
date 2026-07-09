@@ -4,10 +4,10 @@ import "go.opentelemetry.io/otel/attribute"
 
 var (
 	// Identifies the organization.
-	OrganizationID = attribute.Key("signoz.organization.id")
+	OrganizationID = attribute.Key("o11y.organization.id")
 
 	// Identifies the retention bucket a meter belongs to.
-	RetentionDuration = attribute.Key("signoz.retention.duration")
+	RetentionDuration = attribute.Key("o11y.retention.duration")
 )
 
 func NewDimensions(kvs ...attribute.KeyValue) map[string]string {

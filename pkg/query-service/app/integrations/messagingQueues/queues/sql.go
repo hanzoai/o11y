@@ -65,7 +65,7 @@ WITH
             ) AS destination,
             durationNano,
             status_code
-        FROM signoz_traces.distributed_signoz_index_v3
+        FROM o11y_traces.distributed_o11y_index_v3
         WHERE
             ts_bucket_start >= toDateTime64(%f, 9)
             AND ts_bucket_start <= toDateTime64(%f, 9)

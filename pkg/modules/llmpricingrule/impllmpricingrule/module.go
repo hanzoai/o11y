@@ -88,7 +88,7 @@ func (module *module) AgentFeatureType() agentConf.AgentFeatureType {
 }
 
 // RecommendAgentConfig reads pricing rules and generates the
-// signozllmpricing processor config for deployment to OTel collectors via OpAMP.
+// o11yllmpricing processor config for deployment to OTel collectors via OpAMP.
 func (module *module) RecommendAgentConfig(orgID valuer.UUID, currentConfYaml []byte, configVersion *opamptypes.AgentConfigVersion) ([]byte, string, error) {
 	ctx := context.Background()
 

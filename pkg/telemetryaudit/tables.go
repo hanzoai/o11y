@@ -1,7 +1,7 @@
 package telemetryaudit
 
 const (
-	DBName                      = "signoz_audit"
+	DBName                      = "o11y_audit"
 	AuditLogsTableName          = "distributed_logs"
 	AuditLogsLocalTableName     = "logs"
 	TagAttributesTableName      = "distributed_tag_attributes"

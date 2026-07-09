@@ -13,7 +13,7 @@ interface ToolCallStepProps {
 /**
  * Server-supplied `displayText` is the human-friendly title the backend
  * wants surfaced. Falls back to a derived label
- * ("signoz_get_dashboard" → "Get Dashboard") when missing.
+ * ("o11y_get_dashboard" → "Get Dashboard") when missing.
  */
 export function getToolDisplayLabel(toolCall: StreamingToolCall): string {
 	const { toolName, displayText } = toolCall;
@@ -21,7 +21,7 @@ export function getToolDisplayLabel(toolCall: StreamingToolCall): string {
 		return displayText;
 	}
 	return toolName
-		.replace(/^[a-z]+_/, '') // strip prefix like "signoz_"
+		.replace(/^[a-z]+_/, '') // strip prefix like "o11y_"
 		.replace(/_/g, ' ')
 		.replace(/\b\w/g, (c) => c.toUpperCase());
 }

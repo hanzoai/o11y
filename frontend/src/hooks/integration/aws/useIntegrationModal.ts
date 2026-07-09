@@ -171,7 +171,7 @@ export function useIntegrationModal({
 								id: accountId,
 							},
 						);
-						// oxlint-disable-next-line signoz/no-raw-absolute-path -- connectionUrl is an external AWS console URL, not an internal path
+						// oxlint-disable-next-line o11y/no-raw-absolute-path -- connectionUrl is an external AWS console URL, not an internal path
 						window.open(connectionUrl, '_blank');
 						setModalState(ModalStateEnum.WAITING);
 						setAccountId(accountId);
@@ -203,8 +203,8 @@ export function useIntegrationModal({
 				credentials: {
 					ingestionUrl: connectionParams?.data?.ingestionUrl || values.ingestionUrl,
 					ingestionKey: connectionParams?.data?.ingestionKey || values.ingestionKey,
-					sigNozApiUrl: connectionParams?.data?.sigNozApiUrl || values.sigNozApiUrl,
-					sigNozApiKey: connectionParams?.data?.sigNozApiKey || values.sigNozApiKey,
+					o11yApiUrl: connectionParams?.data?.o11yApiUrl || values.o11yApiUrl,
+					o11yApiKey: connectionParams?.data?.o11yApiKey || values.o11yApiKey,
 				},
 			};
 

@@ -38,7 +38,7 @@ FILE = get_testdata_file_path("gauge_data_1h.jsonl")
     ],
 )
 def test_for_one_service(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -72,7 +72,7 @@ def test_for_one_service(
         filter_expression=f'service = "{service}"',
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -96,7 +96,7 @@ def test_for_one_service(
     ],
 )
 def test_for_multiple_aggregations(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -128,7 +128,7 @@ def test_for_multiple_aggregations(
         space_agg,
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()

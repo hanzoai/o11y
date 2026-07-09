@@ -1,12 +1,12 @@
 {
-  "name": "signoz-frontend-automation",
+  "name": "o11y-frontend-automation",
   "version": "1.0.0",
-  "description": "E2E tests for SigNoz frontend with Playwright",
+  "description": "E2E tests for O11y frontend with Playwright",
   "main": "index.js",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "test": "playwright test",
-    "test:staging": "SIGNOZ_E2E_BASE_URL=https://app.us.staging.signoz.cloud playwright test",
+    "test:staging": "O11Y_E2E_BASE_URL=https://app.us.staging.o11y.cloud playwright test",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
@@ -27,7 +27,7 @@
     "playwright",
     "e2e",
     "testing",
-    "signoz"
+    "o11y"
   ],
   "author": "",
   "license": "MIT",

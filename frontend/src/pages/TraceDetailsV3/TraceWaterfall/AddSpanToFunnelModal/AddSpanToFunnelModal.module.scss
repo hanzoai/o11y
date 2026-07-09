@@ -1,4 +1,4 @@
-// Container — applied to the `.ant-modal` element via SignozModal's className
+// Container — applied to the `.ant-modal` element via O11yModal's className
 // prop. Ant Modal portals into document.body, but the className still lives on
 // the modal root, so descendant overrides work via `:global` nesting.
 .container {

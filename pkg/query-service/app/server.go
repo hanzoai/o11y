@@ -17,13 +17,13 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	"github.com/hanzoai/o11y/pkg/licensing/nooplicensing"
+	"github.com/hanzoai/o11y/pkg/o11y"
 	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
 	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
 	"github.com/hanzoai/o11y/pkg/query-service/app/opamp"
 	opAmpModel "github.com/hanzoai/o11y/pkg/query-service/app/opamp/model"
-	"github.com/hanzoai/o11y/pkg/signoz"
 	"github.com/hanzoai/o11y/pkg/web"
 
 	"log/slog"
@@ -38,8 +38,8 @@ import (
 
 // Server runs HTTP, Mux and a grpc server
 type Server struct {
-	config signoz.Config
-	signoz *signoz.SigNoz
+	config o11y.Config
+	o11y   *o11y.O11y
 
 	// public http router
 	httpConn     net.Listener
@@ -52,28 +52,28 @@ type Server struct {
 }
 
 // NewServer creates and initializes Server
-func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
-	integrationsController, err := integrations.NewController(signoz.SQLStore, signoz.Modules.Dashboard)
+func NewServer(config o11y.Config, o11y *o11y.O11y) (*Server, error) {
+	integrationsController, err := integrations.NewController(o11y.SQLStore, o11y.Modules.Dashboard)
 	if err != nil {
 		return nil, err
 	}
 
 	reader := clickhouseReader.NewReader(
-		signoz.Instrumentation.Logger(),
-		signoz.SQLStore,
-		signoz.TelemetryStore,
-		signoz.Prometheus,
-		signoz.TelemetryStore.Cluster(),
-		signoz.Cache,
-		signoz.Flagger,
+		o11y.Instrumentation.Logger(),
+		o11y.SQLStore,
+		o11y.TelemetryStore,
+		o11y.Prometheus,
+		o11y.TelemetryStore.Cluster(),
+		o11y.Cache,
+		o11y.Flagger,
 		nil,
 	)
 
 	logParsingPipelineController, err := logparsingpipeline.NewLogParsingPipelinesController(
-		signoz.SQLStore,
+		o11y.SQLStore,
 		integrationsController.GetPipelinesForInstalledIntegrations,
 		reader,
-		signoz.Flagger,
+		o11y.Flagger,
 	)
 	if err != nil {
 		return nil, err
@@ -85,8 +85,8 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 		LogsParsingPipelineController: logParsingPipelineController,
 		FluxInterval:                  config.Querier.FluxInterval,
 		LicensingAPI:                  nooplicensing.NewLicenseAPI(),
-		Signoz:                        signoz,
-		QueryParserAPI:                queryparser.NewAPI(signoz.Instrumentation.ToProviderSettings(), signoz.QueryParser),
+		O11y:                          o11y,
+		QueryParserAPI:                queryparser.NewAPI(o11y.Instrumentation.ToProviderSettings(), o11y.QueryParser),
 	}, config)
 	if err != nil {
 		return nil, err
@@ -94,12 +94,12 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 
 	s := &Server{
 		config:             config,
-		signoz:             signoz,
+		o11y:               o11y,
 		httpHostPort:       constants.HTTPHostPort,
 		unavailableChannel: make(chan healthcheck.Status),
 	}
 
-	httpServer, err := s.createPublicServer(apiHandler, signoz.Web)
+	httpServer, err := s.createPublicServer(apiHandler, o11y.Web)
 
 	if err != nil {
 		return nil, err
@@ -107,15 +107,15 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 
 	s.httpServer = httpServer
 
-	opAmpModel.Init(signoz.SQLStore, signoz.Instrumentation.Logger(), signoz.Modules.OrgGetter)
+	opAmpModel.Init(o11y.SQLStore, o11y.Instrumentation.Logger(), o11y.Modules.OrgGetter)
 
 	agentConfMgr, err := agentConf.Initiate(
 		&agentConf.ManagerOptions{
-			Store: signoz.SQLStore,
+			Store: o11y.SQLStore,
 			AgentFeatures: []agentConf.AgentFeature{
 				logParsingPipelineController,
-				signoz.Modules.SpanMapper,
-				signoz.Modules.LLMPricingRule,
+				o11y.Modules.SpanMapper,
+				o11y.Modules.LLMPricingRule,
 			},
 		},
 	)
@@ -126,7 +126,7 @@ func NewServer(config signoz.Config, signoz *signoz.SigNoz) (*Server, error) {
 	s.opampServer = opamp.InitializeServer(
 		&opAmpModel.AllAgents,
 		agentConfMgr,
-		signoz.Instrumentation,
+		o11y.Instrumentation,
 	)
 
 	return s, nil
@@ -150,27 +150,27 @@ func (s *Server) PublicHandler() http.Handler {
 func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server, error) {
 	r := NewRouter()
 
-	r.Use(middleware.NewRecovery(s.signoz.Instrumentation.Logger()).Wrap)
+	r.Use(middleware.NewRecovery(s.o11y.Instrumentation.Logger()).Wrap)
 	r.Use(otelmux.Middleware(
 		"apiserver",
-		otelmux.WithMeterProvider(s.signoz.Instrumentation.MeterProvider()),
-		otelmux.WithTracerProvider(s.signoz.Instrumentation.TracerProvider()),
+		otelmux.WithMeterProvider(s.o11y.Instrumentation.MeterProvider()),
+		otelmux.WithTracerProvider(s.o11y.Instrumentation.TracerProvider()),
 		otelmux.WithPropagators(propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})),
 		otelmux.WithFilter(func(r *http.Request) bool {
 			return !slices.Contains([]string{"/api/v1/health"}, r.URL.Path)
 		}),
 	))
-	r.Use(middleware.NewIdentN(s.signoz.IdentNResolver, s.signoz.Sharder, s.signoz.Instrumentation.Logger()).Wrap)
-	r.Use(middleware.NewTimeout(s.signoz.Instrumentation.Logger(),
+	r.Use(middleware.NewIdentN(s.o11y.IdentNResolver, s.o11y.Sharder, s.o11y.Instrumentation.Logger()).Wrap)
+	r.Use(middleware.NewTimeout(s.o11y.Instrumentation.Logger(),
 		s.config.APIServer.Timeout.ExcludedRoutes,
 		s.config.APIServer.Timeout.Default,
 		s.config.APIServer.Timeout.Max,
 	).Wrap)
-	r.Use(middleware.NewResource(s.signoz.Instrumentation.Logger()).Wrap)
-	r.Use(middleware.NewAudit(s.signoz.Instrumentation.Logger(), s.config.APIServer.Logging.ExcludedRoutes, s.signoz.Auditor).Wrap)
+	r.Use(middleware.NewResource(s.o11y.Instrumentation.Logger()).Wrap)
+	r.Use(middleware.NewAudit(s.o11y.Instrumentation.Logger(), s.config.APIServer.Logging.ExcludedRoutes, s.o11y.Auditor).Wrap)
 	r.Use(middleware.NewComment().Wrap)
 
-	am := middleware.NewAuthZ(s.signoz.Instrumentation.Logger(), s.signoz.Modules.OrgGetter, s.signoz.Authz)
+	am := middleware.NewAuthZ(s.o11y.Instrumentation.Logger(), s.o11y.Modules.OrgGetter, s.o11y.Authz)
 
 	api.RegisterRoutes(r, am)
 	api.RegisterLogsRoutes(r, am)
@@ -183,7 +183,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 	api.RegisterThirdPartyApiRoutes(r, am)
 	api.RegisterTraceFunnelsRoutes(r, am)
 
-	err := s.signoz.APIServer.AddToRouter(r)
+	err := s.o11y.APIServer.AddToRouter(r)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +191,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "DELETE", "POST", "PUT", "PATCH", "OPTIONS"},
-		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "cache-control", "X-SIGNOZ-QUERY-ID", "Sec-WebSocket-Protocol"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "cache-control", "X-O11Y-QUERY-ID", "Sec-WebSocket-Protocol"},
 	})
 
 	handler := c.Handler(r)

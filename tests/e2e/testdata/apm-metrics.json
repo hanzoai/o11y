@@ -201,7 +201,7 @@
       "multiSelect": false,
       "name": "deployment.environment",
       "order": 0,
-      "queryValue": "SELECT JSONExtractString(labels, 'deployment.environment') AS `deployment.environment`\nFROM signoz_metrics.time_series_v4_1day\nWHERE (metric_name = 'signoz_calls_total') AND (unix_milli >= (toUnixTimestamp(now() - toIntervalDay(1)) * 1000))\nGROUP BY `deployment.environment`",
+      "queryValue": "SELECT JSONExtractString(labels, 'deployment.environment') AS `deployment.environment`\nFROM o11y_metrics.time_series_v4_1day\nWHERE (metric_name = 'o11y_calls_total') AND (unix_milli >= (toUnixTimestamp(now() - toIntervalDay(1)) * 1000))\nGROUP BY `deployment.environment`",
       "showALLOption": false,
       "sort": "DISABLED",
       "textboxValue": "",
@@ -217,7 +217,7 @@
       "multiSelect": true,
       "name": "top_level_operation",
       "order": 2,
-      "queryValue": "SELECT name FROM signoz_traces.top_level_operations WHERE serviceName = $service.name GROUP BY name",
+      "queryValue": "SELECT name FROM o11y_traces.top_level_operations WHERE serviceName = $service.name GROUP BY name",
       "showALLOption": true,
       "sort": "ASC",
       "textboxValue": "",
@@ -233,7 +233,7 @@
       "multiSelect": false,
       "name": "service.name",
       "order": 1,
-      "queryValue": "\nSELECT JSONExtractString(labels, 'service.name') AS `service.name`\nFROM signoz_metrics.time_series_v4_1day\nWHERE (metric_name = 'signoz_calls_total') AND JSONExtractString(labels, 'deployment.environment') = $deployment.environment AND (unix_milli >= (toUnixTimestamp(now() - toIntervalDay(1)) * 1000))\nGROUP BY `service.name`",
+      "queryValue": "\nSELECT JSONExtractString(labels, 'service.name') AS `service.name`\nFROM o11y_metrics.time_series_v4_1day\nWHERE (metric_name = 'o11y_calls_total') AND JSONExtractString(labels, 'deployment.environment') = $deployment.environment AND (unix_milli >= (toUnixTimestamp(now() - toIntervalDay(1)) * 1000))\nGROUP BY `service.name`",
       "showALLOption": false,
       "sort": "DISABLED",
       "textboxValue": "",
@@ -266,10 +266,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -337,10 +337,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -408,10 +408,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -578,10 +578,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.count--float64--Sum--true",
+                "id": "o11y_latency.count--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.count",
+                "key": "o11y_latency.count",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -748,10 +748,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_calls_total--float64--Sum--true",
+                "id": "o11y_calls_total--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_calls_total",
+                "key": "o11y_calls_total",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -832,10 +832,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_calls_total--float64--Sum--true",
+                "id": "o11y_calls_total--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_calls_total",
+                "key": "o11y_calls_total",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -1023,10 +1023,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -1103,10 +1103,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -1183,10 +1183,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -1263,10 +1263,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_calls_total--float64--Sum--true",
+                "id": "o11y_calls_total--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_calls_total",
+                "key": "o11y_calls_total",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -1343,10 +1343,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_calls_total--float64--Sum--true",
+                "id": "o11y_calls_total--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_calls_total",
+                "key": "o11y_calls_total",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -1537,10 +1537,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_db_latency_count--float64--Sum--true",
+                "id": "o11y_db_latency_count--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_db_latency_count",
+                "key": "o11y_db_latency_count",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -1668,10 +1668,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -1739,10 +1739,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -1810,10 +1810,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -1980,10 +1980,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.count--float64--Sum--true",
+                "id": "o11y_latency.count--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.count",
+                "key": "o11y_latency.count",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -2150,10 +2150,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_calls_total--float64--Sum--true",
+                "id": "o11y_calls_total--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_calls_total",
+                "key": "o11y_calls_total",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -2234,10 +2234,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_calls_total--float64--Sum--true",
+                "id": "o11y_calls_total--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_calls_total",
+                "key": "o11y_calls_total",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -2419,10 +2419,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -2499,10 +2499,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -2579,10 +2579,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_latency.bucket--float64--Histogram--true",
+                "id": "o11y_latency.bucket--float64--Histogram--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_latency.bucket",
+                "key": "o11y_latency.bucket",
                 "type": "Histogram"
               },
               "aggregateOperator": "count",
@@ -2659,10 +2659,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_calls_total--float64--Sum--true",
+                "id": "o11y_calls_total--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_calls_total",
+                "key": "o11y_calls_total",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -2739,10 +2739,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_calls_total--float64--Sum--true",
+                "id": "o11y_calls_total--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_calls_total",
+                "key": "o11y_calls_total",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -2944,10 +2944,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_db_latency_count--float64--Sum--true",
+                "id": "o11y_db_latency_count--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_db_latency_count",
+                "key": "o11y_db_latency_count",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -3099,10 +3099,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_db_latency_sum--float64--Sum--true",
+                "id": "o11y_db_latency_sum--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_db_latency_sum",
+                "key": "o11y_db_latency_sum",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -3155,10 +3155,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_db_latency_count--float64--Sum--true",
+                "id": "o11y_db_latency_count--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_db_latency_count",
+                "key": "o11y_db_latency_count",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -3333,10 +3333,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_external_call_latency_sum--float64--Sum--true",
+                "id": "o11y_external_call_latency_sum--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_external_call_latency_sum",
+                "key": "o11y_external_call_latency_sum",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -3398,10 +3398,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_external_call_latency_count--float64--Sum--true",
+                "id": "o11y_external_call_latency_count--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_external_call_latency_count",
+                "key": "o11y_external_call_latency_count",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",
@@ -3463,10 +3463,10 @@
             {
               "aggregateAttribute": {
                 "dataType": "float64",
-                "id": "signoz_external_call_latency_count--float64--Sum--true",
+                "id": "o11y_external_call_latency_count--float64--Sum--true",
                 "isColumn": true,
                 "isJSON": false,
-                "key": "signoz_external_call_latency_count",
+                "key": "o11y_external_call_latency_count",
                 "type": "Sum"
               },
               "aggregateOperator": "rate",

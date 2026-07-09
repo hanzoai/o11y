@@ -838,7 +838,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 										<a className="upgrade-link" onClick={handleFailedPayment}>
 											pay the bill
 										</a>
-										to continue using SigNoz features.
+										to continue using O11y features.
 										<span className="refresh-payment-status">
 											{' '}
 											| Already paid? <RefreshPaymentStatus type="text" />

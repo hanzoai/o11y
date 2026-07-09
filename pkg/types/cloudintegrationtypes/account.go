@@ -54,8 +54,8 @@ type PostableAccountConfig struct {
 }
 
 type Credentials struct {
-	SigNozAPIURL string `json:"sigNozApiUrl" required:"true"`
-	SigNozAPIKey string `json:"sigNozApiKey" required:"true"` // PAT
+	O11yAPIURL   string `json:"o11yApiUrl" required:"true"`
+	O11yAPIKey   string `json:"o11yApiKey" required:"true"` // PAT
 	IngestionURL string `json:"ingestionUrl" required:"true"`
 	IngestionKey string `json:"ingestionKey" required:"true"`
 }
@@ -97,10 +97,10 @@ func NewAccount(orgID valuer.UUID, provider CloudProviderType, config *AccountCo
 	}
 }
 
-func NewCredentials(sigNozAPIURL, sigNozAPIKey, ingestionURL, ingestionKey string) *Credentials {
+func NewCredentials(o11yAPIURL, o11yAPIKey, ingestionURL, ingestionKey string) *Credentials {
 	return &Credentials{
-		SigNozAPIURL: sigNozAPIURL,
-		SigNozAPIKey: sigNozAPIKey,
+		O11yAPIURL:   o11yAPIURL,
+		O11yAPIKey:   o11yAPIKey,
 		IngestionURL: ingestionURL,
 		IngestionKey: ingestionKey,
 	}
@@ -308,7 +308,7 @@ func NewAgentReport(data map[string]any) *AgentReport {
 	}
 }
 
-func GetSigNozAPIURLFromDeployment(deployment *zeustypes.GettableDeployment) (string, error) {
+func GetO11yAPIURLFromDeployment(deployment *zeustypes.GettableDeployment) (string, error) {
 	if deployment.Name == "" || deployment.Cluster.Region.DNS == "" {
 		return "", errors.New(errors.TypeInvalidInput, ErrCodeInvalidInput, "invalid deployment: missing name or DNS")
 	}
@@ -340,12 +340,12 @@ func (postableAccount *PostableAccount) UnmarshalJSON(data []byte) error {
 		return errors.NewInvalidInputf(ErrCodeInvalidInput, "config and credentials are required")
 	}
 
-	if temp.Credentials.SigNozAPIURL == "" {
-		return errors.NewInvalidInputf(ErrCodeInvalidInput, "sigNozApiURL can not be empty")
+	if temp.Credentials.O11yAPIURL == "" {
+		return errors.NewInvalidInputf(ErrCodeInvalidInput, "o11yApiURL can not be empty")
 	}
 
-	if temp.Credentials.SigNozAPIKey == "" {
-		return errors.NewInvalidInputf(ErrCodeInvalidInput, "sigNozApiKey can not be empty")
+	if temp.Credentials.O11yAPIKey == "" {
+		return errors.NewInvalidInputf(ErrCodeInvalidInput, "o11yApiKey can not be empty")
 	}
 
 	if temp.Credentials.IngestionURL == "" {

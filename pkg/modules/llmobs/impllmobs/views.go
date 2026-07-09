@@ -149,7 +149,7 @@ func buildObservationsQuery(q *llmobstypes.ViewQuery) *qbtypes.QueryRangeRequest
 			attrStr(llmobstypes.GenAIOperationName),
 			attrNum(llmpricingruletypes.GenAIUsageInputTokens),
 			attrNum(llmpricingruletypes.GenAIUsageOutputTokens),
-			attrNum(llmpricingruletypes.SignozGenAITotalCost),
+			attrNum(llmpricingruletypes.O11yGenAITotalCost),
 			attrStr(llmobstypes.SessionID),
 			attrStr(llmobstypes.UserID),
 			resourceField(llmobstypes.ServiceName),
@@ -184,7 +184,7 @@ func mapObservations(resp *qbtypes.QueryRangeResponse) []*llmobstypes.Observatio
 			Provider:         asString(d[llmobstypes.GenAISystem]),
 			PromptTokens:     int64(asFloat(d[llmpricingruletypes.GenAIUsageInputTokens])),
 			CompletionTokens: int64(asFloat(d[llmpricingruletypes.GenAIUsageOutputTokens])),
-			TotalCost:        asFloat(d[llmpricingruletypes.SignozGenAITotalCost]),
+			TotalCost:        asFloat(d[llmpricingruletypes.O11yGenAITotalCost]),
 			SessionID:        asString(d[llmobstypes.SessionID]),
 			UserID:           asString(d[llmobstypes.UserID]),
 			ServiceName:      asString(d[llmobstypes.ServiceName]),
@@ -203,7 +203,7 @@ func costTokenAggs() []qbtypes.TraceAggregation {
 	return []qbtypes.TraceAggregation{
 		{Expression: "sum(" + llmpricingruletypes.GenAIUsageInputTokens + ")", Alias: "promptTokens"},
 		{Expression: "sum(" + llmpricingruletypes.GenAIUsageOutputTokens + ")", Alias: "completionTokens"},
-		{Expression: "sum(" + llmpricingruletypes.SignozGenAITotalCost + ")", Alias: "totalCost"},
+		{Expression: "sum(" + llmpricingruletypes.O11yGenAITotalCost + ")", Alias: "totalCost"},
 	}
 }
 

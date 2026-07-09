@@ -40,11 +40,11 @@ frontend/src/constants/env.ts
 **/__debug_bin
 
 .env
-pkg/query-service/signoz.db
+pkg/query-service/o11y.db
 
 pkg/query-service/tests/test-deploy/data/
 
-ee/query-service/signoz.db
+ee/query-service/o11y.db
 
 ee/query-service/tests/test-deploy/data/
 

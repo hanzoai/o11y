@@ -277,20 +277,20 @@ exporters:
     endpoint: "localhost:4317"
     tls:
       insecure: true
-  # export to SigNoz cloud
-  otlp/signoz:
+  # export to O11y cloud
+  otlp/o11y:
     endpoint: "${env:OTLP_DESTINATION_ENDPOINT}"
     tls:
       insecure: false
     headers:
-      "signoz-access-token": "${env:SIGNOZ_INGESTION_KEY}"
+      "o11y-access-token": "${env:O11Y_INGESTION_KEY}"
 
 service:
   pipelines:
     metrics/mysql:
       receivers: [mysql, prometheus]
       processors: []
-      exporters: [otlp/signoz]
+      exporters: [otlp/o11y]
 ```
 
 #### Set Environment Variables
@@ -307,11 +307,11 @@ export MYSQL_USERNAME="<username>"
 # The password to use for accessing mysql instance
 export MYSQL_PASSWORD="<PASSWORD>"
 
-# region specific SigNoz cloud ingestion endpoint
-export OTLP_DESTINATION_ENDPOINT="ingest.us.signoz.cloud:443"
+# region specific O11y cloud ingestion endpoint
+export OTLP_DESTINATION_ENDPOINT="ingest.us.o11y.cloud:443"
 
-# your SigNoz ingestion key
-export SIGNOZ_INGESTION_KEY="signoz-ingestion-key"
+# your O11y ingestion key
+export O11Y_INGESTION_KEY="o11y-ingestion-key"
 
 ```
 

@@ -215,7 +215,7 @@ func (ic *LogParsingPipelineController) ValidatePipelines(ctx context.Context,
 		})
 	}
 
-	sampleLogs := []model.SignozLog{{Body: ""}}
+	sampleLogs := []model.O11yLog{{Body: ""}}
 	_, _, err := SimulatePipelinesProcessing(ctx, gettablePipelines, sampleLogs)
 	return err
 }
@@ -332,12 +332,12 @@ func (ic *LogParsingPipelineController) GetPipelinesByVersion(
 
 type PipelinesPreviewRequest struct {
 	Pipelines []pipelinetypes.GettablePipeline `json:"pipelines"`
-	Logs      []model.SignozLog                `json:"logs"`
+	Logs      []model.O11yLog                  `json:"logs"`
 }
 
 type PipelinesPreviewResponse struct {
-	OutputLogs    []model.SignozLog `json:"logs"`
-	CollectorLogs []string          `json:"collectorLogs"`
+	OutputLogs    []model.O11yLog `json:"logs"`
+	CollectorLogs []string        `json:"collectorLogs"`
 }
 
 func (ic *LogParsingPipelineController) PreviewLogsPipelines(

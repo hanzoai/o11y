@@ -19,7 +19,7 @@ import { SuccessResponseV2 } from 'types/api';
 import { Widgets } from 'types/api/dashboard/getAll';
 import { PublicDashboardDataProps } from 'types/api/dashboard/public/get';
 
-import signozBrandLogoUrl from '@/assets/Logos/signoz-brand-logo.svg';
+import o11yBrandLogoUrl from '@/assets/Logos/o11y-brand-logo.svg';
 
 import Panel from './Panel';
 

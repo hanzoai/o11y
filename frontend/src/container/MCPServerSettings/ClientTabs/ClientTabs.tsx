@@ -9,7 +9,7 @@ import { docsUrl, MCP_CLIENTS, McpClient } from '../clients';
 
 import './ClientTabs.styles.scss';
 
-const ENDPOINT_PLACEHOLDER = 'https://mcp.<region>.signoz.cloud/mcp';
+const ENDPOINT_PLACEHOLDER = 'https://mcp.<region>.o11y.cloud/mcp';
 
 interface ClientTabsProps {
 	endpoint: string;
