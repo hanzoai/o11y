@@ -9,7 +9,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/analytics/noopanalytics"
 	"github.com/hanzoai/o11y/pkg/analytics/segmentanalytics"
 	"github.com/hanzoai/o11y/pkg/apiserver"
-	"github.com/hanzoai/o11y/pkg/apiserver/signozapiserver"
+	"github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver"
 	"github.com/hanzoai/o11y/pkg/auditor"
 	"github.com/hanzoai/o11y/pkg/auditor/noopauditor"
 	"github.com/hanzoai/o11y/pkg/authz"
@@ -286,7 +286,7 @@ func NewQuerierProviderFactories(telemetryStore telemetrystore.TelemetryStore, p
 
 func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.AuthZ, modules Modules, handlers Handlers, globalConfig global.Config) factory.NamedMap[factory.ProviderFactory[apiserver.APIServer, apiserver.Config]] {
 	return factory.MustNewNamedMap(
-		signozapiserver.NewFactory(
+		o11yapiserver.NewFactory(
 			orgGetter,
 			authz,
 			implorganization.NewHandler(modules.OrgGetter, modules.OrgSetter),
