@@ -63,7 +63,7 @@ devenv-postgres: ## Run postgres in devenv
 
 .PHONY: devenv-otel-collector
 devenv-otel-collector: ## Run otel-collector in devenv (requires datastore to be running)
-	@cd .devenv/docker/signoz-otel-collector; \
+	@cd .devenv/docker/otel-collector; \
 	docker compose -f compose.yaml up -d
 
 .PHONY: devenv-up
@@ -209,11 +209,11 @@ py-lint: ## Run ruff check across the shared tests project
 	@cd tests && uv run ruff check --fix .
 
 .PHONY: py-test-setup
-py-test-setup: ## Bring up the shared SigNoz backend used by integration and e2e tests
+py-test-setup: ## Bring up the shared O11y backend used by integration and e2e tests
 	@cd tests && uv run pytest --basetemp=./tmp/ -vv --reuse --capture=no integration/bootstrap/setup.py::test_setup
 
 .PHONY: py-test-teardown
-py-test-teardown: ## Tear down the shared SigNoz backend
+py-test-teardown: ## Tear down the shared O11y backend
 	@cd tests && uv run pytest --basetemp=./tmp/ -vv --teardown --capture=no  integration/bootstrap/setup.py::test_teardown
 
 .PHONY: py-test

@@ -4,10 +4,10 @@
         "description": ""
     },
     "datasources": {
-        "SigNozDatasource": {
+        "O11yDatasource": {
             "default": true,
             "plugin": {
-                "kind": "signoz/Datasource",
+                "kind": "o11y/Datasource",
                 "spec": {}
             }
         }
@@ -20,7 +20,7 @@
                     "name": ""
                 },
                 "plugin": {
-                    "kind": "signoz/NumberPanel",
+                    "kind": "o11y/NumberPanel",
                     "spec": {
                         "formatting": {
                             "unit": "s",
@@ -33,7 +33,7 @@
                         "kind": "time_series",
                         "spec": {
                             "plugin": {
-                                "kind": "signoz/BuilderQuery",
+                                "kind": "o11y/BuilderQuery",
                                 "spec": {
                                     "name": "A",
                                     "signal": "metrics",
@@ -62,7 +62,7 @@
                     "name": ""
                 },
                 "plugin": {
-                    "kind": "signoz/TimeSeriesPanel",
+                    "kind": "o11y/TimeSeriesPanel",
                     "spec": {
                         "visualization": {
                             "fillSpans": false
@@ -88,7 +88,7 @@
                         "kind": "time_series",
                         "spec": {
                             "plugin": {
-                                "kind": "signoz/BuilderQuery",
+                                "kind": "o11y/BuilderQuery",
                                 "spec": {
                                     "name": "A",
                                     "signal": "metrics",

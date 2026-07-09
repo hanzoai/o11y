@@ -433,7 +433,7 @@ def insert_metrics_to_clickhouse(conn, metrics: list[Metrics]) -> None:
 
     if len(time_series_map) > 0:
         conn.insert(
-            database="signoz_metrics",
+            database="o11y_metrics",
             table="distributed_time_series_v4",
             column_names=[
                 "env",
@@ -457,7 +457,7 @@ def insert_metrics_to_clickhouse(conn, metrics: list[Metrics]) -> None:
     samples = [metric.sample for metric in metrics]
     if len(samples) > 0:
         conn.insert(
-            database="signoz_metrics",
+            database="o11y_metrics",
             table="distributed_samples_v4",
             column_names=[
                 "env",
@@ -526,7 +526,7 @@ def insert_metrics_to_clickhouse(conn, metrics: list[Metrics]) -> None:
 
     if len(metadata_map) > 0:
         conn.insert(
-            database="signoz_metrics",
+            database="o11y_metrics",
             table="distributed_metadata",
             column_names=[
                 "temporality",
@@ -558,7 +558,7 @@ def truncate_metrics_tables(conn, cluster: str) -> None:
     """Truncate all metrics tables. Used by the pytest fixture teardown and by
     the seeder's DELETE /telemetry/metrics endpoint."""
     for table in _METRICS_TABLES_TO_TRUNCATE:
-        conn.query(f"TRUNCATE TABLE signoz_metrics.{table} ON CLUSTER '{cluster}' SYNC")
+        conn.query(f"TRUNCATE TABLE o11y_metrics.{table} ON CLUSTER '{cluster}' SYNC")
 
 
 @pytest.fixture(name="insert_metrics", scope="function")
@@ -572,12 +572,12 @@ def insert_metrics(
 
     truncate_metrics_tables(
         clickhouse.conn,
-        clickhouse.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"],
+        clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"],
     )
 
 
 @pytest.fixture(name="remove_metrics_ttl_and_storage_settings", scope="function")
-def remove_metrics_ttl_and_storage_settings(signoz: types.SigNoz):
+def remove_metrics_ttl_and_storage_settings(o11y: types.O11y):
     """
     Remove any custom TTL settings on metrics tables to revert to default retention.
     Also resets storage policy to default by recreating tables if needed.
@@ -594,10 +594,10 @@ def remove_metrics_ttl_and_storage_settings(signoz: types.SigNoz):
         "metadata",
     ]
 
-    cluster = signoz.telemetrystore.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
+    cluster = o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
     for table in tables:
         try:
-            signoz.telemetrystore.conn.query(f"ALTER TABLE signoz_metrics.{table} ON CLUSTER '{cluster}' REMOVE TTL")
-            signoz.telemetrystore.conn.query(f"ALTER TABLE signoz_metrics.{table} ON CLUSTER '{cluster}' RESET SETTING storage_policy;")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_metrics.{table} ON CLUSTER '{cluster}' REMOVE TTL")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_metrics.{table} ON CLUSTER '{cluster}' RESET SETTING storage_policy;")
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"ttl and storage policy reset failed for {table}: {e}")

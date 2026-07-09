@@ -1,4 +1,4 @@
-### Monitor Azure Managed Instance for Apache Cassandra with SigNoz
+### Monitor Azure Managed Instance for Apache Cassandra with O11y
 
 Collect key Azure Managed Instance for Apache Cassandra metrics and view them with an out of the box dashboard.
 

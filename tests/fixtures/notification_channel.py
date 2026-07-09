@@ -69,7 +69,7 @@ def notification_channel(
 
 @pytest.fixture(name="create_webhook_notification_channel", scope="function")
 def create_webhook_notification_channel(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> Callable[[str, str, dict, bool], str]:
@@ -83,7 +83,7 @@ def create_webhook_notification_channel(
         send_resolved: bool = True,
     ) -> str:
         response = requests.post(
-            signoz.self.host_configs["8080"].get("/api/v1/channels"),
+            o11y.self.host_configs["8080"].get("/api/v1/channels"),
             json={
                 "name": channel_name,
                 "webhook_configs": [

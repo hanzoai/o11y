@@ -13,17 +13,17 @@ CLOUD_PROVIDER = "aws"
 
 
 def test_apply_license(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
     """Apply a license so that subsequent cloud integration calls succeed."""
-    add_license(signoz, make_http_mocks, get_token)
+    add_license(o11y, make_http_mocks, get_token)
 
 
 def test_agent_check_in(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     create_cloud_integration_account: Callable,
@@ -36,7 +36,7 @@ def test_agent_check_in(
     provider_account_id = str(uuid.uuid4())
 
     response = simulate_agent_checkin(
-        signoz,
+        o11y,
         admin_token,
         CLOUD_PROVIDER,
         account_id,
@@ -67,7 +67,7 @@ def test_agent_check_in(
 
 
 def test_agent_check_in_account_not_found(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -75,13 +75,13 @@ def test_agent_check_in_account_not_found(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     fake_id = str(uuid.uuid4())
 
-    response = simulate_agent_checkin(signoz, admin_token, CLOUD_PROVIDER, fake_id, str(uuid.uuid4()))
+    response = simulate_agent_checkin(o11y, admin_token, CLOUD_PROVIDER, fake_id, str(uuid.uuid4()))
 
     assert response.status_code == HTTPStatus.NOT_FOUND, f"Expected 404, got {response.status_code}: {response.text}"
 
 
 def test_duplicate_cloud_account_checkins(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     create_cloud_integration_account: Callable,
@@ -97,9 +97,9 @@ def test_duplicate_cloud_account_checkins(
     same_provider_account_id = str(uuid.uuid4())
 
     # First check-in: account1 claims the provider account ID
-    response = simulate_agent_checkin(signoz, admin_token, CLOUD_PROVIDER, account1["id"], same_provider_account_id)
+    response = simulate_agent_checkin(o11y, admin_token, CLOUD_PROVIDER, account1["id"], same_provider_account_id)
     assert response.status_code == HTTPStatus.OK, f"Expected 200 for first check-in, got {response.status_code}: {response.text}"
 
     # Second check-in: account2 tries to claim the same provider account ID → 409
-    response = simulate_agent_checkin(signoz, admin_token, CLOUD_PROVIDER, account2["id"], same_provider_account_id)
+    response = simulate_agent_checkin(o11y, admin_token, CLOUD_PROVIDER, account2["id"], same_provider_account_id)
     assert response.status_code == HTTPStatus.CONFLICT, f"Expected 409 for duplicate providerAccountId, got {response.status_code}: {response.text}"

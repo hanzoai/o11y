@@ -12,9 +12,9 @@ import (
 	"github.com/perses/spec/go/dashboard"
 )
 
-// DashboardSpec is the SigNoz dashboard v2 spec shape. It mirrors
+// DashboardSpec is the O11y dashboard v2 spec shape. It mirrors
 // dashboard.Spec (Perses) field-for-field, except every common.Plugin
-// occurrence is replaced with a typed SigNoz plugin whose OpenAPI schema is a
+// occurrence is replaced with a typed O11y plugin whose OpenAPI schema is a
 // per-site discriminated oneOf.
 type DashboardSpec struct {
 	Display         Display                    `json:"display" required:"true"`

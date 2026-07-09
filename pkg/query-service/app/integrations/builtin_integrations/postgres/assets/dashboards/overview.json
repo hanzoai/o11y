@@ -119,7 +119,7 @@
             "multiSelect": true,
             "name": "host.name",
             "order": 0,
-            "queryValue": "SELECT JSONExtractString(labels, 'host.name') AS `host.name`\nFROM signoz_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'postgresql.operations'\nGROUP BY `host.name`",
+            "queryValue": "SELECT JSONExtractString(labels, 'host.name') AS `host.name`\nFROM o11y_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'postgresql.operations'\nGROUP BY `host.name`",
             "selectedValue": [
                 "Srikanths-MacBook-Pro.local"
             ],
@@ -137,7 +137,7 @@
             "multiSelect": true,
             "name": "table.name",
             "order": 0,
-            "queryValue": "SELECT JSONExtractString(labels, 'postgresql.table.name') AS `table.name`\nFROM signoz_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'postgresql.operations' AND JSONExtractString(labels, 'postgresql.database.name') IN {{.db.name}}\nGROUP BY `table.name`",
+            "queryValue": "SELECT JSONExtractString(labels, 'postgresql.table.name') AS `table.name`\nFROM o11y_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'postgresql.operations' AND JSONExtractString(labels, 'postgresql.database.name') IN {{.db.name}}\nGROUP BY `table.name`",
             "selectedValue": [
                 "public.activations",
                 "public.licenses",
@@ -162,7 +162,7 @@
             "multiSelect": true,
             "name": "db.name",
             "order": 0,
-            "queryValue": "SELECT JSONExtractString(labels, 'postgresql.database.name') AS `db.name`\nFROM signoz_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'postgresql.operations'\nGROUP BY `db.name`",
+            "queryValue": "SELECT JSONExtractString(labels, 'postgresql.database.name') AS `db.name`\nFROM o11y_metrics.distributed_time_series_v4_1day\nWHERE metric_name = 'postgresql.operations'\nGROUP BY `db.name`",
             "selectedValue": [
                 "postgres"
             ],

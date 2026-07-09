@@ -2,17 +2,17 @@ import { buildPermission } from './utils';
 
 export const IsAdminPermission = buildPermission(
 	'assignee',
-	'role:signoz-admin',
+	'role:o11y-admin',
 );
 export const IsEditorPermission = buildPermission(
 	'assignee',
-	'role:signoz-editor',
+	'role:o11y-editor',
 );
 export const IsViewerPermission = buildPermission(
 	'assignee',
-	'role:signoz-viewer',
+	'role:o11y-viewer',
 );
 export const IsAnonymousPermission = buildPermission(
 	'assignee',
-	'role:signoz-anonymous',
+	'role:o11y-anonymous',
 );

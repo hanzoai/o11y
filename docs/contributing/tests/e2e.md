@@ -1,6 +1,6 @@
 # E2E Tests
 
-SigNoz uses end-to-end tests to verify the frontend works correctly against a real backend. These tests use Playwright to drive a real browser against a containerized SigNoz stack that pytest brings up — the same fixture graph integration tests use, with an extra HTTP seeder container for per-spec telemetry seeding.
+O11y uses end-to-end tests to verify the frontend works correctly against a real backend. These tests use Playwright to drive a real browser against a containerized O11y stack that pytest brings up — the same fixture graph integration tests use, with an extra HTTP seeder container for per-spec telemetry seeding.
 
 ## How to set up the E2E test environment?
 
@@ -30,7 +30,7 @@ yarn install:browsers   # one-time Playwright browser install
 
 ### Starting the Test Environment
 
-To spin up the backend stack (SigNoz, ClickHouse, Postgres, Zookeeper, Zeus mock, gateway mock, seeder, migrator-with-web) and keep it running:
+To spin up the backend stack (O11y, ClickHouse, Postgres, Zookeeper, Zeus mock, gateway mock, seeder, migrator-with-web) and keep it running:
 
 ```bash
 cd tests
@@ -46,7 +46,7 @@ This command will:
 - Write backend coordinates to `tests/e2e/.env.local` (loaded by `playwright.config.ts` via dotenv)
 - Keep containers running via the `--reuse` flag
 
-The `--with-web` flag builds the frontend into the SigNoz container — required for E2E. The build takes ~4 mins on a cold start.
+The `--with-web` flag builds the frontend into the O11y container — required for E2E. The build takes ~4 mins on a cold start.
 
 ### Stopping the Test Environment
 
@@ -60,7 +60,7 @@ uv run pytest --basetemp=./tmp/ -vv --teardown \
 
 ## Understanding the E2E Test Framework
 
-Playwright drives a real browser (Chromium / Firefox / WebKit) against the running SigNoz frontend. The backend is brought up by the same pytest fixture graph integration tests use, so both suites share one source of truth for container lifecycle, license seeding, and test-user accounts.
+Playwright drives a real browser (Chromium / Firefox / WebKit) against the running O11y frontend. The backend is brought up by the same pytest fixture graph integration tests use, so both suites share one source of truth for container lifecycle, license seeding, and test-user accounts.
 
 - **Why Playwright?** First-class TypeScript support, network interception, automatic wait-for-visibility, built-in trace viewer that captures every request/response the UI triggers — so specs rarely need separate API probes alongside UI clicks.
 - **Why pytest for lifecycle?** The integration suite already owns container bring-up. Reusing it keeps the E2E stack exactly in sync with the integration stack and avoids a parallel lifecycle framework.
@@ -246,11 +246,11 @@ yarn report               # open the last HTML report (artifacts/html)
 
 ### Staging fallback
 
-Point `SIGNOZ_E2E_BASE_URL` at a remote env via `.env` — no local backend bring-up, no `.env.local` generated, Playwright hits the URL directly:
+Point `O11Y_E2E_BASE_URL` at a remote env via `.env` — no local backend bring-up, no `.env.local` generated, Playwright hits the URL directly:
 
 ```bash
 cd tests/e2e
-cp .env.example .env      # fill SIGNOZ_E2E_USERNAME / PASSWORD
+cp .env.example .env      # fill O11Y_E2E_USERNAME / PASSWORD
 yarn test:staging
 ```
 
@@ -260,10 +260,10 @@ yarn test:staging
 
 | Variable | Description |
 |---|---|
-| `SIGNOZ_E2E_BASE_URL` | Base URL the browser targets. Written by `bootstrap/setup.py` for local mode; set manually for staging. |
-| `SIGNOZ_E2E_USERNAME` | Admin email. Bootstrap writes `admin@integration.test`. |
-| `SIGNOZ_E2E_PASSWORD` | Admin password. Bootstrap writes the integration-test default. |
-| `SIGNOZ_E2E_SEEDER_URL` | Seeder HTTP base URL — hit by specs that need per-test telemetry. |
+| `O11Y_E2E_BASE_URL` | Base URL the browser targets. Written by `bootstrap/setup.py` for local mode; set manually for staging. |
+| `O11Y_E2E_USERNAME` | Admin email. Bootstrap writes `admin@integration.test`. |
+| `O11Y_E2E_PASSWORD` | Admin password. Bootstrap writes the integration-test default. |
+| `O11Y_E2E_SEEDER_URL` | Seeder HTTP base URL — hit by specs that need per-test telemetry. |
 
 Loading order in `playwright.config.ts`: `.env` first (user-provided, staging), then `.env.local` with `override: true` (bootstrap-generated, local mode). Anything already set in `process.env` at yarn-test time wins because dotenv doesn't touch vars that are already present.
 
@@ -282,7 +282,7 @@ The same pytest flags integration tests expose work here, since E2E reuses the s
 
 - `--reuse` — keep containers warm between runs (required for all iteration).
 - `--teardown` — tear everything down.
-- `--with-web` — build the frontend into the SigNoz container. **Required for E2E**; integration tests don't need it.
+- `--with-web` — build the frontend into the O11y container. **Required for E2E**; integration tests don't need it.
 - `--sqlstore-provider`, `--postgres-version`, `--clickhouse-version`, etc. — see `docs/contributing/integration.md`.
 
 ## What should I remember?

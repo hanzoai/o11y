@@ -94,7 +94,7 @@ def insert_meter_samples(
             return
 
         clickhouse.conn.insert(
-            database="signoz_meter",
+            database="o11y_meter",
             table="distributed_samples",
             column_names=[
                 "temporality",
@@ -113,6 +113,6 @@ def insert_meter_samples(
 
     yield _insert_meter_samples
 
-    cluster = clickhouse.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
+    cluster = clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
     for table in ["samples", "samples_agg_1d"]:
-        clickhouse.conn.query(f"TRUNCATE TABLE signoz_meter.{table} ON CLUSTER '{cluster}' SYNC")
+        clickhouse.conn.query(f"TRUNCATE TABLE o11y_meter.{table} ON CLUSTER '{cluster}' SYNC")

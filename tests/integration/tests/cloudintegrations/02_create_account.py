@@ -11,13 +11,13 @@ logger = setup_logger(__name__)
 
 
 def test_apply_license(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
     """Apply a license so that subsequent cloud integration calls succeed."""
-    add_license(signoz, make_http_mocks, get_token)
+    add_license(o11y, make_http_mocks, get_token)
 
 
 def test_create_account(
@@ -50,7 +50,7 @@ def test_create_account(
 
 
 def test_create_account_unsupported_provider(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -60,14 +60,14 @@ def test_create_account_unsupported_provider(
     endpoint = f"/api/v1/cloud_integrations/{cloud_provider}/accounts"
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get(endpoint),
+        o11y.self.host_configs["8080"].get(endpoint),
         headers={"Authorization": f"Bearer {admin_token}"},
         json={
             "config": {"gcp": {"deploymentRegion": "us-central1", "regions": ["us-central1"]}},
             "credentials": {
-                "sigNozApiURL": "https://test.signoz.cloud",
-                "sigNozApiKey": "test-key",
-                "ingestionUrl": "https://ingest.test.signoz.cloud",
+                "o11yApiURL": "https://test.o11y.cloud",
+                "o11yApiKey": "test-key",
+                "ingestionUrl": "https://ingest.test.o11y.cloud",
                 "ingestionKey": "test-ingestion-key",
             },
         },

@@ -72,7 +72,7 @@ describe('useTableParams navigation scenarios', () => {
 			// Verify it's persisted in localStorage
 			expect(
 				localStorage.getItem(
-					'@signoz/table-columns/alert-rules-preferred-page-size',
+					'@o11y/table-columns/alert-rules-preferred-page-size',
 				),
 			).toBe('100');
 
@@ -89,12 +89,12 @@ describe('useTableParams navigation scenarios', () => {
 
 			// Alert Rules sets limit=100
 			localStorage.setItem(
-				'@signoz/table-columns/alert-rules-preferred-page-size',
+				'@o11y/table-columns/alert-rules-preferred-page-size',
 				'100',
 			);
 			// Triggered Alerts sets limit=25
 			localStorage.setItem(
-				'@signoz/table-columns/triggered-alerts-preferred-page-size',
+				'@o11y/table-columns/triggered-alerts-preferred-page-size',
 				'25',
 			);
 
@@ -126,7 +126,7 @@ describe('useTableParams navigation scenarios', () => {
 
 			// Pre-set alert-rules preference
 			localStorage.setItem(
-				'@signoz/table-columns/alert-rules-preferred-page-size',
+				'@o11y/table-columns/alert-rules-preferred-page-size',
 				'100',
 			);
 
@@ -278,7 +278,7 @@ describe('useTableParams navigation scenarios', () => {
 
 			// Pre-set preference
 			localStorage.setItem(
-				'@signoz/table-columns/test-table-preferred-page-size',
+				'@o11y/table-columns/test-table-preferred-page-size',
 				'100',
 			);
 

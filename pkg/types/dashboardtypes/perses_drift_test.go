@@ -1,7 +1,7 @@
 package dashboardtypes
 
 // TestDashboardSpecMatchesPerses asserts that DashboardData
-// and every nested SigNoz-owned type cover the JSON field set of their Perses
+// and every nested O11y-owned type cover the JSON field set of their Perses
 // counterpart.
 
 import (

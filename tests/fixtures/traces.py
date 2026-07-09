@@ -663,11 +663,11 @@ def insert_traces_to_clickhouse(conn, traces: list[Traces]) -> None:
     """
     Insert traces into ClickHouse tables following the same logic as the Go exporter.
     Handles insertion into:
-    - distributed_signoz_index_v3 (main traces table)
+    - distributed_o11y_index_v3 (main traces table)
     - distributed_traces_v3_resource (resource fingerprints)
     - distributed_tag_attributes_v2 (tag attributes)
     - distributed_span_attributes_keys (attribute keys)
-    - distributed_signoz_error_index_v2 (error events)
+    - distributed_o11y_error_index_v2 (error events)
 
     Pure function so the seeder container (tests/seeder/) can reuse the
     exact insert path used by the pytest fixtures. `conn` is a
@@ -679,7 +679,7 @@ def insert_traces_to_clickhouse(conn, traces: list[Traces]) -> None:
 
     if len(resources) > 0:
         conn.insert(
-            database="signoz_traces",
+            database="o11y_traces",
             table="distributed_traces_v3_resource",
             data=[resource.np_arr() for resource in resources],
         )
@@ -690,7 +690,7 @@ def insert_traces_to_clickhouse(conn, traces: list[Traces]) -> None:
 
     if len(tag_attributes) > 0:
         conn.insert(
-            database="signoz_traces",
+            database="o11y_traces",
             table="distributed_tag_attributes_v2",
             data=[tag_attribute.np_arr() for tag_attribute in tag_attributes],
         )
@@ -703,21 +703,21 @@ def insert_traces_to_clickhouse(conn, traces: list[Traces]) -> None:
 
     if len(attribute_keys) > 0:
         conn.insert(
-            database="signoz_traces",
+            database="o11y_traces",
             table="distributed_span_attributes_keys",
             data=[attribute_key.np_arr() for attribute_key in attribute_keys],
         )
 
     if len(resource_keys) > 0:
         conn.insert(
-            database="signoz_traces",
+            database="o11y_traces",
             table="distributed_span_attributes_keys",
             data=[resource_key.np_arr() for resource_key in resource_keys],
         )
 
     conn.insert(
-        database="signoz_traces",
-        table="distributed_signoz_index_v3",
+        database="o11y_traces",
+        table="distributed_o11y_index_v3",
         column_names=[
             "ts_bucket_start",
             "resource_fingerprint",
@@ -761,18 +761,18 @@ def insert_traces_to_clickhouse(conn, traces: list[Traces]) -> None:
 
     if len(error_events) > 0:
         conn.insert(
-            database="signoz_traces",
-            table="distributed_signoz_error_index_v2",
+            database="o11y_traces",
+            table="distributed_o11y_error_index_v2",
             data=[error_event.np_arr() for error_event in error_events],
         )
 
 
 _TRACES_TABLES_TO_TRUNCATE = [
-    "signoz_index_v3",
+    "o11y_index_v3",
     "traces_v3_resource",
     "tag_attributes_v2",
     "span_attributes_keys",
-    "signoz_error_index_v2",
+    "o11y_error_index_v2",
 ]
 
 
@@ -780,7 +780,7 @@ def truncate_traces_tables(conn, cluster: str) -> None:
     """Truncate all traces tables. Used by the pytest fixture teardown and by
     the seeder's DELETE /telemetry/traces endpoint."""
     for table in _TRACES_TABLES_TO_TRUNCATE:
-        conn.query(f"TRUNCATE TABLE signoz_traces.{table} ON CLUSTER '{cluster}' SYNC")
+        conn.query(f"TRUNCATE TABLE o11y_traces.{table} ON CLUSTER '{cluster}' SYNC")
 
 
 @pytest.fixture(name="insert_traces", scope="function")
@@ -794,20 +794,20 @@ def insert_traces(
 
     truncate_traces_tables(
         clickhouse.conn,
-        clickhouse.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"],
+        clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"],
     )
 
 
 @pytest.fixture(name="remove_traces_ttl_and_storage_settings", scope="function")
-def remove_traces_ttl_and_storage_settings(signoz: types.SigNoz):
+def remove_traces_ttl_and_storage_settings(o11y: types.O11y):
     """
     Remove any custom TTL settings on traces tables to revert to default retention.
     Also resets storage policy to default by recreating tables if needed.
     """
     tables = [
-        "signoz_index_v3",
+        "o11y_index_v3",
         "traces_v3_resource",
-        "signoz_error_index_v2",
+        "o11y_error_index_v2",
         "usage_explorer",
         "dependency_graph_minutes_v2",
         "trace_summary",
@@ -816,7 +816,7 @@ def remove_traces_ttl_and_storage_settings(signoz: types.SigNoz):
 
     for table in tables:
         try:
-            signoz.telemetrystore.conn.query(f"ALTER TABLE signoz_traces.{table} ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' REMOVE TTL")
-            signoz.telemetrystore.conn.query(f"ALTER TABLE signoz_traces.{table} ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' RESET SETTING storage_policy;")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_traces.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' REMOVE TTL")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_traces.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' RESET SETTING storage_policy;")
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"ttl and storage policy reset failed for {table}: {e}")

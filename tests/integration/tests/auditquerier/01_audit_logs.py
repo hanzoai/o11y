@@ -17,7 +17,7 @@ from fixtures.querier import (
 
 
 def test_audit_list_all(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_audit_logs: Callable[[list[AuditLog]], None],
@@ -29,16 +29,16 @@ def test_audit_list_all(
             AuditLog(
                 timestamp=now - timedelta(seconds=3),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "alert-rule",
-                    "signoz.audit.resource.id": "alert-001",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "alert-rule",
+                    "o11y.audit.resource.id": "alert-001",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-010",
-                    "signoz.audit.principal.email": "ops@acme.com",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "create",
-                    "signoz.audit.outcome": "success",
+                    "o11y.audit.principal.id": "user-010",
+                    "o11y.audit.principal.email": "ops@acme.com",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "create",
+                    "o11y.audit.outcome": "success",
                 },
                 body="ops@acme.com (user-010) created alert-rule (alert-001)",
                 event_name="alert-rule.created",
@@ -47,16 +47,16 @@ def test_audit_list_all(
             AuditLog(
                 timestamp=now - timedelta(seconds=2),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "saved-view",
-                    "signoz.audit.resource.id": "view-001",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "saved-view",
+                    "o11y.audit.resource.id": "view-001",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-010",
-                    "signoz.audit.principal.email": "ops@acme.com",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "update",
-                    "signoz.audit.outcome": "success",
+                    "o11y.audit.principal.id": "user-010",
+                    "o11y.audit.principal.email": "ops@acme.com",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "update",
+                    "o11y.audit.outcome": "success",
                 },
                 body="ops@acme.com (user-010) updated saved-view (view-001)",
                 event_name="saved-view.updated",
@@ -65,17 +65,17 @@ def test_audit_list_all(
             AuditLog(
                 timestamp=now - timedelta(seconds=1),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "user",
-                    "signoz.audit.resource.id": "user-020",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "user",
+                    "o11y.audit.resource.id": "user-020",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-010",
-                    "signoz.audit.principal.email": "ops@acme.com",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "update",
-                    "signoz.audit.action_category": "access_control",
-                    "signoz.audit.outcome": "success",
+                    "o11y.audit.principal.id": "user-010",
+                    "o11y.audit.principal.email": "ops@acme.com",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "update",
+                    "o11y.audit.action_category": "access_control",
+                    "o11y.audit.outcome": "success",
                 },
                 body="ops@acme.com (user-010) updated user (user-020)",
                 event_name="user.role.changed",
@@ -87,7 +87,7 @@ def test_audit_list_all(
 
     now = datetime.now(tz=UTC)
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((now - timedelta(seconds=30)).timestamp() * 1000),
         end_ms=int(now.timestamp() * 1000),
@@ -122,31 +122,31 @@ def test_audit_list_all(
     "filter_expression,expected_count,expected_event_names",
     [
         pytest.param(
-            "signoz.audit.principal.id = 'user-001'",
+            "o11y.audit.principal.id = 'user-001'",
             3,
             {"session.login", "dashboard.updated", "dashboard.created"},
             id="filter_by_principal_id",
         ),
         pytest.param(
-            "signoz.audit.outcome = 'failure'",
+            "o11y.audit.outcome = 'failure'",
             1,
             {"dashboard.deleted"},
             id="filter_by_outcome_failure",
         ),
         pytest.param(
-            "signoz.audit.resource.kind = 'dashboard' AND signoz.audit.resource.id = 'dash-001'",
+            "o11y.audit.resource.kind = 'dashboard' AND o11y.audit.resource.id = 'dash-001'",
             3,
             {"dashboard.deleted", "dashboard.updated", "dashboard.created"},
             id="filter_by_resource_kind_and_id",
         ),
         pytest.param(
-            "signoz.audit.principal.type = 'service_account'",
+            "o11y.audit.principal.type = 'service_account'",
             1,
             {"serviceaccount.apikey.created"},
             id="filter_by_principal_type",
         ),
         pytest.param(
-            "signoz.audit.resource.kind = 'dashboard' AND signoz.audit.action = 'delete'",
+            "o11y.audit.resource.kind = 'dashboard' AND o11y.audit.action = 'delete'",
             1,
             {"dashboard.deleted"},
             id="filter_by_resource_kind_and_action",
@@ -154,7 +154,7 @@ def test_audit_list_all(
     ],
 )
 def test_audit_filter(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_audit_logs: Callable[[list[AuditLog]], None],
@@ -169,17 +169,17 @@ def test_audit_filter(
             AuditLog(
                 timestamp=now - timedelta(seconds=5),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "dashboard",
-                    "signoz.audit.resource.id": "dash-001",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "dashboard",
+                    "o11y.audit.resource.id": "dash-001",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-001",
-                    "signoz.audit.principal.email": "alice@acme.com",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "create",
-                    "signoz.audit.action_category": "configuration_change",
-                    "signoz.audit.outcome": "success",
+                    "o11y.audit.principal.id": "user-001",
+                    "o11y.audit.principal.email": "alice@acme.com",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "create",
+                    "o11y.audit.action_category": "configuration_change",
+                    "o11y.audit.outcome": "success",
                 },
                 body="alice@acme.com created dashboard",
                 event_name="dashboard.created",
@@ -187,17 +187,17 @@ def test_audit_filter(
             AuditLog(
                 timestamp=now - timedelta(seconds=4),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "dashboard",
-                    "signoz.audit.resource.id": "dash-001",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "dashboard",
+                    "o11y.audit.resource.id": "dash-001",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-001",
-                    "signoz.audit.principal.email": "alice@acme.com",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "update",
-                    "signoz.audit.action_category": "configuration_change",
-                    "signoz.audit.outcome": "success",
+                    "o11y.audit.principal.id": "user-001",
+                    "o11y.audit.principal.email": "alice@acme.com",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "update",
+                    "o11y.audit.action_category": "configuration_change",
+                    "o11y.audit.outcome": "success",
                 },
                 body="alice@acme.com updated dashboard",
                 event_name="dashboard.updated",
@@ -205,19 +205,19 @@ def test_audit_filter(
             AuditLog(
                 timestamp=now - timedelta(seconds=3),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "dashboard",
-                    "signoz.audit.resource.id": "dash-001",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "dashboard",
+                    "o11y.audit.resource.id": "dash-001",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-002",
-                    "signoz.audit.principal.email": "viewer@acme.com",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "delete",
-                    "signoz.audit.action_category": "configuration_change",
-                    "signoz.audit.outcome": "failure",
-                    "signoz.audit.error.type": "forbidden",
-                    "signoz.audit.error.code": "authz_forbidden",
+                    "o11y.audit.principal.id": "user-002",
+                    "o11y.audit.principal.email": "viewer@acme.com",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "delete",
+                    "o11y.audit.action_category": "configuration_change",
+                    "o11y.audit.outcome": "failure",
+                    "o11y.audit.error.type": "forbidden",
+                    "o11y.audit.error.code": "authz_forbidden",
                 },
                 body="viewer@acme.com failed to delete dashboard",
                 event_name="dashboard.deleted",
@@ -226,17 +226,17 @@ def test_audit_filter(
             AuditLog(
                 timestamp=now - timedelta(seconds=2),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "serviceaccount",
-                    "signoz.audit.resource.id": "sa-001",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "serviceaccount",
+                    "o11y.audit.resource.id": "sa-001",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "sa-001",
-                    "signoz.audit.principal.email": "",
-                    "signoz.audit.principal.type": "service_account",
-                    "signoz.audit.action": "create",
-                    "signoz.audit.action_category": "access_control",
-                    "signoz.audit.outcome": "success",
+                    "o11y.audit.principal.id": "sa-001",
+                    "o11y.audit.principal.email": "",
+                    "o11y.audit.principal.type": "service_account",
+                    "o11y.audit.action": "create",
+                    "o11y.audit.action_category": "access_control",
+                    "o11y.audit.outcome": "success",
                 },
                 body="sa-001 created serviceaccount",
                 event_name="serviceaccount.apikey.created",
@@ -244,17 +244,17 @@ def test_audit_filter(
             AuditLog(
                 timestamp=now - timedelta(seconds=1),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "session",
-                    "signoz.audit.resource.id": "*",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "session",
+                    "o11y.audit.resource.id": "*",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-001",
-                    "signoz.audit.principal.email": "alice@acme.com",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "login",
-                    "signoz.audit.action_category": "access_control",
-                    "signoz.audit.outcome": "success",
+                    "o11y.audit.principal.id": "user-001",
+                    "o11y.audit.principal.email": "alice@acme.com",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "login",
+                    "o11y.audit.action_category": "access_control",
+                    "o11y.audit.outcome": "success",
                 },
                 body="alice@acme.com login session",
                 event_name="session.login",
@@ -265,7 +265,7 @@ def test_audit_filter(
 
     now = datetime.now(tz=UTC)
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((now - timedelta(seconds=30)).timestamp() * 1000),
         end_ms=int(now.timestamp() * 1000),
@@ -291,7 +291,7 @@ def test_audit_filter(
 
 
 def test_audit_scalar_count_failures(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_audit_logs: Callable[[list[AuditLog]], None],
@@ -303,15 +303,15 @@ def test_audit_scalar_count_failures(
             AuditLog(
                 timestamp=now - timedelta(seconds=3),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "dashboard",
-                    "signoz.audit.resource.id": "dash-100",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "dashboard",
+                    "o11y.audit.resource.id": "dash-100",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-050",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "delete",
-                    "signoz.audit.outcome": "failure",
+                    "o11y.audit.principal.id": "user-050",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "delete",
+                    "o11y.audit.outcome": "failure",
                 },
                 body="user-050 failed to delete dashboard",
                 event_name="dashboard.deleted",
@@ -320,15 +320,15 @@ def test_audit_scalar_count_failures(
             AuditLog(
                 timestamp=now - timedelta(seconds=2),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "alert-rule",
-                    "signoz.audit.resource.id": "alert-200",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "alert-rule",
+                    "o11y.audit.resource.id": "alert-200",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-060",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "update",
-                    "signoz.audit.outcome": "failure",
+                    "o11y.audit.principal.id": "user-060",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "update",
+                    "o11y.audit.outcome": "failure",
                 },
                 body="user-060 failed to update alert-rule",
                 event_name="alert-rule.updated",
@@ -337,15 +337,15 @@ def test_audit_scalar_count_failures(
             AuditLog(
                 timestamp=now - timedelta(seconds=1),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "dashboard",
-                    "signoz.audit.resource.id": "dash-100",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "dashboard",
+                    "o11y.audit.resource.id": "dash-100",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-050",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "update",
-                    "signoz.audit.outcome": "success",
+                    "o11y.audit.principal.id": "user-050",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "update",
+                    "o11y.audit.outcome": "success",
                 },
                 body="user-050 updated dashboard",
                 event_name="dashboard.updated",
@@ -356,7 +356,7 @@ def test_audit_scalar_count_failures(
 
     now = datetime.now(tz=UTC)
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((now - timedelta(seconds=30)).timestamp() * 1000),
         end_ms=int(now.timestamp() * 1000),
@@ -366,7 +366,7 @@ def test_audit_scalar_count_failures(
                 signal="logs",
                 source="audit",
                 aggregations=[build_logs_aggregation("count()")],
-                filter_expression="signoz.audit.outcome = 'failure'",
+                filter_expression="o11y.audit.outcome = 'failure'",
             )
         ],
         request_type="scalar",
@@ -381,27 +381,27 @@ def test_audit_scalar_count_failures(
 
 
 def test_audit_does_not_leak_into_logs(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_audit_logs: Callable[[list[AuditLog]], None],
 ) -> None:
-    """A single audit event in signoz_audit must not appear in regular log queries."""
+    """A single audit event in o11y_audit must not appear in regular log queries."""
     now = datetime.now(tz=UTC)
     insert_audit_logs(
         [
             AuditLog(
                 timestamp=now - timedelta(seconds=1),
                 resources={
-                    "service.name": "signoz",
-                    "signoz.audit.resource.kind": "organization",
-                    "signoz.audit.resource.id": "org-999",
+                    "service.name": "o11y",
+                    "o11y.audit.resource.kind": "organization",
+                    "o11y.audit.resource.id": "org-999",
                 },
                 attributes={
-                    "signoz.audit.principal.id": "user-admin",
-                    "signoz.audit.principal.type": "user",
-                    "signoz.audit.action": "update",
-                    "signoz.audit.outcome": "success",
+                    "o11y.audit.principal.id": "user-admin",
+                    "o11y.audit.principal.type": "user",
+                    "o11y.audit.action": "update",
+                    "o11y.audit.outcome": "success",
                 },
                 body="user-admin updated organization (org-999)",
                 event_name="organization.updated",
@@ -412,7 +412,7 @@ def test_audit_does_not_leak_into_logs(
 
     now = datetime.now(tz=UTC)
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((now - timedelta(seconds=30)).timestamp() * 1000),
         end_ms=int(now.timestamp() * 1000),
@@ -430,5 +430,5 @@ def test_audit_does_not_leak_into_logs(
 
     rows = response.json()["data"]["data"]["results"][0].get("rows") or []
 
-    audit_bodies = [row["data"]["body"] for row in rows if "signoz.audit" in row["data"].get("attributes_string", {}).get("signoz.audit.action", "")]
+    audit_bodies = [row["data"]["body"] for row in rows if "o11y.audit" in row["data"].get("attributes_string", {}).get("o11y.audit.action", "")]
     assert len(audit_bodies) == 0

@@ -4221,7 +4221,7 @@ export declare const Typography: {
  * Use these constants to apply complete typography styles in your components
  *
  * Usage in React:
- * import { TypographyStyles } from '@signoz/design-tokens';
+ * import { TypographyStyles } from '@o11y/design-tokens';
  *
  * <p style={TypographyStyles.PARAGRAPH_MEDIUM_400}>Your text here</p>
  */

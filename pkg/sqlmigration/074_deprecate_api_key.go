@@ -239,14 +239,14 @@ func (migration *deprecateAPIKey) Up(ctx context.Context, db *bun.DB) error {
 			CreatedAt:    now,
 			UpdatedAt:    now,
 			Name:         finalName,
-			Email:        fmt.Sprintf("%s@signozserviceaccount.com", finalName),
+			Email:        fmt.Sprintf("%s@o11yserviceaccount.com", finalName),
 			Status:       "active",
 			OrgID:        user.OrgID,
 		})
 
-		managedRoleName, ok := authtypes.ExistingRoleToSigNozManagedRoleMap[types.Role(oldKey.Role)]
+		managedRoleName, ok := authtypes.ExistingRoleToO11yManagedRoleMap[types.Role(oldKey.Role)]
 		if !ok {
-			managedRoleName = authtypes.SigNozViewerRoleName
+			managedRoleName = authtypes.O11yViewerRoleName
 		}
 
 		roleID, ok := roleMap[orgRoleKey{OrgID: user.OrgID, RoleName: managedRoleName}]

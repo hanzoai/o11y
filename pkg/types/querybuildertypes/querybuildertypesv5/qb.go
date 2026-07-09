@@ -3,9 +3,9 @@ package querybuildertypesv5
 import (
 	"context"
 
-	schema "github.com/hanzoai/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
 	"github.com/huandu/go-sqlbuilder"
 )
 

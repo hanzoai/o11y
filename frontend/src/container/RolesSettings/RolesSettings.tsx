@@ -23,7 +23,7 @@ function RolesSettings(): JSX.Element {
 				<p className="roles-settings-header-description">
 					Create and manage custom roles for your team.{' '}
 					<a
-						href="https://signoz.io/docs/manage/administrator-guide/iam/roles/"
+						href="https://o11y.io/docs/manage/administrator-guide/iam/roles/"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="roles-settings-header-learn-more"

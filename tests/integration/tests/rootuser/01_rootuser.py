@@ -9,7 +9,7 @@ from fixtures.logger import setup_logger
 logger = setup_logger(__name__)
 
 
-def test_root_user_created(signoz: types.SigNoz) -> None:
+def test_root_user_created(o11y: types.O11y) -> None:
     """
     The root user service reconciles asynchronously after startup.
 
@@ -20,7 +20,7 @@ def test_root_user_created(signoz: types.SigNoz) -> None:
     # Phase 1: wait for setupCompleted
     for attempt in range(15):
         response = requests.get(
-            signoz.self.host_configs["8080"].get("/api/v1/version"),
+            o11y.self.host_configs["8080"].get("/api/v1/version"),
             timeout=2,
         )
         assert response.status_code == HTTPStatus.OK
@@ -37,7 +37,7 @@ def test_root_user_created(signoz: types.SigNoz) -> None:
     # Phase 2: wait for root user to be fully resolved
     for attempt in range(15):
         response = requests.get(
-            signoz.self.host_configs["8080"].get("/api/v2/users"),
+            o11y.self.host_configs["8080"].get("/api/v2/users"),
             timeout=2,
         )
         if response.status_code == HTTPStatus.OK:

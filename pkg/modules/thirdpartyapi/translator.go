@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	derivedKeyHTTPURL  = "http_url" // https://signoz.io/docs/traces-management/guides/derived-fields-spans/#http_url
+	derivedKeyHTTPURL  = "http_url" // https://o11y.io/docs/traces-management/guides/derived-fields-spans/#http_url
 	derivedKeyHTTPHost = "http_host"
 )
 

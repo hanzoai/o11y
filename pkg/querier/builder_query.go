@@ -255,7 +255,7 @@ func (q *builderQuery[T]) Execute(ctx context.Context) (*qbtypes.Result, error) 
 }
 
 // narrowWindowByTraceID inspects the filter for trace_id predicates and clamps
-// [fromMS,toMS] to the time range stored in signoz_traces.distributed_trace_summary.
+// [fromMS,toMS] to the time range stored in o11y_traces.distributed_trace_summary.
 // Returns the (possibly narrowed) window, overlap=false when the trace lies
 // completely outside the query window (callers should short-circuit), and a
 // warning string the caller should attach to the empty result when the trace

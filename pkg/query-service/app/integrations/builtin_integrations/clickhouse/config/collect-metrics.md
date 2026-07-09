@@ -29,13 +29,13 @@ processors:
       hostname_sources: ["os"]
 
 exporters:
-  # export to SigNoz cloud
+  # export to O11y cloud
   otlp/clickhouse:
     endpoint: "${env:OTLP_DESTINATION_ENDPOINT}"
     tls:
       insecure: false
     headers:
-      "signoz-access-token": "${env:SIGNOZ_INGESTION_KEY}"
+      "o11y-access-token": "${env:O11Y_INGESTION_KEY}"
 
   # export to local collector
   # otlp/clickhouse:
@@ -65,11 +65,11 @@ export CLICKHOUSE_PROM_METRICS_ENDPOINT="clickhouse:9363"
 # You can examine clickhouse server configuration to find it. For details see https://clickhouse.com/docs/en/operations/server-configuration-parameters/settings#prometheus
 export CLICKHOUSE_PROM_METRICS_PATH="/metrics"
 
-# region specific SigNoz cloud ingestion endpoint
-export OTLP_DESTINATION_ENDPOINT="ingest.us.signoz.cloud:443"
+# region specific O11y cloud ingestion endpoint
+export OTLP_DESTINATION_ENDPOINT="ingest.us.o11y.cloud:443"
 
-# your SigNoz ingestion key
-export SIGNOZ_INGESTION_KEY="signoz-ingestion-key"
+# your O11y ingestion key
+export O11Y_INGESTION_KEY="o11y-ingestion-key"
 
 ```
 

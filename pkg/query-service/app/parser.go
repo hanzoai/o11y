@@ -15,7 +15,7 @@ import (
 	"text/template"
 	"time"
 
-	signozerrors "github.com/hanzoai/o11y/pkg/errors"
+	o11yerrors "github.com/hanzoai/o11y/pkg/errors"
 
 	"github.com/hanzoai/o11y/pkg/types/thirdpartyapitypes"
 
@@ -747,7 +747,7 @@ func chTransformQuery(query string, variables map[string]interface{}) {
 	transformer := chVariables.NewQueryTransformer(query, varsForTransform)
 	transformedQuery, err := transformer.Transform()
 	if err != nil {
-		slog.Warn("failed to transform clickhouse query", "query", query, signozerrors.Attr(err))
+		slog.Warn("failed to transform clickhouse query", "query", query, o11yerrors.Attr(err))
 	}
 	slog.Info("transformed clickhouse query", "transformed_query", transformedQuery, "original_query", query)
 }

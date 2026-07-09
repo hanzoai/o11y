@@ -4,7 +4,7 @@ import BrandMark from 'components/BrandMark';
 import { useGetPublicDashboardData } from 'hooks/dashboard/useGetPublicDashboardData';
 import { Frown } from 'components/ui/icons';
 
-import signozBrandLogoUrl from '@/assets/Logos/signoz-brand-logo.svg';
+import o11yBrandLogoUrl from '@/assets/Logos/o11y-brand-logo.svg';
 
 import PublicDashboardContainer from '../../container/PublicDashboardContainer';
 

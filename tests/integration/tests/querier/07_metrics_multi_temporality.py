@@ -33,7 +33,7 @@ MULTI_TEMPORALITY_FILE_24h = get_testdata_file_path("multi_temporality_counters_
     ],
 )
 def test_with_steady_values_and_reset(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -63,7 +63,7 @@ def test_with_steady_values_and_reset(
         filter_expression='endpoint = "/orders"',
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -89,7 +89,7 @@ def test_with_steady_values_and_reset(
     ],
 )
 def test_group_by_endpoint(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -122,7 +122,7 @@ def test_group_by_endpoint(
         group_by=["endpoint"],
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -216,7 +216,7 @@ def test_group_by_endpoint(
     ],
 )
 def test_for_service_with_switch(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -246,7 +246,7 @@ def test_for_service_with_switch(
         filter_expression='service = "api"',
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -271,7 +271,7 @@ def test_for_service_with_switch(
     ],
 )
 def test_for_week_long_time_range(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -298,7 +298,7 @@ def test_for_week_long_time_range(
         "sum",
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     result_values = sorted(get_series_values(data, "A"), key=lambda x: x["timestamp"])
@@ -315,7 +315,7 @@ def test_for_week_long_time_range(
     ],
 )
 def test_for_month_long_time_range(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -342,7 +342,7 @@ def test_for_month_long_time_range(
         "sum",
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     result_values = sorted(get_series_values(data, "A"), key=lambda x: x["timestamp"])

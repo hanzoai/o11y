@@ -6,7 +6,7 @@
 # dashboard SPA at the edge, and the ingress routes o11y.hanzo.ai here while
 # /api/* goes to the backend (universe infra/k8s/o11y/ingress.yaml).
 #
-# CONTENT: built FROM SOURCE (frontend/) now that the @signozhq -> @hanzo/ui
+# CONTENT: built FROM SOURCE (frontend/) now that the @o11yhq -> @hanzo/ui
 # migration is complete, tsgo --noEmit is clean, and `pnpm build` is green. The
 # production build resolves the [[.BaseHref]]/[[.Settings]] Go-template placeholders
 # at build time (vite.config.ts) so index.html is placeholder-free; assets are

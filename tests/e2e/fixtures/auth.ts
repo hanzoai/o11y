@@ -10,8 +10,8 @@ export type User = { email: string; password: string };
 
 // Default user — admin from the pytest bootstrap (.env.local) or staging .env.
 export const ADMIN: User = {
-	email: process.env.SIGNOZ_E2E_USERNAME!,
-	password: process.env.SIGNOZ_E2E_PASSWORD!,
+	email: process.env.O11Y_E2E_USERNAME!,
+	password: process.env.O11Y_E2E_PASSWORD!,
 };
 
 // Per-worker storageState cache. One login per unique user per worker.
@@ -42,7 +42,7 @@ async function storageFor(browser: Browser, user: User): Promise<StorageState> {
 async function login(page: Page, user: User): Promise<void> {
 	if (!user.email || !user.password) {
 		throw new Error(
-			'User credentials missing. Set SIGNOZ_E2E_USERNAME / SIGNOZ_E2E_PASSWORD ' +
+			'User credentials missing. Set O11Y_E2E_USERNAME / O11Y_E2E_PASSWORD ' +
 				'(pytest bootstrap writes them to .env.local), or pass a User via test.use({ user: ... }).',
 		);
 	}

@@ -35,7 +35,7 @@ const (
 // if something doesn't exists then remove it.
 func updateProcessorConfigsInCollectorConf(
 	collectorConf map[string]interface{},
-	signozPipelineProcessors map[string]interface{},
+	o11yPipelineProcessors map[string]interface{},
 ) error {
 	agentProcessors := map[string]interface{}{}
 	if collectorConf["processors"] != nil {
@@ -43,14 +43,14 @@ func updateProcessorConfigsInCollectorConf(
 	}
 
 	exists := map[string]struct{}{}
-	for key, params := range signozPipelineProcessors {
+	for key, params := range o11yPipelineProcessors {
 		agentProcessors[key] = params
 		exists[key] = struct{}{}
 	}
 	// remove the old unwanted pipeline processors
 	for k := range agentProcessors {
 		_, isInDesiredPipelineProcs := exists[k]
-		if hasSignozPipelineProcessorPrefix(k) && !isInDesiredPipelineProcs {
+		if hasO11yPipelineProcessorPrefix(k) && !isInDesiredPipelineProcs {
 			delete(agentProcessors, k)
 		}
 	}
@@ -87,19 +87,19 @@ func getOtelPipelineFromConfig(config map[string]interface{}) (*otelPipeline, er
 // required order:
 //
 //  1. memory_limiter processors (any processor named "memory_limiter" or "memory_limiter/<id>")
-//  2. signoz user-pipeline processors (in the order given by signozPipelineProcessorNames)
-//  3. custom processors (non-signoz, non-memory_limiter, non-batch processors from the current config)
+//  2. o11y user-pipeline processors (in the order given by o11yPipelineProcessorNames)
+//  3. custom processors (non-o11y, non-memory_limiter, non-batch processors from the current config)
 //  4. batch processors (any processor named "batch" or "batch/<id>") and anything after them
 func buildCollectorPipelineProcessorsList(
 	currentCollectorProcessors []string,
-	signozPipelineProcessorNames []string,
+	o11yPipelineProcessorNames []string,
 ) ([]string, error) {
 	lockLogsPipelineSpec.Lock()
 	defer lockLogsPipelineSpec.Unlock()
 
 	// Build a set of user pipeline names so custom processors can skip duplicates.
-	userPipelineSet := make(map[string]struct{}, len(signozPipelineProcessorNames))
-	for _, p := range signozPipelineProcessorNames {
+	userPipelineSet := make(map[string]struct{}, len(o11yPipelineProcessorNames))
+	for _, p := range o11yPipelineProcessorNames {
 		userPipelineSet[p] = struct{}{}
 	}
 
@@ -113,8 +113,8 @@ func buildCollectorPipelineProcessorsList(
 			batchIdx = idx
 		case p == memoryLimiterProcessor || strings.HasPrefix(p, memoryLimiterProcessorPrefix):
 			memoryLimiters = append(memoryLimiters, p)
-		case hasSignozPipelineProcessorPrefix(p):
-			// stale signoz pipeline processor — dropped; signozPipelineProcessorNames is authoritative
+		case hasO11yPipelineProcessorPrefix(p):
+			// stale o11y pipeline processor — dropped; o11yPipelineProcessorNames is authoritative
 		default:
 			if _, inUserPipelines := userPipelineSet[p]; !inUserPipelines {
 				customProcessors = append(customProcessors, p)
@@ -125,9 +125,9 @@ func buildCollectorPipelineProcessorsList(
 		}
 	}
 
-	result := make([]string, 0, len(currentCollectorProcessors)+len(signozPipelineProcessorNames))
+	result := make([]string, 0, len(currentCollectorProcessors)+len(o11yPipelineProcessorNames))
 	result = append(result, memoryLimiters...)
-	result = append(result, signozPipelineProcessorNames...)
+	result = append(result, o11yPipelineProcessorNames...)
 	result = append(result, customProcessors...)
 	if batchIdx >= 0 {
 		result = append(result, currentCollectorProcessors[batchIdx:]...)
@@ -142,15 +142,15 @@ func GenerateCollectorConfigWithPipelines(config []byte, pipelines []pipelinetyp
 		return nil, errors.WrapInvalidInputf(err, CodeCollectorConfigUnmarshalFailed, "could not unmarshal collector config")
 	}
 
-	signozPipelineProcessors, signozPipelineProcNames, err := PreparePipelineProcessor(pipelines)
+	o11yPipelineProcessors, o11yPipelineProcNames, err := PreparePipelineProcessor(pipelines)
 	if err != nil {
 		return nil, err
 	}
 
 	// Escape any `$`s as `$$$` in config generated for pipelines, to ensure any occurrences
 	// like $data do not end up being treated as env vars when loading collector config.
-	for _, procName := range signozPipelineProcNames {
-		procConf := signozPipelineProcessors[procName]
+	for _, procName := range o11yPipelineProcNames {
+		procConf := o11yPipelineProcessors[procName]
 		serializedProcConf, err := yaml.Marshal(procConf)
 		if err != nil {
 			return nil, errors.WrapInternalf(err, CodeCollectorConfigMarshalFailed, "could not marshal processor config for %s", procName)
@@ -165,11 +165,11 @@ func GenerateCollectorConfigWithPipelines(config []byte, pipelines []pipelinetyp
 			return nil, errors.WrapInternalf(err, CodeCollectorConfigUnmarshalFailed, "could not unmarshal dollar escaped processor config for %s", procName)
 		}
 
-		signozPipelineProcessors[procName] = escapedConf
+		o11yPipelineProcessors[procName] = escapedConf
 	}
 
 	// Add processors to unmarshaled collector config `c`
-	updateProcessorConfigsInCollectorConf(collectorConf, signozPipelineProcessors)
+	updateProcessorConfigsInCollectorConf(collectorConf, o11yPipelineProcessors)
 
 	// build the new processor list in service.pipelines.logs
 	p, err := getOtelPipelineFromConfig(collectorConf)
@@ -180,7 +180,7 @@ func GenerateCollectorConfigWithPipelines(config []byte, pipelines []pipelinetyp
 		return nil, errors.NewInternalf(CodeCollectorConfigLogsPipelineNotFound, "logs pipeline doesn't exist")
 	}
 
-	updatedProcessorList, _ := buildCollectorPipelineProcessorsList(p.Pipelines.Logs.Processors, signozPipelineProcNames)
+	updatedProcessorList, _ := buildCollectorPipelineProcessorsList(p.Pipelines.Logs.Processors, o11yPipelineProcNames)
 	p.Pipelines.Logs.Processors = updatedProcessorList
 
 	// add the new processor to the data ( no checks required as the keys will exists)
@@ -194,6 +194,6 @@ func GenerateCollectorConfigWithPipelines(config []byte, pipelines []pipelinetyp
 	return updatedConf, nil
 }
 
-func hasSignozPipelineProcessorPrefix(procName string) bool {
+func hasO11yPipelineProcessorPrefix(procName string) bool {
 	return strings.HasPrefix(procName, constants.LogsPPLPfx) || strings.HasPrefix(procName, constants.OldLogsPPLPfx)
 }

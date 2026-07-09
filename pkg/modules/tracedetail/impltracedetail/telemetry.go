@@ -25,7 +25,7 @@ func newModuleMetrics(meter metric.Meter) (*moduleMetrics, error) {
 	var errs error
 
 	spanLimit, err := meter.Int64Gauge(
-		"signoz.traces.waterfall.span.limit",
+		"o11y.traces.waterfall.span.limit",
 		metric.WithDescription("The span count limit above which windowed waterfall is returned instead of the full waterfall."),
 		metric.WithUnit("{span}"),
 	)
@@ -34,7 +34,7 @@ func newModuleMetrics(meter metric.Meter) (*moduleMetrics, error) {
 	}
 
 	requestCount, err := meter.Int64Counter(
-		"signoz.traces.waterfall.request.count",
+		"o11y.traces.waterfall.request.count",
 		metric.WithDescription("Total number of waterfall requests, by response_type."),
 		metric.WithUnit("{request}"),
 	)
@@ -43,7 +43,7 @@ func newModuleMetrics(meter metric.Meter) (*moduleMetrics, error) {
 	}
 
 	spanCount, err := meter.Int64Counter(
-		"signoz.traces.waterfall.span.count",
+		"o11y.traces.waterfall.span.count",
 		metric.WithDescription("Total number of spans across waterfall requests, by response_type."),
 		metric.WithUnit("{span}"),
 	)
@@ -52,7 +52,7 @@ func newModuleMetrics(meter metric.Meter) (*moduleMetrics, error) {
 	}
 
 	flamegraphSpanLimit, err := meter.Int64Gauge(
-		"signoz.traces.flamegraph.span.limit",
+		"o11y.traces.flamegraph.span.limit",
 		metric.WithDescription("The span count limit above which sampled flamegraph is returned instead of the full flamegraph."),
 		metric.WithUnit("{span}"),
 	)
@@ -61,7 +61,7 @@ func newModuleMetrics(meter metric.Meter) (*moduleMetrics, error) {
 	}
 
 	flamegraphRequestCount, err := meter.Int64Counter(
-		"signoz.traces.flamegraph.request.count",
+		"o11y.traces.flamegraph.request.count",
 		metric.WithDescription("Total number of flamegraph requests, by response_type."),
 		metric.WithUnit("{request}"),
 	)

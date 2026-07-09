@@ -1,7 +1,7 @@
 import BrandMark from 'components/BrandMark';
 import history from 'lib/history';
 
-import signozBrandLogoUrl from '@/assets/Logos/signoz-brand-logo.svg';
+import o11yBrandLogoUrl from '@/assets/Logos/o11y-brand-logo.svg';
 
 import './FullScreenHeader.styles.scss';
 

@@ -29,7 +29,7 @@ func TestMountWithoutHandlerReturns503(t *testing.T) {
 
 // TestMountNormalizesExternalPath proves the one public contract /v1/o11y/<resource>
 // (one /v1/, no nested version, no /api/) is normalized at the mount seam onto o11y's
-// internal /api/ namespace — where a version-less alias (SigNoz, highest-version) or an
+// internal /api/ namespace — where a version-less alias (O11y, highest-version) or an
 // llmobs route answers.
 func TestMountNormalizesExternalPath(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
@@ -56,7 +56,7 @@ func TestMountNormalizesExternalPath(t *testing.T) {
 		{"llmobs score by id", "/v1/o11y/score/abc123", "/api/score/abc123"},
 		// Explicit-version form still resolves to its exact version route.
 		{"explicit version", "/v1/o11y/v3/query_range", "/api/v3/query_range"},
-		// Leaked /api/ form kept working for the not-yet-migrated SigNoz SPA.
+		// Leaked /api/ form kept working for the not-yet-migrated O11y SPA.
 		{"legacy api alias", "/v1/o11y/api/v1/health", "/api/v1/health"},
 	}
 	for _, tc := range cases {

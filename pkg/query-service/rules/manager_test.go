@@ -79,7 +79,7 @@ func TestManager_TestNotification_SendUnmatched_ThresholdRule(t *testing.T) {
 
 					mock := mockStore.Mock()
 					// Mock metadata queries for FetchTemporalityAndTypeMulti
-					// First query: fetchMetricsTemporalityAndType (from signoz_metrics time series table)
+					// First query: fetchMetricsTemporalityAndType (from o11y_metrics time series table)
 					metadataCols := []cmock.ColumnType{
 						{Name: "metric_name", Type: "String"},
 						{Name: "temporality", Type: "String"},
@@ -90,7 +90,7 @@ func TestManager_TestNotification_SendUnmatched_ThresholdRule(t *testing.T) {
 						{"probe_success", metrictypes.Unspecified, metrictypes.GaugeType, false},
 					})
 					mock.ExpectQuery("*distributed_time_series_v4*").WithArgs(nil, nil, nil).WillReturnRows(metadataRows)
-					// Second query: fetchMeterSourceMetricsTemporalityAndType (from signoz_meter table)
+					// Second query: fetchMeterSourceMetricsTemporalityAndType (from o11y_meter table)
 					emptyMetadataRows := cmock.NewRows(metadataCols, [][]any{})
 					mock.ExpectQuery("*meter*").WithArgs(nil).WillReturnRows(emptyMetadataRows)
 

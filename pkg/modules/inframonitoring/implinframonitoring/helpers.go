@@ -467,7 +467,7 @@ func (m *module) getEarliestMetricTime(ctx context.Context, metricNames []string
 }
 
 // getMetricsExistence returns, for each requested metric name, whether it has ever
-// been reported (present in signoz_metrics.distributed_metadata). No time window.
+// been reported (present in o11y_metrics.distributed_metadata). No time window.
 func (m *module) getMetricsExistence(ctx context.Context, metricNames []string) (map[string]bool, error) {
 	present := make(map[string]bool, len(metricNames))
 	for _, n := range metricNames {

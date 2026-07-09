@@ -40,29 +40,29 @@ ROLE_FGA_CUSTOM_USER_PASSWORD = "password123Z$"
 
 
 def test_apply_license(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list[Mapping]], None],
     get_token: Callable[[str, str], str],
 ) -> None:
-    add_license(signoz, make_http_mocks, get_token)
+    add_license(o11y, make_http_mocks, get_token)
 
 
 # ---------------------------------------------------------------------------
-# 2. Reject role names starting with "signoz-"
+# 2. Reject role names starting with "o11y-"
 # ---------------------------------------------------------------------------
 
 
-def test_create_role_with_signoz_prefix_rejected(
-    signoz: types.SigNoz,
+def test_create_role_with_o11y_prefix_rejected(
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
-    for name in ("signoz-custom", "signozcustom"):
+    for name in ("o11y-custom", "o11ycustom"):
         resp = requests.post(
-            signoz.self.host_configs["8080"].get(ROLES_BASE),
+            o11y.self.host_configs["8080"].get(ROLES_BASE),
             json={"name": name},
             headers={"Authorization": f"Bearer {admin_token}"},
             timeout=5,
@@ -76,18 +76,18 @@ def test_create_role_with_signoz_prefix_rejected(
 
 
 def test_create_custom_role_for_role_fga(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     # Create the custom role.
-    role_id = create_custom_role(signoz, admin_token, ROLE_FGA_CUSTOM_ROLE_NAME)
+    role_id = create_custom_role(o11y, admin_token, ROLE_FGA_CUSTOM_ROLE_NAME)
 
     # Grant read on role instances.
     patch_role_objects(
-        signoz,
+        o11y,
         admin_token,
         role_id,
         "read",
@@ -98,7 +98,7 @@ def test_create_custom_role_for_role_fga(
 
     # Grant list on role collection.
     patch_role_objects(
-        signoz,
+        o11y,
         admin_token,
         role_id,
         "list",
@@ -109,14 +109,14 @@ def test_create_custom_role_for_role_fga(
 
     # Create the custom-role user: invite as VIEWER, activate, change role.
     user_id = create_active_user(
-        signoz,
+        o11y,
         admin_token,
         email=ROLE_FGA_CUSTOM_USER_EMAIL,
         role="VIEWER",
         password=ROLE_FGA_CUSTOM_USER_PASSWORD,
         name="role-fga-test-user",
     )
-    change_user_role(signoz, admin_token, user_id, "signoz-viewer", ROLE_FGA_CUSTOM_ROLE_NAME)
+    change_user_role(o11y, admin_token, user_id, "o11y-viewer", ROLE_FGA_CUSTOM_ROLE_NAME)
 
 
 # ---------------------------------------------------------------------------
@@ -125,17 +125,17 @@ def test_create_custom_role_for_role_fga(
 
 
 def test_role_readonly_allowed_operations(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     token = get_token(ROLE_FGA_CUSTOM_USER_EMAIL, ROLE_FGA_CUSTOM_USER_PASSWORD)
-    target_role_id = find_role_by_name(signoz, admin_token, "signoz-viewer")
+    target_role_id = find_role_by_name(o11y, admin_token, "o11y-viewer")
 
     # List roles.
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(ROLES_BASE),
+        o11y.self.host_configs["8080"].get(ROLES_BASE),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -143,7 +143,7 @@ def test_role_readonly_allowed_operations(
 
     # Get role.
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(f"{ROLES_BASE}/{target_role_id}"),
+        o11y.self.host_configs["8080"].get(f"{ROLES_BASE}/{target_role_id}"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -151,7 +151,7 @@ def test_role_readonly_allowed_operations(
 
     # Get objects for role.
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(f"{ROLES_BASE}/{target_role_id}/relations/read/objects"),
+        o11y.self.host_configs["8080"].get(f"{ROLES_BASE}/{target_role_id}/relations/read/objects"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -164,17 +164,17 @@ def test_role_readonly_allowed_operations(
 
 
 def test_role_readonly_forbidden_operations(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     token = get_token(ROLE_FGA_CUSTOM_USER_EMAIL, ROLE_FGA_CUSTOM_USER_PASSWORD)
-    target_role_id = find_role_by_name(signoz, admin_token, "signoz-viewer")
+    target_role_id = find_role_by_name(o11y, admin_token, "o11y-viewer")
 
     # Create role — forbidden.
     resp = requests.post(
-        signoz.self.host_configs["8080"].get(ROLES_BASE),
+        o11y.self.host_configs["8080"].get(ROLES_BASE),
         json={"name": "role-fga-should-fail"},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -183,7 +183,7 @@ def test_role_readonly_forbidden_operations(
 
     # Patch role — forbidden.
     resp = requests.patch(
-        signoz.self.host_configs["8080"].get(f"{ROLES_BASE}/{target_role_id}"),
+        o11y.self.host_configs["8080"].get(f"{ROLES_BASE}/{target_role_id}"),
         json={"description": "role-fga-renamed"},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -192,7 +192,7 @@ def test_role_readonly_forbidden_operations(
 
     # Patch objects — forbidden.
     resp = requests.patch(
-        signoz.self.host_configs["8080"].get(f"{ROLES_BASE}/{target_role_id}/relations/read/objects"),
+        o11y.self.host_configs["8080"].get(f"{ROLES_BASE}/{target_role_id}/relations/read/objects"),
         json={"additions": [object_group("metaresource", "dashboard", ["*"])]},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -201,9 +201,9 @@ def test_role_readonly_forbidden_operations(
 
     # Delete role — forbidden (cannot delete managed role, but auth check comes first).
     # Use the custom role itself as target (non-managed, but user lacks delete permission).
-    custom_role_id = find_role_by_name(signoz, admin_token, ROLE_FGA_CUSTOM_ROLE_NAME)
+    custom_role_id = find_role_by_name(o11y, admin_token, ROLE_FGA_CUSTOM_ROLE_NAME)
     resp = requests.delete(
-        signoz.self.host_configs["8080"].get(f"{ROLES_BASE}/{custom_role_id}"),
+        o11y.self.host_configs["8080"].get(f"{ROLES_BASE}/{custom_role_id}"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -216,17 +216,17 @@ def test_role_readonly_forbidden_operations(
 
 
 def test_role_grant_write_permissions(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
-    role_id = find_role_by_name(signoz, admin_token, ROLE_FGA_CUSTOM_ROLE_NAME)
+    role_id = find_role_by_name(o11y, admin_token, ROLE_FGA_CUSTOM_ROLE_NAME)
 
     # Grant create, update, delete on roles.
     for verb in ("create", "update", "delete"):
         patch_role_objects(
-            signoz,
+            o11y,
             admin_token,
             role_id,
             verb,
@@ -237,7 +237,7 @@ def test_role_grant_write_permissions(
 
     # Create role — now allowed.
     resp = requests.post(
-        signoz.self.host_configs["8080"].get(ROLES_BASE),
+        o11y.self.host_configs["8080"].get(ROLES_BASE),
         json={"name": "role-fga-write-test"},
         headers={"Authorization": f"Bearer {custom_token}"},
         timeout=5,
@@ -247,7 +247,7 @@ def test_role_grant_write_permissions(
 
     # Patch role — now allowed.
     resp = requests.patch(
-        signoz.self.host_configs["8080"].get(f"{ROLES_BASE}/{new_role_id}"),
+        o11y.self.host_configs["8080"].get(f"{ROLES_BASE}/{new_role_id}"),
         json={"description": "role-fga-write-renamed"},
         headers={"Authorization": f"Bearer {custom_token}"},
         timeout=5,
@@ -256,7 +256,7 @@ def test_role_grant_write_permissions(
 
     # Delete role — now allowed.
     resp = requests.delete(
-        signoz.self.host_configs["8080"].get(f"{ROLES_BASE}/{new_role_id}"),
+        o11y.self.host_configs["8080"].get(f"{ROLES_BASE}/{new_role_id}"),
         headers={"Authorization": f"Bearer {custom_token}"},
         timeout=5,
     )
@@ -269,17 +269,17 @@ def test_role_grant_write_permissions(
 
 
 def test_role_revoke_read_permissions(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
-    role_id = find_role_by_name(signoz, admin_token, ROLE_FGA_CUSTOM_ROLE_NAME)
-    target_role_id = find_role_by_name(signoz, admin_token, "signoz-viewer")
+    role_id = find_role_by_name(o11y, admin_token, ROLE_FGA_CUSTOM_ROLE_NAME)
+    target_role_id = find_role_by_name(o11y, admin_token, "o11y-viewer")
 
     # Revoke read.
     patch_role_objects(
-        signoz,
+        o11y,
         admin_token,
         role_id,
         "read",
@@ -288,7 +288,7 @@ def test_role_revoke_read_permissions(
 
     # Revoke list.
     patch_role_objects(
-        signoz,
+        o11y,
         admin_token,
         role_id,
         "list",
@@ -299,7 +299,7 @@ def test_role_revoke_read_permissions(
 
     # List roles — forbidden.
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(ROLES_BASE),
+        o11y.self.host_configs["8080"].get(ROLES_BASE),
         headers={"Authorization": f"Bearer {custom_token}"},
         timeout=5,
     )
@@ -307,7 +307,7 @@ def test_role_revoke_read_permissions(
 
     # Get role — forbidden.
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(f"{ROLES_BASE}/{target_role_id}"),
+        o11y.self.host_configs["8080"].get(f"{ROLES_BASE}/{target_role_id}"),
         headers={"Authorization": f"Bearer {custom_token}"},
         timeout=5,
     )
@@ -320,17 +320,17 @@ def test_role_revoke_read_permissions(
 
 
 def test_role_fga_cleanup(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
-    role_id = find_role_by_name(signoz, admin_token, ROLE_FGA_CUSTOM_ROLE_NAME)
-    user = find_user_by_email(signoz, admin_token, ROLE_FGA_CUSTOM_USER_EMAIL)
+    role_id = find_role_by_name(o11y, admin_token, ROLE_FGA_CUSTOM_ROLE_NAME)
+    user = find_user_by_email(o11y, admin_token, ROLE_FGA_CUSTOM_USER_EMAIL)
 
     # Remove the custom role from the user first.
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v2/users/{user['id']}/roles"),
+        o11y.self.host_configs["8080"].get(f"/api/v2/users/{user['id']}/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
     )
@@ -339,10 +339,10 @@ def test_role_fga_cleanup(
     custom_entry = next((r for r in roles if r["name"] == ROLE_FGA_CUSTOM_ROLE_NAME), None)
     if custom_entry is not None:
         resp = requests.delete(
-            signoz.self.host_configs["8080"].get(f"/api/v2/users/{user['id']}/roles/{custom_entry['id']}"),
+            o11y.self.host_configs["8080"].get(f"/api/v2/users/{user['id']}/roles/{custom_entry['id']}"),
             headers={"Authorization": f"Bearer {admin_token}"},
             timeout=5,
         )
         assert resp.status_code == HTTPStatus.NO_CONTENT, f"remove role from user: {resp.text}"
 
-    delete_custom_role(signoz, admin_token, role_id)
+    delete_custom_role(o11y, admin_token, role_id)

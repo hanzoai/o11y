@@ -28,7 +28,7 @@ var (
 
 var (
 	roleNameRegex     = regexp.MustCompile("^[a-z-]{1,50}$")
-	managedRolePrefix = "signoz"
+	managedRolePrefix = "o11y"
 )
 
 var (
@@ -37,27 +37,27 @@ var (
 )
 
 var (
-	SigNozAnonymousRoleName        = coretypes.SigNozAnonymousRoleName
-	SigNozAnonymousRoleDescription = "Role assigned to anonymous users for access to public resources."
-	SigNozAdminRoleName            = coretypes.SigNozAdminRoleName
-	SigNozAdminRoleDescription     = "Role assigned to users who have full administrative access to SigNoz resources."
-	SigNozEditorRoleName           = coretypes.SigNozEditorRoleName
-	SigNozEditorRoleDescription    = "Role assigned to users who can create, edit, and manage SigNoz resources but do not have full administrative privileges."
-	SigNozViewerRoleName           = coretypes.SigNozViewerRoleName
-	SigNozViewerRoleDescription    = "Role assigned to users who have read-only access to SigNoz resources."
+	O11yAnonymousRoleName        = coretypes.O11yAnonymousRoleName
+	O11yAnonymousRoleDescription = "Role assigned to anonymous users for access to public resources."
+	O11yAdminRoleName            = coretypes.O11yAdminRoleName
+	O11yAdminRoleDescription     = "Role assigned to users who have full administrative access to O11y resources."
+	O11yEditorRoleName           = coretypes.O11yEditorRoleName
+	O11yEditorRoleDescription    = "Role assigned to users who can create, edit, and manage O11y resources but do not have full administrative privileges."
+	O11yViewerRoleName           = coretypes.O11yViewerRoleName
+	O11yViewerRoleDescription    = "Role assigned to users who have read-only access to O11y resources."
 )
 
 var (
-	ExistingRoleToSigNozManagedRoleMap = map[types.Role]string{
-		types.RoleAdmin:  SigNozAdminRoleName,
-		types.RoleEditor: SigNozEditorRoleName,
-		types.RoleViewer: SigNozViewerRoleName,
+	ExistingRoleToO11yManagedRoleMap = map[types.Role]string{
+		types.RoleAdmin:  O11yAdminRoleName,
+		types.RoleEditor: O11yEditorRoleName,
+		types.RoleViewer: O11yViewerRoleName,
 	}
 
-	SigNozManagedRoleToExistingLegacyRole = map[string]types.Role{
-		SigNozAdminRoleName:  types.RoleAdmin,
-		SigNozEditorRoleName: types.RoleEditor,
-		SigNozViewerRoleName: types.RoleViewer,
+	O11yManagedRoleToExistingLegacyRole = map[string]types.Role{
+		O11yAdminRoleName:  types.RoleAdmin,
+		O11yEditorRoleName: types.RoleEditor,
+		O11yViewerRoleName: types.RoleViewer,
 	}
 )
 
@@ -122,10 +122,10 @@ func MakeRoleWithTransactionGroups(role *Role, transactionGroups TransactionGrou
 
 func NewManagedRoles(orgID valuer.UUID) []*Role {
 	return []*Role{
-		NewRole(SigNozAdminRoleName, SigNozAdminRoleDescription, RoleTypeManaged, orgID),
-		NewRole(SigNozEditorRoleName, SigNozEditorRoleDescription, RoleTypeManaged, orgID),
-		NewRole(SigNozViewerRoleName, SigNozViewerRoleDescription, RoleTypeManaged, orgID),
-		NewRole(SigNozAnonymousRoleName, SigNozAnonymousRoleDescription, RoleTypeManaged, orgID),
+		NewRole(O11yAdminRoleName, O11yAdminRoleDescription, RoleTypeManaged, orgID),
+		NewRole(O11yEditorRoleName, O11yEditorRoleDescription, RoleTypeManaged, orgID),
+		NewRole(O11yViewerRoleName, O11yViewerRoleDescription, RoleTypeManaged, orgID),
+		NewRole(O11yAnonymousRoleName, O11yAnonymousRoleDescription, RoleTypeManaged, orgID),
 	}
 
 }
@@ -184,7 +184,7 @@ func (role *PostableRole) UnmarshalJSON(data []byte) error {
 	}
 
 	if strings.HasPrefix(shadow.Name, managedRolePrefix) {
-		return errors.Newf(errors.TypeInvalidInput, ErrCodeRoleInvalidInput, "role name cannot start with %q as it is reserved for SigNoz managed roles.", managedRolePrefix)
+		return errors.Newf(errors.TypeInvalidInput, ErrCodeRoleInvalidInput, "role name cannot start with %q as it is reserved for O11y managed roles.", managedRolePrefix)
 	}
 
 	var transactionGroups TransactionGroups
@@ -230,8 +230,8 @@ func (role *UpdatableRole) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func MustGetSigNozManagedRoleFromExistingRole(role types.Role) string {
-	managedRole, ok := ExistingRoleToSigNozManagedRoleMap[role]
+func MustGetO11yManagedRoleFromExistingRole(role types.Role) string {
+	managedRole, ok := ExistingRoleToO11yManagedRoleMap[role]
 	if !ok {
 		panic(errors.Newf(errors.TypeInternal, errors.CodeInternal, "invalid role: %s", role.String()))
 	}
@@ -245,7 +245,7 @@ func NormalizeRoleName(role string) string {
 		return role
 	}
 
-	managedRole, ok := ExistingRoleToSigNozManagedRoleMap[legacyRole]
+	managedRole, ok := ExistingRoleToO11yManagedRoleMap[legacyRole]
 	if !ok {
 		return role
 	}

@@ -9,7 +9,7 @@ import type {
 	ErrorResponseDTO,
 	MessageActionDTO,
 	MessageSummaryDTOBlocksAnyOfItem,
-} from 'api/ai-assistant/sigNozAIAssistantAPI.schemas';
+} from 'api/ai-assistant/o11yAIAssistantAPI.schemas';
 
 import {
 	approveExecution,
@@ -388,7 +388,7 @@ async function runStreamingLoop(
 			});
 			break;
 		} else if (event.type === 'error') {
-			// MCP/SigNoz auth expired mid-execution — signal the caller to
+			// MCP/O11y auth expired mid-execution — signal the caller to
 			// re-issue the originating action. The retry's REST call will hit
 			// 401 and the shared axios `interceptorRejected` will rotate the
 			// access token + replay, so we don't refresh here ourselves.
