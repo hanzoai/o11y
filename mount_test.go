@@ -1,7 +1,6 @@
 package o11y_test
 
 import (
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -28,7 +27,10 @@ func TestMountWithoutHandlerReturns503(t *testing.T) {
 	}
 }
 
-func TestMountForwardsToRegisteredHandler(t *testing.T) {
+// TestMountNormalizesExternalPath proves the one public contract /v1/o11y/<resource>
+// (one /v1/, no /api/) is normalized at the mount seam onto the two internal route
+// families: SigNoz native (/api/vN/*) and Hanzo llmobs (/v1/o11y/*, passed through).
+func TestMountNormalizesExternalPath(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
 		t.Fatalf("Mount: %v", err)
@@ -37,25 +39,38 @@ func TestMountForwardsToRegisteredHandler(t *testing.T) {
 	var sawPath string
 	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sawPath = r.URL.Path
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(`{"ok":true}`))
 	}))
 	defer o11y.SetHandler(nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/api/v1/health", nil)
-	resp, err := app.Fiber().Test(req)
-	if err != nil {
-		t.Fatalf("Test: %v", err)
+	cases := []struct {
+		name, external, internal string
+	}{
+		// SigNoz native — canonical Hanzo form; the /api/ never surfaces externally.
+		{"signoz canonical v1", "/v1/o11y/v1/health", "/api/v1/health"},
+		{"signoz canonical v3", "/v1/o11y/v3/query_range", "/api/v3/query_range"},
+		{"signoz canonical v5", "/v1/o11y/v5/query_range", "/api/v5/query_range"},
+		// SigNoz native — deprecated /api/ alias still resolves during migration.
+		{"signoz legacy alias", "/v1/o11y/api/v1/health", "/api/v1/health"},
+		// Hanzo llmobs — registered natively at /v1/o11y/*, passed through untouched.
+		{"llmobs traces", "/v1/o11y/traces", "/v1/o11y/traces"},
+		{"llmobs observations", "/v1/o11y/observations", "/v1/o11y/observations"},
+		{"llmobs score by id", "/v1/o11y/score/abc123", "/v1/o11y/score/abc123"},
 	}
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("status=%d want 200", resp.StatusCode)
-	}
-	body, _ := io.ReadAll(resp.Body)
-	if string(body) != `{"ok":true}` {
-		t.Fatalf("body=%q want {\"ok\":true}", body)
-	}
-	if sawPath != "/v1/o11y/api/v1/health" {
-		t.Fatalf("sawPath=%q want /v1/o11y/api/v1/health", sawPath)
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			sawPath = ""
+			req := httptest.NewRequest(http.MethodGet, tc.external, nil)
+			resp, err := app.Fiber().Test(req)
+			if err != nil {
+				t.Fatalf("Test: %v", err)
+			}
+			if resp.StatusCode != http.StatusOK {
+				t.Fatalf("status=%d want 200", resp.StatusCode)
+			}
+			if sawPath != tc.internal {
+				t.Fatalf("external %s → internal %q, want %q", tc.external, sawPath, tc.internal)
+			}
+		})
 	}
 }
