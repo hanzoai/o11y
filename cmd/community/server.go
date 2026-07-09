@@ -9,7 +9,7 @@ import (
 	"github.com/hanzoai/o11y/cmd"
 	"github.com/hanzoai/o11y/pkg/community"
 	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/signoz"
+	"github.com/hanzoai/o11y/pkg/o11y"
 	"github.com/hanzoai/o11y/pkg/version"
 )
 
@@ -18,10 +18,10 @@ func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
 
 	serverCmd := &cobra.Command{
 		Use:                "server",
-		Short:              "Run the SigNoz server",
+		Short:              "Run the O11y server",
 		FParseErrWhitelist: cobra.FParseErrWhitelist{UnknownFlags: true},
 		RunE: func(currCmd *cobra.Command, args []string) error {
-			config, err := cmd.NewSigNozConfig(currCmd.Context(), logger, configFiles)
+			config, err := cmd.NewO11yConfig(currCmd.Context(), logger, configFiles)
 			if err != nil {
 				return err
 			}
@@ -34,7 +34,7 @@ func registerServer(parentCmd *cobra.Command, logger *slog.Logger) {
 	parentCmd.AddCommand(serverCmd)
 }
 
-func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) error {
+func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) error {
 	// print the version
 	version.Info.PrettyPrint(config.Version)
 
@@ -42,9 +42,9 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 	// embed — same providers, same identity (iamidentn gateway-header auth), same
 	// wiring. Standalone owns the process: bind listeners, run background
 	// evaluation, block until shutdown.
-	server, signoz, err := community.NewServer(ctx, config)
+	server, o11y, err := community.NewServer(ctx, config)
 	if err != nil {
-		logger.ErrorContext(ctx, "failed to create signoz server", errors.Attr(err))
+		logger.ErrorContext(ctx, "failed to create o11y server", errors.Attr(err))
 		return err
 	}
 
@@ -53,10 +53,10 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		return err
 	}
 
-	signoz.Start(ctx)
+	o11y.Start(ctx)
 
-	if err := signoz.Wait(ctx); err != nil {
-		logger.ErrorContext(ctx, "failed to start signoz", errors.Attr(err))
+	if err := o11y.Wait(ctx); err != nil {
+		logger.ErrorContext(ctx, "failed to start o11y", errors.Attr(err))
 		return err
 	}
 
@@ -65,8 +65,8 @@ func runServer(ctx context.Context, config signoz.Config, logger *slog.Logger) e
 		return err
 	}
 
-	if err := signoz.Stop(ctx); err != nil {
-		logger.ErrorContext(ctx, "failed to stop signoz", errors.Attr(err))
+	if err := o11y.Stop(ctx); err != nil {
+		logger.ErrorContext(ctx, "failed to stop o11y", errors.Attr(err))
 		return err
 	}
 

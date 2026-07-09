@@ -7,7 +7,7 @@ import ServiceAccountsTable from '../ServiceAccountsTable';
 const mockActiveAccount: ServiceAccountRow = {
 	id: 'sa-1',
 	name: 'CI Bot',
-	email: 'ci-bot@signoz.io',
+	email: 'ci-bot@o11y.io',
 	status: 'ACTIVE',
 	createdAt: '2026-01-01T00:00:00Z',
 	updatedAt: '2026-01-02T00:00:00Z',
@@ -16,7 +16,7 @@ const mockActiveAccount: ServiceAccountRow = {
 const mockDisabledAccount: ServiceAccountRow = {
 	id: 'sa-2',
 	name: 'Legacy Bot',
-	email: 'legacy@signoz.io',
+	email: 'legacy@o11y.io',
 	status: 'DISABLED',
 	createdAt: '2025-06-01T00:00:00Z',
 	updatedAt: '2025-12-01T00:00:00Z',
@@ -36,7 +36,7 @@ describe('ServiceAccountsTable', () => {
 		render(<ServiceAccountsTable {...defaultProps} data={[mockActiveAccount]} />);
 
 		expect(screen.getByText('CI Bot')).toBeInTheDocument();
-		expect(screen.getByText('ci-bot@signoz.io')).toBeInTheDocument();
+		expect(screen.getByText('ci-bot@o11y.io')).toBeInTheDocument();
 		expect(screen.getByText('ACTIVE')).toBeInTheDocument();
 	});
 
@@ -68,7 +68,7 @@ describe('ServiceAccountsTable', () => {
 
 		expect(onRowClick).toHaveBeenCalledTimes(1);
 		expect(onRowClick).toHaveBeenCalledWith(
-			expect.objectContaining({ id: 'sa-1', email: 'ci-bot@signoz.io' }),
+			expect.objectContaining({ id: 'sa-1', email: 'ci-bot@o11y.io' }),
 		);
 	});
 

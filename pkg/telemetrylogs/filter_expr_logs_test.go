@@ -186,10 +186,10 @@ func TestFilterExprLogs(t *testing.T) {
 		},
 		{
 			category:              "Special characters",
-			query:                 "srikanth@signoz.io",
+			query:                 "srikanth@o11y.io",
 			shouldPass:            true,
 			expectedQuery:         "WHERE match(LOWER(body), LOWER(?))",
-			expectedArgs:          []any{"srikanth@signoz.io"},
+			expectedArgs:          []any{"srikanth@o11y.io"},
 			expectedErrorContains: "",
 		},
 		{

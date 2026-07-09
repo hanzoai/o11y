@@ -1,4 +1,4 @@
-### Monitor Azure SQL Database with SigNoz
+### Monitor Azure SQL Database with O11y
 
 Collect key Azure SQL Database (single database) metrics and view them with an out of the box dashboard.
 

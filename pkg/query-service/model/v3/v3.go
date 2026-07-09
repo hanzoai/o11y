@@ -13,7 +13,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	signozerrors "github.com/hanzoai/o11y/pkg/errors"
+	o11yerrors "github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/valuer"
 
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
@@ -940,7 +940,7 @@ func (b *BuilderQuery) SetShiftByFromFunc() {
 					} else if shift, ok := function.Args[0].(string); ok {
 						shiftBy, err := strconv.ParseFloat(shift, 64)
 						if err != nil {
-							slog.Error("failed to parse time shift by", "shift", shift, signozerrors.Attr(err))
+							slog.Error("failed to parse time shift by", "shift", shift, o11yerrors.Attr(err))
 						}
 						timeShiftBy = int64(shiftBy)
 					}

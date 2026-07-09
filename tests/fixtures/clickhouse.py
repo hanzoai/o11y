@@ -36,7 +36,7 @@ def clickhouse(
         container = ClickHouseContainer(
             image=f"clickhouse/clickhouse-server:{version}",
             port=9000,
-            username="signoz",
+            username="o11y",
             password="password",
         )
 
@@ -214,10 +214,10 @@ def clickhouse(
             ),
             conn=connection,
             env={
-                "SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN": f"tcp://{container.username}:{container.password}@{container.get_wrapped_container().name}:{9000}",
-                "SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_USERNAME": container.username,
-                "SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_PASSWORD": container.password,
-                "SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER": "cluster",
+                "O11Y_TELEMETRYSTORE_CLICKHOUSE_DSN": f"tcp://{container.username}:{container.password}@{container.get_wrapped_container().name}:{9000}",
+                "O11Y_TELEMETRYSTORE_CLICKHOUSE_USERNAME": container.username,
+                "O11Y_TELEMETRYSTORE_CLICKHOUSE_PASSWORD": container.password,
+                "O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER": "cluster",
             },
         )
 
@@ -238,8 +238,8 @@ def clickhouse(
         env = cache["env"]
 
         conn = clickhouse_connect.get_client(
-            user=env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_USERNAME"],
-            password=env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_PASSWORD"],
+            user=env["O11Y_TELEMETRYSTORE_CLICKHOUSE_USERNAME"],
+            password=env["O11Y_TELEMETRYSTORE_CLICKHOUSE_PASSWORD"],
             host=host_config.address,
             port=host_config.port,
         )
@@ -267,7 +267,7 @@ def clickhouse(
 
 @pytest.fixture(name="check_query_log")
 def check_query_log(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
 ) -> Callable[..., None]:
     """
     Returns a callable that flushes system.query_log and asserts that at
@@ -289,7 +289,7 @@ def check_query_log(
         check_query_log(
             before, "my.case",
             lambda q: "assumeNotNull" in q,
-            tables=["signoz_logs.distributed_logs_v2"],
+            tables=["o11y_logs.distributed_logs_v2"],
         )
     """
 
@@ -303,7 +303,7 @@ def check_query_log(
         must_not_contain: list[str] | None = None,
         limit: int = 10,
     ) -> None:
-        conn = signoz.telemetrystore.conn
+        conn = o11y.telemetrystore.conn
         conn.command("SYSTEM FLUSH LOGS")
 
         # Use millisecond precision to avoid timestamp collisions between

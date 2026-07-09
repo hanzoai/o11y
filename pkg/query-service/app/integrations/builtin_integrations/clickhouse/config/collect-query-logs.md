@@ -16,13 +16,13 @@ receivers:
       min_scrape_delay_seconds: ${env:QUERY_LOG_SCRAPE_DELAY_SECONDS}
 
 exporters:
-  # export to SigNoz cloud
+  # export to O11y cloud
   otlp/clickhouse-query-logs:
     endpoint: "${env:OTLP_DESTINATION_ENDPOINT}"
     tls:
       insecure: false
     headers:
-      "signoz-access-token": "${env:SIGNOZ_INGESTION_KEY}"
+      "o11y-access-token": "${env:O11Y_INGESTION_KEY}"
 
   # export to local collector
   # otlp/clickhouse-query-logs:
@@ -62,11 +62,11 @@ export QUERY_LOG_SCRAPE_INTERVAL_SECONDS=20
 # flushed before an attempt to collect them is made.
 export QUERY_LOG_SCRAPE_DELAY_SECONDS=8
 
-# region specific SigNoz cloud ingestion endpoint
-export OTLP_DESTINATION_ENDPOINT="ingest.us.signoz.cloud:443"
+# region specific O11y cloud ingestion endpoint
+export OTLP_DESTINATION_ENDPOINT="ingest.us.o11y.cloud:443"
 
-# your SigNoz ingestion key
-export SIGNOZ_INGESTION_KEY="signoz-ingestion-key"
+# your O11y ingestion key
+export O11Y_INGESTION_KEY="o11y-ingestion-key"
 
 ```
 

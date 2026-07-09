@@ -11,7 +11,7 @@ import (
 const (
 	SpanAttrMappingFeatureType agentConf.AgentFeatureType = "span_attr_mapping"
 
-	ProcessorName = "signozspanmapper"
+	ProcessorName = "o11yspanmapper"
 )
 
 var (
@@ -24,7 +24,7 @@ type SpanMapperGroupWithMappers struct {
 	Mappers []*SpanMapper    `json:"mappers"`
 }
 
-// spanMapperProcessorConfig is the collector config for signozspanmapper.
+// spanMapperProcessorConfig is the collector config for o11yspanmapper.
 type spanMapperProcessorConfig struct {
 	Groups []spanMapperProcessorGroup `yaml:"groups" json:"groups"`
 }

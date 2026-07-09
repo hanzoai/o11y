@@ -17,14 +17,14 @@ logger = setup_logger(__name__)
 
 
 def test_create_service_account(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
+        o11y.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
         json={"name": "test-sa"},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -37,7 +37,7 @@ def test_create_service_account(
 
 
 def test_create_service_account_invalid_name(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
@@ -45,7 +45,7 @@ def test_create_service_account_invalid_name(
 
     # name with spaces should be rejected
     response = requests.post(
-        signoz.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
+        o11y.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
         json={"name": "invalid name"},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -55,7 +55,7 @@ def test_create_service_account_invalid_name(
 
 
 def test_create_service_account_missing_name(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
@@ -63,7 +63,7 @@ def test_create_service_account_missing_name(
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
+        o11y.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
         json={"name": ""},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -73,14 +73,14 @@ def test_create_service_account_missing_name(
 
 
 def test_list_service_accounts(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
+        o11y.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -95,15 +95,15 @@ def test_list_service_accounts(
 
 
 def test_get_service_account(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
-    service_account = find_service_account_by_name(signoz, token, "test-sa")
+    service_account = find_service_account_by_name(o11y, token, "test-sa")
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account['id']}"),
+        o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account['id']}"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -118,14 +118,14 @@ def test_get_service_account(
 
 
 def test_get_service_account_not_found(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/00000000-0000-0000-0000-000000000000"),
+        o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/00000000-0000-0000-0000-000000000000"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -134,15 +134,15 @@ def test_get_service_account_not_found(
 
 
 def test_update_service_account(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
-    service_account = find_service_account_by_name(signoz, token, "test-sa")
+    service_account = find_service_account_by_name(o11y, token, "test-sa")
 
     response = requests.put(
-        signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account['id']}"),
+        o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account['id']}"),
         json={"name": "test-sa-updated"},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -152,7 +152,7 @@ def test_update_service_account(
 
     # verify the update
     get_resp = requests.get(
-        signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account['id']}"),
+        o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account['id']}"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -160,18 +160,18 @@ def test_update_service_account(
 
 
 def test_delete_service_account(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
-    service_account_id = create_service_account(signoz, token, "sa-to-disable")
+    service_account_id = create_service_account(o11y, token, "sa-to-disable")
 
-    delete_service_account(signoz, token, service_account_id)
+    delete_service_account(o11y, token, service_account_id)
 
     # verify status changed to deleted
     get_resp = requests.get(
-        signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}"),
+        o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -179,7 +179,7 @@ def test_delete_service_account(
 
 
 def test_create_after_delete_reuses_name(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
@@ -189,11 +189,11 @@ def test_create_after_delete_reuses_name(
     service_account_name = "sa-reuse-name"
 
     # 1. create
-    first_id = create_service_account(signoz, token, service_account_name)
+    first_id = create_service_account(o11y, token, service_account_name)
 
     # 2. creating again with the same name should fail (conflict)
     dup_resp = requests.post(
-        signoz.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
+        o11y.self.host_configs["8080"].get(SERVICE_ACCOUNT_BASE),
         json={"name": service_account_name},
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
@@ -201,28 +201,28 @@ def test_create_after_delete_reuses_name(
     assert dup_resp.status_code == HTTPStatus.CONFLICT, dup_resp.text
 
     # 3. soft-delete the first one
-    delete_service_account(signoz, token, first_id)
+    delete_service_account(o11y, token, first_id)
 
     # 4. now creating with the same name should succeed
-    second_id = create_service_account(signoz, token, service_account_name)
+    second_id = create_service_account(o11y, token, service_account_name)
     assert second_id != first_id, "New SA should have a different ID"
 
 
 def test_delete_already_deleted_service_account(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     """Deleting an already-deleted service account should be handled gracefully."""
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
-    service_account_id = create_service_account(signoz, token, "sa-double-delete")
+    service_account_id = create_service_account(o11y, token, "sa-double-delete")
 
     # first delete
-    delete_service_account(signoz, token, service_account_id)
+    delete_service_account(o11y, token, service_account_id)
 
     # second delete should be handled gracefully (idempotent or error)
     response = requests.delete(
-        signoz.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}"),
+        o11y.self.host_configs["8080"].get(f"{SERVICE_ACCOUNT_BASE}/{service_account_id}"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )

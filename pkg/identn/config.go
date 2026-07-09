@@ -63,7 +63,7 @@ func newConfig() factory.Config {
 		},
 		APIKeyConfig: APIKeyConfig{
 			Enabled: true,
-			Headers: []string{"SIGNOZ-API-KEY"},
+			Headers: []string{"O11Y-API-KEY"},
 		},
 		Impersonation: ImpersonationConfig{
 			Enabled: false,

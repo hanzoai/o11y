@@ -6,8 +6,8 @@ import (
 
 var (
 	CloudFormationQuickCreateBaseURL  = valuer.NewString("https://%s.console.aws.amazon.com/cloudformation/home")
-	AgentCloudFormationTemplateS3Path = valuer.NewString("https://signoz-integrations.s3.us-east-1.amazonaws.com/aws-quickcreate-template-%s.json")
-	AgentCloudFormationBaseStackName  = valuer.NewString("signoz-integration")
+	AgentCloudFormationTemplateS3Path = valuer.NewString("https://o11y-integrations.s3.us-east-1.amazonaws.com/aws-quickcreate-template-%s.json")
+	AgentCloudFormationBaseStackName  = valuer.NewString("o11y-integration")
 )
 
 type AWSPostableAccountConfig struct {

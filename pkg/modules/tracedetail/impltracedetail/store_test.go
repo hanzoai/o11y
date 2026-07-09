@@ -43,7 +43,7 @@ func newTestStore(matcher sqlmock.QueryMatcher) *spantypestest.TraceStoreTest {
 }
 
 func TestGetTraceSummary(t *testing.T) {
-	expectedSQL := "SELECT trace_id, min(start) AS start, max(end) AS end, sum(num_spans) AS num_spans FROM signoz_traces.distributed_trace_summary WHERE trace_id = ? GROUP BY trace_id"
+	expectedSQL := "SELECT trace_id, min(start) AS start, max(end) AS end, sum(num_spans) AS num_spans FROM o11y_traces.distributed_trace_summary WHERE trace_id = ? GROUP BY trace_id"
 
 	t.Run("ValidTraceID_GeneratesExpectedSQL", func(t *testing.T) {
 		s := newTestStore(sqlmock.QueryMatcherRegexp)
@@ -55,7 +55,7 @@ func TestGetTraceSummary(t *testing.T) {
 }
 
 func TestGetMinimalSpans(t *testing.T) {
-	expectedSQL := "SELECT DISTINCT ON (span_id) span_id, parent_span_id, timestamp, duration_nano, has_error, resource_string_service$$name FROM signoz_traces.distributed_signoz_index_v3 WHERE trace_id = ? AND ts_bucket_start >= ? AND ts_bucket_start <= ? ORDER BY timestamp ASC, name ASC"
+	expectedSQL := "SELECT DISTINCT ON (span_id) span_id, parent_span_id, timestamp, duration_nano, has_error, resource_string_service$$name FROM o11y_traces.distributed_o11y_index_v3 WHERE trace_id = ? AND ts_bucket_start >= ? AND ts_bucket_start <= ? ORDER BY timestamp ASC, name ASC"
 
 	t.Run("ValidRange_GeneratesExpectedSQL", func(t *testing.T) {
 		s := newTestStore(sqlmock.QueryMatcherRegexp)
@@ -67,7 +67,7 @@ func TestGetMinimalSpans(t *testing.T) {
 }
 
 func TestGetSpanCountByField(t *testing.T) {
-	expectedSQL := "SELECT resource.`service.name`::String AS field_value, count(DISTINCT span_id) AS count FROM signoz_traces.distributed_signoz_index_v3 WHERE trace_id = ? AND ts_bucket_start >= ? AND ts_bucket_start <= ? AND notEmpty(resource.`service.name`::String) GROUP BY field_value"
+	expectedSQL := "SELECT resource.`service.name`::String AS field_value, count(DISTINCT span_id) AS count FROM o11y_traces.distributed_o11y_index_v3 WHERE trace_id = ? AND ts_bucket_start >= ? AND ts_bucket_start <= ? AND notEmpty(resource.`service.name`::String) GROUP BY field_value"
 
 	tests := []struct {
 		name      string
@@ -92,8 +92,8 @@ func TestGetSpanCountByField(t *testing.T) {
 }
 
 func TestGetFlamegraphSpans(t *testing.T) {
-	baseSQL := "SELECT span_id, any(parent_span_id) AS parent_span_id, any(timestamp) AS timestamp, any(duration_nano) AS duration_nano, any(has_error) AS has_error, any(name) AS name, any(events) AS events, any(attributes_string) AS attributes_string, any(attributes_number) AS attributes_number, any(attributes_bool) AS attributes_bool, any(resources_string) AS resources_string FROM signoz_traces.distributed_signoz_index_v3 WHERE trace_id = ? AND ts_bucket_start >= ? AND ts_bucket_start <= ? GROUP BY span_id ORDER BY timestamp ASC, name ASC"
-	withSpanIDsSQL := "SELECT span_id, any(parent_span_id) AS parent_span_id, any(timestamp) AS timestamp, any(duration_nano) AS duration_nano, any(has_error) AS has_error, any(name) AS name, any(events) AS events, any(attributes_string) AS attributes_string, any(attributes_number) AS attributes_number, any(attributes_bool) AS attributes_bool, any(resources_string) AS resources_string FROM signoz_traces.distributed_signoz_index_v3 WHERE trace_id = ? AND ts_bucket_start >= ? AND ts_bucket_start <= ? AND span_id IN (?, ?) GROUP BY span_id ORDER BY timestamp ASC, name ASC"
+	baseSQL := "SELECT span_id, any(parent_span_id) AS parent_span_id, any(timestamp) AS timestamp, any(duration_nano) AS duration_nano, any(has_error) AS has_error, any(name) AS name, any(events) AS events, any(attributes_string) AS attributes_string, any(attributes_number) AS attributes_number, any(attributes_bool) AS attributes_bool, any(resources_string) AS resources_string FROM o11y_traces.distributed_o11y_index_v3 WHERE trace_id = ? AND ts_bucket_start >= ? AND ts_bucket_start <= ? GROUP BY span_id ORDER BY timestamp ASC, name ASC"
+	withSpanIDsSQL := "SELECT span_id, any(parent_span_id) AS parent_span_id, any(timestamp) AS timestamp, any(duration_nano) AS duration_nano, any(has_error) AS has_error, any(name) AS name, any(events) AS events, any(attributes_string) AS attributes_string, any(attributes_number) AS attributes_number, any(attributes_bool) AS attributes_bool, any(resources_string) AS resources_string FROM o11y_traces.distributed_o11y_index_v3 WHERE trace_id = ? AND ts_bucket_start >= ? AND ts_bucket_start <= ? AND span_id IN (?, ?) GROUP BY span_id ORDER BY timestamp ASC, name ASC"
 
 	tests := []struct {
 		name    string
@@ -117,7 +117,7 @@ func TestGetFlamegraphSpans(t *testing.T) {
 
 func TestGetSpanDurationByField(t *testing.T) {
 
-	expectedSQL := "WITH all_spans AS (SELECT DISTINCT ON (span_id) resource.`service.name`::String AS field_value, toUnixTimestamp64Nano(timestamp) AS start_ns, start_ns + duration_nano AS end_ns FROM signoz_traces.distributed_signoz_index_v3 WHERE trace_id = ? AND ts_bucket_start >= ? AND ts_bucket_start <= ? AND notEmpty(field_value) ORDER BY timestamp ASC, name ASC), effective_start AS (SELECT field_value, end_ns, greatest(start_ns, ifNull(max(end_ns) OVER (PARTITION BY field_value ORDER BY start_ns ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING), toUInt64(0))) AS effective_start_ns FROM all_spans) SELECT field_value, sum(toUInt64(greatest(end_ns - effective_start_ns, 0))) AS total_ns FROM effective_start GROUP BY field_value"
+	expectedSQL := "WITH all_spans AS (SELECT DISTINCT ON (span_id) resource.`service.name`::String AS field_value, toUnixTimestamp64Nano(timestamp) AS start_ns, start_ns + duration_nano AS end_ns FROM o11y_traces.distributed_o11y_index_v3 WHERE trace_id = ? AND ts_bucket_start >= ? AND ts_bucket_start <= ? AND notEmpty(field_value) ORDER BY timestamp ASC, name ASC), effective_start AS (SELECT field_value, end_ns, greatest(start_ns, ifNull(max(end_ns) OVER (PARTITION BY field_value ORDER BY start_ns ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING), toUInt64(0))) AS effective_start_ns FROM all_spans) SELECT field_value, sum(toUInt64(greatest(end_ns - effective_start_ns, 0))) AS total_ns FROM effective_start GROUP BY field_value"
 
 	tests := []struct {
 		name      string

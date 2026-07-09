@@ -15,22 +15,22 @@ type serverMetrics struct {
 func newServerMetrics(meter metric.Meter) (*serverMetrics, error) {
 	var errs error
 
-	eventsEmitted, err := meter.Int64Counter("signoz.audit.events.emitted", metric.WithDescription("Total number of audit events emitted for export."))
+	eventsEmitted, err := meter.Int64Counter("o11y.audit.events.emitted", metric.WithDescription("Total number of audit events emitted for export."))
 	if err != nil {
 		errs = errors.Join(errs, err)
 	}
 
-	writeErrors, err := meter.Int64Counter("signoz.audit.store.write_errors", metric.WithDescription("Total number of audit store write errors during export."))
+	writeErrors, err := meter.Int64Counter("o11y.audit.store.write_errors", metric.WithDescription("Total number of audit store write errors during export."))
 	if err != nil {
 		errs = errors.Join(errs, err)
 	}
 
-	eventsDropped, err := meter.Int64Counter("signoz.audit.events.dropped", metric.WithDescription("Total number of audit events dropped due to a full buffer."))
+	eventsDropped, err := meter.Int64Counter("o11y.audit.events.dropped", metric.WithDescription("Total number of audit events dropped due to a full buffer."))
 	if err != nil {
 		errs = errors.Join(errs, err)
 	}
 
-	bufferSize, err := meter.Int64ObservableGauge("signoz.audit.events.buffer_size", metric.WithDescription("Current number of audit events buffered for export."))
+	bufferSize, err := meter.Int64ObservableGauge("o11y.audit.events.buffer_size", metric.WithDescription("Current number of audit events buffered for export."))
 	if err != nil {
 		errs = errors.Join(errs, err)
 	}

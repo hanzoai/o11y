@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	schema "github.com/hanzoai/signoz-otel-collector/cmd/signozschemamigrator/schema_migrator"
-	"github.com/hanzoai/signoz-otel-collector/utils"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
+	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
+	"github.com/hanzoai/otel-collector/utils"
 	"github.com/huandu/go-sqlbuilder"
 
 	"golang.org/x/exp/maps"

@@ -16,10 +16,10 @@ function NotCloudFallback(): JSX.Element {
 		<div className="not-cloud-fallback">
 			<div className="not-cloud-fallback__content">
 				<h2 className="not-cloud-fallback__title">
-					MCP Server is available on SigNoz
+					MCP Server is available on O11y
 				</h2>
 				<p className="not-cloud-fallback__body">
-					Users can follow the docs to setup the MCP server against their SigNoz
+					Users can follow the docs to setup the MCP server against their O11y
 					instance.
 				</p>
 				<LearnMore

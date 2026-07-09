@@ -12,7 +12,7 @@ import './ErrorBoundaryFallback.styles.scss';
 
 function ErrorBoundaryFallback(): JSX.Element {
 	const handleReload = (): void => {
-		// Hard reload resets Sentry.ErrorBoundary state; withBasePath preserves any /signoz/ prefix.
+		// Hard reload resets Sentry.ErrorBoundary state; withBasePath preserves any /o11y/ prefix.
 		window.location.href = withBasePath(ROUTES.HOME);
 	};
 

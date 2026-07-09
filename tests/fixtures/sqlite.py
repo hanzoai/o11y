@@ -22,7 +22,7 @@ def sqlite(
 
     def create() -> types.TestContainerSQL:
         tmpdir = tmpfs("sqlite")
-        path = tmpdir / "signoz.db"
+        path = tmpdir / "o11y.db"
 
         engine = create_engine(f"sqlite:///{path}")
         with engine.connect() as conn:
@@ -39,10 +39,10 @@ def sqlite(
             ),
             conn=engine,
             env={
-                "SIGNOZ_SQLSTORE_PROVIDER": "sqlite",
-                "SIGNOZ_SQLSTORE_SQLITE_PATH": str(path),
-                "SIGNOZ_SQLSTORE_SQLITE_MODE": mode,
-                "SIGNOZ_SQLSTORE_SQLITE_TRANSACTION__MODE": transaction_mode,
+                "O11Y_SQLSTORE_PROVIDER": "sqlite",
+                "O11Y_SQLSTORE_SQLITE_PATH": str(path),
+                "O11Y_SQLSTORE_SQLITE_MODE": mode,
+                "O11Y_SQLSTORE_SQLITE_TRANSACTION__MODE": transaction_mode,
             },
         )
 
@@ -50,7 +50,7 @@ def sqlite(
         pass
 
     def restore(cache: dict) -> types.TestContainerSQL:
-        path = cache["env"].get("SIGNOZ_SQLSTORE_SQLITE_PATH")
+        path = cache["env"].get("O11Y_SQLSTORE_SQLITE_PATH")
 
         engine = create_engine(f"sqlite:///{path}")
         with engine.connect() as conn:

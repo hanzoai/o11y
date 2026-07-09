@@ -306,7 +306,7 @@ import ec2Url from '@/assets/Logos/ec2.svg';
 2. Add your data source object to the `onboardingConfigWithLinks` array, referencing the imported variable for `imgUrl`
 3. Test the flow locally with `pnpm dev`
 4. Validation:
-   - Navigate to the [onboarding page](http://localhost:3301/get-started-with-signoz-cloud) on your local machine
+   - Navigate to the [onboarding page](http://localhost:3301/get-started-with-o11y-cloud) on your local machine
    - Data source appears in the list
    - Search keywords work correctly
    - All links redirect to the correct pages

@@ -12,7 +12,7 @@ const mockOnCopySnippet = jest.fn();
 const mockOnInstallClick = jest.fn();
 const mockOnDocsLinkClick = jest.fn();
 
-const MCP_ENDPOINT = 'https://mcp.us.signoz.cloud/mcp';
+const MCP_ENDPOINT = 'https://mcp.us.o11y.cloud/mcp';
 
 const defaultProps = {
 	endpoint: MCP_ENDPOINT,

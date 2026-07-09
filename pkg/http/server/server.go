@@ -38,7 +38,7 @@ func New(logger *slog.Logger, cfg Config, handler http.Handler) (*Server, error)
 
 	return &Server{
 		srv:     srv,
-		logger:  logger.With(slog.String("pkg", "go.signoz.io/pkg/http/server")),
+		logger:  logger.With(slog.String("pkg", "go.o11y.io/pkg/http/server")),
 		handler: handler,
 		cfg:     cfg,
 	}, nil

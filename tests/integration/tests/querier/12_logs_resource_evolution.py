@@ -37,7 +37,7 @@ def _build_evolved_log(
 
 
 def _query_grouped_log_series(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     token: str,
     start: datetime,
     end: datetime,
@@ -45,7 +45,7 @@ def _query_grouped_log_series(
     aggregation: str = "count()",
 ) -> dict[str, list[dict]]:
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int(start.timestamp() * 1000),
         end_ms=int(end.timestamp() * 1000),
@@ -79,7 +79,7 @@ def _query_grouped_log_series(
 
 
 def _test_logs_resource_evolution(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     token: str,
     insert_logs: Callable[[list[Logs]], None],
 ) -> None:
@@ -91,7 +91,7 @@ def _test_logs_resource_evolution(
     # 5. Query the logs after the evolution time.
     # Both aggregation and group by should be checked.
     """
-    evolution_time = get_resource_evolution_time(signoz, "logs")
+    evolution_time = get_resource_evolution_time(o11y, "logs")
     evolution_time = evolution_time.replace(second=0, microsecond=0)
 
     before_2 = evolution_time - timedelta(minutes=10)
@@ -128,7 +128,7 @@ def _test_logs_resource_evolution(
         ]
     )
 
-    before_series = _query_grouped_log_series(signoz, token, before_2 - timedelta(minutes=1), before_1 + timedelta(minutes=1))
+    before_series = _query_grouped_log_series(o11y, token, before_2 - timedelta(minutes=1), before_1 + timedelta(minutes=1))
     assert_grouped_series(
         before_series,
         expected_values_by_group={
@@ -141,7 +141,7 @@ def _test_logs_resource_evolution(
         },
     )
 
-    after_series = _query_grouped_log_series(signoz, token, after_1 - timedelta(minutes=1), after_2 + timedelta(minutes=1))
+    after_series = _query_grouped_log_series(o11y, token, after_1 - timedelta(minutes=1), after_2 + timedelta(minutes=1))
     assert_grouped_series(
         after_series,
         expected_values_by_group={
@@ -154,7 +154,7 @@ def _test_logs_resource_evolution(
         },
     )
 
-    spanning_series = _query_grouped_log_series(signoz, token, before_2, after_2 + timedelta(minutes=1))
+    spanning_series = _query_grouped_log_series(o11y, token, before_2, after_2 + timedelta(minutes=1))
     assert_grouped_series(
         spanning_series,
         expected_values_by_group={
@@ -175,7 +175,7 @@ def _test_logs_resource_evolution(
 
     # query to check aggregation on the resource field like count_distinct(service.name)
     aggregation_series = _query_grouped_log_series(
-        signoz,
+        o11y,
         token,
         before_2,
         after_2 + timedelta(minutes=1),
@@ -196,17 +196,17 @@ def _test_logs_resource_evolution(
 
 
 def test_logs_resource_evolution(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
 ) -> None:
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
-    _test_logs_resource_evolution(signoz, token, insert_logs)
+    _test_logs_resource_evolution(o11y, token, insert_logs)
 
 
 def test_logs_materialized_resource_evolution(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -214,4 +214,4 @@ def test_logs_materialized_resource_evolution(
 ) -> None:
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     materialize_log_field(token, "service.name", "string", "resources")
-    _test_logs_resource_evolution(signoz, token, insert_logs)
+    _test_logs_resource_evolution(o11y, token, insert_logs)

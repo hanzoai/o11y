@@ -15,17 +15,17 @@ CLOUD_PROVIDER = "aws"
 
 
 def test_apply_license(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
     """Apply a license so that subsequent cloud integration calls succeed."""
-    add_license(signoz, make_http_mocks, get_token)
+    add_license(o11y, make_http_mocks, get_token)
 
 
 def test_list_accounts_empty(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -33,7 +33,7 @@ def test_list_accounts_empty(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -47,7 +47,7 @@ def test_list_accounts_empty(
 
 
 def test_list_accounts_after_checkin(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     create_cloud_integration_account: Callable,
@@ -59,11 +59,11 @@ def test_list_accounts_after_checkin(
     account_id = account["id"]
     provider_account_id = str(uuid.uuid4())
 
-    checkin = simulate_agent_checkin(signoz, admin_token, CLOUD_PROVIDER, account_id, provider_account_id)
+    checkin = simulate_agent_checkin(o11y, admin_token, CLOUD_PROVIDER, account_id, provider_account_id)
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -80,7 +80,7 @@ def test_list_accounts_after_checkin(
 
 
 def test_get_account(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     create_cloud_integration_account: Callable,
@@ -92,7 +92,7 @@ def test_get_account(
     account_id = account["id"]
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -109,7 +109,7 @@ def test_get_account(
 
 
 def test_get_account_not_found(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -117,7 +117,7 @@ def test_get_account_not_found(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{uuid.uuid4()}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{uuid.uuid4()}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -126,7 +126,7 @@ def test_get_account_not_found(
 
 
 def test_update_account(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     create_cloud_integration_account: Callable,
@@ -137,13 +137,13 @@ def test_update_account(
     account = create_cloud_integration_account(admin_token, CLOUD_PROVIDER, regions=["us-east-1"])
     account_id = account["id"]
 
-    checkin = simulate_agent_checkin(signoz, admin_token, CLOUD_PROVIDER, account_id, str(uuid.uuid4()))
+    checkin = simulate_agent_checkin(o11y, admin_token, CLOUD_PROVIDER, account_id, str(uuid.uuid4()))
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     updated_regions = ["us-east-1", "us-west-2", "eu-west-1"]
 
     response = requests.put(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         json={"config": {"aws": {"regions": updated_regions}}},
         timeout=10,
@@ -152,7 +152,7 @@ def test_update_account(
     assert response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {response.status_code}"
 
     get_response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -161,7 +161,7 @@ def test_update_account(
 
 
 def test_update_account_after_checkin_preserves_connected_status(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     create_cloud_integration_account: Callable,
@@ -180,12 +180,12 @@ def test_update_account_after_checkin_preserves_connected_status(
     provider_account_id = str(uuid.uuid4())
 
     # 2. Agent checks in — sets account_id and last_agent_report
-    checkin = simulate_agent_checkin(signoz, admin_token, CLOUD_PROVIDER, account_id, provider_account_id)
+    checkin = simulate_agent_checkin(o11y, admin_token, CLOUD_PROVIDER, account_id, provider_account_id)
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     # 3. Verify the account appears in the connected list
     list_response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -197,7 +197,7 @@ def test_update_account_after_checkin_preserves_connected_status(
     # 4. Update account config
     updated_regions = ["us-east-1", "us-west-2"]
     update_response = requests.put(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         json={"config": {"aws": {"regions": updated_regions}}},
         timeout=10,
@@ -206,7 +206,7 @@ def test_update_account_after_checkin_preserves_connected_status(
 
     # 5. Verify the account still appears in the connected list with correct fields
     list_response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -221,7 +221,7 @@ def test_update_account_after_checkin_preserves_connected_status(
 
 
 def test_disconnect_account(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     create_cloud_integration_account: Callable,
@@ -232,11 +232,11 @@ def test_disconnect_account(
     account = create_cloud_integration_account(admin_token, CLOUD_PROVIDER)
     account_id = account["id"]
 
-    checkin = simulate_agent_checkin(signoz, admin_token, CLOUD_PROVIDER, account_id, str(uuid.uuid4()))
+    checkin = simulate_agent_checkin(o11y, admin_token, CLOUD_PROVIDER, account_id, str(uuid.uuid4()))
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     response = requests.delete(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -244,7 +244,7 @@ def test_disconnect_account(
     assert response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {response.status_code}"
 
     list_response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -253,7 +253,7 @@ def test_disconnect_account(
 
 
 def test_disconnect_account_idempotent(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -261,7 +261,7 @@ def test_disconnect_account_idempotent(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.delete(
-        signoz.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{uuid.uuid4()}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{uuid.uuid4()}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )

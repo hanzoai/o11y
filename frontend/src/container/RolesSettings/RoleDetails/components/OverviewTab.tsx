@@ -57,7 +57,7 @@ function OverviewTab({
 				<div className="role-details-permissions-header">
 					<span className="role-details-section-label">Permissions</span>
 					<a
-						href="https://signoz.io/docs/manage/administrator-guide/iam/permissions/"
+						href="https://o11y.io/docs/manage/administrator-guide/iam/permissions/"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="role-details-permissions-learn-more"

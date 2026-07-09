@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	MeterSpanSize       = MustNewMeterName("signoz.meter.span.size")
-	MeterLogSize        = MustNewMeterName("signoz.meter.log.size")
-	MeterDatapointCount = MustNewMeterName("signoz.meter.metric.datapoint.count")
-	MeterPlatformActive = MustNewMeterName("signoz.meter.platform.active")
+	MeterSpanSize       = MustNewMeterName("o11y.meter.span.size")
+	MeterLogSize        = MustNewMeterName("o11y.meter.log.size")
+	MeterDatapointCount = MustNewMeterName("o11y.meter.metric.datapoint.count")
+	MeterPlatformActive = MustNewMeterName("o11y.meter.platform.active")
 )
 
 var meterNameRegex = regexp.MustCompile(`^[a-z][a-z0-9_.]+$`)

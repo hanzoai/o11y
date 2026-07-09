@@ -96,7 +96,7 @@ func (module *setter) CreateBulkInvite(ctx context.Context, orgID valuer.UUID, i
 			}
 
 			// store the user and password in db
-			err = module.createUserWithoutGrant(ctx, newUser, root.WithRoleNames([]string{authtypes.MustGetSigNozManagedRoleFromExistingRole(invite.Role)}))
+			err = module.createUserWithoutGrant(ctx, newUser, root.WithRoleNames([]string{authtypes.MustGetO11yManagedRoleFromExistingRole(invite.Role)}))
 			if err != nil {
 				return err
 			}
@@ -156,7 +156,7 @@ func (module *setter) CreateBulkInvite(ctx context.Context, orgID valuer.UUID, i
 		tokenLifetime := module.config.Password.Invite.MaxTokenLifetime
 		humanizedTokenLifetime := strings.TrimSpace(humanize.RelTime(time.Now(), time.Now().Add(tokenLifetime), "", ""))
 
-		if err := module.emailing.SendHTML(ctx, userWithToken.User.Email.String(), "You're Invited to Join SigNoz", emailtypes.TemplateNameInvitationEmail, map[string]any{
+		if err := module.emailing.SendHTML(ctx, userWithToken.User.Email.String(), "You're Invited to Join O11y", emailtypes.TemplateNameInvitationEmail, map[string]any{
 			"inviter_email": identityEmail.StringValue(),
 			"link":          resetLink,
 			"Expiry":        humanizedTokenLifetime,
@@ -265,7 +265,7 @@ func (module *setter) CreatePendingInviteUser(ctx context.Context, identityID va
 	tokenLifetime := module.config.Password.Invite.MaxTokenLifetime
 	humanizedTokenLifetime := strings.TrimSpace(humanize.RelTime(time.Now(), time.Now().Add(tokenLifetime), "", ""))
 
-	if err := module.emailing.SendHTML(ctx, user.Email.String(), "You're Invited to Join SigNoz", emailtypes.TemplateNameInvitationEmail, map[string]any{
+	if err := module.emailing.SendHTML(ctx, user.Email.String(), "You're Invited to Join O11y", emailtypes.TemplateNameInvitationEmail, map[string]any{
 		"inviter_email": identityEmail.StringValue(),
 		"link":          resetLink,
 		"Expiry":        humanizedTokenLifetime,
@@ -299,7 +299,7 @@ func (module *setter) UpdateUserDeprecated(ctx context.Context, orgID valuer.UUI
 
 	if roleChange {
 		selectors := []coretypes.Selector{
-			coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.O11yAdminRoleName),
 		}
 		err = module.authz.CheckWithTupleCreation(
 			ctx,
@@ -324,8 +324,8 @@ func (module *setter) UpdateUserDeprecated(ctx context.Context, orgID valuer.UUI
 	if roleChange {
 		err = module.authz.ModifyGrant(ctx,
 			orgID,
-			[]string{authtypes.MustGetSigNozManagedRoleFromExistingRole(existingUser.Role)},
-			[]string{authtypes.MustGetSigNozManagedRoleFromExistingRole(user.Role)},
+			[]string{authtypes.MustGetO11yManagedRoleFromExistingRole(existingUser.Role)},
+			[]string{authtypes.MustGetO11yManagedRoleFromExistingRole(user.Role)},
 			authtypes.MustNewSubject(coretypes.NewResourceUser(), id, orgID, nil),
 		)
 		if err != nil {
@@ -348,7 +348,7 @@ func (module *setter) UpdateUserDeprecated(ctx context.Context, orgID valuer.UUI
 			}
 
 			// create new ones
-			if err := module.createUserRoleEntries(ctx, existingUser.OrgID, existingUser.ID, []string{authtypes.MustGetSigNozManagedRoleFromExistingRole(user.Role)}); err != nil {
+			if err := module.createUserRoleEntries(ctx, existingUser.OrgID, existingUser.ID, []string{authtypes.MustGetO11yManagedRoleFromExistingRole(user.Role)}); err != nil {
 				return err
 			}
 		}
@@ -585,7 +585,7 @@ func (module *setter) ForgotPassword(ctx context.Context, orgID valuer.UUID, ema
 	if err := module.emailing.SendHTML(
 		ctx,
 		user.Email.String(),
-		"A Password Reset Was Requested for SigNoz",
+		"A Password Reset Was Requested for O11y",
 		emailtypes.TemplateNameResetPassword,
 		map[string]any{
 			"Link":   resetLink,
@@ -768,7 +768,7 @@ func (module *setter) CreateFirstUser(ctx context.Context, organization *types.O
 		return nil, err
 	}
 
-	roleNames := []string{authtypes.SigNozAdminRoleName}
+	roleNames := []string{authtypes.O11yAdminRoleName}
 
 	if err = module.store.RunInTx(ctx, func(ctx context.Context) error {
 		err = module.orgSetter.Create(ctx, organization, func(ctx context.Context, orgID valuer.UUID) error {

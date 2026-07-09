@@ -279,7 +279,7 @@ func (EvaluationEnvelope) PrepareJSONSchema(schema *jsonschema.Schema) error {
 		schema.ExtraProperties = map[string]any{}
 	}
 
-	schema.ExtraProperties["x-signoz-discriminator"] = map[string]any{
+	schema.ExtraProperties["x-o11y-discriminator"] = map[string]any{
 		"propertyName": "kind",
 		"mapping": map[string]string{
 			"rolling":    "#/components/schemas/RuletypesEvaluationRolling",

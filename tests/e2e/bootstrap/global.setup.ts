@@ -1,9 +1,9 @@
 import { expect, test as setup } from '@playwright/test';
 
-const seederUrl = process.env.SIGNOZ_E2E_SEEDER_URL ?? '';
+const seederUrl = process.env.O11Y_E2E_SEEDER_URL ?? '';
 
 setup('refresh golden dataset', async ({ request }) => {
-	expect(seederUrl, 'SIGNOZ_E2E_SEEDER_URL not set').not.toBe('');
+	expect(seederUrl, 'O11Y_E2E_SEEDER_URL not set').not.toBe('');
 	const response = await request.post(`${seederUrl}/seed/golden`, {
 		timeout: 120_000,
 	});

@@ -92,7 +92,7 @@ FILTER_EXPRESSIONS_FILE = os.path.join(TESTDATA_DIR, "filter_expressions_10000.t
     ],
 )
 def test_not_filter_expression(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -152,7 +152,7 @@ def test_not_filter_expression(
     now = datetime.now(tz=UTC)
 
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((now - timedelta(seconds=30)).timestamp() * 1000),
         end_ms=int(now.timestamp() * 1000),
@@ -183,7 +183,7 @@ def test_not_filter_expression(
 
 
 def test_filter_expressions_no_server_error(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     insert_logs,
     get_token: Callable[[str, str], str],
@@ -235,14 +235,14 @@ def test_filter_expressions_no_server_error(
     )
 
     def _make_raw_logs_query(
-        signoz: types.SigNoz,
+        o11y: types.O11y,
         token: str,
         filter_expression: str,
     ) -> requests.Response:
         """Helper to query raw logs with a filter expression over the last 30 seconds."""
         now = datetime.now(tz=UTC)
         return make_query_request(
-            signoz,
+            o11y,
             token,
             start_ms=int((now - timedelta(seconds=30)).timestamp() * 1000),
             end_ms=int(now.timestamp() * 1000),
@@ -271,7 +271,7 @@ def test_filter_expressions_no_server_error(
     failures: list[str] = []
     with ThreadPoolExecutor(max_workers=40) as executor:
         with open(FILTER_EXPRESSIONS_FILE, encoding="utf-8") as f:
-            futures = {executor.submit(_make_raw_logs_query, signoz, token, expr.rstrip("\n")): expr.rstrip("\n") for expr in f}
+            futures = {executor.submit(_make_raw_logs_query, o11y, token, expr.rstrip("\n")): expr.rstrip("\n") for expr in f}
             for future in as_completed(futures):
                 expr = futures[future]
                 if future.result().status_code == HTTPStatus.INTERNAL_SERVER_ERROR:

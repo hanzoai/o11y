@@ -22,14 +22,14 @@ For example, the [prometheus](/pkg/prometheus) provider delivers a prometheus en
 
 ## How to wire it up?
 
-The `pkg/signoz` package contains the inversion of control container responsible for wiring providers. It handles instantiation, configuration, and assembly of providers based on configuration metadata.
+The `pkg/o11y` package contains the inversion of control container responsible for wiring providers. It handles instantiation, configuration, and assembly of providers based on configuration metadata.
 
 > 💡 **Note**: Coming from a Java background? Providers are similar to Spring beans.
 
 Wiring up a provider involves three steps:
 
 1. Wiring up the configuration
-Add your config from `pkg/<name>/config.go` to the `pkg/signoz/config.Config` struct and in new factories:
+Add your config from `pkg/<name>/config.go` to the `pkg/o11y/config.Config` struct and in new factories:
 
 ```go
 type Config struct {
@@ -48,7 +48,7 @@ func NewConfig(ctx context.Context, resolverConfig config.ResolverConfig, ....) 
 ```
 
 2. Wiring up the provider
-Add available provider implementations in `pkg/signoz/provider.go`:
+Add available provider implementations in `pkg/o11y/provider.go`:
 
 ```go
 func NewMyProviderFactories() factory.NamedMap[factory.ProviderFactory[myprovider.MyProvider, myprovider.Config]] {
@@ -59,7 +59,7 @@ func NewMyProviderFactories() factory.NamedMap[factory.ProviderFactory[myprovide
 }
 ```
 
-3. Instantiate the provider by adding it to the `Hanzo O11y` struct in `pkg/signoz/signoz.go`:
+3. Instantiate the provider by adding it to the `Hanzo O11y` struct in `pkg/o11y/o11y.go`:
 
 ```go
 type Hanzo O11y struct {
@@ -83,7 +83,7 @@ func New(...) (*Hanzo O11y, error) {
 To use a provider, import its interface. For example, to use the prometheus provider, import `pkg/prometheus/prometheus.go`:
 
 ```go
-import "github.com/Hanzo O11y/signoz/pkg/prometheus/prometheus"
+import "github.com/Hanzo O11y/o11y/pkg/prometheus/prometheus"
 
 func CreateSomething(ctx context.Context, prometheus prometheus.Prometheus) {
     ...

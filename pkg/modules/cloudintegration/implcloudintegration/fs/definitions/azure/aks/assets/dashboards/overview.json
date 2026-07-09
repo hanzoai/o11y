@@ -578,7 +578,7 @@
         "linksData": []
       },
       "customLegendColors": {
-        "signoz-integration-test": "#18c29d"
+        "o11y-integration-test": "#18c29d"
       },
       "decimalPrecision": 2,
       "description": "Maximum CPU percentage (based off current limit) used by ETCD pod across instances",
@@ -727,7 +727,7 @@
         "linksData": []
       },
       "customLegendColors": {
-        "signoz-integration-test": "#18c29d"
+        "o11y-integration-test": "#18c29d"
       },
       "decimalPrecision": 2,
       "description": "Maximum utilization of the ETCD database across instances",
@@ -876,7 +876,7 @@
         "linksData": []
       },
       "customLegendColors": {
-        "signoz-integration-test": "#18c29d"
+        "o11y-integration-test": "#18c29d"
       },
       "decimalPrecision": 2,
       "description": "Maximum memory percentage (based off current limit) used by ETCD pod across instances",

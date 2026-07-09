@@ -83,7 +83,7 @@ func New(
 	maintenanceStore alertmanagertypes.MaintenanceStore,
 ) (*Server, error) {
 	server := &Server{
-		logger:              logger.With(slog.String("pkg", "go.signoz.io/pkg/alertmanager/alertmanagerserver")),
+		logger:              logger.With(slog.String("pkg", "go.o11y.io/pkg/alertmanager/alertmanagerserver")),
 		registry:            registry,
 		srvConfig:           srvConfig,
 		orgID:               orgID,
@@ -91,10 +91,10 @@ func New(
 		stopc:               make(chan struct{}),
 		notificationManager: nfManager,
 	}
-	signozRegisterer := prometheus.WrapRegistererWithPrefix("signoz_", registry)
-	signozRegisterer = prometheus.WrapRegistererWith(prometheus.Labels{"org_id": server.orgID}, signozRegisterer)
+	o11yRegisterer := prometheus.WrapRegistererWithPrefix("o11y_", registry)
+	o11yRegisterer = prometheus.WrapRegistererWith(prometheus.Labels{"org_id": server.orgID}, o11yRegisterer)
 	// initialize marker
-	server.marker = types.NewMarker(signozRegisterer)
+	server.marker = types.NewMarker(o11yRegisterer)
 
 	// get silences for initial state
 	state, err := server.stateStore.Get(ctx, server.orgID)
@@ -117,7 +117,7 @@ func New(
 			MaxSilences:         func() int { return srvConfig.Silences.Max },
 			MaxSilenceSizeBytes: func() int { return srvConfig.Silences.MaxSizeBytes },
 		},
-		Metrics: signozRegisterer,
+		Metrics: o11yRegisterer,
 		Logger:  server.logger,
 	})
 	if err != nil {
@@ -136,7 +136,7 @@ func New(
 	server.nflog, err = nflog.New(nflog.Options{
 		SnapshotReader: strings.NewReader(nflogSnapshot),
 		Retention:      server.srvConfig.NFLog.Retention,
-		Metrics:        signozRegisterer,
+		Metrics:        o11yRegisterer,
 		Logger:         server.logger,
 	})
 	if err != nil {
@@ -200,14 +200,14 @@ func New(
 		})
 	}()
 
-	server.alerts, err = mem.NewAlerts(ctx, server.marker, server.srvConfig.Alerts.GCInterval, 0, nil, server.logger, signozRegisterer, nil)
+	server.alerts, err = mem.NewAlerts(ctx, server.marker, server.srvConfig.Alerts.GCInterval, 0, nil, server.logger, o11yRegisterer, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	server.muter = NewMaintenanceMuter(maintenanceStore, orgID, server.logger)
-	server.pipelineBuilder = newPipelineBuilder(signozRegisterer, featurecontrol.NoopFlags{})
-	server.dispatcherMetrics = NewDispatcherMetrics(false, signozRegisterer)
+	server.pipelineBuilder = newPipelineBuilder(o11yRegisterer, featurecontrol.NoopFlags{})
+	server.dispatcherMetrics = NewDispatcherMetrics(false, o11yRegisterer)
 
 	return server, nil
 }
@@ -244,11 +244,11 @@ func (server *Server) SetConfig(ctx context.Context, alertmanagerConfig *alertma
 	config := alertmanagerConfig.AlertmanagerConfig()
 
 	var err error
-	// Load SigNoz's alertmanager notification templates from the configured
+	// Load O11y's alertmanager notification templates from the configured
 	// globs. The upstream default templates (default.tmpl, email.tmpl) are
 	// always loaded from the embedded alertmanager assets inside FromGlobs, so
-	// only SigNoz's own templates (e.g. the email.signoz.html layout) are listed
-	// here. The upstream config.Templates field is not used: SigNoz never
+	// only O11y's own templates (e.g. the email.o11y.html layout) are listed
+	// here. The upstream config.Templates field is not used: O11y never
 	// populates it (there is no per-org template configuration).
 	server.tmpl, err = alertmanagertypes.FromGlobs(server.srvConfig.Templates)
 	if err != nil {

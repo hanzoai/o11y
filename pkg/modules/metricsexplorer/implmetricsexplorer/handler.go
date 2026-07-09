@@ -350,7 +350,7 @@ func (h *handler) InspectMetrics(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (h *handler) GetOnboardingStatus(rw http.ResponseWriter, req *http.Request) {
-	hasMetrics, err := h.module.HasNonSigNozMetrics(req.Context())
+	hasMetrics, err := h.module.HasNonO11yMetrics(req.Context())
 	if err != nil {
 		render.Error(rw, err)
 		return

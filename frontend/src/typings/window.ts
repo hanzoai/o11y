@@ -8,7 +8,7 @@ declare global {
 		pylon: any;
 		Appcues: Record<string, any>;
 		__REDUX_DEVTOOLS_EXTENSION_COMPOSE__: typeof compose;
-		signozBootData?: { settings: WebSettings | null };
+		o11yBootData?: { settings: WebSettings | null };
 	}
 }
 

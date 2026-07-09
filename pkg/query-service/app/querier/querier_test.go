@@ -1075,7 +1075,7 @@ func TestQueryRangeValueTypePromQL(t *testing.T) {
 				PanelType: v3.PanelTypeValue,
 				PromQueries: map[string]*v3.PromQuery{
 					"A": {
-						Query: "signoz_calls_total",
+						Query: "o11y_calls_total",
 					},
 				},
 			},
@@ -1089,7 +1089,7 @@ func TestQueryRangeValueTypePromQL(t *testing.T) {
 				PanelType: v3.PanelTypeValue,
 				PromQueries: map[string]*v3.PromQuery{
 					"A": {
-						Query: "signoz_latency_bucket",
+						Query: "o11y_latency_bucket",
 					},
 				},
 			},
@@ -1130,13 +1130,13 @@ func TestQueryRangeValueTypePromQL(t *testing.T) {
 		ranges []querycache.MissInterval
 	}{
 		{
-			query: "signoz_calls_total",
+			query: "o11y_calls_total",
 			ranges: []querycache.MissInterval{
 				{Start: 1675115596722, End: 1675115596722 + 120*60*1000},
 			},
 		},
 		{
-			query: "signoz_latency_bucket",
+			query: "o11y_latency_bucket",
 			ranges: []querycache.MissInterval{
 				{Start: 1675115596722 + 60*60*1000, End: 1675115596722 + 180*60*1000},
 			},

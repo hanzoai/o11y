@@ -36,7 +36,7 @@ const APM_METRICS_TESTDATA_PATH = path.resolve(
 
 /**
  * Read the JWT the auth fixture stored in `localStorage.AUTH_TOKEN`. The
- * page must be on the SigNoz origin first; if not, this navigates to the
+ * page must be on the O11y origin first; if not, this navigates to the
  * dashboards list to populate localStorage from the context's storageState.
  */
 export async function authToken(page: Page): Promise<string> {
@@ -94,7 +94,7 @@ export async function createDashboardViaApi(
  * Generic helper: POST a dashboard with the given title, then PUT the full
  * `data` payload (variables / widgets / layout / version) at
  * `/dashboards/<id>`. The two-step dance is required because POST silently
- * drops everything except `{title, uploadedGrafana, version}` — the SigNoz UI
+ * drops everything except `{title, uploadedGrafana, version}` — the O11y UI
  * itself uses the same pattern.
  */
 async function loadDashboardFromTemplate(
@@ -153,7 +153,7 @@ export async function createApmMetricsDashboardViaApi(
 
 /**
  * Seed a single-panel "E2E Metric RPS" dashboard that queries the
- * `signoz_e2e_metric` counter without any variable substitution. Pair with
+ * `o11y_e2e_metric` counter without any variable substitution. Pair with
  * `seedMetricsViaSeeder` to populate the metric, then assert chart-data
  * rendering. Title is fixed by the JSON fixture.
  */
@@ -171,7 +171,7 @@ export async function createChartDataDashboardViaApi(
 //
 // The pytest harness brings up an HTTP seeder container exposing
 // POST/DELETE on /telemetry/{traces,logs,metrics}. Its URL is written to
-// `tests/e2e/.env.local` as `SIGNOZ_E2E_SEEDER_URL` and read here from the
+// `tests/e2e/.env.local` as `O11Y_E2E_SEEDER_URL` and read here from the
 // process environment.
 
 /** Minimal shape the seeder accepts for a single metric sample. */
@@ -188,10 +188,10 @@ export interface SeederMetric {
 }
 
 function seederUrl(): string {
-	const url = process.env.SIGNOZ_E2E_SEEDER_URL;
+	const url = process.env.O11Y_E2E_SEEDER_URL;
 	if (!url) {
 		throw new Error(
-			'SIGNOZ_E2E_SEEDER_URL not set — pytest test_setup must be running.',
+			'O11Y_E2E_SEEDER_URL not set — pytest test_setup must be running.',
 		);
 	}
 	return url;
