@@ -2,11 +2,13 @@ package o11y
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 	"sync"
 
 	"github.com/hanzoai/cloud"
-	"github.com/zap-proto/zip"
 	luxlog "github.com/luxfi/log"
+	"github.com/zap-proto/zip"
 )
 
 // Mount registers Hanzo o11y's HTTP surface under /v1/o11y per HIP-0106.
@@ -25,9 +27,10 @@ import (
 //     after o11y.New + app.NewServer.
 //   - Until a handler is registered, the routes 503 with a clear error.
 //
-// All traffic under /v1/o11y is delegated to the registered http.Handler
-// via zip.AdaptNetHTTP; the o11y handler internally rewrites /v1/o11y/*
-// to /api/* so existing controllers stay untouched (see app.createPublicServer).
+// All traffic under /v1/o11y is delegated to the registered http.Handler via
+// zip.AdaptNetHTTP; handlerAdapter normalizes the /v1/o11y/<resource> public
+// contract onto the two internal route families HERE — the ONE Hanzo-owned seam —
+// so the embedded SigNoz route literals stay untouched (see rewriteExternalPath).
 func Mount(app *zip.App, deps cloud.Deps) error {
 	log := deps.Logger
 	if log == nil {
@@ -55,7 +58,54 @@ func (handlerAdapter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "o11y runtime not initialized", http.StatusServiceUnavailable)
 		return
 	}
+	rewriteExternalPath(r.URL)
 	h.ServeHTTP(w, r)
+}
+
+// rewriteExternalPath maps the ONE public o11y contract — api.hanzo.ai/v1/o11y/<resource>,
+// one /v1/, no /api/ — onto the two internal route families, at this single Hanzo-owned
+// seam. It is done HERE, never by editing the embedded SigNoz route literals: SigNoz's
+// whole frontend and backend speak /api/vN, and rewriting those literals is a fork diff
+// that a later upstream re-sync silently reverts (it already happened once — see
+// o11y/CLAUDE.md).
+//
+//	SigNoz native (registered at /api/vN/*):
+//	  /v1/o11y/vN/…      → /api/vN/…   (canonical — the /api/ never surfaces)
+//	  /v1/o11y/api/vN/…  → /api/vN/…   (deprecated alias: the leaked form callers emit
+//	                                    today. Drop once every consumer emits the
+//	                                    canonical form — one and one way.)
+//	Hanzo llmobs (registered natively at /v1/o11y/{traces,observations,…}): passed
+//	through unchanged.
+//
+// This requires the embedded SigNoz StripPrefix wrapper to be OFF — cloud CR
+// O11Y_GLOBAL_EXTERNAL__URL="" — so a /v1/o11y/* llmobs path survives to the router.
+func rewriteExternalPath(u *url.URL) {
+	rest, ok := strings.CutPrefix(u.Path, "/v1/o11y/")
+	if !ok {
+		return
+	}
+	switch {
+	case strings.HasPrefix(rest, "api/v"): // deprecated leaked alias: /v1/o11y/api/vN/x
+		setPath(u, "/"+rest) // → /api/vN/x
+	case isVersionSegment(rest): // canonical SigNoz form: /v1/o11y/vN/x
+		setPath(u, "/api/"+rest) // → /api/vN/x
+	default: // Hanzo llmobs / native resource — the router owns /v1/o11y/x directly.
+	}
+}
+
+// isVersionSegment reports whether rest begins with a SigNoz API version segment
+// (v followed by a digit — "v1/health", "v3/query_range"): the marker that tells an
+// embedded-SigNoz route apart from a Hanzo-native llmobs resource (traces, sessions, …).
+func isVersionSegment(rest string) bool {
+	return len(rest) >= 2 && rest[0] == 'v' && rest[1] >= '0' && rest[1] <= '9'
+}
+
+// setPath rewrites the request path, clearing RawPath so EscapedPath re-derives from the
+// new value — the rewritten SigNoz paths contain no characters needing escaping, and
+// llmobs paths (the only ones carrying an {id}) are never rewritten.
+func setPath(u *url.URL, p string) {
+	u.Path = p
+	u.RawPath = ""
 }
 
 var (
