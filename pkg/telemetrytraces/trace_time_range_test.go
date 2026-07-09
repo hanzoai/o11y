@@ -139,7 +139,7 @@ func TestTraceTimeRangeFinderQuery(t *testing.T) {
 		SELECT 
 			toUnixTimestamp64Nano(min(timestamp)) as start_time,
 			toUnixTimestamp64Nano(max(timestamp)) as end_time
-		FROM signoz_traces.distributed_signoz_spans
+		FROM o11y_traces.distributed_o11y_spans
 		WHERE traceID = ?
 		AND timestamp >= now() - INTERVAL 30 DAY
 	`
@@ -150,7 +150,7 @@ func TestTraceTimeRangeFinderQuery(t *testing.T) {
 		SELECT 
 			toUnixTimestamp64Nano(min(timestamp)) as start_time,
 			toUnixTimestamp64Nano(max(timestamp)) as end_time
-		FROM signoz_traces.distributed_signoz_spans
+		FROM o11y_traces.distributed_o11y_spans
 		WHERE traceID = ?
 		AND timestamp >= now() - INTERVAL 30 DAY
 	`

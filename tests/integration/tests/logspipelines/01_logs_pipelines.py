@@ -1,6 +1,6 @@
 """
 Summary:
-This test file contains integration tests for log parsing pipelines in SigNoz's query service.
+This test file contains integration tests for log parsing pipelines in O11y's query service.
 It verifies the correct behavior of log pipeline CRUD operations, versioning, preview functionality,
 and pipeline processing.
 """
@@ -15,7 +15,7 @@ from fixtures.auth import USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD
 
 
 def test_create_logs_pipeline_success(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -72,7 +72,7 @@ def test_create_logs_pipeline_success(
     }
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
+        o11y.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -102,7 +102,7 @@ def test_create_logs_pipeline_success(
 
 
 def test_list_logs_pipelines_success(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -158,7 +158,7 @@ def test_list_logs_pipelines_success(
     }
 
     create_response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
+        o11y.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -171,7 +171,7 @@ def test_list_logs_pipelines_success(
 
     # List pipelines
     list_response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/logs/pipelines/latest"),
+        o11y.self.host_configs["8080"].get("/api/v1/logs/pipelines/latest"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -191,7 +191,7 @@ def test_list_logs_pipelines_success(
 
 
 def test_list_logs_pipelines_by_version(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -248,7 +248,7 @@ def test_list_logs_pipelines_by_version(
     }
 
     v1_response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
+        o11y.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -304,7 +304,7 @@ def test_list_logs_pipelines_by_version(
     }
 
     v2_response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
+        o11y.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -321,7 +321,7 @@ def test_list_logs_pipelines_by_version(
 
     # List by version 1
     v1_list_response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/logs/pipelines/{v1_version}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/logs/pipelines/{v1_version}"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -337,7 +337,7 @@ def test_list_logs_pipelines_by_version(
 
     # List by version 2
     v2_list_response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/logs/pipelines/{v2_version}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/logs/pipelines/{v2_version}"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -353,7 +353,7 @@ def test_list_logs_pipelines_by_version(
 
 
 def test_preview_logs_pipelines_success(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -423,7 +423,7 @@ def test_preview_logs_pipelines_success(
     }
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/logs/pipelines/preview"),
+        o11y.self.host_configs["8080"].get("/api/v1/logs/pipelines/preview"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -445,7 +445,7 @@ def test_preview_logs_pipelines_success(
 
 
 def test_create_multiple_pipelines_success(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -535,7 +535,7 @@ def test_create_multiple_pipelines_success(
     }
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
+        o11y.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -559,7 +559,7 @@ def test_create_multiple_pipelines_success(
 
 
 def test_delete_all_pipelines_success(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -616,7 +616,7 @@ def test_delete_all_pipelines_success(
     }
 
     create_response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
+        o11y.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -632,7 +632,7 @@ def test_delete_all_pipelines_success(
     delete_payload = {"pipelines": []}
 
     delete_response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
+        o11y.self.host_configs["8080"].get("/api/v1/logs/pipelines"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -651,7 +651,7 @@ def test_delete_all_pipelines_success(
 
     # Verify pipelines are deleted by listing
     list_response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/logs/pipelines/latest"),
+        o11y.self.host_configs["8080"].get("/api/v1/logs/pipelines/latest"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",

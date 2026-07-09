@@ -1,4 +1,4 @@
-### Monitor Azure Database for MySQL - Flexible Server with SigNoz
+### Monitor Azure Database for MySQL - Flexible Server with O11y
 
 Collect key Azure Database for MySQL - Flexible Server metrics and view them with an out of the box dashboard.
 

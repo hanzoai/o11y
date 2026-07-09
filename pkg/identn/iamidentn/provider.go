@@ -145,7 +145,7 @@ func (p *provider) provision(ctx context.Context, orgID valuer.UUID, orgSlug str
 	}
 
 	subject := authtypes.MustNewSubject(coretypes.NewResourceUser(), userID.String(), orgID, nil)
-	if err := p.authorizer.Grant(ctx, orgID, []string{authtypes.SigNozAdminRoleName}, subject); err != nil {
+	if err := p.authorizer.Grant(ctx, orgID, []string{authtypes.O11yAdminRoleName}, subject); err != nil {
 		return err
 	}
 

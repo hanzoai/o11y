@@ -19,7 +19,7 @@ const allDeps = {
 };
 
 // 4. Filter for @hanzo packages (design system + libs)
-const signozPackages = Object.keys(allDeps).filter((dep) =>
+const o11yPackages = Object.keys(allDeps).filter((dep) =>
 	dep.startsWith('@hanzo/'),
 );
 
@@ -36,14 +36,14 @@ const fileContent = `// --------------------------------------------------------
 // PR for reference: https://github.com/hanzoai/o11y/pull/9694
 // -------------------------------------------------------------------------
 
-${signozPackages.map((pkg) => `import '${pkg}';`).join('\n')}
+${o11yPackages.map((pkg) => `import '${pkg}';`).join('\n')}
 `;
 
 // 6. Write the file
 try {
 	fs.writeFileSync(registryPath, fileContent);
 	console.log(
-		`✅ Auto-import registry updated with ${signozPackages.length} @hanzo packages.`,
+		`✅ Auto-import registry updated with ${o11yPackages.length} @hanzo packages.`,
 	);
 } catch (err) {
 	console.error('❌ Failed to update auto-import registry:', err);

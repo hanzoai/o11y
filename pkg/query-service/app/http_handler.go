@@ -30,8 +30,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/licensing"
+	"github.com/hanzoai/o11y/pkg/o11y"
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
-	"github.com/hanzoai/o11y/pkg/signoz"
 	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 
@@ -118,7 +118,7 @@ type APIHandler struct {
 
 	LogsParsingPipelineController *logparsingpipeline.LogParsingPipelineController
 
-	// SetupCompleted indicates if SigNoz is ready for general use.
+	// SetupCompleted indicates if O11y is ready for general use.
 	// at the moment, we mark the app ready when the first user
 	// is registers.
 	SetupCompleted bool
@@ -144,7 +144,7 @@ type APIHandler struct {
 
 	QueryParserAPI *queryparser.API
 
-	Signoz *signoz.SigNoz
+	O11y *o11y.O11y
 }
 
 type APIHandlerOpts struct {
@@ -164,21 +164,21 @@ type APIHandlerOpts struct {
 
 	QueryParserAPI *queryparser.API
 
-	Signoz *signoz.SigNoz
+	O11y *o11y.O11y
 }
 
 // NewAPIHandler returns an APIHandler
-func NewAPIHandler(opts APIHandlerOpts, config signoz.Config) (*APIHandler, error) {
+func NewAPIHandler(opts APIHandlerOpts, config o11y.Config) (*APIHandler, error) {
 	querierOpts := querier.QuerierOptions{
 		Reader:       opts.Reader,
-		Cache:        opts.Signoz.Cache,
+		Cache:        opts.O11y.Cache,
 		KeyGenerator: queryBuilder.NewKeyGenerator(),
 		FluxInterval: opts.FluxInterval,
 	}
 
 	querierOptsV2 := querierV2.QuerierOptions{
 		Reader:       opts.Reader,
-		Cache:        opts.Signoz.Cache,
+		Cache:        opts.O11y.Cache,
 		KeyGenerator: queryBuilder.NewKeyGenerator(),
 		FluxInterval: opts.FluxInterval,
 	}
@@ -203,7 +203,7 @@ func NewAPIHandler(opts APIHandlerOpts, config signoz.Config) (*APIHandler, erro
 		logger:                        slog.Default(),
 		reader:                        opts.Reader,
 		temporalityMap:                make(map[string]map[v3.Temporality]bool),
-		ruleManager:                   opts.Signoz.Ruler,
+		ruleManager:                   opts.O11y.Ruler,
 		IntegrationsController:        opts.IntegrationsController,
 		LogsParsingPipelineController: opts.LogsParsingPipelineController,
 		querier:                       querier,
@@ -220,7 +220,7 @@ func NewAPIHandler(opts APIHandlerOpts, config signoz.Config) (*APIHandler, erro
 		jobsRepo:                      jobsRepo,
 		pvcsRepo:                      pvcsRepo,
 		LicensingAPI:                  opts.LicensingAPI,
-		Signoz:                        opts.Signoz,
+		O11y:                          opts.O11y,
 		QueryParserAPI:                opts.QueryParserAPI,
 	}
 
@@ -391,7 +391,7 @@ func (aH *APIHandler) RegisterQueryRangeV3Routes(router *mux.Router, am *middlew
 	subRouter.HandleFunc("/query_progress", am.ViewAccess(aH.GetQueryProgressUpdates)).Methods(http.MethodGet)
 
 	// live logs
-	subRouter.HandleFunc("/logs/livetail", am.ViewAccess(aH.Signoz.Handlers.QuerierHandler.QueryRawStream)).Methods(http.MethodGet)
+	subRouter.HandleFunc("/logs/livetail", am.ViewAccess(aH.O11y.Handlers.QuerierHandler.QueryRawStream)).Methods(http.MethodGet)
 }
 
 func (aH *APIHandler) RegisterInfraMetricsRoutes(router *mux.Router, am *middleware.AuthZ) {
@@ -487,29 +487,29 @@ func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
 	router.HandleFunc("/api/v1/rules/{id}/history/overall_status", am.ViewAccess(aH.getOverallStateTransitions)).Methods(http.MethodPost)
 
 	router.HandleFunc("/api/v1/dashboards", am.ViewAccess(aH.List)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/dashboards", am.EditAccess(aH.Signoz.Handlers.Dashboard.Create)).Methods(http.MethodPost)
+	router.HandleFunc("/api/v1/dashboards", am.EditAccess(aH.O11y.Handlers.Dashboard.Create)).Methods(http.MethodPost)
 	router.HandleFunc("/api/v1/dashboards/{id}", am.ViewAccess(aH.Get)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/dashboards/{id}", am.EditAccess(aH.Signoz.Handlers.Dashboard.Update)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v1/dashboards/{id}", am.EditAccess(aH.Signoz.Handlers.Dashboard.Delete)).Methods(http.MethodDelete)
-	router.HandleFunc("/api/v1/dashboards/{id}/lock", am.EditAccess(aH.Signoz.Handlers.Dashboard.LockUnlock)).Methods(http.MethodPut)
+	router.HandleFunc("/api/v1/dashboards/{id}", am.EditAccess(aH.O11y.Handlers.Dashboard.Update)).Methods(http.MethodPut)
+	router.HandleFunc("/api/v1/dashboards/{id}", am.EditAccess(aH.O11y.Handlers.Dashboard.Delete)).Methods(http.MethodDelete)
+	router.HandleFunc("/api/v1/dashboards/{id}/lock", am.EditAccess(aH.O11y.Handlers.Dashboard.LockUnlock)).Methods(http.MethodPut)
 	router.HandleFunc("/api/v2/variables/query", am.ViewAccess(aH.queryDashboardVarsV2)).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/v1/explorer/views", am.ViewAccess(aH.Signoz.Handlers.SavedView.List)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/explorer/views", am.EditAccess(aH.Signoz.Handlers.SavedView.Create)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.ViewAccess(aH.Signoz.Handlers.SavedView.Get)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.EditAccess(aH.Signoz.Handlers.SavedView.Update)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.EditAccess(aH.Signoz.Handlers.SavedView.Delete)).Methods(http.MethodDelete)
+	router.HandleFunc("/api/v1/explorer/views", am.ViewAccess(aH.O11y.Handlers.SavedView.List)).Methods(http.MethodGet)
+	router.HandleFunc("/api/v1/explorer/views", am.EditAccess(aH.O11y.Handlers.SavedView.Create)).Methods(http.MethodPost)
+	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.ViewAccess(aH.O11y.Handlers.SavedView.Get)).Methods(http.MethodGet)
+	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Update)).Methods(http.MethodPut)
+	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Delete)).Methods(http.MethodDelete)
 	router.HandleFunc("/api/v1/event", am.ViewAccess(aH.registerEvent)).Methods(http.MethodPost)
 
 	router.HandleFunc("/api/v1/services", am.ViewAccess(aH.getServices)).Methods(http.MethodPost) // Deprecated Usage, use the below endpoint /v2/services
-	router.HandleFunc("/api/v2/services", am.ViewAccess(aH.Signoz.Handlers.Services.Get)).Methods(http.MethodPost)
+	router.HandleFunc("/api/v2/services", am.ViewAccess(aH.O11y.Handlers.Services.Get)).Methods(http.MethodPost)
 	router.HandleFunc("/api/v1/services/list", am.ViewAccess(aH.getServicesList)).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/v2/service/top_operations", am.ViewAccess(aH.Signoz.Handlers.Services.GetTopOperations)).Methods(http.MethodPost)
+	router.HandleFunc("/api/v2/service/top_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetTopOperations)).Methods(http.MethodPost)
 	router.HandleFunc("/api/v1/service/top_operations", am.ViewAccess(aH.getTopOperations)).Methods(http.MethodPost)
 	router.HandleFunc("/api/v1/service/top_level_operations", am.ViewAccess(aH.getServicesTopLevelOps)).Methods(http.MethodPost)
 
-	router.HandleFunc("/api/v2/service/entry_point_operations", am.ViewAccess(aH.Signoz.Handlers.Services.GetEntryPointOperations)).Methods(http.MethodPost)
+	router.HandleFunc("/api/v2/service/entry_point_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetEntryPointOperations)).Methods(http.MethodPost)
 	router.HandleFunc("/api/v1/service/entry_point_operations", am.ViewAccess(aH.getEntryPointOps)).Methods(http.MethodPost)
 	router.HandleFunc("/api/v1/traces/{traceId}", am.ViewAccess(aH.SearchTraces)).Methods(http.MethodGet)
 	router.HandleFunc("/api/v1/usage", am.ViewAccess(aH.getUsage)).Methods(http.MethodGet)
@@ -519,8 +519,8 @@ func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
 	router.HandleFunc("/api/v2/settings/ttl", am.AdminAccess(aH.setCustomRetentionTTL)).Methods(http.MethodPost)
 	router.HandleFunc("/api/v2/settings/ttl", am.ViewAccess(aH.getCustomRetentionTTL)).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/v1/settings/apdex", am.AdminAccess(aH.Signoz.Handlers.Apdex.Set)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/settings/apdex", am.ViewAccess(aH.Signoz.Handlers.Apdex.Get)).Methods(http.MethodGet)
+	router.HandleFunc("/api/v1/settings/apdex", am.AdminAccess(aH.O11y.Handlers.Apdex.Set)).Methods(http.MethodPost)
+	router.HandleFunc("/api/v1/settings/apdex", am.ViewAccess(aH.O11y.Handlers.Apdex.Get)).Methods(http.MethodGet)
 
 	router.HandleFunc("/api/v2/traces/fields", am.ViewAccess(aH.traceFields)).Methods(http.MethodGet)
 	router.HandleFunc("/api/v2/traces/fields", am.EditAccess(aH.updateTraceField)).Methods(http.MethodPost)
@@ -538,9 +538,9 @@ func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
 	router.HandleFunc("/api/v1/disks", am.ViewAccess(aH.getDisks)).Methods(http.MethodGet)
 
 	// Quick Filters
-	router.HandleFunc("/api/v1/orgs/me/filters", am.ViewAccess(aH.Signoz.Handlers.QuickFilter.GetQuickFilters)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/orgs/me/filters/{signal}", am.ViewAccess(aH.Signoz.Handlers.QuickFilter.GetSignalFilters)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/orgs/me/filters", am.AdminAccess(aH.Signoz.Handlers.QuickFilter.UpdateQuickFilters)).Methods(http.MethodPut)
+	router.HandleFunc("/api/v1/orgs/me/filters", am.ViewAccess(aH.O11y.Handlers.QuickFilter.GetQuickFilters)).Methods(http.MethodGet)
+	router.HandleFunc("/api/v1/orgs/me/filters/{signal}", am.ViewAccess(aH.O11y.Handlers.QuickFilter.GetSignalFilters)).Methods(http.MethodGet)
+	router.HandleFunc("/api/v1/orgs/me/filters", am.AdminAccess(aH.O11y.Handlers.QuickFilter.UpdateQuickFilters)).Methods(http.MethodPut)
 
 	router.HandleFunc("/api/v1/register", am.OpenAccess(aH.registerUser)).Methods(http.MethodPost)
 
@@ -551,7 +551,7 @@ func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
 		aH.LicensingAPI.Activate(rw, req)
 	})).Methods(http.MethodGet)
 
-	router.HandleFunc("/api/v1/span_percentile", am.ViewAccess(aH.Signoz.Handlers.SpanPercentile.GetSpanPercentileDetails)).Methods(http.MethodPost)
+	router.HandleFunc("/api/v1/span_percentile", am.ViewAccess(aH.O11y.Handlers.SpanPercentile.GetSpanPercentileDetails)).Methods(http.MethodPost)
 
 	// Query Filter Analyzer api used to extract metric names and grouping columns from a query
 	router.HandleFunc("/api/v1/query_filter/analyze", am.ViewAccess(aH.QueryParserAPI.AnalyzeQueryFilter)).Methods(http.MethodPost)
@@ -1094,7 +1094,7 @@ func (aH *APIHandler) Get(rw http.ResponseWriter, r *http.Request) {
 		render.Error(rw, err)
 		return
 	}
-	dashboard, err := aH.Signoz.Modules.Dashboard.Get(ctx, orgID, dashboardID)
+	dashboard, err := aH.O11y.Modules.Dashboard.Get(ctx, orgID, dashboardID)
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -1125,7 +1125,7 @@ func (aH *APIHandler) List(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dashboards, err := aH.Signoz.Modules.Dashboard.List(ctx, orgID)
+	dashboards, err := aH.O11y.Modules.Dashboard.List(ctx, orgID)
 	if err != nil && !errors.Ast(err, errors.TypeNotFound) {
 		render.Error(rw, err)
 		return
@@ -1272,7 +1272,7 @@ func (aH *APIHandler) registerEvent(w http.ResponseWriter, r *http.Request) {
 	if errv2 == nil {
 		switch request.EventType {
 		case model.TrackEvent:
-			aH.Signoz.Analytics.TrackUser(r.Context(), claims.OrgID, claims.IdentityID(), request.EventName, request.Attributes)
+			aH.O11y.Analytics.TrackUser(r.Context(), claims.OrgID, claims.IdentityID(), request.EventName, request.Attributes)
 		}
 		aH.WriteJSON(w, r, map[string]string{"data": "Event Processed Successfully"})
 	} else {
@@ -1616,7 +1616,7 @@ func (aH *APIHandler) getVersion(w http.ResponseWriter, r *http.Request) {
 }
 
 func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
-	featureSet, err := aH.Signoz.Licensing.GetFeatureFlags(r.Context(), valuer.GenerateUUID())
+	featureSet, err := aH.O11y.Licensing.GetFeatureFlags(r.Context(), valuer.GenerateUUID())
 	if err != nil {
 		aH.HandleError(w, err, http.StatusInternalServerError)
 		return
@@ -1631,7 +1631,7 @@ func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
 	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	useSpanMetrics := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseSpanMetrics, evalCtx)
+	useSpanMetrics := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseSpanMetrics, evalCtx)
 
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseSpanMetrics.String()),
@@ -1641,7 +1641,7 @@ func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Route:      "",
 	})
 
-	bodyJSONQuery := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseJSONBody, evalCtx)
+	bodyJSONQuery := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseJSONBody, evalCtx)
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseJSONBody.String()),
 		Active:     bodyJSONQuery,
@@ -1650,7 +1650,7 @@ func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Route:      "",
 	})
 
-	fineGrainedAuthz := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseFineGrainedAuthz, evalCtx)
+	fineGrainedAuthz := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseFineGrainedAuthz, evalCtx)
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseFineGrainedAuthz.String()),
 		Active:     fineGrainedAuthz,
@@ -1659,7 +1659,7 @@ func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Route:      "",
 	})
 
-	useDashboardV2 := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseDashboardV2, evalCtx)
+	useDashboardV2 := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseDashboardV2, evalCtx)
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureUseDashboardV2.String()),
 		Active:     useDashboardV2,
@@ -1668,7 +1668,7 @@ func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
 		Route:      "",
 	})
 
-	aiObservability := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureEnableAIObservability, evalCtx)
+	aiObservability := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureEnableAIObservability, evalCtx)
 	featureSet = append(featureSet, &licensetypes.Feature{
 		Name:       valuer.NewString(flagger.FeatureEnableAIObservability.String()),
 		Active:     aiObservability,
@@ -1716,7 +1716,7 @@ func (aH *APIHandler) registerUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	organization := types.NewOrganization(req.OrgDisplayName, req.OrgName)
-	user, errv2 := aH.Signoz.Modules.UserSetter.CreateFirstUser(r.Context(), organization, req.Name, req.Email, req.Password)
+	user, errv2 := aH.O11y.Modules.UserSetter.CreateFirstUser(r.Context(), organization, req.Name, req.Email, req.Password)
 	if errv2 != nil {
 		render.Error(w, errv2)
 		return
@@ -2308,7 +2308,7 @@ func (aH *APIHandler) getProducerData(w http.ResponseWriter, r *http.Request) {
 		instrumentationtypes.CodeNamespace:    "app",
 		instrumentationtypes.CodeFunctionName: "getProducerData",
 	})
-	kafkaSpanEval := aH.Signoz.Flagger.BooleanOrEmpty(ctx, flagger.FeatureKafkaSpanEval, evalCtx)
+	kafkaSpanEval := aH.O11y.Flagger.BooleanOrEmpty(ctx, flagger.FeatureKafkaSpanEval, evalCtx)
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "producer", kafkaSpanEval)
 	if err != nil {
@@ -2361,7 +2361,7 @@ func (aH *APIHandler) getConsumerData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	kafkaSpanEval := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
+	kafkaSpanEval := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "consumer", kafkaSpanEval)
 	if err != nil {
@@ -2419,7 +2419,7 @@ func (aH *APIHandler) getPartitionOverviewLatencyData(w http.ResponseWriter, r *
 	}
 
 	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	kafkaSpanEval := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
+	kafkaSpanEval := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "producer-topic-throughput", kafkaSpanEval)
 	if err != nil {
@@ -2477,7 +2477,7 @@ func (aH *APIHandler) getConsumerPartitionLatencyData(w http.ResponseWriter, r *
 	}
 
 	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	kafkaSpanEval := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
+	kafkaSpanEval := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "consumer_partition_latency", kafkaSpanEval)
 	if err != nil {
@@ -2653,7 +2653,7 @@ func (aH *APIHandler) getProducerThroughputDetails(w http.ResponseWriter, r *htt
 	}
 
 	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	kafkaSpanEval := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
+	kafkaSpanEval := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "producer-throughput-details", kafkaSpanEval)
 	if err != nil {
@@ -2711,7 +2711,7 @@ func (aH *APIHandler) getConsumerThroughputOverview(w http.ResponseWriter, r *ht
 	}
 
 	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	kafkaSpanEval := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
+	kafkaSpanEval := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "consumer-throughput-overview", kafkaSpanEval)
 	if err != nil {
@@ -2769,7 +2769,7 @@ func (aH *APIHandler) getConsumerThroughputDetails(w http.ResponseWriter, r *htt
 	}
 
 	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	kafkaSpanEval := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
+	kafkaSpanEval := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "consumer-throughput-details", kafkaSpanEval)
 	if err != nil {
@@ -2830,7 +2830,7 @@ func (aH *APIHandler) getProducerConsumerEval(w http.ResponseWriter, r *http.Req
 	}
 
 	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	kafkaSpanEval := aH.Signoz.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
+	kafkaSpanEval := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureKafkaSpanEval, evalCtx)
 
 	queryRangeParams, err := kafka.BuildQueryRangeParams(messagingQueue, "producer-consumer-eval", kafkaSpanEval)
 	if err != nil {
@@ -3725,7 +3725,7 @@ func (aH *APIHandler) queryRangeV3(ctx context.Context, queryRangeParams *v3.Que
 		isUsed, traceIDs := tracesV3.TraceIdFilterUsedWithEqual(queryRangeParams)
 		if isUsed && len(traceIDs) > 0 {
 			aH.logger.DebugContext(ctx, "trace_id used as filter in traces query")
-			// query signoz_spans table with traceID to get min and max timestamp
+			// query o11y_spans table with traceID to get min and max timestamp
 			min, max, err := aH.reader.GetMinAndMaxTimestampForTraceID(ctx, traceIDs)
 			if err == nil {
 				// add timestamp filter to queryRange params
@@ -3736,7 +3736,7 @@ func (aH *APIHandler) queryRangeV3(ctx context.Context, queryRangeParams *v3.Que
 	}
 
 	// Hook up query progress tracking if requested
-	queryIdHeader := r.Header.Get("X-SIGNOZ-QUERY-ID")
+	queryIdHeader := r.Header.Get("X-O11Y-QUERY-ID")
 	if len(queryIdHeader) > 0 {
 		onQueryFinished, apiErr := aH.reader.ReportQueryStartForProgressTracking(queryIdHeader)
 
@@ -3877,7 +3877,7 @@ func (aH *APIHandler) sendQueryResultEvents(r *http.Request, result []*v3.Result
 
 	// Check if result is empty or has no data
 	if len(result) == 0 {
-		aH.Signoz.Analytics.TrackUser(r.Context(), claims.OrgID, claims.IdentityID(), "Telemetry Query Returned Empty", properties)
+		aH.O11y.Analytics.TrackUser(r.Context(), claims.OrgID, claims.IdentityID(), "Telemetry Query Returned Empty", properties)
 		return
 	}
 
@@ -3887,18 +3887,18 @@ func (aH *APIHandler) sendQueryResultEvents(r *http.Request, result []*v3.Result
 		if len(result[0].List) == 0 {
 			// Check if first result has no table data
 			if result[0].Table == nil {
-				aH.Signoz.Analytics.TrackUser(r.Context(), claims.OrgID, claims.IdentityID(), "Telemetry Query Returned Empty", properties)
+				aH.O11y.Analytics.TrackUser(r.Context(), claims.OrgID, claims.IdentityID(), "Telemetry Query Returned Empty", properties)
 				return
 			}
 
 			if len(result[0].Table.Rows) == 0 {
-				aH.Signoz.Analytics.TrackUser(r.Context(), claims.OrgID, claims.IdentityID(), "Telemetry Query Returned Empty", properties)
+				aH.O11y.Analytics.TrackUser(r.Context(), claims.OrgID, claims.IdentityID(), "Telemetry Query Returned Empty", properties)
 				return
 			}
 		}
 	}
 
-	aH.Signoz.Analytics.TrackUser(r.Context(), claims.OrgID, claims.IdentityID(), "Telemetry Query Returned Results", properties)
+	aH.O11y.Analytics.TrackUser(r.Context(), claims.OrgID, claims.IdentityID(), "Telemetry Query Returned Results", properties)
 
 }
 
@@ -4079,7 +4079,7 @@ func (aH *APIHandler) queryRangeV4(ctx context.Context, queryRangeParams *v3.Que
 		isUsed, traceIDs := tracesV3.TraceIdFilterUsedWithEqual(queryRangeParams)
 		if isUsed && len(traceIDs) > 0 {
 			aH.logger.DebugContext(ctx, "trace_id used as filter in traces query")
-			// query signoz_spans table with traceID to get min and max timestamp
+			// query o11y_spans table with traceID to get min and max timestamp
 			min, max, err := aH.reader.GetMinAndMaxTimestampForTraceID(ctx, traceIDs)
 			if err == nil {
 				// add timestamp filter to queryRange params
@@ -4252,7 +4252,7 @@ func (aH *APIHandler) getDomainList(w http.ResponseWriter, r *http.Request) {
 		instrumentationtypes.CodeFunctionName: "getDomainList",
 	})
 	// Execute the query using the v5 querier
-	result, err := aH.Signoz.Querier.QueryRange(ctx, orgID, queryRangeRequest)
+	result, err := aH.O11y.Querier.QueryRange(ctx, orgID, queryRangeRequest)
 	if err != nil {
 		aH.logger.ErrorContext(r.Context(), "query execution failed", errors.Attr(err))
 		apiErrObj := errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, err.Error())
@@ -4312,7 +4312,7 @@ func (aH *APIHandler) getDomainInfo(w http.ResponseWriter, r *http.Request) {
 		instrumentationtypes.CodeFunctionName: "getDomainInfo",
 	})
 	// Execute the query using the v5 querier
-	result, err := aH.Signoz.Querier.QueryRange(ctx, orgID, queryRangeRequest)
+	result, err := aH.O11y.Querier.QueryRange(ctx, orgID, queryRangeRequest)
 	if err != nil {
 		aH.logger.ErrorContext(r.Context(), "query execution failed", errors.Attr(err))
 		apiErrObj := errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, err.Error())
@@ -4342,23 +4342,23 @@ func (aH *APIHandler) RegisterTraceFunnelsRoutes(router *mux.Router, am *middlew
 
 	// API endpoints
 	traceFunnelsRouter.HandleFunc("/new",
-		am.EditAccess(aH.Signoz.Handlers.TraceFunnel.New)).
+		am.EditAccess(aH.O11y.Handlers.TraceFunnel.New)).
 		Methods(http.MethodPost)
 	traceFunnelsRouter.HandleFunc("/list",
-		am.ViewAccess(aH.Signoz.Handlers.TraceFunnel.List)).
+		am.ViewAccess(aH.O11y.Handlers.TraceFunnel.List)).
 		Methods(http.MethodGet)
 	traceFunnelsRouter.HandleFunc("/steps/update",
-		am.EditAccess(aH.Signoz.Handlers.TraceFunnel.UpdateSteps)).
+		am.EditAccess(aH.O11y.Handlers.TraceFunnel.UpdateSteps)).
 		Methods(http.MethodPut)
 
 	traceFunnelsRouter.HandleFunc("/{funnel_id}",
-		am.ViewAccess(aH.Signoz.Handlers.TraceFunnel.Get)).
+		am.ViewAccess(aH.O11y.Handlers.TraceFunnel.Get)).
 		Methods(http.MethodGet)
 	traceFunnelsRouter.HandleFunc("/{funnel_id}",
-		am.EditAccess(aH.Signoz.Handlers.TraceFunnel.Delete)).
+		am.EditAccess(aH.O11y.Handlers.TraceFunnel.Delete)).
 		Methods(http.MethodDelete)
 	traceFunnelsRouter.HandleFunc("/{funnel_id}",
-		am.EditAccess(aH.Signoz.Handlers.TraceFunnel.UpdateFunnel)).
+		am.EditAccess(aH.O11y.Handlers.TraceFunnel.UpdateFunnel)).
 		Methods(http.MethodPut)
 
 	// Analytics endpoints
@@ -4389,7 +4389,7 @@ func (aH *APIHandler) handleValidateTraces(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	funnel, err := aH.Signoz.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
+	funnel, err := aH.O11y.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
 	if err != nil {
 		RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("funnel not found: %v", err)}, nil)
 		return
@@ -4431,7 +4431,7 @@ func (aH *APIHandler) handleFunnelAnalytics(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	funnel, err := aH.Signoz.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
+	funnel, err := aH.O11y.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
 	if err != nil {
 		RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("funnel not found: %v", err)}, nil)
 		return
@@ -4468,7 +4468,7 @@ func (aH *APIHandler) handleFunnelStepAnalytics(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	funnel, err := aH.Signoz.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
+	funnel, err := aH.O11y.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
 	if err != nil {
 		RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("funnel not found: %v", err)}, nil)
 		return
@@ -4505,7 +4505,7 @@ func (aH *APIHandler) handleStepAnalytics(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	funnel, err := aH.Signoz.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
+	funnel, err := aH.O11y.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
 	if err != nil {
 		RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("funnel not found: %v", err)}, nil)
 		return
@@ -4542,7 +4542,7 @@ func (aH *APIHandler) handleFunnelSlowTraces(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	funnel, err := aH.Signoz.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
+	funnel, err := aH.O11y.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
 	if err != nil {
 		RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("funnel not found: %v", err)}, nil)
 		return
@@ -4579,7 +4579,7 @@ func (aH *APIHandler) handleFunnelErrorTraces(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	funnel, err := aH.Signoz.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
+	funnel, err := aH.O11y.Modules.TraceFunnel.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
 	if err != nil {
 		RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("funnel not found: %v", err)}, nil)
 		return

@@ -22,12 +22,12 @@ export const MCP_CLIENTS: McpClient[] = [
 	{
 		key: 'cursor',
 		label: 'Cursor',
-		docsPath: '/docs/ai/signoz-mcp-server/#cursor',
+		docsPath: '/docs/ai/o11y-mcp-server/#cursor',
 		snippet: (endpoint): string =>
 			JSON.stringify(
 				{
 					mcpServers: {
-						signoz: {
+						o11y: {
 							url: endpoint,
 						},
 					},
@@ -37,26 +37,26 @@ export const MCP_CLIENTS: McpClient[] = [
 			),
 		installUrl: (endpoint): string => {
 			const config = b64url(JSON.stringify({ url: endpoint }));
-			return `cursor://anysphere.cursor-deeplink/mcp/install?name=SigNoz&config=${config}`;
+			return `cursor://anysphere.cursor-deeplink/mcp/install?name=O11y&config=${config}`;
 		},
 		installLabel: 'Add to Cursor',
 	},
 	{
 		key: 'claude-code',
 		label: 'Claude Code',
-		docsPath: '/docs/ai/signoz-mcp-server/#claude-code',
+		docsPath: '/docs/ai/o11y-mcp-server/#claude-code',
 		snippet: (endpoint): string =>
-			`claude mcp add --scope user --transport http signoz ${endpoint}`,
+			`claude mcp add --scope user --transport http o11y ${endpoint}`,
 	},
 	{
 		key: 'vscode',
 		label: 'VS Code',
-		docsPath: '/docs/ai/signoz-mcp-server/#vs-code',
+		docsPath: '/docs/ai/o11y-mcp-server/#vs-code',
 		snippet: (endpoint): string =>
 			JSON.stringify(
 				{
 					servers: {
-						signoz: {
+						o11y: {
 							type: 'http',
 							url: endpoint,
 						},
@@ -68,7 +68,7 @@ export const MCP_CLIENTS: McpClient[] = [
 		installUrl: (endpoint): string => {
 			const payload = encodeURIComponent(
 				JSON.stringify({
-					name: 'signoz',
+					name: 'o11y',
 					config: { type: 'http', url: endpoint },
 				}),
 			);
@@ -79,7 +79,7 @@ export const MCP_CLIENTS: McpClient[] = [
 	{
 		key: 'claude-desktop',
 		label: 'Claude Desktop',
-		docsPath: '/docs/ai/signoz-mcp-server/#claude-desktop',
+		docsPath: '/docs/ai/o11y-mcp-server/#claude-desktop',
 		snippet: null,
 		instructions:
 			'Open Claude Desktop, go to Settings → Connectors → Add custom connector, and paste the endpoint URL above. Claude Desktop does not read remote MCP servers from claude_desktop_config.json - the connector UI is the only supported path.',
@@ -87,16 +87,16 @@ export const MCP_CLIENTS: McpClient[] = [
 	{
 		key: 'codex',
 		label: 'Codex',
-		docsPath: '/docs/ai/signoz-mcp-server/#codex',
-		snippet: (endpoint): string => `codex mcp add signoz --url ${endpoint}`,
+		docsPath: '/docs/ai/o11y-mcp-server/#codex',
+		snippet: (endpoint): string => `codex mcp add o11y --url ${endpoint}`,
 	},
 	{
 		key: 'other',
 		label: 'Other',
-		docsPath: '/docs/ai/signoz-mcp-server/',
+		docsPath: '/docs/ai/o11y-mcp-server/',
 		snippet: null,
 		instructions:
-			'Most MCP clients that support remote HTTP servers will accept the endpoint URL above. Add it as a new MCP server in your client and paste your SigNoz API key when the client prompts for authentication. See the docs for client-specific instructions.',
+			'Most MCP clients that support remote HTTP servers will accept the endpoint URL above. Add it as a new MCP server in your client and paste your O11y API key when the client prompts for authentication. See the docs for client-specific instructions.',
 	},
 ];
 
@@ -104,5 +104,5 @@ export function docsUrl(path: string): string {
 	return `${DOCS_BASE_URL}${path}`;
 }
 
-export const MCP_DOCS_URL = `${DOCS_BASE_URL}/docs/ai/signoz-mcp-server/`;
+export const MCP_DOCS_URL = `${DOCS_BASE_URL}/docs/ai/o11y-mcp-server/`;
 export const MCP_USE_CASES_URL = `${DOCS_BASE_URL}/docs/ai/use-cases/`;

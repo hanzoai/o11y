@@ -48,9 +48,9 @@ func (migration *migrateRulesV4ToV5) getLogDuplicateKeys(ctx context.Context) ([
 	query := `
 		SELECT name
 		FROM (
-			SELECT DISTINCT name FROM signoz_logs.distributed_logs_attribute_keys
+			SELECT DISTINCT name FROM o11y_logs.distributed_logs_attribute_keys
 			INTERSECT
-			SELECT DISTINCT name FROM signoz_logs.distributed_logs_resource_keys
+			SELECT DISTINCT name FROM o11y_logs.distributed_logs_resource_keys
 		)
 		ORDER BY name
 	`
@@ -78,7 +78,7 @@ func (migration *migrateRulesV4ToV5) getLogDuplicateKeys(ctx context.Context) ([
 func (migration *migrateRulesV4ToV5) getTraceDuplicateKeys(ctx context.Context) ([]string, error) {
 	query := `
 		SELECT tagKey
-		FROM signoz_traces.distributed_span_attributes_keys
+		FROM o11y_traces.distributed_span_attributes_keys
 		WHERE tagType IN ('tag', 'resource')
 		GROUP BY tagKey
 		HAVING COUNT(DISTINCT tagType) > 1

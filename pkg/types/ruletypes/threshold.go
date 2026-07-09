@@ -53,15 +53,15 @@ func (RuleThresholdData) JSONSchemaOneOf() []any {
 	}
 }
 
-// PrepareJSONSchema marks the schema with x-signoz-discriminator;
-// signoz.attachDiscriminators promotes it to a real OpenAPI 3
+// PrepareJSONSchema marks the schema with x-o11y-discriminator;
+// o11y.attachDiscriminators promotes it to a real OpenAPI 3
 // discriminator after reflection.
 func (RuleThresholdData) PrepareJSONSchema(schema *jsonschema.Schema) error {
 	if schema.ExtraProperties == nil {
 		schema.ExtraProperties = map[string]any{}
 	}
 
-	schema.ExtraProperties["x-signoz-discriminator"] = map[string]any{
+	schema.ExtraProperties["x-o11y-discriminator"] = map[string]any{
 		"propertyName": "kind",
 		"mapping": map[string]string{
 			"basic": "#/components/schemas/RuletypesThresholdBasic",

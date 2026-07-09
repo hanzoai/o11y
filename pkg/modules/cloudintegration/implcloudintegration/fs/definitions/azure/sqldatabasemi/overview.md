@@ -1,4 +1,4 @@
-### Monitor Azure SQL Database Managed Instance with SigNoz
+### Monitor Azure SQL Database Managed Instance with O11y
 
 Collect key Azure SQL Database Managed Instance metrics and view them with an out of the box dashboard.
 

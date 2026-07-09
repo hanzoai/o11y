@@ -57,7 +57,7 @@ func newConfig() factory.Config {
 			MaxConnLifetime: 0,
 		},
 		Sqlite: SqliteConfig{
-			Path:            "/var/lib/signoz/signoz.db",
+			Path:            "/var/lib/o11y/o11y.db",
 			Mode:            "wal",
 			BusyTimeout:     10000 * time.Millisecond, // increasing the defaults from https://github.com/mattn/go-sqlite3/blob/master/sqlite3.go#L1098 because of transpilation from C to GO
 			TransactionMode: "deferred",

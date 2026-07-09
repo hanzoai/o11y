@@ -1,1 +1,1 @@
-# SigNoz integrations
+# O11y integrations

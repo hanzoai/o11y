@@ -25,8 +25,8 @@ const SA_ROLE_DELETE_ENDPOINT = '*/api/v1/service_accounts/:id/roles/:rid';
 const activeAccountResponse = {
 	id: 'sa-1',
 	name: 'CI Bot',
-	email: 'ci-bot@signoz.io',
-	roles: ['signoz-admin'],
+	email: 'ci-bot@o11y.io',
+	roles: ['o11y-admin'],
 	status: 'ACTIVE',
 	createdAt: '2026-01-01T00:00:00Z',
 	updatedAt: '2026-01-02T00:00:00Z',
@@ -88,7 +88,7 @@ function setupBaseHandlers(): void {
 				ctx.status(200),
 				ctx.json({
 					data: listRolesSuccessResponse.data.filter(
-						(r) => r.name === 'signoz-admin',
+						(r) => r.name === 'o11y-admin',
 					),
 				}),
 			),

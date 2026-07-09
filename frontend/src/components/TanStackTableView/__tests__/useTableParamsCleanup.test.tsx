@@ -126,7 +126,7 @@ describe('URL cleanup pattern (simulating ListAlertRules behavior)', () => {
 	it('cleanup should work even when limit was set from localStorage preference', async () => {
 		// Pre-set preference
 		localStorage.setItem(
-			'@signoz/table-columns/alert-rules-preferred-page-size',
+			'@o11y/table-columns/alert-rules-preferred-page-size',
 			'100',
 		);
 

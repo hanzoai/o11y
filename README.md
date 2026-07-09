@@ -51,17 +51,17 @@ Implements:
 <p align="center">All your logs, metrics, and traces in one place. Monitor your application, spot issues before they occur and troubleshoot downtime quickly with rich context. Hanzo O11y is a cost-effective open-source alternative to Datadog and New Relic. Visit <a href="https://o11y.hanzo.ai" target="_blank">o11y.hanzo.ai</a> for the full documentation, tutorials, and guide.</p>
 
 <p align="center">
-    <img alt="GitHub issues" src="https://img.shields.io/github/issues/signoz/signoz"> </a>
-    <a href="https://twitter.com/intent/tweet?text=Monitor%20your%20applications%20and%20troubleshoot%20problems%20with%20Hanzo O11y,%20an%20open-source%20alternative%20to%20DataDog,%20NewRelic.&url=https://o11y.hanzo.ai/&via=Hanzo O11yHQ&hashtags=opensource,signoz,observability"> 
+    <img alt="GitHub issues" src="https://img.shields.io/github/issues/o11y/o11y"> </a>
+    <a href="https://twitter.com/intent/tweet?text=Monitor%20your%20applications%20and%20troubleshoot%20problems%20with%20Hanzo O11y,%20an%20open-source%20alternative%20to%20DataDog,%20NewRelic.&url=https://o11y.hanzo.ai/&via=Hanzo O11yHQ&hashtags=opensource,o11y,observability"> 
         <img alt="tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"> </a> 
 </p>
   
   
 <h3 align="center">
   <a href="https://o11y.hanzo.ai/docs"><b>Documentation</b></a> &bull;
-  <a href="https://github.com/Hanzo O11y/signoz/blob/main/README.zh-cn.md"><b>ReadMe in Chinese</b></a> &bull;
-  <a href="https://github.com/Hanzo O11y/signoz/blob/main/README.de-de.md"><b>ReadMe in German</b></a> &bull;
-  <a href="https://github.com/Hanzo O11y/signoz/blob/main/README.pt-br.md"><b>ReadMe in Portuguese</b></a> &bull;
+  <a href="https://github.com/Hanzo O11y/o11y/blob/main/README.zh-cn.md"><b>ReadMe in Chinese</b></a> &bull;
+  <a href="https://github.com/Hanzo O11y/o11y/blob/main/README.de-de.md"><b>ReadMe in German</b></a> &bull;
+  <a href="https://github.com/Hanzo O11y/o11y/blob/main/README.pt-br.md"><b>ReadMe in Portuguese</b></a> &bull;
   <a href="https://o11y.hanzo.ai/slack"><b>Slack Community</b></a> &bull;
   <a href="https://twitter.com/Hanzo O11yHq"><b>Twitter</b></a>
 </h3>
@@ -278,10 +278,10 @@ You can find docs at https://o11y.hanzo.ai/docs/. If you need any clarification 
 
 Join the [slack community](https://o11y.hanzo.ai/slack) to know more about distributed tracing, observability, or Hanzo O11y and to connect with other users and contributors.
 
-If you have any ideas, questions, or any feedback, please share on our [Github Discussions](https://github.com/Hanzo O11y/signoz/discussions)
+If you have any ideas, questions, or any feedback, please share on our [Github Discussions](https://github.com/Hanzo O11y/o11y/discussions)
 
 As always, thanks to our amazing contributors!
 
-<a href="https://github.com/signoz/signoz/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=signoz/signoz" />
+<a href="https://github.com/o11y/o11y/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=o11y/o11y" />
 </a>

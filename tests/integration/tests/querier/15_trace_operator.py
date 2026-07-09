@@ -248,7 +248,7 @@ def _names(response: requests.Response) -> set:
     ],
 )
 def test_trace_operator(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -417,7 +417,7 @@ def test_trace_operator(
         spec["order"] = case["order"]
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -582,7 +582,7 @@ def _expected_trace_subset(trace: Traces) -> dict[str, Any]:
     ],
 )
 def test_trace_operator_with_adjusted_keys(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -603,7 +603,7 @@ def test_trace_operator_with_adjusted_keys(
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=5)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),

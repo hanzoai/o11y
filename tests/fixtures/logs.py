@@ -424,7 +424,7 @@ def insert_logs_to_clickhouse(conn, logs: list[Logs]) -> None:
 
     if len(resources) > 0:
         conn.insert(
-            database="signoz_logs",
+            database="o11y_logs",
             table="distributed_logs_v2_resource",
             data=[resource.np_arr() for resource in resources],
             column_names=[
@@ -440,7 +440,7 @@ def insert_logs_to_clickhouse(conn, logs: list[Logs]) -> None:
 
     if len(tag_attributes) > 0:
         conn.insert(
-            database="signoz_logs",
+            database="o11y_logs",
             table="distributed_tag_attributes_v2",
             data=[tag_attribute.np_arr() for tag_attribute in tag_attributes],
         )
@@ -451,7 +451,7 @@ def insert_logs_to_clickhouse(conn, logs: list[Logs]) -> None:
 
     if len(attribute_keys) > 0:
         conn.insert(
-            database="signoz_logs",
+            database="o11y_logs",
             table="distributed_logs_attribute_keys",
             data=[attribute_key.np_arr() for attribute_key in attribute_keys],
         )
@@ -462,7 +462,7 @@ def insert_logs_to_clickhouse(conn, logs: list[Logs]) -> None:
 
     if len(resource_keys) > 0:
         conn.insert(
-            database="signoz_logs",
+            database="o11y_logs",
             table="distributed_logs_resource_keys",
             data=[resource_key.np_arr() for resource_key in resource_keys],
         )
@@ -491,7 +491,7 @@ def insert_logs_to_clickhouse(conn, logs: list[Logs]) -> None:
         "resource",
     ]
 
-    result = conn.query("SELECT count() FROM system.columns WHERE database = 'signoz_logs' AND table = 'logs_v2' AND name = 'body_v2'")
+    result = conn.query("SELECT count() FROM system.columns WHERE database = 'o11y_logs' AND table = 'logs_v2' AND name = 'body_v2'")
     has_json_body = result.result_rows[0][0] > 0
 
     if has_json_body:
@@ -504,7 +504,7 @@ def insert_logs_to_clickhouse(conn, logs: list[Logs]) -> None:
         data = [log.np_arr()[keep_indices] for log in logs]
 
     conn.insert(
-        database="signoz_logs",
+        database="o11y_logs",
         table="distributed_logs_v2",
         data=data,
         column_names=column_names,
@@ -524,7 +524,7 @@ def truncate_logs_tables(conn, cluster: str) -> None:
     """Truncate all logs tables. Used by the pytest fixture teardown and by
     the seeder's DELETE /telemetry/logs endpoint."""
     for table in _LOGS_TABLES_TO_TRUNCATE:
-        conn.query(f"TRUNCATE TABLE signoz_logs.{table} ON CLUSTER '{cluster}' SYNC")
+        conn.query(f"TRUNCATE TABLE o11y_logs.{table} ON CLUSTER '{cluster}' SYNC")
 
 
 @pytest.fixture(name="insert_logs", scope="function")
@@ -538,13 +538,13 @@ def insert_logs(
 
     truncate_logs_tables(
         clickhouse.conn,
-        clickhouse.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"],
+        clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"],
     )
 
 
 @pytest.fixture(name="materialize_log_field", scope="function")
 def materialize_log_field(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
 ) -> Generator[Callable[[str, str, str, str], None]]:
     mat_fields: list[tuple[str, str, str]] = []
 
@@ -555,7 +555,7 @@ def materialize_log_field(
         field_type: str,
     ) -> None:
         response = requests.post(
-            signoz.self.host_configs["8080"].get("/api/v1/logs/fields"),
+            o11y.self.host_configs["8080"].get("/api/v1/logs/fields"),
             headers={"authorization": f"Bearer {token}"},
             json={
                 "name": name,
@@ -575,14 +575,14 @@ def materialize_log_field(
         if mat_field_type == "resources":
             mat_field_type = "resource"
         field = f"{mat_field_type}_{mat_field_data_type}_{mat_field_name}"
-        signoz.telemetrystore.conn.query(f"ALTER TABLE signoz_logs.logs_v2 ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' DROP INDEX IF EXISTS {field}_idx")
+        o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' DROP INDEX IF EXISTS {field}_idx")
         for table in ["logs_v2", "distributed_logs_v2"]:
-            signoz.telemetrystore.conn.query(f"ALTER TABLE signoz_logs.{table} ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' DROP COLUMN IF EXISTS {field}")
-            signoz.telemetrystore.conn.query(f"ALTER TABLE signoz_logs.{table} ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' DROP COLUMN IF EXISTS {field}_exists")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' DROP COLUMN IF EXISTS {field}")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' DROP COLUMN IF EXISTS {field}_exists")
 
 
 @pytest.fixture(name="ttl_legacy_logs_v2_table_setup", scope="function")
-def ttl_legacy_logs_v2_table_setup(request, signoz: types.SigNoz):
+def ttl_legacy_logs_v2_table_setup(request, o11y: types.O11y):
     """
     Fixture to setup and teardown legacy TTL test environment.
     It renames existing logs tables to backup names and creates new empty tables for testing.
@@ -590,14 +590,14 @@ def ttl_legacy_logs_v2_table_setup(request, signoz: types.SigNoz):
     """
 
     # Setup code
-    result = signoz.telemetrystore.conn.query(f"RENAME TABLE signoz_logs.logs_v2 TO signoz_logs.logs_v2_backup ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'").result_rows
+    result = o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2 TO o11y_logs.logs_v2_backup ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'").result_rows
     assert result is not None
     # Add cleanup to restore original table
-    request.addfinalizer(lambda: signoz.telemetrystore.conn.query(f"RENAME TABLE signoz_logs.logs_v2_backup TO signoz_logs.logs_v2 ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'"))
+    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2_backup TO o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'"))
 
     # Create new test tables
-    result = signoz.telemetrystore.conn.query(
-        f"""CREATE TABLE signoz_logs.logs_v2 ON CLUSTER '{signoz.telemetrystore.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
+    result = o11y.telemetrystore.conn.query(
+        f"""CREATE TABLE o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
                                                 (
                                                     `id` String,
                                                     `timestamp` UInt64 CODEC(DoubleDelta, LZ4)
@@ -609,13 +609,13 @@ def ttl_legacy_logs_v2_table_setup(request, signoz: types.SigNoz):
 
     assert result is not None
     # Add cleanup to drop test table
-    request.addfinalizer(lambda: signoz.telemetrystore.conn.query(f"DROP TABLE IF EXISTS signoz_logs.logs_v2 ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'"))
+    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"DROP TABLE IF EXISTS o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'"))
 
     yield  # Test runs here
 
 
 @pytest.fixture(name="ttl_legacy_logs_v2_resource_table_setup", scope="function")
-def ttl_legacy_logs_v2_resource_table_setup(request, signoz: types.SigNoz):
+def ttl_legacy_logs_v2_resource_table_setup(request, o11y: types.O11y):
     """
     Fixture to setup and teardown legacy TTL test environment.
     It renames existing logs tables to backup names and creates new empty tables for testing.
@@ -623,14 +623,14 @@ def ttl_legacy_logs_v2_resource_table_setup(request, signoz: types.SigNoz):
     """
 
     # Setup code
-    result = signoz.telemetrystore.conn.query(f"RENAME TABLE signoz_logs.logs_v2_resource TO signoz_logs.logs_v2_resource_backup ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'").result_rows
+    result = o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2_resource TO o11y_logs.logs_v2_resource_backup ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'").result_rows
     assert result is not None
     # Add cleanup to restore original table
-    request.addfinalizer(lambda: signoz.telemetrystore.conn.query(f"RENAME TABLE signoz_logs.logs_v2_resource_backup TO signoz_logs.logs_v2_resource ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'"))
+    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2_resource_backup TO o11y_logs.logs_v2_resource ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'"))
 
     # Create new test tables
-    result = signoz.telemetrystore.conn.query(
-        f"""CREATE TABLE signoz_logs.logs_v2_resource ON CLUSTER '{signoz.telemetrystore.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
+    result = o11y.telemetrystore.conn.query(
+        f"""CREATE TABLE o11y_logs.logs_v2_resource ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
                                                 (
                                                     `id` String,
                                                     `seen_at_ts_bucket_start` Int64 CODEC(Delta(8), ZSTD(1))
@@ -641,13 +641,13 @@ def ttl_legacy_logs_v2_resource_table_setup(request, signoz: types.SigNoz):
 
     assert result is not None
     # Add cleanup to drop test table
-    request.addfinalizer(lambda: signoz.telemetrystore.conn.query(f"DROP TABLE IF EXISTS signoz_logs.logs_v2_resource ON CLUSTER '{signoz.telemetrystore.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}';"))
+    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"DROP TABLE IF EXISTS o11y_logs.logs_v2_resource ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}';"))
 
     yield  # Test runs here
 
 
 @pytest.fixture(name="remove_logs_ttl_settings", scope="function")
-def remove_logs_ttl_settings(signoz: types.SigNoz):
+def remove_logs_ttl_settings(o11y: types.O11y):
     """
     Remove TTL settings from the specified logs table.
     This function alters the table to drop any existing TTL configurations
@@ -671,21 +671,21 @@ def remove_logs_ttl_settings(signoz: types.SigNoz):
                 "distributed_logs_v2_resource",
             ]:
                 reset_retention_query = f"""
-                ALTER TABLE signoz_logs.{table} ON CLUSTER '{signoz.telemetrystore.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
+                ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
                 MODIFY COLUMN _retention_days UInt16 DEFAULT 0
                 """
-                signoz.telemetrystore.conn.query(reset_retention_query)
+                o11y.telemetrystore.conn.query(reset_retention_query)
 
                 reset_retention_cold_query = f"""
-                ALTER TABLE signoz_logs.{table} ON CLUSTER '{signoz.telemetrystore.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
+                ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
                 MODIFY COLUMN _retention_days_cold UInt16 DEFAULT 0
                 """
-                signoz.telemetrystore.conn.query(reset_retention_cold_query)
+                o11y.telemetrystore.conn.query(reset_retention_cold_query)
             else:
                 alter_query = f"""
-                ALTER TABLE signoz_logs.{table} ON CLUSTER '{signoz.telemetrystore.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
+                ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
                 REMOVE TTL
                 """
-                signoz.telemetrystore.conn.query(alter_query)
+                o11y.telemetrystore.conn.query(alter_query)
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"Error removing TTL from table {table}: {e}")

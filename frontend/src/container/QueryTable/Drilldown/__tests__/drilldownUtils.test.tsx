@@ -616,7 +616,7 @@ describe('drilldownUtils', () => {
 						{
 							queryName: 'm',
 							dataSource: 'metrics' as any,
-							aggregations: [{ metricName: 'signoz_calls_total' }] as any,
+							aggregations: [{ metricName: 'o11y_calls_total' }] as any,
 							groupBy: [],
 							expression: '',
 							disabled: false,
@@ -650,7 +650,7 @@ describe('drilldownUtils', () => {
 						{
 							queryName: 'm',
 							dataSource: 'metrics' as any,
-							aggregations: [{ metricName: 'signoz_calls_total' }] as any,
+							aggregations: [{ metricName: 'o11y_calls_total' }] as any,
 							groupBy: [],
 							expression: '',
 							disabled: false,

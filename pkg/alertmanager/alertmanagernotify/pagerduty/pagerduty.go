@@ -1,4 +1,4 @@
-// Copyright (c) 2026 SigNoz, Inc.
+// Copyright (c) 2026 O11y, Inc.
 // Copyright 2019 Prometheus Team
 // SPDX-License-Identifier: Apache-2.0
 
@@ -15,10 +15,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/alecthomas/units"
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertemplate"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
-	"github.com/alecthomas/units"
 	commoncfg "github.com/prometheus/common/config"
 	"github.com/prometheus/common/model"
 

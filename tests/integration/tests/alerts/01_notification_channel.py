@@ -14,7 +14,7 @@ logger = setup_logger(__name__)
 
 
 def test_webhook_notification_channel(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token: Callable[[str, str], str],
     notification_channel: types.TestContainerDocker,
     make_http_mocks: Callable[[types.TestContainerDocker, list[Mapping]], None],
@@ -57,7 +57,7 @@ def test_webhook_notification_channel(
     )
 
     # TODO: @abhishekhugetech # pylint: disable=W0511
-    # Time required for newly created Org to be registered in the alertmanager is 5 seconds in signoz.py
+    # Time required for newly created Org to be registered in the alertmanager is 5 seconds in o11y.py
     # this will be fixed after [https://github.com/SigNoz/engineering-pod/issues/3800]
     # 10 seconds safe time for org to be registered in the alertmanager
     time.sleep(10)
@@ -65,7 +65,7 @@ def test_webhook_notification_channel(
     # Call test API for the notification channel
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = requests.post(
-        url=signoz.self.host_configs["8080"].get("/api/v1/testChannel"),
+        url=o11y.self.host_configs["8080"].get("/api/v1/testChannel"),
         json={
             "name": notification_channel_name,
             "webhook_configs": [

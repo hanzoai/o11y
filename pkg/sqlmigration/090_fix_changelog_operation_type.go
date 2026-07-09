@@ -38,9 +38,9 @@ func (migration *fixChangelogOperationType) Up(ctx context.Context, db *bun.DB) 
 	//      tuple and changelog tables (BYTEA <-> TEXT)
 	//
 	// Changelog: drop and recreate (it is only used by OpenFGA's ReadChanges
-	// API which SigNoz does not call; authorization data lives in tuple).
+	// API which O11y does not call; authorization data lives in tuple).
 	// Tuple: alter columns in place (condition columns are always NULL since
-	// SigNoz does not use FGA conditions).
+	// O11y does not use FGA conditions).
 
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {

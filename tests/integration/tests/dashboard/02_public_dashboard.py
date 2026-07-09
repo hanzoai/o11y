@@ -9,30 +9,30 @@ from wiremock.resources.mappings import Mapping
 
 from fixtures.auth import USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD, add_license
 from fixtures.metrics import Metrics
-from fixtures.types import Operation, SigNoz, TestContainerDocker
+from fixtures.types import Operation, O11y, TestContainerDocker
 
 
 def test_apply_license(
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[TestContainerDocker, list[Mapping]], None],
     get_token: Callable[[str, str], str],
 ) -> None:
     """
-    This applies a license to the signoz instance.
+    This applies a license to the o11y instance.
     """
-    add_license(signoz, make_http_mocks, get_token)
+    add_license(o11y, make_http_mocks, get_token)
 
 
 def test_create_and_get_public_dashboard(
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/dashboards"),
+        o11y.self.host_configs["8080"].get("/api/v1/dashboards"),
         json={"title": "Sample Title", "uploadedGrafana": False, "version": "v5"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -44,7 +44,7 @@ def test_create_and_get_public_dashboard(
     dashboard_id = data["id"]
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
         json={
             "timeRangeEnabled": True,
             "defaultTimeRange": "10s",
@@ -57,7 +57,7 @@ def test_create_and_get_public_dashboard(
     assert "id" in response.json()["data"]
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -69,7 +69,7 @@ def test_create_and_get_public_dashboard(
 
 
 def test_public_dashboard_widget_query_range(
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -151,7 +151,7 @@ def test_public_dashboard_widget_query_range(
         ],
     }
     create_response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/dashboards"),
+        o11y.self.host_configs["8080"].get("/api/v1/dashboards"),
         json=dashboard_req,
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -162,7 +162,7 @@ def test_public_dashboard_widget_query_range(
 
     # create public dashboard
     response = requests.post(
-        signoz.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
         json={
             "timeRangeEnabled": False,
             "defaultTimeRange": "10m",
@@ -175,7 +175,7 @@ def test_public_dashboard_widget_query_range(
     assert "id" in response.json()["data"]
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -186,20 +186,20 @@ def test_public_dashboard_widget_query_range(
     public_dashboard_id = public_path.split("/public/dashboard/")[-1]
 
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/public/dashboards/{public_dashboard_id}/widgets/0/query_range"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/public/dashboards/{public_dashboard_id}/widgets/0/query_range"),
         timeout=2,
     )
     assert resp.status_code == HTTPStatus.OK
     assert resp.json().get("status") == "success"
 
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/public/dashboards/{public_dashboard_id}/widgets/-1/query_range"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/public/dashboards/{public_dashboard_id}/widgets/-1/query_range"),
         timeout=2,
     )
     assert resp.status_code == HTTPStatus.BAD_REQUEST
 
     resp = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/public/dashboards/{public_dashboard_id}/widgets/1/query_range"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/public/dashboards/{public_dashboard_id}/widgets/1/query_range"),
         timeout=2,
     )
     assert resp.status_code == HTTPStatus.BAD_REQUEST
@@ -207,18 +207,18 @@ def test_public_dashboard_widget_query_range(
 
 def test_anonymous_role_has_public_dashboard_permission(
     request: pytest.FixtureRequest,
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     """
-    Verify that the signoz-anonymous role has the public-dashboard/* permission.
+    Verify that the o11y-anonymous role has the public-dashboard/* permission.
     """
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     # Get the roles to find the org_id
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/api/v1/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -227,15 +227,15 @@ def test_anonymous_role_has_public_dashboard_permission(
     assert response.json()["status"] == "success"
 
     roles = response.json()["data"]
-    anonymous_role = next((role for role in roles if role["name"] == "signoz-anonymous"), None)
+    anonymous_role = next((role for role in roles if role["name"] == "o11y-anonymous"), None)
     assert anonymous_role is not None
     org_id = anonymous_role["orgId"]
 
     # Verify the tuple exists in the database that grants
-    # signoz-anonymous role read access to public-dashboard/*
-    with signoz.sqlstore.conn.connect() as conn:
+    # o11y-anonymous role read access to public-dashboard/*
+    with o11y.sqlstore.conn.connect() as conn:
         tuple_object_id = f"organization/{org_id}/public-dashboard/*"
-        anonymous_role_subject = f"organization/{org_id}/role/signoz-anonymous"
+        anonymous_role_subject = f"organization/{org_id}/role/o11y-anonymous"
         tuple_result = conn.execute(
             sql.text("SELECT * FROM tuple WHERE object_id = :object_id AND relation = :relation"),
             {"object_id": tuple_object_id, "relation": "read"},

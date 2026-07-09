@@ -91,10 +91,10 @@ class AuditTagAttributes(ABC):
 
 
 class AuditLog(ABC):
-    """Represents a single audit log event in signoz_audit.
+    """Represents a single audit log event in o11y_audit.
 
     Matches the ClickHouse DDL from the schema migration (ticket #1936):
-    - Database: signoz_audit
+    - Database: o11y_audit
     - Local table: logs
     - Distributed table: distributed_logs
     - No resources_string column (resource JSON only)
@@ -138,7 +138,7 @@ class AuditLog(ABC):
         trace_id: str = "",
         span_id: str = "",
         trace_flags: np.uint32 = 0,
-        scope_name: str = "signoz.audit",
+        scope_name: str = "o11y.audit",
         scope_version: str = "",
     ) -> None:
         if timestamp is None:
@@ -297,7 +297,7 @@ def insert_audit_logs(
 
         if len(resources) > 0:
             clickhouse.conn.insert(
-                database="signoz_audit",
+                database="o11y_audit",
                 table="distributed_logs_resource",
                 data=[resource.np_arr() for resource in resources],
                 column_names=[
@@ -313,7 +313,7 @@ def insert_audit_logs(
 
         if len(tag_attributes) > 0:
             clickhouse.conn.insert(
-                database="signoz_audit",
+                database="o11y_audit",
                 table="distributed_tag_attributes",
                 data=[ta.np_arr() for ta in tag_attributes],
                 column_names=[
@@ -333,7 +333,7 @@ def insert_audit_logs(
 
         if len(attribute_keys) > 0:
             clickhouse.conn.insert(
-                database="signoz_audit",
+                database="o11y_audit",
                 table="distributed_logs_attribute_keys",
                 data=[ak.np_arr() for ak in attribute_keys],
                 column_names=["name", "datatype"],
@@ -345,14 +345,14 @@ def insert_audit_logs(
 
         if len(resource_keys) > 0:
             clickhouse.conn.insert(
-                database="signoz_audit",
+                database="o11y_audit",
                 table="distributed_logs_resource_keys",
                 data=[rk.np_arr() for rk in resource_keys],
                 column_names=["name", "datatype"],
             )
 
         clickhouse.conn.insert(
-            database="signoz_audit",
+            database="o11y_audit",
             table="distributed_logs",
             data=[log.np_arr() for log in logs],
             column_names=[
@@ -380,7 +380,7 @@ def insert_audit_logs(
 
     yield _insert_audit_logs
 
-    cluster = clickhouse.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
+    cluster = clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
     for table in [
         "logs",
         "logs_resource",
@@ -388,4 +388,4 @@ def insert_audit_logs(
         "logs_attribute_keys",
         "logs_resource_keys",
     ]:
-        clickhouse.conn.query(f"TRUNCATE TABLE signoz_audit.{table} ON CLUSTER '{cluster}' SYNC")
+        clickhouse.conn.query(f"TRUNCATE TABLE o11y_audit.{table} ON CLUSTER '{cluster}' SYNC")

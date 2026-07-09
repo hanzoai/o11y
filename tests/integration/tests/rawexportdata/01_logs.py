@@ -14,7 +14,7 @@ from fixtures.querier import BuilderQuery, OrderBy, QueryRangeRequest, Telemetry
 
 
 def test_export_raw_data_get_not_allowed(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -25,7 +25,7 @@ def test_export_raw_data_get_not_allowed(
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/export_raw_data"),
+        o11y.self.host_configs["8080"].get("/api/v1/export_raw_data"),
         timeout=10,
         headers={
             "authorization": f"Bearer {token}",
@@ -36,7 +36,7 @@ def test_export_raw_data_get_not_allowed(
 
 
 def test_export_logs_csv(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -115,7 +115,7 @@ def test_export_logs_csv(
 
     # Export logs as CSV (default format)
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/export_raw_data"),
+        o11y.self.host_configs["8080"].get("/api/v1/export_raw_data"),
         json=body,
         timeout=30,
         headers={
@@ -149,7 +149,7 @@ def test_export_logs_csv(
 
 
 def test_export_logs_jsonl(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -211,7 +211,7 @@ def test_export_logs_jsonl(
 
     # Export logs as JSONL
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/export_raw_data?format=jsonl"),
+        o11y.self.host_configs["8080"].get("/api/v1/export_raw_data?format=jsonl"),
         json=body,
         timeout=10,
         headers={
@@ -245,7 +245,7 @@ def test_export_logs_jsonl(
 
 
 def test_export_logs_with_filter(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -306,7 +306,7 @@ def test_export_logs_with_filter(
 
     # Export logs with filter
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/export_raw_data?format=jsonl"),
+        o11y.self.host_configs["8080"].get("/api/v1/export_raw_data?format=jsonl"),
         json=body,
         timeout=10,
         headers={
@@ -330,7 +330,7 @@ def test_export_logs_with_filter(
 
 
 def test_export_logs_with_limit(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -377,7 +377,7 @@ def test_export_logs_with_limit(
 
     # Export logs with limit
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/export_raw_data?format=csv"),
+        o11y.self.host_configs["8080"].get("/api/v1/export_raw_data?format=csv"),
         json=body,
         timeout=10,
         headers={
@@ -398,7 +398,7 @@ def test_export_logs_with_limit(
 
 
 def test_export_logs_with_columns(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -455,7 +455,7 @@ def test_export_logs_with_columns(
 
     # Export logs with specific columns
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/export_raw_data?format=csv"),
+        o11y.self.host_configs["8080"].get("/api/v1/export_raw_data?format=csv"),
         json=body,
         timeout=10,
         headers={
@@ -484,7 +484,7 @@ def test_export_logs_with_columns(
 
 
 def test_export_logs_with_order_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -551,7 +551,7 @@ def test_export_logs_with_order_by(
 
     # Export logs with ascending order
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/export_raw_data?format=jsonl"),
+        o11y.self.host_configs["8080"].get("/api/v1/export_raw_data?format=jsonl"),
         json=body,
         timeout=10,
         headers={
@@ -575,7 +575,7 @@ def test_export_logs_with_order_by(
 
 
 def test_export_logs_with_complex_filter(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -642,7 +642,7 @@ def test_export_logs_with_complex_filter(
 
     # Export logs with complex filter
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/export_raw_data?format=jsonl"),
+        o11y.self.host_configs["8080"].get("/api/v1/export_raw_data?format=jsonl"),
         json=body,
         timeout=10,
         headers={

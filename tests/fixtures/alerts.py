@@ -20,14 +20,14 @@ logger = setup_logger(__name__)
 
 
 @pytest.fixture(name="create_alert_rule", scope="function")
-def create_alert_rule(signoz: types.SigNoz, get_token: Callable[[str, str], str]) -> Callable[[dict], str]:
+def create_alert_rule(o11y: types.O11y, get_token: Callable[[str, str], str]) -> Callable[[dict], str]:
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     rule_ids = []
 
     def _create_alert_rule(rule_data: dict) -> str:
         response = requests.post(
-            signoz.self.host_configs["8080"].get("/api/v1/rules"),
+            o11y.self.host_configs["8080"].get("/api/v1/rules"),
             json=rule_data,
             headers={"Authorization": f"Bearer {admin_token}"},
             timeout=5,
@@ -40,7 +40,7 @@ def create_alert_rule(signoz: types.SigNoz, get_token: Callable[[str, str], str]
     def _delete_alert_rule(rule_id: str):
         logger.info("Deleting rule: %s", {"rule_id": rule_id})
         response = requests.delete(
-            signoz.self.host_configs["8080"].get(f"/api/v1/rules/{rule_id}"),
+            o11y.self.host_configs["8080"].get(f"/api/v1/rules/{rule_id}"),
             headers={"Authorization": f"Bearer {admin_token}"},
             timeout=5,
         )

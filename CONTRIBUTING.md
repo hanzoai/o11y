@@ -5,19 +5,19 @@ Thank you for your interest in contributing to our project! We greatly value fee
 ## How can I contribute?
 
 ### Finding Issues to Work On
-- Check our [existing open issues](https://github.com/Hanzo O11y/signoz/issues?q=is%3Aopen+is%3Aissue)
-- Look for [good first issues](https://github.com/Hanzo O11y/signoz/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to start with
-- Review [recently closed issues](https://github.com/Hanzo O11y/signoz/issues?q=is%3Aissue+is%3Aclosed) to avoid duplicates
+- Check our [existing open issues](https://github.com/Hanzo O11y/o11y/issues?q=is%3Aopen+is%3Aissue)
+- Look for [good first issues](https://github.com/Hanzo O11y/o11y/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to start with
+- Review [recently closed issues](https://github.com/Hanzo O11y/o11y/issues?q=is%3Aissue+is%3Aclosed) to avoid duplicates
 
 ### Types of Contributions
 
-1. **Report Bugs**: Use our [Bug Report template](https://github.com/Hanzo O11y/signoz/issues/new?assignees=&labels=&template=bug_report.md&title=)
-2. **Request Features**: Submit using [Feature Request template](https://github.com/Hanzo O11y/signoz/issues/new?assignees=&labels=&template=feature_request.md&title=)
+1. **Report Bugs**: Use our [Bug Report template](https://github.com/Hanzo O11y/o11y/issues/new?assignees=&labels=&template=bug_report.md&title=)
+2. **Request Features**: Submit using [Feature Request template](https://github.com/Hanzo O11y/o11y/issues/new?assignees=&labels=&template=feature_request.md&title=)
 3. **Improve Documentation**: Create an issue with the `documentation` label
-4. **Report Performance Issues**: Use our [Performance Issue template](https://github.com/Hanzo O11y/signoz/issues/new?assignees=&labels=&template=performance-issue-report.md&title=)
-5. **Request Dashboards**: Submit using [Dashboard Request template](https://github.com/Hanzo O11y/signoz/issues/new?assignees=&labels=dashboard-template&projects=&template=request_dashboard.md&title=%5BDashboard+Request%5D+)
-6. **Report Security Issues**: Follow our [Security Policy](https://github.com/Hanzo O11y/signoz/security/policy)
-7. **Join Discussions**: Participate in [project discussions](https://github.com/Hanzo O11y/signoz/discussions)
+4. **Report Performance Issues**: Use our [Performance Issue template](https://github.com/Hanzo O11y/o11y/issues/new?assignees=&labels=&template=performance-issue-report.md&title=)
+5. **Request Dashboards**: Submit using [Dashboard Request template](https://github.com/Hanzo O11y/o11y/issues/new?assignees=&labels=dashboard-template&projects=&template=request_dashboard.md&title=%5BDashboard+Request%5D+)
+6. **Report Security Issues**: Follow our [Security Policy](https://github.com/Hanzo O11y/o11y/security/policy)
+7. **Join Discussions**: Participate in [project discussions](https://github.com/Hanzo O11y/o11y/discussions)
 
 ### Creating Helpful Issues
 
@@ -71,8 +71,8 @@ Each repository has its own contributing guidelines. Please refer to the guideli
 ## How can I get help?
 
 Need assistance? Join our Slack community:
-- [`#contributing`](https://signoz-community.slack.com/archives/C01LWQ8KS7M)
-- [`#contributing-frontend`](https://signoz-community.slack.com/archives/C027134DM8B)
+- [`#contributing`](https://o11y-community.slack.com/archives/C01LWQ8KS7M)
+- [`#contributing-frontend`](https://o11y-community.slack.com/archives/C027134DM8B)
 
 ## Where do I go from here?
 

@@ -24,7 +24,7 @@ def _get_bodies(response: requests.Response) -> list[dict[str, Any]]:
     return [row["data"]["body"] for row in get_rows(response)]
 
 
-def _run_query_case(signoz: types.SigNoz, token: str, now: datetime, case: dict[str, Any]) -> None:
+def _run_query_case(o11y: types.O11y, token: str, now: datetime, case: dict[str, Any]) -> None:
     start_ms = case.get("startMs", int((now - timedelta(seconds=10)).timestamp() * 1000))
     end_ms = case.get("endMs", int(now.timestamp() * 1000))
 
@@ -57,7 +57,7 @@ def _run_query_case(signoz: types.SigNoz, token: str, now: datetime, case: dict[
         )
 
     response = make_query_request(
-        signoz=signoz,
+        o11y=o11y,
         token=token,
         start_ms=start_ms,
         end_ms=end_ms,
@@ -88,7 +88,7 @@ def _run_query_case(signoz: types.SigNoz, token: str, now: datetime, case: dict[
 
 
 def test_primitive_path_operations(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -374,7 +374,7 @@ def test_primitive_path_operations(
     for case in cases:
         case.setdefault("groupBy", None)
         case.setdefault("stepInterval", None)
-        _run_query_case(signoz, token, now, case)
+        _run_query_case(o11y, token, now, case)
 
 
 # ============================================================================
@@ -386,7 +386,7 @@ def test_primitive_path_operations(
 
 
 def test_indexed_paths(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -545,13 +545,13 @@ def test_indexed_paths(
         case.setdefault("groupBy", None)
         case.setdefault("stepInterval", None)
         before = datetime.now(tz=UTC)
-        _run_query_case(signoz, token, now, case)
+        _run_query_case(o11y, token, now, case)
         if "check_query" in case:
             check_query_log(
                 before,
                 case["name"],
                 case["check_query"],
-                tables=["signoz_logs.distributed_logs_v2"],
+                tables=["o11y_logs.distributed_logs_v2"],
                 must_contain=["body_v2"],
                 limit=1,
             )
@@ -566,7 +566,7 @@ def test_indexed_paths(
 
 
 def test_select_order_by(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -651,7 +651,7 @@ def test_select_order_by(
         )
         query["spec"]["selectFields"] = case["selectFields"]
         response = make_query_request(
-            signoz=signoz,
+            o11y=o11y,
             token=token,
             start_ms=start_ms,
             end_ms=end_ms,
@@ -716,7 +716,7 @@ def test_select_order_by(
 
 
 def test_array_path_operations(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -987,7 +987,7 @@ def test_array_path_operations(
     for case in cases:
         case.setdefault("groupBy", None)
         case.setdefault("stepInterval", None)
-        _run_query_case(signoz, token, now, case)
+        _run_query_case(o11y, token, now, case)
 
 
 # ============================================================================
@@ -996,7 +996,7 @@ def test_array_path_operations(
 
 
 def test_array_membership_operations(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1133,7 +1133,7 @@ def test_array_membership_operations(
     for case in cases:
         case.setdefault("groupBy", None)
         case.setdefault("stepInterval", None)
-        _run_query_case(signoz, token, now, case)
+        _run_query_case(o11y, token, now, case)
 
 
 # ============================================================================
@@ -1142,7 +1142,7 @@ def test_array_membership_operations(
 
 
 def test_message_searches(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1263,7 +1263,7 @@ def test_message_searches(
     for case in cases:
         case.setdefault("groupBy", None)
         case.setdefault("stepInterval", None)
-        _run_query_case(signoz, token, now, case)
+        _run_query_case(o11y, token, now, case)
 
 
 # ============================================================================
@@ -1272,7 +1272,7 @@ def test_message_searches(
 
 
 def test_polluted_data(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1390,7 +1390,7 @@ def test_polluted_data(
     for case in cases:
         case.setdefault("groupBy", None)
         case.setdefault("stepInterval", None)
-        _run_query_case(signoz, token, now, case)
+        _run_query_case(o11y, token, now, case)
 
 
 # ============================================================================
@@ -1413,7 +1413,7 @@ def test_polluted_data(
 
 
 def test_groupby_scalar(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -1477,4 +1477,4 @@ def test_groupby_scalar(
     ]
 
     for case in cases:
-        _run_query_case(signoz, token, now, case)
+        _run_query_case(o11y, token, now, case)

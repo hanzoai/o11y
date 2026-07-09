@@ -82,7 +82,7 @@ function createMockUser(overrides: Partial<IUser> = {}): IUser {
 		accessJwt: 'test-token',
 		refreshJwt: 'test-refresh-token',
 		id: 'user-id',
-		email: 'test@signoz.io',
+		email: 'test@o11y.io',
 		displayName: 'Test User',
 		createdAt: 1732544623,
 		organization: 'Test Org',
@@ -1017,7 +1017,7 @@ describe('PrivateRoute', () => {
 
 	describe('Onboarding Flow (Cloud Users)', () => {
 		it('should redirect to onboarding when first user has not completed onboarding', async () => {
-			// Set up exactly one user (not admin@signoz.cloud) to trigger first user check
+			// Set up exactly one user (not admin@o11y.cloud) to trigger first user check
 			mockUsersData = [{ email: 'test@example.com' }];
 
 			renderPrivateRoute({

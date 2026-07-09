@@ -29,7 +29,7 @@ func NewConfigFactory() factory.ConfigFactory {
 func newConfig() factory.Config {
 	return &Config{
 		Email: EmailConfig{
-			Domain: "signozserviceaccount.com",
+			Domain: "o11yserviceaccount.com",
 		},
 		Analytics: AnalyticsConfig{
 			Enabled: false,

@@ -154,7 +154,7 @@ func TestGetIdentity_AutoProvisionsAndAuthorizes(t *testing.T) {
 		t.Fatalf("grants = %d, want 1", len(authorizer.grants))
 	}
 	g := authorizer.grants[0]
-	if g.orgID != wantOrg || len(g.names) != 1 || g.names[0] != authtypes.SigNozAdminRoleName {
+	if g.orgID != wantOrg || len(g.names) != 1 || g.names[0] != authtypes.O11yAdminRoleName {
 		t.Fatalf("grant = %+v, want admin on org %s", g, wantOrg)
 	}
 	// The grant subject must equal what the authz middleware checks against.

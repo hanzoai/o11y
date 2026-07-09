@@ -35,7 +35,7 @@ func (migration *addRoleCRUDTuples) Up(ctx context.Context, db *bun.DB) error {
 	defer func() { _ = tx.Rollback() }()
 
 	var storeID string
-	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "signoz").Scan(&storeID)
+	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "o11y").Scan(&storeID)
 	if err != nil {
 		return err
 	}
@@ -60,9 +60,9 @@ func (migration *addRoleCRUDTuples) Up(ctx context.Context, db *bun.DB) error {
 	// only inserted create and list. The read, update, and delete tuples were
 	// lost in the migration. Re-add them here.
 	tuples := []migrationTuple{
-		{authtypes.SigNozAdminRoleName, "role", "role", "read"},
-		{authtypes.SigNozAdminRoleName, "role", "role", "update"},
-		{authtypes.SigNozAdminRoleName, "role", "role", "delete"},
+		{authtypes.O11yAdminRoleName, "role", "role", "read"},
+		{authtypes.O11yAdminRoleName, "role", "role", "update"},
+		{authtypes.O11yAdminRoleName, "role", "role", "delete"},
 	}
 
 	for _, orgID := range orgIDs {

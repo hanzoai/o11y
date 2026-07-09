@@ -8,7 +8,7 @@ import (
 	"github.com/hanzoai/govaluate"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/binding"
-	signozjsonschema "github.com/hanzoai/o11y/pkg/jsonschema"
+	o11yjsonschema "github.com/hanzoai/o11y/pkg/jsonschema"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
@@ -43,12 +43,12 @@ func (builderQuerySpec) PrepareJSONSchema(s *jsonschema.Schema) error {
 	if s.ExtraProperties == nil {
 		s.ExtraProperties = map[string]any{}
 	}
-	s.ExtraProperties["x-signoz-discriminator"] = map[string]any{
+	s.ExtraProperties["x-o11y-discriminator"] = map[string]any{
 		"propertyName": "signal",
 		"mapping": map[string]string{
-			telemetrytypes.SignalTraces.StringValue():  "#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation",
-			telemetrytypes.SignalLogs.StringValue():    "#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation",
-			telemetrytypes.SignalMetrics.StringValue(): "#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation",
+			telemetrytypes.SignalTraces.StringValue():  "#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation",
+			telemetrytypes.SignalLogs.StringValue():    "#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation",
+			telemetrytypes.SignalMetrics.StringValue(): "#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation",
 		},
 	}
 	return nil
@@ -111,12 +111,12 @@ func (QueryEnvelope) JSONSchemaOneOf() []any {
 var _ jsonschema.Preparer = QueryEnvelope{}
 
 // PrepareJSONSchema marks the envelope as a `type`-discriminated union;
-// signoz.attachDiscriminators promotes it and strips the base properties.
+// o11y.attachDiscriminators promotes it and strips the base properties.
 func (QueryEnvelope) PrepareJSONSchema(s *jsonschema.Schema) error {
 	if s.ExtraProperties == nil {
 		s.ExtraProperties = map[string]any{}
 	}
-	s.ExtraProperties["x-signoz-discriminator"] = map[string]any{
+	s.ExtraProperties["x-o11y-discriminator"] = map[string]any{
 		"propertyName": "type",
 		"mapping": map[string]string{
 			QueryTypeBuilder.StringValue():       "#/components/schemas/Querybuildertypesv5QueryEnvelopeBuilder",
@@ -272,7 +272,7 @@ func (c *CompositeQuery) UnmarshalJSON(data []byte) error {
 
 	// Valid field names are derived from the struct itself so this stays in
 	// sync with the schema (and the generated OpenAPI spec) automatically.
-	fieldNames := signozjsonschema.JSONFieldNames((*CompositeQuery)(nil))
+	fieldNames := o11yjsonschema.JSONFieldNames((*CompositeQuery)(nil))
 	validFields := make(map[string]bool, len(fieldNames))
 	for _, f := range fieldNames {
 		validFields[f] = true
@@ -633,7 +633,7 @@ func (r *QueryRangeRequest) UnmarshalJSON(data []byte) error {
 
 	// Valid field names are derived from the struct itself so this stays in
 	// sync with the schema (and the generated OpenAPI spec) automatically.
-	fieldNames := signozjsonschema.JSONFieldNames((*QueryRangeRequest)(nil))
+	fieldNames := o11yjsonschema.JSONFieldNames((*QueryRangeRequest)(nil))
 	validFields := make(map[string]bool, len(fieldNames))
 	for _, f := range fieldNames {
 		validFields[f] = true

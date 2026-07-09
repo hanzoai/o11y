@@ -13,11 +13,11 @@ import cx from 'classnames';
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from 'components/ui/button';
 import { TooltipSimple } from 'components/ui/tooltip';
-import type { MessageActionDTO } from 'api/ai-assistant/sigNozAIAssistantAPI.schemas';
+import type { MessageActionDTO } from 'api/ai-assistant/o11yAIAssistantAPI.schemas';
 import {
 	ApplyFilterSignalDTO,
 	MessageActionKindDTO,
-} from 'api/ai-assistant/sigNozAIAssistantAPI.schemas';
+} from 'api/ai-assistant/o11yAIAssistantAPI.schemas';
 import {
 	restoreExecution,
 	revertExecution,
@@ -174,7 +174,7 @@ function resourceRoute(
 }
 
 /**
- * The agent emits `action.query` as the SigNoz REST query-range request body:
+ * The agent emits `action.query` as the O11y REST query-range request body:
  *
  *   - V5 (current backend): `{ ..., compositeQuery: { queries: [{ type, spec }] } }`
  *     — each `spec` already carries `filter.expression` directly.

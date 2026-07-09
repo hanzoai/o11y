@@ -26,17 +26,17 @@ GATEWAY_APIS_EDITOR_PASSWORD = "password123Z$"
 
 
 def test_apply_license(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list[Mapping]], None],
     get_token: Callable[[str, str], str],
 ) -> None:
     """Activate a license so that all subsequent gateway calls succeed."""
-    add_license(signoz, make_http_mocks, get_token)
+    add_license(o11y, make_http_mocks, get_token)
 
 
 def test_create_editor_user(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -44,7 +44,7 @@ def test_create_editor_user(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     invite_response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json={"email": GATEWAY_APIS_EDITOR_EMAIL, "role": "EDITOR"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
@@ -53,7 +53,7 @@ def test_create_editor_user(
     reset_token = invite_response.json()["data"]["token"]
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
         json={"password": GATEWAY_APIS_EDITOR_PASSWORD, "token": reset_token},
         timeout=5,
     )
@@ -66,7 +66,7 @@ def test_create_editor_user(
 
 
 def test_create_ingestion_key(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -75,7 +75,7 @@ def test_create_ingestion_key(
     editor_token = get_token(GATEWAY_APIS_EDITOR_EMAIL, GATEWAY_APIS_EDITOR_PASSWORD)
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -99,7 +99,7 @@ def test_create_ingestion_key(
     )
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys"),
+        o11y.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys"),
         json={
             "name": "my-test-key",
             "tags": ["env:test", "team:platform"],
@@ -116,14 +116,14 @@ def test_create_ingestion_key(
     assert data["value"] == "ingestion-key-secret-value"
 
     # Verify the body forwarded to the gateway
-    body = get_latest_gateway_request_body(signoz, "POST", "/v1/workspaces/me/keys")
+    body = get_latest_gateway_request_body(o11y, "POST", "/v1/workspaces/me/keys")
     assert body is not None, "Expected a POST request to reach the gateway"
     assert body["name"] == "my-test-key"
     assert body["tags"] == ["env:test", "team:platform"]
 
 
 def test_get_ingestion_keys(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -133,7 +133,7 @@ def test_get_ingestion_keys(
 
     # Default page=1, per_page=10 → gateway gets ?page=1&per_page=10
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -171,7 +171,7 @@ def test_get_ingestion_keys(
     )
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys"),
+        o11y.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )
@@ -186,7 +186,7 @@ def test_get_ingestion_keys(
 
 
 def test_get_ingestion_keys_custom_pagination(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -195,7 +195,7 @@ def test_get_ingestion_keys_custom_pagination(
     editor_token = get_token(GATEWAY_APIS_EDITOR_EMAIL, GATEWAY_APIS_EDITOR_PASSWORD)
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -221,7 +221,7 @@ def test_get_ingestion_keys_custom_pagination(
     )
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys?page=2&per_page=5"),
+        o11y.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys?page=2&per_page=5"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )
@@ -235,7 +235,7 @@ def test_get_ingestion_keys_custom_pagination(
 
 
 def test_search_ingestion_keys(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -245,7 +245,7 @@ def test_search_ingestion_keys(
 
     # name, page, per_page are sorted alphabetically by Go url.Values.Encode()
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -283,7 +283,7 @@ def test_search_ingestion_keys(
     )
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys/search?name=my-test"),
+        o11y.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys/search?name=my-test"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )
@@ -296,7 +296,7 @@ def test_search_ingestion_keys(
 
 
 def test_search_ingestion_keys_empty(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -305,7 +305,7 @@ def test_search_ingestion_keys_empty(
     editor_token = get_token(GATEWAY_APIS_EDITOR_EMAIL, GATEWAY_APIS_EDITOR_PASSWORD)
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -331,7 +331,7 @@ def test_search_ingestion_keys_empty(
     )
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys/search?name=nonexistent"),
+        o11y.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys/search?name=nonexistent"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )
@@ -344,7 +344,7 @@ def test_search_ingestion_keys_empty(
 
 
 def test_update_ingestion_key(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -355,7 +355,7 @@ def test_update_ingestion_key(
     gateway_url = f"/v1/workspaces/me/keys/{TEST_KEY_ID}"
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -370,7 +370,7 @@ def test_update_ingestion_key(
     )
 
     response = requests.patch(
-        signoz.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}"),
+        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}"),
         json={
             "name": "renamed-key",
             "tags": ["env:prod"],
@@ -383,14 +383,14 @@ def test_update_ingestion_key(
     assert response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {response.status_code}: {response.text}"
 
     # Verify the body forwarded to the gateway
-    body = get_latest_gateway_request_body(signoz, "PATCH", gateway_url)
+    body = get_latest_gateway_request_body(o11y, "PATCH", gateway_url)
     assert body is not None, "Expected a PATCH request to reach the gateway"
     assert body["name"] == "renamed-key"
     assert body["tags"] == ["env:prod"]
 
 
 def test_delete_ingestion_key(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
@@ -401,7 +401,7 @@ def test_delete_ingestion_key(
     gateway_url = f"/v1/workspaces/me/keys/{TEST_KEY_ID}"
 
     make_http_mocks(
-        signoz.gateway,
+        o11y.gateway,
         [
             Mapping(
                 request=MappingRequest(
@@ -416,7 +416,7 @@ def test_delete_ingestion_key(
     )
 
     response = requests.delete(
-        signoz.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}"),
+        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )
@@ -424,5 +424,5 @@ def test_delete_ingestion_key(
     assert response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {response.status_code}: {response.text}"
 
     # Verify at least one DELETE reached the gateway
-    matched = get_gateway_requests(signoz, "DELETE", gateway_url)
+    matched = get_gateway_requests(o11y, "DELETE", gateway_url)
     assert len(matched) >= 1, "Expected a DELETE request to reach the gateway"

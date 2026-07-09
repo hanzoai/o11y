@@ -55,7 +55,7 @@ Currently, the Hanzo O11y Community Advocate Program is **invite-only**. We're s
 
 We'll be working closely with our first advocates to shape the program details, benefits, and structure based on what works best for everyone involved.
 
-If you're interested in learning more about the program or want to get more involved in the Hanzo O11y community, join our [Slack community](https://signoz-community.slack.com/) and let us know!
+If you're interested in learning more about the program or want to get more involved in the Hanzo O11y community, join our [Slack community](https://o11y-community.slack.com/) and let us know!
 
 ---
 

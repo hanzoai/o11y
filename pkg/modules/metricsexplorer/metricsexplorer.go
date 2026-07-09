@@ -37,6 +37,6 @@ type Module interface {
 	GetMetricDashboardsV2(ctx context.Context, orgID valuer.UUID, metricName string) (*metricsexplorertypes.MetricDashboardPanelsResponse, error)
 	GetMetricHighlights(ctx context.Context, orgID valuer.UUID, metricName string) (*metricsexplorertypes.MetricHighlightsResponse, error)
 	GetMetricAttributes(ctx context.Context, orgID valuer.UUID, req *metricsexplorertypes.MetricAttributesRequest) (*metricsexplorertypes.MetricAttributesResponse, error)
-	HasNonSigNozMetrics(ctx context.Context) (bool, error)
+	HasNonO11yMetrics(ctx context.Context) (bool, error)
 	InspectMetrics(ctx context.Context, orgID valuer.UUID, req *metricsexplorertypes.InspectMetricsRequest) (*metricsexplorertypes.InspectMetricsResponse, error)
 }

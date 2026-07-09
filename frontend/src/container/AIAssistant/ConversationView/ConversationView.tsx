@@ -181,7 +181,7 @@ export default function ConversationView({
 			/>
 			{showDisclaimer && (
 				<div className={disclaimerClass} role="note" aria-live="polite">
-					SigNoz AI can make mistakes. Please double-check responses.
+					O11y AI can make mistakes. Please double-check responses.
 				</div>
 			)}
 			<div className={inputWrapperClass}>

@@ -87,8 +87,8 @@ function RemoveIntegrationAccount({
 				{cloudProvider === INTEGRATION_TYPES.AWS ? (
 					<>
 						Removing this account will remove all components created for sending
-						telemetry to SigNoz in your AWS account within the next ~15 minutes
-						(cloudformation stacks named signoz-integration-telemetry-collection in
+						telemetry to O11y in your AWS account within the next ~15 minutes
+						(cloudformation stacks named o11y-integration-telemetry-collection in
 						enabled regions). <br />
 						<br />
 						After that, you can delete the cloudformation stack that was created
@@ -97,11 +97,11 @@ function RemoveIntegrationAccount({
 				) : (
 					<>
 						Removing this account will remove all components created for sending
-						telemetry to SigNoz in your Azure subscription within the next ~15 minutes
-						(deployment stack named signoz-integration-telemetry will be deleted
+						telemetry to O11y in your Azure subscription within the next ~15 minutes
+						(deployment stack named o11y-integration-telemetry will be deleted
 						automatically). <br />
 						<br />
-						After that, you have to manually delete &apos;signoz-integration&apos;
+						After that, you have to manually delete &apos;o11y-integration&apos;
 						deployment stack that was created while connecting this account (Takes ~20
 						minutes to delete).
 					</>

@@ -3,7 +3,7 @@ import { Button } from 'components/ui/button';
 import { Input, Spin } from 'antd';
 import cx from 'classnames';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
-import SignozModal from 'components/O11yModal/O11yModal';
+import O11yModal from 'components/O11yModal/O11yModal';
 import {
 	useFunnelDetails,
 	useFunnelsList,
@@ -240,7 +240,7 @@ function AddSpanToFunnelModal({
 	);
 
 	return (
-		<SignozModal
+		<O11yModal
 			open={isOpen}
 			onCancel={onClose}
 			width={570}
@@ -288,7 +288,7 @@ function AddSpanToFunnelModal({
 			{activeView === ModalView.LIST
 				? renderListView()
 				: renderDetailsView({ span })}
-		</SignozModal>
+		</O11yModal>
 	);
 }
 
