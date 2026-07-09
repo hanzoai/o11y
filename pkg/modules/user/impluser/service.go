@@ -37,7 +37,7 @@ func NewService(
 	config user.RootConfig,
 ) user.Service {
 	return &service{
-		settings:  factory.NewScopedProviderSettings(providerSettings, "go.signoz.io/pkg/modules/user"),
+		settings:  factory.NewScopedProviderSettings(providerSettings, "go.o11y.io/pkg/modules/user"),
 		store:     store,
 		getter:    getter,
 		setter:    setter,
@@ -148,7 +148,7 @@ func (s *service) createOrPromoteRootUser(ctx context.Context, orgID valuer.UUID
 		if err := s.authz.ModifyGrant(ctx,
 			orgID,
 			existingUserRoleNames,
-			[]string{authtypes.SigNozAdminRoleName},
+			[]string{authtypes.O11yAdminRoleName},
 			authtypes.MustNewSubject(coretypes.NewResourceUser(), existingUser.ID.StringValue(), orgID, nil),
 		); err != nil {
 			return err
@@ -166,7 +166,7 @@ func (s *service) createOrPromoteRootUser(ctx context.Context, orgID valuer.UUID
 				ctx,
 				existingUser.OrgID,
 				existingUser.ID,
-				[]string{authtypes.SigNozAdminRoleName},
+				[]string{authtypes.O11yAdminRoleName},
 			); err != nil {
 				return err
 			}
@@ -192,7 +192,7 @@ func (s *service) createOrPromoteRootUser(ctx context.Context, orgID valuer.UUID
 		return err
 	}
 
-	return s.setter.CreateUser(ctx, newUser, user.WithFactorPassword(factorPassword), user.WithRoleNames([]string{authtypes.SigNozAdminRoleName}))
+	return s.setter.CreateUser(ctx, newUser, user.WithFactorPassword(factorPassword), user.WithRoleNames([]string{authtypes.O11yAdminRoleName}))
 }
 
 func (s *service) updateExistingRootUser(ctx context.Context, orgID valuer.UUID, existingRoot *types.User) error {

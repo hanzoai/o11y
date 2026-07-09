@@ -37,14 +37,14 @@ describe('getScopedKey — root path "/"', () => {
 	});
 });
 
-describe('getScopedKey — prefixed path "/signoz/"', () => {
+describe('getScopedKey — prefixed path "/o11y/"', () => {
 	it('prefixes the key with the base path', () => {
-		const { getScopedKey } = loadStorageModule('/signoz/');
-		expect(getScopedKey('AUTH_TOKEN')).toBe('/signoz/AUTH_TOKEN');
+		const { getScopedKey } = loadStorageModule('/o11y/');
+		expect(getScopedKey('AUTH_TOKEN')).toBe('/o11y/AUTH_TOKEN');
 	});
 
 	it('isolates from root namespace', () => {
-		const { getScopedKey } = loadStorageModule('/signoz/');
+		const { getScopedKey } = loadStorageModule('/o11y/');
 		localStorage.setItem('AUTH_TOKEN', 'root-tok');
 		expect(localStorage.getItem(getScopedKey('AUTH_TOKEN'))).toBeNull();
 	});

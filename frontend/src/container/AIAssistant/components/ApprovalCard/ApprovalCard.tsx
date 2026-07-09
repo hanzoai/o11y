@@ -15,7 +15,7 @@ import { TooltipSimple } from 'components/ui/tooltip';
 import type {
 	ApprovalEventDTO,
 	ApprovalEventDTODiff,
-} from 'api/ai-assistant/sigNozAIAssistantAPI.schemas';
+} from 'api/ai-assistant/o11yAIAssistantAPI.schemas';
 import {
 	Check,
 	Columns2,

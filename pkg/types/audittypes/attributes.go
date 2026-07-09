@@ -34,10 +34,10 @@ func NewAuditAttributesFromHTTP(statusCode int, action coretypes.Verb, category 
 }
 
 func (attributes AuditAttributes) Put(dest pcommon.Map) {
-	dest.PutStr("signoz.audit.action", attributes.Action.StringValue())
-	dest.PutStr("signoz.audit.action_category", attributes.ActionCategory.StringValue())
-	dest.PutStr("signoz.audit.outcome", attributes.Outcome.StringValue())
-	putStrIfNotEmpty(dest, "signoz.audit.identn_provider", attributes.IdentNProvider.StringValue())
+	dest.PutStr("o11y.audit.action", attributes.Action.StringValue())
+	dest.PutStr("o11y.audit.action_category", attributes.ActionCategory.StringValue())
+	dest.PutStr("o11y.audit.outcome", attributes.Outcome.StringValue())
+	putStrIfNotEmpty(dest, "o11y.audit.identn_provider", attributes.IdentNProvider.StringValue())
 }
 
 // Audit attributes — Principal (Who).
@@ -62,10 +62,10 @@ func NewPrincipalAttributesFromClaims(claims authtypes.Claims) PrincipalAttribut
 }
 
 func (attributes PrincipalAttributes) Put(dest pcommon.Map) {
-	dest.PutStr("signoz.audit.principal.id", attributes.PrincipalID.StringValue())
-	dest.PutStr("signoz.audit.principal.email", attributes.PrincipalEmail.String())
-	dest.PutStr("signoz.audit.principal.type", attributes.PrincipalType.StringValue())
-	dest.PutStr("signoz.audit.principal.org_id", attributes.PrincipalOrgID.StringValue())
+	dest.PutStr("o11y.audit.principal.id", attributes.PrincipalID.StringValue())
+	dest.PutStr("o11y.audit.principal.email", attributes.PrincipalEmail.String())
+	dest.PutStr("o11y.audit.principal.type", attributes.PrincipalType.StringValue())
+	dest.PutStr("o11y.audit.principal.org_id", attributes.PrincipalOrgID.StringValue())
 }
 
 // Audit attributes — Resource (On What).
@@ -102,17 +102,17 @@ func NewRelatedResourceAttributes(resource coretypes.Resource, resourceID string
 // These are resource-level attributes (stored in the resource JSON column),
 // not event-level attributes (stored in attributes_string).
 func (attributes ResourceAttributes) PutResource(orgID valuer.UUID, dest pcommon.Map) {
-	putStrIfNotEmpty(dest, "signoz.audit.resource.kind", attributes.Resource.Kind().String())
-	putStrIfNotEmpty(dest, "signoz.audit.resource.id", attributes.ResourceID)
+	putStrIfNotEmpty(dest, "o11y.audit.resource.kind", attributes.Resource.Kind().String())
+	putStrIfNotEmpty(dest, "o11y.audit.resource.id", attributes.ResourceID)
 	if attributes.ResourceID != "" {
-		putStrIfNotEmpty(dest, "signoz.audit.resource.object", attributes.Resource.Object(orgID, attributes.ResourceID))
+		putStrIfNotEmpty(dest, "o11y.audit.resource.object", attributes.Resource.Object(orgID, attributes.ResourceID))
 	}
 
 	if attributes.TargetResource != nil {
-		putStrIfNotEmpty(dest, "signoz.audit.resource.target.kind", attributes.TargetResource.Kind().String())
-		putStrIfNotEmpty(dest, "signoz.audit.resource.target.id", attributes.TargetResourceID)
+		putStrIfNotEmpty(dest, "o11y.audit.resource.target.kind", attributes.TargetResource.Kind().String())
+		putStrIfNotEmpty(dest, "o11y.audit.resource.target.id", attributes.TargetResourceID)
 		if attributes.TargetResourceID != "" {
-			putStrIfNotEmpty(dest, "signoz.audit.resource.target.object", attributes.TargetResource.Object(orgID, attributes.TargetResourceID))
+			putStrIfNotEmpty(dest, "o11y.audit.resource.target.object", attributes.TargetResource.Object(orgID, attributes.TargetResourceID))
 		}
 	}
 }
@@ -134,8 +134,8 @@ func NewErrorAttributes(errorType, errorCode string) ErrorAttributes {
 }
 
 func (attributes ErrorAttributes) Put(dest pcommon.Map) {
-	putStrIfNotEmpty(dest, "signoz.audit.error.type", attributes.ErrorType)
-	putStrIfNotEmpty(dest, "signoz.audit.error.code", attributes.ErrorCode)
+	putStrIfNotEmpty(dest, "o11y.audit.error.type", attributes.ErrorType)
+	putStrIfNotEmpty(dest, "o11y.audit.error.code", attributes.ErrorCode)
 }
 
 // Audit attributes — Transport Context (Where/How).

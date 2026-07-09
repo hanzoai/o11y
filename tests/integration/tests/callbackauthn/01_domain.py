@@ -4,11 +4,11 @@ from http import HTTPStatus
 import requests
 
 from fixtures.auth import USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD
-from fixtures.types import Operation, SigNoz
+from fixtures.types import Operation, O11y
 
 
 def test_create_and_get_domain(
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
@@ -16,7 +16,7 @@ def test_create_and_get_domain(
 
     # Get domains which should be an empty list
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -28,7 +28,7 @@ def test_create_and_get_domain(
 
     # Create a domain with google auth config
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         json={
             "name": "domain-google.integration.test",
             "config": {
@@ -49,7 +49,7 @@ def test_create_and_get_domain(
 
     # Create a domain with saml config
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         json={
             "name": "domain-saml.integration.test",
             "config": {
@@ -70,7 +70,7 @@ def test_create_and_get_domain(
 
     # List the domains
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -90,7 +90,7 @@ def test_create_and_get_domain(
 
 
 def test_create_invalid(
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
@@ -98,7 +98,7 @@ def test_create_invalid(
 
     # Create a domain with type saml and body for oidc, this should fail because oidcConfig is not allowed for saml
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         json={
             "name": "domain.integration.test",
             "config": {
@@ -119,7 +119,7 @@ def test_create_invalid(
 
     # Create a domain with invalid name
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         json={
             "name": "$%^invalid",
             "config": {
@@ -140,7 +140,7 @@ def test_create_invalid(
 
     # Create a domain with no name
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         json={
             "config": {
                 "ssoEnabled": True,
@@ -160,7 +160,7 @@ def test_create_invalid(
 
     # Create a domain with no config
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         json={
             "name": "domain.integration.test",
         },
@@ -172,7 +172,7 @@ def test_create_invalid(
 
 
 def test_create_invalid_role_mapping(
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
@@ -181,7 +181,7 @@ def test_create_invalid_role_mapping(
 
     # Create domain with invalid defaultRole
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         json={
             "name": "invalid-role-test.integration.test",
             "config": {
@@ -205,7 +205,7 @@ def test_create_invalid_role_mapping(
 
     # Create domain with invalid role in groupMappings
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         json={
             "name": "invalid-group-role.integration.test",
             "config": {
@@ -232,7 +232,7 @@ def test_create_invalid_role_mapping(
 
     # Valid role mapping should succeed
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         json={
             "name": "valid-role-mapping.integration.test",
             "config": {
@@ -246,8 +246,8 @@ def test_create_invalid_role_mapping(
                 "roleMapping": {
                     "defaultRole": "VIEWER",
                     "groupMappings": {
-                        "signoz-admins": "ADMIN",
-                        "signoz-editors": "EDITOR",
+                        "o11y-admins": "ADMIN",
+                        "o11y-editors": "EDITOR",
                     },
                 },
             },

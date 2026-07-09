@@ -67,7 +67,7 @@ describe('AuthDomain', () => {
 			render(<AuthDomain />);
 
 			// mockDomainsListResponse rows:
-			//   [0] signoz.io   → config.ssoEnabled: true
+			//   [0] o11y.io   → config.ssoEnabled: true
 			//   [1] example.com → config.ssoEnabled: false
 			//   [2] corp.io     → config.ssoEnabled: true
 			const switches = await screen.findAllByRole('switch');

@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	signozHistoryDBName       = "signoz_analytics"
+	o11yHistoryDBName         = "o11y_analytics"
 	ruleStateHistoryTableName = "distributed_rule_state_history_v0"
 )
 
@@ -557,7 +557,7 @@ func (s *store) buildMatchedEventsCTE(ruleID string, query *rulestatehistorytype
 }
 
 func historyTable() string {
-	return fmt.Sprintf("%s.%s", signozHistoryDBName, ruleStateHistoryTableName)
+	return fmt.Sprintf("%s.%s", o11yHistoryDBName, ruleStateHistoryTableName)
 }
 
 func minStepSeconds(start, end int64) int64 {

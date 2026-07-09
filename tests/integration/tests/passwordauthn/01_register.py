@@ -19,14 +19,14 @@ from fixtures.logger import setup_logger
 logger = setup_logger(__name__)
 
 
-def test_register_with_invalid_input(signoz: types.SigNoz) -> None:
+def test_register_with_invalid_input(o11y: types.O11y) -> None:
     """
     Test the register endpoint with invalid input.
     1. Invalid Password
     2. Invalid Email
     """
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/register"),
+        o11y.self.host_configs["8080"].get("/api/v1/register"),
         json={
             "name": "admin",
             "orgId": "",
@@ -40,7 +40,7 @@ def test_register_with_invalid_input(signoz: types.SigNoz) -> None:
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/register"),
+        o11y.self.host_configs["8080"].get("/api/v1/register"),
         json={
             "name": "admin",
             "orgId": "",
@@ -54,14 +54,14 @@ def test_register_with_invalid_input(signoz: types.SigNoz) -> None:
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_register(signoz: types.SigNoz, get_token: Callable[[str, str], str]) -> None:
-    response = requests.get(signoz.self.host_configs["8080"].get("/api/v1/version"), timeout=2)
+def test_register(o11y: types.O11y, get_token: Callable[[str, str], str]) -> None:
+    response = requests.get(o11y.self.host_configs["8080"].get("/api/v1/version"), timeout=2)
 
     assert response.status_code == HTTPStatus.OK
     assert response.json()["setupCompleted"] is False
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/register"),
+        o11y.self.host_configs["8080"].get("/api/v1/register"),
         json={
             "name": "admin",
             "orgId": "",
@@ -73,7 +73,7 @@ def test_register(signoz: types.SigNoz, get_token: Callable[[str, str], str]) ->
     )
     assert response.status_code == HTTPStatus.OK
 
-    response = requests.get(signoz.self.host_configs["8080"].get("/api/v1/version"), timeout=2)
+    response = requests.get(o11y.self.host_configs["8080"].get("/api/v1/version"), timeout=2)
 
     assert response.status_code == HTTPStatus.OK
     assert response.json()["setupCompleted"] is True
@@ -81,15 +81,15 @@ def test_register(signoz: types.SigNoz, get_token: Callable[[str, str], str]) ->
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     # Verify admin user exists via v2
-    found_user = find_user_with_roles_by_email(signoz, admin_token, USER_ADMIN_EMAIL)
-    assert_user_has_role(found_user, "signoz-admin")
+    found_user = find_user_with_roles_by_email(o11y, admin_token, USER_ADMIN_EMAIL)
+    assert_user_has_role(found_user, "o11y-admin")
 
 
-def test_invite(signoz: types.SigNoz, get_token: Callable[[str, str], str]) -> None:
+def test_invite(o11y: types.O11y, get_token: Callable[[str, str], str]) -> None:
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     # Generate an invite token for the editor user
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json={"email": USER_EDITOR_EMAIL, "role": "EDITOR", "name": USER_EDITOR_NAME},
         timeout=2,
         headers={"Authorization": f"Bearer {admin_token}"},
@@ -102,15 +102,15 @@ def test_invite(signoz: types.SigNoz, get_token: Callable[[str, str], str]) -> N
     assert invited_user["role"] == "EDITOR"
 
     # Verify the user appears in the users list but as pending_invite status
-    found_user = find_user_with_roles_by_email(signoz, admin_token, USER_EDITOR_EMAIL)
+    found_user = find_user_with_roles_by_email(o11y, admin_token, USER_EDITOR_EMAIL)
     assert found_user["status"] == "pending_invite"
-    assert_user_has_role(found_user, "signoz-editor")
+    assert_user_has_role(found_user, "o11y-editor")
 
     reset_token = invited_user["token"]
 
     # Reset the password to complete the invite flow (activates the user and also grants authz)
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
         json={"password": USER_EDITOR_PASSWORD, "token": reset_token},
         timeout=2,
     )
@@ -122,20 +122,20 @@ def test_invite(signoz: types.SigNoz, get_token: Callable[[str, str], str]) -> N
 
     # Verify that the editor user status has been updated to ACTIVE
     admin_token_fresh = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
-    found_user = find_user_with_roles_by_email(signoz, admin_token_fresh, USER_EDITOR_EMAIL)
+    found_user = find_user_with_roles_by_email(o11y, admin_token_fresh, USER_EDITOR_EMAIL)
 
-    assert_user_has_role(found_user, "signoz-editor")
+    assert_user_has_role(found_user, "o11y-editor")
     assert found_user["displayName"] == USER_EDITOR_NAME
     assert found_user["email"] == USER_EDITOR_EMAIL
     assert found_user["status"] == "active"
 
 
-def test_revoke_invite(signoz: types.SigNoz, get_token: Callable[[str, str], str]) -> None:
+def test_revoke_invite(o11y: types.O11y, get_token: Callable[[str, str], str]) -> None:
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     # Invite the viewer user
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json={"email": USER_VIEWER_EMAIL, "role": "VIEWER"},
         timeout=2,
         headers={"Authorization": f"Bearer {admin_token}"},
@@ -146,7 +146,7 @@ def test_revoke_invite(signoz: types.SigNoz, get_token: Callable[[str, str], str
 
     # Delete the pending invite user (revoke the invite)
     response = requests.delete(
-        signoz.self.host_configs["8080"].get(f"/api/v1/user/{invited_user['id']}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/user/{invited_user['id']}"),
         timeout=2,
         headers={"Authorization": f"Bearer {admin_token}"},
     )
@@ -154,14 +154,14 @@ def test_revoke_invite(signoz: types.SigNoz, get_token: Callable[[str, str], str
 
     # Try to use the reset token — should fail (user deleted)
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
         json={"password": "password123Z$", "token": reset_token},
         timeout=2,
     )
     assert response.status_code in (HTTPStatus.BAD_REQUEST, HTTPStatus.NOT_FOUND)
 
 
-def test_provision_user(signoz: types.SigNoz, get_token: Callable[[str, str], str]) -> None:
+def test_provision_user(o11y: types.O11y, get_token: Callable[[str, str], str]) -> None:
     """
     Simulates the upstream zeus provisioning flow:
     1. Invite a user as ADMIN (register already happened via test_register)
@@ -176,9 +176,9 @@ def test_provision_user(signoz: types.SigNoz, get_token: Callable[[str, str], st
     provisioned_name = "zeus provisioned user"
     provisioned_password = "password123Z$"
 
-    # Step 1: Invite user as ADMIN (mirrors zeus inviteUserOnSigNoz)
+    # Step 1: Invite user as ADMIN (mirrors zeus inviteUserOnO11y)
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json={
             "email": provisioned_email,
             "name": provisioned_name,
@@ -191,7 +191,7 @@ def test_provision_user(signoz: types.SigNoz, get_token: Callable[[str, str], st
 
     # Step 2: List users to find the invited user's ID (mirrors zeus GET /api/v1/user)
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/user"),
+        o11y.self.host_configs["8080"].get("/api/v1/user"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
     )
@@ -203,7 +203,7 @@ def test_provision_user(signoz: types.SigNoz, get_token: Callable[[str, str], st
 
     # Step 3: Get reset password token (mirrors zeus GET /api/v1/getResetPasswordToken/{id})
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"/api/v1/getResetPasswordToken/{user_id}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/getResetPasswordToken/{user_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
     )
@@ -214,7 +214,7 @@ def test_provision_user(signoz: types.SigNoz, get_token: Callable[[str, str], st
 
     # Step 4: Use the token to set password and activate user
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
         json={"password": provisioned_password, "token": reset_token},
         timeout=5,
     )
@@ -224,7 +224,7 @@ def test_provision_user(signoz: types.SigNoz, get_token: Callable[[str, str], st
     user_token = get_token(provisioned_email, provisioned_password)
     assert user_token is not None
 
-    provisioned_user = find_user_with_roles_by_email(signoz, admin_token, provisioned_email)
+    provisioned_user = find_user_with_roles_by_email(o11y, admin_token, provisioned_email)
     assert provisioned_user["status"] == "active"
     assert provisioned_user["displayName"] == provisioned_name
-    assert_user_has_role(provisioned_user, "signoz-admin")
+    assert_user_has_role(provisioned_user, "o11y-admin")

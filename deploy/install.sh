@@ -123,7 +123,7 @@ check_os() {
 }
 
 
-# This function checks if the relevant ports required by SigNoz are available or not
+# This function checks if the relevant ports required by O11y are available or not
 # The script should error out in case they aren't available
 check_ports_occupied() {
     local port_check_output
@@ -144,8 +144,8 @@ check_ports_occupied() {
         send_event "port_not_available"
 
         echo "+++++++++++ ERROR ++++++++++++++++++++++"
-        echo "SigNoz requires ports 8080 & 4317 to be open. Please shut down any other service(s) that may be running on these ports."
-        echo "You can run SigNoz on another port following this guide https://signoz.io/docs/install/troubleshooting/"
+        echo "O11y requires ports 8080 & 4317 to be open. Please shut down any other service(s) that may be running on these ports."
+        echo "You can run O11y on another port following this guide https://o11y.io/docs/install/troubleshooting/"
         echo "++++++++++++++++++++++++++++++++++++++++"
         echo ""
         exit 1
@@ -272,8 +272,8 @@ bye() {  # Prints a friendly good bye message and exits the script.
         echo -e "cd ${DOCKER_STANDALONE_DIR}"
         echo -e "$sudo_cmd $docker_compose_cmd ps -a"
 
-        echo "Please read our troubleshooting guide https://signoz.io/docs/install/troubleshooting/"
-        echo "or reach us for support in #help channel in our Slack Community https://signoz.io/slack"
+        echo "Please read our troubleshooting guide https://o11y.io/docs/install/troubleshooting/"
+        echo "or reach us for support in #help channel in our Slack Community https://o11y.io/slack"
         echo "++++++++++++++++++++++++++++++++++++++++"
 
         if [[ $email == "" ]]; then
@@ -307,13 +307,13 @@ request_sudo() {
             fi
 
             echo -e "Got it! Thanks!! 🙏\n"
-            echo -e "Okay! We will bring up the SigNoz cluster from here 🚀\n"
+            echo -e "Okay! We will bring up the O11y cluster from here 🚀\n"
         fi
 	fi
 }
 
 echo ""
-echo -e "👋 Thank you for trying out SigNoz! "
+echo -e "👋 Thank you for trying out O11y! "
 echo ""
 
 sudo_cmd=""
@@ -358,9 +358,9 @@ elif hash openssl 2>/dev/null; then
 fi
 
 if [[ -z $digest_cmd ]]; then
-    SIGNOZ_INSTALLATION_ID="$sysinfo"
+    O11Y_INSTALLATION_ID="$sysinfo"
 else
-    SIGNOZ_INSTALLATION_ID=$(echo "$sysinfo" | $digest_cmd | grep -E -o '[a-zA-Z0-9]{64}')
+    O11Y_INSTALLATION_ID=$(echo "$sysinfo" | $digest_cmd | grep -E -o '[a-zA-Z0-9]{64}')
 fi
 
 setup_type='clickhouse'
@@ -421,7 +421,7 @@ send_event() {
         error='"error": "'"$error"'", '
     fi
 
-    DATA='{ "anonymousId": "'"$SIGNOZ_INSTALLATION_ID"'", "event": "'"$event"'", "properties": { "os": "'"$os"'", '"$error $others"' "setup_type": "'"$setup_type"'" } }'
+    DATA='{ "anonymousId": "'"$O11Y_INSTALLATION_ID"'", "event": "'"$event"'", "properties": { "os": "'"$os"'", '"$error $others"' "setup_type": "'"$setup_type"'" } }'
 
     if has_curl; then
         curl -sfL -d "$DATA" --header "$HEADER_1" --header "$HEADER_2" "$URL" > /dev/null 2>&1
@@ -482,21 +482,21 @@ start_docker
 # Switch to the Docker Standalone directory
 pushd "${BASE_DIR}/${DOCKER_STANDALONE_DIR}" > /dev/null 2>&1
 
-# check for open ports, if signoz is not installed
+# check for open ports, if o11y is not installed
 if is_command_present docker-compose; then
-    if $sudo_cmd $docker_compose_cmd ps | grep "signoz" | grep -q "healthy" > /dev/null 2>&1; then
-        echo "SigNoz already installed, skipping the occupied ports check"
+    if $sudo_cmd $docker_compose_cmd ps | grep "o11y" | grep -q "healthy" > /dev/null 2>&1; then
+        echo "O11y already installed, skipping the occupied ports check"
     else
         check_ports_occupied
     fi
 fi
 
 echo ""
-echo -e "\n🟡 Pulling the latest container images for SigNoz.\n"
+echo -e "\n🟡 Pulling the latest container images for O11y.\n"
 $sudo_cmd $docker_compose_cmd pull
 
 echo ""
-echo "🟡 Starting the SigNoz containers. It may take a few minutes ..."
+echo "🟡 Starting the O11y containers. It may take a few minutes ..."
 echo
 # The $docker_compose_cmd command does some nasty stuff for the `--detach` functionality. So we add a `|| true` so that the
 # script doesn't exit because this command looks like it failed to do it's thing.
@@ -519,8 +519,8 @@ if [[ $status_code -ne 200 ]]; then
     echo "$sudo_cmd $docker_compose_cmd down -v"
     echo ""
 
-    echo "Please read our troubleshooting guide https://signoz.io/docs/install/troubleshooting/"
-    echo "or reach us on SigNoz for support https://signoz.io/slack"
+    echo "Please read our troubleshooting guide https://o11y.io/docs/install/troubleshooting/"
+    echo "or reach us on O11y for support https://o11y.io/slack"
     echo "++++++++++++++++++++++++++++++++++++++++"
 
     send_event "installation_error_checks"
@@ -533,12 +533,12 @@ else
     echo ""
     echo "🟢 Your installation is complete!"
     echo ""
-    echo -e "🟢 SigNoz is running on http://localhost:8080"
+    echo -e "🟢 O11y is running on http://localhost:8080"
     echo ""
     echo "ℹ️  By default, retention period is set to 15 days for logs and traces, and 30 days for metrics."
-    echo -e "To change this, navigate to the General tab on the Settings page of SigNoz UI. For more details, refer to https://signoz.io/docs/userguide/retention-period \n"
+    echo -e "To change this, navigate to the General tab on the Settings page of O11y UI. For more details, refer to https://o11y.io/docs/userguide/retention-period \n"
 
-    echo "ℹ️  To bring down SigNoz and clean volumes:"
+    echo "ℹ️  To bring down O11y and clean volumes:"
     echo ""
     echo "cd ${DOCKER_STANDALONE_DIR}"
     echo "$sudo_cmd $docker_compose_cmd down -v"
@@ -547,9 +547,9 @@ else
     echo "+++++++++++++++++++++++++++++++++++++++++++++++++"
     echo ""
     echo "👉 Need help in Getting Started?"
-    echo -e "Join us on Slack https://signoz.io/slack"
+    echo -e "Join us on Slack https://o11y.io/slack"
     echo ""
-    echo -e "\n📨 Please share your email to receive support & updates about SigNoz!"
+    echo -e "\n📨 Please share your email to receive support & updates about O11y!"
     read -rp 'Email: ' email
 
     while [[ $email == "" ]]

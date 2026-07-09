@@ -6,13 +6,13 @@ import requests
 from sqlalchemy import sql
 
 from fixtures.auth import USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD
-from fixtures.types import Operation, SigNoz
+from fixtures.types import Operation, O11y
 
 ANONYMOUS_USER_ID = "00000000-0000-0000-0000-000000000000"
 
 
 def test_managed_roles_create_on_register(
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
@@ -20,7 +20,7 @@ def test_managed_roles_create_on_register(
 
     # get the list of all roles.
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/api/v1/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -33,18 +33,18 @@ def test_managed_roles_create_on_register(
     assert len(data) == 4
     role_names = {role["name"] for role in data}
     expected_names = {
-        "signoz-admin",
-        "signoz-viewer",
-        "signoz-editor",
-        "signoz-anonymous",
+        "o11y-admin",
+        "o11y-viewer",
+        "o11y-editor",
+        "o11y-anonymous",
     }
     # do the set mapping as this is order insensitive, direct list match is order-sensitive.
     assert set(role_names) == expected_names
 
 
-def test_root_user_signoz_admin_assignment(
+def test_root_user_o11y_admin_assignment(
     request: pytest.FixtureRequest,
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
@@ -52,7 +52,7 @@ def test_root_user_signoz_admin_assignment(
 
     # Get the user from the v2 /users/me endpoint and extract the id
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/users/me"),
+        o11y.self.host_configs["8080"].get("/api/v2/users/me"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
     )
@@ -61,7 +61,7 @@ def test_root_user_signoz_admin_assignment(
     user_id = user_data["id"]
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/api/v1/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -70,17 +70,17 @@ def test_root_user_signoz_admin_assignment(
     assert response.status_code == HTTPStatus.OK
     assert response.json()["status"] == "success"
 
-    # Loop over the roles and get the org_id and id for signoz-admin role
+    # Loop over the roles and get the org_id and id for o11y-admin role
     roles = response.json()["data"]
-    admin_role_entry = next((role for role in roles if role["name"] == "signoz-admin"), None)
+    admin_role_entry = next((role for role in roles if role["name"] == "o11y-admin"), None)
     assert admin_role_entry is not None
     org_id = admin_role_entry["orgId"]
 
     # to be super sure of authorization server, let's validate the tuples in DB as well.
     # todo[@vikrantgupta25]: replace this with role memebers handler once built.
-    with signoz.sqlstore.conn.connect() as conn:
+    with o11y.sqlstore.conn.connect() as conn:
         # verify the entry present for role assignment
-        tuple_object_id = f"organization/{org_id}/role/signoz-admin"
+        tuple_object_id = f"organization/{org_id}/role/o11y-admin"
         tuple_result = conn.execute(
             sql.text("SELECT * FROM tuple WHERE object_id = :object_id"),
             {"object_id": tuple_object_id},
@@ -102,16 +102,16 @@ def test_root_user_signoz_admin_assignment(
             assert tuple_row["_user"] == _user
 
 
-def test_anonymous_user_signoz_anonymous_assignment(
+def test_anonymous_user_o11y_anonymous_assignment(
     request: pytest.FixtureRequest,
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/api/v1/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -120,17 +120,17 @@ def test_anonymous_user_signoz_anonymous_assignment(
     assert response.status_code == HTTPStatus.OK
     assert response.json()["status"] == "success"
 
-    # Loop over the roles and get the org_id and id for signoz-admin role
+    # Loop over the roles and get the org_id and id for o11y-admin role
     roles = response.json()["data"]
-    admin_role_entry = next((role for role in roles if role["name"] == "signoz-anonymous"), None)
+    admin_role_entry = next((role for role in roles if role["name"] == "o11y-anonymous"), None)
     assert admin_role_entry is not None
     org_id = admin_role_entry["orgId"]
 
     # to be super sure of authorization server, let's validate the tuples in DB as well.
     # todo[@vikrantgupta25]: replace this with role memebers handler once built.
-    with signoz.sqlstore.conn.connect() as conn:
+    with o11y.sqlstore.conn.connect() as conn:
         # verify the entry present for role assignment
-        tuple_object_id = f"organization/{org_id}/role/signoz-anonymous"
+        tuple_object_id = f"organization/{org_id}/role/o11y-anonymous"
         tuple_result = conn.execute(
             sql.text("SELECT * FROM tuple WHERE object_id = :object_id"),
             {"object_id": tuple_object_id},

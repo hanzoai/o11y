@@ -15,8 +15,8 @@ function RenderConnectionFields({
 		isConnectionParamsLoading ||
 		(!!connectionParams?.ingestionUrl &&
 			!!connectionParams?.ingestionKey &&
-			!!connectionParams?.sigNozApiUrl &&
-			!!connectionParams?.sigNozApiKey)
+			!!connectionParams?.o11yApiUrl &&
+			!!connectionParams?.o11yApiKey)
 	) {
 		return null;
 	}
@@ -41,7 +41,7 @@ function RenderConnectionFields({
 					<Input placeholder="Enter ingestion key" disabled={isFormDisabled} />
 				</Form.Item>
 			)}
-			{!connectionParams?.sigNozApiUrl && (
+			{!connectionParams?.o11yApiUrl && (
 				<Form.Item
 					name="observe_api_url"
 					label="Hanzo API URL"
@@ -50,7 +50,7 @@ function RenderConnectionFields({
 					<Input placeholder="Enter Hanzo API URL" disabled={isFormDisabled} />
 				</Form.Item>
 			)}
-			{!connectionParams?.sigNozApiKey && (
+			{!connectionParams?.o11yApiKey && (
 				<Form.Item
 					name="observe_api_key"
 					label="Hanzo API KEY"

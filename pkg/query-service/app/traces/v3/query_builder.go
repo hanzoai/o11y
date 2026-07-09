@@ -275,7 +275,7 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 	var orderBy []string
 
 	for _, item := range items {
-		if item.ColumnName == constants.SigNozOrderByValue {
+		if item.ColumnName == constants.O11yOrderByValue {
 			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order))
 		} else if _, ok := tagLookup[item.ColumnName]; ok {
 			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))

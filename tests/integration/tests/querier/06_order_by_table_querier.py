@@ -86,14 +86,14 @@ def generate_metrics_with_values(
 
 
 def make_scalar_query_request(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     token: str,
     now: datetime,
     queries: list[dict],
     lookback_minutes: int = 5,
 ) -> requests.Response:
     return requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -179,7 +179,7 @@ def build_metrics_query(
 
 
 def test_logs_scalar_group_by_single_agg_no_order(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -189,7 +189,7 @@ def test_logs_scalar_group_by_single_agg_no_order(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_logs_query(group_by=["service.name"])],
@@ -207,7 +207,7 @@ def test_logs_scalar_group_by_single_agg_no_order(
 
 
 def test_logs_scalar_group_by_single_agg_order_by_agg_asc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -217,7 +217,7 @@ def test_logs_scalar_group_by_single_agg_order_by_agg_asc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_logs_query(group_by=["service.name"], order_by=[("count()", "asc")])],
@@ -235,7 +235,7 @@ def test_logs_scalar_group_by_single_agg_order_by_agg_asc(
 
 
 def test_logs_scalar_group_by_single_agg_order_by_agg_desc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -245,7 +245,7 @@ def test_logs_scalar_group_by_single_agg_order_by_agg_desc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_logs_query(group_by=["service.name"], order_by=[("count()", "desc")])],
@@ -263,7 +263,7 @@ def test_logs_scalar_group_by_single_agg_order_by_agg_desc(
 
 
 def test_logs_scalar_group_by_single_agg_order_by_grouping_key_asc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -273,7 +273,7 @@ def test_logs_scalar_group_by_single_agg_order_by_grouping_key_asc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_logs_query(group_by=["service.name"], order_by=[("service.name", "asc")])],
@@ -291,7 +291,7 @@ def test_logs_scalar_group_by_single_agg_order_by_grouping_key_asc(
 
 
 def test_logs_scalar_group_by_single_agg_order_by_grouping_key_desc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -301,7 +301,7 @@ def test_logs_scalar_group_by_single_agg_order_by_grouping_key_desc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_logs_query(group_by=["service.name"], order_by=[("service.name", "desc")])],
@@ -319,7 +319,7 @@ def test_logs_scalar_group_by_single_agg_order_by_grouping_key_desc(
 
 
 def test_logs_scalar_group_by_multiple_aggs_order_by_first_agg_asc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -329,7 +329,7 @@ def test_logs_scalar_group_by_multiple_aggs_order_by_first_agg_asc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [
@@ -349,7 +349,7 @@ def test_logs_scalar_group_by_multiple_aggs_order_by_first_agg_asc(
 
 
 def test_logs_scalar_group_by_multiple_aggs_order_by_second_agg_desc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -359,7 +359,7 @@ def test_logs_scalar_group_by_multiple_aggs_order_by_second_agg_desc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [
@@ -380,7 +380,7 @@ def test_logs_scalar_group_by_multiple_aggs_order_by_second_agg_desc(
 
 
 def test_logs_scalar_group_by_single_agg_order_by_agg_asc_limit_2(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -390,7 +390,7 @@ def test_logs_scalar_group_by_single_agg_order_by_agg_asc_limit_2(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_logs_query(group_by=["service.name"], order_by=[("count()", "asc")], limit=2)],
@@ -408,7 +408,7 @@ def test_logs_scalar_group_by_single_agg_order_by_agg_asc_limit_2(
 
 
 def test_logs_scalar_group_by_single_agg_order_by_agg_desc_limit_3(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -418,7 +418,7 @@ def test_logs_scalar_group_by_single_agg_order_by_agg_desc_limit_3(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_logs_query(group_by=["service.name"], order_by=[("count()", "desc")], limit=3)],
@@ -436,7 +436,7 @@ def test_logs_scalar_group_by_single_agg_order_by_agg_desc_limit_3(
 
 
 def test_logs_scalar_group_by_order_by_grouping_key_asc_limit_2(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -446,7 +446,7 @@ def test_logs_scalar_group_by_order_by_grouping_key_asc_limit_2(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_logs_query(group_by=["service.name"], order_by=[("service.name", "asc")], limit=2)],
@@ -464,7 +464,7 @@ def test_logs_scalar_group_by_order_by_grouping_key_asc_limit_2(
 
 
 def test_traces_scalar_group_by_single_agg_no_order(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -474,7 +474,7 @@ def test_traces_scalar_group_by_single_agg_no_order(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_traces_query(group_by=["service.name"])],
@@ -492,7 +492,7 @@ def test_traces_scalar_group_by_single_agg_no_order(
 
 
 def test_traces_scalar_group_by_single_agg_order_by_agg_asc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -502,7 +502,7 @@ def test_traces_scalar_group_by_single_agg_order_by_agg_asc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_traces_query(group_by=["service.name"], order_by=[("count()", "asc")])],
@@ -520,7 +520,7 @@ def test_traces_scalar_group_by_single_agg_order_by_agg_asc(
 
 
 def test_traces_scalar_group_by_single_agg_order_by_agg_desc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -530,7 +530,7 @@ def test_traces_scalar_group_by_single_agg_order_by_agg_desc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_traces_query(group_by=["service.name"], order_by=[("count()", "desc")])],
@@ -548,7 +548,7 @@ def test_traces_scalar_group_by_single_agg_order_by_agg_desc(
 
 
 def test_traces_scalar_group_by_single_agg_order_by_grouping_key_asc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -558,7 +558,7 @@ def test_traces_scalar_group_by_single_agg_order_by_grouping_key_asc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_traces_query(group_by=["service.name"], order_by=[("service.name", "asc")])],
@@ -576,7 +576,7 @@ def test_traces_scalar_group_by_single_agg_order_by_grouping_key_asc(
 
 
 def test_traces_scalar_group_by_single_agg_order_by_grouping_key_desc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -586,7 +586,7 @@ def test_traces_scalar_group_by_single_agg_order_by_grouping_key_desc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_traces_query(group_by=["service.name"], order_by=[("service.name", "desc")])],
@@ -604,7 +604,7 @@ def test_traces_scalar_group_by_single_agg_order_by_grouping_key_desc(
 
 
 def test_traces_scalar_group_by_multiple_aggs_order_by_first_agg_asc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -614,7 +614,7 @@ def test_traces_scalar_group_by_multiple_aggs_order_by_first_agg_asc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [
@@ -634,7 +634,7 @@ def test_traces_scalar_group_by_multiple_aggs_order_by_first_agg_asc(
 
 
 def test_traces_scalar_group_by_single_agg_order_by_agg_asc_limit_2(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -644,7 +644,7 @@ def test_traces_scalar_group_by_single_agg_order_by_agg_asc_limit_2(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_traces_query(group_by=["service.name"], order_by=[("count()", "asc")], limit=2)],
@@ -662,7 +662,7 @@ def test_traces_scalar_group_by_single_agg_order_by_agg_asc_limit_2(
 
 
 def test_traces_scalar_group_by_single_agg_order_by_agg_desc_limit_3(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -672,7 +672,7 @@ def test_traces_scalar_group_by_single_agg_order_by_agg_desc_limit_3(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_traces_query(group_by=["service.name"], order_by=[("count()", "desc")], limit=3)],
@@ -690,7 +690,7 @@ def test_traces_scalar_group_by_single_agg_order_by_agg_desc_limit_3(
 
 
 def test_traces_scalar_group_by_order_by_grouping_key_asc_limit_2(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_traces: Callable[[list[Traces]], None],
@@ -700,7 +700,7 @@ def test_traces_scalar_group_by_order_by_grouping_key_asc_limit_2(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_traces_query(group_by=["service.name"], order_by=[("service.name", "asc")], limit=2)],
@@ -718,7 +718,7 @@ def test_traces_scalar_group_by_order_by_grouping_key_asc_limit_2(
 
 
 def test_metrics_scalar_group_by_single_agg_no_order(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -728,7 +728,7 @@ def test_metrics_scalar_group_by_single_agg_no_order(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [build_metrics_query(group_by=["service.name"])],
@@ -751,7 +751,7 @@ def test_metrics_scalar_group_by_single_agg_no_order(
 
 
 def test_metrics_scalar_group_by_single_agg_order_by_agg_asc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -761,7 +761,7 @@ def test_metrics_scalar_group_by_single_agg_order_by_agg_asc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [
@@ -789,7 +789,7 @@ def test_metrics_scalar_group_by_single_agg_order_by_agg_asc(
 
 
 def test_metrics_scalar_group_by_single_agg_order_by_grouping_key_asc(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -799,7 +799,7 @@ def test_metrics_scalar_group_by_single_agg_order_by_grouping_key_asc(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [
@@ -827,7 +827,7 @@ def test_metrics_scalar_group_by_single_agg_order_by_grouping_key_asc(
 
 
 def test_metrics_scalar_group_by_single_agg_order_by_agg_asc_limit_2(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -837,7 +837,7 @@ def test_metrics_scalar_group_by_single_agg_order_by_agg_asc_limit_2(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [
@@ -861,7 +861,7 @@ def test_metrics_scalar_group_by_single_agg_order_by_agg_asc_limit_2(
 
 
 def test_metrics_scalar_group_by_single_agg_order_by_agg_desc_limit_3(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -871,7 +871,7 @@ def test_metrics_scalar_group_by_single_agg_order_by_agg_desc_limit_3(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [
@@ -895,7 +895,7 @@ def test_metrics_scalar_group_by_single_agg_order_by_agg_desc_limit_3(
 
 
 def test_metrics_scalar_group_by_order_by_grouping_key_asc_limit_2(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -905,7 +905,7 @@ def test_metrics_scalar_group_by_order_by_grouping_key_asc_limit_2(
 
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = make_scalar_query_request(
-        signoz,
+        o11y,
         token,
         now,
         [

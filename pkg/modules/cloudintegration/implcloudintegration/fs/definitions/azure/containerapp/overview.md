@@ -1,4 +1,4 @@
-### Monitor Container Apps with SigNoz
+### Monitor Container Apps with O11y
 
 Collect key Container App metrics and view them with an out of the box dashboard.
 

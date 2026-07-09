@@ -61,21 +61,21 @@ func (migration *addManagedRoles) Up(ctx context.Context, db *bun.DB) error {
 			return err
 		}
 
-		// signoz admin
-		signozAdminRole := authtypes.NewRole(authtypes.SigNozAdminRoleName, authtypes.SigNozAdminRoleDescription, authtypes.RoleTypeManaged, orgID)
-		managedRoles = append(managedRoles, signozAdminRole)
+		// o11y admin
+		o11yAdminRole := authtypes.NewRole(authtypes.O11yAdminRoleName, authtypes.O11yAdminRoleDescription, authtypes.RoleTypeManaged, orgID)
+		managedRoles = append(managedRoles, o11yAdminRole)
 
-		// signoz editor
-		signozEditorRole := authtypes.NewRole(authtypes.SigNozEditorRoleName, authtypes.SigNozEditorRoleDescription, authtypes.RoleTypeManaged, orgID)
-		managedRoles = append(managedRoles, signozEditorRole)
+		// o11y editor
+		o11yEditorRole := authtypes.NewRole(authtypes.O11yEditorRoleName, authtypes.O11yEditorRoleDescription, authtypes.RoleTypeManaged, orgID)
+		managedRoles = append(managedRoles, o11yEditorRole)
 
-		// signoz viewer
-		signozViewerRole := authtypes.NewRole(authtypes.SigNozViewerRoleName, authtypes.SigNozViewerRoleDescription, authtypes.RoleTypeManaged, orgID)
-		managedRoles = append(managedRoles, signozViewerRole)
+		// o11y viewer
+		o11yViewerRole := authtypes.NewRole(authtypes.O11yViewerRoleName, authtypes.O11yViewerRoleDescription, authtypes.RoleTypeManaged, orgID)
+		managedRoles = append(managedRoles, o11yViewerRole)
 
-		// signoz anonymous
-		signozAnonymousRole := authtypes.NewRole(authtypes.SigNozAnonymousRoleName, authtypes.SigNozAnonymousRoleDescription, authtypes.RoleTypeManaged, orgID)
-		managedRoles = append(managedRoles, signozAnonymousRole)
+		// o11y anonymous
+		o11yAnonymousRole := authtypes.NewRole(authtypes.O11yAnonymousRoleName, authtypes.O11yAnonymousRoleDescription, authtypes.RoleTypeManaged, orgID)
+		managedRoles = append(managedRoles, o11yAnonymousRole)
 	}
 
 	if len(managedRoles) > 0 {

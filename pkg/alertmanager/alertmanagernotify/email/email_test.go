@@ -1,4 +1,4 @@
-// Copyright (c) 2026 SigNoz, Inc.
+// Copyright (c) 2026 O11y, Inc.
 // Copyright 2019 Prometheus Team
 // SPDX-License-Identifier: Apache-2.0
 
@@ -18,11 +18,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/emersion/go-smtp"
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagertemplate"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
-	"github.com/emersion/go-smtp"
 	commoncfg "github.com/prometheus/common/config"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/common/promslog"
@@ -1130,7 +1130,7 @@ func TestPrepareContent(t *testing.T) {
 	})
 
 	t.Run("custom title template; custom body template", func(t *testing.T) {
-		// Load the email.signoz.html layout into the notification template
+		// Load the email.o11y.html layout into the notification template
 		// the same way the alertmanager server does via the templates config.
 		tmpl, err := template.FromGlobs([]string{"../../../../templates/alertmanager/*.gotmpl"})
 		require.NoError(t, err)

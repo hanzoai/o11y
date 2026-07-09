@@ -2,7 +2,7 @@
  * Rule: no-raw-absolute-path
  *
  * Catches patterns that break at runtime when the app is served from a
- * sub-path (e.g. /signoz/):
+ * sub-path (e.g. /o11y/):
  *
  *   1. window.open(path, '_blank')
  *      → use openInNewTab(path) which calls withBasePath internally

@@ -10,11 +10,11 @@ import {
 	SelectTrigger,
 } from 'components/ui/select';
 import logEvent from 'api/common/logEvent';
-import { ClarificationFieldTypeDTO } from 'api/ai-assistant/sigNozAIAssistantAPI.schemas';
+import { ClarificationFieldTypeDTO } from 'api/ai-assistant/o11yAIAssistantAPI.schemas';
 import type {
 	ClarificationEventDTO,
 	ClarificationFieldEventDTO,
-} from 'api/ai-assistant/sigNozAIAssistantAPI.schemas';
+} from 'api/ai-assistant/o11yAIAssistantAPI.schemas';
 import { CircleHelp, Send, X } from 'components/ui/icons';
 
 import { AIAssistantEvents } from '../../events';
@@ -24,7 +24,7 @@ import { useAIAssistantStore } from '../../store/useAIAssistantStore';
 import styles from './ClarificationForm.module.scss';
 
 /** Sentinel emitted by the select dropdown when the user picks the custom slot. */
-const CUSTOM_OPTION_SENTINEL = '__signoz_ai_custom__';
+const CUSTOM_OPTION_SENTINEL = '__o11y_ai_custom__';
 /** User-facing label for the synthetic "type your own answer" option. */
 const CUSTOM_OPTION_LABEL = 'Other (type your own)';
 

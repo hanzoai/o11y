@@ -2,22 +2,22 @@ package coretypes
 
 var (
 	ManagedRoles = []string{
-		SigNozAdminRoleName,
-		SigNozEditorRoleName,
-		SigNozViewerRoleName,
-		SigNozAnonymousRoleName,
+		O11yAdminRoleName,
+		O11yEditorRoleName,
+		O11yViewerRoleName,
+		O11yAnonymousRoleName,
 	}
 )
 
 const (
-	SigNozAdminRoleName     string = "signoz-admin"
-	SigNozEditorRoleName    string = "signoz-editor"
-	SigNozViewerRoleName    string = "signoz-viewer"
-	SigNozAnonymousRoleName string = "signoz-anonymous"
+	O11yAdminRoleName     string = "o11y-admin"
+	O11yEditorRoleName    string = "o11y-editor"
+	O11yViewerRoleName    string = "o11y-viewer"
+	O11yAnonymousRoleName string = "o11y-anonymous"
 )
 
 var ManagedRoleToTransactions = map[string][]Transaction{
-	SigNozAdminRoleName: {
+	O11yAdminRoleName: {
 		// role attach/detach — admin can attach/detach role assignments
 		{Verb: VerbAttach, Object: *MustNewObject(ResourceRef{Type: TypeRole, Kind: KindRole}, WildCardSelectorString)},
 		{Verb: VerbDetach, Object: *MustNewObject(ResourceRef{Type: TypeRole, Kind: KindRole}, WildCardSelectorString)},
@@ -211,7 +211,7 @@ var ManagedRoleToTransactions = map[string][]Transaction{
 		{Verb: VerbUpdate, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindTracesField}, WildCardSelectorString)},
 		{Verb: VerbList, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindTracesField}, WildCardSelectorString)},
 	},
-	SigNozEditorRoleName: {
+	O11yEditorRoleName: {
 		// dashboard — full CRUD
 		{Verb: VerbRead, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindDashboard}, WildCardSelectorString)},
 		{Verb: VerbUpdate, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindDashboard}, WildCardSelectorString)},
@@ -298,7 +298,7 @@ var ManagedRoleToTransactions = map[string][]Transaction{
 		{Verb: VerbUpdate, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindTracesField}, WildCardSelectorString)},
 		{Verb: VerbList, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindTracesField}, WildCardSelectorString)},
 	},
-	SigNozViewerRoleName: {
+	O11yViewerRoleName: {
 		// dashboard — read only
 		{Verb: VerbRead, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindDashboard}, WildCardSelectorString)},
 		{Verb: VerbList, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindDashboard}, WildCardSelectorString)},
@@ -353,7 +353,7 @@ var ManagedRoleToTransactions = map[string][]Transaction{
 		{Verb: VerbRead, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindTracesField}, WildCardSelectorString)},
 		{Verb: VerbList, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindTracesField}, WildCardSelectorString)},
 	},
-	SigNozAnonymousRoleName: {
+	O11yAnonymousRoleName: {
 		// public-dashboard — anonymous read
 		{Verb: VerbRead, Object: *MustNewObject(ResourceRef{Type: TypeMetaResource, Kind: KindPublicDashboard}, WildCardSelectorString)},
 	},

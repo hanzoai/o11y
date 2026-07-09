@@ -16,11 +16,11 @@ const (
 
 // Documentation links — one per component. User-facing; emitted on missing-entries.
 const (
-	docLinkHostMetricsReceiver        = "https://signoz.io/docs/infrastructure-monitoring/user-guides/hostmetrics/#configure-the-hostmetrics-receiver"
-	docLinkKubeletStatsReceiver       = "https://signoz.io/docs/infrastructure-monitoring/user-guides/k8s-metrics/#setup-kubelet-stats-receiver"
-	docLinkK8sClusterReceiver         = "https://signoz.io/docs/infrastructure-monitoring/user-guides/k8s-metrics/#setup-k8s-cluster-receiver"
-	docLinkResourceDetectionProcessor = "https://signoz.io/docs/infrastructure-monitoring/user-guides/hostmetrics/#configure-the-resourcedetection-processor"
-	docLinkK8sAttributesProcessor     = "https://signoz.io/docs/infrastructure-monitoring/user-guides/k8s-metrics/#3-setup-k8sattributesprocessor-to-enable-kubernetes-metadata"
+	docLinkHostMetricsReceiver        = "https://o11y.io/docs/infrastructure-monitoring/user-guides/hostmetrics/#configure-the-hostmetrics-receiver"
+	docLinkKubeletStatsReceiver       = "https://o11y.io/docs/infrastructure-monitoring/user-guides/k8s-metrics/#setup-kubelet-stats-receiver"
+	docLinkK8sClusterReceiver         = "https://o11y.io/docs/infrastructure-monitoring/user-guides/k8s-metrics/#setup-k8s-cluster-receiver"
+	docLinkResourceDetectionProcessor = "https://o11y.io/docs/infrastructure-monitoring/user-guides/hostmetrics/#configure-the-resourcedetection-processor"
+	docLinkK8sAttributesProcessor     = "https://o11y.io/docs/infrastructure-monitoring/user-guides/k8s-metrics/#3-setup-k8sattributesprocessor-to-enable-kubernetes-metadata"
 )
 
 var (

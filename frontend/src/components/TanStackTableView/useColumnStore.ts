@@ -5,7 +5,7 @@ import { create } from 'zustand';
 
 import { TableColumnDef } from './types';
 
-const STORAGE_PREFIX = '@signoz/table-columns/';
+const STORAGE_PREFIX = '@o11y/table-columns/';
 
 const persistedTableCache = new Map<
 	string,

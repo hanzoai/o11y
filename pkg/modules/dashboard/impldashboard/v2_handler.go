@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
@@ -12,7 +13,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 func (handler *handler) CreateV2(rw http.ResponseWriter, r *http.Request) {
@@ -202,7 +202,7 @@ func (handler *handler) lockUnlockV2(rw http.ResponseWriter, r *http.Request, lo
 
 	isAdmin := false
 	selectors := []coretypes.Selector{
-		coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName),
+		coretypes.TypeRole.MustSelector(authtypes.O11yAdminRoleName),
 	}
 	err = handler.authz.CheckWithTupleCreation(
 		ctx,

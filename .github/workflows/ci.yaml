@@ -53,7 +53,7 @@ jobs:
         run: go build ./...
 
       # TestEmailRejected asserts an emersion/go-smtp v0.24.0 error string that
-      # upstream (wholesale-synced SigNoz) formats with quotes; skip only it.
+      # upstream (wholesale-synced O11y) formats with quotes; skip only it.
       - name: go test
         working-directory: o11y
         run: go test -count=1 -skip '^TestEmailRejected$' ./...

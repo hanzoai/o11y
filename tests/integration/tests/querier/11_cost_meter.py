@@ -15,7 +15,7 @@ from fixtures.querier import (
 
 
 def test_query_range_cost_meter(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_meter_samples: Callable[[list[MeterSample]], None],
@@ -24,7 +24,7 @@ def test_query_range_cost_meter(
     start_ms = int((now - timedelta(minutes=65)).timestamp() * 1000)
     end_ms = int(now.timestamp() * 1000)
 
-    metric_name = "signoz_cost_test_query_range"
+    metric_name = "o11y_cost_test_query_range"
     labels = {"service": "test-service", "environment": "production"}
 
     samples = make_meter_samples(
@@ -49,7 +49,7 @@ def test_query_range_cost_meter(
         temporality="delta",
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -61,7 +61,7 @@ def test_query_range_cost_meter(
 
 
 def test_list_meter_metric_names(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_meter_samples: Callable[[list[MeterSample]], None],
@@ -88,7 +88,7 @@ def test_list_meter_metric_names(
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/metrics"),
+        o11y.self.host_configs["8080"].get("/api/v2/metrics"),
         params={
             "start": start_ms,
             "end": end_ms,
@@ -112,7 +112,7 @@ def test_list_meter_metric_names(
 # prefix. Inserts meter-source metrics under ns.a and ns.b, then asserts a specific
 # prefix returns only matching values while a common prefix returns both.
 def test_metric_namespace_meter_values_filtering(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_meter_samples: Callable[[list[MeterSample]], None],
@@ -145,7 +145,7 @@ def test_metric_namespace_meter_values_filtering(
 
     # Specific prefix: metricNamespace=meter.ns.a should return only billing-a
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -166,7 +166,7 @@ def test_metric_namespace_meter_values_filtering(
 
     # Common prefix: metricNamespace=meter.ns should return both
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={

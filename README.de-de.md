@@ -1,21 +1,21 @@
 <p align="center">
-  <img src="https://res.cloudinary.com/dcv3epinx/image/upload/v1618904450/signoz-images/LogoGithub_sigfbu.svg" alt="Hanzo O11y-logo" width="240" />
+  <img src="https://res.cloudinary.com/dcv3epinx/image/upload/v1618904450/o11y-images/LogoGithub_sigfbu.svg" alt="Hanzo O11y-logo" width="240" />
 
   <p align="center">Überwache deine Anwendungen und behebe Probleme in deinen bereitgestellten Anwendungen. Hanzo O11y ist eine Open Source Alternative zu DataDog, New Relic, etc.</p>
 </p>
 
 <p align="center">
-    <img alt="Downloads" src="https://img.shields.io/docker/pulls/signoz/query-service?label=Downloads"> </a>
-    <img alt="GitHub issues" src="https://img.shields.io/github/issues/signoz/signoz"> </a>
-    <a href="https://twitter.com/intent/tweet?text=Monitor%20your%20applications%20and%20troubleshoot%20problems%20with%20Hanzo O11y,%20an%20open-source%20alternative%20to%20DataDog,%20NewRelic.&url=https://o11y.hanzo.ai/&via=Hanzo O11yHQ&hashtags=opensource,signoz,observability">
+    <img alt="Downloads" src="https://img.shields.io/docker/pulls/o11y/query-service?label=Downloads"> </a>
+    <img alt="GitHub issues" src="https://img.shields.io/github/issues/o11y/o11y"> </a>
+    <a href="https://twitter.com/intent/tweet?text=Monitor%20your%20applications%20and%20troubleshoot%20problems%20with%20Hanzo O11y,%20an%20open-source%20alternative%20to%20DataDog,%20NewRelic.&url=https://o11y.hanzo.ai/&via=Hanzo O11yHQ&hashtags=opensource,o11y,observability">
         <img alt="tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"> </a>
 </p>
 
 <h3 align="center">
   <a href="https://o11y.hanzo.ai/docs"><b>Dokumentation</b></a> &bull;
-  <a href="https://github.com/Hanzo O11y/signoz/blob/main/README.md"><b>Readme auf Englisch </b></a> &bull;
-  <a href="https://github.com/Hanzo O11y/signoz/blob/main/README.zh-cn.md"><b>ReadMe auf Chinesisch</b></a> &bull;
-  <a href="https://github.com/Hanzo O11y/signoz/blob/main/README.pt-br.md"><b>ReadMe auf Portugiesisch</b></a> &bull;
+  <a href="https://github.com/Hanzo O11y/o11y/blob/main/README.md"><b>Readme auf Englisch </b></a> &bull;
+  <a href="https://github.com/Hanzo O11y/o11y/blob/main/README.zh-cn.md"><b>ReadMe auf Chinesisch</b></a> &bull;
+  <a href="https://github.com/Hanzo O11y/o11y/blob/main/README.pt-br.md"><b>ReadMe auf Portugiesisch</b></a> &bull;
   <a href="https://o11y.hanzo.ai/slack"><b>Slack Community</b></a> &bull;
   <a href="https://twitter.com/Hanzo O11yHq"><b>Twitter</b></a>
 </h3>
@@ -188,10 +188,10 @@ Du findest unsere Dokumentation unter https://o11y.hanzo.ai/docs/. Falls etwas u
 
 Werde Teil der [slack community](https://o11y.hanzo.ai/slack) um mehr über verteilte Einzelschritt-Fehlersuche, Messung von Systemzuständen oder Hanzo O11y zu erfahren und sich mit anderen Nutzern und Mitwirkenden in Verbindung zu setzen.
 
-Falls du irgendwelche Ideen, Fragen oder Feedback hast, kannst du sie gerne über unsere [Github Discussions](https://github.com/Hanzo O11y/signoz/discussions) mit uns teilen.
+Falls du irgendwelche Ideen, Fragen oder Feedback hast, kannst du sie gerne über unsere [Github Discussions](https://github.com/Hanzo O11y/o11y/discussions) mit uns teilen.
 
 Wie immer, Dank an unsere großartigen Mitwirkenden!
 
-<a href="https://github.com/signoz/signoz/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=signoz/signoz" />
+<a href="https://github.com/o11y/o11y/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=o11y/o11y" />
 </a>

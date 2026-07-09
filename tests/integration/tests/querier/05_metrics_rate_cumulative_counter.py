@@ -23,7 +23,7 @@ CUMULATIVE_COUNTERS_FILE = os.path.join(TESTDATA_DIR, "cumulative_counters_1h.js
 
 
 def test_rate_with_steady_values_and_reset(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -50,7 +50,7 @@ def test_rate_with_steady_values_and_reset(
         filter_expression='endpoint = "/orders"',
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -67,7 +67,7 @@ def test_rate_with_steady_values_and_reset(
 
 
 def test_rate_group_by_endpoint(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -94,7 +94,7 @@ def test_rate_group_by_endpoint(
         group_by=["endpoint"],
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()

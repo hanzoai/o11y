@@ -56,9 +56,9 @@ jest.mock('utils/basePath', () => ({
 	withBasePath: (p: string): string => p,
 }));
 
-const MCP_URL = 'https://mcp.us.signoz.cloud/mcp';
-const CUSTOM_HOST_URL = 'https://myteam.signoz.cloud';
-const DEFAULT_HOST_URL = 'https://default.signoz.cloud';
+const MCP_URL = 'https://mcp.us.o11y.cloud/mcp';
+const CUSTOM_HOST_URL = 'https://myteam.o11y.cloud';
+const DEFAULT_HOST_URL = 'https://default.o11y.cloud';
 
 function setupLicense({
 	isCloudUser = true,
@@ -127,7 +127,7 @@ describe('MCPServerSettings', () => {
 		render(<MCPServerSettings />);
 
 		expect(
-			screen.getByText('MCP Server is available on SigNoz'),
+			screen.getByText('MCP Server is available on O11y'),
 		).toBeInTheDocument();
 		expect(screen.queryByTestId('mcp-settings')).not.toBeInTheDocument();
 	});
@@ -138,7 +138,7 @@ describe('MCPServerSettings', () => {
 		render(<MCPServerSettings />);
 
 		expect(screen.getByTestId('mcp-settings')).toBeInTheDocument();
-		expect(screen.getByText('SigNoz MCP Server')).toBeInTheDocument();
+		expect(screen.getByText('O11y MCP Server')).toBeInTheDocument();
 		expect(screen.getByText('Configure your client')).toBeInTheDocument();
 		expect(screen.getByText('Authenticate from your client')).toBeInTheDocument();
 	});
@@ -199,7 +199,7 @@ describe('MCPServerSettings', () => {
 		render(<MCPServerSettings />);
 
 		await user.click(
-			screen.getByRole('button', { name: 'Copy SigNoz instance URL' }),
+			screen.getByRole('button', { name: 'Copy O11y instance URL' }),
 		);
 
 		expect(mockCopyToClipboard).toHaveBeenCalledWith('http://localhost');
@@ -226,7 +226,7 @@ describe('MCPServerSettings', () => {
 			);
 
 			await user.click(
-				screen.getByRole('button', { name: 'Copy SigNoz instance URL' }),
+				screen.getByRole('button', { name: 'Copy O11y instance URL' }),
 			);
 
 			expect(mockCopyToClipboard).toHaveBeenCalledWith(CUSTOM_HOST_URL);
@@ -246,7 +246,7 @@ describe('MCPServerSettings', () => {
 			);
 
 			await user.click(
-				screen.getByRole('button', { name: 'Copy SigNoz instance URL' }),
+				screen.getByRole('button', { name: 'Copy O11y instance URL' }),
 			);
 
 			expect(mockCopyToClipboard).toHaveBeenCalledWith(DEFAULT_HOST_URL);
@@ -260,7 +260,7 @@ describe('MCPServerSettings', () => {
 			render(<MCPServerSettings />);
 
 			await user.click(
-				screen.getByRole('button', { name: 'Copy SigNoz instance URL' }),
+				screen.getByRole('button', { name: 'Copy O11y instance URL' }),
 			);
 
 			expect(mockCopyToClipboard).toHaveBeenCalledWith('http://localhost');
@@ -284,7 +284,7 @@ describe('MCPServerSettings', () => {
 			render(<MCPServerSettings />);
 
 			expect(
-				screen.queryByRole('button', { name: 'Copy SigNoz instance URL' }),
+				screen.queryByRole('button', { name: 'Copy O11y instance URL' }),
 			).not.toBeInTheDocument();
 			expect(mockCopyToClipboard).not.toHaveBeenCalled();
 		});
@@ -315,7 +315,7 @@ describe('MCPServerSettings', () => {
 			);
 
 			await user.click(
-				screen.getByRole('button', { name: 'Copy SigNoz instance URL' }),
+				screen.getByRole('button', { name: 'Copy O11y instance URL' }),
 			);
 
 			expect(mockCopyToClipboard).toHaveBeenCalledWith('http://localhost');

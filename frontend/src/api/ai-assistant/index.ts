@@ -1,8 +1,8 @@
 /**
  * ! Do not edit manually
- * * The file has been auto-generated using Orval for SigNoz AI Assistant
+ * * The file has been auto-generated using Orval for O11y AI Assistant
  * * regenerate with 'yarn generate:api'
- * SigNoz AI Assistant API
+ * O11y AI Assistant API
  * OpenAPI spec version: 0.1.0
  */
 import { useMutation, useQuery } from 'react-query';
@@ -65,7 +65,7 @@ import type {
 	UpdateThreadApiV1AssistantThreadsThreadIdPatchHeaders,
 	UpdateThreadApiV1AssistantThreadsThreadIdPatchPathParameters,
 	UpdateThreadRequestDTO,
-} from './sigNozAIAssistantAPI.schemas';
+} from './o11yAIAssistantAPI.schemas';
 
 import {
 	GeneratedAPIInstance,

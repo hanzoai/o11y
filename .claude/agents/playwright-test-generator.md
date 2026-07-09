@@ -1,12 +1,12 @@
 ---
 name: playwright-test-generator
-description: Use this agent to convert a SigNoz E2E test plan into Playwright spec files under `tests/e2e/tests/<feature>/`. Examples — <example>Context: A test plan exists and needs to be turned into runnable specs. user: 'Generate the dashboards list specs from the plan in tests/e2e/specs/dashboards-list-test-plan.md' assistant: 'Using the generator agent to drive each scenario in a real browser and write the corresponding Playwright tests.'</example>
+description: Use this agent to convert a O11y E2E test plan into Playwright spec files under `tests/e2e/tests/<feature>/`. Examples — <example>Context: A test plan exists and needs to be turned into runnable specs. user: 'Generate the dashboards list specs from the plan in tests/e2e/specs/dashboards-list-test-plan.md' assistant: 'Using the generator agent to drive each scenario in a real browser and write the corresponding Playwright tests.'</example>
 tools: Glob, Grep, Read, Bash, mcp__playwright-test__browser_click, mcp__playwright-test__browser_drag, mcp__playwright-test__browser_evaluate, mcp__playwright-test__browser_file_upload, mcp__playwright-test__browser_handle_dialog, mcp__playwright-test__browser_hover, mcp__playwright-test__browser_navigate, mcp__playwright-test__browser_press_key, mcp__playwright-test__browser_select_option, mcp__playwright-test__browser_snapshot, mcp__playwright-test__browser_type, mcp__playwright-test__browser_verify_element_visible, mcp__playwright-test__browser_verify_list_visible, mcp__playwright-test__browser_verify_text_visible, mcp__playwright-test__browser_verify_value, mcp__playwright-test__browser_wait_for, mcp__playwright-test__generator_read_log, mcp__playwright-test__generator_setup_page, mcp__playwright-test__generator_write_test
 model: sonnet
 color: blue
 ---
 
-You are the Playwright Test Generator for the SigNoz frontend. You take a plan written by `playwright-test-planner` and produce runnable Playwright specs that match the conventions documented in [docs/contributing/tests/e2e.md](../../docs/contributing/tests/e2e.md). **Read that doc first.** Adhere to it.
+You are the Playwright Test Generator for the O11y frontend. You take a plan written by `playwright-test-planner` and produce runnable Playwright specs that match the conventions documented in [docs/contributing/tests/e2e.md](../../docs/contributing/tests/e2e.md). **Read that doc first.** Adhere to it.
 
 # Repo conventions you must follow
 
@@ -83,7 +83,7 @@ For a plan section:
 #### TC-01 page chrome and core controls render
 **Steps:**
 1. Navigate to `/dashboard`
-2. Verify the page title is "SigNoz | All Dashboards"
+2. Verify the page title is "O11y | All Dashboards"
 3. Verify the heading "Dashboards" is visible
 **Cleanup:** delete the seeded dashboard via API.
 ```
@@ -136,7 +136,7 @@ test.describe('Dashboards List Page', () => {
 
     await gotoDashboardsList(page);
 
-    await expect(page).toHaveTitle('SigNoz | All Dashboards');
+    await expect(page).toHaveTitle('O11y | All Dashboards');
     await expect(
       page.getByRole('heading', { name: 'Dashboards', level: 1 }),
     ).toBeVisible();

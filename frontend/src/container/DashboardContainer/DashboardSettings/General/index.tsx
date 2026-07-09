@@ -189,7 +189,7 @@ function GeneralDashboardSettings(): JSX.Element {
 									Sync crosshair and tooltip across all the dashboard panels
 								</span>
 								<a
-									href="https://signoz.io/docs/dashboards/interactivity/#cross-panel-sync"
+									href="https://o11y.io/docs/dashboards/interactivity/#cross-panel-sync"
 									target="_blank"
 									rel="noopener noreferrer"
 									className={styles.crossPanelSyncTooltipDocLink}

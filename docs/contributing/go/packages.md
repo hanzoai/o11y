@@ -81,8 +81,8 @@ import (
     "github.com/gorilla/mux"
 
     // 3. Internal
-    "github.com/Hanzo O11y/signoz/pkg/errors"
-    "github.com/Hanzo O11y/signoz/pkg/types"
+    "github.com/Hanzo O11y/o11y/pkg/errors"
+    "github.com/Hanzo O11y/o11y/pkg/types"
 )
 ```
 

@@ -14,10 +14,10 @@ import (
 )
 
 var (
-	userRoleToSigNozManagedRoleMap = map[string]string{
-		"ADMIN":  "signoz-admin",
-		"EDITOR": "signoz-editor",
-		"VIEWER": "signoz-viewer",
+	userRoleToO11yManagedRoleMap = map[string]string{
+		"ADMIN":  "o11y-admin",
+		"EDITOR": "o11y-editor",
+		"VIEWER": "o11y-viewer",
 	}
 )
 
@@ -159,9 +159,9 @@ func (migration *addUserRole) Up(ctx context.Context, db *bun.DB) error {
 	now := time.Now()
 	userRoles := make([]*userRoleRow, 0, len(users))
 	for _, u := range users {
-		managedRoleName, ok := userRoleToSigNozManagedRoleMap[u.Role]
+		managedRoleName, ok := userRoleToO11yManagedRoleMap[u.Role]
 		if !ok {
-			managedRoleName = "signoz-viewer" // fallback
+			managedRoleName = "o11y-viewer" // fallback
 		}
 
 		roleID := roleMap[orgRoleKey{OrgID: u.OrgID, RoleName: managedRoleName}]

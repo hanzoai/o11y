@@ -191,7 +191,7 @@ describe('RolesSettings', () => {
 			},
 		});
 
-		await expect(screen.findByText('signoz-admin')).resolves.toBeInTheDocument();
+		await expect(screen.findByText('o11y-admin')).resolves.toBeInTheDocument();
 
 		expect(
 			screen.queryByRole('button', { name: /custom role/i }),
@@ -209,7 +209,7 @@ describe('RolesSettings', () => {
 			appContextOverrides: { activeLicense: invalidLicense },
 		});
 
-		await expect(screen.findByText('signoz-admin')).resolves.toBeInTheDocument();
+		await expect(screen.findByText('o11y-admin')).resolves.toBeInTheDocument();
 
 		// Create button must be absent
 		expect(

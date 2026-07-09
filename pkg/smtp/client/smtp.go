@@ -38,7 +38,7 @@ type Client struct {
 
 func New(address string, logger *slog.Logger, opts ...Option) (*Client, error) {
 	clientOpts := options{
-		from:    "signoz@signoz.localhost",
+		from:    "o11y@o11y.localhost",
 		headers: make(map[string]string),
 		auth:    Auth{},
 		tls: TLS{

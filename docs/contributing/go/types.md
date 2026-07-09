@@ -1,6 +1,6 @@
 # Types
 
-Domain types in `pkg/types/<domain>/` live on three serialization boundaries — inbound HTTP, outbound HTTP, and SQL — on top of an in-memory domain representation. SigNoz's convention is **core-type-first**: every domain defines a single canonical type `X`, and specialized flavors (`PostableX`, `GettableX`, `UpdatableX`, `StorableX`) are introduced **only when they actually differ from `X`**. This guide spells out when each flavor is warranted and how they relate to each other.
+Domain types in `pkg/types/<domain>/` live on three serialization boundaries — inbound HTTP, outbound HTTP, and SQL — on top of an in-memory domain representation. O11y's convention is **core-type-first**: every domain defines a single canonical type `X`, and specialized flavors (`PostableX`, `GettableX`, `UpdatableX`, `StorableX`) are introduced **only when they actually differ from `X`**. This guide spells out when each flavor is warranted and how they relate to each other.
 
 Before reading, make sure you have read [abstractions.md](abstractions.md) — the rules here build on its guidance that every new type must earn its place.
 

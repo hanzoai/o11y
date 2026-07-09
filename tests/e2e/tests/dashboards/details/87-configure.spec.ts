@@ -306,7 +306,7 @@ test.describe('Dashboard Detail — Configure drawer', () => {
 	});
 
 	// known limitation: TC-07 (add a Dynamic (Beta) variable) is intentionally
-	// not implemented. Dynamic variables source from the SigNoz attribute
+	// not implemented. Dynamic variables source from the O11y attribute
 	// index — the bootstrap stack ingests no telemetry, so the field selector
 	// renders an empty option list and Save Variable can never be enabled.
 	// Re-add once the bootstrap seeds telemetry attributes.

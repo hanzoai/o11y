@@ -6,24 +6,24 @@ import {
 	interceptorsRequestResponse,
 	interceptorsResponse,
 } from 'api';
-import { getSigNozInstanceUrl } from 'utils/signozInstanceUrl';
+import { getO11yInstanceUrl } from 'utils/o11yInstanceUrl';
 
 /** Path-only base for the AI Assistant API. */
 export const AI_API_PATH = '/api/v1/assistant';
 
-/** Header that tells the AI backend which SigNoz instance to query against. */
-export const SIGNOZ_URL_HEADER = 'X-SigNoz-URL';
+/** Header that tells the AI backend which O11y instance to query against. */
+export const O11Y_URL_HEADER = 'X-O11y-URL';
 
 /**
- * Sets `X-SigNoz-URL` on every outgoing AI Assistant request. The backend
- * needs the originating SigNoz instance URL for multi-tenant deployments;
- * when omitted it falls back to its `SIGNOZ_API_URL` env var.
+ * Sets `X-O11y-URL` on every outgoing AI Assistant request. The backend
+ * needs the originating O11y instance URL for multi-tenant deployments;
+ * when omitted it falls back to its `O11Y_API_URL` env var.
  */
-export const interceptorsRequestSigNozUrl = (
+export const interceptorsRequestO11yUrl = (
 	value: InternalAxiosRequestConfig,
 ): InternalAxiosRequestConfig => {
 	if (value.headers) {
-		value.headers[SIGNOZ_URL_HEADER] = getSigNozInstanceUrl();
+		value.headers[O11Y_URL_HEADER] = getO11yInstanceUrl();
 	}
 	return value;
 };
@@ -60,7 +60,7 @@ export function getAIBaseUrl(): string {
 /**
  * Dedicated axios instance for the AI Assistant.
  *
- * Mirrors the request/response interceptor stack of the main SigNoz axios
+ * Mirrors the request/response interceptor stack of the main O11y axios
  * instance — most importantly `interceptorRejected`, which transparently
  * rotates the access token via `/sessions/rotate` on a 401 and replays the
  * original request. That's why we don't need any AI-specific 401 handling
@@ -74,7 +74,7 @@ export const AIAssistantInstance = axios.create({});
 
 AIAssistantInstance.interceptors.request.use(interceptorsRequestResponse);
 AIAssistantInstance.interceptors.request.use(interceptorsRequestBasePath);
-AIAssistantInstance.interceptors.request.use(interceptorsRequestSigNozUrl);
+AIAssistantInstance.interceptors.request.use(interceptorsRequestO11yUrl);
 AIAssistantInstance.interceptors.response.use(
 	interceptorsResponse,
 	interceptorRejected,

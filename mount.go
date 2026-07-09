@@ -30,7 +30,7 @@ import (
 // All traffic under /v1/o11y is delegated to the registered http.Handler via
 // zip.AdaptNetHTTP; handlerAdapter normalizes the /v1/o11y/<resource> public
 // contract onto the two internal route families HERE — the ONE Hanzo-owned seam —
-// so the embedded SigNoz route literals stay untouched (see rewriteExternalPath).
+// so the embedded O11y route literals stay untouched (see rewriteExternalPath).
 func Mount(app *zip.App, deps cloud.Deps) error {
 	log := deps.Logger
 	if log == nil {
@@ -64,22 +64,22 @@ func (handlerAdapter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // rewriteExternalPath maps the ONE public o11y contract — api.hanzo.ai/v1/o11y/<resource>,
 // one /v1/, no nested version, no /api/ — onto o11y's internal /api/ namespace, at this
-// single Hanzo-owned seam. It is done HERE, never by editing the embedded SigNoz route
-// literals: SigNoz's whole frontend and backend speak /api/vN, and rewriting those
+// single Hanzo-owned seam. It is done HERE, never by editing the embedded O11y route
+// literals: O11y's whole frontend and backend speak /api/vN, and rewriting those
 // literals is a fork diff a later upstream re-sync silently reverts (it happened once —
 // see o11y/CLAUDE.md).
 //
 //	/v1/o11y/<resource>   → /api/<resource>   (canonical; resolves to a version-less
-//	                                           alias — SigNoz, highest version wins —
+//	                                           alias — O11y, highest version wins —
 //	                                           or a Hanzo llmobs route)
-//	/v1/o11y/api/vN/…      → /api/vN/…         (leaked form still emitted by the SigNoz
+//	/v1/o11y/api/vN/…      → /api/vN/…         (leaked form still emitted by the O11y
 //	                                           SPA; kept working by dropping the mount
 //	                                           prefix only, until it migrates)
 //
-// Because every rewritten path starts with /api/, the embedded SigNoz StripPrefix
+// Because every rewritten path starts with /api/, the embedded O11y StripPrefix
 // wrapper (ExternalPath=/v1/o11y) finds nothing to strip and passes through — so no CR
 // change is needed. The version-less /api/<resource> aliases are registered by
-// signozapiserver.AddVersionlessAliases when the router is assembled.
+// o11yapiserver.AddVersionlessAliases when the router is assembled.
 func rewriteExternalPath(u *url.URL) {
 	rest, ok := strings.CutPrefix(u.Path, "/v1/o11y/")
 	if !ok {
@@ -93,7 +93,7 @@ func rewriteExternalPath(u *url.URL) {
 }
 
 // setPath rewrites the request path, clearing RawPath so EscapedPath re-derives from the
-// new value — the rewritten SigNoz paths contain no characters needing escaping, and
+// new value — the rewritten O11y paths contain no characters needing escaping, and
 // llmobs paths (the only ones carrying an {id}) are never rewritten.
 func setPath(u *url.URL, p string) {
 	u.Path = p

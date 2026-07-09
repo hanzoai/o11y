@@ -1015,13 +1015,13 @@ components:
           type: string
         ingestionUrl:
           type: string
-        sigNozApiKey:
+        o11yApiKey:
           type: string
-        sigNozApiUrl:
+        o11yApiUrl:
           type: string
       required:
-      - sigNozApiUrl
-      - sigNozApiKey
+      - o11yApiUrl
+      - o11yApiKey
       - ingestionUrl
       - ingestionKey
       type: object
@@ -2434,9 +2434,9 @@ components:
       type: object
     DashboardtypesBuilderQuerySpec:
       oneOf:
-      - $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation'
-      - $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation'
-      - $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation'
+      - $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation'
+      - $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation'
+      - $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation'
     DashboardtypesComparisonOperator:
       enum:
       - above
@@ -2529,13 +2529,13 @@ components:
       - $ref: '#/components/schemas/DashboardtypesDatasourcePluginVariantStruct'
     DashboardtypesDatasourcePluginKind:
       enum:
-      - signoz/Datasource
+      - o11y/Datasource
       type: string
     DashboardtypesDatasourcePluginVariantStruct:
       properties:
         kind:
           enum:
-          - signoz/Datasource
+          - o11y/Datasource
           type: string
         spec:
           nullable: true
@@ -2744,28 +2744,28 @@ components:
       type: object
     DashboardtypesPanelPlugin:
       oneOf:
-      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesTimeSeriesPanelSpec'
-      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesBarChartPanelSpec'
-      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesNumberPanelSpec'
-      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesPieChartPanelSpec'
-      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesTablePanelSpec'
-      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesHistogramPanelSpec'
-      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesListPanelSpec'
+      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesTimeSeriesPanelSpec'
+      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesBarChartPanelSpec'
+      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesNumberPanelSpec'
+      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesPieChartPanelSpec'
+      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesTablePanelSpec'
+      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesHistogramPanelSpec'
+      - $ref: '#/components/schemas/DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesListPanelSpec'
     DashboardtypesPanelPluginKind:
       enum:
-      - signoz/TimeSeriesPanel
-      - signoz/BarChartPanel
-      - signoz/NumberPanel
-      - signoz/PieChartPanel
-      - signoz/TablePanel
-      - signoz/HistogramPanel
-      - signoz/ListPanel
+      - o11y/TimeSeriesPanel
+      - o11y/BarChartPanel
+      - o11y/NumberPanel
+      - o11y/PieChartPanel
+      - o11y/TablePanel
+      - o11y/HistogramPanel
+      - o11y/ListPanel
       type: string
-    DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesBarChartPanelSpec:
+    DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesBarChartPanelSpec:
       properties:
         kind:
           enum:
-          - signoz/BarChartPanel
+          - o11y/BarChartPanel
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesBarChartPanelSpec'
@@ -2773,11 +2773,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesHistogramPanelSpec:
+    DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesHistogramPanelSpec:
       properties:
         kind:
           enum:
-          - signoz/HistogramPanel
+          - o11y/HistogramPanel
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesHistogramPanelSpec'
@@ -2785,11 +2785,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesListPanelSpec:
+    DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesListPanelSpec:
       properties:
         kind:
           enum:
-          - signoz/ListPanel
+          - o11y/ListPanel
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesListPanelSpec'
@@ -2797,11 +2797,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesNumberPanelSpec:
+    DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesNumberPanelSpec:
       properties:
         kind:
           enum:
-          - signoz/NumberPanel
+          - o11y/NumberPanel
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesNumberPanelSpec'
@@ -2809,11 +2809,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesPieChartPanelSpec:
+    DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesPieChartPanelSpec:
       properties:
         kind:
           enum:
-          - signoz/PieChartPanel
+          - o11y/PieChartPanel
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesPieChartPanelSpec'
@@ -2821,11 +2821,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesTablePanelSpec:
+    DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesTablePanelSpec:
       properties:
         kind:
           enum:
-          - signoz/TablePanel
+          - o11y/TablePanel
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesTablePanelSpec'
@@ -2833,11 +2833,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesPanelPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesTimeSeriesPanelSpec:
+    DashboardtypesPanelPluginVariantGithubComO11yO11yPkgTypesDashboardtypesTimeSeriesPanelSpec:
       properties:
         kind:
           enum:
-          - signoz/TimeSeriesPanel
+          - o11y/TimeSeriesPanel
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesTimeSeriesPanelSpec'
@@ -2916,26 +2916,26 @@ components:
       type: object
     DashboardtypesQueryPlugin:
       oneOf:
-      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesBuilderQuerySpec'
-      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5CompositeQuery'
-      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormula'
-      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5PromQuery'
-      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQuery'
-      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderTraceOperator'
+      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesDashboardtypesBuilderQuerySpec'
+      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5CompositeQuery'
+      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormula'
+      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5PromQuery'
+      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQuery'
+      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderTraceOperator'
     DashboardtypesQueryPluginKind:
       enum:
-      - signoz/BuilderQuery
-      - signoz/CompositeQuery
-      - signoz/Formula
-      - signoz/PromQLQuery
-      - signoz/ClickHouseSQL
-      - signoz/TraceOperator
+      - o11y/BuilderQuery
+      - o11y/CompositeQuery
+      - o11y/Formula
+      - o11y/PromQLQuery
+      - o11y/ClickHouseSQL
+      - o11y/TraceOperator
       type: string
-    DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesDashboardtypesBuilderQuerySpec:
+    DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesDashboardtypesBuilderQuerySpec:
       properties:
         kind:
           enum:
-          - signoz/BuilderQuery
+          - o11y/BuilderQuery
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesBuilderQuerySpec'
@@ -2943,11 +2943,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQuery:
+    DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQuery:
       properties:
         kind:
           enum:
-          - signoz/ClickHouseSQL
+          - o11y/ClickHouseSQL
           type: string
         spec:
           $ref: '#/components/schemas/Querybuildertypesv5ClickHouseQuery'
@@ -2955,11 +2955,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5CompositeQuery:
+    DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5CompositeQuery:
       properties:
         kind:
           enum:
-          - signoz/CompositeQuery
+          - o11y/CompositeQuery
           type: string
         spec:
           $ref: '#/components/schemas/Querybuildertypesv5CompositeQuery'
@@ -2967,11 +2967,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5PromQuery:
+    DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5PromQuery:
       properties:
         kind:
           enum:
-          - signoz/PromQLQuery
+          - o11y/PromQLQuery
           type: string
         spec:
           $ref: '#/components/schemas/Querybuildertypesv5PromQuery'
@@ -2979,11 +2979,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormula:
+    DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormula:
       properties:
         kind:
           enum:
-          - signoz/Formula
+          - o11y/Formula
           type: string
         spec:
           $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderFormula'
@@ -2991,11 +2991,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesQueryPluginVariantGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderTraceOperator:
+    DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderTraceOperator:
       properties:
         kind:
           enum:
-          - signoz/TraceOperator
+          - o11y/TraceOperator
           type: string
         spec:
           $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderTraceOperator'
@@ -3156,7 +3156,7 @@ components:
       type: object
     DashboardtypesVariable:
       oneOf:
-      - $ref: '#/components/schemas/DashboardtypesVariableEnvelopeGithubComSigNozSignozPkgTypesDashboardtypesListVariableSpec'
+      - $ref: '#/components/schemas/DashboardtypesVariableEnvelopeGithubComO11yO11yPkgTypesDashboardtypesListVariableSpec'
       - $ref: '#/components/schemas/DashboardtypesVariableEnvelopeGithubComPersesPersesPkgModelApiV1DashboardTextVariableSpec'
     DashboardtypesVariableEnvelopeGithubComPersesPersesPkgModelApiV1DashboardTextVariableSpec:
       properties:
@@ -3170,7 +3170,7 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesVariableEnvelopeGithubComSigNozSignozPkgTypesDashboardtypesListVariableSpec:
+    DashboardtypesVariableEnvelopeGithubComO11yO11yPkgTypesDashboardtypesListVariableSpec:
       properties:
         kind:
           enum:
@@ -3184,20 +3184,20 @@ components:
       type: object
     DashboardtypesVariablePlugin:
       oneOf:
-      - $ref: '#/components/schemas/DashboardtypesVariablePluginVariantGithubComSigNozSignozPkgTypesDashboardtypesDynamicVariableSpec'
-      - $ref: '#/components/schemas/DashboardtypesVariablePluginVariantGithubComSigNozSignozPkgTypesDashboardtypesQueryVariableSpec'
-      - $ref: '#/components/schemas/DashboardtypesVariablePluginVariantGithubComSigNozSignozPkgTypesDashboardtypesCustomVariableSpec'
+      - $ref: '#/components/schemas/DashboardtypesVariablePluginVariantGithubComO11yO11yPkgTypesDashboardtypesDynamicVariableSpec'
+      - $ref: '#/components/schemas/DashboardtypesVariablePluginVariantGithubComO11yO11yPkgTypesDashboardtypesQueryVariableSpec'
+      - $ref: '#/components/schemas/DashboardtypesVariablePluginVariantGithubComO11yO11yPkgTypesDashboardtypesCustomVariableSpec'
     DashboardtypesVariablePluginKind:
       enum:
-      - signoz/DynamicVariable
-      - signoz/QueryVariable
-      - signoz/CustomVariable
+      - o11y/DynamicVariable
+      - o11y/QueryVariable
+      - o11y/CustomVariable
       type: string
-    DashboardtypesVariablePluginVariantGithubComSigNozSignozPkgTypesDashboardtypesCustomVariableSpec:
+    DashboardtypesVariablePluginVariantGithubComO11yO11yPkgTypesDashboardtypesCustomVariableSpec:
       properties:
         kind:
           enum:
-          - signoz/CustomVariable
+          - o11y/CustomVariable
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesCustomVariableSpec'
@@ -3205,11 +3205,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesVariablePluginVariantGithubComSigNozSignozPkgTypesDashboardtypesDynamicVariableSpec:
+    DashboardtypesVariablePluginVariantGithubComO11yO11yPkgTypesDashboardtypesDynamicVariableSpec:
       properties:
         kind:
           enum:
-          - signoz/DynamicVariable
+          - o11y/DynamicVariable
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesDynamicVariableSpec'
@@ -3217,11 +3217,11 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesVariablePluginVariantGithubComSigNozSignozPkgTypesDashboardtypesQueryVariableSpec:
+    DashboardtypesVariablePluginVariantGithubComO11yO11yPkgTypesDashboardtypesQueryVariableSpec:
       properties:
         kind:
           enum:
-          - signoz/QueryVariable
+          - o11y/QueryVariable
           type: string
         spec:
           $ref: '#/components/schemas/DashboardtypesQueryVariableSpec'
@@ -5344,7 +5344,7 @@ components:
             $ref: '#/components/schemas/Querybuildertypesv5OrderBy'
           type: array
       type: object
-    Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation:
+    Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation:
       properties:
         aggregations:
           items:
@@ -5395,7 +5395,7 @@ components:
         stepInterval:
           $ref: '#/components/schemas/Querybuildertypesv5Step'
       type: object
-    Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation:
+    Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation:
       properties:
         aggregations:
           items:
@@ -5446,7 +5446,7 @@ components:
         stepInterval:
           $ref: '#/components/schemas/Querybuildertypesv5Step'
       type: object
-    Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation:
+    Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation:
       properties:
         aggregations:
           items:
@@ -5570,21 +5570,21 @@ components:
     Querybuildertypesv5QueryEnvelopeBuilderLog:
       properties:
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation'
+          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5LogAggregation'
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object
     Querybuildertypesv5QueryEnvelopeBuilderMetric:
       properties:
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation'
+          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5MetricAggregation'
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object
     Querybuildertypesv5QueryEnvelopeBuilderTrace:
       properties:
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComSigNozSignozPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation'
+          $ref: '#/components/schemas/Querybuildertypesv5QueryBuilderQueryGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5TraceAggregation'
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object
@@ -7296,9 +7296,9 @@ components:
       type: http
 info:
   contact:
-    email: support@signoz.io
-    name: SigNoz Support
-    url: https://signoz.io
+    email: support@o11y.io
+    name: O11y Support
+    url: https://o11y.io
   description: OpenTelemetry-Native Logs, Metrics and Traces in a single pane
   title: Hanzo O11y
   version: ""
@@ -14690,7 +14690,7 @@ paths:
   /api/v2/metrics/onboarding:
     get:
       deprecated: false
-      description: Lightweight endpoint that checks if any non-SigNoz metrics have
+      description: Lightweight endpoint that checks if any non-O11y metrics have
         been ingested, used for onboarding status detection
       operationId: GetMetricsOnboardingStatus
       responses:
@@ -14731,7 +14731,7 @@ paths:
         - VIEWER
       - tokenizer:
         - VIEWER
-      summary: Check if non-SigNoz metrics have been received
+      summary: Check if non-O11y metrics have been received
       tags:
       - metrics
   /api/v2/metrics/stats:
@@ -15285,7 +15285,7 @@ paths:
               metric_anomaly:
                 description: Anomaly rules are not yet supported under schemaVersion
                   v2alpha1, so this example uses the v1 shape. Wraps a builder query
-                  in the `anomaly` function with daily seasonality SigNoz compares
+                  in the `anomaly` function with daily seasonality O11y compares
                   each point against the forecast for that time of day. Fires when
                   the anomaly score stays below the threshold for the entire window;
                   `requireMinPoints` guards against noisy intervals.
@@ -15850,7 +15850,7 @@ paths:
               traces_threshold_latency:
                 description: Builder query against the traces signal with p99(duration_nano).
                   The series unit is ns (compositeQuery.unit), the target is in seconds
-                  (threshold.targetUnit) SigNoz converts before comparing. Canonical
+                  (threshold.targetUnit) O11y converts before comparing. Canonical
                   shape when series and target live in different units.
                 summary: Traces threshold p99 latency (ns → s conversion)
                 value:
@@ -16234,7 +16234,7 @@ paths:
               metric_anomaly:
                 description: Anomaly rules are not yet supported under schemaVersion
                   v2alpha1, so this example uses the v1 shape. Wraps a builder query
-                  in the `anomaly` function with daily seasonality SigNoz compares
+                  in the `anomaly` function with daily seasonality O11y compares
                   each point against the forecast for that time of day. Fires when
                   the anomaly score stays below the threshold for the entire window;
                   `requireMinPoints` guards against noisy intervals.
@@ -16799,7 +16799,7 @@ paths:
               traces_threshold_latency:
                 description: Builder query against the traces signal with p99(duration_nano).
                   The series unit is ns (compositeQuery.unit), the target is in seconds
-                  (threshold.targetUnit) SigNoz converts before comparing. Canonical
+                  (threshold.targetUnit) O11y converts before comparing. Canonical
                   shape when series and target live in different units.
                 summary: Traces threshold p99 latency (ns → s conversion)
                 value:
@@ -17086,7 +17086,7 @@ paths:
               metric_anomaly:
                 description: Anomaly rules are not yet supported under schemaVersion
                   v2alpha1, so this example uses the v1 shape. Wraps a builder query
-                  in the `anomaly` function with daily seasonality SigNoz compares
+                  in the `anomaly` function with daily seasonality O11y compares
                   each point against the forecast for that time of day. Fires when
                   the anomaly score stays below the threshold for the entire window;
                   `requireMinPoints` guards against noisy intervals.
@@ -17651,7 +17651,7 @@ paths:
               traces_threshold_latency:
                 description: Builder query against the traces signal with p99(duration_nano).
                   The series unit is ns (compositeQuery.unit), the target is in seconds
-                  (threshold.targetUnit) SigNoz converts before comparing. Canonical
+                  (threshold.targetUnit) O11y converts before comparing. Canonical
                   shape when series and target live in different units.
                 summary: Traces threshold p99 latency (ns → s conversion)
                 value:
@@ -18441,7 +18441,7 @@ paths:
               metric_anomaly:
                 description: Anomaly rules are not yet supported under schemaVersion
                   v2alpha1, so this example uses the v1 shape. Wraps a builder query
-                  in the `anomaly` function with daily seasonality SigNoz compares
+                  in the `anomaly` function with daily seasonality O11y compares
                   each point against the forecast for that time of day. Fires when
                   the anomaly score stays below the threshold for the entire window;
                   `requireMinPoints` guards against noisy intervals.
@@ -19006,7 +19006,7 @@ paths:
               traces_threshold_latency:
                 description: Builder query against the traces signal with p99(duration_nano).
                   The series unit is ns (compositeQuery.unit), the target is in seconds
-                  (threshold.targetUnit) SigNoz converts before comparing. Canonical
+                  (threshold.targetUnit) O11y converts before comparing. Canonical
                   shape when series and target live in different units.
                 summary: Traces threshold p99 latency (ns → s conversion)
                 value:
@@ -20623,15 +20623,15 @@ paths:
       tags:
       - querier
 servers:
-- description: The fully qualified URL to the SigNoz APIServer.
+- description: The fully qualified URL to the O11y APIServer.
   url: https://{host}:{port}{base_path}
   variables:
     base_path:
       default: /
-      description: The base path of the SigNoz APIServer
+      description: The base path of the O11y APIServer
     host:
       default: localhost
-      description: The host of the SigNoz APIServer
+      description: The host of the O11y APIServer
     port:
       default: "8080"
-      description: The port of the SigNoz APIServer
+      description: The port of the O11y APIServer

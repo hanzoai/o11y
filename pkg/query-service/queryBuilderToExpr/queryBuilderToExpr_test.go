@@ -3,9 +3,9 @@ package queryBuilderToExpr
 import (
 	"testing"
 
-	signozstanzahelper "github.com/hanzoai/signoz-otel-collector/processor/signozlogspipelineprocessor/stanza/operator/helper"
-	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/expr-lang/expr/vm"
+	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	o11ystanzahelper "github.com/hanzoai/otel-collector/processor/o11ylogspipelineprocessor/stanza/operator/helper"
 	"github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza/entry"
 	"github.com/stretchr/testify/assert"
 )
@@ -334,7 +334,7 @@ func TestExpressionVSEntry(t *testing.T) {
 			ExpectedMatches: []int{0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17},
 		},
 		// body.log.message exists/nexists: expr checks "log.message" in fromJSON(body); nested key
-		// semantics depend on signoz stanza helper. Omitted here to avoid coupling to env shape.
+		// semantics depend on o11y stanza helper. Omitted here to avoid coupling to env shape.
 		{
 			Name: "body top-level key exists (body.msg)",
 			Query: &v3.FilterSet{Operator: "AND", Items: []v3.FilterItem{
@@ -518,12 +518,12 @@ func TestExpressionVSEntry(t *testing.T) {
 			expression, err := Parse(tt.Query)
 			assert.NoError(t, err)
 
-			compiled, hasBodyFieldRef, _, err := signozstanzahelper.ExprCompileBool(expression)
+			compiled, hasBodyFieldRef, _, err := o11ystanzahelper.ExprCompileBool(expression)
 			assert.NoError(t, err)
 
 			matchedIDs := []int{}
 			for _, d := range dataset {
-				err := signozstanzahelper.RunWithExprEnv(d.Entry, hasBodyFieldRef, nil, func(env map[string]any) error {
+				err := o11ystanzahelper.RunWithExprEnv(d.Entry, hasBodyFieldRef, nil, func(env map[string]any) error {
 					matches, err := vm.Run(compiled, env)
 					if err != nil {
 						// Eval error (e.g. fromJSON on non-JSON body) => treat as no match

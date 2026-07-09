@@ -106,13 +106,13 @@ const mockFetchedUser = {
 	data: {
 		id: 'user-1',
 		displayName: 'Alice Smith',
-		email: 'alice@signoz.io',
+		email: 'alice@o11y.io',
 		status: 'active',
 		userRoles: [
 			{
 				id: 'ur-1',
 				roleId: managedRoles[0].id,
-				role: managedRoles[0], // signoz-admin
+				role: managedRoles[0], // o11y-admin
 			},
 		],
 	},
@@ -310,9 +310,9 @@ describe('EditMemberDrawer', () => {
 
 		renderDrawer({ onComplete });
 
-		// signoz-admin is already selected; add signoz-editor on top
+		// o11y-admin is already selected; add o11y-editor on top
 		await user.click(screen.getByLabelText('Roles'));
-		await user.click(await screen.findByTitle('signoz-editor'));
+		await user.click(await screen.findByTitle('o11y-editor'));
 
 		const saveBtn = screen.getByRole('button', { name: /save member details/i });
 		await waitFor(() => expect(saveBtn).not.toBeDisabled());
@@ -321,7 +321,7 @@ describe('EditMemberDrawer', () => {
 		await waitFor(() => {
 			expect(mockSet).toHaveBeenCalledWith({
 				pathParams: { id: 'user-1' },
-				data: { name: 'signoz-editor' },
+				data: { name: 'o11y-editor' },
 			});
 			expect(mockRemoveMutateAsync).not.toHaveBeenCalled();
 			expect(onComplete).toHaveBeenCalled();
@@ -334,8 +334,8 @@ describe('EditMemberDrawer', () => {
 
 		renderDrawer({ onComplete });
 
-		// signoz-admin appears as a selected tag — click its remove button to deselect
-		const adminTag = await screen.findByTitle('signoz-admin');
+		// o11y-admin appears as a selected tag — click its remove button to deselect
+		const adminTag = await screen.findByTitle('o11y-admin');
 		const removeBtn = adminTag.querySelector(
 			'.ant-select-selection-item-remove',
 		) as Element;
@@ -478,7 +478,7 @@ describe('EditMemberDrawer', () => {
 						{
 							id: 'ur-2',
 							roleId: managedRoles[2].id,
-							role: managedRoles[2], // signoz-viewer
+							role: managedRoles[2], // o11y-viewer
 						},
 					],
 				},
