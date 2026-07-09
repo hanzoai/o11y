@@ -11,9 +11,10 @@ import (
 	"github.com/swaggest/openapi-go/openapi3"
 )
 
-// TestLLMObsRoutes proves the /v1/o11y surface both registers on the router and
-// reflects cleanly through the OpenAPI collector (the same walk the spec
-// generator performs), without needing a live instrumentation stack.
+// TestLLMObsRoutes proves the llmobs routes register on the router at the internal
+// /api/<resource> paths (the external /v1/o11y/<resource> contract maps onto them via
+// the o11y mount) and reflect cleanly through the OpenAPI collector (the same walk the
+// spec generator performs), without needing a live instrumentation stack.
 func TestLLMObsRoutes(t *testing.T) {
 	p := &provider{
 		llmObsHandler:   struct{ llmobs.Handler }{},
@@ -26,13 +27,13 @@ func TestLLMObsRoutes(t *testing.T) {
 	}
 
 	want := map[string]bool{
-		"/v1/o11y/observations": false,
-		"/v1/o11y/traces":       false,
-		"/v1/o11y/sessions":     false,
-		"/v1/o11y/users":        false,
-		"/v1/o11y/scores":       false,
-		"/v1/o11y/score/{id}":   false,
-		"/v1/o11y/annotation":   false,
+		"/api/observations": false,
+		"/api/traces":       false,
+		"/api/sessions":     false,
+		"/api/users":        false,
+		"/api/scores":       false,
+		"/api/score/{id}":   false,
+		"/api/annotation":   false,
 	}
 	err := router.Walk(func(route *mux.Route, _ *mux.Router, _ []*mux.Route) error {
 		if path, err := route.GetPathTemplate(); err == nil {
