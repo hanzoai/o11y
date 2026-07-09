@@ -221,7 +221,7 @@ The implementation (e.g. `pkg/tokenizer/opaquetokenizer/provider.go`) implements
 
 ## How to wire it up
 
-Wiring happens in `pkg/signoz/signoz.go`.
+Wiring happens in `pkg/o11y/o11y.go`.
 
 ### 1. Instantiate the service
 

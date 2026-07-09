@@ -27,16 +27,16 @@ def seeder(
         docker_client.images.build(
             path=str(pytestconfig.rootpath),
             dockerfile="Dockerfile.seeder",
-            tag="signoz-tests-seeder:latest",
+            tag="o11y-tests-seeder:latest",
             rm=True,
         )
 
-        container = DockerContainer("signoz-tests-seeder:latest")
+        container = DockerContainer("o11y-tests-seeder:latest")
         container.with_env("CH_HOST", clickhouse.container.container_configs["8123"].address)
         container.with_env("CH_PORT", str(clickhouse.container.container_configs["8123"].port))
-        container.with_env("CH_USER", clickhouse.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_USERNAME"])
-        container.with_env("CH_PASSWORD", clickhouse.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_PASSWORD"])
-        container.with_env("CH_CLUSTER", clickhouse.env["SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"])
+        container.with_env("CH_USER", clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_USERNAME"])
+        container.with_env("CH_PASSWORD", clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_PASSWORD"])
+        container.with_env("CH_CLUSTER", clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"])
         container.with_exposed_ports(8080)
         container.with_network(network=network)
         container.start()

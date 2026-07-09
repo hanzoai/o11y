@@ -9,25 +9,25 @@ from fixtures import types
 logger = logging.getLogger(__name__)
 
 
-def test_setup(signoz: types.SigNoz) -> None:
-    response = requests.get(signoz.self.host_configs["8080"].get("/api/v1/version"), timeout=2)
+def test_setup(o11y: types.O11y) -> None:
+    response = requests.get(o11y.self.host_configs["8080"].get("/api/v1/version"), timeout=2)
     assert response.status_code == HTTPStatus.OK
 
-    healthz = requests.get(signoz.self.host_configs["8080"].get("/api/v2/healthz"), timeout=2)
+    healthz = requests.get(o11y.self.host_configs["8080"].get("/api/v2/healthz"), timeout=2)
     logger.info("healthz response: %s", healthz.json())
     assert healthz.status_code == HTTPStatus.OK
 
 
-def test_telemetry_databases_exist(signoz: types.SigNoz) -> None:
-    arr: np.ndarray = signoz.telemetrystore.conn.query_np("SHOW DATABASES")
+def test_telemetry_databases_exist(o11y: types.O11y) -> None:
+    arr: np.ndarray = o11y.telemetrystore.conn.query_np("SHOW DATABASES")
     databases = arr.tolist() if arr.size > 0 else []
     required_databases = [
-        "signoz_metrics",
-        "signoz_logs",
-        "signoz_traces",
-        "signoz_metadata",
-        "signoz_analytics",
-        "signoz_meter",
+        "o11y_metrics",
+        "o11y_logs",
+        "o11y_traces",
+        "o11y_metadata",
+        "o11y_analytics",
+        "o11y_meter",
     ]
 
     for db_name in required_databases:
@@ -35,7 +35,7 @@ def test_telemetry_databases_exist(signoz: types.SigNoz) -> None:
 
 
 def test_teardown(
-    signoz: types.SigNoz,  # pylint: disable=unused-argument
+    o11y: types.O11y,  # pylint: disable=unused-argument
     idp: types.TestContainerIDP,  # pylint: disable=unused-argument
     create_user_admin: types.Operation,  # pylint: disable=unused-argument
     migrator: types.Operation,  # pylint: disable=unused-argument

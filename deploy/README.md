@@ -1,7 +1,7 @@
 # Deploy
 
-Check that you have cloned [signoz/signoz](https://github.com/signoz/signoz)
-and currently are in `signoz/deploy` folder.
+Check that you have cloned [o11y/o11y](https://github.com/o11y/o11y)
+and currently are in `o11y/deploy` folder.
 
 ## Docker
 
@@ -52,7 +52,7 @@ To install Hanzo O11y using Docker Swarm, run the following command:
 
 ```sh
 cd deploy/docker-swarm
-docker stack deploy -c docker-compose.yaml signoz
+docker stack deploy -c docker-compose.yaml o11y
 ```
 
 Open http://localhost:8080 in your favourite browser.

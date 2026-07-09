@@ -62,7 +62,7 @@ func New(ctx context.Context, cfg Config, build version.Build, serviceName strin
 	// hard-pinned semconv version: contrib's NewSDK merges this against
 	// resource.Default(), and OTEL rejects a merge of two non-empty, differing
 	// schema URLs. Pinning semconv/vX here silently conflicts with whatever
-	// schema the otel/sdk in go.mod ships (skewed by the SigNoz re-sync), which
+	// schema the otel/sdk in go.mod ships (skewed by the O11y re-sync), which
 	// crashes New() with "conflicting Schema URL". Sourcing it from the resource
 	// we actually built keeps it correct across otel bumps.
 	sch := resource.SchemaURL()

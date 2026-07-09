@@ -611,7 +611,7 @@ describe('K8sBaseList', () => {
 				expect(link).toBeInTheDocument();
 				expect(link).toHaveAttribute(
 					'href',
-					'https://signoz.io/docs/userguide/hostmetrics/',
+					'https://o11y.io/docs/userguide/hostmetrics/',
 				);
 			});
 		});
@@ -648,7 +648,7 @@ describe('K8sBaseList', () => {
 		it('should display upgrade message', async () => {
 			await waitFor(() => {
 				expect(
-					screen.getByText(/upgrade to the latest version of SigNoz k8s-infra/i),
+					screen.getByText(/upgrade to the latest version of O11y k8s-infra/i),
 				).toBeInTheDocument();
 			});
 		});

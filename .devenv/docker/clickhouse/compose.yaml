@@ -49,7 +49,7 @@ services:
       - CLICKHOUSE_SKIP_USER_SETUP=1
     networks:
       - default
-      - signoz-devenv
+      - o11y-devenv
   zookeeper:
     image: observe/zookeeper:3.7.1
     container_name: zookeeper
@@ -88,8 +88,8 @@ services:
     restart: on-failure
     networks:
       - default
-      - signoz-devenv
+      - o11y-devenv
 
 networks:
-  signoz-devenv:
-    name: signoz-devenv
+  o11y-devenv:
+    name: o11y-devenv

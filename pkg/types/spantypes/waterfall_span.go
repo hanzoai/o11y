@@ -13,8 +13,8 @@ import (
 
 const (
 	// ClickHouse database and table names for trace queries.
-	TraceDB           = "signoz_traces"
-	TraceTable        = "distributed_signoz_index_v3"
+	TraceDB           = "o11y_traces"
+	TraceTable        = "distributed_o11y_index_v3"
 	TraceSummaryTable = "distributed_trace_summary"
 )
 
@@ -68,7 +68,7 @@ type WaterfallSpan struct {
 	TraceState   string            `json:"trace_state"`
 	References   []OtelSpanRef     `json:"references" required:"true" nullable:"false"`
 
-	// Calculated fields https://signoz.io/docs/traces-management/guides/derived-fields-spans
+	// Calculated fields https://o11y.io/docs/traces-management/guides/derived-fields-spans
 	DBName             string `json:"db_name,omitempty"`
 	DBOperation        string `json:"db_operation,omitempty"`
 	ExternalHTTPMethod string `json:"external_http_method,omitempty"`

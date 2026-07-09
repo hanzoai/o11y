@@ -198,7 +198,7 @@ var testEnrichmentRequiredData = []struct {
 						DataSource: v3.DataSourceLogs,
 						// here we have to fallback to trace_id attribute instead of column
 						GroupBy: []v3.AttributeKey{{Key: "trace_id", DataType: v3.AttributeKeyDataTypeString, Type: v3.AttributeKeyTypeTag}},
-						OrderBy: []v3.OrderBy{{ColumnName: "#SIGNOZ_VALUE", Order: "ASC"}},
+						OrderBy: []v3.OrderBy{{ColumnName: "#O11Y_VALUE", Order: "ASC"}},
 					},
 				},
 			},

@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/render"
@@ -14,7 +15,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 const (
@@ -47,9 +47,9 @@ func (middleware *AuthZ) ViewAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []coretypes.Selector{
-			coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName),
-			coretypes.TypeRole.MustSelector(authtypes.SigNozEditorRoleName),
-			coretypes.TypeRole.MustSelector(authtypes.SigNozViewerRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.O11yAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.O11yEditorRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.O11yViewerRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -86,8 +86,8 @@ func (middleware *AuthZ) EditAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []coretypes.Selector{
-			coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName),
-			coretypes.TypeRole.MustSelector(authtypes.SigNozEditorRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.O11yAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.O11yEditorRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -124,7 +124,7 @@ func (middleware *AuthZ) AdminAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []coretypes.Selector{
-			coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.O11yAdminRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(
@@ -160,7 +160,7 @@ func (middleware *AuthZ) SelfAccess(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		selectors := []coretypes.Selector{
-			coretypes.TypeRole.MustSelector(authtypes.SigNozAdminRoleName),
+			coretypes.TypeRole.MustSelector(authtypes.O11yAdminRoleName),
 		}
 
 		err = middleware.authzService.CheckWithTupleCreation(

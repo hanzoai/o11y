@@ -16,7 +16,7 @@ from fixtures.querier import (
 
 
 def test_resource_default_warning(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -40,7 +40,7 @@ def test_resource_default_warning(
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=20)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),
@@ -73,7 +73,7 @@ def test_resource_default_warning(
 
 
 def test_key_collision_warning(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -110,7 +110,7 @@ def test_key_collision_warning(
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((datetime.now(tz=UTC) - timedelta(minutes=20)).timestamp() * 1000),
         end_ms=int(datetime.now(tz=UTC).timestamp() * 1000),
@@ -137,7 +137,7 @@ def test_key_collision_warning(
 
 
 def test_deduped_warnings_for_single_query(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -201,7 +201,7 @@ def test_deduped_warnings_for_single_query(
 
     # First request populates the cache for [-90m, -30m], storing the warnings.
     first = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=now_ms - 90 * minute,
         end_ms=now_ms - 30 * minute,
@@ -216,7 +216,7 @@ def test_deduped_warnings_for_single_query(
     # cached warnings) and executes only the trailing [-30m, -20m] step fresh,
     # which re-emits the same warnings — exercising the cache/fresh merge.
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=now_ms - 90 * minute,
         end_ms=now_ms - 20 * minute,
@@ -248,7 +248,7 @@ def test_deduped_warnings_for_single_query(
 
 
 def test_deduped_warnings_for_multiple_queries(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -309,7 +309,7 @@ def test_deduped_warnings_for_multiple_queries(
     minute = 60 * 1000
 
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=now_ms - 90 * minute,
         end_ms=now_ms - 20 * minute,
@@ -339,7 +339,7 @@ def test_deduped_warnings_for_multiple_queries(
 
 
 def test_no_warnings_for_meter_query(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_meter_samples: Callable[[list[MeterSample]], None],
@@ -349,7 +349,7 @@ def test_no_warnings_for_meter_query(
     # range would normally clamp and emit a warning for a regular metric — for a
     # meter source the querier discards it. This asserts no warning leaks out.
     now = datetime.now(tz=UTC).replace(second=0, microsecond=0)
-    metric_name = "signoz.meter.log.size"
+    metric_name = "o11y.meter.log.size"
     insert_meter_samples(
         make_meter_samples(
             metric_name,
@@ -365,7 +365,7 @@ def test_no_warnings_for_meter_query(
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = make_query_request(
-        signoz,
+        o11y,
         token,
         start_ms=int((now - timedelta(minutes=20)).timestamp() * 1000),
         end_ms=int(now.timestamp() * 1000),

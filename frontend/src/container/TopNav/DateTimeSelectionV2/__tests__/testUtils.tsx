@@ -45,7 +45,7 @@ export function TestWrapper({
 			role: 'ADMIN',
 			user: {
 				userId: 'test-user-id',
-				email: 'test@signoz.io',
+				email: 'test@o11y.io',
 				name: 'TestUser',
 				profilePictureURL: '',
 				accessJwt: '',

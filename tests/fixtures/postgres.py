@@ -23,9 +23,9 @@ def postgres(network: Network, request: pytest.FixtureRequest, pytestconfig: pyt
         container = PostgresContainer(
             image=f"postgres:{version}",
             port=5432,
-            username="signoz",
+            username="o11y",
             password="password",
-            dbname="signoz",
+            dbname="o11y",
             driver="psycopg2",
         )
         container.with_network(network)
@@ -51,11 +51,11 @@ def postgres(network: Network, request: pytest.FixtureRequest, pytestconfig: pyt
             ),
             conn=engine,
             env={
-                "SIGNOZ_SQLSTORE_PROVIDER": "postgres",
-                "SIGNOZ_SQLSTORE_POSTGRES_DSN": f"postgresql://{container.username}:{container.password}@{container.get_wrapped_container().name}:{5432}/{container.dbname}",
-                "SIGNOZ_SQLSTORE_POSTGRES_DBNAME": container.dbname,
-                "SIGNOZ_SQLSTORE_POSTGRES_USER": container.username,
-                "SIGNOZ_SQLSTORE_POSTGRES_PASSWORD": container.password,
+                "O11Y_SQLSTORE_PROVIDER": "postgres",
+                "O11Y_SQLSTORE_POSTGRES_DSN": f"postgresql://{container.username}:{container.password}@{container.get_wrapped_container().name}:{5432}/{container.dbname}",
+                "O11Y_SQLSTORE_POSTGRES_DBNAME": container.dbname,
+                "O11Y_SQLSTORE_POSTGRES_USER": container.username,
+                "O11Y_SQLSTORE_POSTGRES_PASSWORD": container.password,
             },
         )
 
@@ -75,7 +75,7 @@ def postgres(network: Network, request: pytest.FixtureRequest, pytestconfig: pyt
         host_config = container.host_configs["5432"]
         env = cache["env"]
 
-        engine = create_engine(f"postgresql+psycopg2://{env['SIGNOZ_SQLSTORE_POSTGRES_USER']}:{env['SIGNOZ_SQLSTORE_POSTGRES_PASSWORD']}@{host_config.address}:{host_config.port}/{env['SIGNOZ_SQLSTORE_POSTGRES_DBNAME']}")
+        engine = create_engine(f"postgresql+psycopg2://{env['O11Y_SQLSTORE_POSTGRES_USER']}:{env['O11Y_SQLSTORE_POSTGRES_PASSWORD']}@{host_config.address}:{host_config.port}/{env['O11Y_SQLSTORE_POSTGRES_DBNAME']}")
 
         with engine.connect() as conn:
             result = conn.execute(sql.text("SELECT 1"))

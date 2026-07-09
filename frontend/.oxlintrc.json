@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "jsPlugins": [
-    "./plugins/signoz.mjs",
+    "./plugins/o11y.mjs",
     "eslint-plugin-sonarjs"
   ],
   "plugins": [
@@ -279,15 +279,15 @@
     // "react-hooks/unsupported-syntax": "warn",
     // "react-hooks/use-memo": "error",
     // "react-hooks/incompatible-library": "warn",
-    "signoz/no-unsupported-asset-pattern": "error",
+    "o11y/no-unsupported-asset-pattern": "error",
     // Prevents the wrong usage of assets to break custom base path installations
-    "signoz/no-zustand-getstate-in-hooks": "error",
+    "o11y/no-zustand-getstate-in-hooks": "error",
     // Prevents useStore.getState() - export standalone actions instead
-    "signoz/no-navigator-clipboard": "error",
+    "o11y/no-navigator-clipboard": "error",
     // Prevents navigator.clipboard - use useCopyToClipboard hook instead (disabled in tests via override)
-    "signoz/no-raw-absolute-path": "error",
+    "o11y/no-raw-absolute-path": "error",
     // Prevents window.open(path), window.location.origin + path, window.location.href = path
-    "signoz/no-antd-components": "error",
+    "o11y/no-antd-components": "error",
     // Prevents the usage of specific antd components in favor of our lib
     "no-restricted-globals": [
       "error",
@@ -529,12 +529,12 @@
       "rules": {
         "import/first": "off",
         // Should ignore due to mocks
-        "signoz/no-navigator-clipboard": "off",
+        "o11y/no-navigator-clipboard": "off",
         // Tests can use navigator.clipboard directly,
-        "signoz/no-raw-absolute-path":"off",
+        "o11y/no-raw-absolute-path":"off",
         "no-restricted-globals": "off",
         // Tests need raw localStorage/sessionStorage to seed DOM state for isolation
-        "signoz/no-zustand-getstate-in-hooks": "off",
+        "o11y/no-zustand-getstate-in-hooks": "off",
         "@typescript-eslint/no-explicit-any": "off", // Tests often need any for mocks/stubs
         "@typescript-eslint/explicit-module-boundary-types": "off", // Return types not required in tests
         "@typescript-eslint/explicit-function-return-type": "off" // Same as above rule, don't need to care about return type
@@ -547,7 +547,7 @@
         "**/*Store.tsx"
       ],
       "rules": {
-        "signoz/no-zustand-getstate-in-hooks": "off"
+        "o11y/no-zustand-getstate-in-hooks": "off"
       }
     }
   ]

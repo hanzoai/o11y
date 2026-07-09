@@ -1,6 +1,6 @@
 {
 	"title": "detail-chart-data-suite",
-	"description": "Single Time Series panel querying `signoz_calls_total` (in the bootstrap golden seed) with no variable substitution. Used by chart-data assertion tests to verify the panel renders data without inline seeding.",
+	"description": "Single Time Series panel querying `o11y_calls_total` (in the bootstrap golden seed) with no variable substitution. Used by chart-data assertion tests to verify the panel renders data without inline seeding.",
 	"tags": [],
 	"widgets": [
 		{
@@ -21,10 +21,10 @@
 						{
 							"aggregateAttribute": {
 								"dataType": "float64",
-								"id": "signoz_calls_total--float64--Sum--true",
+								"id": "o11y_calls_total--float64--Sum--true",
 								"isColumn": true,
 								"isJSON": false,
-								"key": "signoz_calls_total",
+								"key": "o11y_calls_total",
 								"type": "Sum"
 							},
 							"aggregateOperator": "sum_rate",

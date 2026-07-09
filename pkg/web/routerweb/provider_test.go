@@ -12,17 +12,17 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/factory/factorytest"
 	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/web"
-	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func expectedHTML(baseHref string, settings web.Settings) string {
 	settingsJSON, _ := json.Marshal(settings)
-	return `<html><head><base href="` + baseHref + `" /></head><body><script>window.signozBootData={settings:` + string(settingsJSON) + `}</script>Welcome to test data!!!</body></html>`
+	return `<html><head><base href="` + baseHref + `" /></head><body><script>window.o11yBootData={settings:` + string(settingsJSON) + `}</script>Welcome to test data!!!</body></html>`
 }
 
 func startServer(t *testing.T, config web.Config, globalConfig global.Config) string {
@@ -93,23 +93,23 @@ func TestServeTemplatedIndex(t *testing.T) {
 		{
 			name:         "SubPathBaseHrefAtRoot",
 			path:         "/",
-			globalConfig: global.Config{ExternalURL: &url.URL{Scheme: "https", Host: "example.com", Path: "/signoz"}},
+			globalConfig: global.Config{ExternalURL: &url.URL{Scheme: "https", Host: "example.com", Path: "/o11y"}},
 			webConfig:    web.Config{Index: "valid_template.html", Directory: "testdata"},
-			expected:     expectedHTML("/signoz/", emptySettings),
+			expected:     expectedHTML("/o11y/", emptySettings),
 		},
 		{
 			name:         "SubPathBaseHrefAtNonExistentPath",
 			path:         "/does-not-exist",
-			globalConfig: global.Config{ExternalURL: &url.URL{Scheme: "https", Host: "example.com", Path: "/signoz"}},
+			globalConfig: global.Config{ExternalURL: &url.URL{Scheme: "https", Host: "example.com", Path: "/o11y"}},
 			webConfig:    web.Config{Index: "valid_template.html", Directory: "testdata"},
-			expected:     expectedHTML("/signoz/", emptySettings),
+			expected:     expectedHTML("/o11y/", emptySettings),
 		},
 		{
 			name:         "SubPathBaseHrefAtDirectory",
 			path:         "/assets",
-			globalConfig: global.Config{ExternalURL: &url.URL{Scheme: "https", Host: "example.com", Path: "/signoz"}},
+			globalConfig: global.Config{ExternalURL: &url.URL{Scheme: "https", Host: "example.com", Path: "/o11y"}},
 			webConfig:    web.Config{Index: "valid_template.html", Directory: "testdata"},
-			expected:     expectedHTML("/signoz/", emptySettings),
+			expected:     expectedHTML("/o11y/", emptySettings),
 		},
 		{
 			name:         "WithPopulatedSettings",
@@ -234,7 +234,7 @@ func TestServeInvalidTemplateIndex(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			base := startServer(t, web.Config{Index: "invalid_template.html", Directory: "testdata"}, global.Config{ExternalURL: &url.URL{Path: "/signoz"}})
+			base := startServer(t, web.Config{Index: "invalid_template.html", Directory: "testdata"}, global.Config{ExternalURL: &url.URL{Path: "/o11y"}})
 
 			assert.Equal(t, string(expected), httpGet(t, base+testCase.path))
 		})
@@ -247,7 +247,7 @@ func TestServeStaticFilesUnchanged(t *testing.T) {
 	expected, err := os.ReadFile(filepath.Join("testdata", "assets", "style.css"))
 	require.NoError(t, err)
 
-	base := startServer(t, web.Config{Index: "valid_template.html", Directory: "testdata"}, global.Config{ExternalURL: &url.URL{Path: "/signoz"}})
+	base := startServer(t, web.Config{Index: "valid_template.html", Directory: "testdata"}, global.Config{ExternalURL: &url.URL{Path: "/o11y"}})
 
 	assert.Equal(t, string(expected), httpGet(t, base+"/assets/style.css"))
 }

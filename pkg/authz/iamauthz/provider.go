@@ -329,7 +329,7 @@ func (p *provider) CreateManagedRoles(ctx context.Context, _ valuer.UUID, manage
 
 func (p *provider) CreateManagedUserRoleTransactions(ctx context.Context, orgID valuer.UUID, userID valuer.UUID) error {
 	subject := authtypes.MustNewSubject(coretypes.NewResourceUser(), userID.String(), orgID, nil)
-	return p.Grant(ctx, orgID, []string{authtypes.SigNozAdminRoleName}, subject)
+	return p.Grant(ctx, orgID, []string{authtypes.O11yAdminRoleName}, subject)
 }
 
 // =============================================================================

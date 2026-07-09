@@ -379,9 +379,9 @@ test.describe('Dashboard Detail — Variables', () => {
 		// d_namespace's `dynamicVariablesAttribute` is `k8s.namespace.name`
 		// over the `metrics` source. The bootstrap OTel collector ingests
 		// the golden dataset which tags every resource with
-		// `k8s.namespace.name=signoz-<service>` for 8 distinct services.
-		// SigNoz's `signoz_metrics.distributed_metadata` table is populated
-		// naturally by the collector's signozclickhousemetrics exporter, and
+		// `k8s.namespace.name=o11y-<service>` for 8 distinct services.
+		// O11y's `o11y_metrics.distributed_metadata` table is populated
+		// naturally by the collector's o11yclickhousemetrics exporter, and
 		// `/api/v1/fields/values?signal=metrics&name=k8s.namespace.name`
 		// surfaces the values so the Dynamic variable auto-resolves.
 		await gotoVariablesDashboard(page);
@@ -392,7 +392,7 @@ test.describe('Dashboard Detail — Variables', () => {
 		// namespaces — ordering depends on the backend sort, so we accept
 		// whichever it returns first.
 		const dynamic = page.getByTestId('variable-select').nth(5);
-		await expect(dynamic).toContainText(/signoz-\w+/, { timeout: 15_000 });
+		await expect(dynamic).toContainText(/o11y-\w+/, { timeout: 15_000 });
 	});
 
 	// eslint-disable-next-line playwright/expect-expect

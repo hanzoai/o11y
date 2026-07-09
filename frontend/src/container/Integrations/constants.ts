@@ -26,11 +26,11 @@ export const INTEGRATION_TYPES = {
 export const AWS_INTEGRATION = {
 	id: INTEGRATION_TYPES.AWS,
 	title: 'Amazon Web Services',
-	description: 'One click setup for AWS monitoring with SigNoz',
+	description: 'One click setup for AWS monitoring with O11y',
 	author: {
-		name: 'SigNoz',
-		email: 'integrations@signoz.io',
-		homepage: 'https://signoz.io',
+		name: 'O11y',
+		email: 'integrations@o11y.io',
+		homepage: 'https://o11y.io',
 	},
 	icon: awsDarkLogo,
 	icon_alt: 'aws-logo',
@@ -41,11 +41,11 @@ export const AWS_INTEGRATION = {
 export const AZURE_INTEGRATION = {
 	id: INTEGRATION_TYPES.AZURE,
 	title: 'Microsoft Azure',
-	description: 'One click setup for Azure monitoring with SigNoz',
+	description: 'One click setup for Azure monitoring with O11y',
 	author: {
-		name: 'SigNoz',
-		email: 'integrations@signoz.io',
-		homepage: 'https://signoz.io',
+		name: 'O11y',
+		email: 'integrations@o11y.io',
+		homepage: 'https://o11y.io',
 	},
 	icon: azureOpenaiLogo,
 	icon_alt: 'azure-logo',

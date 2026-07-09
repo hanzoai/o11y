@@ -4,6 +4,6 @@ export const handleContactSupport = (isCloudUser: boolean): void => {
 	if (isCloudUser) {
 		history.push('/support');
 	} else {
-		window.open('https://signoz.io/slack', '_blank');
+		window.open('https://o11y.io/slack', '_blank');
 	}
 };

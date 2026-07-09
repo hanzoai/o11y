@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-// eslint-disable-next-line signoz/no-antd-components -- TODO: migrate Dropdown to components/ui/dropdown-menu
+// eslint-disable-next-line o11y/no-antd-components -- TODO: migrate Dropdown to components/ui/dropdown-menu
 import { Button, Dropdown, MenuProps } from 'antd';
 import cx from 'classnames';
 import logEvent from 'api/common/logEvent';
@@ -21,7 +21,7 @@ interface Props {
 }
 
 const TEMPLATES_HREF =
-	'https://signoz.io/docs/dashboards/dashboard-templates/overview/';
+	'https://o11y.io/docs/dashboards/dashboard-templates/overview/';
 
 function CreateDashboardDropdown({
 	canCreate,

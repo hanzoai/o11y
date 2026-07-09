@@ -19,7 +19,7 @@ import { useSafeNavigate } from 'hooks/useSafeNavigate';
 import { isEmpty, isNull } from 'lodash-es';
 import { isModifierKeyPressed } from 'utils/app';
 
-import signozBrandLogoUrl from '@/assets/Logos/signoz-brand-logo.svg';
+import o11yBrandLogoUrl from '@/assets/Logos/o11y-brand-logo.svg';
 
 import { useOnboardingContext } from '../../context/OnboardingContext';
 import {

@@ -35,20 +35,20 @@ var (
 )
 
 type querier struct {
-	logger                    *slog.Logger
-	fl                        flagger.Flagger
-	telemetryStore            telemetrystore.TelemetryStore
-	metadataStore             telemetrytypes.MetadataStore
-	promEngine                prometheus.Prometheus
-	traceStmtBuilder          qbtypes.StatementBuilder[qbtypes.TraceAggregation]
-	logStmtBuilder            qbtypes.StatementBuilder[qbtypes.LogAggregation]
-	auditStmtBuilder          qbtypes.StatementBuilder[qbtypes.LogAggregation]
-	metricStmtBuilder         qbtypes.StatementBuilder[qbtypes.MetricAggregation]
-	meterStmtBuilder          qbtypes.StatementBuilder[qbtypes.MetricAggregation]
-	traceOperatorStmtBuilder  qbtypes.TraceOperatorStatementBuilder
-	bucketCache               BucketCache
-	liveDataRefresh           time.Duration
-	builderConfig             builderConfig
+	logger                   *slog.Logger
+	fl                       flagger.Flagger
+	telemetryStore           telemetrystore.TelemetryStore
+	metadataStore            telemetrytypes.MetadataStore
+	promEngine               prometheus.Prometheus
+	traceStmtBuilder         qbtypes.StatementBuilder[qbtypes.TraceAggregation]
+	logStmtBuilder           qbtypes.StatementBuilder[qbtypes.LogAggregation]
+	auditStmtBuilder         qbtypes.StatementBuilder[qbtypes.LogAggregation]
+	metricStmtBuilder        qbtypes.StatementBuilder[qbtypes.MetricAggregation]
+	meterStmtBuilder         qbtypes.StatementBuilder[qbtypes.MetricAggregation]
+	traceOperatorStmtBuilder qbtypes.TraceOperatorStatementBuilder
+	bucketCache              BucketCache
+	liveDataRefresh          time.Duration
+	builderConfig            builderConfig
 }
 
 var _ Querier = (*querier)(nil)
@@ -70,19 +70,19 @@ func New(
 ) *querier {
 	querierSettings := factory.NewScopedProviderSettings(settings, "github.com/hanzoai/o11y/pkg/querier")
 	return &querier{
-		logger:                    querierSettings.Logger(),
-		fl:                        flagger,
-		telemetryStore:            telemetryStore,
-		metadataStore:             metadataStore,
-		promEngine:                promEngine,
-		traceStmtBuilder:          traceStmtBuilder,
-		logStmtBuilder:            logStmtBuilder,
-		auditStmtBuilder:          auditStmtBuilder,
-		metricStmtBuilder:         metricStmtBuilder,
-		meterStmtBuilder:          meterStmtBuilder,
-		traceOperatorStmtBuilder:  traceOperatorStmtBuilder,
-		bucketCache:               bucketCache,
-		liveDataRefresh:           5 * time.Second,
+		logger:                   querierSettings.Logger(),
+		fl:                       flagger,
+		telemetryStore:           telemetryStore,
+		metadataStore:            metadataStore,
+		promEngine:               promEngine,
+		traceStmtBuilder:         traceStmtBuilder,
+		logStmtBuilder:           logStmtBuilder,
+		auditStmtBuilder:         auditStmtBuilder,
+		metricStmtBuilder:        metricStmtBuilder,
+		meterStmtBuilder:         meterStmtBuilder,
+		traceOperatorStmtBuilder: traceOperatorStmtBuilder,
+		bucketCache:              bucketCache,
+		liveDataRefresh:          5 * time.Second,
 		builderConfig: builderConfig{
 			logTraceIDWindowPaddingMS: uint64(logTraceIDWindowPadding.Milliseconds()),
 		},
@@ -296,9 +296,9 @@ func (q *querier) populateQBEvent(event *qbtypes.QBEvent, queries []qbtypes.Quer
 		case qbtypes.QueryTypeClickHouseSQL:
 			sql := query.GetQuery()
 			if strings.TrimSpace(sql) != "" {
-				event.MetricsUsed = strings.Contains(sql, "signoz_metrics")
-				event.LogsUsed = strings.Contains(sql, "signoz_logs")
-				event.TracesUsed = strings.Contains(sql, "signoz_traces")
+				event.MetricsUsed = strings.Contains(sql, "o11y_metrics")
+				event.LogsUsed = strings.Contains(sql, "o11y_logs")
+				event.TracesUsed = strings.Contains(sql, "o11y_traces")
 			}
 		}
 	}
@@ -400,7 +400,7 @@ func (q *querier) resolveMetricMetadata(ctx context.Context, orgID valuer.UUID, 
 		return missingMetricQueries, nil, nil
 	}
 
-	isInternalMetric := func(n string) bool { return strings.HasPrefix(n, "signoz.") || strings.HasPrefix(n, "signoz_") }
+	isInternalMetric := func(n string) bool { return strings.HasPrefix(n, "o11y.") || strings.HasPrefix(n, "o11y_") }
 	externalMissingMetrics := make([]string, 0, len(missingMetrics))
 	for _, m := range missingMetrics {
 		if !isInternalMetric(m) {

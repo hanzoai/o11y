@@ -51,7 +51,7 @@ def _maybe_add_formula_functions(spec: dict[str, Any], fill_mode: str) -> None:
 @pytest.mark.parametrize("fill_mode", [FILL_GAPS, FILL_ZERO], ids=["fillGaps", "fillZero"])
 def test_metrics_fill_no_group_by(
     fill_mode: str,
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -106,7 +106,7 @@ def test_metrics_fill_no_group_by(
     _maybe_add_functions(query_spec, fill_mode)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -142,7 +142,7 @@ def test_metrics_fill_no_group_by(
 @pytest.mark.parametrize("fill_mode", [FILL_GAPS, FILL_ZERO], ids=["fillGaps", "fillZero"])
 def test_metrics_fill_with_group_by(
     fill_mode: str,
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -213,7 +213,7 @@ def test_metrics_fill_with_group_by(
     _maybe_add_functions(query_spec, fill_mode)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -260,7 +260,7 @@ def test_metrics_fill_with_group_by(
 @pytest.mark.parametrize("fill_mode", [FILL_GAPS, FILL_ZERO], ids=["fillGaps", "fillZero"])
 def test_metrics_fill_formula(
     fill_mode: str,
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -316,7 +316,7 @@ def test_metrics_fill_formula(
     _maybe_add_formula_functions(formula_spec, fill_mode)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -395,7 +395,7 @@ def test_metrics_fill_formula(
 @pytest.mark.parametrize("fill_mode", [FILL_GAPS, FILL_ZERO], ids=["fillGaps", "fillZero"])
 def test_metrics_fill_formula_with_group_by(
     fill_mode: str,
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -487,7 +487,7 @@ def test_metrics_fill_formula_with_group_by(
     _maybe_add_formula_functions(formula_spec, fill_mode)
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -574,7 +574,7 @@ def test_metrics_fill_formula_with_group_by(
 
 
 def test_histogram_p90_returns_warning_outside_data_window(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -601,12 +601,12 @@ def test_histogram_p90_returns_warning_outside_data_window(
     end_ms = int(now.timestamp() * 1000)
 
     start_2h = int((now - timedelta(hours=2)).timestamp() * 1000)
-    response = make_query_request(signoz, token, start_2h, end_ms, [query])
+    response = make_query_request(o11y, token, start_2h, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
     assert response.json()["status"] == "success"
 
     start_15m = int((now - timedelta(minutes=15)).timestamp() * 1000)
-    response = make_query_request(signoz, token, start_15m, end_ms, [query])
+    response = make_query_request(o11y, token, start_15m, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     warnings = get_all_warnings(data)
@@ -615,7 +615,7 @@ def test_histogram_p90_returns_warning_outside_data_window(
 
 
 def test_non_existent_metrics_returns_404(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ) -> None:
@@ -634,7 +634,7 @@ def test_non_existent_metrics_returns_404(
     end_ms = int(now.timestamp() * 1000)
 
     start_2h = int((now - timedelta(hours=2)).timestamp() * 1000)
-    response = make_query_request(signoz, token, start_2h, end_ms, [query])
+    response = make_query_request(o11y, token, start_2h, end_ms, [query])
     assert response.status_code == HTTPStatus.NOT_FOUND
 
     assert get_error_message(response.json()) == "could not find the metric whatevergoennnsgoeshere"
@@ -644,7 +644,7 @@ def test_non_existent_metrics_returns_404(
 # Inserts metrics under ns.a and ns.b, then asserts a specific prefix returns
 # only matching values while a common prefix returns both.
 def test_metric_namespace_values_filtering(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -671,7 +671,7 @@ def test_metric_namespace_values_filtering(
 
     # Specific prefix: metricNamespace=ns.a should return only svc-a
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -691,7 +691,7 @@ def test_metric_namespace_values_filtering(
 
     # Common prefix: metricNamespace=ns should return both
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -714,7 +714,7 @@ def test_metric_namespace_values_filtering(
 # metricNamespace prefix. A specific prefix returns only its metric names;
 # a common prefix returns metric names from all matching namespaces.
 def test_metric_namespace_metric_name_values_filtering(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -741,7 +741,7 @@ def test_metric_namespace_metric_name_values_filtering(
 
     # Specific prefix: metricNamespace=ns.a should return only ns.a.* metric names
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -761,7 +761,7 @@ def test_metric_namespace_metric_name_values_filtering(
 
     # Common prefix: metricNamespace=ns should return both
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -784,7 +784,7 @@ def test_metric_namespace_metric_name_values_filtering(
 # Metrics under ns.a and ns.b carry distinct labels; a specific prefix returns
 # only its keys while a common prefix returns keys from both namespaces.
 def test_metric_namespace_keys_filtering(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -811,7 +811,7 @@ def test_metric_namespace_keys_filtering(
 
     # Specific prefix: metricNamespace=ns.a should return only a_only_label
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/keys"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/keys"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -830,7 +830,7 @@ def test_metric_namespace_keys_filtering(
 
     # Common prefix: metricNamespace=ns should return both keys
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/fields/keys"),
+        o11y.self.host_configs["8080"].get("/api/v1/fields/keys"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={

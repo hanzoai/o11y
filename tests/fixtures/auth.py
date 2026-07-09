@@ -34,13 +34,13 @@ USER_VIEWER_PASSWORD = "password123Z$"
 USERS_BASE = "/api/v2/users"
 
 
-def _login(signoz: types.SigNoz, email: str, password: str) -> str:
+def _login(o11y: types.O11y, email: str, password: str) -> str:
     """Complete GET /sessions/context + POST /sessions/email_password; return accessToken."""
     ctx = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/sessions/context"),
+        o11y.self.host_configs["8080"].get("/api/v2/sessions/context"),
         params={
             "email": email,
-            "ref": f"{signoz.self.host_configs['8080'].base()}",
+            "ref": f"{o11y.self.host_configs['8080'].base()}",
         },
         timeout=5,
     )
@@ -48,7 +48,7 @@ def _login(signoz: types.SigNoz, email: str, password: str) -> str:
     org_id = ctx.json()["data"]["orgs"][0]["id"]
 
     login = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/sessions/email_password"),
+        o11y.self.host_configs["8080"].get("/api/v2/sessions/email_password"),
         json={"email": email, "password": password, "orgId": org_id},
         timeout=5,
     )
@@ -57,10 +57,10 @@ def _login(signoz: types.SigNoz, email: str, password: str) -> str:
 
 
 @pytest.fixture(name="create_user_admin", scope="package")
-def create_user_admin(signoz: types.SigNoz, request: pytest.FixtureRequest, pytestconfig: pytest.Config) -> types.Operation:
+def create_user_admin(o11y: types.O11y, request: pytest.FixtureRequest, pytestconfig: pytest.Config) -> types.Operation:
     def create() -> None:
         response = requests.post(
-            signoz.self.host_configs["8080"].get("/api/v1/register"),
+            o11y.self.host_configs["8080"].get("/api/v1/register"),
             json={
                 "name": USER_ADMIN_NAME,
                 "orgName": "",
@@ -92,13 +92,13 @@ def create_user_admin(signoz: types.SigNoz, request: pytest.FixtureRequest, pyte
 
 
 @pytest.fixture(name="get_session_context", scope="function")
-def get_session_context(signoz: types.SigNoz) -> Callable[[str, str], str]:
+def get_session_context(o11y: types.O11y) -> Callable[[str, str], str]:
     def _get_session_context(email: str) -> str:
         response = requests.get(
-            signoz.self.host_configs["8080"].get("/api/v2/sessions/context"),
+            o11y.self.host_configs["8080"].get("/api/v2/sessions/context"),
             params={
                 "email": email,
-                "ref": f"{signoz.self.host_configs['8080'].base()}",
+                "ref": f"{o11y.self.host_configs['8080'].base()}",
             },
             timeout=5,
         )
@@ -110,13 +110,13 @@ def get_session_context(signoz: types.SigNoz) -> Callable[[str, str], str]:
 
 
 @pytest.fixture(name="get_token", scope="function")
-def get_token(signoz: types.SigNoz) -> Callable[[str, str], str]:
+def get_token(o11y: types.O11y) -> Callable[[str, str], str]:
     def _get_token(email: str, password: str) -> str:
         response = requests.get(
-            signoz.self.host_configs["8080"].get("/api/v2/sessions/context"),
+            o11y.self.host_configs["8080"].get("/api/v2/sessions/context"),
             params={
                 "email": email,
-                "ref": f"{signoz.self.host_configs['8080'].base()}",
+                "ref": f"{o11y.self.host_configs['8080'].base()}",
             },
             timeout=5,
         )
@@ -125,7 +125,7 @@ def get_token(signoz: types.SigNoz) -> Callable[[str, str], str]:
         org_id = response.json()["data"]["orgs"][0]["id"]
 
         response = requests.post(
-            signoz.self.host_configs["8080"].get("/api/v2/sessions/email_password"),
+            o11y.self.host_configs["8080"].get("/api/v2/sessions/email_password"),
             json={
                 "email": email,
                 "password": password,
@@ -141,13 +141,13 @@ def get_token(signoz: types.SigNoz) -> Callable[[str, str], str]:
 
 
 @pytest.fixture(name="get_tokens", scope="function")
-def get_tokens(signoz: types.SigNoz) -> Callable[[str, str], tuple[str, str]]:
+def get_tokens(o11y: types.O11y) -> Callable[[str, str], tuple[str, str]]:
     def _get_tokens(email: str, password: str) -> str:
         response = requests.get(
-            signoz.self.host_configs["8080"].get("/api/v2/sessions/context"),
+            o11y.self.host_configs["8080"].get("/api/v2/sessions/context"),
             params={
                 "email": email,
-                "ref": f"{signoz.self.host_configs['8080'].base()}",
+                "ref": f"{o11y.self.host_configs['8080'].base()}",
             },
             timeout=5,
         )
@@ -156,7 +156,7 @@ def get_tokens(signoz: types.SigNoz) -> Callable[[str, str], tuple[str, str]]:
         org_id = response.json()["data"]["orgs"][0]["id"]
 
         response = requests.post(
-            signoz.self.host_configs["8080"].get("/api/v2/sessions/email_password"),
+            o11y.self.host_configs["8080"].get("/api/v2/sessions/email_password"),
             json={
                 "email": email,
                 "password": password,
@@ -175,7 +175,7 @@ def get_tokens(signoz: types.SigNoz) -> Callable[[str, str], tuple[str, str]]:
 
 @pytest.fixture(name="apply_license", scope="package")
 def apply_license(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: types.Operation,  # pylint: disable=unused-argument,redefined-outer-name
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
@@ -185,13 +185,13 @@ def apply_license(
     every spec inherits the licensed state."""
 
     def create() -> types.Operation:
-        Config.base_url = signoz.zeus.host_configs["8080"].get("/__admin")
+        Config.base_url = o11y.zeus.host_configs["8080"].get("/__admin")
         Mappings.create_mapping(
             mapping=Mapping(
                 request=MappingRequest(
                     method=HttpMethods.GET,
                     url="/v2/licenses/me",
-                    headers={"X-Signoz-Cloud-Api-Key": {WireMockMatchers.EQUAL_TO: "secret-key"}},
+                    headers={"X-O11y-Cloud-Api-Key": {WireMockMatchers.EQUAL_TO: "secret-key"}},
                 ),
                 response=MappingResponse(
                     status=200,
@@ -215,12 +215,12 @@ def apply_license(
             )
         )
 
-        access_token = _login(signoz, USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
+        access_token = _login(o11y, USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
         # 202 = applied, 409 = already applied. Retry transient failures —
         # the BE occasionally 5xxs right after startup before the license
         # sync goroutine is ready.
-        license_url = signoz.self.host_configs["8080"].get("/api/v3/licenses")
+        license_url = o11y.self.host_configs["8080"].get("/api/v3/licenses")
         auth_header = {"Authorization": f"Bearer {access_token}"}
         for attempt in range(10):
             resp = requests.post(
@@ -239,7 +239,7 @@ def apply_license(
         # redirects first-time admins to a questionnaire. Mark the preference
         # complete so specs can navigate directly to the feature under test.
         pref_resp = requests.put(
-            signoz.self.host_configs["8080"].get("/api/v1/org/preferences/org_onboarding"),
+            o11y.self.host_configs["8080"].get("/api/v1/org/preferences/org_onboarding"),
             json={"value": True},
             headers=auth_header,
             timeout=5,
@@ -264,21 +264,21 @@ def apply_license(
     )
 
 
-# This is not a fixture purposefully, we just want to add a license to the signoz instance.
+# This is not a fixture purposefully, we just want to add a license to the o11y instance.
 # This is also idempotent in nature.
 def add_license(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     make_http_mocks: Callable[[types.TestContainerDocker, list[Mapping]], None],
     get_token: Callable[[str, str], str],  # pylint: disable=redefined-outer-name
 ) -> None:
     make_http_mocks(
-        signoz.zeus,
+        o11y.zeus,
         [
             Mapping(
                 request=MappingRequest(
                     method=HttpMethods.GET,
                     url="/v2/licenses/me",
-                    headers={"X-Signoz-Cloud-Api-Key": {WireMockMatchers.EQUAL_TO: "secret-key"}},
+                    headers={"X-O11y-Cloud-Api-Key": {WireMockMatchers.EQUAL_TO: "secret-key"}},
                 ),
                 response=MappingResponse(
                     status=200,
@@ -308,7 +308,7 @@ def add_license(
     access_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.post(
-        url=signoz.self.host_configs["8080"].get("/api/v3/licenses"),
+        url=o11y.self.host_configs["8080"].get("/api/v3/licenses"),
         json={"key": "secret-key"},
         headers={"Authorization": "Bearer " + access_token},
         timeout=5,
@@ -320,7 +320,7 @@ def add_license(
     assert response.status_code == HTTPStatus.ACCEPTED
 
     response = requests.post(
-        url=signoz.zeus.host_configs["8080"].get("/__admin/requests/count"),
+        url=o11y.zeus.host_configs["8080"].get("/__admin/requests/count"),
         json={"method": "GET", "url": "/v2/licenses/me"},
         timeout=5,
     )
@@ -329,7 +329,7 @@ def add_license(
 
 
 def create_active_user(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     admin_token: str,
     email: str,
     role: str,
@@ -338,7 +338,7 @@ def create_active_user(
 ) -> str:
     """Invite a user and activate via resetPassword. Returns user ID."""
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json={"email": email, "role": role, "name": name},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
@@ -347,7 +347,7 @@ def create_active_user(
     invited_user = response.json()["data"]
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
         json={"password": password, "token": invited_user["token"]},
         timeout=5,
     )
@@ -356,10 +356,10 @@ def create_active_user(
     return invited_user["id"]
 
 
-def find_user_by_email(signoz: types.SigNoz, token: str, email: str) -> dict:
+def find_user_by_email(o11y: types.O11y, token: str, email: str) -> dict:
     """Find a user by email from the user list. Raises AssertionError if not found."""
     response = requests.get(
-        signoz.self.host_configs["8080"].get(USERS_BASE),
+        o11y.self.host_configs["8080"].get(USERS_BASE),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -369,14 +369,14 @@ def find_user_by_email(signoz: types.SigNoz, token: str, email: str) -> dict:
     return user
 
 
-def find_user_with_roles_by_email(signoz: types.SigNoz, token: str, email: str) -> dict:
+def find_user_with_roles_by_email(o11y: types.O11y, token: str, email: str) -> dict:
     """Find a user by email and return UserWithRoles (user fields + userRoles).
 
     Raises AssertionError if the user is not found.
     """
-    user = find_user_by_email(signoz, token, email)
+    user = find_user_by_email(o11y, token, email)
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"{USERS_BASE}/{user['id']}"),
+        o11y.self.host_configs["8080"].get(f"{USERS_BASE}/{user['id']}"),
         headers={"Authorization": f"Bearer {token}"},
         timeout=5,
     )
@@ -391,7 +391,7 @@ def assert_user_has_role(data: dict, role_name: str) -> None:
 
 
 def change_user_role(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     admin_token: str,
     user_id: str,
     old_role: str,
@@ -399,11 +399,11 @@ def change_user_role(
 ) -> None:
     """Change a user's role (remove old, assign new).
 
-    Role names should be managed role names (e.g. signoz-editor).
+    Role names should be managed role names (e.g. o11y-editor).
     """
     # Get current roles to find the old role's ID
     response = requests.get(
-        signoz.self.host_configs["8080"].get(f"{USERS_BASE}/{user_id}/roles"),
+        o11y.self.host_configs["8080"].get(f"{USERS_BASE}/{user_id}/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
     )
@@ -415,7 +415,7 @@ def change_user_role(
 
     # Remove old role
     response = requests.delete(
-        signoz.self.host_configs["8080"].get(f"{USERS_BASE}/{user_id}/roles/{old_role_entry['id']}"),
+        o11y.self.host_configs["8080"].get(f"{USERS_BASE}/{user_id}/roles/{old_role_entry['id']}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
     )
@@ -423,7 +423,7 @@ def change_user_role(
 
     # Assign new role
     response = requests.post(
-        signoz.self.host_configs["8080"].get(f"{USERS_BASE}/{user_id}/roles"),
+        o11y.self.host_configs["8080"].get(f"{USERS_BASE}/{user_id}/roles"),
         json={"name": new_role},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,

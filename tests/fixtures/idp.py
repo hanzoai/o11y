@@ -16,7 +16,7 @@ from fixtures.keycloak import IDP_ROOT_PASSWORD, IDP_ROOT_USERNAME
 
 
 @pytest.fixture(name="create_saml_client", scope="function")
-def create_saml_client(idp: types.TestContainerIDP, signoz: types.SigNoz) -> Callable[[str, str], None]:
+def create_saml_client(idp: types.TestContainerIDP, o11y: types.O11y) -> Callable[[str, str], None]:
     def _create_saml_client(client_id: str, callback_path: str) -> None:
         client = KeycloakAdmin(
             server_url=idp.container.host_configs["6060"].base(),
@@ -28,17 +28,17 @@ def create_saml_client(idp: types.TestContainerIDP, signoz: types.SigNoz) -> Cal
         client.create_client(
             skip_exists=True,
             payload={
-                "clientId": f"{signoz.self.host_configs['8080'].address}:{signoz.self.host_configs['8080'].port}",
+                "clientId": f"{o11y.self.host_configs['8080'].address}:{o11y.self.host_configs['8080'].port}",
                 "name": f"{client_id}",
                 "description": f"client for {client_id}",
                 "rootUrl": "",
                 "adminUrl": "",
-                "baseUrl": urljoin(f"{signoz.self.host_configs['8080'].base()}", callback_path),
+                "baseUrl": urljoin(f"{o11y.self.host_configs['8080'].base()}", callback_path),
                 "surrogateAuthRequired": False,
                 "enabled": True,
                 "alwaysDisplayInConsole": False,
                 "clientAuthenticatorType": "client-secret",
-                "redirectUris": [f"{signoz.self.host_configs['8080'].base()}/*"],
+                "redirectUris": [f"{o11y.self.host_configs['8080'].base()}/*"],
                 "webOrigins": [],
                 "notBefore": 0,
                 "bearerOnly": False,
@@ -68,7 +68,7 @@ def create_saml_client(idp: types.TestContainerIDP, signoz: types.SigNoz) -> Cal
                     "saml_signature_canonicalization_method": "http://www.w3.org/2001/10/xml-exc-c14n#",
                     "saml.onetimeuse.condition": "false",
                     "saml.server.signature.keyinfo.xmlSigKeyInfoKeyNameTransformer": "NONE",
-                    "saml_assertion_consumer_url_post": urljoin(f"{signoz.self.host_configs['8080'].base()}", callback_path),
+                    "saml_assertion_consumer_url_post": urljoin(f"{o11y.self.host_configs['8080'].base()}", callback_path),
                 },
                 "authenticationFlowBindingOverrides": {},
                 "fullScopeAllowed": True,
@@ -129,9 +129,9 @@ def create_saml_client(idp: types.TestContainerIDP, signoz: types.SigNoz) -> Cal
                         "consentRequired": False,
                         "config": {
                             "attribute.nameformat": "Basic",
-                            "user.attribute": "signoz_role",
-                            "friendly.name": "signoz_role",
-                            "attribute.name": "signoz_role",
+                            "user.attribute": "o11y_role",
+                            "friendly.name": "o11y_role",
+                            "attribute.name": "o11y_role",
                         },
                     },
                     {
@@ -182,7 +182,7 @@ def update_saml_client_attributes(
 
 
 @pytest.fixture(name="create_oidc_client", scope="function")
-def create_oidc_client(idp: types.TestContainerIDP, signoz: types.SigNoz) -> Callable[[str, str], None]:
+def create_oidc_client(idp: types.TestContainerIDP, o11y: types.O11y) -> Callable[[str, str], None]:
     def _create_oidc_client(client_id: str, callback_path: str) -> None:
         client = KeycloakAdmin(
             server_url=idp.container.host_configs["6060"].base(),
@@ -206,7 +206,7 @@ def create_oidc_client(idp: types.TestContainerIDP, signoz: types.SigNoz) -> Cal
                 "enabled": True,
                 "alwaysDisplayInConsole": False,
                 "clientAuthenticatorType": "client-secret",
-                "redirectUris": [f"{urljoin(signoz.self.host_configs['8080'].base(), callback_path)}"],
+                "redirectUris": [f"{urljoin(o11y.self.host_configs['8080'].base(), callback_path)}"],
                 "webOrigins": ["/*"],
                 "notBefore": 0,
                 "bearerOnly": False,
@@ -505,7 +505,7 @@ def create_user_idp_with_role(
                 "enabled": True,
                 "emailVerified": verified,
                 "attributes": {
-                    "signoz_role": role,
+                    "o11y_role": role,
                 },
             },
         )
@@ -527,7 +527,7 @@ def create_user_idp_with_role(
 
 @pytest.fixture(name="setup_user_profile", scope="package")
 def setup_user_profile(idp: types.TestContainerIDP) -> Callable[[], None]:
-    """Setup Keycloak User Profile with signoz_role attribute."""
+    """Setup Keycloak User Profile with o11y_role attribute."""
 
     def _setup_user_profile() -> None:
         client = KeycloakAdmin(
@@ -540,16 +540,16 @@ def setup_user_profile(idp: types.TestContainerIDP) -> Callable[[], None]:
         # Get current user profile config
         profile = client.get_realm_users_profile()
 
-        # Check if signoz_role attribute already exists
+        # Check if o11y_role attribute already exists
         attributes = profile.get("attributes", [])
-        signoz_role_exists = any(attr.get("name") == "signoz_role" for attr in attributes)
+        o11y_role_exists = any(attr.get("name") == "o11y_role" for attr in attributes)
 
-        if not signoz_role_exists:
-            # Add signoz_role attribute to user profile
+        if not o11y_role_exists:
+            # Add o11y_role attribute to user profile
             attributes.append(
                 {
-                    "name": "signoz_role",
-                    "displayName": "SigNoz Role",
+                    "name": "o11y_role",
+                    "displayName": "O11y Role",
                     "validations": {},
                     "annotations": {},
                     # "required": {
@@ -599,15 +599,15 @@ def _ensure_groups_client_scope(client: KeycloakAdmin) -> None:
                         },
                     },
                     {
-                        "name": "signoz_role",
+                        "name": "o11y_role",
                         "protocol": "openid-connect",
                         "protocolMapper": "oidc-usermodel-attribute-mapper",
                         "consentRequired": False,
                         "config": {
-                            "user.attribute": "signoz_role",
+                            "user.attribute": "o11y_role",
                             "id.token.claim": "true",
                             "access.token.claim": "true",
-                            "claim.name": "signoz_role",
+                            "claim.name": "o11y_role",
                             "userinfo.token.claim": "true",
                             "jsonType.label": "String",
                         },
@@ -618,10 +618,10 @@ def _ensure_groups_client_scope(client: KeycloakAdmin) -> None:
         )
 
 
-def get_oidc_domain(signoz: types.SigNoz, admin_token: str) -> dict:
+def get_oidc_domain(o11y: types.O11y, admin_token: str) -> dict:
     """Helper to get the OIDC domain."""
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -631,10 +631,10 @@ def get_oidc_domain(signoz: types.SigNoz, admin_token: str) -> dict:
     )
 
 
-def get_user_by_email(signoz: types.SigNoz, admin_token: str, email: str) -> dict:
+def get_user_by_email(o11y: types.O11y, admin_token: str, email: str) -> dict:
     """Helper to get a user by email."""
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/user"),
+        o11y.self.host_configs["8080"].get("/api/v1/user"),
         timeout=2,
         headers={"Authorization": f"Bearer {admin_token}"},
     )
@@ -645,7 +645,7 @@ def get_user_by_email(signoz: types.SigNoz, admin_token: str, email: str) -> dic
 
 
 def perform_oidc_login(
-    signoz: types.SigNoz,  # pylint: disable=unused-argument
+    o11y: types.O11y,  # pylint: disable=unused-argument
     idp: types.TestContainerIDP,
     driver: webdriver.Chrome,
     get_session_context: Callable[[str], str],
@@ -662,9 +662,9 @@ def perform_oidc_login(
     idp_login(email, password)
 
 
-def get_saml_domain(signoz: types.SigNoz, admin_token: str) -> dict:
+def get_saml_domain(o11y: types.O11y, admin_token: str) -> dict:
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/api/v1/domains"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -675,7 +675,7 @@ def get_saml_domain(signoz: types.SigNoz, admin_token: str) -> dict:
 
 
 def perform_saml_login(
-    signoz: types.SigNoz,  # pylint: disable=unused-argument
+    o11y: types.O11y,  # pylint: disable=unused-argument
     driver: webdriver.Chrome,
     get_session_context: Callable[[str], str],
     idp_login: Callable[[str, str], None],  # pylint: disable=redefined-outer-name

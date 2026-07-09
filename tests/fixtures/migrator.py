@@ -28,8 +28,8 @@ def create_migrator(
         environment = dict(env_overrides) if env_overrides else {}
 
         container = client.containers.run(
-            image=f"signoz/signoz-schema-migrator:{version}",
-            command=f"sync --replication=true --cluster-name=cluster --up= --dsn={clickhouse.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN']}",
+            image=f"o11y/o11y-schema-migrator:{version}",
+            command=f"sync --replication=true --cluster-name=cluster --up= --dsn={clickhouse.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_DSN']}",
             detach=True,
             auto_remove=False,
             network=network.id,
@@ -47,8 +47,8 @@ def create_migrator(
         container.remove()
 
         container = client.containers.run(
-            image=f"signoz/signoz-schema-migrator:{version}",
-            command=f"async --replication=true --cluster-name=cluster --up= --dsn={clickhouse.env['SIGNOZ_TELEMETRYSTORE_CLICKHOUSE_DSN']}",
+            image=f"o11y/o11y-schema-migrator:{version}",
+            command=f"async --replication=true --cluster-name=cluster --up= --dsn={clickhouse.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_DSN']}",
             detach=True,
             auto_remove=False,
             network=network.id,

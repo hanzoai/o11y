@@ -30,11 +30,11 @@ Before diving in, make sure you have these tools installed:
 1. Open your terminal
 2. Clone the repository:
    ```bash
-   git clone https://github.com/Hanzo O11y/signoz.git
+   git clone https://github.com/Hanzo O11y/o11y.git
    ```
 3. Navigate to the project:
    ```bash
-   cd signoz
+   cd o11y
    ```
 
 ## How do I run it locally?
@@ -59,7 +59,7 @@ This command:
 Next, start the OpenTelemetry Collector to receive telemetry data:
 
 ```bash
-make devenv-signoz-otel-collector
+make devenv-otel-collector
 ```
 
 This command:

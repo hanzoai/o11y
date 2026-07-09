@@ -127,8 +127,8 @@ export function useIntegrationModal({
 				credentials: {
 					ingestionUrl: connectionParams?.data?.ingestionUrl || values.ingestionUrl,
 					ingestionKey: connectionParams?.data?.ingestionKey || values.ingestionKey,
-					sigNozApiUrl: connectionParams?.data?.sigNozApiUrl || values.sigNozApiUrl,
-					sigNozApiKey: connectionParams?.data?.sigNozApiKey || values.sigNozApiKey,
+					o11yApiUrl: connectionParams?.data?.o11yApiUrl || values.o11yApiUrl,
+					o11yApiKey: connectionParams?.data?.o11yApiKey || values.o11yApiKey,
 				},
 			};
 

@@ -41,7 +41,7 @@ export default defineConfig({
 	// Shared settings
 	use: {
 		baseURL:
-			process.env.SIGNOZ_E2E_BASE_URL || 'https://app.us.staging.signoz.cloud',
+			process.env.O11Y_E2E_BASE_URL || 'https://app.us.staging.o11y.cloud',
 		trace: 'on-first-retry',
 		screenshot: 'only-on-failure',
 		video: 'retain-on-failure',

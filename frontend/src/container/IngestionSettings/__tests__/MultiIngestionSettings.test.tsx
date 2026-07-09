@@ -223,7 +223,7 @@ describe('MultiIngestionSettings Page', () => {
 			"signoz.workspace.key.id='k2'",
 		);
 		expect(firstQueryData.aggregations[0].metricName).toBe(
-			'signoz.meter.log.size',
+			'o11y.meter.log.size',
 		);
 
 		expect(urlParams.get(QueryParams.yAxisUnit)).toBe('bytes');

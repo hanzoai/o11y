@@ -47,7 +47,7 @@ func (migration *migratePublicDashboards) Up(ctx context.Context, db *bun.DB) er
 	}()
 
 	var storeID string
-	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "signoz").Scan(&storeID)
+	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "o11y").Scan(&storeID)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func (migration *migratePublicDashboards) Up(ctx context.Context, db *bun.DB) er
 			tuples = append(tuples, tuple{
 				OrgID:       orgID,
 				DashboardID: id,
-				RoleName:    "signoz-anonymous",
+				RoleName:    "o11y-anonymous",
 			})
 		}
 	}

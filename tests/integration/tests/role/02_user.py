@@ -12,12 +12,12 @@ from fixtures.auth import (
     USER_EDITOR_PASSWORD,
     change_user_role,
 )
-from fixtures.types import Operation, SigNoz
+from fixtures.types import Operation, O11y
 
 
 def test_user_invite_accept_role_grant(
     request: pytest.FixtureRequest,
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
@@ -29,7 +29,7 @@ def test_user_invite_accept_role_grant(
         "role": "EDITOR",
     }
     invite_response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json=invite_payload,
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -39,7 +39,7 @@ def test_user_invite_accept_role_grant(
     reset_token = invited_user["token"]
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
         json={"password": USER_EDITOR_PASSWORD, "token": reset_token},
         timeout=2,
     )
@@ -48,7 +48,7 @@ def test_user_invite_accept_role_grant(
     # Login with editor email and password
     editor_token = get_token(USER_EDITOR_EMAIL, USER_EDITOR_PASSWORD)
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/users/me"),
+        o11y.self.host_configs["8080"].get("/api/v2/users/me"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=5,
     )
@@ -58,14 +58,14 @@ def test_user_invite_accept_role_grant(
 
     # check the forbidden response for admin api for editor user
     admin_roles_response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/api/v1/roles"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=2,
     )
     assert admin_roles_response.status_code == HTTPStatus.FORBIDDEN
 
     roles_response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/api/v1/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -73,8 +73,8 @@ def test_user_invite_accept_role_grant(
     org_id = roles_response.json()["data"][0]["orgId"]
 
     # check role assignment tuples in DB
-    with signoz.sqlstore.conn.connect() as conn:
-        tuple_object_id = f"organization/{org_id}/role/signoz-editor"
+    with o11y.sqlstore.conn.connect() as conn:
+        tuple_object_id = f"organization/{org_id}/role/o11y-editor"
         tuple_result = conn.execute(
             sql.text("SELECT * FROM tuple WHERE object_id = :object_id"),
             {"object_id": tuple_object_id},
@@ -97,14 +97,14 @@ def test_user_invite_accept_role_grant(
 
 def test_user_update_role_grant(
     request: pytest.FixtureRequest,
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     # Get the editor user's id
     editor_token = get_token(USER_EDITOR_EMAIL, USER_EDITOR_PASSWORD)
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/users/me"),
+        o11y.self.host_configs["8080"].get("/api/v2/users/me"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=5,
     )
@@ -115,7 +115,7 @@ def test_user_update_role_grant(
     # Get the role id for viewer
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     roles_response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/api/v1/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -124,13 +124,13 @@ def test_user_update_role_grant(
     org_id = roles_data[0]["orgId"]
 
     # Update the user's role to viewer via v2 role endpoints
-    change_user_role(signoz, admin_token, editor_id, "signoz-editor", "signoz-viewer")
+    change_user_role(o11y, admin_token, editor_id, "o11y-editor", "o11y-viewer")
 
     # Check that user no longer has the editor role in the db
-    with signoz.sqlstore.conn.connect() as conn:
-        editor_tuple_object_id = f"organization/{org_id}/role/signoz-editor"
-        viewer_tuple_object_id = f"organization/{org_id}/role/signoz-viewer"
-        # Check there is no tuple for signoz-editor assignment
+    with o11y.sqlstore.conn.connect() as conn:
+        editor_tuple_object_id = f"organization/{org_id}/role/o11y-editor"
+        viewer_tuple_object_id = f"organization/{org_id}/role/o11y-viewer"
+        # Check there is no tuple for o11y-editor assignment
         editor_tuple_result = conn.execute(
             sql.text("SELECT * FROM tuple WHERE object_id = :object_id AND relation = 'assignee'"),
             {"object_id": editor_tuple_object_id},
@@ -143,7 +143,7 @@ def test_user_update_role_grant(
                 _user = f"user:organization/{org_id}/user/{editor_id}"
                 assert row["_user"] != _user
 
-        # Check that a tuple exists for signoz-viewer assignment
+        # Check that a tuple exists for o11y-viewer assignment
         viewer_tuple_result = conn.execute(
             sql.text("SELECT * FROM tuple WHERE object_id = :object_id AND relation = 'assignee'"),
             {"object_id": viewer_tuple_object_id},
@@ -164,14 +164,14 @@ def test_user_update_role_grant(
 
 def test_user_delete_role_revoke(
     request: pytest.FixtureRequest,
-    signoz: SigNoz,
+    o11y: O11y,
     create_user_admin: Operation,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
 ):
     # login with editor to get the user_id and check if user exists
     editor_token = get_token(USER_EDITOR_EMAIL, USER_EDITOR_PASSWORD)
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/users/me"),
+        o11y.self.host_configs["8080"].get("/api/v2/users/me"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=5,
     )
@@ -182,7 +182,7 @@ def test_user_delete_role_revoke(
     # delete the editor user
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     delete_response = requests.delete(
-        signoz.self.host_configs["8080"].get(f"/api/v1/user/{editor_id}"),
+        o11y.self.host_configs["8080"].get(f"/api/v1/user/{editor_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -190,15 +190,15 @@ def test_user_delete_role_revoke(
 
     # get the role id from roles list
     roles_response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/api/v1/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
     assert roles_response.status_code == HTTPStatus.OK
     org_id = roles_response.json()["data"][0]["orgId"]
-    tuple_object_id = f"organization/{org_id}/role/signoz-editor"
+    tuple_object_id = f"organization/{org_id}/role/o11y-editor"
 
-    with signoz.sqlstore.conn.connect() as conn:
+    with o11y.sqlstore.conn.connect() as conn:
         tuple_result = conn.execute(
             sql.text("SELECT * FROM tuple WHERE object_id = :object_id AND relation = 'assignee'"),
             {"object_id": tuple_object_id},

@@ -142,7 +142,7 @@ func TestMapObservations(t *testing.T) {
 		"gen_ai.operation.name":      "chat",
 		"gen_ai.usage.input_tokens":  float64(100),
 		"gen_ai.usage.output_tokens": float64(50),
-		"_signoz.gen_ai.total_cost":  float64(0.0025),
+		"_o11y.gen_ai.total_cost":    float64(0.0025),
 		"session.id":                 "sess1",
 		"user.id":                    "user1",
 		"service.name":               "app",

@@ -1,4 +1,4 @@
-### Monitor Azure MongoDB with SigNoz
+### Monitor Azure MongoDB with O11y
 
 Collect key Azure MongoDB (DocumentDB) cluster metrics and view them with an out of the box dashboard.
 

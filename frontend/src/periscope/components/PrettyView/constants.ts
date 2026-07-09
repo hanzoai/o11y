@@ -1,7 +1,7 @@
-// Dark theme — SigNoz design palette
+// Dark theme — O11y design palette
 export const darkTheme = {
-	scheme: 'signoz-dark',
-	author: 'signoz',
+	scheme: 'o11y-dark',
+	author: 'o11y',
 	base00: 'transparent',
 	base01: '#161922',
 	base02: '#1d212d',
@@ -22,8 +22,8 @@ export const darkTheme = {
 
 // Light theme
 export const lightTheme = {
-	scheme: 'signoz-light',
-	author: 'signoz',
+	scheme: 'o11y-light',
+	author: 'o11y',
 	base00: 'transparent',
 	base01: '#F9F9FB',
 	base02: '#EFF0F3',

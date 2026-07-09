@@ -154,7 +154,7 @@ class QueryRangeRequest:
 
 
 def make_query_request(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     token: str,
     start_ms: int,
     end_ms: int,
@@ -182,7 +182,7 @@ def make_query_request(
         payload["variables"] = variables
 
     return requests.post(
-        signoz.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
         timeout=timeout,
         headers={"authorization": f"Bearer {token}"},
         json=payload,
@@ -715,11 +715,11 @@ def assert_identical_query_response(response1: requests.Response, response2: req
 
 # we already create the evolution for resource during schema migration
 # since we have to create test data around it, we need to get the evolution time
-def get_resource_evolution_time(signoz: types.SigNoz, signal: str) -> datetime:
-    result = signoz.telemetrystore.conn.query(
+def get_resource_evolution_time(o11y: types.O11y, signal: str) -> datetime:
+    result = o11y.telemetrystore.conn.query(
         """
         SELECT release_time
-        FROM signoz_metadata.distributed_column_evolution_metadata
+        FROM o11y_metadata.distributed_column_evolution_metadata
         WHERE signal = %(signal)s
           AND field_context = 'resource'
           AND field_name = '__all__'

@@ -4,13 +4,13 @@ from http import HTTPStatus
 import requests
 
 from fixtures.auth import USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD
-from fixtures.types import SigNoz
+from fixtures.types import O11y
 
 DUPLICATE_USER_EMAIL = "duplicate@integration.test"
 
 
 def test_duplicate_user_invite_rejected(
-    signoz: SigNoz,
+    o11y: O11y,
     get_token: Callable[[str, str], str],
 ):
     """
@@ -22,7 +22,7 @@ def test_duplicate_user_invite_rejected(
 
     # Invite a new user
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json={"email": DUPLICATE_USER_EMAIL, "role": "EDITOR"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -33,7 +33,7 @@ def test_duplicate_user_invite_rejected(
 
     # Invite the same email again — should fail
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json={"email": DUPLICATE_USER_EMAIL, "role": "VIEWER"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -42,7 +42,7 @@ def test_duplicate_user_invite_rejected(
 
     # activate the user
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
         json={"password": "password123Z$", "token": reset_token},
         timeout=2,
     )
@@ -50,7 +50,7 @@ def test_duplicate_user_invite_rejected(
 
     # Try to invite the same email again — should fail
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/api/v1/invite"),
         json={"email": DUPLICATE_USER_EMAIL, "role": "VIEWER"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,

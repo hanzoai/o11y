@@ -2,9 +2,9 @@ package llmobstypes
 
 import "github.com/hanzoai/o11y/pkg/errors"
 
-// OTel GenAI semantic-convention attribute keys used to project SigNoz spans
+// OTel GenAI semantic-convention attribute keys used to project O11y spans
 // into LLM observations. The pricing-owned keys
-// (gen_ai.request.model, gen_ai.usage.*, _signoz.gen_ai.total_cost) live in
+// (gen_ai.request.model, gen_ai.usage.*, _o11y.gen_ai.total_cost) live in
 // llmpricingruletypes and are referenced from there to stay DRY; only the
 // keys unique to the observability views are declared here.
 const (

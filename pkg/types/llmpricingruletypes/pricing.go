@@ -21,11 +21,11 @@ const (
 	GenAIUsageCacheReadInputTokens     = "gen_ai.usage.cache_read.input_tokens"
 	GenAIUsageCacheCreationInputTokens = "gen_ai.usage.cache_creation.input_tokens"
 
-	SignozGenAICostInput      = "_signoz.gen_ai.cost_input"
-	SignozGenAICostOutput     = "_signoz.gen_ai.cost_output"
-	SignozGenAICostCacheRead  = "_signoz.gen_ai.cost_cache_read"
-	SignozGenAICostCacheWrite = "_signoz.gen_ai.cost_cache_write"
-	SignozGenAITotalCost      = "_signoz.gen_ai.total_cost"
+	O11yGenAICostInput      = "_o11y.gen_ai.cost_input"
+	O11yGenAICostOutput     = "_o11y.gen_ai.cost_output"
+	O11yGenAICostCacheRead  = "_o11y.gen_ai.cost_cache_read"
+	O11yGenAICostCacheWrite = "_o11y.gen_ai.cost_cache_write"
+	O11yGenAITotalCost      = "_o11y.gen_ai.total_cost"
 )
 
 var (

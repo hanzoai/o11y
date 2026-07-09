@@ -13,11 +13,11 @@ import type { Browser, BrowserContext } from '@playwright/test';
 export async function newAdminContext(
 	browser: Browser,
 ): Promise<BrowserContext> {
-	const email = process.env.SIGNOZ_E2E_USERNAME;
-	const password = process.env.SIGNOZ_E2E_PASSWORD;
+	const email = process.env.O11Y_E2E_USERNAME;
+	const password = process.env.O11Y_E2E_PASSWORD;
 	if (!email || !password) {
 		throw new Error(
-			'SIGNOZ_E2E_USERNAME / SIGNOZ_E2E_PASSWORD must be set ' +
+			'O11Y_E2E_USERNAME / O11Y_E2E_PASSWORD must be set ' +
 				'(pytest bootstrap writes them to .env.local).',
 		);
 	}

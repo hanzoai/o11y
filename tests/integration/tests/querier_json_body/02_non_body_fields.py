@@ -21,7 +21,7 @@ from fixtures.querier import (
 
 
 def _raw(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     token: str,
     start_ms: int,
     end_ms: int,
@@ -39,13 +39,13 @@ def _raw(
         limit=limit,
         step_interval=60,
     )
-    r = make_query_request(signoz, token, start_ms, end_ms, queries=[q], request_type="raw")
+    r = make_query_request(o11y, token, start_ms, end_ms, queries=[q], request_type="raw")
     assert r.status_code == 200, f"HTTP {r.status_code} for '{name}': {r.text}"
     return r
 
 
 def _scalar(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     token: str,
     start_ms: int,
     end_ms: int,
@@ -63,7 +63,7 @@ def _scalar(
         group_by=group_by,
         step_interval=60,
     )
-    r = make_query_request(signoz, token, start_ms, end_ms, queries=[q], request_type="scalar")
+    r = make_query_request(o11y, token, start_ms, end_ms, queries=[q], request_type="scalar")
     assert r.status_code == 200, f"HTTP {r.status_code} for '{name}': {r.text}"
     return r
 
@@ -85,16 +85,16 @@ def _counts(response: requests.Response) -> dict[str, Any]:
 
 
 def _run_case(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     token: str,
     start_ms: int,
     end_ms: int,
     case: dict[str, Any],
 ) -> None:
     if case["requestType"] == "raw":
-        response = _raw(signoz, token, start_ms, end_ms, case["name"], expression=case.get("expression"), order=case.get("order"))
+        response = _raw(o11y, token, start_ms, end_ms, case["name"], expression=case.get("expression"), order=case.get("order"))
     else:
-        response = _scalar(signoz, token, start_ms, end_ms, case["name"], case["aggregation"], expression=case.get("expression"), group_by=case.get("groupBy"))
+        response = _scalar(o11y, token, start_ms, end_ms, case["name"], case["aggregation"], expression=case.get("expression"), group_by=case.get("groupBy"))
     assert case["validate"](response), f"Validation failed for '{case['name']}': {response.json()}"
 
 
@@ -120,7 +120,7 @@ def _run_case(
 
 
 def test_non_body_filter_groupby_aggregation(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -207,7 +207,7 @@ def test_non_body_filter_groupby_aggregation(
 
     for case in cases:
         case.setdefault("groupBy", None)
-        _run_case(signoz, token, start_ms, end_ms, case)
+        _run_case(o11y, token, start_ms, end_ms, case)
 
 
 # ============================================================================
@@ -228,7 +228,7 @@ def test_non_body_filter_groupby_aggregation(
 
 
 def test_non_body_orderby(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_logs: Callable[[list[Logs]], None],
@@ -282,4 +282,4 @@ def test_non_body_orderby(
 
     for case in cases:
         case.setdefault("groupBy", None)
-        _run_case(signoz, token, start_ms, end_ms, case)
+        _run_case(o11y, token, start_ms, end_ms, case)

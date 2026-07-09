@@ -747,8 +747,8 @@ func TestBaseRule_ExternalURL(t *testing.T) {
 		want        string
 	}{
 		{name: "default value returned as-is", externalURL: mustParseURL(t, "http://localhost:8080"), want: "http://localhost:8080"},
-		{name: "configured https host", externalURL: mustParseURL(t, "https://signoz.example.com"), want: "https://signoz.example.com"},
-		{name: "configured host with port", externalURL: mustParseURL(t, "http://signoz.internal:3301"), want: "http://signoz.internal:3301"},
+		{name: "configured https host", externalURL: mustParseURL(t, "https://o11y.example.com"), want: "https://o11y.example.com"},
+		{name: "configured host with port", externalURL: mustParseURL(t, "http://o11y.internal:3301"), want: "http://o11y.internal:3301"},
 	}
 
 	for _, tc := range tests {
@@ -773,8 +773,8 @@ func TestBaseRule_GeneratorURL(t *testing.T) {
 		{
 			name:        "configured external URL",
 			ruleID:      "abc",
-			externalURL: mustParseURL(t, "https://signoz.example.com"),
-			want:        "https://signoz.example.com/alerts/overview?ruleId=abc",
+			externalURL: mustParseURL(t, "https://o11y.example.com"),
+			want:        "https://o11y.example.com/alerts/overview?ruleId=abc",
 		},
 		{
 			name:        "default external URL is used as-is",
@@ -785,8 +785,8 @@ func TestBaseRule_GeneratorURL(t *testing.T) {
 		{
 			name:        "external URL with base path is preserved",
 			ruleID:      "abc",
-			externalURL: mustParseURL(t, "https://signoz.example.com/signoz"),
-			want:        "https://signoz.example.com/signoz/alerts/overview?ruleId=abc",
+			externalURL: mustParseURL(t, "https://o11y.example.com/o11y"),
+			want:        "https://o11y.example.com/o11y/alerts/overview?ruleId=abc",
 		},
 	}
 

@@ -15,7 +15,7 @@ export default function EntityError(): JSX.Element {
 		if (isCloudUserVal) {
 			history.push('/support');
 		} else {
-			openInNewTab('https://signoz.io/slack');
+			openInNewTab('https://o11y.io/slack');
 		}
 	};
 

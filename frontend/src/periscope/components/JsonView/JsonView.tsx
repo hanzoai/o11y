@@ -35,7 +35,7 @@ const editorOptions: EditorProps['options'] = {
 };
 
 function setEditorTheme(monaco: Monaco): void {
-	monaco.editor.defineTheme('signoz-dark', {
+	monaco.editor.defineTheme('o11y-dark', {
 		base: 'vs-dark',
 		inherit: true,
 		rules: [
@@ -65,7 +65,7 @@ function JsonView({ data, height = '575px' }: JsonViewProps): JSX.Element {
 				options={{ ...editorOptions, wordWrap: isWrapWord ? 'on' : 'off' }}
 				onChange={(): void => {}}
 				height={height}
-				theme={isDarkMode ? 'signoz-dark' : 'light'}
+				theme={isDarkMode ? 'o11y-dark' : 'light'}
 				beforeMount={setEditorTheme}
 			/>
 			<div className="json-view__footer">

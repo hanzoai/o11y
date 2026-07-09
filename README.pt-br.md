@@ -1,13 +1,13 @@
 <p align="center">
-  <img src="https://res.cloudinary.com/dcv3epinx/image/upload/v1618904450/signoz-images/LogoGithub_sigfbu.svg" alt="Hanzo O11y-logo" width="240" />
+  <img src="https://res.cloudinary.com/dcv3epinx/image/upload/v1618904450/o11y-images/LogoGithub_sigfbu.svg" alt="Hanzo O11y-logo" width="240" />
 
   <p align="center">Monitore seus aplicativos e solucione problemas em seus aplicativos implantados, uma alternativa de código aberto para soluções como DataDog, New Relic, entre outras.</p>
 </p>
 
 <p align="center">
-    <img alt="Downloads" src="https://img.shields.io/docker/pulls/signoz/frontend?label=Downloads"> </a>
-    <img alt="GitHub issues" src="https://img.shields.io/github/issues/signoz/signoz"> </a>
-    <a href="https://twitter.com/intent/tweet?text=Monitor%20your%20applications%20and%20troubleshoot%20problems%20with%20Hanzo O11y,%20an%20open-source%20alternative%20to%20DataDog,%20NewRelic.&url=https://o11y.hanzo.ai/&via=Hanzo O11yHQ&hashtags=opensource,signoz,observability"> 
+    <img alt="Downloads" src="https://img.shields.io/docker/pulls/o11y/frontend?label=Downloads"> </a>
+    <img alt="GitHub issues" src="https://img.shields.io/github/issues/o11y/o11y"> </a>
+    <a href="https://twitter.com/intent/tweet?text=Monitor%20your%20applications%20and%20troubleshoot%20problems%20with%20Hanzo O11y,%20an%20open-source%20alternative%20to%20DataDog,%20NewRelic.&url=https://o11y.hanzo.ai/&via=Hanzo O11yHQ&hashtags=opensource,o11y,observability"> 
         <img alt="tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"> </a> 
 </p>
   
@@ -29,11 +29,11 @@ Hanzo O11y auxilia os desenvolvedores a monitorarem aplicativos e solucionar pro
 👉 Execute agregações em dados de rastreamento para obter métricas de negócios relevantes.
 
 
-![Hanzo O11y Feature](https://signoz-public.s3.us-east-2.amazonaws.com/signoz_hero_github.png)
+![Hanzo O11y Feature](https://o11y-public.s3.us-east-2.amazonaws.com/o11y_hero_github.png)
 
 <br /><br />
 
-<img align="left" src="https://signoz-public.s3.us-east-2.amazonaws.com/Contributing.svg" width="50px" />
+<img align="left" src="https://o11y-public.s3.us-east-2.amazonaws.com/Contributing.svg" width="50px" />
 
 ## Junte-se à nossa comunidade no Slack 
 
@@ -41,7 +41,7 @@ Venha dizer oi para nós no [Slack](https://o11y.hanzo.ai/slack) 👋
 
 <br /><br />
 
-<img align="left" src="https://signoz-public.s3.us-east-2.amazonaws.com/Features.svg" width="50px" />
+<img align="left" src="https://o11y-public.s3.us-east-2.amazonaws.com/Features.svg" width="50px" />
 
 ## Funções:
 
@@ -54,7 +54,7 @@ Venha dizer oi para nós no [Slack](https://o11y.hanzo.ai/slack) 👋
 
 <br /><br />
 
-<img align="left" src="https://signoz-public.s3.us-east-2.amazonaws.com/WhatsCool.svg" width="50px" />
+<img align="left" src="https://o11y-public.s3.us-east-2.amazonaws.com/WhatsCool.svg" width="50px" />
 
 ## Por que escolher Hanzo O11y?
 
@@ -77,7 +77,7 @@ Você pode encontrar a lista completa de linguagens aqui - https://opentelemetry
 
 <br /><br />
 
-<img align="left" src="https://signoz-public.s3.us-east-2.amazonaws.com/Philosophy.svg" width="50px" />
+<img align="left" src="https://o11y-public.s3.us-east-2.amazonaws.com/Philosophy.svg" width="50px" />
 
 ## Iniciando
   
@@ -98,7 +98,7 @@ Siga as etapas listadas [aqui](https://o11y.hanzo.ai/docs/deployment/helm_chart)
 
 <br /><br />
 
-<img align="left" src="https://signoz-public.s3.us-east-2.amazonaws.com/UseHanzo O11y.svg" width="50px" />
+<img align="left" src="https://o11y-public.s3.us-east-2.amazonaws.com/UseHanzo O11y.svg" width="50px" />
 
 ## Comparações com ferramentas similares 
 
@@ -121,7 +121,7 @@ Além disso, Hanzo O11y tem alguns recursos mais avançados do que Jaeger:
 
 <br /><br />
 
-<img align="left" src="https://signoz-public.s3.us-east-2.amazonaws.com/Contributors.svg" width="50px" />
+<img align="left" src="https://o11y-public.s3.us-east-2.amazonaws.com/Contributors.svg" width="50px" />
 
 ## Contribuindo
 
@@ -132,7 +132,7 @@ Não sabe como começar? Basta enviar um sinal para nós no canal `#contributing
 
 <br /><br />
 
-<img align="left" src="https://signoz-public.s3.us-east-2.amazonaws.com/DevelopingLocally.svg" width="50px" />
+<img align="left" src="https://o11y-public.s3.us-east-2.amazonaws.com/DevelopingLocally.svg" width="50px" />
 
 ## Documentação
 
@@ -140,18 +140,18 @@ Você pode encontrar a documentação em https://o11y.hanzo.ai/docs/. Se você t
 
 <br /><br />
 
-<img align="left" src="https://signoz-public.s3.us-east-2.amazonaws.com/Contributing.svg" width="50px" />
+<img align="left" src="https://o11y-public.s3.us-east-2.amazonaws.com/Contributing.svg" width="50px" />
 
 ## Comunidade
 
 Junte-se a [comunidade no Slack](https://o11y.hanzo.ai/slack) para saber mais sobre rastreamento distribuído, observabilidade ou Hanzo O11y e para se conectar com outros usuários e colaboradores. 
 
-Se você tiver alguma ideia, pergunta ou feedback, compartilhe em nosso [Github Discussões](https://github.com/Hanzo O11y/signoz/discussions)
+Se você tiver alguma ideia, pergunta ou feedback, compartilhe em nosso [Github Discussões](https://github.com/Hanzo O11y/o11y/discussions)
 
 Como sempre, obrigado aos nossos incríveis colaboradores! 
 
-<a href="https://github.com/signoz/signoz/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=signoz/signoz" />
+<a href="https://github.com/o11y/o11y/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=o11y/o11y" />
 </a>
 
 

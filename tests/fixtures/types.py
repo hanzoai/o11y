@@ -110,7 +110,7 @@ class TestContainerIDP:
 
 
 @dataclass
-class SigNoz:
+class O11y:
     __test__ = False
     self: TestContainerDocker
     sqlstore: TestContainerSQL
@@ -122,7 +122,7 @@ class SigNoz:
         return self.self.__cache__()
 
     def __log__(self) -> str:
-        return f"SigNoz(self={self.self.__log__()}, sqlstore={self.sqlstore.__log__()}, telemetrystore={self.telemetrystore.__log__()}, zeus={self.zeus.__log__()}, gateway={self.gateway.__log__()})"
+        return f"O11y(self={self.self.__log__()}, sqlstore={self.sqlstore.__log__()}, telemetrystore={self.telemetrystore.__log__()}, zeus={self.zeus.__log__()}, gateway={self.gateway.__log__()})"
 
 
 @dataclass

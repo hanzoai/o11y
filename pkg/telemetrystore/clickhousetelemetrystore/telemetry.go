@@ -15,22 +15,22 @@ type metrics struct {
 func newMetrics(meter metric.Meter) (*metrics, error) {
 	var errs error
 
-	open, err := meter.Int64ObservableGauge("signoz.telemetrystore.connection.open", metric.WithDescription("Open is the current number of open connections to the telemetry store."))
+	open, err := meter.Int64ObservableGauge("o11y.telemetrystore.connection.open", metric.WithDescription("Open is the current number of open connections to the telemetry store."))
 	if err != nil {
 		errs = errors.Join(errs, err)
 	}
 
-	idle, err := meter.Int64ObservableGauge("signoz.telemetrystore.connection.idle", metric.WithDescription("Idle is the current number of idle connections in the telemetry store pool."))
+	idle, err := meter.Int64ObservableGauge("o11y.telemetrystore.connection.idle", metric.WithDescription("Idle is the current number of idle connections in the telemetry store pool."))
 	if err != nil {
 		errs = errors.Join(errs, err)
 	}
 
-	maxOpen, err := meter.Int64ObservableGauge("signoz.telemetrystore.connection.max_open", metric.WithDescription("MaxOpen is the configured maximum number of open connections to the telemetry store."))
+	maxOpen, err := meter.Int64ObservableGauge("o11y.telemetrystore.connection.max_open", metric.WithDescription("MaxOpen is the configured maximum number of open connections to the telemetry store."))
 	if err != nil {
 		errs = errors.Join(errs, err)
 	}
 
-	maxIdle, err := meter.Int64ObservableGauge("signoz.telemetrystore.connection.max_idle", metric.WithDescription("MaxIdle is the configured maximum number of idle connections in the telemetry store pool."))
+	maxIdle, err := meter.Int64ObservableGauge("o11y.telemetrystore.connection.max_idle", metric.WithDescription("MaxIdle is the configured maximum number of idle connections in the telemetry store pool."))
 	if err != nil {
 		errs = errors.Join(errs, err)
 	}

@@ -48,33 +48,33 @@ describe('get — root path "/"', () => {
 	});
 });
 
-describe('get — prefixed path "/signoz/"', () => {
+describe('get — prefixed path "/o11y/"', () => {
 	it('reads an already-scoped key directly', () => {
-		const { default: get } = loadGetModule('/signoz/');
-		localStorage.setItem('/signoz/AUTH_TOKEN', 'scoped-tok');
+		const { default: get } = loadGetModule('/o11y/');
+		localStorage.setItem('/o11y/AUTH_TOKEN', 'scoped-tok');
 		expect(get('AUTH_TOKEN')).toBe('scoped-tok');
 	});
 
 	it('returns null when neither scoped nor bare key exists', () => {
-		const { default: get } = loadGetModule('/signoz/');
+		const { default: get } = loadGetModule('/o11y/');
 		expect(get('MISSING')).toBeNull();
 	});
 
 	it('lazy-migrates bare key to scoped key on first read', () => {
-		const { default: get } = loadGetModule('/signoz/');
+		const { default: get } = loadGetModule('/o11y/');
 		localStorage.setItem('AUTH_TOKEN', 'old-tok');
 
 		const result = get('AUTH_TOKEN');
 
 		expect(result).toBe('old-tok');
-		expect(localStorage.getItem('/signoz/AUTH_TOKEN')).toBe('old-tok');
+		expect(localStorage.getItem('/o11y/AUTH_TOKEN')).toBe('old-tok');
 		expect(localStorage.getItem('AUTH_TOKEN')).toBeNull();
 	});
 
 	it('scoped key takes precedence over bare key', () => {
-		const { default: get } = loadGetModule('/signoz/');
+		const { default: get } = loadGetModule('/o11y/');
 		localStorage.setItem('AUTH_TOKEN', 'bare-tok');
-		localStorage.setItem('/signoz/AUTH_TOKEN', 'scoped-tok');
+		localStorage.setItem('/o11y/AUTH_TOKEN', 'scoped-tok');
 
 		expect(get('AUTH_TOKEN')).toBe('scoped-tok');
 		// bare key left untouched — scoped already existed
@@ -82,7 +82,7 @@ describe('get — prefixed path "/signoz/"', () => {
 	});
 
 	it('subsequent reads after migration use scoped key (no double-write)', () => {
-		const { default: get } = loadGetModule('/signoz/');
+		const { default: get } = loadGetModule('/o11y/');
 		localStorage.setItem('THEME', 'dark');
 
 		get('THEME'); // triggers migration
@@ -94,21 +94,21 @@ describe('get — prefixed path "/signoz/"', () => {
 });
 
 describe('get — two-prefix isolation', () => {
-	it('/signoz/ and /testing/ do not share migrated values', () => {
+	it('/o11y/ and /testing/ do not share migrated values', () => {
 		localStorage.setItem('THEME', 'light');
 
 		const base1 = document.createElement('base');
-		base1.setAttribute('href', '/signoz/');
+		base1.setAttribute('href', '/o11y/');
 		document.head.append(base1);
-		let getSignoz!: GetModule['default'];
+		let getO11y!: GetModule['default'];
 		jest.isolateModules(() => {
 			// oxlint-disable-next-line typescript-eslint/no-require-imports, typescript-eslint/no-var-requires
-			getSignoz = require('../get').default;
+			getO11y = require('../get').default;
 		});
 		base1.remove();
 
-		// migrate bare → /signoz/THEME
-		getSignoz('THEME');
+		// migrate bare → /o11y/THEME
+		getO11y('THEME');
 
 		const base2 = document.createElement('base');
 		base2.setAttribute('href', '/testing/');
@@ -122,7 +122,7 @@ describe('get — two-prefix isolation', () => {
 
 		// /testing/ prefix: bare key already gone, scoped key does not exist
 		expect(getTesting('THEME')).toBeNull();
-		expect(localStorage.getItem('/signoz/THEME')).toBe('light');
+		expect(localStorage.getItem('/o11y/THEME')).toBe('light');
 		expect(localStorage.getItem('/testing/THEME')).toBeNull();
 	});
 });

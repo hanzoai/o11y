@@ -105,7 +105,7 @@ export const useSafeNavigate = (
 	const safeNavigate = useCallback(
 		// eslint-disable-next-line sonarjs/cognitive-complexity
 		(to: string | SafeNavigateParams, options?: NavigateOptions) => {
-			// oxlint-disable-next-line signoz/no-raw-absolute-path
+			// oxlint-disable-next-line o11y/no-raw-absolute-path
 			const base = window.location.origin;
 			const currentUrl = new URL(`${location.pathname}${location.search}`, base);
 

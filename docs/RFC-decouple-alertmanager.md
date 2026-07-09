@@ -40,7 +40,7 @@ matcher, notification, receiver, recurrence, route, schedule, template`.
 
 ## Why it's hard
 
-1. **The schema IS the API.** SigNoz's frontend, our k8s CRDs, and any
+1. **The schema IS the API.** O11y's frontend, our k8s CRDs, and any
    external alert source all speak the Alertmanager YAML schema. Replacing
    the parser without preserving the schema breaks every consumer.
 2. **Routing is non-trivial.** Alertmanager's route tree (with `continue`,
@@ -101,7 +101,7 @@ get reimplemented; routing tree stays Alertmanager's.
 ### Option 4 — Accept the Alertmanager dep
 
 The o11y team explicitly carves out alerting as the one place we
-intentionally use upstream Prometheus types, because SigNoz's contract
+intentionally use upstream Prometheus types, because O11y's contract
 *is* the Alertmanager schema. Every other Hanzo repo is now
 prometheus-free.
 
@@ -117,7 +117,7 @@ prometheus-free.
 The 24-repo client_golang → luxfi/metric migration that shipped alongside
 this RFC already removes Prometheus from 161 files. The remaining
 alertmanager dependency is *isolated to o11y's alerting plane* and is
-load-bearing for the SigNoz frontend's contract.
+load-bearing for the O11y frontend's contract.
 
 A clean-room rewrite (Option 1) is the only path that ends with zero
 Prometheus in any Hanzo binary. But it's a 4-6 week initiative that
@@ -143,8 +143,8 @@ Total: ~4-6 weeks calendar time for one engineer focused.
 1. Does anything outside o11y consume the Alertmanager config schema
    (e.g. k8s CRDs, alert-router)? If yes, schema changes are
    cross-repo and need their own coordination.
-2. Is the SigNoz frontend wired to send alerts to o11y via the
-   Alertmanager v2 OpenAPI schema, or via SigNoz's own internal RPC?
+2. Is the O11y frontend wired to send alerts to o11y via the
+   Alertmanager v2 OpenAPI schema, or via O11y's own internal RPC?
    If the former, the v2 wire format is part of the contract and we
    need a compatibility shim regardless of which option we pick.
 3. Do we actually use Alertmanager's inhibit rules in production? If

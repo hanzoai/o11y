@@ -3,7 +3,7 @@ import set from 'api/browser/localstorage/set';
 import remove from 'api/browser/localstorage/remove';
 import { create } from 'zustand';
 
-const STORAGE_PREFIX = '@signoz/table-columns/';
+const STORAGE_PREFIX = '@o11y/table-columns/';
 const STORAGE_SUFFIX = '-preferred-page-size';
 
 type PreferredPageSizeState = {
@@ -76,7 +76,7 @@ export function usePreferredPageSize(
 }
 
 export function getPreferredPageSize(storageKey: string): number | null {
-	// oxlint-disable-next-line signoz/no-zustand-getstate-in-hooks
+	// oxlint-disable-next-line o11y/no-zustand-getstate-in-hooks
 	const state = usePreferredPageSizeStore.getState();
 	const cached = state.tables[storageKey];
 	if (cached !== undefined) {

@@ -4,7 +4,7 @@ const _basePath: string = ((): string => {
 	return href.endsWith('/') ? href : `${href}/`;
 })();
 
-/** Returns the runtime base path — always trailing-slashed. e.g. "/" or "/signoz/" */
+/** Returns the runtime base path — always trailing-slashed. e.g. "/" or "/o11y/" */
 export function getBasePath(): string {
 	return _basePath;
 }
@@ -13,8 +13,8 @@ export function getBasePath(): string {
  * Prepends the base path to an internal absolute path.
  * Idempotent and safe to call on any value.
  *
- *   withBasePath('/logs')         → '/signoz/logs'
- *   withBasePath('/signoz/logs')  → '/signoz/logs'  (already prefixed)
+ *   withBasePath('/logs')         → '/o11y/logs'
+ *   withBasePath('/o11y/logs')  → '/o11y/logs'  (already prefixed)
  *   withBasePath('https://x.com') → 'https://x.com' (external, passthrough)
  */
 export function withBasePath(path: string): string {
@@ -32,20 +32,20 @@ export function withBasePath(path: string): string {
 
 /**
  * Full absolute URL — for copy-to-clipboard and window.open calls.
- * getAbsoluteUrl(ROUTES.LOGS_EXPLORER) → 'https://host/signoz/logs/logs-explorer'
+ * getAbsoluteUrl(ROUTES.LOGS_EXPLORER) → 'https://host/o11y/logs/logs-explorer'
  */
 export function getAbsoluteUrl(path: string): string {
-	// oxlint-disable-next-line signoz/no-raw-absolute-path
+	// oxlint-disable-next-line o11y/no-raw-absolute-path
 	return window.location.origin + withBasePath(path);
 }
 
 /**
  * Origin + base path without trailing slash — for sending to the backend
  * as frontendBaseUrl in invite / password-reset email flows.
- * getBaseUrl() → 'https://host/signoz'
+ * getBaseUrl() → 'https://host/o11y'
  */
 export function getBaseUrl(): string {
-	// oxlint-disable-next-line signoz/no-raw-absolute-path
+	// oxlint-disable-next-line o11y/no-raw-absolute-path
 	const origin = window.location.origin;
 	return origin + (_basePath === '/' ? '' : _basePath.slice(0, -1));
 }

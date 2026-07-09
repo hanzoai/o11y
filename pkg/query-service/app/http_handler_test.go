@@ -64,7 +64,7 @@ func TestPrepareQuery(t *testing.T) {
 		{
 			name: "query contains alter table",
 			postData: &model.DashboardVars{
-				Query: "ALTER TABLE signoz_table DELETE where true",
+				Query: "ALTER TABLE o11y_table DELETE where true",
 			},
 			expectedErr: true,
 			errMsg:      "operation alter table is not allowed",
@@ -72,7 +72,7 @@ func TestPrepareQuery(t *testing.T) {
 		{
 			name: "query text produces template exec error",
 			postData: &model.DashboardVars{
-				Query: "SELECT durationNano from signoz_traces.signoz_index_v2 WHERE id = {{if .X}}1{{else}}2{{else}}3{{end}}",
+				Query: "SELECT durationNano from o11y_traces.o11y_index_v2 WHERE id = {{if .X}}1{{else}}2{{else}}3{{end}}",
 			},
 			expectedErr: true,
 			errMsg:      "expected end; found {{else}}",

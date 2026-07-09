@@ -204,7 +204,7 @@ function KeysTab({
 				<p className="keys-tab__empty-text">
 					No keys. Start by creating one.{' '}
 					<a
-						href="https://signoz.io/docs/manage/administrator-guide/iam/service-accounts/#step-3-generate-an-api-key"
+						href="https://o11y.io/docs/manage/administrator-guide/iam/service-accounts/#step-3-generate-an-api-key"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="keys-tab__learn-more"

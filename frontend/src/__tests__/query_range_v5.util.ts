@@ -206,7 +206,7 @@ const createEventsResponse = ({
 									body: eventBodies[reasonIndex],
 									id,
 									resources_string: {
-										'k8s.cluster.name': 'signoz-test',
+										'k8s.cluster.name': 'o11y-test',
 										'k8s.node.name': '',
 										'k8s.object.api_version': 'batch/v1',
 										'k8s.object.fieldpath': '',
@@ -214,7 +214,7 @@ const createEventsResponse = ({
 										'k8s.object.name': `demo-object-${cumulativeIndex}`,
 										'k8s.object.resource_version': `${462900 + cumulativeIndex}`,
 										'k8s.object.uid': `object-uid-${cumulativeIndex}`,
-										'signoz.component': 'otel-deployment',
+										'o11y.component': 'otel-deployment',
 									},
 									scope_name:
 										'github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8seventsreceiver',

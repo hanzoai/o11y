@@ -1,4 +1,4 @@
-// Copyright (c) 2026 SigNoz, Inc.
+// Copyright (c) 2026 O11y, Inc.
 // Copyright 2019 Prometheus Team
 // SPDX-License-Identifier: Apache-2.0
 
@@ -324,7 +324,7 @@ func TestPrepareContent(t *testing.T) {
 				Title:     `{{ .CommonLabels.alertname }} ({{ .Status | toUpper }})`,
 				Text:      `{{ range .Alerts }}Alert: {{ .Labels.alertname }} - severity {{ .Labels.severity }}{{ end }}`,
 				Color:     `{{ if eq .Status "firing" }}danger{{ else }}good{{ end }}`,
-				TitleLink: "https://alertmanager.signoz.com",
+				TitleLink: "https://alertmanager.o11y.com",
 			},
 			tmpl:      tmpl,
 			logger:    slog.New(slog.DiscardHandler),
@@ -368,7 +368,7 @@ func TestPrepareContent(t *testing.T) {
 			conf: &config.SlackConfig{
 				Title:     "default title fallback",
 				Text:      "default text fallback",
-				TitleLink: "https://alertmanager.signoz.com",
+				TitleLink: "https://alertmanager.o11y.com",
 			},
 			tmpl:      tmpl,
 			logger:    slog.New(slog.DiscardHandler),
@@ -431,7 +431,7 @@ func TestPrepareContent(t *testing.T) {
 		require.Equal(t, "[firing] HighCPU — api-server", atts[0].Title)
 		require.Empty(t, atts[0].Color)
 		require.Nil(t, atts[0].Blocks)
-		require.Equal(t, "https://alertmanager.signoz.com", atts[0].TitleLink)
+		require.Equal(t, "https://alertmanager.o11y.com", atts[0].TitleLink)
 
 		expectedFiringBody := "*HighCPU*\n\n" +
 			"*Service:* _api-server_\n*Instance:* _i-0abc123_\n*Region:* _us-east-1_\n*Method:* _GET_\n\n" +
@@ -474,9 +474,9 @@ func TestPrepareContent(t *testing.T) {
 					{Title: "Service", Value: "api-server", Short: &short},
 				},
 				Actions: []*config.SlackAction{
-					{Type: "button", Text: "View Alert", URL: "https://alertmanager.signoz.com"},
+					{Type: "button", Text: "View Alert", URL: "https://alertmanager.o11y.com"},
 				},
-				TitleLink: "https://alertmanager.signoz.com",
+				TitleLink: "https://alertmanager.o11y.com",
 			},
 			tmpl:      tmpl,
 			logger:    slog.New(slog.DiscardHandler),
@@ -516,7 +516,7 @@ func TestPrepareContent(t *testing.T) {
 		require.Len(t, atts[0].Actions, 1)
 		require.Equal(t, "button", atts[0].Actions[0].Type)
 		require.Equal(t, "View Alert", atts[0].Actions[0].Text)
-		require.Equal(t, "https://alertmanager.signoz.com", atts[0].Actions[0].URL)
+		require.Equal(t, "https://alertmanager.o11y.com", atts[0].Actions[0].URL)
 	})
 }
 

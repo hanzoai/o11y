@@ -87,9 +87,9 @@ func (plugin *reqResLog) OnError(request *http.Request, err error) {
 func redactSensitiveHeaders(headers http.Header) http.Header {
 	// maintained list of headers to redact
 	sensitiveHeaders := map[string]bool{
-		"Authorization":          true,
-		"Cookie":                 true,
-		"X-Signoz-Cloud-Api-Key": true,
+		"Authorization":        true,
+		"Cookie":               true,
+		"X-O11y-Cloud-Api-Key": true,
 	}
 
 	safeHeaders := make(http.Header)

@@ -165,15 +165,15 @@ describe('InviteMembersModal', () => {
 		it('shows BE message on single invite 409', async () => {
 			const user = userEvent.setup({ pointerEventsCheck: 0 });
 			const error = makeApiError(
-				'An invite already exists for this email: single@signoz.io',
+				'An invite already exists for this email: single@o11y.io',
 			);
 			mockSendInvite.mockRejectedValue(error);
 
 			render(<InviteMembersModal {...defaultProps} />);
 
 			await user.type(
-				screen.getAllByPlaceholderText('john@signoz.io')[0],
-				'single@signoz.io',
+				screen.getAllByPlaceholderText('john@o11y.io')[0],
+				'single@o11y.io',
 			);
 			await user.click(screen.getAllByText('Select roles')[0]);
 			await user.click(await screen.findByText('Viewer'));
@@ -189,18 +189,18 @@ describe('InviteMembersModal', () => {
 		it('shows BE message on bulk invite 409', async () => {
 			const user = userEvent.setup({ pointerEventsCheck: 0 });
 			const error = makeApiError(
-				'An invite already exists for this email: alice@signoz.io',
+				'An invite already exists for this email: alice@o11y.io',
 			);
 			mockInviteUsers.mockRejectedValue(error);
 
 			render(<InviteMembersModal {...defaultProps} />);
 
-			const emailInputs = screen.getAllByPlaceholderText('john@signoz.io');
-			await user.type(emailInputs[0], 'alice@signoz.io');
+			const emailInputs = screen.getAllByPlaceholderText('john@o11y.io');
+			await user.type(emailInputs[0], 'alice@o11y.io');
 			await user.click(screen.getAllByText('Select roles')[0]);
 			await user.click(await screen.findByText('Viewer'));
 
-			await user.type(emailInputs[1], 'bob@signoz.io');
+			await user.type(emailInputs[1], 'bob@o11y.io');
 			await user.click(screen.getAllByText('Select roles')[0]);
 			const editorOptions = await screen.findAllByText('Editor');
 			await user.click(editorOptions[editorOptions.length - 1]);
@@ -225,8 +225,8 @@ describe('InviteMembersModal', () => {
 			render(<InviteMembersModal {...defaultProps} />);
 
 			await user.type(
-				screen.getAllByPlaceholderText('john@signoz.io')[0],
-				'single@signoz.io',
+				screen.getAllByPlaceholderText('john@o11y.io')[0],
+				'single@o11y.io',
 			);
 			await user.click(screen.getAllByText('Select roles')[0]);
 			await user.click(await screen.findByText('Viewer'));

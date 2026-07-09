@@ -411,7 +411,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
 
 		const textToCopy = selectedTexts.join(', ');
 
-		// oxlint-disable-next-line signoz/no-navigator-clipboard
+		// oxlint-disable-next-line o11y/no-navigator-clipboard
 		navigator.clipboard.writeText(textToCopy).catch(console.error);
 	}, [selectedChips, selectedValues]);
 

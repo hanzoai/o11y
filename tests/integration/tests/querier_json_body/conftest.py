@@ -3,7 +3,7 @@ from testcontainers.core.container import Network
 
 from fixtures import types
 from fixtures.migrator import create_migrator
-from fixtures.signoz import create_signoz
+from fixtures.o11y import create_o11y
 
 UNSUPPORTED_CLICKHOUSE_VERSIONS = {"25.5.6"}
 
@@ -38,8 +38,8 @@ def migrator_json(
     )
 
 
-@pytest.fixture(name="signoz", scope="package")
-def signoz_json_body(
+@pytest.fixture(name="o11y", scope="package")
+def o11y_json_body(
     network: Network,
     migrator: types.Operation,  # pylint: disable=unused-argument
     zeus: types.TestContainerDocker,
@@ -48,11 +48,11 @@ def signoz_json_body(
     clickhouse: types.TestContainerClickhouse,
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
-) -> types.SigNoz:
+) -> types.O11y:
     """
-    Package-scoped fixture for SigNoz with BODY_JSON_QUERY_ENABLED=true.
+    Package-scoped fixture for O11y with BODY_JSON_QUERY_ENABLED=true.
     """
-    return create_signoz(
+    return create_o11y(
         network=network,
         zeus=zeus,
         gateway=gateway,
@@ -60,8 +60,8 @@ def signoz_json_body(
         clickhouse=clickhouse,
         request=request,
         pytestconfig=pytestconfig,
-        cache_key="signoz-json-body",
+        cache_key="o11y-json-body",
         env_overrides={
-            "SIGNOZ_FLAGGER_CONFIG_BOOLEAN_USE__JSON__BODY": True,
+            "O11Y_FLAGGER_CONFIG_BOOLEAN_USE__JSON__BODY": True,
         },
     )

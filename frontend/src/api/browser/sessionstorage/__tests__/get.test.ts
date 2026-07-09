@@ -45,33 +45,33 @@ describe('get — root path "/"', () => {
 	});
 });
 
-describe('get — prefixed path "/signoz/"', () => {
+describe('get — prefixed path "/o11y/"', () => {
 	it('reads an already-scoped key directly', () => {
-		const { default: get } = loadGetModule('/signoz/');
-		sessionStorage.setItem('/signoz/retry-lazy-refreshed', 'true');
+		const { default: get } = loadGetModule('/o11y/');
+		sessionStorage.setItem('/o11y/retry-lazy-refreshed', 'true');
 		expect(get('retry-lazy-refreshed')).toBe('true');
 	});
 
 	it('returns null when neither scoped nor bare key exists', () => {
-		const { default: get } = loadGetModule('/signoz/');
+		const { default: get } = loadGetModule('/o11y/');
 		expect(get('MISSING')).toBeNull();
 	});
 
 	it('lazy-migrates bare key to scoped key on first read', () => {
-		const { default: get } = loadGetModule('/signoz/');
+		const { default: get } = loadGetModule('/o11y/');
 		sessionStorage.setItem('retry-lazy-refreshed', 'true');
 
 		const result = get('retry-lazy-refreshed');
 
 		expect(result).toBe('true');
-		expect(sessionStorage.getItem('/signoz/retry-lazy-refreshed')).toBe('true');
+		expect(sessionStorage.getItem('/o11y/retry-lazy-refreshed')).toBe('true');
 		expect(sessionStorage.getItem('retry-lazy-refreshed')).toBeNull();
 	});
 
 	it('scoped key takes precedence over bare key', () => {
-		const { default: get } = loadGetModule('/signoz/');
+		const { default: get } = loadGetModule('/o11y/');
 		sessionStorage.setItem('retry-lazy-refreshed', 'bare');
-		sessionStorage.setItem('/signoz/retry-lazy-refreshed', 'scoped');
+		sessionStorage.setItem('/o11y/retry-lazy-refreshed', 'scoped');
 
 		expect(get('retry-lazy-refreshed')).toBe('scoped');
 		expect(sessionStorage.getItem('retry-lazy-refreshed')).toBe('bare');

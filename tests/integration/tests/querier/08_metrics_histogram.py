@@ -48,7 +48,7 @@ FILE = get_testdata_file_path("histogram_data_1h.jsonl")
     ],
 )
 def test_histogram_count_for_one_endpoint(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -79,7 +79,7 @@ def test_histogram_count_for_one_endpoint(
         filter_expression='endpoint = "/health"',
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -115,7 +115,7 @@ def test_histogram_count_for_one_endpoint(
     ],
 )
 def test_histogram_count_for_one_service(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -146,7 +146,7 @@ def test_histogram_count_for_one_service(
         filter_expression='service = "api"',
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -184,7 +184,7 @@ def test_histogram_count_for_one_service(
     ],
 )
 def test_histogram_count_for_delta_service(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -216,7 +216,7 @@ def test_histogram_count_for_delta_service(
         filter_expression='service = "web"',
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -243,7 +243,7 @@ def test_histogram_count_for_delta_service(
     ],
 )
 def test_histogram_count_for_all_services(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -275,7 +275,7 @@ def test_histogram_count_for_all_services(
         ## no services filter, this tests for multitemporality handling as well
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -287,7 +287,7 @@ def test_histogram_count_for_all_services(
 
 
 def test_histogram_count_no_param(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -312,7 +312,7 @@ def test_histogram_count_no_param(
         "count",
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -369,7 +369,7 @@ def test_histogram_count_no_param(
     ],
 )
 def test_histogram_percentile_for_all_services(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -398,7 +398,7 @@ def test_histogram_percentile_for_all_services(
         space_agg,
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -420,7 +420,7 @@ def test_histogram_percentile_for_all_services(
     ],
 )
 def test_histogram_percentile_for_cumulative_service(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -449,7 +449,7 @@ def test_histogram_percentile_for_cumulative_service(
         filter_expression='service = "api"',
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()
@@ -470,7 +470,7 @@ def test_histogram_percentile_for_cumulative_service(
     ],
 )
 def test_histogram_percentile_for_delta_service(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     create_user_admin: None,  # pylint: disable=unused-argument
     get_token: Callable[[str, str], str],
     insert_metrics: Callable[[list[Metrics]], None],
@@ -500,7 +500,7 @@ def test_histogram_percentile_for_delta_service(
         filter_expression='service = "web"',
     )
 
-    response = make_query_request(signoz, token, start_ms, end_ms, [query])
+    response = make_query_request(o11y, token, start_ms, end_ms, [query])
     assert response.status_code == HTTPStatus.OK
 
     data = response.json()

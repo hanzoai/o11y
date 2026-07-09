@@ -26,9 +26,9 @@ type authDomainRow struct {
 }
 
 var legacyRoleToManagedRoleName = map[string]string{
-	"ADMIN":  "signoz-admin",
-	"EDITOR": "signoz-editor",
-	"VIEWER": "signoz-viewer",
+	"ADMIN":  "o11y-admin",
+	"EDITOR": "o11y-editor",
+	"VIEWER": "o11y-viewer",
 }
 
 type ssoRoleMapping struct {

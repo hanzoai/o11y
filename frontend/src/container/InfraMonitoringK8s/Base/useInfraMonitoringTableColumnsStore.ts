@@ -97,7 +97,7 @@ export const useInfraMonitoringTableColumnsStore =
 				},
 			}),
 			{
-				name: '@signoz/infra-monitoring-columns',
+				name: '@o11y/infra-monitoring-columns',
 			},
 		),
 	);

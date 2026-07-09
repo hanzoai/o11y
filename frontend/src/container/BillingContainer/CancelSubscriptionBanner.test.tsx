@@ -5,8 +5,8 @@ import CancelSubscriptionBanner from './CancelSubscriptionBanner';
 jest.mock('utils/basePath', () => ({
 	getBasePath: (): string => '/',
 	withBasePath: (path: string): string => path,
-	getAbsoluteUrl: (path: string): string => `https://test.signoz.io${path}`,
-	getBaseUrl: (): string => 'https://test.signoz.io',
+	getAbsoluteUrl: (path: string): string => `https://test.o11y.io${path}`,
+	getBaseUrl: (): string => 'https://test.o11y.io',
 }));
 
 describe('CancelSubscriptionBanner', () => {
@@ -17,7 +17,7 @@ describe('CancelSubscriptionBanner', () => {
 		).toBeInTheDocument();
 		expect(
 			screen.getByText(
-				/When you cancel your SigNoz subscription, all your data will be deleted/i,
+				/When you cancel your O11y subscription, all your data will be deleted/i,
 			),
 		).toBeInTheDocument();
 	});
@@ -112,8 +112,8 @@ describe('CancelSubscriptionBanner', () => {
 			screen.getByRole('button', { name: /cancel subscription/i }),
 		);
 
-		expect(mockAnchor.href).toContain('mailto:cloud-support@signoz.io');
-		expect(mockAnchor.href).toContain('Cancel%20My%20SigNoz%20Subscription');
+		expect(mockAnchor.href).toContain('mailto:cloud-support@o11y.io');
+		expect(mockAnchor.href).toContain('Cancel%20My%20O11y%20Subscription');
 		expect(mockClick).toHaveBeenCalledTimes(1);
 
 		jest.restoreAllMocks();

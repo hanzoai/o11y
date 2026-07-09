@@ -1,7 +1,7 @@
 """
 Summary:
 This test file contains integration tests for Time-To-Live (TTL) and custom retention policies
-in SigNoz's query service. It verifies the correct behavior of TTL settings for traces, metrics,
+in O11y's query service. It verifies the correct behavior of TTL settings for traces, metrics,
 and logs, including support for cold storage, custom retention conditions, error handling for
 invalid configurations, and retrieval of TTL settings.
 """
@@ -27,14 +27,14 @@ NOTE: These functions only works when last inserted data is in the latest partit
 
 
 def verify_table_partition_expressions(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     expected_partition_expressions_map: dict[str, tuple[int, int, int]],
 ):
     """
     Verify table partitions exist with data and have correct retention values.
 
     Args:
-        signoz: SigNoz fixture providing access to telemetry store
+        o11y: O11y fixture providing access to telemetry store
         expected_partition_expressions_map: Dictionary mapping table names to expected count of partitions
                             Example: {"logs_v2": (10, 15, 1), "logs_v2_resource": (10, 15, 1)}
     """
@@ -46,31 +46,31 @@ def verify_table_partition_expressions(
         retention, retention_cold, count = expected_partition_expressions_map[table]
 
         retention_query = f"SELECT COUNT(*) FROM {table} WHERE _retention_days = {retention} AND _retention_days_cold = {retention_cold}"
-        retention_result = signoz.telemetrystore.conn.query(retention_query).result_rows
+        retention_result = o11y.telemetrystore.conn.query(retention_query).result_rows
 
         assert retention_result[0][0] == count, f"No data found with retention values '{retention}, {retention_cold}' in table {table}. Expected at least one row with these retention settings."
 
         partition_query = f"SELECT rows FROM system.parts WHERE `table` = '{table.split('.')[-1]}' AND active = 1 AND partition LIKE '%{retention},{retention_cold}%' ORDER BY partition ASC"
 
-        partition_result = signoz.telemetrystore.conn.query(partition_query).result_rows
+        partition_result = o11y.telemetrystore.conn.query(partition_query).result_rows
         assert len(partition_result) >= 1, f"No active partitions found for table {table}"
 
         assert partition_result[0][0] >= count
 
 
-def verify_table_retention_expression(signoz: types.SigNoz, table_expected_retention_expression_map: dict[str, str]):
+def verify_table_retention_expression(o11y: types.O11y, table_expected_retention_expression_map: dict[str, str]):
     """
     Verify table partitions exist with data and have correct retention values.
 
     Args:
-        signoz: SigNoz fixture providing access to telemetry store
+        o11y: O11y fixture providing access to telemetry store
         table_expected_retention_expression_map: Dictionary mapping table names to expected retention expressions
             Example: {"logs_v2": "created_at + INTERVAL 100 DAY", "logs_v2_resource": "created_at + INTERVAL 100 DAY"}
     """
 
     for table in table_expected_retention_expression_map:
         query = f"SELECT engine_full FROM system.tables WHERE table = '{table}'"
-        result = signoz.telemetrystore.conn.query(query).result_rows
+        result = o11y.telemetrystore.conn.query(query).result_rows
         assert len(result) == 1, f"Table {table} not found in system.tables"
 
         assert all("TTL" in r[0] for r in result)
@@ -90,7 +90,7 @@ def ttl_test_suite_setup(create_user_admin):  # pylint: disable=unused-argument
 
 
 def test_set_ttl_traces_success(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token: Callable[[str, str], str],
     remove_traces_ttl_and_storage_settings,  # pylint: disable=unused-argument
 ):
@@ -106,7 +106,7 @@ def test_set_ttl_traces_success(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -121,11 +121,11 @@ def test_set_ttl_traces_success(
     time.sleep(2)
 
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
-            "signoz_index_v3": f"toIntervalSecond({test_duration_hours * 3600})",  # 3601 hours in seconds
+            "o11y_index_v3": f"toIntervalSecond({test_duration_hours * 3600})",  # 3601 hours in seconds
             "traces_v3_resource": f"toIntervalSecond({test_duration_hours * 3600})",  # 3601 hours in seconds
-            "signoz_error_index_v2": f"toIntervalSecond({test_duration_hours * 3600})",  # 3601 hours in seconds
+            "o11y_error_index_v2": f"toIntervalSecond({test_duration_hours * 3600})",  # 3601 hours in seconds
             "usage_explorer": f"toIntervalSecond({test_duration_hours * 3600})",  # 3601 hours in seconds
             "dependency_graph_minutes_v2": f"toIntervalSecond({test_duration_hours * 3600})",  # 3601 hours in seconds
             "trace_summary": f"toIntervalSecond({test_duration_hours * 3600})",  # 3601 hours in seconds
@@ -135,7 +135,7 @@ def test_set_ttl_traces_success(
 
 
 def test_set_ttl_traces_with_cold_storage(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token: Callable[[str, str], str],
     remove_traces_ttl_and_storage_settings,  # pylint: disable=unused-argument
 ):
@@ -154,7 +154,7 @@ def test_set_ttl_traces_with_cold_storage(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -168,11 +168,11 @@ def test_set_ttl_traces_with_cold_storage(
     time.sleep(2)
 
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
-            "signoz_index_v3": f"toIntervalSecond({test_duration_hours * 3600})",  # 91 days in seconds
+            "o11y_index_v3": f"toIntervalSecond({test_duration_hours * 3600})",  # 91 days in seconds
             "traces_v3_resource": f"toIntervalSecond({test_duration_hours * 3600})",  # 91 days in seconds
-            "signoz_error_index_v2": f"toIntervalSecond({test_duration_hours * 3600})",  # 91 days in seconds
+            "o11y_error_index_v2": f"toIntervalSecond({test_duration_hours * 3600})",  # 91 days in seconds
             "usage_explorer": f"toIntervalSecond({test_duration_hours * 3600})",  # 91 days in seconds
             "dependency_graph_minutes_v2": f"toIntervalSecond({test_duration_hours * 3600})",  # 91 days in seconds
             "trace_summary": f"toIntervalSecond({test_duration_hours * 3600})",  # 91 days in seconds
@@ -181,11 +181,11 @@ def test_set_ttl_traces_with_cold_storage(
     )
 
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
-            "signoz_index_v3": f"toIntervalSecond({test_cold_duration_hours * 3600}) TO VOLUME 'cold'",
+            "o11y_index_v3": f"toIntervalSecond({test_cold_duration_hours * 3600}) TO VOLUME 'cold'",
             "traces_v3_resource": f"toIntervalSecond({test_cold_duration_hours * 3600}) TO VOLUME 'cold'",
-            "signoz_error_index_v2": f"toIntervalSecond({test_cold_duration_hours * 3600}) TO VOLUME 'cold'",
+            "o11y_error_index_v2": f"toIntervalSecond({test_cold_duration_hours * 3600}) TO VOLUME 'cold'",
             "usage_explorer": f"toIntervalSecond({test_cold_duration_hours * 3600}) TO VOLUME 'cold'",
             "dependency_graph_minutes_v2": f"toIntervalSecond({test_cold_duration_hours * 3600}) TO VOLUME 'cold'",
             "trace_summary": f"toIntervalSecond({test_cold_duration_hours * 3600}) TO VOLUME 'cold'",
@@ -196,7 +196,7 @@ def test_set_ttl_traces_with_cold_storage(
 
 
 def test_set_ttl_metrics_success(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token: Callable[[str, str], str],
     remove_metrics_ttl_and_storage_settings,  # pylint: disable=unused-argument
 ):
@@ -214,7 +214,7 @@ def test_set_ttl_metrics_success(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -231,7 +231,7 @@ def test_set_ttl_metrics_success(
 
     # Check TTL settings on relevant metrics tables
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
             "samples_v4": f"toIntervalSecond({test_duration_hours * 3600})",  # 92 days in seconds
             "samples_v4_agg_5m": f"toIntervalSecond({test_duration_hours * 3600})",  # 92 days in seconds
@@ -245,7 +245,7 @@ def test_set_ttl_metrics_success(
 
 
 def test_set_ttl_metrics_with_cold_storage(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token: Callable[[str, str], str],
     remove_metrics_ttl_and_storage_settings,  # pylint: disable=unused-argument
 ):
@@ -264,7 +264,7 @@ def test_set_ttl_metrics_with_cold_storage(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -279,7 +279,7 @@ def test_set_ttl_metrics_with_cold_storage(
 
     # Check TTL settings on relevant metrics tables
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
             "samples_v4": f"toIntervalSecond({test_duration_hours * 3600})",  # 92 days in seconds
             "samples_v4_agg_5m": f"toIntervalSecond({test_duration_hours * 3600})",  # 92 days in seconds
@@ -293,7 +293,7 @@ def test_set_ttl_metrics_with_cold_storage(
 
     # Check cold storage settings on relevant metrics tables
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
             # 21 days in seconds
             "samples_v4": f"toIntervalSecond({test_cold_duration_hours * 3600}) TO VOLUME 'cold'",
@@ -313,7 +313,7 @@ def test_set_ttl_metrics_with_cold_storage(
     )
 
 
-def test_set_ttl_invalid_type(signoz: types.SigNoz, get_token: Callable[[str, str], str]):
+def test_set_ttl_invalid_type(o11y: types.O11y, get_token: Callable[[str, str], str]):
     """Test setting TTL with invalid type returns error."""
     payload = {
         "type": "invalid_type",
@@ -325,7 +325,7 @@ def test_set_ttl_invalid_type(signoz: types.SigNoz, get_token: Callable[[str, st
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -335,7 +335,7 @@ def test_set_ttl_invalid_type(signoz: types.SigNoz, get_token: Callable[[str, st
 
 
 def test_set_custom_retention_ttl_basic(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token: Callable[[str, str], str],
     insert_logs,
     remove_logs_ttl_settings,  # pylint: disable=unused-argument
@@ -355,7 +355,7 @@ def test_set_custom_retention_ttl_basic(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -376,16 +376,16 @@ def test_set_custom_retention_ttl_basic(
 
     # Verify partitions for logs tables
     verify_table_partition_expressions(
-        signoz,
+        o11y,
         {
-            "signoz_logs.logs_v2": (test_retention_days, 0, 1),
-            "signoz_logs.logs_v2_resource": (test_retention_days, 0, 1),
+            "o11y_logs.logs_v2": (test_retention_days, 0, 1),
+            "o11y_logs.logs_v2_resource": (test_retention_days, 0, 1),
         },
     )
 
     # Verify retention settings for logs tables
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
             "logs_attribute_keys": f"toIntervalDay({test_retention_days})",
             "logs_resource_keys": f"toIntervalDay({test_retention_days})",
@@ -394,7 +394,7 @@ def test_set_custom_retention_ttl_basic(
 
 
 def test_set_custom_retention_ttl_basic_with_cold_storage(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token: Callable[[str, str], str],
     insert_logs,
     remove_logs_ttl_settings,  # pylint: disable=unused-argument
@@ -415,7 +415,7 @@ def test_set_custom_retention_ttl_basic_with_cold_storage(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -436,10 +436,10 @@ def test_set_custom_retention_ttl_basic_with_cold_storage(
 
     # Verify partitions and retention for logs tables
     verify_table_partition_expressions(
-        signoz,
+        o11y,
         {
-            "signoz_logs.logs_v2": (test_retention_days, test_retention_days_cold, 1),
-            "signoz_logs.logs_v2_resource": (
+            "o11y_logs.logs_v2": (test_retention_days, test_retention_days_cold, 1),
+            "o11y_logs.logs_v2_resource": (
                 test_retention_days,
                 test_retention_days_cold,
                 1,
@@ -448,7 +448,7 @@ def test_set_custom_retention_ttl_basic_with_cold_storage(
     )
 
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
             "logs_v2": "toIntervalDay(_retention_days_cold) TO VOLUME 'cold'",
             "logs_v2_resource": "toIntervalDay(_retention_days_cold) TO VOLUME 'cold'",
@@ -461,7 +461,7 @@ def test_set_custom_retention_ttl_basic_with_cold_storage(
 
 
 def test_set_custom_retention_ttl_basic_fallback(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token,
     ttl_legacy_logs_v2_table_setup,  # pylint: disable=unused-argument
     ttl_legacy_logs_v2_resource_table_setup,  # pylint: disable=unused-argument,
@@ -481,7 +481,7 @@ def test_set_custom_retention_ttl_basic_fallback(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -498,7 +498,7 @@ def test_set_custom_retention_ttl_basic_fallback(
 
     # Check TTL settings on relevant logs tables
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
             # 101 days in seconds
             "logs_v2": f"toIntervalSecond({test_retention_days * 24 * 3600})",
@@ -512,7 +512,7 @@ def test_set_custom_retention_ttl_basic_fallback(
     )
 
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
             # 17 days in seconds
             "logs_v2": f"toIntervalSecond({test_retention_days_cold * 24 * 3600}) TO VOLUME 'cold'",
@@ -523,7 +523,7 @@ def test_set_custom_retention_ttl_basic_fallback(
 
 
 def test_set_custom_retention_ttl_basic_101_times(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token,
     remove_logs_ttl_settings,  # pylint: disable=unused-argument
 ):
@@ -543,7 +543,7 @@ def test_set_custom_retention_ttl_basic_101_times(
         headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
         response = requests.post(
-            signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+            o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
             json=payload,
             headers=headers,
             timeout=30,
@@ -555,7 +555,7 @@ def test_set_custom_retention_ttl_basic_101_times(
 
     # Verify retention settings for logs tables
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
             "logs_attribute_keys": f"toIntervalDay({test_retention_days})",
             "logs_resource_keys": f"toIntervalDay({test_retention_days})",
@@ -564,7 +564,7 @@ def test_set_custom_retention_ttl_basic_101_times(
 
 
 def test_set_custom_retention_ttl_with_conditions(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token: Callable[[str, str], str],
     insert_logs,
     remove_logs_ttl_settings,  # pylint: disable=unused-argument
@@ -591,7 +591,7 @@ def test_set_custom_retention_ttl_with_conditions(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -607,7 +607,7 @@ def test_set_custom_retention_ttl_with_conditions(
     ]
     insert_logs(logs)
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -624,14 +624,14 @@ def test_set_custom_retention_ttl_with_conditions(
 
     # Verify partitions and retention for logs tables
     verify_table_partition_expressions(
-        signoz,
+        o11y,
         {
-            "signoz_logs.logs_v2": (
+            "o11y_logs.logs_v2": (
                 test_retention_days_condition,
                 test_retention_days_cold,
                 1,
             ),
-            "signoz_logs.logs_v2_resource": (
+            "o11y_logs.logs_v2_resource": (
                 test_retention_days_condition,
                 test_retention_days_cold,
                 1,
@@ -647,10 +647,10 @@ def test_set_custom_retention_ttl_with_conditions(
 
     # Verify partitions and retention for logs tables
     verify_table_partition_expressions(
-        signoz,
+        o11y,
         {
-            "signoz_logs.logs_v2": (test_retention_days, test_retention_days_cold, 1),
-            "signoz_logs.logs_v2_resource": (
+            "o11y_logs.logs_v2": (test_retention_days, test_retention_days_cold, 1),
+            "o11y_logs.logs_v2_resource": (
                 test_retention_days,
                 test_retention_days_cold,
                 1,
@@ -659,7 +659,7 @@ def test_set_custom_retention_ttl_with_conditions(
     )
 
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
             "logs_v2": "toIntervalDay(_retention_days_cold) TO VOLUME 'cold'",
             "logs_v2_resource": "toIntervalDay(_retention_days_cold) TO VOLUME 'cold'",
@@ -672,7 +672,7 @@ def test_set_custom_retention_ttl_with_conditions(
 
 
 def test_set_custom_retention_ttl_with_invalid_cold_storage(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token: Callable[[str, str], str],
     insert_logs,
     remove_logs_ttl_settings,  # pylint: disable=unused-argument
@@ -700,7 +700,7 @@ def test_set_custom_retention_ttl_with_invalid_cold_storage(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -713,7 +713,7 @@ def test_set_custom_retention_ttl_with_invalid_cold_storage(
     assert "No such volume `logs_cold_storage`" in response_data["error"]["message"]
 
 
-def test_set_custom_retention_ttl_duplicate_conditions(signoz: types.SigNoz, get_token: Callable[[str, str], str]):
+def test_set_custom_retention_ttl_duplicate_conditions(o11y: types.O11y, get_token: Callable[[str, str], str]):
     """Test that duplicate TTL conditions are rejected."""
     payload = {
         "type": "logs",
@@ -740,7 +740,7 @@ def test_set_custom_retention_ttl_duplicate_conditions(signoz: types.SigNoz, get
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -750,7 +750,7 @@ def test_set_custom_retention_ttl_duplicate_conditions(signoz: types.SigNoz, get
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_set_custom_retention_ttl_invalid_condition(signoz: types.SigNoz, get_token: Callable[[str, str], str]):
+def test_set_custom_retention_ttl_invalid_condition(o11y: types.O11y, get_token: Callable[[str, str], str]):
     """Test that conditions with empty values are rejected."""
     payload = {
         "type": "logs",
@@ -773,7 +773,7 @@ def test_set_custom_retention_ttl_invalid_condition(signoz: types.SigNoz, get_to
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -783,7 +783,7 @@ def test_set_custom_retention_ttl_invalid_condition(signoz: types.SigNoz, get_to
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
-def test_get_custom_retention_ttl(signoz: types.SigNoz, get_token: Callable[[str, str], str], insert_logs):
+def test_get_custom_retention_ttl(o11y: types.O11y, get_token: Callable[[str, str], str], insert_logs):
     """Test getting custom retention TTL configuration."""
     # First set a custom retention TTL
     set_payload = {
@@ -807,7 +807,7 @@ def test_get_custom_retention_ttl(signoz: types.SigNoz, get_token: Callable[[str
 
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
     set_response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         json=set_payload,
         headers=headers,
         timeout=30,
@@ -821,7 +821,7 @@ def test_get_custom_retention_ttl(signoz: types.SigNoz, get_token: Callable[[str
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     get_response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         params={"type": "logs"},
         headers=headers,
         timeout=30,
@@ -839,7 +839,7 @@ def test_get_custom_retention_ttl(signoz: types.SigNoz, get_token: Callable[[str
 
 
 def test_set_ttl_logs_success(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token,
     ttl_legacy_logs_v2_table_setup,  # pylint: disable=unused-argument
     ttl_legacy_logs_v2_resource_table_setup,  # pylint: disable=unused-argument
@@ -855,7 +855,7 @@ def test_set_ttl_logs_success(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -870,7 +870,7 @@ def test_set_ttl_logs_success(
 
     # Verify TTL settings in Clickhouse
     verify_table_retention_expression(
-        signoz,
+        o11y,
         {
             "logs_v2": f"toIntervalSecond({test_retention_days * 24 * 3600})",  # 150 days in seconds
             "logs_v2_resource": f"toIntervalSecond({test_retention_days * 24 * 3600})",  # 150 days in seconds
@@ -880,7 +880,7 @@ def test_set_ttl_logs_success(
     )
 
 
-def test_get_ttl_traces_success(signoz: types.SigNoz, get_token: Callable[[str, str], str]):
+def test_get_ttl_traces_success(o11y: types.O11y, get_token: Callable[[str, str], str]):
     """Test getting TTL for traces."""
     # First set a TTL configuration for traces
 
@@ -893,7 +893,7 @@ def test_get_ttl_traces_success(signoz: types.SigNoz, get_token: Callable[[str, 
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     set_response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
         params=set_payload,
         headers=headers,
         timeout=30,
@@ -906,7 +906,7 @@ def test_get_ttl_traces_success(signoz: types.SigNoz, get_token: Callable[[str, 
 
     # Now get the TTL configuration for traces
     get_response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
         params={"type": "traces"},
         headers=headers,
         timeout=30,
@@ -924,7 +924,7 @@ def test_get_ttl_traces_success(signoz: types.SigNoz, get_token: Callable[[str, 
 
 
 def test_large_ttl_conditions_list(
-    signoz: types.SigNoz,
+    o11y: types.O11y,
     get_token: Callable[[str, str], str],
     insert_logs,
     remove_logs_ttl_settings,  # pylint: disable=unused-argument
@@ -954,7 +954,7 @@ def test_large_ttl_conditions_list(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,

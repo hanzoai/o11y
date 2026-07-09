@@ -15,7 +15,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 // served by hanzoai/static (which does no templating), so we resolve them at build
 // time — and in the dev server, where the backend is likewise not involved. Both
 // paths produce identical placeholder-free HTML. Set VITE_BASE_PATH to serve under a
-// URL prefix (e.g. /signoz/); defaults to '/'.
+// URL prefix (e.g. /o11y/); defaults to '/'.
 function baseHrefPlugin(basePath: string): Plugin {
 	return {
 		name: 'base-href',
@@ -57,7 +57,7 @@ function rawMarkdownPlugin(): Plugin {
 
 export default defineConfig(({ mode }): UserConfig => {
 	const env = loadEnv(mode, process.cwd(), '');
-	// Base path for serving the app (e.g., '/signoz/'). Defaults to '/'.
+	// Base path for serving the app (e.g., '/o11y/'). Defaults to '/'.
 	const basePath = env.VITE_BASE_PATH || '/';
 
 	const plugins = [

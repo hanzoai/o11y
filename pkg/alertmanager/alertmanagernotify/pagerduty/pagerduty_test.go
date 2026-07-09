@@ -1,4 +1,4 @@
-// Copyright (c) 2026 SigNoz, Inc.
+// Copyright (c) 2026 O11y, Inc.
 // Copyright 2019 Prometheus Team
 // SPDX-License-Identifier: Apache-2.0
 

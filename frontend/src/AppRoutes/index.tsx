@@ -292,7 +292,7 @@ function App(): JSX.Element {
 				isChatSupportEnabled &&
 				!showAddCreditCardModal &&
 				(isCloudUser || isEnterpriseSelfHostedUser) &&
-				(window.signozBootData?.settings?.pylon.enabled ?? true)
+				(window.o11yBootData?.settings?.pylon.enabled ?? true)
 			) {
 				const email = user.email || '';
 				const secret = process.env.PYLON_IDENTITY_SECRET || '';
@@ -343,7 +343,7 @@ function App(): JSX.Element {
 
 			if (
 				!isSentryInitialized &&
-				(window.signozBootData?.settings?.sentry.enabled ?? true)
+				(window.o11yBootData?.settings?.sentry.enabled ?? true)
 			) {
 				Sentry.init({
 					dsn: process.env.SENTRY_DSN,

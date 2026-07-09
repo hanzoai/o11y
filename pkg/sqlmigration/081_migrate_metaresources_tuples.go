@@ -29,7 +29,7 @@ func (migration *migrateMetaresourcesTuples) Register(migrations *migrate.Migrat
 
 // migrationTuple describes a single FGA tuple to insert.
 type migrationTuple struct {
-	roleName   string // "signoz-admin", "signoz-editor", "signoz-viewer"
+	roleName   string // "o11y-admin", "o11y-editor", "o11y-viewer"
 	objectType string // "serviceaccount", "user", "role", "metaresource"
 	objectName string // "serviceaccount", "user", "role", etc.
 	relation   string // "create", "list", "detach", etc.
@@ -43,7 +43,7 @@ func (migration *migrateMetaresourcesTuples) Up(ctx context.Context, db *bun.DB)
 	defer func() { _ = tx.Rollback() }()
 
 	var storeID string
-	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "signoz").Scan(&storeID)
+	err = tx.QueryRowContext(ctx, `SELECT id FROM store WHERE name = ? LIMIT 1`, "o11y").Scan(&storeID)
 	if err != nil {
 		return err
 	}
@@ -86,19 +86,19 @@ func (migration *migrateMetaresourcesTuples) Up(ctx context.Context, db *bun.DB)
 	// Also add new detach tuples for role/user/serviceaccount.
 	tuples := []migrationTuple{
 		// New detach tuples for admin
-		{authtypes.SigNozAdminRoleName, "role", "role", "detach"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "detach"},
+		{authtypes.O11yAdminRoleName, "role", "role", "detach"},
+		{authtypes.O11yAdminRoleName, "serviceaccount", "serviceaccount", "detach"},
 		// Replacement create/list for user/serviceaccount/role (moved from metaresources to own types)
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "create"},
-		{authtypes.SigNozAdminRoleName, "serviceaccount", "serviceaccount", "list"},
-		{authtypes.SigNozAdminRoleName, "role", "role", "create"},
-		{authtypes.SigNozAdminRoleName, "role", "role", "list"},
+		{authtypes.O11yAdminRoleName, "serviceaccount", "serviceaccount", "create"},
+		{authtypes.O11yAdminRoleName, "serviceaccount", "serviceaccount", "list"},
+		{authtypes.O11yAdminRoleName, "role", "role", "create"},
+		{authtypes.O11yAdminRoleName, "role", "role", "list"},
 		// Replacement create/list for resources that move from "metaresources" to "metaresource"
-		{authtypes.SigNozAdminRoleName, "metaresource", "factor-api-key", "create"},
-		{authtypes.SigNozAdminRoleName, "metaresource", "factor-api-key", "list"},
-		{authtypes.SigNozAdminRoleName, "metaresource", "factor-api-key", "read"},
-		{authtypes.SigNozAdminRoleName, "metaresource", "factor-api-key", "update"},
-		{authtypes.SigNozAdminRoleName, "metaresource", "factor-api-key", "delete"},
+		{authtypes.O11yAdminRoleName, "metaresource", "factor-api-key", "create"},
+		{authtypes.O11yAdminRoleName, "metaresource", "factor-api-key", "list"},
+		{authtypes.O11yAdminRoleName, "metaresource", "factor-api-key", "read"},
+		{authtypes.O11yAdminRoleName, "metaresource", "factor-api-key", "update"},
+		{authtypes.O11yAdminRoleName, "metaresource", "factor-api-key", "delete"},
 	}
 
 	for _, orgID := range orgIDs {

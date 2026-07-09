@@ -31,13 +31,13 @@ processors:
     timeout: 10s
 
 exporters:
-  # export to SigNoz cloud
+  # export to O11y cloud
   otlp/mysql_logs:
     endpoint: "${env:OTLP_DESTINATION_ENDPOINT}"
     tls:
       insecure: false
     headers:
-      "signoz-access-token": "${env:SIGNOZ_INGESTION_KEY}"
+      "o11y-access-token": "${env:O11Y_INGESTION_KEY}"
 
   # export to local collector
   otlp/local:
@@ -63,11 +63,11 @@ Set the following environment variables in your otel-collector environment:
 
 ```bash
 
-# region specific SigNoz cloud ingestion endpoint
-export OTLP_DESTINATION_ENDPOINT="ingest.us.signoz.cloud:443"
+# region specific O11y cloud ingestion endpoint
+export OTLP_DESTINATION_ENDPOINT="ingest.us.o11y.cloud:443"
 
-# your SigNoz ingestion key
-export SIGNOZ_INGESTION_KEY="signoz-ingestion-key"
+# your O11y ingestion key
+export O11Y_INGESTION_KEY="o11y-ingestion-key"
 
 ```
 
@@ -81,4 +81,4 @@ Note: the collector can use multiple config files, specified by multiple occurre
 
 #### Parse the logs
 
-Use the log pipelines feature to parse and structure the logs https://signoz.io/docs/logs-pipelines/introduction/
+Use the log pipelines feature to parse and structure the logs https://o11y.io/docs/logs-pipelines/introduction/

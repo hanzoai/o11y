@@ -63,7 +63,7 @@
 			// Mirrors the logic in ThemeProvider (hooks/useDarkMode/index.tsx).
 			(function () {
 				try {
-					// When served under a URL prefix (e.g. /signoz/), storage keys are scoped
+					// When served under a URL prefix (e.g. /o11y/), storage keys are scoped
 					// to that prefix by the React app (see utils/storage.ts getScopedKey).
 					// Read the <base> tag — already populated by the Go template — to derive
 					// the same prefix here, before any JS module has loaded.
@@ -89,17 +89,17 @@
 				}
 			})();
 		</script>
-		<script type="application/json" id="signoz-boot-settings">
+		<script type="application/json" id="o11y-boot-settings">
 			[[.Settings]]
 		</script>
 		<script>
 			try {
-				var _el = document.getElementById('signoz-boot-settings');
-				window.signozBootData = {
+				var _el = document.getElementById('o11y-boot-settings');
+				window.o11yBootData = {
 					settings: _el ? JSON.parse(_el.textContent) : null,
 				};
 			} catch (e) {
-				window.signozBootData = { settings: null };
+				window.o11yBootData = { settings: null };
 			}
 		</script>
 		<noscript>You need to enable JavaScript to run this app.</noscript>
@@ -108,7 +108,7 @@
 		<script>
 			var PYLON_APP_ID = '<%- PYLON_APP_ID %>';
 			var pylonSettings =
-				((window.signozBootData || {}).settings || {}).pylon || {};
+				((window.o11yBootData || {}).settings || {}).pylon || {};
 			var pylonEnabled = pylonSettings.enabled !== false;
 			if (PYLON_APP_ID && pylonEnabled) {
 				(function () {
@@ -147,7 +147,7 @@
 		<script>
 			var APPCUES_APP_ID = '<%- APPCUES_APP_ID %>';
 			var appcuesSettings =
-				((window.signozBootData || {}).settings || {}).appcues || {};
+				((window.o11yBootData || {}).settings || {}).appcues || {};
 			var appcuesEnabled = appcuesSettings.enabled !== false;
 			if (APPCUES_APP_ID && appcuesEnabled) {
 				(function (d, t) {

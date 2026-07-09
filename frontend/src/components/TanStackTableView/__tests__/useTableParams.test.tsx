@@ -718,7 +718,7 @@ describe('useTableParams (auto page size with storageKey)', () => {
 	it('prefers stored value over calculatedPageSize', () => {
 		// Pre-populate the store
 		localStorage.setItem(
-			'@signoz/table-columns/test-table-preferred-page-size',
+			'@o11y/table-columns/test-table-preferred-page-size',
 			'25',
 		);
 
@@ -743,7 +743,7 @@ describe('useTableParams (auto page size with storageKey)', () => {
 
 	it('preserves URL limit over calculated and preferred', () => {
 		localStorage.setItem(
-			'@signoz/table-columns/test-table-preferred-page-size',
+			'@o11y/table-columns/test-table-preferred-page-size',
 			'25',
 		);
 
@@ -791,14 +791,14 @@ describe('useTableParams (auto page size with storageKey)', () => {
 
 		expect(result.current.limit).toBe(30);
 		expect(
-			localStorage.getItem('@signoz/table-columns/test-table-preferred-page-size'),
+			localStorage.getItem('@o11y/table-columns/test-table-preferred-page-size'),
 		).toBe('30');
 	});
 
 	it('clears preference when user selects calculated value', () => {
 		// Pre-set a preference
 		localStorage.setItem(
-			'@signoz/table-columns/test-table-preferred-page-size',
+			'@o11y/table-columns/test-table-preferred-page-size',
 			'30',
 		);
 		usePreferredPageSizeStore.setState({ tables: { 'test-table': 30 } });
@@ -827,7 +827,7 @@ describe('useTableParams (auto page size with storageKey)', () => {
 		expect(result.current.limit).toBe(42);
 		// Preference should be cleared (null removes from storage)
 		expect(
-			localStorage.getItem('@signoz/table-columns/test-table-preferred-page-size'),
+			localStorage.getItem('@o11y/table-columns/test-table-preferred-page-size'),
 		).toBeNull();
 	});
 

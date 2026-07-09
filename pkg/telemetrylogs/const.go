@@ -3,9 +3,9 @@ package telemetrylogs
 import (
 	"fmt"
 
-	"github.com/hanzoai/signoz-otel-collector/constants"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+	"github.com/hanzoai/otel-collector/constants"
 )
 
 const (

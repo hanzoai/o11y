@@ -1,8 +1,8 @@
-// Package community constructs the ONE Hanzo o11y (SigNoz-community) runtime and
+// Package community constructs the ONE Hanzo o11y (O11y-community) runtime and
 // HTTP server used by BOTH the standalone `cmd/community` binary AND the unified
 // hanzoai/cloud binary's in-process embed (via app.Server.PublicHandler).
 //
-// Keeping the whole construction — config resolution, the SigNoz provider set,
+// Keeping the whole construction — config resolution, the O11y provider set,
 // and the app server — behind a single exported builder guarantees the two
 // deployments run byte-identical middleware, identity (pkg/identn/iamidentn,
 // i.e. Hanzo IAM gateway-header auth), authz (iamauthz), telemetry stores, rule
@@ -43,13 +43,13 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/tag"
+	"github.com/hanzoai/o11y/pkg/o11y"
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/query-service/app"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/ruler"
-	"github.com/hanzoai/o11y/pkg/ruler/signozruler"
-	"github.com/hanzoai/o11y/pkg/signoz"
+	"github.com/hanzoai/o11y/pkg/ruler/o11yruler"
 	"github.com/hanzoai/o11y/pkg/sqlschema"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -59,19 +59,19 @@ import (
 	"github.com/hanzoai/o11y/pkg/zeus/noopzeus"
 )
 
-// NewConfig resolves the SigNoz config from the given YAML files (if any) plus
+// NewConfig resolves the O11y config from the given YAML files (if any) plus
 // the process environment (env:), applying the Hanzo operator-facing aliases
 // (e.g. the flat O11Y_DATASTORE_DSN → telemetrystore.datastore.dsn) inside
-// signoz.NewConfig. This is THE config path; cmd.NewSigNozConfig delegates here
+// o11y.NewConfig. This is THE config path; cmd.NewO11yConfig delegates here
 // so standalone and embed read configuration identically.
-func NewConfig(ctx context.Context, logger *slog.Logger, configFiles []string) (signoz.Config, error) {
+func NewConfig(ctx context.Context, logger *slog.Logger, configFiles []string) (o11y.Config, error) {
 	uris := make([]string, 0, len(configFiles)+1)
 	for _, f := range configFiles {
 		uris = append(uris, "file:"+f)
 	}
 	uris = append(uris, "env:")
 
-	return signoz.NewConfig(
+	return o11y.NewConfig(
 		ctx,
 		logger,
 		config.ResolverConfig{
@@ -87,23 +87,23 @@ func NewConfig(ctx context.Context, logger *slog.Logger, configFiles []string) (
 // SQLStoreProviderFactories is the community SQL store provider set (the
 // control-plane metadata store — sqlite by default).
 func SQLStoreProviderFactories() factory.NamedMap[factory.ProviderFactory[sqlstore.SQLStore, sqlstore.Config]] {
-	return signoz.NewSQLStoreProviderFactories()
+	return o11y.NewSQLStoreProviderFactories()
 }
 
 // SQLSchemaProviderFactories is the community SQL schema provider set.
 func SQLSchemaProviderFactories(sqlstore sqlstore.SQLStore) factory.NamedMap[factory.ProviderFactory[sqlschema.SQLSchema, sqlschema.Config]] {
-	return signoz.NewSQLSchemaProviderFactories(sqlstore)
+	return o11y.NewSQLSchemaProviderFactories(sqlstore)
 }
 
-// NewSigNoz constructs the SigNoz runtime with the community provider set: noop
+// NewO11y constructs the O11y runtime with the community provider set: noop
 // zeus/licensing/gateway, Hanzo IAM authz (iamauthz — the sole authorizer), the
 // ClickHouse (Hanzo Datastore) telemetry store, sqlite control-plane store, the
 // full dashboard/cloudintegration/metricreductionrule/ruler modules, and (wired
-// internally by signoz.New) the identN provider set including iamidentn — the
+// internally by o11y.New) the identN provider set including iamidentn — the
 // gateway-header human identity the running pod trusts. The provider list is the
 // single source of truth for how o11y boots.
-func NewSigNoz(ctx context.Context, config signoz.Config) (*signoz.SigNoz, error) {
-	return signoz.New(
+func NewO11y(ctx context.Context, config o11y.Config) (*o11y.O11y, error) {
+	return o11y.New(
 		ctx,
 		config,
 		zeus.Config{},
@@ -112,14 +112,14 @@ func NewSigNoz(ctx context.Context, config signoz.Config) (*signoz.SigNoz, error
 		func(_ sqlstore.SQLStore, _ zeus.Zeus, _ organization.Getter, _ analytics.Analytics) factory.ProviderFactory[licensing.Licensing, licensing.Config] {
 			return nooplicensing.NewFactory()
 		},
-		signoz.NewEmailingProviderFactories(),
-		signoz.NewCacheProviderFactories(),
-		signoz.NewWebProviderFactories(config.Global),
+		o11y.NewEmailingProviderFactories(),
+		o11y.NewCacheProviderFactories(),
+		o11y.NewWebProviderFactories(config.Global),
 		SQLSchemaProviderFactories,
 		SQLStoreProviderFactories(),
-		signoz.NewTelemetryStoreProviderFactories(),
+		o11y.NewTelemetryStoreProviderFactories(),
 		func(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
-			return signoz.NewAuthNs(ctx, providerSettings, store, licensing, config.Global)
+			return o11y.NewAuthNs(ctx, providerSettings, store, licensing, config.Global)
 		},
 		func(_ context.Context, sqlstore sqlstore.SQLStore, _ authz.Config, _ licensing.Licensing, _ []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error) {
 			// Hanzo IAM is the sole authorization provider — every decision is
@@ -133,10 +133,10 @@ func NewSigNoz(ctx context.Context, config signoz.Config) (*signoz.SigNoz, error
 			return noopgateway.NewProviderFactory()
 		},
 		func(_ licensing.Licensing) factory.NamedMap[factory.ProviderFactory[auditor.Auditor, auditor.Config]] {
-			return signoz.NewAuditorProviderFactories()
+			return o11y.NewAuditorProviderFactories()
 		},
 		func(_ context.Context, _ factory.ProviderSettings, _ flagger.Flagger, _ licensing.Licensing, _ telemetrystore.TelemetryStore, _ retention.Getter, _ organization.Getter, _ zeus.Zeus) (factory.NamedMap[factory.ProviderFactory[meterreporter.Reporter, meterreporter.Config]], string) {
-			return signoz.NewMeterReporterProviderFactories(), "noop"
+			return o11y.NewMeterReporterProviderFactories(), "noop"
 		},
 		func(ps factory.ProviderSettings, q querier.Querier, a analytics.Analytics) querier.Handler {
 			return querier.NewHandler(ps, q, a)
@@ -148,23 +148,23 @@ func NewSigNoz(ctx context.Context, config signoz.Config) (*signoz.SigNoz, error
 			return implmetricreductionrule.NewModule()
 		},
 		func(c cache.Cache, am alertmanager.Alertmanager, ss sqlstore.SQLStore, ts telemetrystore.TelemetryStore, ms telemetrytypes.MetadataStore, p prometheus.Prometheus, og organization.Getter, rsh rulestatehistory.Module, q querier.Querier, qp queryparser.QueryParser) factory.NamedMap[factory.ProviderFactory[ruler.Ruler, ruler.Config]] {
-			return factory.MustNewNamedMap(signozruler.NewFactory(c, am, ss, ts, ms, p, og, rsh, q, qp, nil, nil))
+			return factory.MustNewNamedMap(o11yruler.NewFactory(c, am, ss, ts, ms, p, og, rsh, q, qp, nil, nil))
 		},
 	)
 }
 
-// NewServer constructs the SigNoz runtime and its HTTP server together. Callers
+// NewServer constructs the O11y runtime and its HTTP server together. Callers
 // choose the serving mode:
 //
-//   - standalone (cmd/community): server.Start binds the listeners; SigNoz.Start
-//     runs background evaluation; SigNoz.Wait blocks.
-//   - embedded (hanzoai/cloud): SigNoz.Start runs background evaluation, and
+//   - standalone (cmd/community): server.Start binds the listeners; O11y.Start
+//     runs background evaluation; O11y.Wait blocks.
+//   - embedded (hanzoai/cloud): O11y.Start runs background evaluation, and
 //     server.PublicHandler() is installed via o11y.SetHandler — cloud's own HTTP
 //     stack serves /v1/o11y/*; the listeners are never bound.
 //
 // Both paths share this ONE construction, so identity and authz are identical.
-func NewServer(ctx context.Context, config signoz.Config) (*app.Server, *signoz.SigNoz, error) {
-	sn, err := NewSigNoz(ctx, config)
+func NewServer(ctx context.Context, config o11y.Config) (*app.Server, *o11y.O11y, error) {
+	sn, err := NewO11y(ctx, config)
 	if err != nil {
 		return nil, nil, err
 	}

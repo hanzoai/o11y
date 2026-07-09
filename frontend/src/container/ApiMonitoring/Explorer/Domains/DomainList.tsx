@@ -190,7 +190,7 @@ function DomainList(): JSX.Element {
 									rel="noreferrer"
 									className="external-api-doc-link"
 								>
-									Learn how External API monitoring works in SigNoz{' '}
+									Learn how External API monitoring works in O11y{' '}
 									<MoveUpRight size={14} />
 								</a>
 							</div>

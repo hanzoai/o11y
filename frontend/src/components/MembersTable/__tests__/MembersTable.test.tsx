@@ -92,7 +92,7 @@ describe('MembersTable', () => {
 		const deletedMember: MemberRow = {
 			id: 'user-del',
 			name: 'Dave Deleted',
-			email: 'dave@signoz.io',
+			email: 'dave@o11y.io',
 			status: MemberStatus.Deleted,
 			joinedOn: null,
 		};

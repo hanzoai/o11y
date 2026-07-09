@@ -1,4 +1,4 @@
-### Monitor Azure Cosmos DB with SigNoz
+### Monitor Azure Cosmos DB with O11y
 
 Collect key Azure Cosmos DB metrics and view them with an out of the box dashboard.
 

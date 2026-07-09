@@ -74,7 +74,7 @@ func NewDispatcher(
 		route:               r,
 		marker:              mk,
 		timeout:             to,
-		logger:              l.With(slog.String("component", "signoz-dispatcher")),
+		logger:              l.With(slog.String("component", "o11y-dispatcher")),
 		metrics:             m,
 		limits:              lim,
 		notificationManager: n,
@@ -117,7 +117,7 @@ func (d *Dispatcher) run(it provider.AlertIterator) {
 			}
 			alert := alertWrapper.Data
 
-			d.logger.DebugContext(d.ctx, "SigNoz Custom Dispatcher: Received alert", slog.Any("alert", alert))
+			d.logger.DebugContext(d.ctx, "O11y Custom Dispatcher: Received alert", slog.Any("alert", alert))
 
 			// Log errors but keep trying.
 			if err := it.Err(); err != nil {
@@ -516,7 +516,7 @@ func (ag *aggrGroup) flush(notify func(...*types.Alert) bool) {
 	}
 }
 
-// unlimitedLimits provides unlimited aggregation groups for SigNoz.
+// unlimitedLimits provides unlimited aggregation groups for O11y.
 type unlimitedLimits struct{}
 
 func (u *unlimitedLimits) MaxNumberOfAggregationGroups() int { return 0 }

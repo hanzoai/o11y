@@ -1,6 +1,6 @@
 # Integration Tests
 
-SigNoz uses integration tests to verify that different components work together correctly in a real environment. These tests run against actual services (ClickHouse, PostgreSQL, SigNoz, Zeus mock, Keycloak, etc.) spun up as containers, so suites exercise the same code paths production does.
+O11y uses integration tests to verify that different components work together correctly in a real environment. These tests run against actual services (ClickHouse, PostgreSQL, O11y, Zeus mock, Keycloak, etc.) spun up as containers, so suites exercise the same code paths production does.
 
 ## How to set up the integration test environment?
 
@@ -41,7 +41,7 @@ uv run pytest --basetemp=./tmp/ -vv --reuse integration/bootstrap/setup.py::test
 ```
 
 This command will:
-- Start all required services (ClickHouse, PostgreSQL, Zookeeper, SigNoz, Zeus mock, gateway mock)
+- Start all required services (ClickHouse, PostgreSQL, Zookeeper, O11y, Zeus mock, gateway mock)
 - Register an admin user
 - Keep containers running via the `--reuse` flag
 
@@ -81,7 +81,7 @@ tests/
 │   ├── http.py              # WireMock helpers
 │   ├── keycloak.py          # IdP container
 │   ├── postgres.py
-│   ├── signoz.py            # SigNoz-backend container
+│   ├── o11y.py            # O11y-backend container
 │   ├── sql.py
 │   ├── types.py
 │   └── ...                  # logs, metrics, traces, alerts, dashboards, ...
@@ -110,7 +110,7 @@ Each test suite follows these principles:
 
 ### Test Suite Design
 
-Test suites should target functional domains or subsystems within SigNoz. When designing a test suite, consider these principles:
+Test suites should target functional domains or subsystems within O11y. When designing a test suite, consider these principles:
 
 - **Functional Cohesion**: Group tests around a specific capability or service boundary
 - **Data Flow**: Follow the path of data through related components
@@ -131,15 +131,15 @@ from fixtures.logger import setup_logger
 logger = setup_logger(__name__)
 
 
-def test_version(signoz: types.SigNoz) -> None:
+def test_version(o11y: types.O11y) -> None:
     response = requests.get(
-        signoz.self.host_configs["8080"].get("/api/v1/version"),
+        o11y.self.host_configs["8080"].get("/api/v1/version"),
         timeout=2,
     )
     logger.info(response)
 ```
 
-We have written a simple test which calls the `version` endpoint of the SigNoz backend. **To run just this function, run the following command:**
+We have written a simple test which calls the `version` endpoint of the O11y backend. **To run just this function, run the following command:**
 
 ```bash
 cd tests
@@ -160,10 +160,10 @@ from fixtures.logger import setup_logger
 logger = setup_logger(__name__)
 
 
-def test_user_registration(signoz: types.SigNoz) -> None:
+def test_user_registration(o11y: types.O11y) -> None:
     """Test user registration functionality."""
     response = requests.post(
-        signoz.self.host_configs["8080"].get("/api/v1/register"),
+        o11y.self.host_configs["8080"].get("/api/v1/register"),
         json={
             "name": "testuser",
             "orgId": "",
@@ -226,7 +226,7 @@ Tests can be configured using pytest options:
 - `--postgres-version` — PostgreSQL version (default: `15`)
 - `--clickhouse-version` — ClickHouse version (default: `25.5.6`)
 - `--zookeeper-version` — Zookeeper version (default: `3.7.1`)
-- `--schema-migrator-version` — SigNoz schema migrator version (default: `v0.144.2`)
+- `--schema-migrator-version` — O11y schema migrator version (default: `v0.144.2`)
 
 Example:
 
@@ -243,9 +243,9 @@ uv run pytest --basetemp=./tmp/ -vv --reuse \
 - **Do not pre-emptively teardown before setup.** If the stack is partially up, `--reuse` picks up from wherever it is. `make py-test-teardown` then `make py-test-setup` wastes minutes.
 - **Follow the naming convention** with two-digit numeric prefixes (`01_`, `02_`) for ordered test execution within a suite.
 - **Use proper timeouts** in HTTP requests to avoid hanging tests (`timeout=5` is typical).
-- **Clean up test data** between tests in the same suite to avoid interference — or rely on a fresh SigNoz container if you need full isolation.
+- **Clean up test data** between tests in the same suite to avoid interference — or rely on a fresh O11y container if you need full isolation.
 - **Use descriptive test names** that clearly indicate what is being tested.
 - **Leverage fixtures** for common setup. The shared fixture package is at `tests/fixtures/` — reuse before adding new ones.
 - **Test both success and failure scenarios** (4xx / 5xx paths) to ensure robust functionality.
 - **Run `make py-fmt` and `make py-lint` before committing** Python changes — black + isort + autoflake + pylint.
-- **`--sqlite-mode=wal` does not work on macOS.** The integration test environment runs SigNoz inside a Linux container with the SQLite database file mounted from the macOS host. WAL mode requires shared memory between connections, and connections crossing the VM boundary (macOS host ↔ Linux container) cannot share the WAL index, resulting in `SQLITE_IOERR_SHORT_READ`. WAL mode is tested in CI on Linux only.
+- **`--sqlite-mode=wal` does not work on macOS.** The integration test environment runs O11y inside a Linux container with the SQLite database file mounted from the macOS host. WAL mode requires shared memory between connections, and connections crossing the VM boundary (macOS host ↔ Linux container) cannot share the WAL index, resulting in `SQLITE_IOERR_SHORT_READ`. WAL mode is tested in CI on Linux only.

@@ -77,7 +77,7 @@ def _generate_metrics() -> list[dict]:
                     resource_attrs = {
                         "service.name": service,
                         "deployment.environment": _ENV,
-                        "k8s.namespace.name": f"signoz-{service}",
+                        "k8s.namespace.name": f"o11y-{service}",
                     }
                     point_attrs = {
                         "operation": operation,
@@ -85,9 +85,9 @@ def _generate_metrics() -> list[dict]:
                         "span_kind": "SPAN_KIND_SERVER",
                     }
                     for name, value in (
-                        ("signoz_calls_total", counter),
-                        ("signoz_latency_count", counter),
-                        ("signoz_latency_sum", latency_sum),
+                        ("o11y_calls_total", counter),
+                        ("o11y_latency_count", counter),
+                        ("o11y_latency_sum", latency_sum),
                     ):
                         samples.append(
                             {
@@ -106,13 +106,13 @@ def _generate_metrics() -> list[dict]:
                 db_counter += 20 + rng.randint(0, 15)
                 samples.append(
                     {
-                        "metric_name": "signoz_db_latency_count",
+                        "metric_name": "o11y_db_latency_count",
                         "minutes_ago": minutes_ago,
                         "value": db_counter,
                         "resource_attributes": {
                             "service.name": service,
                             "deployment.environment": _ENV,
-                            "k8s.namespace.name": f"signoz-{service}",
+                            "k8s.namespace.name": f"o11y-{service}",
                         },
                         "attributes": {
                             "db.system": "postgresql" if service == "cartservice" else "mongodb",
@@ -142,7 +142,7 @@ def _generate_traces() -> list[dict]:
                         "resource_attributes": {
                             "service.name": service,
                             "deployment.environment": _ENV,
-                            "k8s.namespace.name": f"signoz-{service}",
+                            "k8s.namespace.name": f"o11y-{service}",
                         },
                         "attributes": {
                             "http.method": "GET" if "get" in operation.lower() or operation == "/" else "POST",
@@ -185,7 +185,7 @@ def _generate_logs() -> list[dict]:
                     "resource_attributes": {
                         "service.name": service,
                         "deployment.environment": _ENV,
-                        "k8s.namespace.name": f"signoz-{service}",
+                        "k8s.namespace.name": f"o11y-{service}",
                     },
                     "attributes": {"logger.name": f"{service}.app"},
                 }

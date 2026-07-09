@@ -1,0 +1,50 @@
+package o11yapiserver
+
+import (
+	"net/http"
+
+	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
+)
+
+func (provider *provider) addFieldsRoutes(router *mux.Router) error {
+	if err := router.Handle("/api/v1/fields/keys", handler.New(provider.authzMiddleware.ViewAccess(provider.fieldsHandler.GetFieldsKeys), handler.OpenAPIDef{
+		ID:                  "GetFieldsKeys",
+		Tags:                []string{"fields"},
+		Summary:             "Get field keys",
+		Description:         "This endpoint returns field keys",
+		Request:             nil,
+		RequestQuery:        new(telemetrytypes.PostableFieldKeysParams),
+		RequestContentType:  "",
+		Response:            new(telemetrytypes.GettableFieldKeys),
+		ResponseContentType: "application/json",
+		SuccessStatusCode:   http.StatusOK,
+		ErrorStatusCodes:    []int{},
+		Deprecated:          false,
+		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
+	})).Methods(http.MethodGet).GetError(); err != nil {
+		return err
+	}
+
+	if err := router.Handle("/api/v1/fields/values", handler.New(provider.authzMiddleware.ViewAccess(provider.fieldsHandler.GetFieldsValues), handler.OpenAPIDef{
+		ID:                  "GetFieldsValues",
+		Tags:                []string{"fields"},
+		Summary:             "Get field values",
+		Description:         "This endpoint returns field values",
+		Request:             nil,
+		RequestQuery:        new(telemetrytypes.PostableFieldValueParams),
+		RequestContentType:  "",
+		Response:            new(telemetrytypes.GettableFieldValues),
+		ResponseContentType: "application/json",
+		SuccessStatusCode:   http.StatusOK,
+		ErrorStatusCodes:    []int{},
+		Deprecated:          false,
+		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
+	})).Methods(http.MethodGet).GetError(); err != nil {
+		return err
+	}
+
+	return nil
+}
