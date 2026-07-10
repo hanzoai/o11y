@@ -3,6 +3,7 @@ package impllmobs
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -18,6 +19,12 @@ import (
 const (
 	viewTimeout  = 30 * time.Second
 	writeTimeout = 15 * time.Second
+
+	// headerOrgID is the gateway-asserted tenant slug (JWT `owner` / X-Org-Id) —
+	// the same trusted header identn derives claims from (HIP-0026: the gateway
+	// sets it and strips any client copy). It is the tenant boundary for the span
+	// views, which have no other org column.
+	headerOrgID = "X-Org-Id"
 )
 
 type handler struct {
@@ -244,6 +251,15 @@ func viewRequest(ctx context.Context, r *http.Request) (valuer.UUID, *llmobstype
 	if err := binding.Query.BindQuery(r.URL.Query(), q); err != nil {
 		return valuer.UUID{}, nil, err
 	}
+	// MANDATORY tenant scope for the span views: set the org slug SERVER-SIDE from
+	// the validated X-Org-Id, AFTER binding, so no client query param can spoof it
+	// (ViewQuery.OrgSlug has no `query` tag). Fail CLOSED when the gateway asserted
+	// no tenant — never run an un-scoped span query that would read every org.
+	orgSlug := strings.TrimSpace(r.Header.Get(headerOrgID))
+	if orgSlug == "" {
+		return valuer.UUID{}, nil, errors.NewUnauthenticatedf(errors.CodeUnauthenticated, "missing tenant identity for span view")
+	}
+	q.OrgSlug = orgSlug
 	return orgID, q, nil
 }
 
