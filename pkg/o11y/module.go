@@ -15,6 +15,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/authdomain/implauthdomain"
 	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
+	"github.com/hanzoai/o11y/pkg/modules/errortracking"
+	"github.com/hanzoai/o11y/pkg/modules/errortracking/implerrortracking"
 	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
 	"github.com/hanzoai/o11y/pkg/modules/inframonitoring/implinframonitoring"
 	"github.com/hanzoai/o11y/pkg/modules/llmobs"
@@ -97,6 +99,7 @@ type Modules struct {
 	SpanMapper          spanmapper.Module
 	LLMPricingRule      llmpricingrule.Module
 	LLMObs              llmobs.Module
+	ErrorTracking       errortracking.Module
 	Tag                 tag.Module
 }
 
@@ -165,6 +168,7 @@ func NewModules(
 		SpanMapper:          implspanmapper.NewModule(implspanmapper.NewStore(sqlstore), fl),
 		LLMPricingRule:      impllmpricingrule.NewModule(impllmpricingrule.NewStore(sqlstore), fl),
 		LLMObs:              impllmobs.NewModule(querier, impllmobs.NewStore(sqlstore)),
+		ErrorTracking:       implerrortracking.NewModule(implerrortracking.NewStore(sqlstore), implerrortracking.NewNoopSink()),
 		Tag:                 tagModule,
 	}
 }
