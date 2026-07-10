@@ -14,6 +14,7 @@ var (
 	ErrCodeErrorTrackingNotFound     = errors.MustNewCode("errortracking_not_found")
 	ErrCodeErrorTrackingUnauthorized = errors.MustNewCode("errortracking_unauthorized")
 	ErrCodeErrorTrackingDisabled     = errors.MustNewCode("errortracking_disabled")
+	ErrCodeErrorTrackingConflict     = errors.MustNewCode("errortracking_conflict")
 )
 
 // IssueStatus is the lifecycle state of an issue (Sentry-class).
@@ -74,6 +75,11 @@ type Issue struct {
 	Environment string      `bun:"environment,type:text" json:"environment,omitempty"`
 	Release     string      `bun:"release,type:text" json:"release,omitempty"`
 	ServiceName string      `bun:"service_name,type:text" json:"serviceName,omitempty"`
+
+	// Version is the optimistic-concurrency guard for lifecycle updates: bumped only
+	// by UpdateIssue, never by ingest, so an operator's resolve/ignore cannot clobber
+	// a concurrent operator's write (last-writer-wins) — a stale version is a conflict.
+	Version int64 `bun:"version,type:bigint,notnull,default:0" json:"-"`
 
 	// SampleEvent is the latest normalized Occurrence, stored as JSON so the issue
 	// detail is fully viewable straight from SQL — no dependency on the (fast-follow)
