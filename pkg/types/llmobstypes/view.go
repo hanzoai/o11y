@@ -78,6 +78,15 @@ type ViewQuery struct {
 	Model     string `query:"model" json:"model"`
 	Offset    int    `query:"offset" json:"offset"`
 	Limit     int    `query:"limit" json:"limit"`
+
+	// OrgSlug is the TENANT the query is scoped to — the validated X-Org-Id the
+	// gateway asserted, matching the gen_ai.hanzo.org_id the ai emit path tags on
+	// every span. It has NO `query` tag on purpose: it is server-set by the handler
+	// from the validated identity AFTER binding, never populated from client input.
+	// It is a MANDATORY, non-empty equality predicate on every span-view query —
+	// the sole tenant boundary for ClickHouse telemetry (the span views carry no
+	// other org column), so an empty value must fail closed, never read all orgs.
+	OrgSlug string `json:"-"`
 }
 
 type GettableObservations struct {
