@@ -16,9 +16,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// newTestStore builds a real in-memory-ish sqlite store with the o11y_issues table
-// and its (org_id, fingerprint) unique index — the same shape the migration ships,
-// so ON CONFLICT upserts behave exactly as in production.
+// newTestStore builds a real sqlite store with the o11y_issues table and its
+// (org_id, fingerprint) unique index — the shape the migration ships, so ON CONFLICT
+// upserts behave exactly as in production.
 func newTestStore(t *testing.T) sqlstore.SQLStore {
 	t.Helper()
 	dbPath := filepath.Join(t.TempDir(), "test.db")
@@ -45,6 +45,12 @@ func newTestStore(t *testing.T) sqlstore.SQLStore {
 
 	_, err = store.BunDB().Exec(`CREATE UNIQUE INDEX IF NOT EXISTS uq_o11y_issues_org_fingerprint ON o11y_issues (org_id, fingerprint)`)
 	require.NoError(t, err)
+
+	_, err = store.BunDB().NewCreateTable().
+		Model((*ingestRevocation)(nil)).
+		IfNotExists().
+		Exec(context.Background())
+	require.NoError(t, err)
 	return store
 }
 
@@ -65,17 +71,23 @@ func occ(fp, typ, val string, ts time.Time) *errortrackingtypes.Occurrence {
 	}
 }
 
+// mustIngest sends a batch (one or more occurrences) through the module.
+func mustIngest(t *testing.T, m errortracking.Module, ctx context.Context, org valuer.UUID, occs ...*errortrackingtypes.Occurrence) {
+	t.Helper()
+	_, err := m.Ingest(ctx, org, occs)
+	require.NoError(t, err)
+}
+
 // TestStore_TwoOrgIsolation is the load-bearing tenancy proof: two orgs report the
-// SAME fingerprint; each org sees ONLY its own issue, and neither can read the
-// other's issue by id. A cross-tenant leak here is a security bug, so this test is
-// the org-scope gate.
+// SAME fingerprint; each org sees ONLY its own issue, and neither can read/mutate
+// the other's issue by id.
 func TestStore_TwoOrgIsolation(t *testing.T) {
 	ctx := context.Background()
 	mod, orgA, orgB := newTestModule(t)
 	now := time.Now().UTC()
 
-	require.NoError(t, mod.Ingest(ctx, orgA, occ("fp-shared", "TypeError", "from-A", now)))
-	require.NoError(t, mod.Ingest(ctx, orgB, occ("fp-shared", "TypeError", "from-B", now)))
+	mustIngest(t, mod, ctx, orgA, occ("fp-shared", "TypeError", "from-A", now))
+	mustIngest(t, mod, ctx, orgB, occ("fp-shared", "TypeError", "from-B", now))
 
 	aList, aTotal, err := mod.ListIssues(ctx, orgA, &errortrackingtypes.IssuesQuery{})
 	require.NoError(t, err)
@@ -91,24 +103,21 @@ func TestStore_TwoOrgIsolation(t *testing.T) {
 	assert.Equal(t, "from-B", bList[0].Value, "org B must see only its own occurrence value")
 	assert.Equal(t, orgB, bList[0].OrgID)
 
-	// Cross-org read by id must fail closed (not found), never return the row.
 	_, err = mod.GetIssue(ctx, orgB, aList[0].ID)
-	require.Error(t, err, "org B must NOT be able to read org A's issue by id")
+	require.Error(t, err, "org B must NOT read org A's issue by id")
 
-	// And org B cannot mutate org A's issue.
 	reopen := "resolved"
 	_, err = mod.UpdateIssue(ctx, orgB, aList[0].ID, &errortrackingtypes.UpdateIssue{Status: &reopen})
-	require.Error(t, err, "org B must NOT be able to update org A's issue")
+	require.Error(t, err, "org B must NOT update org A's issue")
 
-	// Org A's issue is untouched by B's attempts.
 	got, err := mod.GetIssue(ctx, orgA, aList[0].ID)
 	require.NoError(t, err)
 	assert.Equal(t, errortrackingtypes.StatusUnresolved, got.Issue.Status)
 }
 
 // TestStore_UpsertGroupsByFingerprint proves the fingerprint bucket: repeated
-// occurrences of the same (org, fingerprint) collapse into one issue with a
-// running count and advancing last-seen, while first-seen is preserved.
+// occurrences of the same (org, fingerprint) collapse into one issue with a running
+// count and advancing last-seen, first-seen preserved.
 func TestStore_UpsertGroupsByFingerprint(t *testing.T) {
 	ctx := context.Background()
 	mod, orgA, _ := newTestModule(t)
@@ -116,9 +125,9 @@ func TestStore_UpsertGroupsByFingerprint(t *testing.T) {
 	first := time.Now().UTC().Add(-time.Hour)
 	later := time.Now().UTC()
 
-	require.NoError(t, mod.Ingest(ctx, orgA, occ("fp1", "ValueError", "boom", first)))
-	require.NoError(t, mod.Ingest(ctx, orgA, occ("fp1", "ValueError", "boom", later)))
-	require.NoError(t, mod.Ingest(ctx, orgA, occ("fp1", "ValueError", "boom", later)))
+	mustIngest(t, mod, ctx, orgA, occ("fp1", "ValueError", "boom", first))
+	mustIngest(t, mod, ctx, orgA, occ("fp1", "ValueError", "boom", later))
+	mustIngest(t, mod, ctx, orgA, occ("fp1", "ValueError", "boom", later))
 
 	list, total, err := mod.ListIssues(ctx, orgA, &errortrackingtypes.IssuesQuery{})
 	require.NoError(t, err)
@@ -128,22 +137,21 @@ func TestStore_UpsertGroupsByFingerprint(t *testing.T) {
 	assert.WithinDuration(t, first, list[0].FirstSeen, time.Second, "first-seen preserved")
 	assert.WithinDuration(t, later, list[0].LastSeen, time.Second, "last-seen advanced")
 
-	// A different fingerprint is a different issue.
-	require.NoError(t, mod.Ingest(ctx, orgA, occ("fp2", "KeyError", "missing", later)))
+	mustIngest(t, mod, ctx, orgA, occ("fp2", "KeyError", "missing", later))
 	_, total2, err := mod.ListIssues(ctx, orgA, &errortrackingtypes.IssuesQuery{})
 	require.NoError(t, err)
 	assert.Equal(t, 2, total2)
 }
 
-// TestStore_RegressionReopensResolved proves regression detection: a resolved
-// issue that recurs flips back to unresolved and is flagged regressed; an ignored
-// issue stays muted.
+// TestStore_RegressionReopensResolved proves regression detection: a resolved issue
+// that recurs flips back to unresolved and is flagged regressed; an ignored issue
+// stays muted.
 func TestStore_RegressionReopensResolved(t *testing.T) {
 	ctx := context.Background()
 	mod, orgA, _ := newTestModule(t)
 	now := time.Now().UTC()
 
-	require.NoError(t, mod.Ingest(ctx, orgA, occ("fp-reg", "TypeError", "x", now)))
+	mustIngest(t, mod, ctx, orgA, occ("fp-reg", "TypeError", "x", now))
 	list, _, err := mod.ListIssues(ctx, orgA, &errortrackingtypes.IssuesQuery{})
 	require.NoError(t, err)
 	id := list[0].ID
@@ -154,19 +162,17 @@ func TestStore_RegressionReopensResolved(t *testing.T) {
 	require.Equal(t, errortrackingtypes.StatusResolved, updated.Status)
 	require.NotNil(t, updated.ResolvedAt)
 
-	// Recurrence after resolution => regression.
-	require.NoError(t, mod.Ingest(ctx, orgA, occ("fp-reg", "TypeError", "x", now.Add(time.Minute))))
+	mustIngest(t, mod, ctx, orgA, occ("fp-reg", "TypeError", "x", now.Add(time.Minute)))
 	got, err := mod.GetIssue(ctx, orgA, id)
 	require.NoError(t, err)
 	assert.Equal(t, errortrackingtypes.StatusUnresolved, got.Issue.Status, "resolved issue must reopen on recurrence")
-	assert.True(t, got.Issue.Regressed, "reopened issue must be flagged as a regression")
+	assert.True(t, got.Issue.Regressed, "reopened issue must be flagged a regression")
 	assert.Equal(t, int64(2), got.Issue.Count)
 
-	// Ignored issues stay muted on recurrence.
 	ignored := string(errortrackingtypes.StatusIgnored)
 	_, err = mod.UpdateIssue(ctx, orgA, id, &errortrackingtypes.UpdateIssue{Status: &ignored})
 	require.NoError(t, err)
-	require.NoError(t, mod.Ingest(ctx, orgA, occ("fp-reg", "TypeError", "x", now.Add(2*time.Minute))))
+	mustIngest(t, mod, ctx, orgA, occ("fp-reg", "TypeError", "x", now.Add(2*time.Minute)))
 	got, err = mod.GetIssue(ctx, orgA, id)
 	require.NoError(t, err)
 	assert.Equal(t, errortrackingtypes.StatusIgnored, got.Issue.Status, "ignored issue must stay muted")
@@ -181,7 +187,7 @@ func TestModule_GetIssueParsesLatestEvent(t *testing.T) {
 
 	o := occ("fp-detail", "RuntimeError", "kaput", now)
 	o.Culprit = "handler in server.go"
-	require.NoError(t, mod.Ingest(ctx, orgA, o))
+	mustIngest(t, mod, ctx, orgA, o)
 
 	list, _, err := mod.ListIssues(ctx, orgA, &errortrackingtypes.IssuesQuery{})
 	require.NoError(t, err)

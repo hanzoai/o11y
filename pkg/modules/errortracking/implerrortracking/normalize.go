@@ -15,11 +15,23 @@ const (
 	maxFrames     = 250
 )
 
+// ingestOpts carries the request-scoped ingest policy into the (otherwise pure)
+// normalizer — currently just whether to retain end-user PII.
+type ingestOpts struct {
+	capturePII bool
+}
+
 // normalizeEvent turns a decoded Sentry event into the canonical Occurrence and
-// stamps its fingerprint. It is pure and total: any missing/odd field degrades to
-// a safe default rather than erroring, because an ingest endpoint must never 500
-// on a malformed client payload.
-func normalizeEvent(e *errortrackingtypes.SentryEvent) *errortrackingtypes.Occurrence {
+// stamps its fingerprint. It is total: any missing/odd field degrades to a safe
+// default rather than erroring, because an ingest endpoint must never 500 on a
+// malformed client payload. Secrets are always redacted and PII scrubbed (unless
+// capture is enabled) BEFORE the value enters the fingerprint. The default (no
+// opts) is fail-secure: scrub.
+func normalizeEvent(e *errortrackingtypes.SentryEvent, opts ...ingestOpts) *errortrackingtypes.Occurrence {
+	var o ingestOpts
+	if len(opts) > 0 {
+		o = opts[0]
+	}
 	occ := &errortrackingtypes.Occurrence{
 		EventID:     e.EventID,
 		Level:       firstNonEmpty(strings.ToLower(e.Level), errortrackingtypes.DefaultLevel),
@@ -52,6 +64,10 @@ func normalizeEvent(e *errortrackingtypes.SentryEvent) *errortrackingtypes.Occur
 	occ.TraceID, occ.SpanID = traceContext(e.Contexts)
 	occ.User = convertUser(e.User)
 	occ.Culprit = truncate(culprit(occ, e), maxCulpritLen)
+
+	// Redact secrets (always) + PII (unless captured) before the value is hashed, so
+	// grouping is stable and nothing sensitive reaches the fingerprint or storage.
+	sanitizeOccurrence(occ, o.capturePII)
 
 	occ.Fingerprint = computeFingerprint(occ, e.Fingerprint)
 	return occ
