@@ -14,22 +14,22 @@ var testSecret = []byte("kms-platform-ingest-secret")
 
 func TestVerifyKey_RoundTrip(t *testing.T) {
 	key := publicKeyFor(testSecret, "acme")
-	assert.True(t, verifyKey(testSecret, "acme", key), "the derived key must verify for its project")
+	assert.True(t, verifyKey(testSecret, "acme", key, 0), "the derived key must verify for its project")
 }
 
 func TestVerifyKey_RejectsWrongProject(t *testing.T) {
 	key := publicKeyFor(testSecret, "acme")
-	assert.False(t, verifyKey(testSecret, "evil", key), "a key minted for acme must not verify for another project")
+	assert.False(t, verifyKey(testSecret, "evil", key, 0), "a key minted for acme must not verify for another project")
 }
 
 func TestVerifyKey_RejectsWrongSecret(t *testing.T) {
 	key := publicKeyFor(testSecret, "acme")
-	assert.False(t, verifyKey([]byte("different-secret"), "acme", key))
+	assert.False(t, verifyKey([]byte("different-secret"), "acme", key, 0))
 }
 
 func TestVerifyKey_FailsClosed(t *testing.T) {
-	assert.False(t, verifyKey(nil, "acme", "anything"), "no secret => fail closed")
-	assert.False(t, verifyKey(testSecret, "acme", ""), "no presented key => fail closed")
+	assert.False(t, verifyKey(nil, "acme", "anything", 0), "no secret => fail closed")
+	assert.False(t, verifyKey(testSecret, "acme", "", 0), "no presented key => fail closed")
 }
 
 // The MOST important parity test: the org UUID the ingest path derives from a DSN

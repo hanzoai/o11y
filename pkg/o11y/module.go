@@ -100,7 +100,10 @@ type Modules struct {
 	LLMPricingRule      llmpricingrule.Module
 	LLMObs              llmobs.Module
 	ErrorTracking       errortracking.Module
-	Tag                 tag.Module
+	// ErrorTrackingRevocations backs per-org DSN-key rotation; the handler consults
+	// it on every ingest. Built here because it needs the sqlstore.
+	ErrorTrackingRevocations implerrortracking.RevocationStore
+	Tag                      tag.Module
 }
 
 func NewModules(
@@ -168,7 +171,12 @@ func NewModules(
 		SpanMapper:          implspanmapper.NewModule(implspanmapper.NewStore(sqlstore), fl),
 		LLMPricingRule:      impllmpricingrule.NewModule(impllmpricingrule.NewStore(sqlstore), fl),
 		LLMObs:              impllmobs.NewModule(querier, impllmobs.NewStore(sqlstore)),
-		ErrorTracking:       implerrortracking.NewModule(implerrortracking.NewStore(sqlstore), implerrortracking.NewNoopSink()),
-		Tag:                 tagModule,
+		ErrorTracking: implerrortracking.NewModule(
+			implerrortracking.NewStore(sqlstore),
+			implerrortracking.NewNoopSink(),
+			implerrortracking.WithRetention(errorTrackingRetention()),
+		),
+		ErrorTrackingRevocations: implerrortracking.NewSQLRevocations(sqlstore),
+		Tag:                      tagModule,
 	}
 }

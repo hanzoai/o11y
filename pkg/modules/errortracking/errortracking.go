@@ -13,10 +13,11 @@ import (
 // this module owns the grouped-Issue lifecycle over that data and the ingest that
 // normalizes Sentry-SDK reports into it.
 type Module interface {
-	// Ingest groups one normalized occurrence into the caller's org (resolved from
-	// the DSN by the handler), upserting the issue and — fail-soft — persisting the
-	// occurrence to the reused occurrence store.
-	Ingest(ctx context.Context, orgID valuer.UUID, occ *errortrackingtypes.Occurrence) error
+	// Ingest groups a BATCH of normalized occurrences into the caller's org (resolved
+	// from the DSN by the handler): occurrences are collapsed by fingerprint and
+	// upserted in one transaction under the per-org issue ceiling, bounding the write
+	// amplification of a single request. Returns issues written.
+	Ingest(ctx context.Context, orgID valuer.UUID, occs []*errortrackingtypes.Occurrence) (int, error)
 
 	ListIssues(ctx context.Context, orgID valuer.UUID, q *errortrackingtypes.IssuesQuery) ([]*errortrackingtypes.Issue, int, error)
 	GetIssue(ctx context.Context, orgID, id valuer.UUID) (*errortrackingtypes.GettableIssue, error)
