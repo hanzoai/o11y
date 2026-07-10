@@ -20,6 +20,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/authn"
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/authz/iamauthz"
+	"github.com/hanzoai/o11y/pkg/authz/localauthz"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/config"
 	"github.com/hanzoai/o11y/pkg/config/envprovider"
@@ -121,9 +122,19 @@ func NewO11y(ctx context.Context, config o11y.Config) (*o11y.O11y, error) {
 		func(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
 			return o11y.NewAuthNs(ctx, providerSettings, store, licensing, config.Global)
 		},
-		func(_ context.Context, sqlstore sqlstore.SQLStore, _ authz.Config, _ licensing.Licensing, _ []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error) {
-			// Hanzo IAM is the sole authorization provider — every decision is
-			// delegated to IAM's Casbin enforce endpoint. No OpenFGA, no fallback.
+		func(_ context.Context, sqlstore sqlstore.SQLStore, config authz.Config, _ licensing.Licensing, _ []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error) {
+			// Authorization is selected by the trust boundary, not pluggable policy —
+			// the enforced policy is identical, only where the relationship tuples live
+			// differs:
+			//   - "iam" (default, STANDALONE o11y): every decision is delegated to Hanzo
+			//     IAM's Casbin enforce endpoint. o11y is its own trust domain.
+			//   - "local" (EMBEDDED one-binary, O11Y_AUTHZ_PROVIDER=local): the edge
+			//     gateway already validated the Hanzo IAM session and injected trusted
+			//     identity headers, and the sharder gates cross-org — so authorization is
+			//     a local decision, no round-trip back out to IAM. See pkg/authz/localauthz.
+			if config.Provider == "local" {
+				return localauthz.NewProviderFactory(sqlstore), nil
+			}
 			return iamauthz.NewProviderFactory(sqlstore), nil
 		},
 		func(store sqlstore.SQLStore, settings factory.ProviderSettings, analytics analytics.Analytics, orgGetter organization.Getter, queryParser queryparser.QueryParser, _ querier.Querier, _ licensing.Licensing, tagModule tag.Module) dashboard.Module {
