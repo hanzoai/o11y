@@ -15,6 +15,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/soheilhy/cmux"
 
+	"github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	"github.com/hanzoai/o11y/pkg/licensing/nooplicensing"
 	"github.com/hanzoai/o11y/pkg/o11y"
@@ -200,6 +201,16 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 
 	err = web.AddToRouter(r)
 	if err != nil {
+		return nil, err
+	}
+
+	// Register the version-less /api/<resource> aliases for every /api/vN route on the
+	// assembled router, so the ONE public Hanzo contract — /v1/o11y/<resource> (rewritten
+	// to /api/<resource> by mount.go rewriteExternalPath) — resolves. Done HERE, after ALL
+	// routes (api + web) are registered on r, matching what the o11yapiserver provider does.
+	// Without it the embedded runtime (cloud one-binary via community.NewServer) 404s every
+	// version-less call — the console's canonical o11y contract. Additive: adds aliases only.
+	if err = o11yapiserver.AddVersionlessAliases(r); err != nil {
 		return nil, err
 	}
 
