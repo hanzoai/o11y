@@ -1,6 +1,8 @@
 package o11y
 
 import (
+	"os"
+
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/alertmanager/o11yalertmanager"
 	"github.com/hanzoai/o11y/pkg/analytics"
@@ -18,6 +20,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/cloudintegration/implcloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard/impldashboard"
+	"github.com/hanzoai/o11y/pkg/modules/errortracking"
+	"github.com/hanzoai/o11y/pkg/modules/errortracking/implerrortracking"
 	"github.com/hanzoai/o11y/pkg/modules/fields"
 	"github.com/hanzoai/o11y/pkg/modules/fields/implfields"
 	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
@@ -87,6 +91,7 @@ type Handlers struct {
 	RulerHandler            ruler.Handler
 	LLMPricingRuleHandler   llmpricingrule.Handler
 	LLMObsHandler           llmobs.Handler
+	ErrorTrackingHandler    errortracking.Handler
 	StatsHandler            statsreporter.Handler
 }
 
@@ -136,6 +141,16 @@ func NewHandlers(
 		RulerHandler:            o11yruler.NewHandler(rulerService),
 		LLMPricingRuleHandler:   impllmpricingrule.NewHandler(modules.LLMPricingRule),
 		LLMObsHandler:           impllmobs.NewHandler(modules.LLMObs),
+		ErrorTrackingHandler:    implerrortracking.NewHandler(modules.ErrorTracking, errorTrackingIngestSecret()),
 		StatsHandler:            statsreporter.NewHandler(statsAggregator),
 	}
+}
+
+// errorTrackingIngestSecret is the platform secret used to verify Sentry DSN keys
+// on the public error-ingest endpoints. It is sourced from KMS (synced to this env
+// var via a KMSSecret CRD) — never committed, never plaintext at rest. When unset,
+// the ingest endpoints fail closed (503) while the IAM-scoped read endpoints keep
+// working.
+func errorTrackingIngestSecret() []byte {
+	return []byte(os.Getenv("O11Y_ERRORTRACKING_INGEST_SECRET"))
 }
