@@ -22,7 +22,8 @@ const (
 	ingestTimeout = 15 * time.Second
 
 	// maxCompressedBody bounds the raw request body before decompression; the
-	// decoded payload is separately bounded by maxDecodedBytes.
+	// decoded payload is separately bounded by maxDecodedBytes and the event count
+	// by maxEventsPerEnvelope.
 	maxCompressedBody = 6 << 20
 )
 
@@ -35,12 +36,26 @@ type handler struct {
 	// ingestSecret is the KMS-sourced platform ingest secret used to verify DSN
 	// public keys. Empty => ingest is disabled (fail closed), reads still work.
 	ingestSecret []byte
+	capturePII   bool
+	revocations  RevocationStore
+	limiter      *rateLimiter
 }
 
-// NewHandler builds the HTTP surface. ingestSecret should be the KMS-synced
-// platform error-ingest secret; when empty the ingest routes fail closed (503).
-func NewHandler(module errortracking.Module, ingestSecret []byte) errortracking.Handler {
-	return &handler{module: module, ingestSecret: ingestSecret}
+// NewHandler builds the HTTP surface. ingestSecret is the KMS-synced platform
+// error-ingest secret (empty => ingest fails closed 503); capturePII retains
+// end-user PII when true (default false = scrub); revocations resolves per-org key
+// rotation (nil => none).
+func NewHandler(module errortracking.Module, ingestSecret []byte, capturePII bool, revocations RevocationStore) errortracking.Handler {
+	if revocations == nil {
+		revocations = NoopRevocations{}
+	}
+	return &handler{
+		module:       module,
+		ingestSecret: ingestSecret,
+		capturePII:   capturePII,
+		revocations:  revocations,
+		limiter:      newRateLimiter(ingestRatePerSec, ingestBurst),
+	}
 }
 
 // --- ingest (public, DSN-authenticated) ---
@@ -53,10 +68,11 @@ func (h *handler) StoreIngest(rw http.ResponseWriter, r *http.Request) {
 	h.ingest(rw, r, parseStoreBody)
 }
 
-// ingest is the shared pipeline for both wire formats: enabled-check → resolve org
-// from the DSN project → verify the DSN key (constant-time) → bounded read+decode →
-// parse → normalize+group each event under the resolved org. Every failure mode
-// fails closed and never leaks internal detail to the untrusted client.
+// ingest is the shared pipeline: enabled-check → resolve org from the DSN project →
+// verify the DSN key at its version (rejecting revoked versions, constant-time) →
+// per-org rate limit → bounded read+decode → parse (event-count capped) → normalize
+// (scrub) → group+upsert the whole batch in one transaction. Every failure fails
+// closed and never leaks internal detail to the untrusted client.
 func (h *handler) ingest(rw http.ResponseWriter, r *http.Request, parse eventParser) {
 	ctx, cancel := context.WithTimeout(r.Context(), ingestTimeout)
 	defer cancel()
@@ -73,9 +89,16 @@ func (h *handler) ingest(rw http.ResponseWriter, r *http.Request, parse eventPar
 		return
 	}
 
-	if !verifyKey(h.ingestSecret, project, sentryKeyFromRequest(r)) {
+	minVersion := h.revocations.MinVersion(ctx, orgID)
+	if !verifyKey(h.ingestSecret, project, sentryKeyFromRequest(r), minVersion) {
 		// Sentry SDKs treat 401 as "bad DSN" and drop the event (no retry storm).
 		http.Error(rw, "invalid ingest key", http.StatusUnauthorized)
+		return
+	}
+
+	if !h.limiter.allow(orgID) {
+		rw.Header().Set("Retry-After", "1")
+		http.Error(rw, "rate limited", http.StatusTooManyRequests)
 		return
 	}
 
@@ -97,18 +120,22 @@ func (h *handler) ingest(rw http.ResponseWriter, r *http.Request, parse eventPar
 		return
 	}
 
+	opts := ingestOpts{capturePII: h.capturePII}
+	occs := make([]*errortrackingtypes.Occurrence, 0, len(events))
 	lastID := ""
 	for _, ev := range events {
-		occ := normalizeEvent(ev)
+		occ := normalizeEvent(ev, opts)
 		if occ.Fingerprint == "" {
 			continue
 		}
-		if err := h.module.Ingest(ctx, orgID, occ); err != nil {
-			// A store failure is ours, not the client's — 500 so the SDK retries.
-			http.Error(rw, "ingest failed", http.StatusInternalServerError)
-			return
-		}
+		occs = append(occs, occ)
 		lastID = occ.EventID
+	}
+
+	if _, err := h.module.Ingest(ctx, orgID, occs); err != nil {
+		// A store failure is ours, not the client's — 500 so the SDK retries.
+		http.Error(rw, "ingest failed", http.StatusInternalServerError)
+		return
 	}
 
 	// Sentry SDKs only require 200; echo the last event id for parity.
@@ -192,12 +219,19 @@ func (h *handler) UpdateIssue(rw http.ResponseWriter, r *http.Request) {
 
 // --- shared helpers ---
 
+// orgFromContext resolves the caller's org UUID from the gateway-asserted claims.
+// It never panics on a malformed claim (a non-UUID org id fails closed as an
+// unauthenticated request rather than crashing the handler).
 func orgFromContext(ctx context.Context) (valuer.UUID, error) {
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
 		return valuer.UUID{}, err
 	}
-	return valuer.MustNewUUID(claims.OrgID), nil
+	orgID, err := valuer.NewUUID(claims.OrgID)
+	if err != nil {
+		return valuer.UUID{}, errors.Wrapf(err, errors.TypeUnauthenticated, errortrackingtypes.ErrCodeErrorTrackingUnauthorized, "identity carries no valid org")
+	}
+	return orgID, nil
 }
 
 func idFromPath(r *http.Request) (valuer.UUID, error) {
