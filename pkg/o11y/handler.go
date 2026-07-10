@@ -2,6 +2,9 @@ package o11y
 
 import (
 	"os"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/alertmanager/o11yalertmanager"
@@ -141,7 +144,7 @@ func NewHandlers(
 		RulerHandler:            o11yruler.NewHandler(rulerService),
 		LLMPricingRuleHandler:   impllmpricingrule.NewHandler(modules.LLMPricingRule),
 		LLMObsHandler:           impllmobs.NewHandler(modules.LLMObs),
-		ErrorTrackingHandler:    implerrortracking.NewHandler(modules.ErrorTracking, errorTrackingIngestSecret()),
+		ErrorTrackingHandler:    implerrortracking.NewHandler(modules.ErrorTracking, errorTrackingIngestSecret(), errorTrackingCapturePII(), modules.ErrorTrackingRevocations),
 		StatsHandler:            statsreporter.NewHandler(statsAggregator),
 	}
 }
@@ -153,4 +156,24 @@ func NewHandlers(
 // working.
 func errorTrackingIngestSecret() []byte {
 	return []byte(os.Getenv("O11Y_ERRORTRACKING_INGEST_SECRET"))
+}
+
+// errorTrackingCapturePII reports whether the error-ingest path retains end-user
+// PII (email/IP). Default false = scrub (fail-secure), mirroring the llmobs
+// O11Y_GENAI_CAPTURE_MESSAGES precedent. Secrets are always redacted regardless.
+func errorTrackingCapturePII() bool {
+	v := strings.ToLower(strings.TrimSpace(os.Getenv("O11Y_ERRORTRACKING_CAPTURE_PII")))
+	return v == "true" || v == "1" || v == "yes"
+}
+
+// errorTrackingRetention is the age past which resolved-or-stale issues are swept.
+// Default 90 days; O11Y_ERRORTRACKING_RETENTION_DAYS overrides; 0 disables the sweep.
+func errorTrackingRetention() time.Duration {
+	days := 90
+	if v := strings.TrimSpace(os.Getenv("O11Y_ERRORTRACKING_RETENTION_DAYS")); v != "" {
+		if n, err := strconv.Atoi(v); err == nil && n >= 0 {
+			days = n
+		}
+	}
+	return time.Duration(days) * 24 * time.Hour
 }
