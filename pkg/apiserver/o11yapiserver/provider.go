@@ -18,6 +18,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/fields"
 	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
+	"github.com/hanzoai/o11y/pkg/modules/errortracking"
 	"github.com/hanzoai/o11y/pkg/modules/llmobs"
 	"github.com/hanzoai/o11y/pkg/modules/llmpricingrule"
 	"github.com/hanzoai/o11y/pkg/modules/metricreductionrule"
@@ -75,6 +76,7 @@ type provider struct {
 	rulerHandler               ruler.Handler
 	llmPricingRuleHandler      llmpricingrule.Handler
 	llmObsHandler              llmobs.Handler
+	errorTrackingHandler       errortracking.Handler
 	statsHandler               statsreporter.Handler
 }
 
@@ -111,6 +113,7 @@ func NewFactory(
 	rulerHandler ruler.Handler,
 	statsHandler statsreporter.Handler,
 	llmObsHandler llmobs.Handler,
+	errorTrackingHandler errortracking.Handler,
 ) factory.ProviderFactory[apiserver.APIServer, apiserver.Config] {
 	return factory.NewProviderFactory(factory.MustNewName("o11y"), func(ctx context.Context, providerSettings factory.ProviderSettings, config apiserver.Config) (apiserver.APIServer, error) {
 		return newProvider(
@@ -149,6 +152,7 @@ func NewFactory(
 			rulerHandler,
 			statsHandler,
 			llmObsHandler,
+			errorTrackingHandler,
 		)
 	})
 }
@@ -189,6 +193,7 @@ func newProvider(
 	rulerHandler ruler.Handler,
 	statsHandler statsreporter.Handler,
 	llmObsHandler llmobs.Handler,
+	errorTrackingHandler errortracking.Handler,
 ) (apiserver.APIServer, error) {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver")
 	router := mux.NewRouter().UseEncodedPath()
@@ -227,6 +232,7 @@ func newProvider(
 		rulerHandler:               rulerHandler,
 		llmPricingRuleHandler:      llmPricingRuleHandler,
 		llmObsHandler:              llmObsHandler,
+		errorTrackingHandler:       errorTrackingHandler,
 		statsHandler:               statsHandler,
 	}
 
@@ -349,6 +355,10 @@ func (provider *provider) AddToRouter(router *mux.Router) error {
 	}
 
 	if err := provider.addLLMObsRoutes(router); err != nil {
+		return err
+	}
+
+	if err := provider.addErrorTrackingRoutes(router); err != nil {
 		return err
 	}
 
