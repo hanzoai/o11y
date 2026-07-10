@@ -20,6 +20,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/authdomain"
 	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
+	"github.com/hanzoai/o11y/pkg/modules/errortracking"
 	"github.com/hanzoai/o11y/pkg/modules/fields"
 	"github.com/hanzoai/o11y/pkg/modules/inframonitoring"
 	"github.com/hanzoai/o11y/pkg/modules/llmobs"
@@ -89,6 +90,7 @@ func NewOpenAPI(ctx context.Context, instrumentation instrumentation.Instrumenta
 		struct{ ruler.Handler }{},
 		struct{ statsreporter.Handler }{},
 		struct{ llmobs.Handler }{},
+		struct{ errortracking.Handler }{},
 	).New(ctx, instrumentation.ToProviderSettings(), apiserver.Config{})
 	if err != nil {
 		return nil, err
