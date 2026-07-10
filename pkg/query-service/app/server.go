@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"slices"
+	"strings"
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/queryparser"
@@ -218,8 +219,14 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 	if routePrefix != "" {
 		prefixed := http.StripPrefix(routePrefix, handler)
 		handler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			switch req.URL.Path {
-			case "/api/v1/health", "/api/v2/healthz", "/api/v2/readyz", "/api/v2/livez":
+			// A path already under /api/ reaches the router directly. In the embedded
+			// one-binary runtime the host (cloud mount.go rewriteExternalPath) rewrote
+			// /v1/o11y/<res> → /api/<res> BEFORE this handler, so StripPrefix(routePrefix=
+			// /v1/o11y) would 404 it — the /v1/o11y prefix is already gone (double-strip),
+			// which broke EVERY embedded o11y data call. Standalone requests still arrive
+			// /v1/o11y-prefixed and fall through to StripPrefix. Supersedes the prior
+			// health-only special-case (health is under /api/ too).
+			if strings.HasPrefix(req.URL.Path, "/api/") {
 				r.ServeHTTP(w, req)
 				return
 			}
