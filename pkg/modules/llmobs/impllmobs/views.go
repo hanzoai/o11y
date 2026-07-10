@@ -28,6 +28,12 @@ const (
 // genAIMarker is the canonical "this span is an LLM call" filter.
 var genAIMarker = llmobstypes.GenAISystem + " EXISTS"
 
+// noOrgSentinel is a tenant value no real span carries. When a span-view query
+// reaches genAIFilter with an empty org slug (a caller/plumbing bug — the handler
+// already fails closed), the org predicate binds this sentinel so the query matches
+// ZERO rows instead of every tenant's spans. Fail closed, never fail open.
+const noOrgSentinel = "\x00-no-org-\x00"
+
 func spanField(name string) telemetrytypes.TelemetryFieldKey {
 	return telemetrytypes.TelemetryFieldKey{Name: name, FieldContext: telemetrytypes.FieldContextSpan}
 }
@@ -92,15 +98,36 @@ func genAIFilter(q *llmobstypes.ViewQuery, requireExists ...string) (string, map
 
 	vars := map[string]qbtypes.VariableItem{}
 	next := 1
-	eq := func(key, val string) {
-		if val == "" {
-			return
-		}
+	// bind adds an unconditional `key = $N` predicate with the value bound as a
+	// query variable (never string-interpolated).
+	bind := func(key, val string) {
 		id := strconv.Itoa(next)
 		vars[id] = qbtypes.VariableItem{Type: qbtypes.DynamicVariableType, Value: val}
 		parts = append(parts, key+" = $"+id)
 		next++
 	}
+	// eq is the optional narrower: skipped when the value is empty.
+	eq := func(key, val string) {
+		if val == "" {
+			return
+		}
+		bind(key, val)
+	}
+
+	// MANDATORY tenant boundary, added FIRST. Every observations/traces/sessions/
+	// users row must belong to the caller's validated org: the span views have no
+	// org column other than the gen_ai.hanzo.org_id the ai emit path tags, so
+	// without this AND any authenticated tenant reads every other tenant's spans.
+	// The slug is server-set by the handler from the validated X-Org-Id (never
+	// client input); an empty value binds a sentinel that matches nothing (fail
+	// closed). Because it is ANDed before the optional narrowers, a caller supplying
+	// a FOREIGN traceId/sessionId still gets zero rows — the foreign row's org
+	// differs — closing the compose-path cross-tenant read.
+	org := q.OrgSlug
+	if org == "" {
+		org = noOrgSentinel
+	}
+	bind(llmobstypes.GenAIHanzoOrgID, org)
 
 	eq("trace_id", q.TraceID)
 	eq(llmobstypes.SessionID, q.SessionID)
