@@ -18,6 +18,12 @@ import (
 // traces / batched envelopes while staying bounded.
 const maxDecodedBytes = 24 << 20
 
+// maxEventsPerEnvelope caps the events extracted from ONE request, so a single
+// envelope cannot fan out into an unbounded number of issue upserts (amplification
+// backpressure). Real SDKs send one event per envelope; batching senders stay well
+// under this.
+const maxEventsPerEnvelope = 1000
+
 // decodeBody transparently inflates gzip / zlib / raw-deflate request bodies (the
 // Content-Encodings Sentry SDKs use), bounded by maxDecodedBytes. Identity/unknown
 // encodings pass through unchanged.
@@ -88,6 +94,9 @@ func parseEnvelope(body []byte) ([]*errortrackingtypes.SentryEvent, error) {
 
 	var events []*errortrackingtypes.SentryEvent
 	for pos < len(body) {
+		if len(events) >= maxEventsPerEnvelope {
+			break // amplification cap: ignore the tail of an oversized envelope
+		}
 		hdrLine, ok := readLine()
 		if !ok {
 			break
@@ -101,11 +110,11 @@ func parseEnvelope(body []byte) ([]*errortrackingtypes.SentryEvent, error) {
 		}
 
 		var payload []byte
-		if ih.Length != nil && *ih.Length >= 0 {
+		// Use the declared length ONLY when it is in-bounds — never add an
+		// attacker-supplied int to pos (a huge/negative length would overflow past
+		// the clamp and panic the slice). Out-of-range → treat as newline-delimited.
+		if ih.Length != nil && *ih.Length >= 0 && *ih.Length <= len(body)-pos {
 			end := pos + *ih.Length
-			if end > len(body) {
-				end = len(body)
-			}
 			payload = body[pos:end]
 			pos = end
 			if pos < len(body) && body[pos] == '\n' {

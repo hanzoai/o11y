@@ -68,11 +68,25 @@ func (migration *addErrorTracking) Up(ctx context.Context, db *bun.DB) error {
 			{Name: "environment", DataType: sqlschema.DataTypeText, Nullable: true},
 			{Name: "release", DataType: sqlschema.DataTypeText, Nullable: true},
 			{Name: "service_name", DataType: sqlschema.DataTypeText, Nullable: true},
+			{Name: "version", DataType: sqlschema.DataTypeBigInt, Nullable: false, Default: "0"},
 			{Name: "sample_event", DataType: sqlschema.DataTypeText, Nullable: true},
 		},
 		PrimaryKeyConstraint:  &sqlschema.PrimaryKeyConstraint{ColumnNames: []sqlschema.ColumnName{"id"}},
 		ForeignKeyConstraints: []*sqlschema.ForeignKeyConstraint{orgFK("org_id")},
 	})
+
+	// o11y_ingest_revocations: the per-org DSN-key rotation watermark. A DSN key is
+	// "<version>:<hmac>"; raising min_version for ONE org revokes only that org's
+	// below-min DSNs — isolated rotation without a global secret roll.
+	sqls = append(sqls, migration.sqlschema.Operator().CreateTable(&sqlschema.Table{
+		Name: "o11y_ingest_revocations",
+		Columns: []*sqlschema.Column{
+			{Name: "org_id", DataType: sqlschema.DataTypeText, Nullable: false},
+			{Name: "min_version", DataType: sqlschema.DataTypeBigInt, Nullable: false, Default: "0"},
+			{Name: "updated_at", DataType: sqlschema.DataTypeTimestamp, Nullable: false},
+		},
+		PrimaryKeyConstraint: &sqlschema.PrimaryKeyConstraint{ColumnNames: []sqlschema.ColumnName{"org_id"}},
+	})...)
 
 	// The grouping key (ingest upserts ON CONFLICT here) and the list-ordering index.
 	sqls = append(sqls,

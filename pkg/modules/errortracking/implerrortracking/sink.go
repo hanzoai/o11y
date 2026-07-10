@@ -7,19 +7,22 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
-// OccurrenceSink persists a normalized occurrence to the REUSED telemetry store
-// (o11y_logs as an ERROR-severity record) so OTel-native drill-down and the
-// unified plane see the same events. It is deliberately a seam:
+// OccurrenceSink is the OPTIONAL bridge that would also persist each occurrence to
+// the shared telemetry store (o11y_logs as an ERROR-severity record) for OTel-native
+// drill-down. It is deliberately a seam, and the default is NoopSink:
 //
-//   - The issue list/detail never depends on it — o11y_issues carries the latest
-//     sample, so error capture is fully viewable with the no-op sink.
-//   - The write is best-effort at the call site (fail-soft): a telemetry-store
-//     hiccup must never drop the authoritative issue upsert.
+//   - Authoritative storage is o11y_issues — the grouped issue plus the latest
+//     occurrence sample. Error capture is fully viewable with the no-op sink; the
+//     sink is enrichment, not the source of truth.
+//   - When a real sink is wired, its write is fail-soft at the call site: a
+//     telemetry-store hiccup must never drop the durable issue upsert.
 //
-// The default is NoopSink. The ClickHouse logs sink is enabled explicitly once its
-// insert is byte-verified against a live datastore (a raw logs_v2 INSERT couples
-// to resource-fingerprint/ts-bucket schema that must be confirmed live, not
-// reconstructed) — see chsink.go.
+// NOTE (honest status): the ClickHouse logs sink is NOT implemented in this build —
+// only NoopSink exists. A raw logs_v2 INSERT couples to resource-fingerprint /
+// ts-bucket schema that must be byte-verified against a LIVE datastore, not
+// reconstructed, so it is a deliberate fast-follow. Today occurrences are NOT
+// written to the telemetry store; the count and the latest sample live on the
+// issue row.
 type OccurrenceSink interface {
 	Write(ctx context.Context, orgID valuer.UUID, occ *errortrackingtypes.Occurrence) error
 }
