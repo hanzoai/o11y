@@ -46,6 +46,9 @@ func (m *IdentN) Wrap(next http.Handler) http.Handler {
 
 		identity, err := idn.GetIdentity(r)
 		if err != nil {
+			// Surface the identity-resolution failure instead of silently dropping to a
+			// downstream generic 401 — a swallowed provision/auth error is undebuggable.
+			m.logger.ErrorContext(r.Context(), "::IDENTITY-GET-FAILED::", errors.Attr(err))
 			next.ServeHTTP(w, r)
 			return
 		}
