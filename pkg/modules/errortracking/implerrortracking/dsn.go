@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -13,17 +14,20 @@ import (
 
 // The ingest endpoints authenticate with the Sentry-native DSN model: the caller
 // presents a public key that proves it holds an org's ingest credential. We make
-// that key STATELESS and KMS-backed rather than adding a key table for the MVP:
+// that key STATELESS and KMS-backed rather than adding a per-key secret table:
 //
-//	publicKey(org) = HMAC-SHA256(platformIngestSecret, "org:"+org)
+//	publicKey(org, v) = "<v>:" + hex(HMAC-SHA256(platformIngestSecret, "org:"+org+":v"+v))
 //
-// The platform secret comes from KMS (never plaintext, never committed). Verifying
-// is a constant-time compare; there is nothing to look up, and rotating the KMS
-// secret revokes every DSN at once. Per-org revocable keys are the fast-follow.
+// The platform secret comes from KMS (never plaintext, never committed). The key
+// carries its VERSION so ONE org can be rotated in isolation: bump that org's
+// min-version (RevocationStore.Rotate) and only its below-min DSNs stop verifying —
+// no global secret roll. Verifying is a version check + a constant-time compare.
 //
 // The org travels in the DSN project segment; the key proves the caller may write
-// to THAT org. Resolution reuses iamidentn's exact UUIDv5 mapping so the row
-// written here is read back by exactly that tenant.
+// to THAT org at THAT version. Resolution reuses iamidentn's exact UUIDv5 mapping so
+// the row written here is read back by exactly that tenant.
+
+const defaultKeyVersion = 1
 
 // orgUUIDFromProject maps a DSN project segment to the o11y org UUID. It mirrors
 // iamidentn.toUUID("org", …) BYTE-FOR-BYTE (a raw UUID passes through; a slug is
@@ -41,21 +45,39 @@ func orgUUIDFromProject(project string) (valuer.UUID, bool) {
 	return valuer.MustNewUUID(derived.String()), true
 }
 
-// publicKeyFor derives the deterministic ingest public key for a project.
-func publicKeyFor(secret []byte, project string) string {
+// publicKeyForVersion derives the versioned ingest public key for a project.
+func publicKeyForVersion(secret []byte, project string, version int) string {
 	m := hmac.New(sha256.New, secret)
-	m.Write([]byte("org:" + strings.TrimSpace(project)))
-	return hex.EncodeToString(m.Sum(nil))
+	m.Write([]byte("org:" + strings.TrimSpace(project) + ":v" + strconv.Itoa(version)))
+	return strconv.Itoa(version) + ":" + hex.EncodeToString(m.Sum(nil))
 }
 
-// verifyKey constant-time compares a presented key against the expected one for a
-// project. An empty secret or key never verifies (fail closed).
-func verifyKey(secret []byte, project, presented string) bool {
+// publicKeyFor derives the default (v1) key.
+func publicKeyFor(secret []byte, project string) string {
+	return publicKeyForVersion(secret, project, defaultKeyVersion)
+}
+
+// verifyKey constant-time compares a presented "<v>:<hmac>" key against the expected
+// one for its project, rejecting versions below the org's revocation watermark. An
+// empty secret or key, a malformed version, or a below-min version never verify
+// (fail closed).
+func verifyKey(secret []byte, project, presented string, minVersion int) bool {
 	if len(secret) == 0 || presented == "" {
 		return false
 	}
-	want := publicKeyFor(secret, project)
-	return hmac.Equal([]byte(want), []byte(presented))
+	i := strings.IndexByte(presented, ':')
+	if i <= 0 {
+		return false
+	}
+	version, err := strconv.Atoi(presented[:i])
+	if err != nil || version <= 0 {
+		return false
+	}
+	if version < minVersion {
+		return false // revoked by rotation
+	}
+	expected := publicKeyForVersion(secret, project, version)
+	return hmac.Equal([]byte(expected), []byte(presented))
 }
 
 // sentryKeyFromRequest extracts the presented public key from the Sentry auth
@@ -71,7 +93,7 @@ func sentryKeyFromRequest(r *http.Request) string {
 
 // parseSentryAuthHeader pulls sentry_key out of a header like:
 //
-//	Sentry sentry_version=7, sentry_key=abc123, sentry_client=sentry.python/1.2
+//	Sentry sentry_version=7, sentry_key=1:abc123, sentry_client=sentry.python/1.2
 func parseSentryAuthHeader(h string) string {
 	h = strings.TrimSpace(h)
 	if h == "" {
@@ -87,14 +109,15 @@ func parseSentryAuthHeader(h string) string {
 	return ""
 }
 
-// MintDSN builds the DSN an operator hands to an app to report into a given org.
-// host is the ingest origin (e.g. "o11y.hanzo.ai"); the resulting DSN is
-//
-//	https://<publicKey>@<host>/v1/o11y/<org>
-//
-// from which the Sentry SDK derives its endpoint as
-// https://<host>/v1/o11y/api/<org>/envelope/ — which the existing /v1/o11y mount
-// forwards to this module's /api/{project}/envelope/ route. No gateway change.
+// MintDSN builds the default-version DSN an operator hands to an app to report into
+// an org. host is the ingest origin (e.g. "o11y.hanzo.ai"); the SDK derives its
+// endpoint as https://<host>/v1/o11y/api/<org>/envelope/, which the existing
+// /v1/o11y mount forwards to this module's ingest route.
 func MintDSN(secret []byte, host, org string) string {
-	return "https://" + publicKeyFor(secret, org) + "@" + host + "/v1/o11y/" + org
+	return MintDSNVersion(secret, host, org, defaultKeyVersion)
+}
+
+// MintDSNVersion builds a DSN at a specific key version (used after rotating an org).
+func MintDSNVersion(secret []byte, host, org string, version int) string {
+	return "https://" + publicKeyForVersion(secret, org, version) + "@" + host + "/v1/o11y/" + org
 }

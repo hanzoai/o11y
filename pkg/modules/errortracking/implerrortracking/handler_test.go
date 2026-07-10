@@ -17,7 +17,7 @@ import (
 func newIngestFixture(t *testing.T, secret []byte) (errortracking.Handler, errortracking.Module) {
 	t.Helper()
 	mod := NewModule(NewStore(newTestStore(t)), NewNoopSink())
-	return NewHandler(mod, secret), mod
+	return NewHandler(mod, secret, false, nil), mod
 }
 
 func envelopeFor(project string) []byte {
