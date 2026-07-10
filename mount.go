@@ -42,12 +42,6 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	return nil
 }
 
-func init() {
-	cloud.Register("o11y", 70, func(app any, deps cloud.Deps) error {
-		return Mount(app.(*zip.App), deps)
-	})
-}
-
 // handlerAdapter forwards each request to the registered runtime handler
 // or returns 503 if none is set yet.
 type handlerAdapter struct{}
