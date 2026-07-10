@@ -21,6 +21,13 @@ const (
 
 	// ServiceName is the resource attribute identifying the emitting app.
 	ServiceName = "service.name"
+
+	// GenAIHanzoOrgID is the TENANT slug the ai emit path stamps on every gen_ai
+	// span (= the JWT `owner` / X-Org-Id slug). It is the ONLY org discriminator on
+	// the span-view telemetry, so every observations/traces/sessions/users query
+	// MUST AND an equality on it against the caller's validated org — otherwise a
+	// tenant reads every other tenant's spans.
+	GenAIHanzoOrgID = "gen_ai.hanzo.org_id"
 )
 
 var (

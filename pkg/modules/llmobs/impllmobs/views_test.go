@@ -1,6 +1,7 @@
 package impllmobs
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -42,33 +43,89 @@ func TestClampLimitOffset(t *testing.T) {
 }
 
 func TestGenAIFilter(t *testing.T) {
-	// bare query yields only the marker, no variables
+	orgClause := " AND " + llmobstypes.GenAIHanzoOrgID + " = $1"
+
+	// Even a "bare" query is ALWAYS org-scoped: the marker plus the mandatory
+	// tenant equality (here empty → the fail-closed sentinel, which matches nothing).
 	expr, vars := genAIFilter(&llmobstypes.ViewQuery{})
-	if expr != genAIMarker {
-		t.Fatalf("bare filter = %q, want %q", expr, genAIMarker)
+	if expr != genAIMarker+orgClause {
+		t.Fatalf("bare filter = %q, want %q", expr, genAIMarker+orgClause)
 	}
-	if len(vars) != 0 {
-		t.Fatalf("bare filter should have no vars, got %d", len(vars))
+	if v, ok := vars["1"]; !ok || v.Value != noOrgSentinel {
+		t.Fatalf("empty org must bind the fail-closed sentinel, got %+v", v)
 	}
 
-	// predicates become $N placeholders bound safely in the variables map
-	q := &llmobstypes.ViewQuery{TraceID: "t1", Model: "gpt-4o"}
+	// The org predicate is bound FIRST ($1); the optional narrowers follow as $2…
+	q := &llmobstypes.ViewQuery{OrgSlug: "acme", TraceID: "t1", Model: "gpt-4o"}
 	expr, vars = genAIFilter(q)
-	want := genAIMarker + " AND trace_id = $1 AND gen_ai.request.model = $2"
+	want := genAIMarker + " AND " + llmobstypes.GenAIHanzoOrgID + " = $1 AND trace_id = $2 AND gen_ai.request.model = $3"
 	if expr != want {
 		t.Fatalf("filter = %q, want %q", expr, want)
 	}
-	if v, ok := vars["1"]; !ok || v.Value != "t1" || v.Type != qbtypes.DynamicVariableType {
-		t.Fatalf("var 1 = %+v, want t1/dynamic", v)
+	if v, ok := vars["1"]; !ok || v.Value != "acme" || v.Type != qbtypes.DynamicVariableType {
+		t.Fatalf("var 1 (org) = %+v, want acme/dynamic", v)
 	}
-	if v, ok := vars["2"]; !ok || v.Value != "gpt-4o" {
-		t.Fatalf("var 2 = %+v, want gpt-4o", v)
+	if v, ok := vars["2"]; !ok || v.Value != "t1" {
+		t.Fatalf("var 2 = %+v, want t1", v)
+	}
+	if v, ok := vars["3"]; !ok || v.Value != "gpt-4o" {
+		t.Fatalf("var 3 = %+v, want gpt-4o", v)
 	}
 
-	// requireExists injects EXISTS clauses after the marker
-	expr, _ = genAIFilter(&llmobstypes.ViewQuery{}, llmobstypes.SessionID)
-	if expr != genAIMarker+" AND "+llmobstypes.SessionID+" EXISTS" {
-		t.Fatalf("requireExists filter = %q", expr)
+	// requireExists injects EXISTS clauses after the marker, before the org clause
+	expr, _ = genAIFilter(&llmobstypes.ViewQuery{OrgSlug: "acme"}, llmobstypes.SessionID)
+	want = genAIMarker + " AND " + llmobstypes.SessionID + " EXISTS AND " + llmobstypes.GenAIHanzoOrgID + " = $1"
+	if expr != want {
+		t.Fatalf("requireExists filter = %q, want %q", expr, want)
+	}
+}
+
+// TestGenAIFilter_TenantIsolation is the cross-tenant GATE: every span-view query
+// MUST AND an equality on the caller's org, so org A can never read org B's spans —
+// including when A supplies B's traceId/sessionId (the compose path).
+func TestGenAIFilter_TenantIsolation(t *testing.T) {
+	orgEq := func(vars map[string]qbtypes.VariableItem, slug string) bool {
+		v, ok := vars["1"] // org is always bound first
+		return ok && v.Value == slug
+	}
+	mustContainOrg := func(expr string) bool {
+		return strings.Contains(expr, llmobstypes.GenAIHanzoOrgID+" = $1")
+	}
+
+	// Two orgs → the SAME query shape, but a DIFFERENT bound tenant value.
+	exprA, varsA := genAIFilter(&llmobstypes.ViewQuery{OrgSlug: "org-a"})
+	exprB, varsB := genAIFilter(&llmobstypes.ViewQuery{OrgSlug: "org-b"})
+	if !mustContainOrg(exprA) || !orgEq(varsA, "org-a") {
+		t.Fatalf("org A not scoped: expr=%q vars=%+v", exprA, varsA)
+	}
+	if !mustContainOrg(exprB) || !orgEq(varsB, "org-b") {
+		t.Fatalf("org B not scoped: expr=%q vars=%+v", exprB, varsB)
+	}
+	if varsA["1"].Value == varsB["1"].Value {
+		t.Fatalf("two orgs bound the SAME tenant value — no isolation")
+	}
+
+	// C4: org A supplying org B's traceId/sessionId still filters on org A, so B's
+	// row (org=B) can never match — the compose path is org-ANDed.
+	exprAForeign, varsAForeign := genAIFilter(&llmobstypes.ViewQuery{OrgSlug: "org-a", TraceID: "org-b-trace", SessionID: "org-b-session"})
+	if !mustContainOrg(exprAForeign) || !orgEq(varsAForeign, "org-a") {
+		t.Fatalf("foreign traceId/sessionId dropped the org scope: expr=%q vars=%+v", exprAForeign, varsAForeign)
+	}
+
+	// The org scope is present on EVERY built span-view query (all four surfaces).
+	specFilter := func(req *qbtypes.QueryRangeRequest) string {
+		return req.CompositeQuery.Queries[0].Spec.(qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation]).Filter.Expression
+	}
+	q := &llmobstypes.ViewQuery{OrgSlug: "org-a"}
+	for name, expr := range map[string]string{
+		"observations": specFilter(buildObservationsQuery(q)),
+		"traces":       specFilter(buildTracesQuery(q)),
+		"sessions":     specFilter(buildSessionsQuery(q)),
+		"users":        specFilter(buildUsersQuery(q)),
+	} {
+		if !mustContainOrg(expr) {
+			t.Fatalf("%s view query is NOT org-scoped: %q", name, expr)
+		}
 	}
 }
 
@@ -110,7 +167,9 @@ func TestBuildScalarQueries(t *testing.T) {
 	if len(sSpec.Aggregations) == 0 {
 		t.Fatalf("scalar query must have aggregations")
 	}
-	if sSpec.Filter.Expression != genAIMarker+" AND "+llmobstypes.SessionID+" EXISTS" {
+	// sessions require session.id EXISTS AND are org-scoped (empty org here → the
+	// fail-closed sentinel bound as $1).
+	if sSpec.Filter.Expression != genAIMarker+" AND "+llmobstypes.SessionID+" EXISTS AND "+llmobstypes.GenAIHanzoOrgID+" = $1" {
 		t.Fatalf("sessions filter = %q", sSpec.Filter.Expression)
 	}
 
