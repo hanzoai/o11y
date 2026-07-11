@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"strings"
 
-	chparser "github.com/AfterShip/clickhouse-sql-parser/parser"
+	chparser "github.com/hanzo-ds/sqlparser/parser"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
