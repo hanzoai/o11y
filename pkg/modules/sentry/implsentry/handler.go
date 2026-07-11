@@ -294,7 +294,12 @@ func (h *handler) IssueEvents(rw http.ResponseWriter, r *http.Request) {
 		render.Error(rw, err)
 		return
 	}
-	events, err := h.module.IssueEvents(ctx, orgID, id, queryLimit(r))
+	projectID, err := projectFromQuery(r)
+	if err != nil {
+		render.Error(rw, err)
+		return
+	}
+	events, err := h.module.IssueEvents(ctx, orgID, id, projectID, queryLimit(r))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -333,7 +338,12 @@ func (h *handler) GetEvent(rw http.ResponseWriter, r *http.Request) {
 		render.Error(rw, err)
 		return
 	}
-	event, err := h.module.GetEvent(ctx, orgID, mux.Vars(r)["id"])
+	projectID, err := projectFromQuery(r)
+	if err != nil {
+		render.Error(rw, err)
+		return
+	}
+	event, err := h.module.GetEvent(ctx, orgID, projectID, mux.Vars(r)["id"])
 	if err != nil {
 		render.Error(rw, err)
 		return

@@ -211,15 +211,27 @@ func buildFilters(filters []sentrytypes.DiscoverFilter) (string, []any, error) {
 // occurrences / logs). Order MUST match scanEvent in eventstore.go.
 const selectColumns = "org_id, project_id, event_id, timestamp, received_at, level, type, value, message, culprit, fingerprint, platform, environment, release, service_name, transaction, trace_id, span_id, server_name, user_id, user_email, user_ip, tags, sample"
 
-func buildGetEvent(db, table, orgID, eventID string) (string, []any) {
-	// Scoped by org first, then event id; a foreign event id returns zero rows.
-	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org_id = ? AND event_id = ? ORDER BY timestamp DESC LIMIT 1", selectColumns, db, table),
-		[]any{orgID, eventID}
+func buildGetEvent(db, table, orgID, projectID, eventID string) (string, []any) {
+	// Tenant boundary FIRST (org, then project — a project is the DSN-bearing
+	// isolation unit), then event id; a foreign org/project/event returns zero rows.
+	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org_id = ? AND project_id = ? AND event_id = ? ORDER BY timestamp DESC LIMIT 1", selectColumns, db, table),
+		[]any{orgID, projectID, eventID}
 }
 
-func buildListForFingerprint(db, table, orgID, fingerprint string, limit int) (string, []any) {
-	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org_id = ? AND fingerprint = ? ORDER BY timestamp DESC LIMIT ?", selectColumns, db, table),
-		[]any{orgID, fingerprint, clampLimit(limit, defaultReadLimit, maxReadLimit)}
+func buildListForFingerprint(db, table, orgID, projectID, fingerprint string, limit int) (string, []any) {
+	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org_id = ? AND project_id = ? AND fingerprint = ? ORDER BY timestamp DESC LIMIT ?", selectColumns, db, table),
+		[]any{orgID, projectID, fingerprint, clampLimit(limit, defaultReadLimit, maxReadLimit)}
+}
+
+// buildListForTrace returns the (org, project)-scoped error events that reference a
+// trace id — the tenant-safe "errors in this trace" detail. The trace id is
+// attacker-influenced (it comes from the ingested event body), so it is ANDed AFTER
+// the bound org+project predicates: a caller only ever sees their OWN project's events
+// for a trace, never another tenant's spans (the o11y_traces span plane has no general
+// org column and is intentionally NOT read here — see the report).
+func buildListForTrace(db, table, orgID, projectID, traceID string, limit int) (string, []any) {
+	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org_id = ? AND project_id = ? AND trace_id = ? ORDER BY timestamp ASC LIMIT ?", selectColumns, db, table),
+		[]any{orgID, projectID, traceID, clampLimit(limit, defaultReadLimit, maxReadLimit)}
 }
 
 func buildListLogs(db, table, orgID, projectID, query string, w sentrytypes.Window, limit int) (string, []any) {
@@ -244,12 +256,6 @@ func buildListTraces(db, table, orgID, projectID string, w sentrytypes.Window, l
 	return fmt.Sprintf(
 		"SELECT trace_id, count() AS c, min(timestamp) AS f, max(timestamp) AS l, argMax(sample, timestamp) AS s FROM %s.%s WHERE %s AND trace_id != '' GROUP BY trace_id ORDER BY l DESC LIMIT ?",
 		db, table, where), args
-}
-
-func buildTraceExists(db, table, orgID, projectID, traceID string, w sentrytypes.Window) (string, []any) {
-	where, args := scope(orgID, projectID, w)
-	args = append(args, traceID)
-	return fmt.Sprintf("SELECT count() FROM %s.%s WHERE %s AND trace_id = ?", db, table, where), args
 }
 
 // statsFields is the allowlist selecting the counted subset for the stats timeseries.
