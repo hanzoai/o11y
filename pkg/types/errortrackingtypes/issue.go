@@ -101,6 +101,13 @@ type IssuesQuery struct {
 	Sort        string `query:"sort" json:"sort"`
 	Offset      int    `query:"offset" json:"offset"`
 	Limit       int    `query:"limit" json:"limit"`
+
+	// Fingerprints is a SERVER-ONLY narrowing set (note the absence of a `query` tag:
+	// no URL param can populate it). The Hanzo Sentry face sets it to a project's
+	// fingerprints — derived from the org+project-scoped events plane — so an org's
+	// grouped issue list can be projected to one project without widening scope. Empty
+	// leaves the list org-scoped, exactly as before.
+	Fingerprints []string `json:"-"`
 }
 
 type GettableIssues struct {
