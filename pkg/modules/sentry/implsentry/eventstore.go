@@ -196,11 +196,11 @@ func (s *eventStore) Discover(ctx context.Context, orgID, projectID valuer.UUID,
 	return out, rows.Err()
 }
 
-func (s *eventStore) GetEvent(ctx context.Context, orgID valuer.UUID, eventID string) (*sentrytypes.Event, error) {
+func (s *eventStore) GetEvent(ctx context.Context, orgID, projectID valuer.UUID, eventID string) (*sentrytypes.Event, error) {
 	if err := s.ensureSchema(ctx); err != nil {
 		return nil, err
 	}
-	sql, args := buildGetEvent(s.db, s.table, orgID.String(), eventID)
+	sql, args := buildGetEvent(s.db, s.table, orgID.String(), projectID.String(), eventID)
 	events, err := s.queryEvents(ctx, sql, args)
 	if err != nil || len(events) == 0 {
 		return nil, err
@@ -208,11 +208,22 @@ func (s *eventStore) GetEvent(ctx context.Context, orgID valuer.UUID, eventID st
 	return events[0], nil
 }
 
-func (s *eventStore) ListForFingerprint(ctx context.Context, orgID valuer.UUID, fingerprint string, limit int) ([]*sentrytypes.Event, error) {
+func (s *eventStore) ListForFingerprint(ctx context.Context, orgID, projectID valuer.UUID, fingerprint string, limit int) ([]*sentrytypes.Event, error) {
 	if err := s.ensureSchema(ctx); err != nil {
 		return nil, err
 	}
-	sql, args := buildListForFingerprint(s.db, s.table, orgID.String(), fingerprint, limit)
+	sql, args := buildListForFingerprint(s.db, s.table, orgID.String(), projectID.String(), fingerprint, limit)
+	return s.queryEvents(ctx, sql, args)
+}
+
+func (s *eventStore) ListForTrace(ctx context.Context, orgID, projectID valuer.UUID, traceID string, limit int) ([]*sentrytypes.Event, error) {
+	if traceID == "" {
+		return nil, nil
+	}
+	if err := s.ensureSchema(ctx); err != nil {
+		return nil, err
+	}
+	sql, args := buildListForTrace(s.db, s.table, orgID.String(), projectID.String(), traceID, limit)
 	return s.queryEvents(ctx, sql, args)
 }
 
@@ -264,24 +275,6 @@ func (s *eventStore) ListTraces(ctx context.Context, orgID, projectID valuer.UUI
 		out = append(out, t)
 	}
 	return out, rows.Err()
-}
-
-func (s *eventStore) TraceBelongsToProject(ctx context.Context, orgID, projectID valuer.UUID, traceID string) (bool, error) {
-	if traceID == "" {
-		return false, nil
-	}
-	if err := s.ensureSchema(ctx); err != nil {
-		return false, err
-	}
-	// A wide window: trace correlation is not time-bounded by the caller. Bounded by
-	// retention (the table TTL) regardless.
-	w := sentrytypes.Window{From: time.Unix(0, 0), To: s.now().Add(time.Hour)}
-	sql, args := buildTraceExists(s.db, s.table, orgID.String(), projectID.String(), traceID, w)
-	var n uint64
-	if err := s.store.ClickhouseDB().QueryRow(ctx, sql, args...).Scan(&n); err != nil {
-		return false, err
-	}
-	return n > 0, nil
 }
 
 func (s *eventStore) Stats(ctx context.Context, orgID, projectID valuer.UUID, field string, w sentrytypes.Window) ([]sentrytypes.StatsPoint, error) {

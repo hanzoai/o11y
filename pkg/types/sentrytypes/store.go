@@ -37,13 +37,19 @@ type EventStore interface {
 	// Discover runs a bounded, allowlist-checked aggregation scoped to (org, project).
 	Discover(ctx context.Context, orgID, projectID valuer.UUID, req *DiscoverRequest, w Window) (*DiscoverResult, error)
 
-	// GetEvent returns one event by id within the org (project-agnostic within the
-	// tenant). Not found => (nil, nil).
-	GetEvent(ctx context.Context, orgID valuer.UUID, eventID string) (*Event, error)
+	// GetEvent returns one event by id within (org, project) — a project is an
+	// isolation unit, so a cross-project id in the same tenant returns not-found.
+	// Not found => (nil, nil).
+	GetEvent(ctx context.Context, orgID, projectID valuer.UUID, eventID string) (*Event, error)
 
 	// ListForFingerprint returns the latest occurrences of an issue (by fingerprint)
-	// within the org, newest first.
-	ListForFingerprint(ctx context.Context, orgID valuer.UUID, fingerprint string, limit int) ([]*Event, error)
+	// within (org, project), newest first.
+	ListForFingerprint(ctx context.Context, orgID, projectID valuer.UUID, fingerprint string, limit int) ([]*Event, error)
+
+	// ListForTrace returns the (org, project)-scoped error events referencing a trace
+	// id — the tenant-safe "errors in this trace" detail (the o11y_traces span plane is
+	// NOT read: it has no general org column and cannot be tenant-scoped).
+	ListForTrace(ctx context.Context, orgID, projectID valuer.UUID, traceID string, limit int) ([]*Event, error)
 
 	// DistinctFingerprints returns the set of issue fingerprints seen for (org,
 	// project) inside the window — the project→issue projection used to scope the
@@ -56,11 +62,6 @@ type EventStore interface {
 
 	// ListTraces returns error-correlated traces for (org, project) in the window.
 	ListTraces(ctx context.Context, orgID, projectID valuer.UUID, w Window, limit int) ([]*TraceSummary, error)
-
-	// TraceBelongsToProject is the tenant gate for trace DETAIL: it reports whether the
-	// trace produced any captured error event for (org, project), so the reused
-	// o11y_traces waterfall read is only ever invoked for a trace the caller owns.
-	TraceBelongsToProject(ctx context.Context, orgID, projectID valuer.UUID, traceID string) (bool, error)
 
 	// Stats returns an event-count timeseries bucketed across the window for (org,
 	// project). field selects the counted subset (allowlist).

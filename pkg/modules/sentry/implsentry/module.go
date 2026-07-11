@@ -10,7 +10,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/errortracking"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking/implerrortracking"
 	"github.com/hanzoai/o11y/pkg/modules/sentry"
-	"github.com/hanzoai/o11y/pkg/modules/tracedetail"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/errortrackingtypes"
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
@@ -33,24 +32,25 @@ type Config struct {
 }
 
 type module struct {
-	projects    sentrytypes.ProjectStore
-	events      sentrytypes.EventStore
-	issues      errortracking.Module // reused grouped-issue lifecycle (o11y_issues)
-	traceDetail tracedetail.Module   // reused o11y_traces waterfall read
-	limiter     *implerrortracking.RateLimiter
-	cfg         Config
+	projects sentrytypes.ProjectStore
+	events   sentrytypes.EventStore
+	issues   errortracking.Module // reused grouped-issue lifecycle (o11y_issues)
+	limiter  *implerrortracking.RateLimiter
+	cfg      Config
 }
 
 // NewModule composes the sentry product face over the reused engine, the projects
-// store, the columnar events plane and the reused issue/trace read paths.
-func NewModule(projects sentrytypes.ProjectStore, events sentrytypes.EventStore, issues errortracking.Module, traceDetail tracedetail.Module, cfg Config) sentry.Module {
+// store, the columnar events plane and the reused issue lifecycle. Trace/event/issue
+// reads are all org+project scoped over the events plane (the o11y_traces span plane
+// is intentionally NOT read — it has no general org column, so it cannot be
+// tenant-scoped for this multi-tenant product; see the report).
+func NewModule(projects sentrytypes.ProjectStore, events sentrytypes.EventStore, issues errortracking.Module, cfg Config) sentry.Module {
 	return &module{
-		projects:    projects,
-		events:      events,
-		issues:      issues,
-		traceDetail: traceDetail,
-		limiter:     implerrortracking.NewRateLimiter(implerrortracking.IngestRatePerSec, implerrortracking.IngestBurst),
-		cfg:         cfg,
+		projects: projects,
+		events:   events,
+		issues:   issues,
+		limiter:  implerrortracking.NewRateLimiter(implerrortracking.IngestRatePerSec, implerrortracking.IngestBurst),
+		cfg:      cfg,
 	}
 }
 
@@ -211,13 +211,18 @@ func (m *module) UpdateIssue(ctx context.Context, orgID, id valuer.UUID, in *err
 }
 
 // IssueEvents returns an issue's recent occurrences from the events plane, scoped to
-// the caller's org via the issue's own fingerprint (an org-scoped GetIssue first).
-func (m *module) IssueEvents(ctx context.Context, orgID, id valuer.UUID, limit int) ([]*sentrytypes.Event, error) {
+// (org, project): the org-scoped GetIssue resolves the fingerprint, then the events
+// read binds BOTH org and project — a project is an isolation unit, so occurrences are
+// never read across projects.
+func (m *module) IssueEvents(ctx context.Context, orgID, id, projectID valuer.UUID, limit int) ([]*sentrytypes.Event, error) {
+	if _, err := m.projects.Get(ctx, orgID, projectID); err != nil {
+		return nil, err
+	}
 	issue, err := m.issues.GetIssue(ctx, orgID, id)
 	if err != nil {
 		return nil, err
 	}
-	return m.events.ListForFingerprint(ctx, orgID, issue.Issue.Fingerprint, limit)
+	return m.events.ListForFingerprint(ctx, orgID, projectID, issue.Issue.Fingerprint, limit)
 }
 
 // --- discover / events / logs / traces / stats (events plane) ---
@@ -230,8 +235,11 @@ func (m *module) Discover(ctx context.Context, orgID valuer.UUID, req *sentrytyp
 	return m.events.Discover(ctx, orgID, projectID, req, resolveWindow(req.Period, nowUTC()))
 }
 
-func (m *module) GetEvent(ctx context.Context, orgID valuer.UUID, eventID string) (*sentrytypes.Event, error) {
-	return m.events.GetEvent(ctx, orgID, eventID)
+func (m *module) GetEvent(ctx context.Context, orgID, projectID valuer.UUID, eventID string) (*sentrytypes.Event, error) {
+	if _, err := m.projects.Get(ctx, orgID, projectID); err != nil {
+		return nil, err
+	}
+	return m.events.GetEvent(ctx, orgID, projectID, eventID)
 }
 
 func (m *module) ListLogs(ctx context.Context, orgID, projectID valuer.UUID, query, period string, limit int) ([]*sentrytypes.Event, error) {
@@ -248,22 +256,22 @@ func (m *module) ListTraces(ctx context.Context, orgID, projectID valuer.UUID, p
 	return m.events.ListTraces(ctx, orgID, projectID, resolveWindow(period, nowUTC()), limit)
 }
 
-// TraceDetail returns the full o11y_traces waterfall for a trace — but ONLY after the
-// events plane confirms the trace produced a captured error for (org, project). That
-// tenant gate is what makes reusing the org-agnostic tracedetail read safe: a foreign
-// trace id fails the gate and never reaches the waterfall query.
+// TraceDetail returns the (org, project)-scoped error events referencing a trace —
+// the tenant-safe "errors in this trace" view. The load-bearing scope is on the READ
+// itself: the events query binds org AND project, so a caller only ever sees their own
+// project's events for a trace, never another tenant's. The o11y_traces span waterfall
+// is intentionally NOT read — that plane has no general org column (only gen_ai spans
+// carry gen_ai.hanzo.org_id), so it cannot be tenant-scoped for a multi-tenant product;
+// the full span waterfall is a follow-on gated on a general org column in o11y_traces.
 func (m *module) TraceDetail(ctx context.Context, orgID, projectID valuer.UUID, traceID string) (any, error) {
 	if _, err := m.projects.Get(ctx, orgID, projectID); err != nil {
 		return nil, err
 	}
-	ok, err := m.events.TraceBelongsToProject(ctx, orgID, projectID, traceID)
+	events, err := m.events.ListForTrace(ctx, orgID, projectID, traceID, 0)
 	if err != nil {
 		return nil, err
 	}
-	if !ok {
-		return nil, errors.Newf(errors.TypeNotFound, sentrytypes.ErrCodeSentryNotFound, "trace %s not found for the project", traceID)
-	}
-	return m.traceDetail.GetWaterfallV4(ctx, traceID, "", nil)
+	return map[string]any{"traceId": traceID, "events": events}, nil
 }
 
 func (m *module) Stats(ctx context.Context, orgID, projectID valuer.UUID, field, period string) ([]sentrytypes.StatsPoint, error) {
