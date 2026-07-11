@@ -221,6 +221,7 @@ func NewSQLMigrationProviderFactories(
 		sqlmigration.NewRemoveOrganizationTuplesFactory(sqlstore),
 		sqlmigration.NewAddLLMObsFactory(sqlstore, sqlschema),
 		sqlmigration.NewAddErrorTrackingFactory(sqlstore, sqlschema),
+		sqlmigration.NewAddSentryProjectsFactory(sqlstore, sqlschema),
 	)
 }
 
@@ -321,6 +322,7 @@ func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.Au
 			handlers.StatsHandler,
 			handlers.LLMObsHandler,
 			handlers.ErrorTrackingHandler,
+			handlers.SentryHandler,
 		),
 	)
 }
