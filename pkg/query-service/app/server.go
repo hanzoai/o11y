@@ -231,6 +231,16 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 				return
 			}
 
+			// Hanzo Sentry is served under the CLEAN /v1/sentry contract (no /api/,
+			// no /v1/o11y rewrite): its routes are registered on r at their literal
+			// /v1/sentry/… path. StripPrefix(routePrefix=/v1/o11y) would 404 them, so
+			// pass them straight to the router — the same escape hatch the /api/ paths
+			// use, for the same reason.
+			if strings.HasPrefix(req.URL.Path, "/v1/sentry/") {
+				r.ServeHTTP(w, req)
+				return
+			}
+
 			prefixed.ServeHTTP(w, req)
 		})
 	}

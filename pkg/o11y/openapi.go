@@ -32,6 +32,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/promote"
 	"github.com/hanzoai/o11y/pkg/modules/rawdataexport"
 	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
+	"github.com/hanzoai/o11y/pkg/modules/sentry"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/session"
 	"github.com/hanzoai/o11y/pkg/modules/spanmapper"
@@ -91,6 +92,7 @@ func NewOpenAPI(ctx context.Context, instrumentation instrumentation.Instrumenta
 		struct{ statsreporter.Handler }{},
 		struct{ llmobs.Handler }{},
 		struct{ errortracking.Handler }{},
+		struct{ sentry.Handler }{},
 	).New(ctx, instrumentation.ToProviderSettings(), apiserver.Config{})
 	if err != nil {
 		return nil, err
