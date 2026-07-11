@@ -3,9 +3,9 @@ package clickhousetelemetrystore
 import (
 	"context"
 
-	chproto "github.com/ClickHouse/ch-go/proto"
-	"github.com/ClickHouse/clickhouse-go/v2"
-	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
+	chproto "github.com/hanzo-ds/native/proto"
+	clickhouse "github.com/hanzo-ds/go"
+	"github.com/hanzo-ds/go/lib/driver"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"

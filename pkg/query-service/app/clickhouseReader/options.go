@@ -3,7 +3,7 @@ package clickhouseReader
 import (
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouse "github.com/hanzo-ds/go"
 )
 
 type Encoding string

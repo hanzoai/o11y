@@ -3,7 +3,7 @@ package queryfilterextractor
 import (
 	"strings"
 
-	"github.com/AfterShip/clickhouse-sql-parser/parser"
+	"github.com/hanzo-ds/sqlparser/parser"
 	"github.com/hanzoai/o11y/pkg/errors"
 )
 
