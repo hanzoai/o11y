@@ -28,6 +28,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/promote"
 	"github.com/hanzoai/o11y/pkg/modules/rawdataexport"
 	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
+	"github.com/hanzoai/o11y/pkg/modules/sentry"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/session"
 	"github.com/hanzoai/o11y/pkg/modules/spanmapper"
@@ -77,6 +78,7 @@ type provider struct {
 	llmPricingRuleHandler      llmpricingrule.Handler
 	llmObsHandler              llmobs.Handler
 	errorTrackingHandler       errortracking.Handler
+	sentryHandler              sentry.Handler
 	statsHandler               statsreporter.Handler
 }
 
@@ -114,6 +116,7 @@ func NewFactory(
 	statsHandler statsreporter.Handler,
 	llmObsHandler llmobs.Handler,
 	errorTrackingHandler errortracking.Handler,
+	sentryHandler sentry.Handler,
 ) factory.ProviderFactory[apiserver.APIServer, apiserver.Config] {
 	return factory.NewProviderFactory(factory.MustNewName("o11y"), func(ctx context.Context, providerSettings factory.ProviderSettings, config apiserver.Config) (apiserver.APIServer, error) {
 		return newProvider(
@@ -153,6 +156,7 @@ func NewFactory(
 			statsHandler,
 			llmObsHandler,
 			errorTrackingHandler,
+			sentryHandler,
 		)
 	})
 }
@@ -194,6 +198,7 @@ func newProvider(
 	statsHandler statsreporter.Handler,
 	llmObsHandler llmobs.Handler,
 	errorTrackingHandler errortracking.Handler,
+	sentryHandler sentry.Handler,
 ) (apiserver.APIServer, error) {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver")
 	router := mux.NewRouter().UseEncodedPath()
@@ -233,6 +238,7 @@ func newProvider(
 		llmPricingRuleHandler:      llmPricingRuleHandler,
 		llmObsHandler:              llmObsHandler,
 		errorTrackingHandler:       errorTrackingHandler,
+		sentryHandler:              sentryHandler,
 		statsHandler:               statsHandler,
 	}
 
@@ -359,6 +365,12 @@ func (provider *provider) AddToRouter(router *mux.Router) error {
 	}
 
 	if err := provider.addErrorTrackingRoutes(router); err != nil {
+		return err
+	}
+
+	// Hanzo Sentry product face — clean /v1/sentry/* routes on THIS router (no
+	// /v1/o11y→/api rewrite). Registered here so its literal paths precede any wildcard.
+	if err := provider.addSentryRoutes(router); err != nil {
 		return err
 	}
 
