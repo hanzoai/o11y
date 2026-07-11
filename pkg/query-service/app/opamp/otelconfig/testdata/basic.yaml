@@ -51,9 +51,9 @@ processors:
 extensions:
   zpages: {}
 exporters:
-  clickhousetraces:
+  datastoretraces:
     datasource: tcp://localhost:9000/o11y_traces
-    migrations: exporter/clickhousetracesexporter/migrations
+    migrations: exporter/datastoretracesexporter/migrations
   clickhousemetricswrite:
     endpoint: tcp://localhost:9000/o11y_metrics
     resource_to_telemetry_conversion:
@@ -66,7 +66,7 @@ service:
     traces:
       receivers: [jaeger, otlp]
       processors: [o11yspanmetrics/cumulative, batch]
-      exporters: [clickhousetraces]
+      exporters: [datastoretraces]
     metrics:
       receivers: [otlp, hostmetrics]
       processors: [batch]
