@@ -150,6 +150,12 @@ func (s *store) ListIssues(ctx context.Context, orgID valuer.UUID, q *errortrack
 		like := "%" + q.Query + "%"
 		query = query.Where("(type LIKE ? OR value LIKE ? OR culprit LIKE ?)", like, like, like)
 	}
+	// Server-only narrowing to a set of fingerprints (the Sentry project projection).
+	// Never client-settable (IssuesQuery.Fingerprints has no query tag), still under
+	// the mandatory org_id filter above.
+	if len(q.Fingerprints) > 0 {
+		query = query.Where("fingerprint IN (?)", bun.In(q.Fingerprints))
+	}
 
 	count, err := query.
 		OrderExpr(sortColumn(q.Sort)).
