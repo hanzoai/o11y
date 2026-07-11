@@ -21,7 +21,6 @@ import (
 // read is only ever asked for the caller's own tenant.
 type fakeEvents struct {
 	inserts   map[[2]string][]*sentrytypes.Event
-	traceOK   bool
 	lastOrg   string
 	lastProj  string
 	discovers int
@@ -41,29 +40,31 @@ func (f *fakeEvents) Discover(_ context.Context, o, p valuer.UUID, _ *sentrytype
 	f.lastOrg, f.lastProj, f.discovers = o.String(), p.String(), f.discovers+1
 	return &sentrytypes.DiscoverResult{}, nil
 }
-func (f *fakeEvents) GetEvent(_ context.Context, o valuer.UUID, id string) (*sentrytypes.Event, error) {
-	for k, evs := range f.inserts {
-		if k[0] != o.String() {
-			continue // tenant boundary: never return another org's event
-		}
-		for _, e := range evs {
-			if e.EventID == id {
-				return e, nil
-			}
+func (f *fakeEvents) GetEvent(_ context.Context, o, p valuer.UUID, id string) (*sentrytypes.Event, error) {
+	// Tenant boundary: only THIS (org, project)'s events — never another org's or
+	// another project's within the org.
+	for _, e := range f.inserts[f.key(o, p)] {
+		if e.EventID == id {
+			return e, nil
 		}
 	}
 	return nil, nil
 }
-func (f *fakeEvents) ListForFingerprint(_ context.Context, o valuer.UUID, fp string, _ int) ([]*sentrytypes.Event, error) {
+func (f *fakeEvents) ListForFingerprint(_ context.Context, o, p valuer.UUID, fp string, _ int) ([]*sentrytypes.Event, error) {
 	var out []*sentrytypes.Event
-	for k, evs := range f.inserts {
-		if k[0] != o.String() {
-			continue
+	for _, e := range f.inserts[f.key(o, p)] {
+		if e.Fingerprint == fp {
+			out = append(out, e)
 		}
-		for _, e := range evs {
-			if e.Fingerprint == fp {
-				out = append(out, e)
-			}
+	}
+	return out, nil
+}
+func (f *fakeEvents) ListForTrace(_ context.Context, o, p valuer.UUID, traceID string, _ int) ([]*sentrytypes.Event, error) {
+	f.lastOrg, f.lastProj = o.String(), p.String()
+	var out []*sentrytypes.Event
+	for _, e := range f.inserts[f.key(o, p)] {
+		if e.TraceID == traceID {
+			out = append(out, e)
 		}
 	}
 	return out, nil
@@ -87,10 +88,6 @@ func (f *fakeEvents) ListTraces(_ context.Context, o, p valuer.UUID, _ sentrytyp
 	f.lastOrg, f.lastProj = o.String(), p.String()
 	return nil, nil
 }
-func (f *fakeEvents) TraceBelongsToProject(_ context.Context, o, p valuer.UUID, _ string) (bool, error) {
-	f.lastOrg, f.lastProj = o.String(), p.String()
-	return f.traceOK, nil
-}
 func (f *fakeEvents) Stats(_ context.Context, o, p valuer.UUID, _ string, _ sentrytypes.Window) ([]sentrytypes.StatsPoint, error) {
 	f.lastOrg, f.lastProj = o.String(), p.String()
 	return nil, nil
@@ -110,7 +107,7 @@ func newModuleHarness(t *testing.T) *harness {
 	projects := NewProjectStore(store)
 	issues := errortracking.Module(implerrortracking.NewModule(implerrortracking.NewStore(store), implerrortracking.NewNoopSink()))
 	events := newFakeEvents()
-	mod := NewModule(projects, events, issues, nil, Config{IngestSecret: []byte(testSecret), Host: "api.hanzo.ai"})
+	mod := NewModule(projects, events, issues, Config{IngestSecret: []byte(testSecret), Host: "api.hanzo.ai"})
 	return &harness{mod: mod, events: events, projects: projects}
 }
 
@@ -134,9 +131,13 @@ func mustProject(t *testing.T, h *harness, org valuer.UUID, name string) *sentry
 }
 
 func occ(fp, eventID string) *errortrackingtypes.Occurrence {
+	return occTrace(fp, eventID, "")
+}
+
+func occTrace(fp, eventID, traceID string) *errortrackingtypes.Occurrence {
 	return &errortrackingtypes.Occurrence{
 		EventID: eventID, Fingerprint: fp, Type: "Error", Value: "boom",
-		Level: "error", Timestamp: time.Now().UTC(),
+		Level: "error", Timestamp: time.Now().UTC(), TraceID: traceID,
 	}
 }
 
@@ -275,18 +276,95 @@ func TestListIssues_ProjectFilterViaEventsPlane(t *testing.T) {
 	require.Error(t, err)
 }
 
-// TestTraceDetail_ForeignTraceNotFound confirms the events-plane tenant gate: a trace
-// with no captured error for (org, project) is Not Found and the reused waterfall read
-// is never invoked (traceDetail is nil in this harness — a call would panic).
-func TestTraceDetail_ForeignTraceNotFound(t *testing.T) {
+// TestTraceDetail_CrossTenantTraceIsolation is the exact scenario Red flagged: org B
+// injects an event carrying org A's trace_id, then reads that trace. Because the
+// load-bearing scope is on the events READ (org AND project bound), TraceDetail returns
+// ONLY org B's own project events for the trace — ZERO of org A's data — and the
+// o11y_traces span plane (which has no org column) is never read.
+func TestTraceDetail_CrossTenantTraceIsolation(t *testing.T) {
+	ctx := context.Background()
+	h := newModuleHarness(t)
+	orgA, orgB := valuer.GenerateUUID(), valuer.GenerateUUID()
+	pA := mustProject(t, h, orgA, "a").Project.ID
+	pB := mustProject(t, h, orgB, "b").Project.ID
+
+	const victimTrace = "VICTIM-TRACE-DEADBEEF"
+	// org A's real event on the victim trace.
+	require.NoError(t, h.mod.Ingest(ctx, orgA, pA, []*errortrackingtypes.Occurrence{occTrace("fp-a", "a-secret", victimTrace)}))
+	// org B forges an event CLAIMING the same trace id in ITS OWN project.
+	require.NoError(t, h.mod.Ingest(ctx, orgB, pB, []*errortrackingtypes.Occurrence{occTrace("fp-b", "b-own", victimTrace)}))
+
+	// org B reads the trace in its own project: sees ONLY its own event, never org A's.
+	detail, err := h.mod.TraceDetail(ctx, orgB, pB, victimTrace)
+	require.NoError(t, err)
+	events := detail.(map[string]any)["events"].([]*sentrytypes.Event)
+	require.Len(t, events, 1)
+	assert.Equal(t, "b-own", events[0].EventID)
+	for _, e := range events {
+		assert.NotEqual(t, "a-secret", e.EventID, "org A's event must NEVER surface for org B")
+		assert.Equal(t, orgB.String(), e.OrgID, "only org B rows may be returned")
+	}
+
+	// org B cannot even target org A's project (foreign project → denied).
+	_, err = h.mod.TraceDetail(ctx, orgB, pA, victimTrace)
+	require.Error(t, err)
+}
+
+// TestGetEvent_ProjectScoped: a within-tenant cross-PROJECT read is denied — a project
+// is the isolation unit, so an event in project X is not readable via project Y.
+func TestGetEvent_ProjectScoped(t *testing.T) {
 	ctx := context.Background()
 	h := newModuleHarness(t)
 	org := valuer.GenerateUUID()
-	pid := mustProject(t, h, org, "web").Project.ID
+	web := mustProject(t, h, org, "web").Project.ID
+	api := mustProject(t, h, org, "api").Project.ID
+	require.NoError(t, h.mod.Ingest(ctx, org, web, []*errortrackingtypes.Occurrence{occ("fp", "evt-web")}))
 
-	h.events.traceOK = false
-	_, err := h.mod.TraceDetail(ctx, org, pid, "unknown-trace")
-	require.Error(t, err, "a trace not seen for the project must be Not Found, never fetched")
+	// Correct project → found.
+	got, err := h.mod.GetEvent(ctx, org, web, "evt-web")
+	require.NoError(t, err)
+	require.NotNil(t, got)
+	assert.Equal(t, "evt-web", got.EventID)
+
+	// Wrong project (same org) → not found (not a leak).
+	got, err = h.mod.GetEvent(ctx, org, api, "evt-web")
+	require.NoError(t, err)
+	assert.Nil(t, got, "event from another project must not be readable via a different project")
+
+	// Foreign project (another org) → denied.
+	other := valuer.GenerateUUID()
+	foreign := mustProject(t, h, other, "x").Project.ID
+	_, err = h.mod.GetEvent(ctx, org, foreign, "evt-web")
+	require.Error(t, err)
+}
+
+// TestIssueEvents_ProjectScoped: issue occurrences are read only for the named project.
+func TestIssueEvents_ProjectScoped(t *testing.T) {
+	ctx := context.Background()
+	h := newModuleHarness(t)
+	org := valuer.GenerateUUID()
+	web := mustProject(t, h, org, "web").Project.ID
+	api := mustProject(t, h, org, "api").Project.ID
+	require.NoError(t, h.mod.Ingest(ctx, org, web, []*errortrackingtypes.Occurrence{occ("fp-shared", "e-web")}))
+	require.NoError(t, h.mod.Ingest(ctx, org, api, []*errortrackingtypes.Occurrence{occ("fp-shared", "e-api")}))
+
+	// One org-scoped issue exists for fp-shared; find it.
+	issues, err := h.mod.ListIssues(ctx, org, nil, &errortrackingtypes.IssuesQuery{}, testWindow())
+	require.NoError(t, err)
+	require.Len(t, issues.Items, 1)
+	issueID := issues.Items[0].ID
+
+	// Occurrences scoped to web → only the web event.
+	webEvents, err := h.mod.IssueEvents(ctx, org, issueID, web, 0)
+	require.NoError(t, err)
+	require.Len(t, webEvents, 1)
+	assert.Equal(t, "e-web", webEvents[0].EventID)
+
+	// Foreign project → denied.
+	other := valuer.GenerateUUID()
+	foreign := mustProject(t, h, other, "x").Project.ID
+	_, err = h.mod.IssueEvents(ctx, org, issueID, foreign, 0)
+	require.Error(t, err)
 }
 
 // disableProject flips a project's status to disabled via a direct store write.
