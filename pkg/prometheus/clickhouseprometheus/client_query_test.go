@@ -5,7 +5,7 @@ import (
 	"sort"
 	"testing"
 
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	cmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/stretchr/testify/require"
 
