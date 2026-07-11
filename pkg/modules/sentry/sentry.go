@@ -44,11 +44,13 @@ type Module interface {
 	ListIssues(ctx context.Context, orgID valuer.UUID, projectID *valuer.UUID, q *errortrackingtypes.IssuesQuery, w sentrytypes.Window) (*errortrackingtypes.GettableIssues, error)
 	GetIssue(ctx context.Context, orgID, id valuer.UUID) (*errortrackingtypes.GettableIssue, error)
 	UpdateIssue(ctx context.Context, orgID, id valuer.UUID, in *errortrackingtypes.UpdateIssue) (*errortrackingtypes.Issue, error)
-	IssueEvents(ctx context.Context, orgID, id valuer.UUID, limit int) ([]*sentrytypes.Event, error)
+	// IssueEvents lists an issue's occurrences scoped to (org, project) — a project is
+	// an isolation unit, so the caller declares which project's occurrences to read.
+	IssueEvents(ctx context.Context, orgID, id, projectID valuer.UUID, limit int) ([]*sentrytypes.Event, error)
 
 	// Discover / event detail / logs / traces / stats — all over the events plane.
 	Discover(ctx context.Context, orgID valuer.UUID, req *sentrytypes.DiscoverRequest) (*sentrytypes.DiscoverResult, error)
-	GetEvent(ctx context.Context, orgID valuer.UUID, eventID string) (*sentrytypes.Event, error)
+	GetEvent(ctx context.Context, orgID, projectID valuer.UUID, eventID string) (*sentrytypes.Event, error)
 	ListLogs(ctx context.Context, orgID valuer.UUID, projectID valuer.UUID, query, period string, limit int) ([]*sentrytypes.Event, error)
 	ListTraces(ctx context.Context, orgID valuer.UUID, projectID valuer.UUID, period string, limit int) ([]*sentrytypes.TraceSummary, error)
 	TraceDetail(ctx context.Context, orgID, projectID valuer.UUID, traceID string) (any, error)

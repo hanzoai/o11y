@@ -162,7 +162,6 @@ func NewModules(
 		implsentry.NewProjectStore(sqlstore),
 		implsentry.NewEventStore(telemetryStore),
 		errorTrackingModule,
-		traceDetailModule,
 		implsentry.Config{
 			IngestSecret: errorTrackingIngestSecret(),
 			Host:         sentryIngestHost(),

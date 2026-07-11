@@ -106,14 +106,25 @@ func TestBuildStats_ScopedAndFieldAllowlist(t *testing.T) {
 	require.Error(t, err, "unknown stats field must be rejected")
 }
 
-func TestRowReads_AreOrgScoped(t *testing.T) {
-	get, gArgs := buildGetEvent("db", "t", "org-A", "evt-1")
-	assert.Contains(t, get, "org_id = ?")
+func TestRowReads_AreOrgAndProjectScoped(t *testing.T) {
+	// Event detail is org+project bound (a project is an isolation unit).
+	get, gArgs := buildGetEvent("db", "t", "org-A", "proj-1", "evt-1")
+	assert.Contains(t, get, "org_id = ? AND project_id = ? AND event_id = ?")
 	assert.Equal(t, "org-A", gArgs[0])
+	assert.Equal(t, "proj-1", gArgs[1])
 
-	fp, fArgs := buildListForFingerprint("db", "t", "org-A", "fp-1", 10)
-	assert.Contains(t, fp, "org_id = ? AND fingerprint = ?")
+	// Issue occurrences are org+project bound.
+	fp, fArgs := buildListForFingerprint("db", "t", "org-A", "proj-1", "fp-1", 10)
+	assert.Contains(t, fp, "org_id = ? AND project_id = ? AND fingerprint = ?")
 	assert.Equal(t, "org-A", fArgs[0])
+	assert.Equal(t, "proj-1", fArgs[1])
+
+	// Trace detail reads the EVENTS plane (org+project+trace bound) — never o11y_traces.
+	ft, ftArgs := buildListForTrace("db", "t", "org-A", "proj-1", "trace-xyz", 10)
+	assert.Contains(t, ft, "org_id = ? AND project_id = ? AND trace_id = ?")
+	assert.Equal(t, "org-A", ftArgs[0])
+	assert.Equal(t, "proj-1", ftArgs[1])
+	assert.Equal(t, "trace-xyz", ftArgs[2])
 
 	logs, lArgs := buildListLogs("db", "t", "org-A", "proj-1", "boom", testWindow(), 10)
 	assert.Contains(t, logs, "org_id = ? AND project_id = ?")
@@ -124,11 +135,6 @@ func TestRowReads_AreOrgScoped(t *testing.T) {
 	tr, tArgs := buildListTraces("db", "t", "org-A", "proj-1", testWindow(), 10)
 	assert.Contains(t, tr, "org_id = ? AND project_id = ?")
 	assert.Equal(t, "org-A", tArgs[0])
-
-	ex, eArgs := buildTraceExists("db", "t", "org-A", "proj-1", "trace-xyz", testWindow())
-	assert.Contains(t, ex, "org_id = ? AND project_id = ?")
-	assert.Equal(t, "org-A", eArgs[0])
-	assert.Equal(t, "trace-xyz", eArgs[len(eArgs)-1])
 
 	df, dArgs := buildDistinctFingerprints("db", "t", "org-A", "proj-1", testWindow())
 	assert.Contains(t, df, "org_id = ? AND project_id = ?")
