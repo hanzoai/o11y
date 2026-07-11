@@ -45,6 +45,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory/implrulestatehistory"
 	"github.com/hanzoai/o11y/pkg/modules/savedview"
 	"github.com/hanzoai/o11y/pkg/modules/savedview/implsavedview"
+	"github.com/hanzoai/o11y/pkg/modules/sentry"
+	"github.com/hanzoai/o11y/pkg/modules/sentry/implsentry"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount/implserviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/services"
@@ -95,6 +97,7 @@ type Handlers struct {
 	LLMPricingRuleHandler   llmpricingrule.Handler
 	LLMObsHandler           llmobs.Handler
 	ErrorTrackingHandler    errortracking.Handler
+	SentryHandler           sentry.Handler
 	StatsHandler            statsreporter.Handler
 }
 
@@ -145,6 +148,7 @@ func NewHandlers(
 		LLMPricingRuleHandler:   impllmpricingrule.NewHandler(modules.LLMPricingRule),
 		LLMObsHandler:           impllmobs.NewHandler(modules.LLMObs),
 		ErrorTrackingHandler:    implerrortracking.NewHandler(modules.ErrorTracking, errorTrackingIngestSecret(), errorTrackingCapturePII(), modules.ErrorTrackingRevocations),
+		SentryHandler:           implsentry.NewHandler(modules.Sentry, len(errorTrackingIngestSecret()) > 0, errorTrackingCapturePII()),
 		StatsHandler:            statsreporter.NewHandler(statsAggregator),
 	}
 }
@@ -164,6 +168,16 @@ func errorTrackingIngestSecret() []byte {
 func errorTrackingCapturePII() bool {
 	v := strings.ToLower(strings.TrimSpace(os.Getenv("O11Y_ERRORTRACKING_CAPTURE_PII")))
 	return v == "true" || v == "1" || v == "yes"
+}
+
+// sentryIngestHost is the DSN endpoint origin the Sentry product mints into project
+// DSNs (https://<key>@<host>/v1/sentry/<project>). Defaults to the public API host;
+// O11Y_SENTRY_INGEST_HOST overrides per deployment/brand.
+func sentryIngestHost() string {
+	if v := strings.TrimSpace(os.Getenv("O11Y_SENTRY_INGEST_HOST")); v != "" {
+		return v
+	}
+	return "api.hanzo.ai"
 }
 
 // errorTrackingRetention is the age past which resolved-or-stale issues are swept.
