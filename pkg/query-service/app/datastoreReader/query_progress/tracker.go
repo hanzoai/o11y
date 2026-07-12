@@ -3,7 +3,7 @@ package queryprogress
 import (
 	"log/slog"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouse "github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 )
 

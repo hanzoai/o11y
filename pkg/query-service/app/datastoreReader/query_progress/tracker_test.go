@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouse "github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/stretchr/testify/require"
 )

@@ -302,7 +302,7 @@ func (m *module) getPerGroupPodPhaseCounts(
 	finalSQL := querybuilder.CombineCTEs(cteFragments) + countPodsPerPhaseSQL
 	finalArgs := querybuilder.PrependArgs([][]any{timeSeriesFPsArgs, latestPhasePerPodArgs}, nil)
 
-	rows, err := m.telemetryStore.ClickhouseDB().Query(ctx, finalSQL, finalArgs...)
+	rows, err := m.telemetryStore.DatastoreDB().Query(ctx, finalSQL, finalArgs...)
 	if err != nil {
 		return nil, err
 	}

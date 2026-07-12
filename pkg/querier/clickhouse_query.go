@@ -10,7 +10,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouse "github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -129,7 +129,7 @@ func (q *chSQLQuery) Execute(ctx context.Context) (*qbtypes.Result, error) {
 		return nil, err
 	}
 
-	rows, err := q.telemetryStore.ClickhouseDB().Query(ctx, query, q.args...)
+	rows, err := q.telemetryStore.DatastoreDB().Query(ctx, query, q.args...)
 	if err != nil {
 		return nil, err
 	}
