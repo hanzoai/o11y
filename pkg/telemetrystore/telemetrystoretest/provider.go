@@ -7,7 +7,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	cmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
-	"github.com/hanzoai/o11y/pkg/telemetrystore/clickhousetelemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoretelemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/telemetrystoretypes"
 )
 
@@ -30,8 +30,8 @@ func New(_ telemetrystore.Config, matcher sqlmock.QueryMatcher) *Provider {
 	}
 }
 
-// ClickhouseDB returns the mock Clickhouse connection.
-func (p *Provider) ClickhouseDB() clickhouse.Conn {
+// DatastoreDB returns the mock Clickhouse connection.
+func (p *Provider) DatastoreDB() clickhouse.Conn {
 	return p.clickhouseDB.(clickhouse.Conn)
 }
 
@@ -42,17 +42,17 @@ func (p *Provider) Cluster() string {
 
 // Estimate runs EXPLAIN ESTIMATE against the mock connection.
 func (p *Provider) Estimate(ctx context.Context, stmt string, args ...any) ([]telemetrystoretypes.EstimateEntry, error) {
-	return clickhousetelemetrystore.RunExplainEstimate(ctx, p.clickhouseDB.(clickhouse.Conn), stmt, args...)
+	return datastoretelemetrystore.RunExplainEstimate(ctx, p.clickhouseDB.(clickhouse.Conn), stmt, args...)
 }
 
 // Plan runs EXPLAIN PLAN against the mock connection.
 func (p *Provider) Plan(ctx context.Context, stmt string, args ...any) error {
-	return clickhousetelemetrystore.RunExplainPlan(ctx, p.clickhouseDB.(clickhouse.Conn), stmt, args...)
+	return datastoretelemetrystore.RunExplainPlan(ctx, p.clickhouseDB.(clickhouse.Conn), stmt, args...)
 }
 
 // Indexes runs EXPLAIN indexes against the mock connection.
 func (p *Provider) Indexes(ctx context.Context, stmt string, args ...any) (telemetrystoretypes.Granules, bool, error) {
-	return clickhousetelemetrystore.RunExplainIndexes(ctx, p.clickhouseDB.(clickhouse.Conn), stmt, args...)
+	return datastoretelemetrystore.RunExplainIndexes(ctx, p.clickhouseDB.(clickhouse.Conn), stmt, args...)
 }
 
 // Mock returns the underlying Clickhouse mock instance for setting expectations.

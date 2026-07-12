@@ -1,4 +1,4 @@
-package clickhousetelemetrystore
+package datastoretelemetrystore
 
 import (
 	"context"
@@ -88,7 +88,7 @@ func NewFactory(hookFactories ...factory.ProviderFactory[telemetrystore.Telemetr
 }
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config telemetrystore.Config, hookFactories ...factory.ProviderFactory[telemetrystore.TelemetryStoreHook, telemetrystore.Config]) (telemetrystore.TelemetryStore, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/telemetrystore/clickhousetelemetrystore")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/telemetrystore/datastoretelemetrystore")
 
 	options, err := clickhouse.ParseDSN(config.Clickhouse.DSN)
 	if err != nil {
@@ -140,7 +140,7 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 	return p, nil
 }
 
-func (p *provider) ClickhouseDB() clickhouse.Conn {
+func (p *provider) DatastoreDB() clickhouse.Conn {
 	return p
 }
 

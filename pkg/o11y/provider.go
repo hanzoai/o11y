@@ -44,7 +44,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/pprof/httppprof"
 	"github.com/hanzoai/o11y/pkg/pprof/nooppprof"
 	"github.com/hanzoai/o11y/pkg/prometheus"
-	"github.com/hanzoai/o11y/pkg/prometheus/clickhouseprometheus"
+	"github.com/hanzoai/o11y/pkg/prometheus/datastoreprometheus"
 	"github.com/hanzoai/o11y/pkg/querier"
 	"github.com/hanzoai/o11y/pkg/querier/o11yquerier"
 	"github.com/hanzoai/o11y/pkg/sharder"
@@ -60,7 +60,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/statsreporter/analyticsstatsreporter"
 	"github.com/hanzoai/o11y/pkg/statsreporter/noopstatsreporter"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
-	"github.com/hanzoai/o11y/pkg/telemetrystore/clickhousetelemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoretelemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystorehook"
 	"github.com/hanzoai/o11y/pkg/tokenizer"
 	"github.com/hanzoai/o11y/pkg/tokenizer/jwttokenizer"
@@ -226,7 +226,7 @@ func NewSQLMigrationProviderFactories(
 
 func NewTelemetryStoreProviderFactories() factory.NamedMap[factory.ProviderFactory[telemetrystore.TelemetryStore, telemetrystore.Config]] {
 	return factory.MustNewNamedMap(
-		clickhousetelemetrystore.NewFactory(
+		datastoretelemetrystore.NewFactory(
 			telemetrystorehook.NewLoggingFactory(),
 			// adding instrumentation factory before settings as we are starting the query span here
 			telemetrystorehook.NewInstrumentationFactory(),
@@ -237,7 +237,7 @@ func NewTelemetryStoreProviderFactories() factory.NamedMap[factory.ProviderFacto
 
 func NewPrometheusProviderFactories(telemetryStore telemetrystore.TelemetryStore) factory.NamedMap[factory.ProviderFactory[prometheus.Prometheus, prometheus.Config]] {
 	return factory.MustNewNamedMap(
-		clickhouseprometheus.NewFactory(telemetryStore),
+		datastoreprometheus.NewFactory(telemetryStore),
 	)
 }
 
