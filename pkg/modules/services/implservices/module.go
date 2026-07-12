@@ -38,7 +38,7 @@ func NewModule(q querier.Querier, ts telemetrystore.TelemetryStore) services.Mod
 func (m *module) FetchTopLevelOperations(ctx context.Context, start time.Time, services []string) (map[string][]string, error) {
 	ctx = m.withServicesContext(ctx, "FetchTopLevelOperations")
 
-	db := m.TelemetryStore.ClickhouseDB()
+	db := m.TelemetryStore.DatastoreDB()
 	query := fmt.Sprintf("SELECT name, serviceName, max(time) as ts FROM %s.%s WHERE time >= @start", telemetrytraces.DBName, telemetrytraces.TopLevelOperationsTableName)
 	args := []any{clickhouse.Named("start", start)}
 	if len(services) > 0 {
