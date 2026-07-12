@@ -191,7 +191,7 @@ func NewReader(
 	traceLocalTableName := options.primary.TraceLocalTableNameV3
 
 	return &ClickHouseReader{
-		db:                       telemetryStore.ClickhouseDB(),
+		db:                       telemetryStore.DatastoreDB(),
 		logger:                   logger,
 		prometheus:               prometheus,
 		sqlDB:                    sqlDB,
