@@ -92,7 +92,6 @@ require (
 	cloud.google.com/go v0.123.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0 // indirect
-	github.com/ClickHouse/clickhouse-go/v2 v2.44.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/ThinkInAIXYZ/go-mcp v0.2.24 // indirect
@@ -212,7 +211,7 @@ require (
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
-	github.com/hanzoai/ai v1.804.1 // indirect
+	github.com/hanzoai/ai v1.805.3 // indirect
 	github.com/hanzoai/beego/v2 v2.4.1 // indirect
 	github.com/hanzoai/dashscope-go-sdk v0.0.2 // indirect
 	github.com/hanzoai/dashscopego v0.6.0 // indirect
@@ -330,6 +329,7 @@ require (
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xlab/treeprint v1.2.0 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
+	github.com/zap-proto/fiber/v3 v3.2.1 // indirect
 	github.com/zap-proto/go v1.3.0 // indirect
 	github.com/zap-proto/http v0.2.0 // indirect
 	github.com/zap-proto/md v0.1.0 // indirect
@@ -375,7 +375,6 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.12.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.0 // indirect
-	github.com/ClickHouse/ch-go v0.71.0 // indirect
 	github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b
 	github.com/andybalholm/brotli v1.2.1 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
@@ -423,8 +422,8 @@ require (
 	github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
 	github.com/hanzo-ds/go v1.0.0
-	github.com/hanzo-ds/mock v0.14.1
-	github.com/hanzo-ds/native v0.71.0
+	github.com/hanzo-ds/mock v0.14.2
+	github.com/hanzo-ds/native v0.72.0
 	github.com/hanzo-ds/sqlparser v0.4.16
 	github.com/hanzoai/cloud v1.786.112
 	github.com/hashicorp/errwrap v1.1.0 // indirect
@@ -502,7 +501,7 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	github.com/zap-proto/zip v1.2.1
+	github.com/zap-proto/zip v1.5.0
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/collector/component v1.54.0 // indirect
 	go.opentelemetry.io/collector/component/componentstatus v0.148.0 // indirect
@@ -582,3 +581,9 @@ replace github.com/expr-lang/expr => github.com/hanzoai/expr v1.17.8
 replace github.com/hanzoai/cloud => ../cloud
 
 exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
+
+replace github.com/hanzoai/otel-collector v0.144.8 => github.com/hanzoai/otel-collector v0.144.8-hanzo.0
+
+replace github.com/SigNoz/signoz-otel-collector => github.com/hanzoai/signoz-otel-collector v0.144.3-hanzo.1
+
+replace github.com/sashabaranov/go-openai => github.com/hanzoai/go-openai v1.40.0

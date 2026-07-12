@@ -17,7 +17,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
-	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader"
 	logsV4 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v4"
 	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
 	tracesV3 "github.com/hanzoai/o11y/pkg/query-service/app/traces/v3"
@@ -1382,7 +1382,7 @@ func Test_querier_Traces_runWindowBasedListQueryDesc(t *testing.T) {
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastoreReader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
@@ -1404,7 +1404,7 @@ func Test_querier_Traces_runWindowBasedListQueryDesc(t *testing.T) {
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastoreReader.NewReader(
 				slog.Default(),
 				nil,
 				telemetryStore,
@@ -1609,7 +1609,7 @@ func Test_querier_Traces_runWindowBasedListQueryAsc(t *testing.T) {
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastoreReader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
@@ -1629,7 +1629,7 @@ func Test_querier_Traces_runWindowBasedListQueryAsc(t *testing.T) {
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastoreReader.NewReader(
 				slog.Default(),
 				nil,
 				telemetryStore,
@@ -1909,7 +1909,7 @@ func Test_querier_Logs_runWindowBasedListQueryDesc(t *testing.T) {
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastoreReader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
@@ -1929,7 +1929,7 @@ func Test_querier_Logs_runWindowBasedListQueryDesc(t *testing.T) {
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastoreReader.NewReader(
 				slog.Default(),
 				nil,
 				telemetryStore,
@@ -2136,7 +2136,7 @@ func Test_querier_Logs_runWindowBasedListQueryAsc(t *testing.T) {
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastoreReader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
@@ -2156,7 +2156,7 @@ func Test_querier_Logs_runWindowBasedListQueryAsc(t *testing.T) {
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastoreReader.NewReader(
 				slog.Default(),
 				nil,
 				telemetryStore,
