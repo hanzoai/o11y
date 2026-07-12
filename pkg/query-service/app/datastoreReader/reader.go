@@ -1,4 +1,4 @@
-package clickhouseReader
+package datastoreReader
 
 import (
 	"context"
@@ -44,7 +44,7 @@ import (
 
 	"log/slog"
 
-	queryprogress "github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader/query_progress"
+	queryprogress "github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader/query_progress"
 	"github.com/hanzoai/o11y/pkg/query-service/app/resource"
 	"github.com/hanzoai/o11y/pkg/query-service/app/services"
 	"github.com/hanzoai/o11y/pkg/query-service/app/traces/smart"
@@ -191,7 +191,7 @@ func NewReader(
 	traceLocalTableName := options.primary.TraceLocalTableNameV3
 
 	return &ClickHouseReader{
-		db:                       telemetryStore.ClickhouseDB(),
+		db:                       telemetryStore.DatastoreDB(),
 		logger:                   logger,
 		prometheus:               prometheus,
 		sqlDB:                    sqlDB,

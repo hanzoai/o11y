@@ -1,4 +1,4 @@
-package clickhousetelemetrystore
+package datastoretelemetrystore
 
 import (
 	"github.com/hanzoai/o11y/pkg/errors"

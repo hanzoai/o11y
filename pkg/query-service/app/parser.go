@@ -41,7 +41,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 	querytemplate "github.com/hanzoai/o11y/pkg/query-service/utils/queryTemplate"
 	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
-	chVariables "github.com/hanzoai/o11y/pkg/variables/clickhouse"
+	dsVariables "github.com/hanzoai/o11y/pkg/variables/datastore"
 )
 
 var allowedFunctions = []string{"count", "ratePerSec", "sum", "avg", "min", "max", "p50", "p90", "p95", "p99"}
@@ -735,16 +735,16 @@ func validateExpressions(expressions []string, funcs map[string]govaluate.Expres
 // dashboard variables
 // TODO(srikanthccv): version based query replacement
 func chTransformQuery(query string, variables map[string]interface{}) {
-	varsForTransform := make([]chVariables.VariableValue, 0, len(variables))
+	varsForTransform := make([]dsVariables.VariableValue, 0, len(variables))
 	for name := range variables {
-		varsForTransform = append(varsForTransform, chVariables.VariableValue{
+		varsForTransform = append(varsForTransform, dsVariables.VariableValue{
 			Name:        name,
 			Values:      []string{"__all__"},
 			IsSelectAll: true,
 			FieldType:   "scalar",
 		})
 	}
-	transformer := chVariables.NewQueryTransformer(query, varsForTransform)
+	transformer := dsVariables.NewQueryTransformer(query, varsForTransform)
 	transformedQuery, err := transformer.Transform()
 	if err != nil {
 		slog.Warn("failed to transform clickhouse query", "query", query, o11yerrors.Attr(err))
