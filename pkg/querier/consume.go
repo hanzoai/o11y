@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
+	"github.com/hanzoai/datastore-go/v2/lib/driver"
 	"github.com/hanzoai/o11y/pkg/errors"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/spantypes"

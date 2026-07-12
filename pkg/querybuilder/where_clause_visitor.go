@@ -1022,8 +1022,8 @@ func trimQuotes(txt string) string {
 		}
 	}
 
-	// unescape so clickhouse-go can escape it
-	// https://github.com/ClickHouse/clickhouse-go/blob/6c5ddb38dd2edc841a3b927711b841014759bede/bind.go#L278
+	// unescape so the datastore driver can escape it
+	// see github.com/hanzoai/datastore-go/v2 bind.go stringQuoteReplacer
 	txt = strings.ReplaceAll(txt, `\\`, `\`)
 	txt = strings.ReplaceAll(txt, `\'`, `'`)
 	return txt
