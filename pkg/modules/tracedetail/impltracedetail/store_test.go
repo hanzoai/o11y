@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	cmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/modules/tracedetail/impltracedetail"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"

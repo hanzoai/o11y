@@ -1,4 +1,4 @@
-package clickhouseprometheus
+package datastoreprometheus
 
 import (
 	"context"
@@ -174,7 +174,7 @@ func (client *client) queryToClickhouseQuery(_ context.Context, query *prompb.Qu
 
 func (client *client) getFingerprintsFromClickhouseQuery(ctx context.Context, query string, args []any) (map[uint64][]prompb.Label, error) {
 	ctx = client.withClickhousePrometheusContext(ctx, "getFingerprintsFromClickhouseQuery")
-	rows, err := client.telemetryStore.ClickhouseDB().Query(ctx, query, args...)
+	rows, err := client.telemetryStore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +226,7 @@ func (client *client) querySamples(ctx context.Context, start int64, end int64, 
 
 	query, allArgs := buildSamplesQuery(start, end, metricName, subQuery, args)
 
-	rows, err := client.telemetryStore.ClickhouseDB().Query(ctx, query, allArgs...)
+	rows, err := client.telemetryStore.DatastoreDB().Query(ctx, query, allArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +292,7 @@ func (client *client) querySamples(ctx context.Context, start int64, end int64, 
 func (client *client) queryRaw(ctx context.Context, query string, ts int64) (*prompb.QueryResult, error) {
 	ctx = client.withClickhousePrometheusContext(ctx, "queryRaw")
 
-	rows, err := client.telemetryStore.ClickhouseDB().Query(ctx, query)
+	rows, err := client.telemetryStore.DatastoreDB().Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}

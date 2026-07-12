@@ -1,4 +1,4 @@
-package clickhousetelemetrystore
+package datastoretelemetrystore
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouse "github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/telemetrystoretypes"
 )

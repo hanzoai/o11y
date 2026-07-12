@@ -1,4 +1,4 @@
-package clickhouseReader
+package datastoreReader
 
 import (
 	"context"
@@ -37,14 +37,14 @@ import (
 	"github.com/prometheus/prometheus/promql"
 	"github.com/prometheus/prometheus/util/stats"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
-	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
+	clickhouse "github.com/hanzo-ds/go"
+	"github.com/hanzo-ds/go/lib/driver"
 
 	"github.com/hanzoai/o11y/pkg/cache"
 
 	"log/slog"
 
-	queryprogress "github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader/query_progress"
+	queryprogress "github.com/hanzoai/o11y/pkg/query-service/app/datastoreReader/query_progress"
 	"github.com/hanzoai/o11y/pkg/query-service/app/resource"
 	"github.com/hanzoai/o11y/pkg/query-service/app/services"
 	"github.com/hanzoai/o11y/pkg/query-service/app/traces/smart"
@@ -191,7 +191,7 @@ func NewReader(
 	traceLocalTableName := options.primary.TraceLocalTableNameV3
 
 	return &ClickHouseReader{
-		db:                       telemetryStore.ClickhouseDB(),
+		db:                       telemetryStore.DatastoreDB(),
 		logger:                   logger,
 		prometheus:               prometheus,
 		sqlDB:                    sqlDB,

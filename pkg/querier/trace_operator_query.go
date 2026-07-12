@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouse "github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
@@ -76,7 +76,7 @@ func (q *traceOperatorQuery) executeWithContext(ctx context.Context, query strin
 		elapsed += p.Elapsed
 	}))
 
-	rows, err := q.telemetryStore.ClickhouseDB().Query(ctx, query, args...)
+	rows, err := q.telemetryStore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}

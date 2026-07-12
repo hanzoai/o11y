@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	cmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
@@ -21,7 +21,7 @@ type anyMatcher struct{}
 func (anyMatcher) Match(string, string) error { return nil }
 
 // TestEventStore_EnsureSchemaAndQuery exercises the REAL datastore IO path against the
-// clickhouse-go-mock: ensureSchema runs the CREATE DATABASE + CREATE TABLE DDL exactly
+// datastore mock: ensureSchema runs the CREATE DATABASE + CREATE TABLE DDL exactly
 // once, and a read binds + decodes rows. This verifies the wiring (query executes,
 // rows scan) — it does NOT verify a live datastore accepts the DDL (see the honest
 // caveat on createSchemaDDL; no live datastore was reachable in this build).
