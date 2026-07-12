@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouse "github.com/hanzoai/datastore-go/v2"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/google/uuid"
 	"golang.org/x/exp/maps"

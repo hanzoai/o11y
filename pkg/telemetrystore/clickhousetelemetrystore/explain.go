@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouse "github.com/hanzoai/datastore-go/v2"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/telemetrystoretypes"
 )

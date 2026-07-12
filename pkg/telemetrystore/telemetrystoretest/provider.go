@@ -3,7 +3,7 @@ package telemetrystoretest
 import (
 	"context"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouse "github.com/hanzoai/datastore-go/v2"
 	"github.com/DATA-DOG/go-sqlmock"
 	cmock "github.com/hanzoai/clickhouse-go-mock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
