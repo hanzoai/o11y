@@ -1,5 +1,5 @@
 // Clickhouse reader methods for powering QB filter suggestions
-package clickhouseReader
+package datastoreReader
 
 import (
 	"context"

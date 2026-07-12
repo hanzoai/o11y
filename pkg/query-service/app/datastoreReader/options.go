@@ -1,4 +1,4 @@
-package clickhouseReader
+package datastoreReader
 
 import (
 	"time"
