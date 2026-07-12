@@ -1,4 +1,4 @@
-package clickhouseprometheus
+package datastoreprometheus
 
 import (
 	"context"
@@ -31,7 +31,7 @@ func NewFactory(telemetryStore telemetrystore.TelemetryStore) factory.ProviderFa
 }
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config prometheus.Config, telemetryStore telemetrystore.TelemetryStore) (prometheus.Prometheus, error) {
-	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/prometheus/clickhouseprometheus")
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/prometheus/datastoreprometheus")
 
 	readClient := NewReadClient(settings, telemetryStore)
 

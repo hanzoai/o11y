@@ -10,7 +10,7 @@
 // satisfies zapmetricreceiver.Handler, so a receiver dispatches each decoded
 // batch straight into the datastore:
 //
-//	w := datastoremetrics.NewWriter(store.ClickhouseDB())
+//	w := datastoremetrics.NewWriter(store.DatastoreDB())
 //	rcv, _ := zapmetricreceiver.New(zapmetricreceiver.Config{OnBatch: w.WriteMetrics})
 //
 // WHY THIS EXISTS — the unblock. The stock histogram exporter serialises OTLP
@@ -32,8 +32,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
-	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
+	clickhouse "github.com/hanzo-ds/go"
+	"github.com/hanzo-ds/go/lib/driver"
 	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
 	"github.com/hanzoai/o11y/pkg/zapmetricreceiver"
 )

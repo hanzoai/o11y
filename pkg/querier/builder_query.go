@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouse "github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrytraces"
@@ -364,7 +364,7 @@ func (q *builderQuery[T]) executeWithContext(ctx context.Context, query string, 
 		elapsed += p.Elapsed
 	}))
 
-	rows, err := q.telemetryStore.ClickhouseDB().Query(ctx, query, args...)
+	rows, err := q.telemetryStore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return nil, errors.Newf(errors.TypeTimeout, errors.CodeTimeout, "Query timed out").
