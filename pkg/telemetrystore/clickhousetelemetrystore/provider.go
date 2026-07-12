@@ -140,7 +140,7 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 	return p, nil
 }
 
-func (p *provider) ClickhouseDB() clickhouse.Conn {
+func (p *provider) DatastoreDB() clickhouse.Conn {
 	return p
 }
 

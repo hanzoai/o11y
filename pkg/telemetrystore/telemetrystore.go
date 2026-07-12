@@ -8,8 +8,8 @@ import (
 )
 
 type TelemetryStore interface {
-	// ClickhouseDB returns the clickhouse connection, which can also EXPLAIN.
-	ClickhouseDB() clickhouse.Conn
+	// DatastoreDB returns the clickhouse connection, which can also EXPLAIN.
+	DatastoreDB() clickhouse.Conn
 
 	// Cluster returns the cluster name.
 	Cluster() string

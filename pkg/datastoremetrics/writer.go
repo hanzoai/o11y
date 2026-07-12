@@ -10,7 +10,7 @@
 // satisfies zapmetricreceiver.Handler, so a receiver dispatches each decoded
 // batch straight into the datastore:
 //
-//	w := datastoremetrics.NewWriter(store.ClickhouseDB())
+//	w := datastoremetrics.NewWriter(store.DatastoreDB())
 //	rcv, _ := zapmetricreceiver.New(zapmetricreceiver.Config{OnBatch: w.WriteMetrics})
 //
 // WHY THIS EXISTS — the unblock. The stock histogram exporter serialises OTLP

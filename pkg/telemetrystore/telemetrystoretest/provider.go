@@ -30,8 +30,8 @@ func New(_ telemetrystore.Config, matcher sqlmock.QueryMatcher) *Provider {
 	}
 }
 
-// ClickhouseDB returns the mock Clickhouse connection.
-func (p *Provider) ClickhouseDB() clickhouse.Conn {
+// DatastoreDB returns the mock Clickhouse connection.
+func (p *Provider) DatastoreDB() clickhouse.Conn {
 	return p.clickhouseDB.(clickhouse.Conn)
 }
 
