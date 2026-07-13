@@ -8,7 +8,7 @@ import (
 
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzoai/sqlbuilder"
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -82,7 +82,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorILike,
 			value:         "%admin%",
-			expectedSQL:   "LOWER(JSONExtractString(labels, 'user.id')) LIKE LOWER(?)",
+			expectedSQL:   "JSONExtractString(labels, 'user.id') ILIKE ?",
 			expectedArgs:  []any{"%admin%"},
 			expectedError: nil,
 		},
@@ -95,7 +95,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotILike,
 			value:         "%admin%",
-			expectedSQL:   "LOWER(JSONExtractString(labels, 'user.id')) NOT LIKE LOWER(?)",
+			expectedSQL:   "JSONExtractString(labels, 'user.id') NOT ILIKE ?",
 			expectedArgs:  []any{"%admin%"},
 			expectedError: nil,
 		},
@@ -108,7 +108,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorContains,
 			value:         "admin",
-			expectedSQL:   "LOWER(JSONExtractString(labels, 'user.id')) LIKE LOWER(?)",
+			expectedSQL:   "JSONExtractString(labels, 'user.id') ILIKE ?",
 			expectedArgs:  []any{"%admin%"},
 			expectedError: nil,
 		},
@@ -144,7 +144,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorContains,
 			value:         521509198310,
-			expectedSQL:   "LOWER(JSONExtractString(labels, 'user.id')) LIKE LOWER(?)",
+			expectedSQL:   "JSONExtractString(labels, 'user.id') ILIKE ?",
 			expectedArgs:  []any{"%521509198310%"},
 			expectedError: nil,
 		},
