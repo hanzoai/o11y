@@ -378,7 +378,6 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.12.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.0 // indirect
-	github.com/ClickHouse/ch-go v0.72.0 // indirect
 	github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b
 	github.com/andybalholm/brotli v1.2.1 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
@@ -426,7 +425,7 @@ require (
 	github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
 	github.com/hanzoai/cloud v1.786.112
-	github.com/hanzoai/datastore-go/v2 v2.47.0
+	github.com/hanzoai/datastore-go/v2 v2.47.2
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.5 // indirect
