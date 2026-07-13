@@ -6,7 +6,40 @@ licensed under the MIT Expat license:
 
     Copyright (c) 2020-present SigNoz Inc.
 
+Forked from https://github.com/SigNoz/signoz (SigNoz core, MIT Expat), synced
+to upstream main at commit 3e6339019. The import history was squashed, so the
+repository root commit is a Hanzo branding commit rather than the upstream
+commit history.
+
 Only the MIT Expat-licensed portions of SigNoz are used here. SigNoz's
 source-available "ee/" and "cmd/enterprise/" code (governed by the separate,
 non-OSS SigNoz Enterprise License) is NOT included in this repository and is
 never redistributed.
+
+DEVIATIONS
+
+The following changes distinguish this distribution from upstream SigNoz. They
+are recorded for provenance and do not alter the MIT Expat license terms above.
+
+* Product rebranded to "o11y" (Hanzo o11y): Go module github.com/hanzoai/o11y,
+  frontend package @hanzo/o11y, served title "Hanzo O11y", Hanzo logo and icon.
+* The SigNoz "ee/" and "cmd/enterprise/" directories (SigNoz Enterprise License,
+  non-OSS) are excluded entirely; this is an MIT Expat-only core distribution.
+* Upstream Go modules renamed to Hanzo forks: SigNoz/signoz-otel-collector ->
+  github.com/hanzoai/otel-collector, SigNoz/govaluate -> github.com/hanzoai/govaluate.
+* github.com/expr-lang/expr is consumed via a go.mod replace directive pointing
+  at github.com/hanzoai/expr.
+* The ClickHouse mock and SQL builder/parser dependencies are flipped to the
+  hanzo-ds/* forks (hanzo-ds/go, hanzo-ds/mock, hanzo-ds/sqlbuilder, hanzo-ds/sqlparser).
+* Telemetry storage is debranded: the legacy signoz_* ClickHouse databases and
+  their signoz_-prefixed tables are renamed to o11y_* identifiers
+  (deploy/datastore/migrations/0001_rename_signoz_to_o11y.sql).
+* Native Hanzo IAM authorization is added (pkg/authz/iamauthz) with per-request
+  org scoping via the X-Org-Id header derived from the JWT.
+* Native Hanzo API surfaces are added under pkg/apiserver/o11yapiserver,
+  including error tracking, LLM observability, Sentry-compatible ingest, and a
+  community embed accessor.
+* The service runs behind the Hanzo gateway and mounts as the o11y subsystem of
+  the unified cloud binary per HIP-0106.
+* Operator-facing environment variables and configuration keys are Hanzo-branded
+  rather than SigNoz-branded.
