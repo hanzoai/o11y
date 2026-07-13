@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	pql "github.com/prometheus/prometheus/promql"
-	dsmock "github.com/hanzoai/datastore-go-mock"
+	dsmock "github.com/hanzo-ds/mock"
 
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/prometheus"
