@@ -16,7 +16,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzoai/sqlbuilder"
+	"github.com/hanzo-ds/sqlbuilder"
 )
 
 var (
@@ -848,7 +848,7 @@ func (b *traceQueryStatementBuilder) expandRawSelectFields(query qbtypes.QueryBu
 		{Name: SpanSpanIDColumn, FieldContext: telemetrytypes.FieldContextSpan},
 	}
 	for _, field := range query.SelectFields {
-		// TODO(tvats): If a user specifies attribute.timestamp in the select fields, this loop will basically ignore it, as we already added a field by default. This can be fixed once we close https://github.com/SigNoz/engineering-pod/issues/3693
+		// TODO: If a user specifies attribute.timestamp in the select fields, this loop will basically ignore it, as we already added a field by default.
 		if field.Name == SpanTimestampColumn || field.Name == SpanTraceIDColumn || field.Name == SpanSpanIDColumn {
 			continue
 		}

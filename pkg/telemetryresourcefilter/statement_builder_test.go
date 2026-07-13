@@ -183,7 +183,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (LOWER(simpleJSONExtractString(labels, 'service.name')) LIKE LOWER(?) AND labels LIKE ? AND LOWER(labels) LIKE LOWER(?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (simpleJSONExtractString(labels, 'service.name') ILIKE ? AND labels LIKE ? AND labels ILIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis%", "%service.name%", "%service.name%redis%%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -258,7 +258,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (LOWER(simpleJSONExtractString(labels, 'service.name')) LIKE LOWER(?) AND labels LIKE ? AND LOWER(labels) LIKE LOWER(?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (simpleJSONExtractString(labels, 'service.name') ILIKE ? AND labels LIKE ? AND labels ILIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"%redis%", "%service.name%", "%service.name%redis%", expectedBucketStart, expectedBucketEnd},
 			},
 		},

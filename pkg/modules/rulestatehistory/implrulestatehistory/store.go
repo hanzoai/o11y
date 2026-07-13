@@ -15,7 +15,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	sqlbuilder "github.com/hanzoai/sqlbuilder"
+	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 )
 
 const (

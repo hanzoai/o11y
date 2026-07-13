@@ -16,6 +16,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer"
 	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer/implmetricsexplorer"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoremock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/hanzoai/o11y/pkg/types/metricsexplorertypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
@@ -77,7 +78,7 @@ func newFlagger(t *testing.T, reductionEnabled bool) flagger.Flagger {
 // newTestModule builds the metricsexplorer module backed by a mocked datastore
 // connection, a mock metadata store, and an in-memory cache. reductionEnabled
 // toggles the metrics-reduction feature flag.
-func newTestModule(t *testing.T, matcher sqlmock.QueryMatcher, reductionEnabled bool) (metricsexplorer.Module, dsmock.ClickConnMockCommon, *telemetrytypestest.MockMetadataStore) {
+func newTestModule(t *testing.T, matcher sqlmock.QueryMatcher, reductionEnabled bool) (metricsexplorer.Module, datastoremock.Conn, *telemetrytypestest.MockMetadataStore) {
 	t.Helper()
 
 	ts := telemetrystoretest.New(telemetrystore.Config{}, matcher)
