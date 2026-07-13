@@ -78,7 +78,7 @@ const buildWidget = (queryType: EQueryType | undefined): Widgets =>
 		query: {
 			queryType,
 			builder: { queryData: [], queryFormulas: [] },
-			clickhouse_sql: [],
+			datastore_sql: [],
 			promql: [],
 			id: 'q-1',
 		},

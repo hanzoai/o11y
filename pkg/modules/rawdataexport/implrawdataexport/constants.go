@@ -14,6 +14,6 @@ const (
 
 	// Query Limits.
 	ChunkSize                         = 5_000 // 5k
-	ClickhouseExportRawDataMaxThreads = 2
-	ClickhouseExportRawDataTimeout    = 10 * time.Minute
+	DatastoreExportRawDataMaxThreads = 2
+	DatastoreExportRawDataTimeout    = 10 * time.Minute
 )

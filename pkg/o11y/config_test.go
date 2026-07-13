@@ -27,5 +27,5 @@ func TestDatastoreDSNCanonicalAlias(t *testing.T) {
 	logger := slog.New(slog.DiscardHandler)
 	config, err := NewConfig(context.Background(), logger, configtest.NewResolverConfig())
 	require.NoError(t, err)
-	assert.Equal(t, dsn, config.TelemetryStore.Clickhouse.DSN)
+	assert.Equal(t, dsn, config.TelemetryStore.Datastore.DSN)
 }

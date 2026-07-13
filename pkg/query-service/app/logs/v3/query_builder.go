@@ -54,7 +54,7 @@ var logOperators = map[v3.FilterOperator]string{
 
 const BODY = "body"
 
-func GetClickhouseLogsColumnType(columnType v3.AttributeKeyType) string {
+func GetDatastoreLogsColumnType(columnType v3.AttributeKeyType) string {
 	if columnType == v3.AttributeKeyTypeTag {
 		return "attributes"
 	}
@@ -64,7 +64,7 @@ func GetClickhouseLogsColumnType(columnType v3.AttributeKeyType) string {
 	return "resources"
 }
 
-func getClickhouseLogsColumnDataType(columnDataType v3.AttributeKeyDataType) string {
+func getDatastoreLogsColumnDataType(columnDataType v3.AttributeKeyDataType) string {
 	if columnDataType == v3.AttributeKeyDataTypeFloat64 {
 		return "float64"
 	}
@@ -77,9 +77,9 @@ func getClickhouseLogsColumnDataType(columnDataType v3.AttributeKeyDataType) str
 	return "string"
 }
 
-// getClickhouseColumnName returns the corresponding clickhouse column name for the given attribute/resource key
-func getClickhouseColumnName(key v3.AttributeKey) string {
-	clickhouseColumn := key.Key
+// getDatastoreColumnName returns the corresponding datastore column name for the given attribute/resource key
+func getDatastoreColumnName(key v3.AttributeKey) string {
+	datastoreColumn := key.Key
 	if key.Key == constants.TIMESTAMP || key.Key == "id" {
 		return key.Key
 	}
@@ -87,21 +87,21 @@ func getClickhouseColumnName(key v3.AttributeKey) string {
 	//if the key is present in the topLevelColumn then it will be only searched in those columns,
 	//regardless if it is indexed/present again in resource or column attribute
 	if !key.IsColumn {
-		columnType := GetClickhouseLogsColumnType(key.Type)
-		columnDataType := getClickhouseLogsColumnDataType(key.DataType)
-		clickhouseColumn = fmt.Sprintf("%s_%s_value[indexOf(%s_%s_key, '%s')]", columnType, columnDataType, columnType, columnDataType, key.Key)
-		return clickhouseColumn
+		columnType := GetDatastoreLogsColumnType(key.Type)
+		columnDataType := getDatastoreLogsColumnDataType(key.DataType)
+		datastoreColumn = fmt.Sprintf("%s_%s_value[indexOf(%s_%s_key, '%s')]", columnType, columnDataType, columnType, columnDataType, key.Key)
+		return datastoreColumn
 	}
 
 	// check if it is a static field
 	if key.Type == v3.AttributeKeyTypeUnspecified {
 		// name is the column name
-		return clickhouseColumn
+		return datastoreColumn
 	}
 
 	// materialized column created from query
-	clickhouseColumn = utils.GetClickhouseColumnName(string(key.Type), string(key.DataType), key.Key)
-	return clickhouseColumn
+	datastoreColumn = utils.GetDatastoreColumnName(string(key.Type), string(key.DataType), key.Key)
+	return datastoreColumn
 }
 
 // getSelectLabels returns the select labels for the query based on groupBy and aggregateOperator
@@ -111,7 +111,7 @@ func getSelectLabels(aggregatorOperator v3.AggregateOperator, groupBy []v3.Attri
 		selectLabels = ""
 	} else {
 		for _, tag := range groupBy {
-			columnName := getClickhouseColumnName(tag)
+			columnName := getDatastoreColumnName(tag)
 			selectLabels += fmt.Sprintf(" %s as `%s`,", columnName, tag.Key)
 		}
 	}
@@ -142,7 +142,7 @@ func GetExistsNexistsFilter(op v3.FilterOperator, item v3.FilterItem) string {
 				return ""
 			}
 
-			columnName := getClickhouseColumnName(item.Key)
+			columnName := getDatastoreColumnName(item.Key)
 			if val.DataType == v3.AttributeKeyDataTypeString {
 				return fmt.Sprintf("%s %s ''", columnName, top)
 			} else {
@@ -156,10 +156,10 @@ func GetExistsNexistsFilter(op v3.FilterOperator, item v3.FilterItem) string {
 		if op == v3.FilterOperatorNotExists {
 			val = false
 		}
-		return fmt.Sprintf("%s_exists`=%v", strings.TrimSuffix(getClickhouseColumnName(item.Key), "`"), val)
+		return fmt.Sprintf("%s_exists`=%v", strings.TrimSuffix(getDatastoreColumnName(item.Key), "`"), val)
 	}
-	columnType := GetClickhouseLogsColumnType(item.Key.Type)
-	columnDataType := getClickhouseLogsColumnDataType(item.Key.DataType)
+	columnType := GetDatastoreLogsColumnType(item.Key.Type)
+	columnDataType := getDatastoreLogsColumnDataType(item.Key.DataType)
 	return fmt.Sprintf(logOperators[op], columnType, columnDataType, item.Key.Key)
 }
 
@@ -193,11 +193,11 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 				case v3.FilterOperatorExists, v3.FilterOperatorNotExists:
 					conditions = append(conditions, GetExistsNexistsFilter(op, item))
 				case v3.FilterOperatorRegex, v3.FilterOperatorNotRegex:
-					columnName := getClickhouseColumnName(item.Key)
-					fmtVal := utils.ClickHouseFormattedValue(value)
+					columnName := getDatastoreColumnName(item.Key)
+					fmtVal := utils.DatastoreFormattedValue(value)
 					conditions = append(conditions, fmt.Sprintf(logsOp, columnName, fmtVal))
 				case v3.FilterOperatorContains, v3.FilterOperatorNotContains:
-					columnName := getClickhouseColumnName(item.Key)
+					columnName := getDatastoreColumnName(item.Key)
 					val := utils.QuoteEscapedString(fmt.Sprintf("%v", item.Value))
 					if columnName == BODY {
 						logsOp = strings.Replace(logsOp, "ILIKE", "LIKE", 1) // removing i from ilike and not ilike
@@ -206,8 +206,8 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 						conditions = append(conditions, fmt.Sprintf("%s %s '%%%s%%'", columnName, logsOp, val))
 					}
 				default:
-					columnName := getClickhouseColumnName(item.Key)
-					fmtVal := utils.ClickHouseFormattedValue(value)
+					columnName := getDatastoreColumnName(item.Key)
+					fmtVal := utils.DatastoreFormattedValue(value)
 
 					// for use lower for like and ilike
 					if op == v3.FilterOperatorLike || op == v3.FilterOperatorNotLike {
@@ -228,12 +228,12 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 	// add group by conditions to filter out log lines which doesn't have the key
 	for _, attr := range groupBy {
 		if !attr.IsColumn {
-			columnType := GetClickhouseLogsColumnType(attr.Type)
-			columnDataType := getClickhouseLogsColumnDataType(attr.DataType)
+			columnType := GetDatastoreLogsColumnType(attr.Type)
+			columnDataType := getDatastoreLogsColumnDataType(attr.DataType)
 			conditions = append(conditions, fmt.Sprintf("has(%s_%s_key, '%s')", columnType, columnDataType, attr.Key))
 		} else if attr.Type != v3.AttributeKeyTypeUnspecified {
 			// for materialzied columns
-			conditions = append(conditions, fmt.Sprintf("%s_exists`=true", strings.TrimSuffix(getClickhouseColumnName(attr), "`")))
+			conditions = append(conditions, fmt.Sprintf("%s_exists`=true", strings.TrimSuffix(getDatastoreColumnName(attr), "`")))
 		}
 	}
 
@@ -310,7 +310,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 
 	aggregationKey := ""
 	if mq.AggregateAttribute.Key != "" {
-		aggregationKey = getClickhouseColumnName(mq.AggregateAttribute)
+		aggregationKey = getDatastoreColumnName(mq.AggregateAttribute)
 	}
 
 	switch mq.AggregateOperator {
@@ -413,7 +413,7 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
 		} else if panelType == v3.PanelTypeList {
 			attr := v3.AttributeKey{Key: item.ColumnName, DataType: item.DataType, Type: item.Type, IsColumn: item.IsColumn}
-			name := getClickhouseColumnName(attr)
+			name := getDatastoreColumnName(attr)
 			orderBy = append(orderBy, fmt.Sprintf("%s %s", name, item.Order))
 		}
 	}
@@ -445,7 +445,7 @@ func Having(items []v3.Having) string {
 	// aggregate something and filter on that aggregate
 	var having []string
 	for _, item := range items {
-		having = append(having, fmt.Sprintf("value %s %s", item.Operator, utils.ClickHouseFormattedValue(item.Value)))
+		having = append(having, fmt.Sprintf("value %s %s", item.Operator, utils.DatastoreFormattedValue(item.Value)))
 	}
 	return strings.Join(having, " AND ")
 }

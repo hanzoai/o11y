@@ -53,12 +53,12 @@ const (
 	QueryKindComposite     QueryPluginKind = "o11y/CompositeQuery"
 	QueryKindFormula       QueryPluginKind = "o11y/Formula"
 	QueryKindPromQL        QueryPluginKind = "o11y/PromQLQuery"
-	QueryKindClickHouseSQL QueryPluginKind = "o11y/ClickHouseSQL"
+	QueryKindDatastoreSQL QueryPluginKind = "o11y/DatastoreSQL"
 	QueryKindTraceOperator QueryPluginKind = "o11y/TraceOperator"
 )
 
 func (QueryPluginKind) Enum() []any {
-	return []any{QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindPromQL, QueryKindClickHouseSQL, QueryKindTraceOperator}
+	return []any{QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindPromQL, QueryKindDatastoreSQL, QueryKindTraceOperator}
 }
 
 type (
@@ -66,7 +66,7 @@ type (
 	QueryEnvelope          = qb.QueryEnvelope
 	FormulaSpec            = qb.QueryBuilderFormula
 	PromQLQuerySpec        = qb.PromQuery
-	ClickHouseSQLQuerySpec = qb.ClickHouseQuery
+	DatastoreSQLQuerySpec = qb.DatastoreQuery
 	TraceOperatorSpec      = qb.QueryBuilderTraceOperator
 )
 

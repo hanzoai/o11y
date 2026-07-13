@@ -7,7 +7,7 @@ import (
 
 	"strconv"
 
-	clickhouse "github.com/hanzoai/datastore-go/v2"
+	"github.com/hanzoai/datastore-go/v2"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/modules/services"
 	"github.com/hanzoai/o11y/pkg/querier"
@@ -40,10 +40,10 @@ func (m *module) FetchTopLevelOperations(ctx context.Context, start time.Time, s
 
 	db := m.TelemetryStore.DatastoreDB()
 	query := fmt.Sprintf("SELECT name, serviceName, max(time) as ts FROM %s.%s WHERE time >= @start", telemetrytraces.DBName, telemetrytraces.TopLevelOperationsTableName)
-	args := []any{clickhouse.Named("start", start)}
+	args := []any{datastore.Named("start", start)}
 	if len(services) > 0 {
 		query += " AND serviceName IN @services"
-		args = append(args, clickhouse.Named("services", services))
+		args = append(args, datastore.Named("services", services))
 	}
 	query += " GROUP BY name, serviceName ORDER BY ts DESC LIMIT 5000"
 

@@ -82,7 +82,7 @@ func AddMetricValueFilter(mq *v3.BuilderQuery) *v3.MetricValueFilter {
 	return metricValueFilter
 }
 
-// FormattedValue formats the value to be used in clickhouse query
+// FormattedValue formats the value to be used in datastore query
 func FormattedValue(v interface{}) string {
 	switch x := v.(type) {
 	case int:

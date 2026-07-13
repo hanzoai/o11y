@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/cache/cachetest"
 	"github.com/hanzoai/o11y/pkg/errors"
@@ -74,10 +74,10 @@ func newFlagger(t *testing.T, reductionEnabled bool) flagger.Flagger {
 	return fl
 }
 
-// newTestModule builds the metricsexplorer module backed by a mocked clickhouse
+// newTestModule builds the metricsexplorer module backed by a mocked datastore
 // connection, a mock metadata store, and an in-memory cache. reductionEnabled
 // toggles the metrics-reduction feature flag.
-func newTestModule(t *testing.T, matcher sqlmock.QueryMatcher, reductionEnabled bool) (metricsexplorer.Module, cmock.ClickConnMockCommon, *telemetrytypestest.MockMetadataStore) {
+func newTestModule(t *testing.T, matcher sqlmock.QueryMatcher, reductionEnabled bool) (metricsexplorer.Module, dsmock.ClickConnMockCommon, *telemetrytypestest.MockMetadataStore) {
 	t.Helper()
 
 	ts := telemetrystoretest.New(telemetrystore.Config{}, matcher)
@@ -158,16 +158,16 @@ func seedFilterKey(md *telemetrytypestest.MockMetadataStore, name string) {
 	}
 }
 
-// anyArgs returns n nil wildcards. cmock treats a nil expected arg as a match
+// anyArgs returns n nil wildcards. dsmock treats a nil expected arg as a match
 // for any actual value, so this asserts only the bound-arg count, not values
 // (the SQL text itself is what we verify). The count must match the query.
 func anyArgs(n int) []any {
 	return make([]any, n)
 }
 
-func treemapEntryRows() *cmock.Rows {
-	return cmock.NewRows(
-		[]cmock.ColumnType{
+func treemapEntryRows() *dsmock.Rows {
+	return dsmock.NewRows(
+		[]dsmock.ColumnType{
 			{Name: "metric_name", Type: "String"},
 			{Name: "total_value", Type: "UInt64"},
 			{Name: "percentage", Type: "Float64"},
@@ -188,7 +188,7 @@ func TestGetStats(t *testing.T) {
 		expectSQL        string
 		argCount         int
 		reductionEnabled bool
-		noQuery          bool // SQL never reaches clickhouse (validation/build error)
+		noQuery          bool // SQL never reaches datastore (validation/build error)
 		wantCode         errors.Code
 	}{
 		{name: "NoFilter_FastPathSQL", expectSQL: statsNoFilterSQL, argCount: 14, reductionEnabled: true},
@@ -215,7 +215,7 @@ func TestGetStats(t *testing.T) {
 				if tc.queryErr != nil {
 					eq.WillReturnError(tc.queryErr)
 				} else {
-					eq.WillReturnRows(cmock.NewRows(nil, nil))
+					eq.WillReturnRows(dsmock.NewRows(nil, nil))
 				}
 			}
 
@@ -246,7 +246,7 @@ func TestGetTreemap(t *testing.T) {
 		expectSQL        string
 		argCount         int
 		reductionEnabled bool
-		rows             *cmock.Rows
+		rows             *dsmock.Rows
 		wantSamples      []metricsexplorertypes.TreemapEntry
 		wantTS           []metricsexplorertypes.TreemapEntry
 		noQuery          bool
@@ -282,7 +282,7 @@ func TestGetTreemap(t *testing.T) {
 				case tc.rows != nil:
 					eq.WillReturnRows(tc.rows)
 				default:
-					eq.WillReturnRows(cmock.NewRows(nil, nil))
+					eq.WillReturnRows(dsmock.NewRows(nil, nil))
 				}
 			}
 

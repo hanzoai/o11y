@@ -54,8 +54,8 @@ ee/query-service/tests/test-deploy/data/
 *.db-shm
 *.db-wal
 **/db
-/deploy/docker/clickhouse-setup/data/
-/deploy/docker-swarm/clickhouse-setup/data/
+/deploy/docker/datastore-setup/data/
+/deploy/docker-swarm/datastore-setup/data/
 bin/
 .local/
 */query-service/queries.active
@@ -78,8 +78,8 @@ __debug_bin**
 # goreleaser
 dist/
 
-# ignore user_scripts that is fetched by init-clickhouse
-deploy/common/clickhouse/user_scripts/
+# ignore user_scripts that is fetched by the datastore init container
+deploy/common/datastore/user_scripts/
 
 queries.active
 

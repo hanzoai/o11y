@@ -3,7 +3,7 @@
 
 // Package datastoremetrics is the o11y-native datastore metrics driver: it
 // writes metric samples + series metadata to the datastore (the columnar
-// telemetry backend) over UPSTREAM ch-go / clickhouse-go v2, with NO
+// telemetry backend) over UPSTREAM ch-go / datastore-go v2, with NO
 // histogram-fork dependency.
 //
 // It is the write-side companion to pkg/zapmetricreceiver: WriteMetrics
@@ -32,7 +32,7 @@ import (
 	"strconv"
 	"time"
 
-	clickhouse "github.com/hanzoai/datastore-go/v2"
+	"github.com/hanzoai/datastore-go/v2"
 	"github.com/hanzoai/datastore-go/v2/lib/driver"
 	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
 	"github.com/hanzoai/o11y/pkg/zapmetricreceiver"
@@ -96,9 +96,9 @@ type tsRow struct {
 }
 
 // Writer ingests decoded metric batches into the datastore over upstream
-// clickhouse-go v2. It is safe for concurrent use (clickhouse.Conn is).
+// datastore-go v2. It is safe for concurrent use (datastore.Conn is).
 type Writer struct {
-	conn         clickhouse.Conn
+	conn         datastore.Conn
 	db           string
 	tsTable      string
 	samplesTable string
@@ -123,7 +123,7 @@ func WithNow(now func() int64) Option { return func(w *Writer) { w.nowMilli = no
 // NewWriter builds a Writer over an existing datastore connection. Defaults
 // target the SAME database + distributed tables the query plane reads, so a
 // series written here is immediately queryable.
-func NewWriter(conn clickhouse.Conn, opts ...Option) *Writer {
+func NewWriter(conn datastore.Conn, opts ...Option) *Writer {
 	w := &Writer{
 		conn:         conn,
 		db:           telemetrymetrics.DBName,

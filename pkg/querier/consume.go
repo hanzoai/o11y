@@ -11,18 +11,18 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bytedance/sonic"
 	"github.com/hanzoai/datastore-go/v2/lib/driver"
 	"github.com/hanzoai/o11y/pkg/errors"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/spantypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/bytedance/sonic"
 )
 
 var (
 	aggRe = regexp.MustCompile(`^__result_(\d+)$`)
 	// legacyReservedColumnTargetAliases identifies result value from a user
-	// written clickhouse query. The column alias indcate which value is
+	// written datastore query. The column alias indcate which value is
 	// to be considered as final result (or target).
 	legacyReservedColumnTargetAliases = []string{"__result", "__value", "result", "res", "value"}
 
@@ -298,10 +298,10 @@ func readAsScalar(rows driver.Rows, queryName string) (*qbtypes.ScalarData, erro
 	for i, name := range colNames {
 		colType := qbtypes.ColumnTypeGroup
 		// Builder queries aliases aggregation columns as __result_N (always numeric) and wraps group-by keys with toString (always string);
-		// Raw ClickHouse queries may use any aliases.
+		// Raw Datastore queries may use any aliases.
 		// Handling Builder queries, If name like __result_N -> aggregation, otherwise group-by column
-		// Handling Raw ClickHouse queries, If type is numeric -> aggregation, otherwise group-by column
-		// NOTE: For clickhouse queries, its wrong to assume that numeric columns are always aggregations, user might be grouping by on integer status_code.
+		// Handling Raw Datastore queries, If type is numeric -> aggregation, otherwise group-by column
+		// NOTE: For datastore queries, its wrong to assume that numeric columns are always aggregations, user might be grouping by on integer status_code.
 		// However, we are fine with this for now. If need arises, simplest way would be to solve this on the frontend side by asking user a mapping of column names to column types.
 		if aggRe.MatchString(name) || isNumericKind(colTypes[i].ScanType()) {
 			colType = qbtypes.ColumnTypeAggregation

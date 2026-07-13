@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	sqlbuilder "github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
+	sqlbuilder "github.com/hanzoai/sqlbuilder"
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -49,7 +51,7 @@ func (s *traceStore) GetTraceSummary(ctx context.Context, traceID string) (*span
 	sb.From(fmt.Sprintf("%s.%s", spantypes.TraceDB, spantypes.TraceSummaryTable))
 	sb.Where(sb.E("trace_id", traceID))
 	sb.GroupBy("trace_id")
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var summary spantypes.TraceSummary
 	err := s.telemetryStore.DatastoreDB().QueryRow(ctx, query, args...).Scan(
@@ -65,7 +67,7 @@ func (s *traceStore) GetTraceSummary(ctx context.Context, traceID string) (*span
 }
 
 func (s *traceStore) GetTraceSpans(ctx context.Context, traceID string, summary *spantypes.TraceSummary) ([]spantypes.StorableSpan, error) {
-	// DISTINCT ON (span_id) is ClickHouse-specific syntax not supported by sqlbuilder
+	// DISTINCT ON (span_id) is Datastore-specific syntax not supported by sqlbuilder
 	query := fmt.Sprintf(`
 		SELECT DISTINCT ON (span_id)
 			timestamp, duration_nano, span_id, has_error, kind,
@@ -108,7 +110,7 @@ func (s *traceStore) GetMinimalSpans(ctx context.Context, traceID string, start,
 	)
 	sb.OrderByAsc("timestamp")
 	sb.OrderByAsc("name")
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var spans []spantypes.MinimalSpan
 	if err := s.telemetryStore.DatastoreDB().Select(ctx, &spans, query, args...); err != nil {
@@ -145,7 +147,7 @@ func (s *traceStore) GetTraceSpansByIDs(ctx context.Context, traceID string, sta
 	)
 	sb.OrderByAsc("timestamp")
 	sb.OrderByAsc("name")
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var spans []spantypes.StorableSpan
 	if err := s.telemetryStore.DatastoreDB().Select(ctx, &spans, query, args...); err != nil {
@@ -186,7 +188,7 @@ func (s *traceStore) GetFlamegraphSpans(ctx context.Context, traceID string, sta
 	sb.GroupBy("span_id")
 	sb.OrderByAsc("timestamp")
 	sb.OrderByAsc("name")
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var spans []spantypes.StorableSpan
 	if err := s.telemetryStore.DatastoreDB().Select(ctx, &spans, query, args...); err != nil {
@@ -210,7 +212,7 @@ func (s *traceStore) GetSpanCountByField(ctx context.Context, traceID string, su
 		"notEmpty("+fieldExpr+")",
 	)
 	sb.GroupBy("field_value")
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var rows []spanCountRow
 	if err := s.telemetryStore.DatastoreDB().Select(ctx, &rows, query, args...); err != nil {
@@ -265,7 +267,7 @@ func (s *traceStore) GetSpanDurationByField(ctx context.Context, traceID string,
 	sb.From("effective_start")
 	sb.GroupBy("field_value")
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	var rows []spanDurationRow
 	if err := s.telemetryStore.DatastoreDB().Select(ctx, &rows, query, args...); err != nil {
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "error querying span duration by field")

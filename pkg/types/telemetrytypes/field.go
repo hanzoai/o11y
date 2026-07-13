@@ -402,7 +402,7 @@ func NewFieldValueSelectorFromPostableFieldValueParams(params PostableFieldValue
 }
 
 type TelemetryFieldKeySkipIndex struct {
-	Name            string        `json:"name"` // Name is TelemetryFieldKey.Name not IndexName from ClickHouse
+	Name            string        `json:"name"` // Name is TelemetryFieldKey.Name not IndexName from Datastore
 	FieldContext    FieldContext  `json:"fieldContext,omitzero"`
 	FieldDataType   FieldDataType `json:"fieldDataType,omitzero"`
 	BaseColumn      string        `json:"baseColumn"`

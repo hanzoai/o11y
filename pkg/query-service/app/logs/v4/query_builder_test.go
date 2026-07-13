@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_getClickhouseKey(t *testing.T) {
+func Test_getDatastoreKey(t *testing.T) {
 	type args struct {
 		key v3.AttributeKey
 	}
@@ -62,8 +62,8 @@ func Test_getClickhouseKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getClickhouseKey(tt.args.key); got != tt.want {
-				t.Errorf("getClickhouseKey() = %v, want %v", got, tt.want)
+			if got := getDatastoreKey(tt.args.key); got != tt.want {
+				t.Errorf("getDatastoreKey() = %v, want %v", got, tt.want)
 			}
 		})
 	}

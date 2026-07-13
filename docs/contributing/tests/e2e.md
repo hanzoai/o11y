@@ -30,7 +30,7 @@ yarn install:browsers   # one-time Playwright browser install
 
 ### Starting the Test Environment
 
-To spin up the backend stack (O11y, ClickHouse, Postgres, Zookeeper, Zeus mock, gateway mock, seeder, migrator-with-web) and keep it running:
+To spin up the backend stack (O11y, Datastore, Postgres, Zookeeper, Zeus mock, gateway mock, seeder, migrator-with-web) and keep it running:
 
 ```bash
 cd tests
@@ -64,7 +64,7 @@ Playwright drives a real browser (Chromium / Firefox / WebKit) against the runni
 
 - **Why Playwright?** First-class TypeScript support, network interception, automatic wait-for-visibility, built-in trace viewer that captures every request/response the UI triggers — so specs rarely need separate API probes alongside UI clicks.
 - **Why pytest for lifecycle?** The integration suite already owns container bring-up. Reusing it keeps the E2E stack exactly in sync with the integration stack and avoids a parallel lifecycle framework.
-- **Why a separate seeder container?** Per-spec telemetry seeding (traces / logs / metrics) needs a thin HTTP wrapper around the ClickHouse insert helpers so a browser spec can POST from inside the test. The seeder lives at `tests/seeder/`, is built from `tests/Dockerfile.seeder`, and reuses the same `fixtures/{traces,logs,metrics}.py` as integration tests.
+- **Why a separate seeder container?** Per-spec telemetry seeding (traces / logs / metrics) needs a thin HTTP wrapper around the Datastore insert helpers so a browser spec can POST from inside the test. The seeder lives at `tests/seeder/`, is built from `tests/Dockerfile.seeder`, and reuses the same `fixtures/{traces,logs,metrics}.py` as integration tests.
 
 ```
 tests/
@@ -283,7 +283,7 @@ The same pytest flags integration tests expose work here, since E2E reuses the s
 - `--reuse` — keep containers warm between runs (required for all iteration).
 - `--teardown` — tear everything down.
 - `--with-web` — build the frontend into the O11y container. **Required for E2E**; integration tests don't need it.
-- `--sqlstore-provider`, `--postgres-version`, `--clickhouse-version`, etc. — see `docs/contributing/integration.md`.
+- `--sqlstore-provider`, `--postgres-version`, `--datastore-version`, etc. — see `docs/contributing/integration.md`.
 
 ## What should I remember?
 

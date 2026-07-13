@@ -1,6 +1,6 @@
 # Integration Tests
 
-O11y uses integration tests to verify that different components work together correctly in a real environment. These tests run against actual services (ClickHouse, PostgreSQL, O11y, Zeus mock, Keycloak, etc.) spun up as containers, so suites exercise the same code paths production does.
+O11y uses integration tests to verify that different components work together correctly in a real environment. These tests run against actual services (Datastore, PostgreSQL, O11y, Zeus mock, Keycloak, etc.) spun up as containers, so suites exercise the same code paths production does.
 
 ## How to set up the integration test environment?
 
@@ -41,7 +41,7 @@ uv run pytest --basetemp=./tmp/ -vv --reuse integration/bootstrap/setup.py::test
 ```
 
 This command will:
-- Start all required services (ClickHouse, PostgreSQL, Zookeeper, O11y, Zeus mock, gateway mock)
+- Start all required services (Datastore, PostgreSQL, Zookeeper, O11y, Zeus mock, gateway mock)
 - Register an admin user
 - Keep containers running via the `--reuse` flag
 
@@ -77,7 +77,7 @@ tests/
 ├── fixtures/                # shared fixture library (flat package)
 │   ├── __init__.py
 │   ├── auth.py              # admin/editor/viewer users, tokens, license
-│   ├── clickhouse.py
+│   ├── datastore.py
 │   ├── http.py              # WireMock helpers
 │   ├── keycloak.py          # IdP container
 │   ├── postgres.py
@@ -224,7 +224,7 @@ Tests can be configured using pytest options:
 - `--sqlstore-provider` — Choose the SQL store provider (default: `postgres`)
 - `--sqlite-mode` — SQLite journal mode: `delete` or `wal` (default: `delete`). Only relevant when `--sqlstore-provider=sqlite`.
 - `--postgres-version` — PostgreSQL version (default: `15`)
-- `--clickhouse-version` — ClickHouse version (default: `25.5.6`)
+- `--datastore-version` — Datastore version (default: `25.5.6`)
 - `--zookeeper-version` — Zookeeper version (default: `3.7.1`)
 - `--schema-migrator-version` — O11y schema migrator version (default: `v0.144.2`)
 

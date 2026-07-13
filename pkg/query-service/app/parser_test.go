@@ -337,7 +337,7 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			desc: "no query in request",
 			compositeQuery: v3.CompositeQuery{
 				PanelType: v3.PanelTypeGraph,
-				QueryType: v3.QueryTypeClickHouseSQL,
+				QueryType: v3.QueryTypeDatastoreSQL,
 			},
 			expectErr: true,
 			errMsg:    "composite query must contain at least one query",
@@ -346,8 +346,8 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			desc: "invalid panel type",
 			compositeQuery: v3.CompositeQuery{
 				PanelType: "invalid",
-				QueryType: v3.QueryTypeClickHouseSQL,
-				ClickHouseQueries: map[string]*v3.ClickHouseQuery{
+				QueryType: v3.QueryTypeDatastoreSQL,
+				DatastoreQueries: map[string]*v3.DatastoreQuery{
 					"A": {
 						Query:    "query",
 						Disabled: false,
@@ -362,7 +362,7 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			compositeQuery: v3.CompositeQuery{
 				PanelType: v3.PanelTypeGraph,
 				QueryType: "invalid",
-				ClickHouseQueries: map[string]*v3.ClickHouseQuery{
+				DatastoreQueries: map[string]*v3.DatastoreQuery{
 					"A": {
 						Query:    "query",
 						Disabled: false,
@@ -388,11 +388,11 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			errMsg:    "query is empty",
 		},
 		{
-			desc: "invalid clickhouse query",
+			desc: "invalid datastore query",
 			compositeQuery: v3.CompositeQuery{
 				PanelType: v3.PanelTypeGraph,
-				QueryType: v3.QueryTypeClickHouseSQL,
-				ClickHouseQueries: map[string]*v3.ClickHouseQuery{
+				QueryType: v3.QueryTypeDatastoreSQL,
+				DatastoreQueries: map[string]*v3.DatastoreQuery{
 					"A": {
 						Query:    "",
 						Disabled: false,
@@ -418,11 +418,11 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			errMsg:    "query is empty",
 		},
 		{
-			desc: "invalid clickhouse query with disabled query",
+			desc: "invalid datastore query with disabled query",
 			compositeQuery: v3.CompositeQuery{
 				PanelType: v3.PanelTypeGraph,
-				QueryType: v3.QueryTypeClickHouseSQL,
-				ClickHouseQueries: map[string]*v3.ClickHouseQuery{
+				QueryType: v3.QueryTypeDatastoreSQL,
+				DatastoreQueries: map[string]*v3.DatastoreQuery{
 					"A": {
 						Query:    "",
 						Disabled: true,

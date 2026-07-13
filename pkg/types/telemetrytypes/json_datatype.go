@@ -1,7 +1,7 @@
 package telemetrytypes
 
 type JSONDataType struct {
-	str            string // Store the correct case for ClickHouse
+	str            string // Store the correct case for Datastore
 	IsArray        bool
 	ScalerType     string
 	IndexSupported bool

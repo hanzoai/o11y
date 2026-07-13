@@ -63,7 +63,7 @@ func TestExtractFieldKeysFromTblStatement(t *testing.T) {
 		INDEX ` + "`resource_string_k8s$$deployment$$name_idx`" + ` ` + "`resource_string_k8s$$deployment$$name`" + ` TYPE bloom_filter(0.01) GRANULARITY 64,
 		INDEX attribute_string_processor_idx attribute_string_processor TYPE bloom_filter(0.01) GRANULARITY 64
 	)
-	ENGINE = ReplicatedMergeTree('/clickhouse/tables/{uuid}/{shard}', '{replica}')
+	ENGINE = ReplicatedMergeTree('/datastore/tables/{uuid}/{shard}', '{replica}')
 	PARTITION BY toDate(timestamp / 1000000000)
 	ORDER BY (ts_bucket_start, resource_fingerprint, severity_text, timestamp, id)
 	TTL toDateTime(timestamp / 1000000000) + toIntervalSecond(2592000)

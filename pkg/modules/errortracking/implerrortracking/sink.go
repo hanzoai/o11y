@@ -17,7 +17,7 @@ import (
 //   - When a real sink is wired, its write is fail-soft at the call site: a
 //     telemetry-store hiccup must never drop the durable issue upsert.
 //
-// NOTE (honest status): the ClickHouse logs sink is NOT implemented in this build —
+// NOTE (honest status): the Datastore logs sink is NOT implemented in this build —
 // only NoopSink exists. A raw logs_v2 INSERT couples to resource-fingerprint /
 // ts-bucket schema that must be byte-verified against a LIVE datastore, not
 // reconstructed, so it is a deliberate fast-follow. Today occurrences are NOT

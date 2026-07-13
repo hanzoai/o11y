@@ -208,7 +208,7 @@ func (module *module) GetByMetricNames(ctx context.Context, orgID valuer.UUID, m
 
 			// Check all three query types
 			module.checkBuilderQueriesForMetricNames(query, metricNames, foundMetrics, groupByByMetric, filterByByMetric)
-			module.checkClickHouseQueriesForMetricNames(ctx, query, metricNames, foundMetrics)
+			module.checkDatastoreQueriesForMetricNames(ctx, query, metricNames, foundMetrics)
 			module.checkPromQLQueriesForMetricNames(ctx, query, metricNames, foundMetrics)
 
 			// Add widget to results for all found metrics
@@ -406,14 +406,14 @@ func appendDedup(dst []string, values ...string) []string {
 	return dst
 }
 
-// checkClickHouseQueriesForMetricNames checks clickhouse_sql[] array for metric names in query strings.
-func (module *module) checkClickHouseQueriesForMetricNames(ctx context.Context, query map[string]interface{}, metricNames []string, foundMetrics map[string]bool) {
-	clickhouseSQL, ok := query["clickhouse_sql"].([]interface{})
+// checkDatastoreQueriesForMetricNames checks datastore_sql[] array for metric names in query strings.
+func (module *module) checkDatastoreQueriesForMetricNames(ctx context.Context, query map[string]interface{}, metricNames []string, foundMetrics map[string]bool) {
+	datastoreSQL, ok := query["datastore_sql"].([]interface{})
 	if !ok {
 		return
 	}
 
-	for _, chQuery := range clickhouseSQL {
+	for _, chQuery := range datastoreSQL {
 		chQueryMap, ok := chQuery.(map[string]interface{})
 		if !ok {
 			continue
@@ -425,10 +425,10 @@ func (module *module) checkClickHouseQueriesForMetricNames(ctx context.Context, 
 		}
 
 		// Parse query to extract metric names
-		result, err := module.queryParser.AnalyzeQueryFilter(ctx, qbtypes.QueryTypeClickHouseSQL, queryStr)
+		result, err := module.queryParser.AnalyzeQueryFilter(ctx, qbtypes.QueryTypeDatastoreSQL, queryStr)
 		if err != nil {
 			// Log warning and continue - parsing errors shouldn't break the search
-			module.settings.Logger().WarnContext(ctx, "failed to parse ClickHouse query", slog.String("query", queryStr), errors.Attr(err))
+			module.settings.Logger().WarnContext(ctx, "failed to parse Datastore query", slog.String("query", queryStr), errors.Attr(err))
 			continue
 		}
 

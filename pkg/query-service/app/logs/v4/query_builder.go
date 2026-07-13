@@ -49,7 +49,7 @@ const (
 	NANOSECOND                   = 1000000000
 )
 
-func getClickhouseLogsColumnDataType(columnDataType v3.AttributeKeyDataType) string {
+func getDatastoreLogsColumnDataType(columnDataType v3.AttributeKeyDataType) string {
 	if columnDataType == v3.AttributeKeyDataTypeFloat64 || columnDataType == v3.AttributeKeyDataTypeInt64 {
 		return "number"
 	}
@@ -59,7 +59,7 @@ func getClickhouseLogsColumnDataType(columnDataType v3.AttributeKeyDataType) str
 	return "string"
 }
 
-func getClickhouseKey(key v3.AttributeKey) string {
+func getDatastoreKey(key v3.AttributeKey) string {
 	// check if it is a top level static field
 	if _, ok := constants.StaticFieldsLogsV3[key.Key]; ok && key.Type == v3.AttributeKeyTypeUnspecified {
 		return key.Key
@@ -68,14 +68,14 @@ func getClickhouseKey(key v3.AttributeKey) string {
 	//if the key is present in the topLevelColumn then it will be only searched in those columns,
 	//regardless if it is indexed/present again in resource or column attribute
 	if !key.IsColumn {
-		columnType := logsV3.GetClickhouseLogsColumnType(key.Type)
-		columnDataType := getClickhouseLogsColumnDataType(key.DataType)
+		columnType := logsV3.GetDatastoreLogsColumnType(key.Type)
+		columnDataType := getDatastoreLogsColumnDataType(key.DataType)
 		return fmt.Sprintf("%s_%s['%s']", columnType, columnDataType, key.Key)
 	}
 
 	// materialized column created from query
 	// https://github.com/hanzoai/o11y/pull/4775
-	return "`" + utils.GetClickhouseColumnNameV2(string(key.Type), string(key.DataType), key.Key) + "`"
+	return "`" + utils.GetDatastoreColumnNameV2(string(key.Type), string(key.DataType), key.Key) + "`"
 }
 
 func getSelectLabels(aggregatorOperator v3.AggregateOperator, groupBy []v3.AttributeKey) string {
@@ -84,7 +84,7 @@ func getSelectLabels(aggregatorOperator v3.AggregateOperator, groupBy []v3.Attri
 		selectLabels = ""
 	} else {
 		for _, tag := range groupBy {
-			columnName := getClickhouseKey(tag)
+			columnName := getDatastoreKey(tag)
 			selectLabels += fmt.Sprintf(" %s as `%s`,", columnName, tag.Key)
 		}
 	}
@@ -103,7 +103,7 @@ func getExistsNexistsFilter(op v3.FilterOperator, item v3.FilterItem) string {
 		if op == v3.FilterOperatorNotExists {
 			chOp = "="
 		}
-		key := getClickhouseKey(item.Key)
+		key := getDatastoreKey(item.Key)
 		if item.Key.DataType == v3.AttributeKeyDataTypeString {
 			return fmt.Sprintf("%s %s ''", key, chOp)
 		}
@@ -116,11 +116,11 @@ func getExistsNexistsFilter(op v3.FilterOperator, item v3.FilterItem) string {
 		if op == v3.FilterOperatorNotExists {
 			val = false
 		}
-		return fmt.Sprintf("%s_exists`=%v", strings.TrimSuffix(getClickhouseKey(item.Key), "`"), val)
+		return fmt.Sprintf("%s_exists`=%v", strings.TrimSuffix(getDatastoreKey(item.Key), "`"), val)
 	}
 	// filter for non materialized attributes
-	columnType := logsV3.GetClickhouseLogsColumnType(item.Key.Type)
-	columnDataType := getClickhouseLogsColumnDataType(item.Key.DataType)
+	columnType := logsV3.GetDatastoreLogsColumnType(item.Key.Type)
+	columnDataType := getDatastoreLogsColumnDataType(item.Key.DataType)
 	return fmt.Sprintf(logOperators[op], columnType, columnDataType, item.Key.Key)
 }
 
@@ -144,12 +144,12 @@ func buildAttributeFilter(item v3.FilterItem) (string, error) {
 		if (op != v3.FilterOperatorEqual && op != v3.FilterOperatorContains) || item.Key.DataType != v3.AttributeKeyDataTypeString {
 			return "", fmt.Errorf("only = operator and string data type is supported for __attrs")
 		}
-		val := utils.ClickHouseFormattedValue(item.Value)
+		val := utils.DatastoreFormattedValue(item.Value)
 		return fmt.Sprintf("has(mapValues(attributes_string), %s)", val), nil
 	}
 
-	keyName := getClickhouseKey(item.Key)
-	fmtVal := utils.ClickHouseFormattedValue(value)
+	keyName := getDatastoreKey(item.Key)
+	fmtVal := utils.DatastoreFormattedValue(value)
 
 	if logsOp, ok := logOperators[op]; ok {
 		switch op {
@@ -221,7 +221,7 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 		op := v3.FilterOperator(strings.ToLower(string(item.Operator)))
 
 		// add extra condition for map contains
-		// by default clickhouse is not able to utilize indexes for keys with all operators.
+		// by default datastore is not able to utilize indexes for keys with all operators.
 		// mapContains forces the use of index.
 		// for mat column it's is not required as it will already use the dedicated index.
 		// skip the exists filter for operators such as !=, not like, not contains, not regex, not in
@@ -238,12 +238,12 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 		}
 
 		if !attr.IsColumn {
-			columnType := logsV3.GetClickhouseLogsColumnType(attr.Type)
-			columnDataType := getClickhouseLogsColumnDataType(attr.DataType)
+			columnType := logsV3.GetDatastoreLogsColumnType(attr.Type)
+			columnDataType := getDatastoreLogsColumnDataType(attr.DataType)
 			conditions = append(conditions, fmt.Sprintf("mapContains(%s_%s, '%s')", columnType, columnDataType, attr.Key))
 		} else if attr.Type != v3.AttributeKeyTypeUnspecified {
 			// for materialzied columns and not the top level static fields
-			name := utils.GetClickhouseColumnNameV2(string(attr.Type), string(attr.DataType), attr.Key)
+			name := utils.GetDatastoreColumnNameV2(string(attr.Type), string(attr.DataType), attr.Key)
 			conditions = append(conditions, fmt.Sprintf("`%s_exists`=true", name))
 		}
 	}
@@ -271,7 +271,7 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
 		} else if panelType == v3.PanelTypeList {
 			attr := v3.AttributeKey{Key: item.ColumnName, DataType: item.DataType, Type: item.Type, IsColumn: item.IsColumn}
-			name := getClickhouseKey(attr)
+			name := getDatastoreKey(attr)
 			orderBy = append(orderBy, fmt.Sprintf("%s %s", name, item.Order))
 		}
 	}
@@ -428,7 +428,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 	// get the aggregation key
 	aggregationKey := ""
 	if mq.AggregateAttribute.Key != "" {
-		aggregationKey = getClickhouseKey(mq.AggregateAttribute)
+		aggregationKey = getDatastoreKey(mq.AggregateAttribute)
 	}
 
 	// for limit queries, there are two queries formed

@@ -87,13 +87,13 @@ def make_meter_samples(
 
 @pytest.fixture(name="insert_meter_samples", scope="function")
 def insert_meter_samples(
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
 ) -> Generator[Callable[[list[MeterSample]], None], Any]:
     def _insert_meter_samples(samples: list[MeterSample]) -> None:
         if len(samples) == 0:
             return
 
-        clickhouse.conn.insert(
+        datastore.conn.insert(
             database="o11y_meter",
             table="distributed_samples",
             column_names=[
@@ -113,6 +113,6 @@ def insert_meter_samples(
 
     yield _insert_meter_samples
 
-    cluster = clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
+    cluster = datastore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"]
     for table in ["samples", "samples_agg_1d"]:
-        clickhouse.conn.query(f"TRUNCATE TABLE o11y_meter.{table} ON CLUSTER '{cluster}' SYNC")
+        datastore.conn.query(f"TRUNCATE TABLE o11y_meter.{table} ON CLUSTER '{cluster}' SYNC")

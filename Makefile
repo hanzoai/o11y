@@ -51,9 +51,9 @@ help: ## Displays help.
 ##############################################################
 # devenv commands
 ##############################################################
-.PHONY: devenv-clickhouse
-devenv-clickhouse: ## Run clickhouse in devenv
-	@cd .devenv/docker/clickhouse; \
+.PHONY: devenv-datastore
+devenv-datastore: ## Run datastore in devenv
+	@cd .devenv/docker/datastore; \
 	docker compose -f compose.yaml up -d
 
 .PHONY: devenv-postgres
@@ -67,16 +67,16 @@ devenv-otel-collector: ## Run otel-collector in devenv (requires datastore to be
 	docker compose -f compose.yaml up -d
 
 .PHONY: devenv-up
-devenv-up: devenv-clickhouse devenv-otel-collector ## Start both datastore and otel-collector for local development
+devenv-up: devenv-datastore devenv-otel-collector ## Start both datastore and otel-collector for local development
 	@echo "Development environment is ready!"
 	@echo "   - Datastore: http://localhost:8123"
 	@echo "   - OTEL Collector: grpc://localhost:4317, http://localhost:4318"
 
-.PHONY: devenv-clickhouse-clean
-devenv-clickhouse-clean: ## Clean all ClickHouse data from filesystem
-	@echo "Removing ClickHouse data..."
-	@rm -rf .devenv/docker/clickhouse/fs/tmp/*
-	@echo "ClickHouse data cleaned!"
+.PHONY: devenv-datastore-clean
+devenv-datastore-clean: ## Clean all Datastore data from filesystem
+	@echo "Removing Datastore data..."
+	@rm -rf .devenv/docker/datastore/fs/tmp/*
+	@echo "Datastore data cleaned!"
 
 ##############################################################
 # go commands

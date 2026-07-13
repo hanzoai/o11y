@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"testing"
 
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
@@ -79,7 +79,7 @@ func TestGetFirstSeenFromMetricMetadata(t *testing.T) {
 		},
 	}
 
-	// ClickHouse tuple syntax is (x, y, z)
+	// Datastore tuple syntax is (x, y, z)
 	// the structure should lead to:
 	// SELECT ... WHERE (metric_name, attr_name, attr_string_value) IN ((?, ?, ?), (?, ?, ?)) ...
 
@@ -89,7 +89,7 @@ func TestGetFirstSeenFromMetricMetadata(t *testing.T) {
 
 	mock.ExpectQuery(expectedQuery).
 		WithArgs("metric1", "attr1", "val1", "metric2", "attr2", "val2").
-		WillReturnRows(cmock.NewRows([]cmock.ColumnType{
+		WillReturnRows(dsmock.NewRows([]dsmock.ColumnType{
 			{Name: "metric_name", Type: "String"},
 			{Name: "attr_name", Type: "String"},
 			{Name: "attr_string_value", Type: "String"},

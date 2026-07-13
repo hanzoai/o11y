@@ -283,7 +283,7 @@ def _parse_json_bodies_and_extract_paths(
 
 @pytest.fixture(name="export_json_types", scope="function")
 def export_json_types(
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
 ) -> Generator[Callable[[list[JSONPathType] | list[str] | list[Any]], None], Any]:
     """
     Fixture for exporting JSON type metadata to the path_types table.
@@ -354,7 +354,7 @@ def export_json_types(
         if len(path_types) == 0:
             return
 
-        clickhouse.conn.insert(
+        datastore.conn.insert(
             database="o11y_metadata",
             table="distributed_field_keys",
             data=[path_type.np_arr() for path_type in path_types],
@@ -370,7 +370,7 @@ def export_json_types(
     yield _export_json_types
 
     # Cleanup - truncate the local table after tests (following pattern from logs fixture)
-    clickhouse.conn.query(f"TRUNCATE TABLE o11y_metadata.field_keys ON CLUSTER '{clickhouse.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' SYNC")
+    datastore.conn.query(f"TRUNCATE TABLE o11y_metadata.field_keys ON CLUSTER '{datastore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}' SYNC")
 
 
 @pytest.fixture(name="create_json_index", scope="function")
@@ -434,7 +434,7 @@ def create_json_index(
     if not created_paths:
         return
 
-    cluster = o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
+    cluster = o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"]
     for path in created_paths:
         result = o11y.telemetrystore.conn.query(f"SELECT name FROM system.data_skipping_indices WHERE database = 'o11y_logs' AND table = 'logs_v2' AND expr LIKE '%{path}%'")
         for (index_name,) in result.result_rows:

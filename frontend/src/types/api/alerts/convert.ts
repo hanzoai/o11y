@@ -120,7 +120,7 @@ function toEQueryType(queryType: RuletypesQueryTypeDTO): EQueryType {
 	switch (queryType) {
 		case RuletypesQueryTypeDTO.builder:
 			return EQueryType.QUERY_BUILDER;
-		case RuletypesQueryTypeDTO.clickhouse_sql:
+		case RuletypesQueryTypeDTO.datastore_sql:
 			return EQueryType.DATASTORE;
 		case RuletypesQueryTypeDTO.promql:
 			return EQueryType.PROM;

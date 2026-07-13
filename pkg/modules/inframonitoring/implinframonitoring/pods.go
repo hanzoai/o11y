@@ -7,12 +7,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
 	"github.com/hanzoai/o11y/pkg/types/inframonitoringtypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 // buildPodRecords assembles the page records. Phase counts come from
@@ -246,7 +248,7 @@ func (m *module) getPerGroupPodPhaseCounts(
 		timeSeriesFPsGroupBy = append(timeSeriesFPsGroupBy, quoteIdentifier(key.Name))
 	}
 	timeSeriesFPs.GroupBy(timeSeriesFPsGroupBy...)
-	timeSeriesFPsSQL, timeSeriesFPsArgs := timeSeriesFPs.BuildWithFlavor(sqlbuilder.ClickHouse)
+	timeSeriesFPsSQL, timeSeriesFPsArgs := timeSeriesFPs.BuildWithFlavor(datastoresql.Flavor)
 
 	latestPhasePerPod := sqlbuilder.NewSelectBuilder()
 	latestPhasePerPodSelectCols := []string{"tsfp.pod_uid AS pod_uid"}
@@ -271,7 +273,7 @@ func (m *module) getPerGroupPodPhaseCounts(
 		"tsfp.pod_uid != ''",
 	)
 	latestPhasePerPod.GroupBy(latestPhasePerPodGroupBy...)
-	latestPhasePerPodSQL, latestPhasePerPodArgs := latestPhasePerPod.BuildWithFlavor(sqlbuilder.ClickHouse)
+	latestPhasePerPodSQL, latestPhasePerPodArgs := latestPhasePerPod.BuildWithFlavor(datastoresql.Flavor)
 
 	// ----- countPodsPerPhase (outer SELECT) -----
 	countPodsPerPhaseSelectCols := make([]string, 0, len(groupBy)+5)

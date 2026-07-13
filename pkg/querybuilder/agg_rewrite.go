@@ -6,7 +6,9 @@ import (
 	"log/slog"
 	"strings"
 
-	chparser "github.com/AfterShip/clickhouse-sql-parser/parser"
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
+	dsparser "github.com/hanzoai/datastore-sql-parser/parser"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
@@ -14,7 +16,6 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/huandu/go-sqlbuilder"
 )
 
 type aggExprRewriter struct {
@@ -61,7 +62,7 @@ func (r *aggExprRewriter) Rewrite(
 ) (string, []any, error) {
 
 	wrapped := fmt.Sprintf("SELECT %s", expr)
-	p := chparser.NewParser(wrapped)
+	p := dsparser.NewParser(wrapped)
 	stmts, err := p.ParseStmts()
 
 	if err != nil {
@@ -72,7 +73,7 @@ func (r *aggExprRewriter) Rewrite(
 		return "", nil, errors.NewInternalf(errors.CodeInternal, "no statements found for %q", expr)
 	}
 
-	sel, ok := stmts[0].(*chparser.SelectQuery)
+	sel, ok := stmts[0].(*dsparser.SelectQuery)
 	if !ok {
 		return "", nil, errors.NewInternalf(errors.CodeInternal, "expected SelectQuery, got %T", stmts[0])
 	}
@@ -137,7 +138,7 @@ type exprVisitor struct {
 	ctx     context.Context
 	startNs uint64
 	endNs   uint64
-	chparser.DefaultASTVisitor
+	dsparser.DefaultASTVisitor
 	logger           *slog.Logger
 	fieldKeys        map[string][]*telemetrytypes.TelemetryFieldKey
 	fullTextColumn   *telemetrytypes.TelemetryFieldKey
@@ -177,7 +178,7 @@ func newExprVisitor(
 }
 
 // VisitFunctionExpr is invoked for each function call in the AST.
-func (v *exprVisitor) VisitFunctionExpr(fn *chparser.FunctionExpr) error {
+func (v *exprVisitor) VisitFunctionExpr(fn *dsparser.FunctionExpr) error {
 	name := strings.ToLower(fn.Name.Name)
 
 	aggFunc, ok := AggreFuncMap[valuer.NewString(name)]
@@ -185,7 +186,7 @@ func (v *exprVisitor) VisitFunctionExpr(fn *chparser.FunctionExpr) error {
 		return errors.NewInvalidInputf(errors.CodeInvalidInput, "unrecognized function: %s", name)
 	}
 
-	var args []chparser.Expr
+	var args []dsparser.Expr
 	if fn.Params != nil && fn.Params.Items != nil {
 		args = fn.Params.Items.Items
 	}
@@ -235,7 +236,7 @@ func (v *exprVisitor) VisitFunctionExpr(fn *chparser.FunctionExpr) error {
 			return errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid predicate argument for %q: %q", name, origPred)
 		}
 
-		newPred, chArgs := whereClause.WhereClause.BuildWithFlavor(sqlbuilder.ClickHouse)
+		newPred, chArgs := whereClause.WhereClause.BuildWithFlavor(datastoresql.Flavor)
 		newPred = strings.TrimPrefix(newPred, "WHERE")
 		parsedPred, err := parseFragment(newPred)
 		if err != nil {
@@ -289,14 +290,14 @@ func (v *exprVisitor) VisitFunctionExpr(fn *chparser.FunctionExpr) error {
 }
 
 // parseFragment parses a SQL expression fragment by wrapping in SELECT.
-func parseFragment(sql string) (chparser.Expr, error) {
+func parseFragment(sql string) (dsparser.Expr, error) {
 	wrapped := fmt.Sprintf("SELECT %s", sql)
-	p := chparser.NewParser(wrapped)
+	p := dsparser.NewParser(wrapped)
 	stmts, err := p.ParseStmts()
 	if err != nil {
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "failed to parse re-written expression %q", sql)
 	}
-	sel, ok := stmts[0].(*chparser.SelectQuery)
+	sel, ok := stmts[0].(*dsparser.SelectQuery)
 	if !ok {
 		return nil, errors.NewInternalf(errors.CodeInternal, "unexpected statement type in re-written expression %q: %T", sql, stmts[0])
 	}

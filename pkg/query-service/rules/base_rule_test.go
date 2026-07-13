@@ -103,7 +103,7 @@ func createFirstSeenMap(metricName string, groupByFields []string, evalTime time
 
 // mergeFirstSeenMaps merges multiple first_seen maps into one
 // When the same key exists in multiple maps, it keeps the lowest value
-// which simulatest the behavior of the ClickHouse query
+// which simulatest the behavior of the Datastore query
 // finding the minimum first_seen timestamp across all groupBy attributes for a single series
 func mergeFirstSeenMaps(maps ...map[telemetrytypes.MetricMetadataLookupKey]int64) map[telemetrytypes.MetricMetadataLookupKey]int64 {
 	result := make(map[telemetrytypes.MetricMetadataLookupKey]int64)
@@ -247,13 +247,13 @@ func TestBaseRule_FilterNewSeries(t *testing.T) {
 			expectedFiltered:  []*qbtypes.TimeSeries{}, // all should be filtered out (new series)
 		},
 		{
-			name: "all old series - ClickHouse query",
+			name: "all old series - Datastore query",
 			compositeQuery: &ruletypes.AlertCompositeQuery{
-				QueryType: ruletypes.QueryTypeClickHouseSQL,
+				QueryType: ruletypes.QueryTypeDatastoreSQL,
 				Queries: []qbtypes.QueryEnvelope{
 					{
-						Type: qbtypes.QueryTypeClickHouseSQL,
-						Spec: qbtypes.ClickHouseQuery{
+						Type: qbtypes.QueryTypeDatastoreSQL,
+						Spec: qbtypes.DatastoreQuery{
 							Name:     "CH1",
 							Query:    "SELECT service_name, env FROM metrics WHERE metric_name='request_total' GROUP BY service_name, env",
 							Disabled: false,
@@ -406,13 +406,13 @@ func TestBaseRule_FilterNewSeries(t *testing.T) {
 			}, // both should be included - svc-old is old, svc-no-metadata can't be decided
 		},
 		{
-			name: "series with partial metadata - ClickHouse",
+			name: "series with partial metadata - Datastore",
 			compositeQuery: &ruletypes.AlertCompositeQuery{
-				QueryType: ruletypes.QueryTypeClickHouseSQL,
+				QueryType: ruletypes.QueryTypeDatastoreSQL,
 				Queries: []qbtypes.QueryEnvelope{
 					{
-						Type: qbtypes.QueryTypeClickHouseSQL,
-						Spec: qbtypes.ClickHouseQuery{
+						Type: qbtypes.QueryTypeDatastoreSQL,
+						Spec: qbtypes.DatastoreQuery{
 							Name:     "CH1",
 							Query:    "SELECT service_name, env FROM metrics WHERE metric_name='request_total' GROUP BY service_name, env",
 							Disabled: false,
