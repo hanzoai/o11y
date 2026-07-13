@@ -1,7 +1,7 @@
 {
   "name": "@hanzo/o11y",
   "version": "1.0.0",
-  "description": "",
+  "description": "Hanzo o11y frontend — unified observability for metrics, traces, and logs.",
   "type": "module",
   "packageManager": "pnpm@10.33.4",
   "scripts": {
