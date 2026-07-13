@@ -31,7 +31,7 @@ require (
 	github.com/hanzoai/govaluate v0.1.0
 	github.com/hanzoai/otel-collector v0.144.9
 	github.com/hanzoai/sqlbuilder v1.39.2
-	github.com/hanzoai/sqlite v0.2.3
+	github.com/hanzoai/sqlite v0.3.0
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12
 	github.com/knadh/koanf v1.5.0
 	github.com/knadh/koanf/v2 v2.3.3
@@ -215,6 +215,7 @@ require (
 	github.com/grandcat/zeroconf v1.0.0 // indirect
 	github.com/hanzoai/ai v1.806.6 // indirect
 	github.com/hanzoai/beego/v2 v2.4.1 // indirect
+	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/dashscope-go-sdk v0.0.2 // indirect
 	github.com/hanzoai/dashscopego v0.6.0 // indirect
 	github.com/hanzoai/dbx v1.16.0 // indirect
@@ -268,7 +269,6 @@ require (
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/mattn/go-runewidth v0.0.21 // indirect
-	github.com/mattn/go-sqlite3 v1.14.47 // indirect
 	github.com/microsoft/go-mssqldb v1.9.5 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
@@ -578,7 +578,5 @@ require (
 replace github.com/expr-lang/expr => github.com/hanzoai/expr v1.17.8
 
 replace github.com/hanzoai/cloud => ../cloud
-
-exclude github.com/mattn/go-sqlite3 v2.0.3+incompatible
 
 replace github.com/sashabaranov/go-openai => github.com/hanzoai/go-openai v1.40.0

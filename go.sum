@@ -903,6 +903,8 @@ github.com/hanzoai/ai v1.806.6 h1:G5aZ6oGr6ODRGjUI3AEJzcmjgJTeQNsS371L/Lk3aN4=
 github.com/hanzoai/ai v1.806.6/go.mod h1:YpAU6oEoxfhOyN5ezVtwy1pw+xb9wcjmsgY8zuiAdiI=
 github.com/hanzoai/beego/v2 v2.4.1 h1:rChSPaueQtzriNxmt4jonobe6ujeqho0WTcPVYaH8Ac=
 github.com/hanzoai/beego/v2 v2.4.1/go.mod h1:eDGRL/NJSqjoYHtWa5eMb2ze0gnlEabs1UO/naIfuX0=
+github.com/hanzoai/csqlite v0.1.0 h1:suwC3dh0INlfP/U0Es6cDf6JNQ+2+GVLLATPWCUux6k=
+github.com/hanzoai/csqlite v0.1.0/go.mod h1:H31a/O6VXuklR9UBkgY++bmAK5uzVfXPqU0F6P9Wsos=
 github.com/hanzoai/dashscope-go-sdk v0.0.2 h1:L/FlStjXeehrNSBqU8y/ecSG/MnaAJqfyfjmLYmY344=
 github.com/hanzoai/dashscope-go-sdk v0.0.2/go.mod h1:DSUNMIR7RvSoO8B/VOQLGTqsMAnE6boJm9MjeodsVF4=
 github.com/hanzoai/dashscopego v0.6.0 h1:sLUepwcnVajaDgzlgfuJWkZblBg9UIalkpFUjXHx0Fg=
@@ -935,6 +937,8 @@ github.com/hanzoai/sqlbuilder v1.39.2 h1:YDfZlCfgwRYSYag5LjeuclbQ5CRvqLehOmeDdTn
 github.com/hanzoai/sqlbuilder v1.39.2/go.mod h1:XlCgRiiXt/5PWeXG7OValozMoZN+ywY1T0hOwqZvnxo=
 github.com/hanzoai/sqlite v0.2.3 h1:X9AmaAro1hCsYY/ykI/nD5wiTCPpHhtBkUqe+PfSzuM=
 github.com/hanzoai/sqlite v0.2.3/go.mod h1:jhU6OMiNmNmjFHOgfIskse/RImYEe7rUTm6+rMKMRzg=
+github.com/hanzoai/sqlite v0.3.0 h1:Siqa7b89CgSCteg5ubXOCQiPRxYIJGb9kMemwjXMIUQ=
+github.com/hanzoai/sqlite v0.3.0/go.mod h1:/eumCoj+3FLbLXr3jZomamv2DdJvh4No2nfYDdlGgUU=
 github.com/hanzoai/tasks v1.51.0 h1:Mf1dyL8Y2EQ/m8cIc5+i8BdYvob6fZek9bj8O8sHJ3Y=
 github.com/hanzoai/tasks v1.51.0/go.mod h1:+Oqq+L3nY4uKeLyPanimlbcym/HoIUDaBezgIs6v4Hk=
 github.com/hanzoai/vfs v0.6.4 h1:7T1b/ONc2/3RhYwIAYB8MYAjXbP5fqnqsK2gZ3yQOSU=
@@ -1269,8 +1273,6 @@ github.com/mattn/go-isatty v0.0.22 h1:j8l17JJ9i6VGPUFUYoTUKPSgKe/83EYU2zBC7YNKMw
 github.com/mattn/go-isatty v0.0.22/go.mod h1:ZXfXG4SQHsB/w3ZeOYbR0PrPwLy+n6xiMrJlRFqopa4=
 github.com/mattn/go-runewidth v0.0.21 h1:jJKAZiQH+2mIinzCJIaIG9Be1+0NR+5sz/lYEEjdM8w=
 github.com/mattn/go-runewidth v0.0.21/go.mod h1:XBkDxAl56ILZc9knddidhrOlY5R/pDhgLpndooCuJAs=
-github.com/mattn/go-sqlite3 v1.14.47 h1:jOBI62gS7nKeZv+as1oGEy0+1qISgXwH/QBlR6KbfIo=
-github.com/mattn/go-sqlite3 v1.14.47/go.mod h1:6JTjA44L93a0QCyJef5YvlPoKXntQPjzWv5gtm9sB6w=
 github.com/matttproud/golang_protobuf_extensions v1.0.1/go.mod h1:D8He9yQNgCq6Z5Ld7szi9bcBfOoFv/3dc6xSMkL2PC0=
 github.com/matttproud/golang_protobuf_extensions v1.0.4 h1:mmDVorXM7PCGKw94cs5zkfA9PSy5pEvNWRP0ET0TIVo=
 github.com/matttproud/golang_protobuf_extensions v1.0.4/go.mod h1:BSXmuO+STAnVfrANrmjBb36TMTDstsz7MSK+HVaYKv4=
