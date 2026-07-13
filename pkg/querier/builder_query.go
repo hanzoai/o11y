@@ -364,7 +364,7 @@ func (q *builderQuery[T]) executeWithContext(ctx context.Context, query string, 
 		elapsed += p.Elapsed
 	}))
 
-	rows, err := q.telemetryStore.DatastoreDB().Query(ctx, query, args...)
+	rows, err := q.telemetryStore.Datastore().Query(ctx, query, args...)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return nil, errors.Newf(errors.TypeTimeout, errors.CodeTimeout, "Query timed out").

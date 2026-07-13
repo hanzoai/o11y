@@ -65,7 +65,7 @@ func (r *ResourceFingerprintResolver[T]) Resolve(
 	}
 
 	var count uint64
-	row := r.telemetryStore.DatastoreDB().QueryRow(ctx, countStmt.Query, countStmt.Args...)
+	row := r.telemetryStore.Datastore().QueryRow(ctx, countStmt.Query, countStmt.Args...)
 	if err := row.Scan(&count); err != nil {
 		return qbtypes.ResourceFilterResolveKindNoOp, err
 	}

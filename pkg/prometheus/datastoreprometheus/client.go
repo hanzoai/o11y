@@ -174,7 +174,7 @@ func (client *client) queryToDatastoreQuery(_ context.Context, query *prompb.Que
 
 func (client *client) getFingerprintsFromDatastoreQuery(ctx context.Context, query string, args []any) (map[uint64][]prompb.Label, error) {
 	ctx = client.withDatastorePrometheusContext(ctx, "getFingerprintsFromDatastoreQuery")
-	rows, err := client.telemetryStore.DatastoreDB().Query(ctx, query, args...)
+	rows, err := client.telemetryStore.Datastore().Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +226,7 @@ func (client *client) querySamples(ctx context.Context, start int64, end int64, 
 
 	query, allArgs := buildSamplesQuery(start, end, metricName, subQuery, args)
 
-	rows, err := client.telemetryStore.DatastoreDB().Query(ctx, query, allArgs...)
+	rows, err := client.telemetryStore.Datastore().Query(ctx, query, allArgs...)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +292,7 @@ func (client *client) querySamples(ctx context.Context, start int64, end int64, 
 func (client *client) queryRaw(ctx context.Context, query string, ts int64) (*prompb.QueryResult, error) {
 	ctx = client.withDatastorePrometheusContext(ctx, "queryRaw")
 
-	rows, err := client.telemetryStore.DatastoreDB().Query(ctx, query)
+	rows, err := client.telemetryStore.Datastore().Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}

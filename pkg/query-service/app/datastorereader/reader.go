@@ -191,7 +191,7 @@ func NewReader(
 	traceLocalTableName := options.primary.TraceLocalTableNameV3
 
 	return &DatastoreReader{
-		db:                       telemetryStore.DatastoreDB(),
+		db:                       telemetryStore.Datastore(),
 		logger:                   logger,
 		prometheus:               prometheus,
 		sqlDB:                    sqlDB,
