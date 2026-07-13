@@ -26,11 +26,8 @@ require (
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
-	github.com/hanzoai/datastore-go-mock v0.14.3
-	github.com/hanzoai/datastore-sql-parser v0.4.17
 	github.com/hanzoai/govaluate v0.1.0
-	github.com/hanzoai/otel-collector v0.144.9
-	github.com/hanzoai/sqlbuilder v1.39.2
+	github.com/hanzoai/otel-collector v0.144.13
 	github.com/hanzoai/sqlite v0.3.0
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12
 	github.com/knadh/koanf v1.5.0
@@ -94,7 +91,6 @@ require (
 	cloud.google.com/go v0.123.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0 // indirect
-	github.com/ClickHouse/clickhouse-go/v2 v2.46.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/ThinkInAIXYZ/go-mcp v0.2.24 // indirect
@@ -213,14 +209,16 @@ require (
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
-	github.com/hanzoai/ai v1.806.6 // indirect
+	github.com/hanzo-ds/go v1.0.0 // indirect
+	github.com/hanzo-ds/native v0.72.0 // indirect
+	github.com/hanzoai/ai v1.806.9 // indirect
 	github.com/hanzoai/beego/v2 v2.4.1 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/dashscope-go-sdk v0.0.2 // indirect
 	github.com/hanzoai/dashscopego v0.6.0 // indirect
 	github.com/hanzoai/dbx v1.16.0 // indirect
 	github.com/hanzoai/go-openrouter v1.0.0 // indirect
-	github.com/hanzoai/iam v1.31.22 // indirect
+	github.com/hanzoai/iam v1.31.24 // indirect
 	github.com/hanzoai/pdf v1.2.0 // indirect
 	github.com/hanzoai/search-go v0.36.0 // indirect
 	github.com/hanzoai/tasks v1.51.0 // indirect
@@ -377,7 +375,6 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.13.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.12.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.0 // indirect
-	github.com/ClickHouse/ch-go v0.72.0 // indirect
 	github.com/alecthomas/units v0.0.0-20240927000941-0f3dac36c52b
 	github.com/andybalholm/brotli v1.2.1 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
@@ -424,8 +421,11 @@ require (
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
+	github.com/hanzo-ds/sqlbuilder v1.42.2
+	github.com/hanzo-ds/sqlparser v0.4.16
 	github.com/hanzoai/cloud v1.786.112
-	github.com/hanzoai/datastore-go/v2 v2.47.0
+	github.com/hanzoai/datastore-go-mock v0.14.3
+	github.com/hanzoai/datastore-go/v2 v2.47.2
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.5 // indirect
