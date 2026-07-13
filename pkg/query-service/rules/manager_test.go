@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	dsmock "github.com/hanzoai/datastore-go-mock"
+	dsmock "github.com/hanzo-ds/mock"
 )
 
 func TestManager_TestNotification_SendUnmatched_ThresholdRule(t *testing.T) {

@@ -1023,7 +1023,7 @@ func trimQuotes(txt string) string {
 	}
 
 	// unescape so the datastore driver can escape it
-	// see github.com/hanzoai/datastore-go/v2 bind.go stringQuoteReplacer
+	// see github.com/hanzo-ds/go bind.go stringQuoteReplacer
 	txt = strings.ReplaceAll(txt, `\\`, `\`)
 	txt = strings.ReplaceAll(txt, `\'`, `'`)
 	return txt

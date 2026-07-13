@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	dsmock "github.com/hanzoai/datastore-go-mock"
+	dsmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/cache/cachetest"
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
