@@ -100,9 +100,9 @@ func NewQuerier(opts QuerierOptions) interfaces.Querier {
 	}
 }
 
-// execClickHouseQuery executes the clickhouse query and returns the series list
+// execDatastoreQuery executes the datastore query and returns the series list
 // if testing mode is enabled, it returns the mocked series list
-func (q *querier) execClickHouseQuery(ctx context.Context, query string) ([]*v3.Series, error) {
+func (q *querier) execDatastoreQuery(ctx context.Context, query string) ([]*v3.Series, error) {
 	if q.testingMode && q.reader == nil {
 		q.queriesExecuted = append(q.queriesExecuted, query)
 		return q.returnedSeries, q.returnedErr
@@ -271,19 +271,19 @@ func (q *querier) runPromQueries(ctx context.Context, orgID valuer.UUID, params 
 	return results, errQueriesByName, err
 }
 
-func (q *querier) runClickHouseQueries(ctx context.Context, params *v3.QueryRangeParamsV3) ([]*v3.Result, map[string]error, error) {
-	channelResults := make(chan channelResult, len(params.CompositeQuery.ClickHouseQueries))
+func (q *querier) runDatastoreQueries(ctx context.Context, params *v3.QueryRangeParamsV3) ([]*v3.Result, map[string]error, error) {
+	channelResults := make(chan channelResult, len(params.CompositeQuery.DatastoreQueries))
 	var wg sync.WaitGroup
-	for queryName, clickHouseQuery := range params.CompositeQuery.ClickHouseQueries {
-		if clickHouseQuery.Disabled {
+	for queryName, datastoreQuery := range params.CompositeQuery.DatastoreQueries {
+		if datastoreQuery.Disabled {
 			continue
 		}
 		wg.Add(1)
-		go func(queryName string, clickHouseQuery *v3.ClickHouseQuery) {
+		go func(queryName string, datastoreQuery *v3.DatastoreQuery) {
 			defer wg.Done()
-			series, err := q.execClickHouseQuery(ctx, clickHouseQuery.Query)
-			channelResults <- channelResult{Err: err, Name: queryName, Query: clickHouseQuery.Query, Series: series}
-		}(queryName, clickHouseQuery)
+			series, err := q.execDatastoreQuery(ctx, datastoreQuery.Query)
+			channelResults <- channelResult{Err: err, Name: queryName, Query: datastoreQuery.Query, Series: series}
+		}(queryName, datastoreQuery)
 	}
 	wg.Wait()
 	close(channelResults)
@@ -306,7 +306,7 @@ func (q *querier) runClickHouseQueries(ctx context.Context, params *v3.QueryRang
 
 	var err error
 	if len(errs) > 0 {
-		err = fmt.Errorf("error in clickhouse queries")
+		err = fmt.Errorf("error in datastore queries")
 	}
 	return results, errQueriesByName, err
 }
@@ -458,8 +458,8 @@ func (q *querier) runBuilderListQueries(ctx context.Context, params *v3.QueryRan
 	var err error
 	if params.CompositeQuery.QueryType == v3.QueryTypeBuilder {
 		queries, err = q.builder.PrepareQueries(params)
-	} else if params.CompositeQuery.QueryType == v3.QueryTypeClickHouseSQL {
-		for name, chQuery := range params.CompositeQuery.ClickHouseQueries {
+	} else if params.CompositeQuery.QueryType == v3.QueryTypeDatastoreSQL {
+		for name, chQuery := range params.CompositeQuery.DatastoreQueries {
 			queries[name] = chQuery.Query
 		}
 	}
@@ -535,12 +535,12 @@ func (q *querier) QueryRange(ctx context.Context, orgID valuer.UUID, params *v3.
 			}
 		case v3.QueryTypePromQL:
 			results, errQueriesByName, err = q.runPromQueries(ctx, orgID, params)
-		case v3.QueryTypeClickHouseSQL:
+		case v3.QueryTypeDatastoreSQL:
 			if params.CompositeQuery.PanelType == v3.PanelTypeList || params.CompositeQuery.PanelType == v3.PanelTypeTrace {
 				results, errQueriesByName, err = q.runBuilderListQueries(ctx, params)
 			} else {
 				ctx = context.WithValue(ctx, "enforce_max_result_rows", true)
-				results, errQueriesByName, err = q.runClickHouseQueries(ctx, params)
+				results, errQueriesByName, err = q.runDatastoreQueries(ctx, params)
 			}
 		default:
 			err = fmt.Errorf("invalid query type")

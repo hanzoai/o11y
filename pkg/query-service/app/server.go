@@ -21,7 +21,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/licensing/nooplicensing"
 	"github.com/hanzoai/o11y/pkg/o11y"
 	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
-	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/query-service/app/datastorereader"
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations"
 	"github.com/hanzoai/o11y/pkg/query-service/app/logparsingpipeline"
 	"github.com/hanzoai/o11y/pkg/query-service/app/opamp"
@@ -60,7 +60,7 @@ func NewServer(config o11y.Config, o11y *o11y.O11y) (*Server, error) {
 		return nil, err
 	}
 
-	reader := clickhouseReader.NewReader(
+	reader := datastorereader.NewReader(
 		o11y.Instrumentation.Logger(),
 		o11y.SQLStore,
 		o11y.TelemetryStore,

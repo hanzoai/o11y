@@ -39,7 +39,7 @@ const (
 	BodyV2ColumnPrefix       = constants.BodyV2ColumnPrefix
 	BodyPromotedColumnPrefix = constants.BodyPromotedColumnPrefix
 
-	// messageSubColumn is the ClickHouse sub-column that body searches map to
+	// messageSubColumn is the Datastore sub-column that body searches map to
 	// when use_json_body feature flag is true.
 	messageSubField          = "message"
 	messageSubColumn         = "body_v2.message"

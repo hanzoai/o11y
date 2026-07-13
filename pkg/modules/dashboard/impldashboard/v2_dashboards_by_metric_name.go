@@ -92,8 +92,8 @@ func (m *module) extractMetricNamesFromQuerySpec(ctx context.Context, spec any) 
 		}
 	case *qbtypes.PromQuery:
 		maps.Copy(found, m.extractMetricNamesFromRawQuery(ctx, qbtypes.QueryTypePromQL, s.Query))
-	case *qbtypes.ClickHouseQuery:
-		maps.Copy(found, m.extractMetricNamesFromRawQuery(ctx, qbtypes.QueryTypeClickHouseSQL, s.Query))
+	case *qbtypes.DatastoreQuery:
+		maps.Copy(found, m.extractMetricNamesFromRawQuery(ctx, qbtypes.QueryTypeDatastoreSQL, s.Query))
 	}
 	return found
 }
@@ -109,8 +109,8 @@ func (m *module) extractMetricNamesFromQueryEnvelope(ctx context.Context, envelo
 		}
 	case qbtypes.PromQuery:
 		maps.Copy(found, m.extractMetricNamesFromRawQuery(ctx, qbtypes.QueryTypePromQL, s.Query))
-	case qbtypes.ClickHouseQuery:
-		maps.Copy(found, m.extractMetricNamesFromRawQuery(ctx, qbtypes.QueryTypeClickHouseSQL, s.Query))
+	case qbtypes.DatastoreQuery:
+		maps.Copy(found, m.extractMetricNamesFromRawQuery(ctx, qbtypes.QueryTypeDatastoreSQL, s.Query))
 	}
 	return found
 }

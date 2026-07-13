@@ -9,7 +9,7 @@ import (
 // The hanzoai/cloud embed and the standalone binary both resolve config through
 // NewConfig. The flat operator knob O11Y_DATASTORE_DSN MUST win and land on the
 // telemetry store DSN — this is the ONE var the cloud CR sets to point the
-// in-process runtime at the shared ClickHouse (Hanzo Datastore). If this alias
+// in-process runtime at the shared Datastore (Hanzo Datastore). If this alias
 // regresses, the embed silently talks to localhost and serves no telemetry.
 func TestNewConfigAppliesDatastoreDSNAlias(t *testing.T) {
 	const dsn = "tcp://datastore.hanzo.svc:9000?username=u&password=p"
@@ -21,10 +21,10 @@ func TestNewConfigAppliesDatastoreDSNAlias(t *testing.T) {
 		t.Fatalf("NewConfig: %v", err)
 	}
 
-	if got := config.TelemetryStore.Clickhouse.DSN; got != dsn {
+	if got := config.TelemetryStore.Datastore.DSN; got != dsn {
 		t.Fatalf("telemetrystore DSN = %q, want the O11Y_DATASTORE_DSN value %q", got, dsn)
 	}
-	if got := config.TelemetryStore.Clickhouse.Cluster; got != "insights" {
+	if got := config.TelemetryStore.Datastore.Cluster; got != "insights" {
 		t.Fatalf("telemetrystore cluster = %q, want %q", got, "insights")
 	}
 }

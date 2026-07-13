@@ -9,7 +9,7 @@ UNSUPPORTED_CLICKHOUSE_VERSIONS = {"25.5.6"}
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
-    version = config.getoption("--clickhouse-version")
+    version = config.getoption("--datastore-version")
     if version in UNSUPPORTED_CLICKHOUSE_VERSIONS:
         skip = pytest.mark.skip(reason=f"JSON body QB tests require ClickHouse > {version}")
         for item in items:
@@ -19,7 +19,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
 @pytest.fixture(name="migrator", scope="package")
 def migrator_json(
     network: Network,
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
 ) -> types.Operation:
@@ -28,7 +28,7 @@ def migrator_json(
     """
     return create_migrator(
         network=network,
-        clickhouse=clickhouse,
+        datastore=datastore,
         request=request,
         pytestconfig=pytestconfig,
         cache_key="migrator-json-body",
@@ -45,7 +45,7 @@ def o11y_json_body(
     zeus: types.TestContainerDocker,
     gateway: types.TestContainerDocker,
     sqlstore: types.TestContainerSQL,
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
 ) -> types.O11y:
@@ -57,7 +57,7 @@ def o11y_json_body(
         zeus=zeus,
         gateway=gateway,
         sqlstore=sqlstore,
-        clickhouse=clickhouse,
+        datastore=datastore,
         request=request,
         pytestconfig=pytestconfig,
         cache_key="o11y-json-body",

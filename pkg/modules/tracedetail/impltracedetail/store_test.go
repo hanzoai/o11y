@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 	"github.com/hanzoai/o11y/pkg/modules/tracedetail/impltracedetail"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
@@ -48,7 +48,7 @@ func TestGetTraceSummary(t *testing.T) {
 	t.Run("ValidTraceID_GeneratesExpectedSQL", func(t *testing.T) {
 		s := newTestStore(sqlmock.QueryMatcherRegexp)
 		s.Mock().ExpectQueryRow(regexp.QuoteMeta(expectedSQL)).
-			WillReturnRow(cmock.NewRow(nil, nil))
+			WillReturnRow(dsmock.NewRow(nil, nil))
 		_, _ = s.Store().GetTraceSummary(context.Background(), testTraceID)
 		assert.NoError(t, s.Mock().ExpectationsWereMet())
 	})
@@ -60,7 +60,7 @@ func TestGetMinimalSpans(t *testing.T) {
 	t.Run("ValidRange_GeneratesExpectedSQL", func(t *testing.T) {
 		s := newTestStore(sqlmock.QueryMatcherRegexp)
 		s.Mock().ExpectSelect(regexp.QuoteMeta(expectedSQL)).
-			WillReturnRows(cmock.NewRows(nil, nil))
+			WillReturnRows(dsmock.NewRows(nil, nil))
 		_, _ = s.Store().GetMinimalSpans(context.Background(), testTraceID, testStart, testEnd)
 		assert.NoError(t, s.Mock().ExpectationsWereMet())
 	})
@@ -83,7 +83,7 @@ func TestGetSpanCountByField(t *testing.T) {
 			s := newTestStore(sqlmock.QueryMatcherRegexp)
 			if tc.wantQuery {
 				s.Mock().ExpectSelect(regexp.QuoteMeta(expectedSQL)).
-					WillReturnRows(cmock.NewRows(nil, nil))
+					WillReturnRows(dsmock.NewRows(nil, nil))
 			}
 			_, _ = s.Store().GetSpanCountByField(context.Background(), testTraceID, testSummary, tc.field)
 			assert.NoError(t, s.Mock().ExpectationsWereMet())
@@ -108,7 +108,7 @@ func TestGetFlamegraphSpans(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			s := newTestStore(sqlmock.QueryMatcherRegexp)
 			s.Mock().ExpectSelect(regexp.QuoteMeta(tc.sql)).
-				WillReturnRows(cmock.NewRows(nil, nil))
+				WillReturnRows(dsmock.NewRows(nil, nil))
 			_, _ = s.Store().GetFlamegraphSpans(context.Background(), testTraceID, testStart, testEnd, tc.spanIDs)
 			assert.NoError(t, s.Mock().ExpectationsWereMet())
 		})
@@ -133,7 +133,7 @@ func TestGetSpanDurationByField(t *testing.T) {
 			s := newTestStore(sqlmock.QueryMatcherRegexp)
 			if tc.wantQuery {
 				s.Mock().ExpectSelect(regexp.QuoteMeta(expectedSQL)).
-					WillReturnRows(cmock.NewRows(nil, nil))
+					WillReturnRows(dsmock.NewRows(nil, nil))
 			}
 			_, _ = s.Store().GetSpanDurationByField(context.Background(), testTraceID, testSummary, tc.field)
 			assert.NoError(t, s.Mock().ExpectationsWereMet())

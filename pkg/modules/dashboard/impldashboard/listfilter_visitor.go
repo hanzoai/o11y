@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
 	qbtypesv5 "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/antlr4-go/antlr/v4"
-	sqlbuilder "github.com/huandu/go-sqlbuilder"
+	sqlbuilder "github.com/hanzoai/sqlbuilder"
 )
 
 // bunPlaceholderFlavor is any flavor that renders `?` placeholders, which bun

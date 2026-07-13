@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
@@ -525,7 +525,7 @@ func TestThresholdRuleUnitCombinations(t *testing.T) {
 	querier, mockMetadataStore := prepareQuerierForMetrics(t, telemetryStore)
 	mockMetadataStore.TypeMap["o11y_calls_total"] = metrictypes.SumType
 
-	cols := []cmock.ColumnType{
+	cols := []dsmock.ColumnType{
 		{Name: "ts", Type: "DateTime"},
 		{Name: "value", Type: "Float64"},
 	}
@@ -622,7 +622,7 @@ func TestThresholdRuleUnitCombinations(t *testing.T) {
 	logger := instrumentationtest.New().Logger()
 
 	for idx, c := range cases {
-		rows := cmock.NewRows(cols, c.values)
+		rows := dsmock.NewRows(cols, c.values)
 		// We are testing the eval logic after the query is run
 		// so we don't care about the query string here
 		queryString := "SELECT any"
@@ -712,10 +712,10 @@ func TestThresholdRuleNoData(t *testing.T) {
 		},
 	}
 
-	cols := make([]cmock.ColumnType, 0)
-	cols = append(cols, cmock.ColumnType{Name: "value", Type: "Float64"})
-	cols = append(cols, cmock.ColumnType{Name: "attr", Type: "String"})
-	cols = append(cols, cmock.ColumnType{Name: "timestamp", Type: "DateTime"})
+	cols := make([]dsmock.ColumnType, 0)
+	cols = append(cols, dsmock.ColumnType{Name: "value", Type: "Float64"})
+	cols = append(cols, dsmock.ColumnType{Name: "attr", Type: "String"})
+	cols = append(cols, dsmock.ColumnType{Name: "timestamp", Type: "DateTime"})
 
 	cases := []struct {
 		values       [][]any
@@ -733,7 +733,7 @@ func TestThresholdRuleNoData(t *testing.T) {
 
 		telemetryStore := telemetrystoretest.New(telemetrystore.Config{}, &queryMatcherAny{})
 
-		rows := cmock.NewRows(cols, c.values)
+		rows := dsmock.NewRows(cols, c.values)
 		queryString := "SELECT any"
 		telemetryStore.Mock().
 			ExpectQuery(queryString).
@@ -814,10 +814,10 @@ func TestThresholdRuleTracesLink(t *testing.T) {
 		},
 	}
 
-	cols := make([]cmock.ColumnType, 0)
-	cols = append(cols, cmock.ColumnType{Name: "value", Type: "Float64"})
-	cols = append(cols, cmock.ColumnType{Name: "attr", Type: "String"})
-	cols = append(cols, cmock.ColumnType{Name: "timestamp", Type: "DateTime"})
+	cols := make([]dsmock.ColumnType, 0)
+	cols = append(cols, dsmock.ColumnType{Name: "value", Type: "Float64"})
+	cols = append(cols, dsmock.ColumnType{Name: "attr", Type: "String"})
+	cols = append(cols, dsmock.ColumnType{Name: "timestamp", Type: "DateTime"})
 
 	keysMap := map[string][]*telemetrytypes.TelemetryFieldKey{
 		"http.method": {
@@ -835,7 +835,7 @@ func TestThresholdRuleTracesLink(t *testing.T) {
 
 		telemetryStore := telemetrystoretest.New(telemetrystore.Config{}, &queryMatcherAny{})
 
-		rows := cmock.NewRows(cols, c.values)
+		rows := dsmock.NewRows(cols, c.values)
 		queryString := "SELECT any"
 		telemetryStore.Mock().
 			ExpectQuery(queryString).
@@ -942,10 +942,10 @@ func TestThresholdRuleLogsLink(t *testing.T) {
 		},
 	}
 
-	cols := make([]cmock.ColumnType, 0)
-	cols = append(cols, cmock.ColumnType{Name: "value", Type: "Float64"})
-	cols = append(cols, cmock.ColumnType{Name: "attr", Type: "String"})
-	cols = append(cols, cmock.ColumnType{Name: "timestamp", Type: "DateTime"})
+	cols := make([]dsmock.ColumnType, 0)
+	cols = append(cols, dsmock.ColumnType{Name: "value", Type: "Float64"})
+	cols = append(cols, dsmock.ColumnType{Name: "attr", Type: "String"})
+	cols = append(cols, dsmock.ColumnType{Name: "timestamp", Type: "DateTime"})
 
 	logger := instrumentationtest.New().Logger()
 
@@ -953,7 +953,7 @@ func TestThresholdRuleLogsLink(t *testing.T) {
 
 		telemetryStore := telemetrystoretest.New(telemetrystore.Config{}, &queryMatcherAny{})
 
-		rows := cmock.NewRows(cols, c.values)
+		rows := dsmock.NewRows(cols, c.values)
 		queryString := "SELECT any"
 		telemetryStore.Mock().
 			ExpectQuery(queryString).
@@ -1043,10 +1043,10 @@ func TestMultipleThresholdRule(t *testing.T) {
 		},
 	}
 
-	cols := make([]cmock.ColumnType, 0)
-	cols = append(cols, cmock.ColumnType{Name: "value", Type: "Float64"})
-	cols = append(cols, cmock.ColumnType{Name: "attr", Type: "String"})
-	cols = append(cols, cmock.ColumnType{Name: "timestamp", Type: "DateTime"})
+	cols := make([]dsmock.ColumnType, 0)
+	cols = append(cols, dsmock.ColumnType{Name: "value", Type: "Float64"})
+	cols = append(cols, dsmock.ColumnType{Name: "attr", Type: "String"})
+	cols = append(cols, dsmock.ColumnType{Name: "timestamp", Type: "DateTime"})
 
 	cases := []struct {
 		targetUnit      string
@@ -1125,7 +1125,7 @@ func TestMultipleThresholdRule(t *testing.T) {
 
 		telemetryStore := telemetrystoretest.New(telemetrystore.Config{}, &queryMatcherAny{})
 
-		rows := cmock.NewRows(cols, c.values)
+		rows := dsmock.NewRows(cols, c.values)
 		queryString := "SELECT any"
 		telemetryStore.Mock().
 			ExpectQuery(queryString).
@@ -1908,7 +1908,7 @@ func TestThresholdEval_RequireMinPoints(t *testing.T) {
 		},
 	}
 
-	cols := []cmock.ColumnType{
+	cols := []dsmock.ColumnType{
 		{Name: "value", Type: "Float64"},
 		{Name: "key", Type: "String"},
 		{Name: "ts", Type: "DateTime"},
@@ -1918,7 +1918,7 @@ func TestThresholdEval_RequireMinPoints(t *testing.T) {
 		logger := instrumentationtest.New().Logger()
 		telemetryStore := telemetrystoretest.New(telemetrystore.Config{}, &queryMatcherAny{})
 
-		rows := cmock.NewRows(cols, c.values)
+		rows := dsmock.NewRows(cols, c.values)
 		queryString := "SELECT any"
 		telemetryStore.Mock().
 			ExpectQuery(queryString).

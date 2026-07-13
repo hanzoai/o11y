@@ -47,7 +47,7 @@
 					],
 					"queryFormulas": []
 				},
-				"clickhouse_sql": [
+				"datastore_sql": [
 					{ "disabled": false, "legend": "", "name": "A", "query": "" }
 				],
 				"id": "22222222-2222-4222-8222-222222222222",

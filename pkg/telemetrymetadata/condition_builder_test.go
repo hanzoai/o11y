@@ -4,9 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -60,7 +62,7 @@ func TestConditionFor(t *testing.T) {
 				assert.Equal(t, tc.expectedError, err)
 			} else {
 				require.NoError(t, err)
-				sql, _ := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+				sql, _ := sb.BuildWithFlavor(datastoresql.Flavor)
 				assert.Contains(t, sql, tc.expectedSQL)
 			}
 		})

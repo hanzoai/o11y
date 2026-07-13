@@ -84,7 +84,7 @@ type QueryRangePreviewParams struct {
 
 // PrepareJSONSchema adds description to the QueryRangePreviewResponse schema.
 func (q *QueryRangePreviewResponse) PrepareJSONSchema(schema *jsonschema.Schema) error {
-	schema.WithDescription("Response from the v5 query range preview (dry-run) endpoint. For each query in the composite query, returns the underlying ClickHouse statement(s) it renders to without executing them (one per PromQL metric selector; exactly one for builder/ClickHouse/trace-operator queries), with the optional EXPLAIN ESTIMATE and granule analysis attached per statement when requested.")
+	schema.WithDescription("Response from the v5 query range preview (dry-run) endpoint. For each query in the composite query, returns the underlying Datastore statement(s) it renders to without executing them (one per PromQL metric selector; exactly one for builder/Datastore/trace-operator queries), with the optional EXPLAIN ESTIMATE and granule analysis attached per statement when requested.")
 	return nil
 }
 
@@ -96,7 +96,7 @@ type QueryPreview struct {
 	Statements []PreviewStatement `json:"statements" required:"true" nullable:"false"`
 }
 
-// PreviewStatement is one rendered ClickHouse statement with its args and, when
+// PreviewStatement is one rendered Datastore statement with its args and, when
 // requested, its EXPLAIN ESTIMATE and granule breakdown. The query/args JSON
 // keys follow the OpenTelemetry db.statement.* convention.
 type PreviewStatement struct {

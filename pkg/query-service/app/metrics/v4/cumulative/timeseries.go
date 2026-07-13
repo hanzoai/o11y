@@ -10,7 +10,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 )
 
-// See https://clickhouse.com/docs/en/sql-reference/window-functions for more details on `lagInFrame` function
+// See https://datastore.com/docs/en/sql-reference/window-functions for more details on `lagInFrame` function
 //
 // Calculating the rate of change of a metric is a common use case.
 // Requests and errors are two examples of metrics that are often expressed as a rate of change.
@@ -116,7 +116,7 @@ func prepareTimeAggregationSubQuery(start, end, step int64, mq *v3.BuilderQuery)
 		return "", err
 	}
 
-	samplesTableFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli < %d", utils.ClickHouseFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
+	samplesTableFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli < %d", utils.DatastoreFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
 
 	tableName := helpers.WhichSamplesTableToUse(start, end, mq)
 

@@ -12,13 +12,13 @@ import (
 )
 
 const (
-	// ClickHouse database and table names for trace queries.
+	// Datastore database and table names for trace queries.
 	TraceDB           = "o11y_traces"
 	TraceTable        = "distributed_o11y_index_v3"
 	TraceSummaryTable = "distributed_trace_summary"
 )
 
-// ErrTraceNotFound is returned when a trace ID has no matching spans in ClickHouse.
+// ErrTraceNotFound is returned when a trace ID has no matching spans in Datastore.
 var ErrTraceNotFound = errors.NewNotFoundf(errors.CodeNotFound, "trace not found")
 
 // PostableWaterfall is the request body for the waterfall API.
@@ -91,7 +91,7 @@ type WaterfallSpan struct {
 	ServiceName string `json:"-"`
 }
 
-// StorableSpan is the ClickHouse scan struct for the v3 waterfall query.
+// StorableSpan is the Datastore scan struct for the v3 waterfall query.
 type StorableSpan struct {
 	StartTime          time.Time          `ch:"timestamp"`
 	DurationNano       uint64             `ch:"duration_nano"`

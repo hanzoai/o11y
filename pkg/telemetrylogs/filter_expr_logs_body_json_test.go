@@ -6,11 +6,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/huandu/go-sqlbuilder"
 	"github.com/stretchr/testify/require"
 )
 
@@ -179,7 +180,7 @@ func TestFilterExprLogsBodyJSON(t *testing.T) {
 				}
 
 				// Build the SQL and print it for debugging
-				sql, args := clause.WhereClause.BuildWithFlavor(sqlbuilder.ClickHouse)
+				sql, args := clause.WhereClause.BuildWithFlavor(datastoresql.Flavor)
 
 				require.Equal(t, tc.expectedQuery, sql)
 				require.Equal(t, tc.expectedArgs, args)

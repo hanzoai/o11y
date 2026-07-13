@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 )
 
 func TestManager_TestNotification_SendUnmatched_ThresholdRule(t *testing.T) {
@@ -70,28 +70,28 @@ func TestManager_TestNotification_SendUnmatched_ThresholdRule(t *testing.T) {
 				TelemetryStoreHook: func(store telemetrystore.TelemetryStore) {
 					mockStore := store.(*telemetrystoretest.Provider)
 					// Set up mock data for telemetry store
-					cols := make([]cmock.ColumnType, 0)
-					cols = append(cols, cmock.ColumnType{Name: "value", Type: "Float64"})
-					cols = append(cols, cmock.ColumnType{Name: "attr", Type: "String"})
-					cols = append(cols, cmock.ColumnType{Name: "ts", Type: "DateTime"})
+					cols := make([]dsmock.ColumnType, 0)
+					cols = append(cols, dsmock.ColumnType{Name: "value", Type: "Float64"})
+					cols = append(cols, dsmock.ColumnType{Name: "attr", Type: "String"})
+					cols = append(cols, dsmock.ColumnType{Name: "ts", Type: "DateTime"})
 
-					alertDataRows := cmock.NewRows(cols, tc.Values)
+					alertDataRows := dsmock.NewRows(cols, tc.Values)
 
 					mock := mockStore.Mock()
 					// Mock metadata queries for FetchTemporalityAndTypeMulti
 					// First query: fetchMetricsTemporalityAndType (from o11y_metrics time series table)
-					metadataCols := []cmock.ColumnType{
+					metadataCols := []dsmock.ColumnType{
 						{Name: "metric_name", Type: "String"},
 						{Name: "temporality", Type: "String"},
 						{Name: "type", Type: "String"},
 						{Name: "is_monotonic", Type: "Bool"},
 					}
-					metadataRows := cmock.NewRows(metadataCols, [][]any{
+					metadataRows := dsmock.NewRows(metadataCols, [][]any{
 						{"probe_success", metrictypes.Unspecified, metrictypes.GaugeType, false},
 					})
 					mock.ExpectQuery("*distributed_time_series_v4*").WithArgs(nil, nil, nil).WillReturnRows(metadataRows)
 					// Second query: fetchMeterSourceMetricsTemporalityAndType (from o11y_meter table)
-					emptyMetadataRows := cmock.NewRows(metadataCols, [][]any{})
+					emptyMetadataRows := dsmock.NewRows(metadataCols, [][]any{})
 					mock.ExpectQuery("*meter*").WithArgs(nil).WillReturnRows(emptyMetadataRows)
 
 					// Generate query arguments for the metric query
@@ -183,13 +183,13 @@ func TestManager_TestNotification_SendUnmatched_PromRule(t *testing.T) {
 
 					// Set up Prometheus-specific mock data
 					// Fingerprint columns for Prometheus queries
-					fingerprintCols := []cmock.ColumnType{
+					fingerprintCols := []dsmock.ColumnType{
 						{Name: "fingerprint", Type: "UInt64"},
 						{Name: "any(labels)", Type: "String"},
 					}
 
 					// Samples columns for Prometheus queries
-					samplesCols := []cmock.ColumnType{
+					samplesCols := []dsmock.ColumnType{
 						{Name: "metric_name", Type: "String"},
 						{Name: "fingerprint", Type: "UInt64"},
 						{Name: "unix_milli", Type: "Int64"},
@@ -212,7 +212,7 @@ func TestManager_TestNotification_SendUnmatched_PromRule(t *testing.T) {
 					fingerprintData := [][]any{
 						{fingerprint, labelsJSON},
 					}
-					fingerprintRows := cmock.NewRows(fingerprintCols, fingerprintData)
+					fingerprintRows := dsmock.NewRows(fingerprintCols, fingerprintData)
 
 					// Create samples data from test case values, calculating timestamps relative to baseTime
 					validSamplesData := make([][]any, 0)
@@ -231,7 +231,7 @@ func TestManager_TestNotification_SendUnmatched_PromRule(t *testing.T) {
 							uint32(0), // flags - 0 means normal value
 						})
 					}
-					samplesRows := cmock.NewRows(samplesCols, validSamplesData)
+					samplesRows := dsmock.NewRows(samplesCols, validSamplesData)
 
 					mock := mockStore.Mock()
 

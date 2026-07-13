@@ -5,7 +5,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/prometheus"
-	"github.com/hanzoai/o11y/pkg/prometheus/clickhouseprometheus"
+	"github.com/hanzoai/o11y/pkg/prometheus/datastoreprometheus"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
@@ -31,7 +31,7 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 
 	engine := prometheus.NewEngine(settings.Logger(), config)
 
-	readClient := clickhouseprometheus.NewReadClient(settings, telemetryStore)
+	readClient := datastoreprometheus.NewReadClient(settings, telemetryStore)
 
 	queryable := remote.NewSampleAndChunkQueryableClient(readClient, labels.EmptyLabels(), []*labels.Matcher{}, false, stCallback)
 

@@ -1,6 +1,6 @@
 package telemetrystoretypes
 
-// EstimateEntry is ClickHouse's EXPLAIN ESTIMATE for one table read: the parts,
+// EstimateEntry is Datastore's EXPLAIN ESTIMATE for one table read: the parts,
 // rows, and marks it estimates it will scan.
 type EstimateEntry struct {
 	Database string `json:"database" required:"true" nullable:"false"`

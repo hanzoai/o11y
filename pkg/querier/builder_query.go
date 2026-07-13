@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	clickhouse "github.com/hanzoai/datastore-go/v2"
+	"github.com/hanzoai/datastore-go/v2"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrytraces"
@@ -358,7 +358,7 @@ func (q *builderQuery[T]) executeWithContext(ctx context.Context, query string, 
 	totalBytes := uint64(0)
 	elapsed := time.Duration(0)
 
-	ctx = clickhouse.Context(ctx, clickhouse.WithProgress(func(p *clickhouse.Progress) {
+	ctx = datastore.Context(ctx, datastore.WithProgress(func(p *datastore.Progress) {
 		totalRows += p.Rows
 		totalBytes += p.Bytes
 		elapsed += p.Elapsed
@@ -443,7 +443,7 @@ func (q *builderQuery[T]) executeWindowList(ctx context.Context) (*qbtypes.Resul
 		reqLimit = 10_000 // sane upper-bound default
 	}
 	offsetLeft := q.spec.Offset
-	need := reqLimit + offsetLeft // rows to fetch from ClickHouse
+	need := reqLimit + offsetLeft // rows to fetch from Datastore
 
 	var rows []*qbtypes.RawRow
 

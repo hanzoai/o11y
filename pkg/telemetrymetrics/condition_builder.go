@@ -10,7 +10,7 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 type conditionBuilder struct {

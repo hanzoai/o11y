@@ -109,7 +109,7 @@ func validateQueryAllowedForPanel(plugin QueryPlugin, allowed []QueryPluginKind,
 		qb.QueryTypeFormula:       QueryKindFormula,
 		qb.QueryTypeTraceOperator: QueryKindTraceOperator,
 		qb.QueryTypePromQL:        QueryKindPromQL,
-		qb.QueryTypeClickHouseSQL: QueryKindClickHouseSQL,
+		qb.QueryTypeDatastoreSQL: QueryKindDatastoreSQL,
 	}
 	if !slices.Contains(allowed, plugin.Kind) {
 		return errors.NewInvalidInputf(ErrCodeDashboardInvalidInput,

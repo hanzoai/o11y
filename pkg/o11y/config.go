@@ -254,7 +254,7 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 
 	if os.Getenv("DatastoreUrl") != "" {
 		logger.WarnContext(ctx, "[Deprecated] env DatastoreUrl is deprecated and scheduled for removal. Please use O11Y_DATASTORE_DSN instead.")
-		config.TelemetryStore.Clickhouse.DSN = os.Getenv("DatastoreUrl")
+		config.TelemetryStore.Datastore.DSN = os.Getenv("DatastoreUrl")
 	}
 
 	// O11Y_DATASTORE_DSN is the canonical, flat operator-facing key for the Hanzo
@@ -262,7 +262,7 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 	// O11Y_TELEMETRYSTORE_DATASTORE_DSN (telemetrystore.datastore.dsn), which stays
 	// as an internal fallback.
 	if dsn := os.Getenv("O11Y_DATASTORE_DSN"); dsn != "" {
-		config.TelemetryStore.Clickhouse.DSN = dsn
+		config.TelemetryStore.Datastore.DSN = dsn
 	}
 
 	if os.Getenv("INVITE_EMAIL_TEMPLATE") != "" {

@@ -80,7 +80,7 @@ You can [instrument](https://o11y.hanzo.ai/docs/instrumentation/) your applicati
 
 ### Logs Management
 
-Hanzo O11y can be used as a centralized log management solution. We use ClickHouse (used by likes of Uber & Cloudflare) as a datastore, ⎯ an extremely fast and highly optimized storage for logs data. Instantly search through all your logs using quick filters and a powerful query builder.
+Hanzo O11y can be used as a centralized log management solution. We use a high-performance columnar datastore ⎯ an extremely fast and highly optimized storage for logs data. Instantly search through all your logs using quick filters and a powerful query builder.
 
 You can also create charts on your logs and monitor them with customized dashboards. Read [more](https://o11y.hanzo.ai/log-management/).
 
@@ -154,9 +154,9 @@ Hanzo O11y is a single tool for all your monitoring and observability needs. Her
 
 - Correlated logs, metrics and traces for much richer context while debugging
 
-- Uses ClickHouse (used by likes of Uber & Cloudflare) as datastore - an extremely fast and highly optimized storage for observability data
+- Uses a high-performance columnar datastore - an extremely fast and highly optimized storage for observability data
 
-- DIY Query builder, PromQL, and ClickHouse queries to fulfill all your use-cases around querying observability data
+- DIY Query builder, PromQL, and Datastore SQL queries to fulfill all your use-cases around querying observability data
 
 - Open-Source - you can use open-source, our [cloud service](https://o11y.hanzo.ai/teams/) or a mix of both based on your use case
 
@@ -240,7 +240,7 @@ Moreover, Hanzo O11y has few more advanced features wrt Jaeger:
 
 ### Hanzo O11y vs Elastic 
 
-- Hanzo O11y Logs management are based on ClickHouse, a columnar OLAP datastore which makes aggregate log analytics queries much more efficient
+- Hanzo O11y Logs management is based on a columnar OLAP datastore which makes aggregate log analytics queries much more efficient
 - 50% lower resource requirement compared to Elastic during ingestion
 
 We have published benchmarks comparing Elastic with Hanzo O11y. Check it out [here](https://o11y.hanzo.ai/blog/logs-performance-benchmark/?utm_source=github-readme&utm_medium=logs-benchmark)

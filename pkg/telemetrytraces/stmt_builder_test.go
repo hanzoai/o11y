@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
@@ -1630,7 +1630,7 @@ func TestSkipResourceFingerprint(t *testing.T) {
 		// Only the count query runs against the telemetry store; the CTE
 		// itself is embedded as SQL in the main query (no extra round trip).
 		mock.ExpectQueryRow(`SELECT count\(\) FROM \(SELECT fingerprint FROM o11y_traces\.distributed_traces_v3_resource`).
-			WillReturnRow(cmock.NewRow([]cmock.ColumnType{
+			WillReturnRow(dsmock.NewRow([]dsmock.ColumnType{
 				{Name: "count", Type: "UInt64"},
 			}, []any{uint64(2)}))
 
@@ -1650,7 +1650,7 @@ func TestSkipResourceFingerprint(t *testing.T) {
 		mock := mockStore.Mock()
 
 		mock.ExpectQueryRow(`SELECT count\(\) FROM \(SELECT fingerprint FROM o11y_traces\.distributed_traces_v3_resource`).
-			WillReturnRow(cmock.NewRow([]cmock.ColumnType{
+			WillReturnRow(dsmock.NewRow([]dsmock.ColumnType{
 				{Name: "count", Type: "UInt64"},
 			}, []any{threshold}))
 

@@ -405,7 +405,7 @@ class Logs(ABC):
         return logs
 
 
-def insert_logs_to_clickhouse(conn, logs: list[Logs]) -> None:
+def insert_logs_to_datastore(conn, logs: list[Logs]) -> None:
     """
     Insert logs into ClickHouse tables following the same logic as the Go exporter.
     Handles insertion into:
@@ -529,16 +529,16 @@ def truncate_logs_tables(conn, cluster: str) -> None:
 
 @pytest.fixture(name="insert_logs", scope="function")
 def insert_logs(
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
 ) -> Generator[Callable[[list[Logs]], None], Any]:
     def _insert_logs(logs: list[Logs]) -> None:
-        insert_logs_to_clickhouse(clickhouse.conn, logs)
+        insert_logs_to_datastore(datastore.conn, logs)
 
     yield _insert_logs
 
     truncate_logs_tables(
-        clickhouse.conn,
-        clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"],
+        datastore.conn,
+        datastore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"],
     )
 
 
@@ -575,10 +575,10 @@ def materialize_log_field(
         if mat_field_type == "resources":
             mat_field_type = "resource"
         field = f"{mat_field_type}_{mat_field_data_type}_{mat_field_name}"
-        o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' DROP INDEX IF EXISTS {field}_idx")
+        o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}' DROP INDEX IF EXISTS {field}_idx")
         for table in ["logs_v2", "distributed_logs_v2"]:
-            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' DROP COLUMN IF EXISTS {field}")
-            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' DROP COLUMN IF EXISTS {field}_exists")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}' DROP COLUMN IF EXISTS {field}")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}' DROP COLUMN IF EXISTS {field}_exists")
 
 
 @pytest.fixture(name="ttl_legacy_logs_v2_table_setup", scope="function")
@@ -590,14 +590,14 @@ def ttl_legacy_logs_v2_table_setup(request, o11y: types.O11y):
     """
 
     # Setup code
-    result = o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2 TO o11y_logs.logs_v2_backup ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'").result_rows
+    result = o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2 TO o11y_logs.logs_v2_backup ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}'").result_rows
     assert result is not None
     # Add cleanup to restore original table
-    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2_backup TO o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'"))
+    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2_backup TO o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}'"))
 
     # Create new test tables
     result = o11y.telemetrystore.conn.query(
-        f"""CREATE TABLE o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
+        f"""CREATE TABLE o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"]}'
                                                 (
                                                     `id` String,
                                                     `timestamp` UInt64 CODEC(DoubleDelta, LZ4)
@@ -609,7 +609,7 @@ def ttl_legacy_logs_v2_table_setup(request, o11y: types.O11y):
 
     assert result is not None
     # Add cleanup to drop test table
-    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"DROP TABLE IF EXISTS o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'"))
+    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"DROP TABLE IF EXISTS o11y_logs.logs_v2 ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}'"))
 
     yield  # Test runs here
 
@@ -623,14 +623,14 @@ def ttl_legacy_logs_v2_resource_table_setup(request, o11y: types.O11y):
     """
 
     # Setup code
-    result = o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2_resource TO o11y_logs.logs_v2_resource_backup ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'").result_rows
+    result = o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2_resource TO o11y_logs.logs_v2_resource_backup ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}'").result_rows
     assert result is not None
     # Add cleanup to restore original table
-    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2_resource_backup TO o11y_logs.logs_v2_resource ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}'"))
+    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"RENAME TABLE o11y_logs.logs_v2_resource_backup TO o11y_logs.logs_v2_resource ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}'"))
 
     # Create new test tables
     result = o11y.telemetrystore.conn.query(
-        f"""CREATE TABLE o11y_logs.logs_v2_resource ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
+        f"""CREATE TABLE o11y_logs.logs_v2_resource ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"]}'
                                                 (
                                                     `id` String,
                                                     `seen_at_ts_bucket_start` Int64 CODEC(Delta(8), ZSTD(1))
@@ -641,7 +641,7 @@ def ttl_legacy_logs_v2_resource_table_setup(request, o11y: types.O11y):
 
     assert result is not None
     # Add cleanup to drop test table
-    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"DROP TABLE IF EXISTS o11y_logs.logs_v2_resource ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}';"))
+    request.addfinalizer(lambda: o11y.telemetrystore.conn.query(f"DROP TABLE IF EXISTS o11y_logs.logs_v2_resource ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}';"))
 
     yield  # Test runs here
 
@@ -671,19 +671,19 @@ def remove_logs_ttl_settings(o11y: types.O11y):
                 "distributed_logs_v2_resource",
             ]:
                 reset_retention_query = f"""
-                ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
+                ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"]}'
                 MODIFY COLUMN _retention_days UInt16 DEFAULT 0
                 """
                 o11y.telemetrystore.conn.query(reset_retention_query)
 
                 reset_retention_cold_query = f"""
-                ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
+                ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"]}'
                 MODIFY COLUMN _retention_days_cold UInt16 DEFAULT 0
                 """
                 o11y.telemetrystore.conn.query(reset_retention_cold_query)
             else:
                 alter_query = f"""
-                ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]}'
+                ALTER TABLE o11y_logs.{table} ON CLUSTER '{o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"]}'
                 REMOVE TTL
                 """
                 o11y.telemetrystore.conn.query(alter_query)

@@ -66,8 +66,8 @@ func NewQueryInfoResult(postData *v3.QueryRangeParamsV3, version string) QueryIn
 				queryInfoResult.MetricsUsed = true
 			}
 		}
-	} else if postData.CompositeQuery.QueryType == v3.QueryTypeClickHouseSQL {
-		for _, query := range postData.CompositeQuery.ClickHouseQueries {
+	} else if postData.CompositeQuery.QueryType == v3.QueryTypeDatastoreSQL {
+		for _, query := range postData.CompositeQuery.DatastoreQueries {
 			if strings.Contains(query.Query, "o11y_metrics") && len(query.Query) > 0 {
 				queryInfoResult.MetricsUsed = true
 			}

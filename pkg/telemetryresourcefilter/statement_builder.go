@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
@@ -12,7 +14,7 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 // resourceFilterStatementBuilder builds resource fingerprint filter CTEs.
@@ -116,11 +118,11 @@ func (b *resourceFilterStatementBuilder[T]) Build(
 		return nil, nil //nolint:nilnil
 	}
 
-	// Group by fingerprint instead of using DISTINCT; on ClickHouse GROUP BY
+	// Group by fingerprint instead of using DISTINCT; on Datastore GROUP BY
 	// parallelizes across multiple threads and is faster for deduplication.
 	q.GroupBy("fingerprint")
 
-	stmt, args := q.BuildWithFlavor(sqlbuilder.ClickHouse)
+	stmt, args := q.BuildWithFlavor(datastoresql.Flavor)
 	return &qbtypes.Statement{
 		Query: stmt,
 		Args:  args,

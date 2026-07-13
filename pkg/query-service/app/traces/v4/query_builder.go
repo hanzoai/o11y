@@ -34,14 +34,14 @@ var tracesOperatorMappingV3 = map[v3.FilterOperator]string{
 	v3.FilterOperatorNotILike:        "NOT ILIKE",
 }
 
-func getClickHouseTracesColumnType(columnType v3.AttributeKeyType) string {
+func getDatastoreTracesColumnType(columnType v3.AttributeKeyType) string {
 	if columnType == v3.AttributeKeyTypeResource {
 		return "resources"
 	}
 	return "attributes"
 }
 
-func getClickHouseTracesColumnDataType(columnDataType v3.AttributeKeyDataType) string {
+func getDatastoreTracesColumnDataType(columnDataType v3.AttributeKeyDataType) string {
 	if columnDataType == v3.AttributeKeyDataTypeFloat64 || columnDataType == v3.AttributeKeyDataTypeInt64 {
 		return "number"
 	}
@@ -71,12 +71,12 @@ func getColumnName(key v3.AttributeKey, replaceAlias bool) string {
 	}
 
 	if !key.IsColumn {
-		keyType := getClickHouseTracesColumnType(key.Type)
-		keyDType := getClickHouseTracesColumnDataType(key.DataType)
+		keyType := getDatastoreTracesColumnType(key.Type)
+		keyDType := getDatastoreTracesColumnDataType(key.DataType)
 		return fmt.Sprintf("%s_%s['%s']", keyType, keyDType, key.Key)
 	}
 
-	return "`" + utils.GetClickhouseColumnNameV2(string(key.Type), string(key.DataType), key.Key) + "`"
+	return "`" + utils.GetDatastoreColumnNameV2(string(key.Type), string(key.DataType), key.Key) + "`"
 }
 
 // getSelectLabels returns the select labels for the query based on groupBy and aggregateOperator
@@ -127,7 +127,7 @@ func BuildTracesFilterQuery(fs *v3.FilterSet, skipAllowed bool) (string, error) 
 				}
 			}
 			if val != nil {
-				fmtVal = utils.ClickHouseFormattedValue(val)
+				fmtVal = utils.DatastoreFormattedValue(val)
 			}
 			if operator, ok := tracesOperatorMappingV3[item.Operator]; ok {
 				switch item.Operator {
@@ -145,8 +145,8 @@ func BuildTracesFilterQuery(fs *v3.FilterSet, skipAllowed bool) (string, error) 
 						}
 						conditions = append(conditions, subQuery)
 					} else {
-						cType := getClickHouseTracesColumnType(item.Key.Type)
-						cDataType := getClickHouseTracesColumnDataType(item.Key.DataType)
+						cType := getDatastoreTracesColumnType(item.Key.Type)
+						cDataType := getDatastoreTracesColumnDataType(item.Key.DataType)
 						col := fmt.Sprintf("%s_%s", cType, cDataType)
 						conditions = append(conditions, fmt.Sprintf(operator, col, item.Key.Key))
 					}
@@ -441,8 +441,8 @@ func buildTracesQuery(start, end, step int64, mq *v3.BuilderQuery, panelType v3.
 					filterSubQuery = fmt.Sprintf("%s AND %s", filterSubQuery, subQuery)
 				}
 			} else {
-				cType := getClickHouseTracesColumnType(mq.AggregateAttribute.Type)
-				cDataType := getClickHouseTracesColumnDataType(mq.AggregateAttribute.DataType)
+				cType := getDatastoreTracesColumnType(mq.AggregateAttribute.Type)
+				cDataType := getDatastoreTracesColumnDataType(mq.AggregateAttribute.DataType)
 				filterSubQuery = fmt.Sprintf("%s AND mapContains(%s_%s, '%s')", filterSubQuery, cType, cDataType, mq.AggregateAttribute.Key)
 			}
 		}

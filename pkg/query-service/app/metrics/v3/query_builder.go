@@ -60,7 +60,7 @@ func buildMetricQuery(start, end, step int64, mq *v3.BuilderQuery) (string, erro
 		return "", err
 	}
 
-	samplesTableTimeFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli < %d", utils.ClickHouseFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
+	samplesTableTimeFilter := fmt.Sprintf("metric_name IN %s AND unix_milli >= %d AND unix_milli < %d", utils.DatastoreFormattedMetricNames(mq.AggregateAttribute.Key), start, end)
 
 	// Select the aggregate value for interval
 	queryTmpl :=
@@ -296,7 +296,7 @@ func orderByAttributeKeyTags(items []v3.OrderBy, tags []v3.AttributeKey) string 
 func having(items []v3.Having) string {
 	var having []string
 	for _, item := range items {
-		having = append(having, fmt.Sprintf("%s %s %v", "value", item.Operator, utils.ClickHouseFormattedValue(item.Value)))
+		having = append(having, fmt.Sprintf("%s %s %v", "value", item.Operator, utils.DatastoreFormattedValue(item.Value)))
 	}
 	return strings.Join(having, " AND ")
 }

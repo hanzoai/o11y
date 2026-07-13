@@ -10,14 +10,14 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/cache/cachetest"
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
-	"github.com/hanzoai/o11y/pkg/query-service/app/clickhouseReader"
+	"github.com/hanzoai/o11y/pkg/query-service/app/datastorereader"
 	logsV4 "github.com/hanzoai/o11y/pkg/query-service/app/logs/v4"
 	"github.com/hanzoai/o11y/pkg/query-service/app/queryBuilder"
 	tracesV3 "github.com/hanzoai/o11y/pkg/query-service/app/traces/v3"
@@ -1429,19 +1429,19 @@ func Test_querier_Traces_runWindowBasedListQueryDesc(t *testing.T) {
 		},
 	}
 
-	cols := []cmock.ColumnType{
+	cols := []dsmock.ColumnType{
 		{Name: "timestamp", Type: "UInt64"},
 		{Name: "name", Type: "String"},
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastorereader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup mock
-			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherRegexp)
+			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherRegexp)
 
 			// Configure mock responses
 			for _, response := range tc.queryResponses {
@@ -1451,12 +1451,12 @@ func Test_querier_Traces_runWindowBasedListQueryDesc(t *testing.T) {
 				}
 				// if len(values) > 0 {
 				telemetryStore.Mock().ExpectQuery(response.expectedQuery).WillReturnRows(
-					cmock.NewRows(cols, values),
+					dsmock.NewRows(cols, values),
 				)
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastorereader.NewReader(
 				slog.Default(),
 				nil,
 				telemetryStore,
@@ -1655,19 +1655,19 @@ func Test_querier_Traces_runWindowBasedListQueryAsc(t *testing.T) {
 		},
 	}
 
-	cols := []cmock.ColumnType{
+	cols := []dsmock.ColumnType{
 		{Name: "timestamp", Type: "UInt64"},
 		{Name: "name", Type: "String"},
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastorereader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup mock
-			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherRegexp)
+			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherRegexp)
 
 			// Configure mock responses
 			for _, response := range tc.queryResponses {
@@ -1676,12 +1676,12 @@ func Test_querier_Traces_runWindowBasedListQueryAsc(t *testing.T) {
 					values = append(values, []any{&ts, &testName})
 				}
 				telemetryStore.Mock().ExpectQuery(response.expectedQuery).WillReturnRows(
-					cmock.NewRows(cols, values),
+					dsmock.NewRows(cols, values),
 				)
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastorereader.NewReader(
 				slog.Default(),
 				nil,
 				telemetryStore,
@@ -1954,19 +1954,19 @@ func Test_querier_Logs_runWindowBasedListQueryDesc(t *testing.T) {
 		},
 	}
 
-	cols := []cmock.ColumnType{
+	cols := []dsmock.ColumnType{
 		{Name: "timestamp", Type: "UInt64"},
 		{Name: "name", Type: "String"},
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastorereader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup mock
-			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherRegexp)
+			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherRegexp)
 
 			// Configure mock responses
 			for _, response := range tc.queryResponses {
@@ -1975,12 +1975,12 @@ func Test_querier_Logs_runWindowBasedListQueryDesc(t *testing.T) {
 					values = append(values, []any{&ts, &testName})
 				}
 				telemetryStore.Mock().ExpectQuery(response.expectedQuery).WillReturnRows(
-					cmock.NewRows(cols, values),
+					dsmock.NewRows(cols, values),
 				)
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastorereader.NewReader(
 				slog.Default(),
 				nil,
 				telemetryStore,
@@ -2181,19 +2181,19 @@ func Test_querier_Logs_runWindowBasedListQueryAsc(t *testing.T) {
 		},
 	}
 
-	cols := []cmock.ColumnType{
+	cols := []dsmock.ColumnType{
 		{Name: "timestamp", Type: "UInt64"},
 		{Name: "name", Type: "String"},
 	}
 	testName := "name"
 
-	options := clickhouseReader.NewOptions("", "", "archiveNamespace")
+	options := datastorereader.NewOptions("", "", "archiveNamespace")
 
 	// iterate over test data, create reader and run test
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup mock
-			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherRegexp)
+			telemetryStore := telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherRegexp)
 
 			// Configure mock responses
 			for _, response := range tc.queryResponses {
@@ -2202,12 +2202,12 @@ func Test_querier_Logs_runWindowBasedListQueryAsc(t *testing.T) {
 					values = append(values, []any{&ts, &testName})
 				}
 				telemetryStore.Mock().ExpectQuery(response.expectedQuery).WillReturnRows(
-					cmock.NewRows(cols, values),
+					dsmock.NewRows(cols, values),
 				)
 			}
 
 			// Create reader and querier
-			reader := clickhouseReader.NewReader(
+			reader := datastorereader.NewReader(
 				slog.Default(),
 				nil,
 				telemetryStore,

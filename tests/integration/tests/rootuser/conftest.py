@@ -14,7 +14,7 @@ def o11y_rootuser(
     zeus: types.TestContainerDocker,
     gateway: types.TestContainerDocker,
     sqlstore: types.TestContainerSQL,
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
 ) -> types.O11y:
@@ -26,7 +26,7 @@ def o11y_rootuser(
         zeus=zeus,
         gateway=gateway,
         sqlstore=sqlstore,
-        clickhouse=clickhouse,
+        datastore=datastore,
         request=request,
         pytestconfig=pytestconfig,
         cache_key="o11y-rootuser",

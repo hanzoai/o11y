@@ -40,11 +40,11 @@ func TestNewWithEnvProvider(t *testing.T) {
 	assert.NoError(t, actual.Validate())
 
 	expected := NewConfigFactory().New().(Config)
-	expected.Provider = "clickhouse"
+	expected.Provider = "datastore"
 	expected.Connection.MaxOpenConns = 150
 	expected.Connection.MaxIdleConns = 60
 	expected.Connection.DialTimeout = 5 * time.Second
-	expected.Clickhouse.DSN = "tcp://localhost:9000"
+	expected.Datastore.DSN = "tcp://localhost:9000"
 
 	assert.Equal(t, expected, actual)
 }
@@ -76,7 +76,7 @@ func TestNewWithEnvProviderWithQuerySettings(t *testing.T) {
 	require.NoError(t, err)
 
 	expected := Config{
-		Clickhouse: ClickhouseConfig{
+		Datastore: DatastoreConfig{
 			QuerySettings: QuerySettings{
 				MaxExecutionTime:                    10,
 				MaxExecutionTimeLeaf:                10,
@@ -87,5 +87,5 @@ func TestNewWithEnvProviderWithQuerySettings(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, expected.Clickhouse.QuerySettings, actual.Clickhouse.QuerySettings)
+	assert.Equal(t, expected.Datastore.QuerySettings, actual.Datastore.QuerySettings)
 }

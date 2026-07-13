@@ -13,16 +13,16 @@ import (
 // postProcessResult applies having clause, metric limit, reduce function to the result
 // This function is effective for metrics data source for now, but it can be extended to other data sources
 // if needed
-// Much of this work can be done in the ClickHouse query, but we decided to do it here because:
+// Much of this work can be done in the Datastore query, but we decided to do it here because:
 // 1. Effective use of caching
 // 2. Easier to add new functions
 func PostProcessResult(result []*v3.Result, queryRangeParams *v3.QueryRangeParamsV3) ([]*v3.Result, error) {
-	// Having clause is not part of the clickhouse query, so we need to apply it here
+	// Having clause is not part of the datastore query, so we need to apply it here
 	// It's not included in the query because it doesn't work nicely with caching
 	// With this change, if you have a query with a having clause, and then you change the having clause
 	// to something else, the query will still be cached.
 	ApplyHavingClause(result, queryRangeParams)
-	// We apply the metric limit here because it's not part of the clickhouse query
+	// We apply the metric limit here because it's not part of the datastore query
 	// The limit in the context of the time series query is the number of time series
 	// So for the limit to work, we need to know what series to keep and what to discard
 	// For us to know that, we need to execute the query first, and then apply the limit

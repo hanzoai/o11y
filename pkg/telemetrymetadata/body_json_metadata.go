@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/datastore-go/v2/lib/chcol"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
@@ -17,7 +19,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schemamigrator "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
 	"github.com/hanzoai/otel-collector/constants"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 var (
@@ -153,7 +155,7 @@ func buildListLogsJSONIndexesQuery(cluster string, filters ...string) (string, [
 	}
 	sb.Where(sb.Or(filterExprs...))
 
-	return sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	return sb.BuildWithFlavor(datastoresql.Flavor)
 }
 
 func (t *telemetryMetaStore) ListLogsJSONIndexes(ctx context.Context, filters ...string) ([]telemetrytypes.TelemetryFieldKeySkipIndex, error) {
@@ -254,7 +256,7 @@ func (t *telemetryMetaStore) ListJSONValues(ctx context.Context, path string, li
 
 	contextWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	rows, err := t.telemetrystore.DatastoreDB().Query(contextWithTimeout, query, args...)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
@@ -411,7 +413,7 @@ func (t *telemetryMetaStore) GetPromotedPaths(ctx context.Context, paths ...stri
 	}
 	sb.Where(sb.And(conditions...))
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
 		return nil, errors.WrapInternalf(err, CodeFailCheckPathPromoted, "failed to get promoted paths")

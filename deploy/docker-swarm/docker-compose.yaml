@@ -78,7 +78,7 @@ services:
       restart_policy:
         condition: on-failure
     volumes:
-      - ../common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
+      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
   zookeeper-1:
     !!merge <<: *zookeeper-defaults
     # ports:
@@ -113,8 +113,8 @@ services:
         target: /etc/clickhouse-server/config.d/cluster.xml
     volumes:
       - clickhouse:/var/lib/clickhouse/
-      - ../common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
-      # - ../common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
+      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
+      # - ../common/datastore/storage.xml:/etc/clickhouse-server/config.d/storage.xml
   observe:
     !!merge <<: *db-depend
     image: ghcr.io/hanzoai/o11y:v0.115.0
@@ -193,13 +193,13 @@ volumes:
     name: o11y-zookeeper-1
 configs:
   clickhouse-config:
-    file: ../common/clickhouse/config.xml
+    file: ../common/datastore/config.xml
   clickhouse-users:
-    file: ../common/clickhouse/users.xml
+    file: ../common/datastore/users.xml
   clickhouse-custom-function:
-    file: ../common/clickhouse/custom-function.xml
+    file: ../common/datastore/custom-function.xml
   clickhouse-cluster:
-    file: ../common/clickhouse/cluster.xml
+    file: ../common/datastore/cluster.xml
   otel-collector-config:
     file: ./otel-collector-config.yaml
   otel-manager-config:

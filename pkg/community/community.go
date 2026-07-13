@@ -98,7 +98,7 @@ func SQLSchemaProviderFactories(sqlstore sqlstore.SQLStore) factory.NamedMap[fac
 
 // NewO11y constructs the O11y runtime with the community provider set: noop
 // zeus/licensing/gateway, Hanzo IAM authz (iamauthz — the sole authorizer), the
-// ClickHouse (Hanzo Datastore) telemetry store, sqlite control-plane store, the
+// Datastore (Hanzo Datastore) telemetry store, sqlite control-plane store, the
 // full dashboard/cloudintegration/metricreductionrule/ruler modules, and (wired
 // internally by o11y.New) the identN provider set including iamidentn — the
 // gateway-header human identity the running pod trusts. The provider list is the
