@@ -8,7 +8,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-var testGetClickhouseColumnNameData = []struct {
+var testGetDatastoreColumnNameData = []struct {
 	Name               string
 	AttributeKey       v3.AttributeKey
 	ExpectedColumnName string
@@ -60,10 +60,10 @@ var testGetClickhouseColumnNameData = []struct {
 	},
 }
 
-func TestGetClickhouseColumnName(t *testing.T) {
-	for _, tt := range testGetClickhouseColumnNameData {
-		Convey("testGetClickhouseColumnNameData", t, func() {
-			columnName := getClickhouseColumnName(tt.AttributeKey)
+func TestGetDatastoreColumnName(t *testing.T) {
+	for _, tt := range testGetDatastoreColumnNameData {
+		Convey("testGetDatastoreColumnNameData", t, func() {
+			columnName := getDatastoreColumnName(tt.AttributeKey)
 			So(columnName, ShouldEqual, tt.ExpectedColumnName)
 		})
 	}

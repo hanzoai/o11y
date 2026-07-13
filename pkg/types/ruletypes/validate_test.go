@@ -1592,11 +1592,11 @@ func TestValidate_QueryTypes(t *testing.T) {
 		}
 	})
 
-	t.Run("clickhouse_sql query", func(t *testing.T) {
+	t.Run("datastore_sql query", func(t *testing.T) {
 		j := `{
 			"alert": "Test", "version": "v5",
 			"condition": {
-				"compositeQuery": {"queryType": "clickhouse_sql", "queries": [{"type": "clickhouse_sql", "spec": {"name": "A", "query": "SELECT count() FROM logs", "disabled": false}}]},
+				"compositeQuery": {"queryType": "datastore_sql", "queries": [{"type": "datastore_sql", "spec": {"name": "A", "query": "SELECT count() FROM logs", "disabled": false}}]},
 				"target": 10.0, "matchType": "1", "op": "1"
 			}
 		}`
@@ -1606,17 +1606,17 @@ func TestValidate_QueryTypes(t *testing.T) {
 		}
 	})
 
-	t.Run("clickhouse_sql with empty query string", func(t *testing.T) {
+	t.Run("datastore_sql with empty query string", func(t *testing.T) {
 		j := `{
 			"alert": "Test", "version": "v5",
 			"condition": {
-				"compositeQuery": {"queryType": "clickhouse_sql", "queries": [{"type": "clickhouse_sql", "spec": {"name": "A", "query": "", "disabled": false}}]},
+				"compositeQuery": {"queryType": "datastore_sql", "queries": [{"type": "datastore_sql", "spec": {"name": "A", "query": "", "disabled": false}}]},
 				"target": 10.0, "matchType": "1", "op": "1"
 			}
 		}`
 		_, err := unmarshalAndValidate(j)
 		if err == nil {
-			t.Error("expected error for empty clickhouse_sql query")
+			t.Error("expected error for empty datastore_sql query")
 		}
 	})
 

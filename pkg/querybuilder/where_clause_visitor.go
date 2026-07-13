@@ -14,7 +14,7 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 
-	sqlbuilder "github.com/huandu/go-sqlbuilder"
+	sqlbuilder "github.com/hanzoai/sqlbuilder"
 )
 
 var searchTroubleshootingGuideURL = "https://o11y.io/docs/userguide/search-troubleshooting/"
@@ -22,7 +22,7 @@ var searchTroubleshootingGuideURL = "https://o11y.io/docs/userguide/search-troub
 const stringMatchingOperatorDocURL = "https://o11y.io/docs/userguide/operators-reference/#string-matching-operators"
 
 // filterExpressionVisitor implements the FilterQueryVisitor interface
-// to convert the parsed filter expressions into ClickHouse WHERE clause.
+// to convert the parsed filter expressions into Datastore WHERE clause.
 type filterExpressionVisitor struct {
 	context            context.Context
 	logger             *slog.Logger
@@ -100,7 +100,7 @@ func (p PreparedWhereClause) IsEmpty() bool {
 	return p.WhereClause == nil
 }
 
-// PrepareWhereClause generates a ClickHouse compatible WHERE clause from the filter query.
+// PrepareWhereClause generates a Datastore compatible WHERE clause from the filter query.
 func PrepareWhereClause(query string, opts FilterExprVisitorOpts) (PreparedWhereClause, error) {
 
 	// Setup the ANTLR parsing pipeline
@@ -155,7 +155,7 @@ func PrepareWhereClause(query string, opts FilterExprVisitorOpts) (PreparedWhere
 		return PreparedWhereClause{}, combinedErrors.WithAdditional(additionals...).WithUrl(searchTroubleshootingGuideURL)
 	}
 
-	// Visit the parse tree with our ClickHouse visitor
+	// Visit the parse tree with our Datastore visitor
 	cond := visitor.Visit(tree).(string)
 
 	if len(visitor.errors) > 0 {
@@ -826,7 +826,7 @@ func (v *filterExpressionVisitor) VisitFunctionCall(ctx *grammar.FunctionCallCon
 			}
 
 			var cond string
-			// Map our functions to ClickHouse equivalents
+			// Map our functions to Datastore equivalents
 			switch functionName {
 			case "has":
 				cond = fmt.Sprintf("has(%s, %s)", fieldName, v.builder.Var(value[0]))
@@ -889,7 +889,7 @@ func (v *filterExpressionVisitor) VisitValue(ctx *grammar.ValueContext) any {
 		}
 		return number
 	} else if ctx.BOOL() != nil {
-		// Convert to ClickHouse boolean literal
+		// Convert to Datastore boolean literal
 		boolText := strings.ToLower(ctx.BOOL().GetText())
 		return boolText == TrueConditionLiteral
 	} else if ctx.KEY() != nil {

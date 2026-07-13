@@ -6,13 +6,15 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 	"golang.org/x/exp/slices"
 )
 
@@ -318,7 +320,7 @@ func (b *MetricQueryStatementBuilder) buildReducedTimeSeriesCTE(
 	sb.GroupBy("fingerprint")
 	sb.GroupBy(querybuilder.GroupByKeys(query.GroupBy)...)
 
-	q, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	q, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	return fmt.Sprintf("(%s) AS filtered_time_series", q), args, nil
 }
 
@@ -350,7 +352,7 @@ func (b *MetricQueryStatementBuilder) buildReducedTemporalAggregationCTE(
 		dedup.LT("unix_milli", end),
 	)
 	dedup.GroupBy("reduced_fingerprint", "unix_milli")
-	dedupQuery, dedupArgs := dedup.BuildWithFlavor(sqlbuilder.ClickHouse)
+	dedupQuery, dedupArgs := dedup.BuildWithFlavor(datastoresql.Flavor)
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("fingerprint")
@@ -370,7 +372,7 @@ func (b *MetricQueryStatementBuilder) buildReducedTemporalAggregationCTE(
 	sb.GroupBy(querybuilder.GroupByKeys(query.GroupBy)...)
 
 	initArgs := append(append([]any{}, dedupArgs...), timeSeriesCTEArgs...)
-	q, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse, initArgs...)
+	q, args := sb.BuildWithFlavor(datastoresql.Flavor, initArgs...)
 	return fmt.Sprintf("__temporal_aggregation_cte AS (%s)", q), args, true
 }
 
@@ -397,7 +399,7 @@ func (b *MetricQueryStatementBuilder) buildReducedSpatialAggregationCTE(
 	sb.GroupBy("ts")
 	sb.GroupBy(querybuilder.GroupByKeys(query.GroupBy)...)
 
-	q, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	q, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	return fmt.Sprintf("__spatial_aggregation_cte AS (%s)", q), args
 }
 
@@ -448,7 +450,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggDeltaFastPath(
 	sb.GroupBy("ts")
 	sb.GroupBy(querybuilder.GroupByKeys(query.GroupBy)...)
 
-	q, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse, timeSeriesCTEArgs...)
+	q, args := sb.BuildWithFlavor(datastoresql.Flavor, timeSeriesCTEArgs...)
 	return fmt.Sprintf("__spatial_aggregation_cte AS (%s)", q), args, nil
 }
 
@@ -521,7 +523,7 @@ func (b *MetricQueryStatementBuilder) buildTimeSeriesCTE(
 	sb.GroupBy("fingerprint")
 	sb.GroupBy(querybuilder.GroupByKeys(query.GroupBy)...)
 
-	q, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	q, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	return fmt.Sprintf("(%s) AS filtered_time_series", q), args, nil
 }
 
@@ -585,7 +587,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggDelta(
 	sb.GroupBy(querybuilder.GroupByKeys(query.GroupBy)...)
 	sb.OrderBy("fingerprint", "ts")
 
-	q, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse, timeSeriesCTEArgs...)
+	q, args := sb.BuildWithFlavor(datastoresql.Flavor, timeSeriesCTEArgs...)
 	return fmt.Sprintf("__temporal_aggregation_cte AS (%s)", q), args, nil
 }
 
@@ -626,7 +628,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggCumulativeOrUnspecified(
 	baseSb.GroupBy(querybuilder.GroupByKeys(query.GroupBy)...)
 	baseSb.OrderBy("fingerprint", "ts")
 
-	innerQuery, innerArgs := baseSb.BuildWithFlavor(sqlbuilder.ClickHouse, timeSeriesCTEArgs...)
+	innerQuery, innerArgs := baseSb.BuildWithFlavor(datastoresql.Flavor, timeSeriesCTEArgs...)
 
 	switch query.Aggregations[0].TimeAggregation {
 	case metrictypes.TimeAggregationRate:
@@ -637,7 +639,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggCumulativeOrUnspecified(
 		}
 		wrapped.SelectMore(fmt.Sprintf("%s AS per_series_value", RateTmpl))
 		wrapped.From(fmt.Sprintf("(%s) WINDOW rate_window AS (PARTITION BY fingerprint ORDER BY fingerprint, ts)", innerQuery))
-		q, args := wrapped.BuildWithFlavor(sqlbuilder.ClickHouse, innerArgs...)
+		q, args := wrapped.BuildWithFlavor(datastoresql.Flavor, innerArgs...)
 		return fmt.Sprintf("__temporal_aggregation_cte AS (%s)", q), args, nil
 
 	case metrictypes.TimeAggregationIncrease:
@@ -648,7 +650,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggCumulativeOrUnspecified(
 		}
 		wrapped.SelectMore(fmt.Sprintf("%s AS per_series_value", IncreaseTmpl))
 		wrapped.From(fmt.Sprintf("(%s) WINDOW rate_window AS (PARTITION BY fingerprint ORDER BY fingerprint, ts)", innerQuery))
-		q, args := wrapped.BuildWithFlavor(sqlbuilder.ClickHouse, innerArgs...)
+		q, args := wrapped.BuildWithFlavor(datastoresql.Flavor, innerArgs...)
 		return fmt.Sprintf("__temporal_aggregation_cte AS (%s)", q), args, nil
 	default:
 		return fmt.Sprintf("__temporal_aggregation_cte AS (%s)", innerQuery), innerArgs, nil
@@ -715,7 +717,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggForMultipleTemporalities(
 	)
 	sb.GroupBy("fingerprint", "ts", "temporality")
 	sb.GroupBy(querybuilder.GroupByKeys(query.GroupBy)...)
-	queryWithoutWindow, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse, timeSeriesCTEArgs...)
+	queryWithoutWindow, args := sb.BuildWithFlavor(datastoresql.Flavor, timeSeriesCTEArgs...)
 	queryWithWindowAndOrder := queryWithoutWindow + " WINDOW rate_window AS (PARTITION BY fingerprint ORDER BY fingerprint ASC, ts ASC) ORDER BY ts"
 	return fmt.Sprintf("__temporal_aggregation_cte AS (%s)", queryWithWindowAndOrder), args, nil
 }
@@ -742,7 +744,7 @@ func (b *MetricQueryStatementBuilder) buildSpatialAggregationCTE(
 	sb.GroupBy("ts")
 	sb.GroupBy(querybuilder.GroupByKeys(query.GroupBy)...)
 
-	q, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	q, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	return fmt.Sprintf("__spatial_aggregation_cte AS (%s)", q), args
 }
 
@@ -829,6 +831,6 @@ func (b *MetricQueryStatementBuilder) BuildFinalSelect(
 		sb.OrderBy("toFloat64(le)")
 	}
 
-	q, a := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	q, a := sb.BuildWithFlavor(datastoresql.Flavor)
 	return &qbtypes.Statement{Query: combined + q, Args: append(args, a...)}, nil
 }

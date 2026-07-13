@@ -154,7 +154,7 @@ Außerdem hat Hanzo O11y noch mehr spezielle Funktionen im Vergleich zu Jaeger:
 
 ### Hanzo O11y vs Elastic
 
-- Die Verwaltung von Hanzo O11y-Protokollen basiert auf 'ClickHouse', einem spaltenbasierten OLAP-Datenspeicher, der aggregierte Protokollanalyseabfragen wesentlich effizienter macht.
+- Die Verwaltung von Hanzo O11y-Protokollen basiert auf einem spaltenbasierten OLAP-Datenspeicher, der aggregierte Protokollanalyseabfragen wesentlich effizienter macht.
 - 50 % geringerer Ressourcenbedarf im Vergleich zu Elastic während der Aufnahme.
 
 Wir haben Benchmarks veröffentlicht, die Elastic mit SignNoz vergleichen. Schauen Sie es sich [hier](https://o11y.hanzo.ai/blog/logs-performance-benchmark/?utm_source=github-readme&utm_medium=logs-benchmark)

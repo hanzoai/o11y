@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
@@ -1231,7 +1231,7 @@ func TestSkipResourceFingerprintLogs(t *testing.T) {
 		mock := mockStore.Mock()
 
 		mock.ExpectQueryRow(`SELECT count\(\) FROM \(SELECT fingerprint FROM o11y_logs\.distributed_logs_v2_resource`).
-			WillReturnRow(cmock.NewRow([]cmock.ColumnType{
+			WillReturnRow(dsmock.NewRow([]dsmock.ColumnType{
 				{Name: "count", Type: "UInt64"},
 			}, []any{uint64(2)}))
 
@@ -1251,7 +1251,7 @@ func TestSkipResourceFingerprintLogs(t *testing.T) {
 		mock := mockStore.Mock()
 
 		mock.ExpectQueryRow(`SELECT count\(\) FROM \(SELECT fingerprint FROM o11y_logs\.distributed_logs_v2_resource`).
-			WillReturnRow(cmock.NewRow([]cmock.ColumnType{
+			WillReturnRow(dsmock.NewRow([]dsmock.ColumnType{
 				{Name: "count", Type: "UInt64"},
 			}, []any{threshold}))
 

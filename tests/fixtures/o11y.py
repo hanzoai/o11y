@@ -21,7 +21,7 @@ def create_o11y(
     zeus: types.TestContainerDocker,
     gateway: types.TestContainerDocker,
     sqlstore: types.TestContainerSQL,
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
     cache_key: str = "o11y",
@@ -80,7 +80,7 @@ def create_o11y(
                 "O11Y_CLOUDINTEGRATION_AGENT_VERSION": "v0.0.8",
             }
             | sqlstore.env
-            | clickhouse.env
+            | datastore.env
         )
 
         if with_web:
@@ -156,7 +156,7 @@ def create_o11y(
                 },
             ),
             sqlstore=sqlstore,
-            telemetrystore=clickhouse,
+            telemetrystore=datastore,
             zeus=zeus,
             gateway=gateway,
         )
@@ -177,7 +177,7 @@ def create_o11y(
         return types.O11y(
             self=self,
             sqlstore=sqlstore,
-            telemetrystore=clickhouse,
+            telemetrystore=datastore,
             zeus=zeus,
             gateway=gateway,
         )
@@ -193,7 +193,7 @@ def create_o11y(
                 container_configs={},
             ),
             sqlstore=sqlstore,
-            telemetrystore=clickhouse,
+            telemetrystore=datastore,
             zeus=zeus,
             gateway=gateway,
         ),
@@ -209,7 +209,7 @@ def o11y(  # pylint: disable=too-many-arguments,too-many-positional-arguments
     zeus: types.TestContainerDocker,
     gateway: types.TestContainerDocker,
     sqlstore: types.TestContainerSQL,
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
 ) -> types.O11y:
@@ -221,7 +221,7 @@ def o11y(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         zeus=zeus,
         gateway=gateway,
         sqlstore=sqlstore,
-        clickhouse=clickhouse,
+        datastore=datastore,
         request=request,
         pytestconfig=pytestconfig,
     )

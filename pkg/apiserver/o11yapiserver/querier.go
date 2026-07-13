@@ -14,7 +14,7 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 		ID:                 "QueryRangeV5",
 		Tags:               []string{"querier"},
 		Summary:            "Query range",
-		Description:        "Execute a composite query over a time range. Supports builder queries (traces, logs, metrics), formulas, trace operators, PromQL, and ClickHouse SQL.",
+		Description:        "Execute a composite query over a time range. Supports builder queries (traces, logs, metrics), formulas, trace operators, PromQL, and Datastore SQL.",
 		Request:            new(qbtypes.QueryRangeRequest),
 		RequestContentType: "application/json",
 		RequestExamples: []handler.OpenAPIExample{
@@ -355,8 +355,8 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 				},
 			},
 			{
-				Name:    "clickhouse_sql_traces_time_series",
-				Summary: "ClickHouse SQL: traces time series with resource filter",
+				Name:    "datastore_sql_traces_time_series",
+				Summary: "Datastore SQL: traces time series with resource filter",
 				Value: map[string]any{
 					"schemaVersion": "v1",
 					"start":         1640995200000,
@@ -365,7 +365,7 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 					"compositeQuery": map[string]any{
 						"queries": []any{
 							map[string]any{
-								"type": "clickhouse_sql",
+								"type": "datastore_sql",
 								"spec": map[string]any{
 									"name": "span_rate",
 									"query": "WITH __resource_filter AS (" +
@@ -384,8 +384,8 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 				},
 			},
 			{
-				Name:    "clickhouse_sql_logs_raw",
-				Summary: "ClickHouse SQL: raw logs with resource filter",
+				Name:    "datastore_sql_logs_raw",
+				Summary: "Datastore SQL: raw logs with resource filter",
 				Value: map[string]any{
 					"schemaVersion": "v1",
 					"start":         1640995200000,
@@ -394,7 +394,7 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 					"compositeQuery": map[string]any{
 						"queries": []any{
 							map[string]any{
-								"type": "clickhouse_sql",
+								"type": "datastore_sql",
 								"spec": map[string]any{
 									"name": "recent_errors",
 									"query": "WITH __resource_filter AS (" +
@@ -414,8 +414,8 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 				},
 			},
 			{
-				Name:    "clickhouse_sql_traces_scalar",
-				Summary: "ClickHouse SQL: scalar aggregate with resource filter",
+				Name:    "datastore_sql_traces_scalar",
+				Summary: "Datastore SQL: scalar aggregate with resource filter",
 				Value: map[string]any{
 					"schemaVersion": "v1",
 					"start":         1640995200000,
@@ -424,7 +424,7 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 					"compositeQuery": map[string]any{
 						"queries": []any{
 							map[string]any{
-								"type": "clickhouse_sql",
+								"type": "datastore_sql",
 								"spec": map[string]any{
 									"name": "total_spans",
 									"query": "WITH __resource_filter AS (" +
@@ -455,7 +455,7 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 		ID:                  "QueryRangePreviewV5",
 		Tags:                []string{"querier"},
 		Summary:             "Query range preview",
-		Description:         "Validate a composite query without executing it. Accepts the same payload as the query range endpoint. By default (verbose=true) returns, for each query, the rendered underlying ClickHouse statement(s) with each statement's EXPLAIN ESTIMATE (per-table parts/rows/marks) and granule index analysis (candidate/surviving granules and the per-index pruning funnel). Pass ?verbose=false for the lightweight per-query verdict (valid/error/warnings) with no rendered SQL and no ClickHouse round trips. Intended for agentic/dry-run consumption: per-query errors are reported in the response rather than failing the whole request.",
+		Description:         "Validate a composite query without executing it. Accepts the same payload as the query range endpoint. By default (verbose=true) returns, for each query, the rendered underlying Datastore statement(s) with each statement's EXPLAIN ESTIMATE (per-table parts/rows/marks) and granule index analysis (candidate/surviving granules and the per-index pruning funnel). Pass ?verbose=false for the lightweight per-query verdict (valid/error/warnings) with no rendered SQL and no Datastore round trips. Intended for agentic/dry-run consumption: per-query errors are reported in the response rather than failing the whole request.",
 		Request:             new(qbtypes.QueryRangeRequest),
 		RequestQuery:        new(qbtypes.QueryRangePreviewParams),
 		RequestContentType:  "application/json",

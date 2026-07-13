@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
@@ -14,7 +16,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 var (
@@ -336,7 +338,7 @@ func (b *traceQueryStatementBuilder) buildListQuery(
 		sb.Offset(query.Offset)
 	}
 
-	mainSQL, mainArgs := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	mainSQL, mainArgs := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	finalSQL := querybuilder.CombineCTEs(cteFragments) + mainSQL
 	finalArgs := querybuilder.PrependArgs(cteArgs, mainArgs)
@@ -387,7 +389,7 @@ func (b *traceQueryStatementBuilder) buildTraceQuery(
 		return nil, err
 	}
 
-	distSQL, distArgs := distSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	distSQL, distArgs := distSB.BuildWithFlavor(datastoresql.Flavor)
 
 	cteFragments = append(cteFragments, fmt.Sprintf("__toe AS (%s)", distSQL))
 	cteArgs = append(cteArgs, distArgs)
@@ -414,7 +416,7 @@ func (b *traceQueryStatementBuilder) buildTraceQuery(
 	innerSB.OrderBy("duration_nano DESC")
 	innerSB.SQL("LIMIT 1 BY trace_id")
 
-	innerSQL, innerArgs := innerSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	innerSQL, innerArgs := innerSB.BuildWithFlavor(datastoresql.Flavor)
 
 	cteFragments = append(cteFragments, fmt.Sprintf("__toe_duration_sorted AS (%s)", innerSQL))
 	cteArgs = append(cteArgs, innerArgs)
@@ -453,7 +455,7 @@ func (b *traceQueryStatementBuilder) buildTraceQuery(
 		mainSB.Offset(query.Offset)
 	}
 
-	mainSQL, mainArgs := mainSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	mainSQL, mainArgs := mainSB.BuildWithFlavor(datastoresql.Flavor)
 
 	// combine it all together:  WITH … SELECT …
 	finalSQL := querybuilder.CombineCTEs(cteFragments) + mainSQL + " SETTINGS distributed_product_mode='allow', max_memory_usage=10000000000"
@@ -574,7 +576,7 @@ func (b *traceQueryStatementBuilder) buildTimeSeriesQuery(
 		}
 
 		combinedArgs := append(allGroupByArgs, allAggChArgs...)
-		mainSQL, mainArgs := sb.BuildWithFlavor(sqlbuilder.ClickHouse, combinedArgs...)
+		mainSQL, mainArgs := sb.BuildWithFlavor(datastoresql.Flavor, combinedArgs...)
 
 		// Stitch it all together:  WITH … SELECT …
 		finalSQL = querybuilder.CombineCTEs(cteFragments) + mainSQL
@@ -603,7 +605,7 @@ func (b *traceQueryStatementBuilder) buildTimeSeriesQuery(
 		}
 
 		combinedArgs := append(allGroupByArgs, allAggChArgs...)
-		mainSQL, mainArgs := sb.BuildWithFlavor(sqlbuilder.ClickHouse, combinedArgs...)
+		mainSQL, mainArgs := sb.BuildWithFlavor(datastoresql.Flavor, combinedArgs...)
 
 		// Stitch it all together:  WITH … SELECT …
 		finalSQL = querybuilder.CombineCTEs(cteFragments) + mainSQL
@@ -723,7 +725,7 @@ func (b *traceQueryStatementBuilder) buildScalarQuery(
 
 	combinedArgs := append(allGroupByArgs, allAggChArgs...)
 
-	mainSQL, mainArgs := sb.BuildWithFlavor(sqlbuilder.ClickHouse, combinedArgs...)
+	mainSQL, mainArgs := sb.BuildWithFlavor(datastoresql.Flavor, combinedArgs...)
 
 	finalSQL := querybuilder.CombineCTEs(cteFragments) + mainSQL
 	finalArgs := querybuilder.PrependArgs(cteArgs, mainArgs)

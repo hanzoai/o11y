@@ -73,7 +73,7 @@ func TestJSONTypeSet() (map[string][]FieldDataType, MetadataStore) {
 }
 
 // TestIndexedPathEntry is a path + JSON type pair representing a field
-// backed by a ClickHouse skip index in the test data.
+// backed by a Datastore skip index in the test data.
 //
 // Only non-array paths with IndexSupported types (String, Int64, Float64)
 // are valid entries — arrays and Bool cannot carry a skip index.

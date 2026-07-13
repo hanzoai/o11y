@@ -17,15 +17,15 @@ import clickhouse_connect
 from fastapi import FastAPI, HTTPException, Response, status
 
 from fixtures.logger import setup_logger
-from fixtures.logs import Logs, insert_logs_to_clickhouse, truncate_logs_tables
+from fixtures.logs import Logs, insert_logs_to_datastore, truncate_logs_tables
 from fixtures.metrics import (
     Metrics,
-    insert_metrics_to_clickhouse,
+    insert_metrics_to_datastore,
     truncate_metrics_tables,
 )
 from fixtures.traces import (
     Traces,
-    insert_traces_to_clickhouse,
+    insert_traces_to_datastore,
     truncate_traces_tables,
 )
 
@@ -86,7 +86,7 @@ def _tag_metrics(item: dict[str, Any]) -> dict[str, Any]:
 def post_traces(payload: list[dict[str, Any]]) -> dict[str, Any]:
     try:
         traces = [Traces.from_dict(_tag(item)) for item in payload]
-        insert_traces_to_clickhouse(get_conn(), traces)
+        insert_traces_to_datastore(get_conn(), traces)
         logger.info("inserted %d traces", len(traces))
         return {"inserted": len(traces)}
     except KeyError as e:
@@ -111,7 +111,7 @@ def delete_traces() -> Response:
 def post_logs(payload: list[dict[str, Any]]) -> dict[str, Any]:
     try:
         logs = [Logs.from_dict(_tag(item)) for item in payload]
-        insert_logs_to_clickhouse(get_conn(), logs)
+        insert_logs_to_datastore(get_conn(), logs)
         logger.info("inserted %d logs", len(logs))
         return {"inserted": len(logs)}
     except KeyError as e:
@@ -136,7 +136,7 @@ def delete_logs() -> Response:
 def post_metrics(payload: list[dict[str, Any]]) -> dict[str, Any]:
     try:
         metrics = [Metrics.from_dict(_tag_metrics(item)) for item in payload]
-        insert_metrics_to_clickhouse(get_conn(), metrics)
+        insert_metrics_to_datastore(get_conn(), metrics)
         logger.info("inserted %d metrics", len(metrics))
         return {"inserted": len(metrics)}
     except KeyError as e:

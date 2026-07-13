@@ -7,7 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
+	"github.com/hanzoai/sqlbuilder"
 	"golang.org/x/exp/maps"
 
 	"github.com/hanzoai/o11y/pkg/errors"
@@ -261,7 +263,7 @@ func (t *telemetryMetaStore) getTracesKeys(ctx context.Context, fieldKeySelector
 	// query one extra to check if we hit the limit
 	mainSb.Limit(limit + 1)
 
-	query, args := mainSb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := mainSb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
@@ -497,7 +499,7 @@ func (t *telemetryMetaStore) getLogsKeys(ctx context.Context, fieldKeySelectors 
 			sb.Where(sb.Or(conds...))
 		}
 		sb.GroupBy("name", "datatype")
-		query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+		query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 		queries = append(queries, query)
 		allArgs = append(allArgs, args...)
 	}
@@ -558,7 +560,7 @@ func (t *telemetryMetaStore) getLogsKeys(ctx context.Context, fieldKeySelectors 
 			sb.Where(sb.Or(branches...))
 		}
 		sb.GroupBy("field_name", "field_data_type")
-		query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+		query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 		queries = append(queries, query)
 		allArgs = append(allArgs, args...)
 	}
@@ -823,7 +825,7 @@ func (t *telemetryMetaStore) getAuditKeys(ctx context.Context, fieldKeySelectors
 			limit = 1000
 		}
 
-		query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+		query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 		queries = append(queries, query)
 		allArgs = append(allArgs, args...)
 	}
@@ -1006,7 +1008,7 @@ func (t *telemetryMetaStore) getMetricsKeys(ctx context.Context, fieldKeySelecto
 	// query one extra to check if we hit the limit
 	mainSb.Limit(limit + 1)
 
-	query, args := mainSb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := mainSb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
@@ -1091,7 +1093,7 @@ func (t *telemetryMetaStore) getMeterSourceMetricKeys(ctx context.Context, field
 	}
 
 	sb.Limit(limit)
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
@@ -1483,7 +1485,7 @@ func (t *telemetryMetaStore) getRelatedValues(ctx context.Context, fieldValueSel
 	// query one extra to check if we hit the limit
 	sb.Limit(limit + 1)
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	t.logger.DebugContext(ctx, "query for related values", slog.String("query", query), slog.Any("args", args))
 
@@ -1568,7 +1570,7 @@ func (t *telemetryMetaStore) getSpanFieldValues(ctx context.Context, fieldValueS
 	// query one extra to check if we hit the limit
 	sb.Limit(limit + 1)
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
@@ -1656,7 +1658,7 @@ func (t *telemetryMetaStore) getLogFieldValues(ctx context.Context, fieldValueSe
 	// query one extra to check if we hit the limit
 	sb.Limit(limit + 1)
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
@@ -1743,7 +1745,7 @@ func (t *telemetryMetaStore) getAuditFieldValues(ctx context.Context, fieldValue
 	// fetch one extra row to detect whether the result set is complete
 	sb.Limit(limit + 1)
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
@@ -1860,7 +1862,7 @@ func (t *telemetryMetaStore) getMetricFieldValues(ctx context.Context, orgID val
 	// query one extra to check if we hit the limit
 	sb.Limit(remainingLimit + 1)
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
@@ -1999,7 +2001,7 @@ func (t *telemetryMetaStore) getIntrinsicMetricFieldValuesForTable(ctx context.C
 	sb.GroupBy(sqlbuilder.Escape(key.Name))
 	sb.Limit(limit + 1)
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
 		return nil, errors.Wrap(err, errors.TypeInternal, errors.CodeInternal, ErrFailedToGetMetricsKeys.Error())
@@ -2060,7 +2062,7 @@ func (t *telemetryMetaStore) getMeterSourceMetricFieldValues(ctx context.Context
 	// query one extra to check if we hit the limit
 	sb.Limit(limit + 1)
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
 		return nil, false, errors.Wrap(err, errors.TypeInternal, errors.CodeInternal, ErrFailedToGetMeterValues.Error())
@@ -2340,7 +2342,7 @@ func (t *telemetryMetaStore) fetchTemporalityTypeForTable(ctx context.Context, t
 	sb.Where(conds...)
 	sb.GroupBy("metric_name", "temporality")
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	t.logger.DebugContext(ctx, "fetching metric temporality", slog.String("query", query), slog.Any("args", args))
 
 	rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
@@ -2394,7 +2396,7 @@ func (t *telemetryMetaStore) fetchMeterSourceMetricsTemporalityAndType(ctx conte
 	// Group by metric name to get one temporality per metric
 	sb.GroupBy("metric_name")
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	t.logger.DebugContext(ctx, "fetching meter metrics temporality", slog.String("query", query), slog.Any("args", args))
 
@@ -2423,7 +2425,7 @@ func (t *telemetryMetaStore) fetchMeterSourceMetricsTemporalityAndType(ctx conte
 	return temporalities, types, nil
 }
 
-func (k *telemetryMetaStore) fetchEvolutionEntryFromClickHouse(ctx context.Context, selectors []*telemetrytypes.EvolutionSelector) ([]*telemetrytypes.EvolutionEntry, error) {
+func (k *telemetryMetaStore) fetchEvolutionEntryFromDatastore(ctx context.Context, selectors []*telemetrytypes.EvolutionSelector) ([]*telemetrytypes.EvolutionEntry, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("signal", "column_name", "column_type", "field_context", "field_name", "version", "release_time")
 	sb.From(fmt.Sprintf("%s.%s", k.relatedMetadataDBName, k.columnEvolutionMetadataTblName))
@@ -2445,7 +2447,7 @@ func (k *telemetryMetaStore) fetchEvolutionEntryFromClickHouse(ctx context.Conte
 	}
 	sb.Where(sb.Or(clauses...))
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var entries []*telemetrytypes.EvolutionEntry
 	rows, err := k.telemetrystore.DatastoreDB().Query(ctx, query, args...)
@@ -2494,9 +2496,9 @@ func (k *telemetryMetaStore) updateColumnEvolutionMetadataForKeys(ctx context.Co
 		metadataKeySelectors = append(metadataKeySelectors, selector)
 	}
 
-	evolutions, err := k.fetchEvolutionEntryFromClickHouse(ctx, metadataKeySelectors)
+	evolutions, err := k.fetchEvolutionEntryFromDatastore(ctx, metadataKeySelectors)
 	if err != nil {
-		return errors.Newf(errors.TypeInternal, errors.CodeInternal, "failed to fetch evolution from clickhouse %s", err.Error())
+		return errors.Newf(errors.TypeInternal, errors.CodeInternal, "failed to fetch evolution from datastore %s", err.Error())
 	}
 
 	evolutionsByUniqueKey := make(map[string][]*telemetrytypes.EvolutionEntry)
@@ -2536,7 +2538,7 @@ func (k *telemetryMetaStore) updateColumnEvolutionMetadataForKeys(ctx context.Co
 //
 //  1. The Ceiling: 250 KB (256,000 bytes). A conservative safety limit set just below the common DB max_query_size (262KB)
 //     to guarantee the database does not reject the query.
-//     Reference: https://clickhouse.com/docs/operations/settings/settings#max_query_size
+//     Reference: https://datastore.com/docs/operations/settings/settings#max_query_size
 //
 //  2. Unit Cost: ~150 bytes per tuple. The estimated "weight" of a single lookup key, summing MetricName (40B),
 //     AttrName (30B), AttrValue (64B), and SQL syntax overhead (16B).
@@ -2585,7 +2587,7 @@ func (t *telemetryMetaStore) GetFirstSeenFromMetricMetadata(ctx context.Context,
 		sb.GroupBy("metric_name", "attr_name", "attr_string_value")
 		sb.OrderBy("first_seen")
 
-		query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+		query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 		rows, err := t.telemetrystore.DatastoreDB().Query(ctx, query, args...)
 		if err != nil {
@@ -2646,7 +2648,7 @@ func (t *telemetryMetaStore) fetchLastSeenInfoForTable(ctx context.Context, tabl
 	sb.Where(sb.In("metric_name", metricNames))
 	sb.GroupBy("metric_name")
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	t.logger.DebugContext(ctx, "fetching metric last seen timestamp", slog.String("query", query), slog.Any("args", args))
 

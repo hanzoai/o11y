@@ -10,10 +10,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/errors"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 	"golang.org/x/exp/maps"
 )
 
@@ -53,7 +55,7 @@ func CollisionHandledFinalExpr(
 		}
 		sb.Where(condition)
 
-		expr, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+		expr, args := sb.BuildWithFlavor(datastoresql.Flavor)
 		expr = strings.TrimPrefix(expr, "WHERE ")
 		stmts = append(stmts, expr)
 		allArgs = append(allArgs, args...)
@@ -214,11 +216,11 @@ func DataTypeCollisionHandledFieldName(key *telemetrytypes.TelemetryFieldKey, va
 			} else {
 				// Any mix that is not all-floats (e.g. [bool, float64], [bool], all-strings)
 				// must be stringified: passing a Go bool as UInt8 against a String column
-				// causes ClickHouse error 386 "no supertype for String and UInt8".
+				// causes Datastore error 386 "no supertype for String and UInt8".
 				_, value = castString(tblFieldName), toStrings(v)
 			}
 		case bool:
-			// we don't have a toBoolOrNull in ClickHouse, so we need to convert the bool to a string
+			// we don't have a toBoolOrNull in Datastore, so we need to convert the bool to a string
 			value = fmt.Sprintf("%t", v)
 		}
 	case telemetrytypes.FieldDataTypeInt64,
@@ -240,7 +242,7 @@ func DataTypeCollisionHandledFieldName(key *telemetrytypes.TelemetryFieldKey, va
 		// final query as attributes_number['http.status_code'] = 200 giving this error
 		// This following is one way to workaround it
 
-		// if the key is a number, the value is a string, we will let clickHouse handle the conversion
+		// if the key is a number, the value is a string, we will let datastore handle the conversion
 		case float32, float64:
 			tblFieldName = castFloatHack(tblFieldName)
 		case string:

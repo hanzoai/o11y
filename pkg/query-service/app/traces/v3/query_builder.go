@@ -57,11 +57,11 @@ func getColumnName(key v3.AttributeKey) string {
 	if key.IsColumn {
 		return key.Key
 	}
-	filterType, filterDataType := getClickhouseTracesColumnDataTypeAndType(key)
+	filterType, filterDataType := getDatastoreTracesColumnDataTypeAndType(key)
 	return fmt.Sprintf("%s%s['%s']", filterDataType, filterType, key.Key)
 }
 
-func getClickhouseTracesColumnDataTypeAndType(key v3.AttributeKey) (v3.AttributeKeyType, string) {
+func getDatastoreTracesColumnDataTypeAndType(key v3.AttributeKey) (v3.AttributeKeyType, string) {
 	filterType := key.Type
 	filterDataType := "string"
 	if key.DataType == v3.AttributeKeyDataTypeFloat64 || key.DataType == v3.AttributeKeyDataTypeInt64 {
@@ -162,7 +162,7 @@ func buildTracesFilterQuery(fs *v3.FilterSet) (string, error) {
 				}
 			}
 			if val != nil {
-				fmtVal = utils.ClickHouseFormattedValue(val)
+				fmtVal = utils.DatastoreFormattedValue(val)
 			}
 			if operator, ok := tracesOperatorMappingV3[item.Operator]; ok {
 				switch item.Operator {
@@ -179,7 +179,7 @@ func buildTracesFilterQuery(fs *v3.FilterSet) (string, error) {
 						}
 						conditions = append(conditions, subQuery)
 					} else {
-						columnType, columnDataType := getClickhouseTracesColumnDataTypeAndType(item.Key)
+						columnType, columnDataType := getDatastoreTracesColumnDataTypeAndType(item.Key)
 						conditions = append(conditions, fmt.Sprintf(operator, columnDataType, columnType, item.Key.Key))
 					}
 
@@ -317,7 +317,7 @@ func Having(items []v3.Having) string {
 	// aggregate something and filter on that aggregate
 	var having []string
 	for _, item := range items {
-		having = append(having, fmt.Sprintf("value %s %s", item.Operator, utils.ClickHouseFormattedValue(item.Value)))
+		having = append(having, fmt.Sprintf("value %s %s", item.Operator, utils.DatastoreFormattedValue(item.Value)))
 	}
 	return strings.Join(having, " AND ")
 }

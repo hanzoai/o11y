@@ -26,8 +26,8 @@ func getQueryIdentifier(envelope QueryEnvelope, index int) string {
 		typeLabel = "join"
 	case QueryTypePromQL:
 		typeLabel = "PromQL query"
-	case QueryTypeClickHouseSQL:
-		typeLabel = "ClickHouse query"
+	case QueryTypeDatastoreSQL:
+		typeLabel = "Datastore query"
 	default:
 		typeLabel = "query"
 	}
@@ -759,18 +759,18 @@ func validateQueryEnvelope(envelope QueryEnvelope, opts ...ValidationOption) err
 			)
 		}
 		return nil
-	case QueryTypeClickHouseSQL:
-		spec, ok := envelope.Spec.(ClickHouseQuery)
+	case QueryTypeDatastoreSQL:
+		spec, ok := envelope.Spec.(DatastoreQuery)
 		if !ok {
 			return errors.NewInvalidInputf(
 				errors.CodeInvalidInput,
-				"invalid ClickHouse SQL spec",
+				"invalid Datastore SQL spec",
 			)
 		}
 		if spec.Query == "" {
 			return errors.NewInvalidInputf(
 				errors.CodeInvalidInput,
-				"ClickHouse SQL query is required",
+				"Datastore SQL query is required",
 			)
 		}
 		return nil
@@ -780,7 +780,7 @@ func validateQueryEnvelope(envelope QueryEnvelope, opts ...ValidationOption) err
 			"unknown query type: %s",
 			envelope.Type,
 		).WithAdditional(
-			"Valid query types are: builder_query, builder_sub_query, builder_formula, builder_join, promql, clickhouse_sql, trace_operator",
+			"Valid query types are: builder_query, builder_sub_query, builder_formula, builder_join, promql, datastore_sql, trace_operator",
 		).WithSuggestions(errors.NewValidReferences(errors.NounQueryTypes, QueryType{}.Enum()...))
 	}
 }

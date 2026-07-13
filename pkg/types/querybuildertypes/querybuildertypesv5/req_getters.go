@@ -53,7 +53,7 @@ func (q *QueryEnvelope) GetQuery() string {
 	switch spec := q.Spec.(type) {
 	case PromQuery:
 		return spec.Query
-	case ClickHouseQuery:
+	case DatastoreQuery:
 		return spec.Query
 	}
 	return ""
@@ -121,7 +121,7 @@ func (q *QueryEnvelope) GetQueryName() string {
 		return spec.Name
 	case PromQuery:
 		return spec.Name
-	case ClickHouseQuery:
+	case DatastoreQuery:
 		return spec.Name
 	}
 	return ""
@@ -144,7 +144,7 @@ func (q *QueryEnvelope) IsDisabled() bool {
 		return spec.Disabled
 	case PromQuery:
 		return spec.Disabled
-	case ClickHouseQuery:
+	case DatastoreQuery:
 		return spec.Disabled
 	}
 	return false
@@ -312,7 +312,7 @@ func (q *QueryEnvelope) GetLegend() string {
 		return spec.Legend
 	case PromQuery:
 		return spec.Legend
-	case ClickHouseQuery:
+	case DatastoreQuery:
 		return spec.Legend
 	}
 	return ""

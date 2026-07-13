@@ -5,9 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -300,7 +302,7 @@ func TestConditionFor(t *testing.T) {
 				assert.Equal(t, tc.expectedError, err)
 			} else {
 				require.NoError(t, err)
-				sql, _ := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+				sql, _ := sb.BuildWithFlavor(datastoresql.Flavor)
 				assert.Contains(t, sql, tc.expectedSQL)
 			}
 		})
@@ -383,7 +385,7 @@ func TestConditionForResourceWithEvolution(t *testing.T) {
 			cond, err := conditionBuilder.ConditionFor(ctx, tc.tsStart, tc.tsEnd, &tc.key, tc.operator, nil, sb)
 			require.NoError(t, err)
 			sb.Where(cond)
-			sql, _ := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+			sql, _ := sb.BuildWithFlavor(datastoresql.Flavor)
 			assert.Contains(t, sql, tc.expectedSQL)
 		})
 	}

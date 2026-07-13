@@ -8,9 +8,9 @@ This document defines the design principles, invariants, and architectural contr
 
 ## Core Architectural Principle
 
-**The user speaks OpenTelemetry. The storage speaks ClickHouse. The system translates between them. These two worlds must never leak into each other.**
+**The user speaks OpenTelemetry. The storage speaks Datastore. The system translates between them. These two worlds must never leak into each other.**
 
-Every design choice in Query Range flows from this separation. The user-facing API surface deals exclusively in `TelemetryFieldKey`: a representation of fields as they exist in the OpenTelemetry data model. The storage layer deals in ClickHouse column expressions, table names, and SQL fragments. The translation between them is mediated by a small set of composable abstractions with strict boundaries.
+Every design choice in Query Range flows from this separation. The user-facing API surface deals exclusively in `TelemetryFieldKey`: a representation of fields as they exist in the OpenTelemetry data model. The storage layer deals in Datastore column expressions, table names, and SQL fragments. The translation between them is mediated by a small set of composable abstractions with strict boundaries.
 
 ---
 
@@ -60,16 +60,16 @@ The query pipeline is built from four interfaces that compose vertically. Each l
 StatementBuilder          <- Orchestrates everything into executable SQL
   ├── AggExprRewriter     <- Rewrites aggregation expressions (maps field refs to columns)
   ├── ConditionBuilder    <- Builds WHERE predicates (field + operator + value -> SQL)
-  └── FieldMapper         <- Maps TelemetryFieldKey -> ClickHouse column expression
+  └── FieldMapper         <- Maps TelemetryFieldKey -> Datastore column expression
 ```
 
 ### FieldMapper
 
-**Contract:** Given a `TelemetryFieldKey`, return a ClickHouse column expression that yields the value for that field when used in a SELECT.
+**Contract:** Given a `TelemetryFieldKey`, return a Datastore column expression that yields the value for that field when used in a SELECT.
 
 **Principle:** This is the *only* place where field-to-column translation happens. No other layer should contain knowledge of how fields map to storage. If you need a column expression, go through the FieldMapper.
 
-**Why:** The user says `http.request.method`. ClickHouse might store it as `attributes_string['http.request.method']`, or as a materialized column `` `attribute_string_http$$request$$method` ``, or via a JSON access path in a body column. This variation is entirely contained within the FieldMapper. Everything above it is storage-agnostic.
+**Why:** The user says `http.request.method`. Datastore might store it as `attributes_string['http.request.method']`, or as a materialized column `` `attribute_string_http$$request$$method` ``, or via a JSON access path in a body column. This variation is entirely contained within the FieldMapper. Everything above it is storage-agnostic.
 
 ### ConditionBuilder
 
@@ -81,7 +81,7 @@ StatementBuilder          <- Orchestrates everything into executable SQL
 
 ### AggExprRewriter
 
-**Contract:** Given a user-facing aggregation expression like `sum(duration_nano)`, resolve field references within it and produce valid ClickHouse SQL.
+**Contract:** Given a user-facing aggregation expression like `sum(duration_nano)`, resolve field references within it and produce valid Datastore SQL.
 
 **Dependency:** Uses FieldMapper to resolve field names within expressions.
 
@@ -103,11 +103,11 @@ The StatementBuilder must not call FieldMapper directly to build conditions, it 
 
 ## Design Decisions as Constraints
 
-### Constraint: Formula evaluation happens in Go, not in ClickHouse
+### Constraint: Formula evaluation happens in Go, not in Datastore
 
-Formulas (`A + B`, `A / B`, `sqrt(A*A + B*B)`) are evaluated application-side by `FormulaEvaluator`, not via ClickHouse JOINs.
+Formulas (`A + B`, `A / B`, `sqrt(A*A + B*B)`) are evaluated application-side by `FormulaEvaluator`, not via Datastore JOINs.
 
-**Why this is a constraint, not just an implementation choice:** The original JOIN-based approach was abandoned because ClickHouse evaluates joins right-to-left, serializing execution unnecessarily. Running queries independently allows parallelism and caching of intermediate results. Any future optimization must not reintroduce the JOIN pattern without solving the serialization problem.
+**Why this is a constraint, not just an implementation choice:** The original JOIN-based approach was abandoned because Datastore evaluates joins right-to-left, serializing execution unnecessarily. Running queries independently allows parallelism and caching of intermediate results. Any future optimization must not reintroduce the JOIN pattern without solving the serialization problem.
 
 **Consequence:** Individual query results must be independently cacheable. Formula evaluation must handle label matching, timestamp alignment, and missing values without requiring the queries to coordinate at the SQL level.
 
@@ -130,7 +130,7 @@ Only additive/counting aggregations (`count`, `count_distinct`, `sum`, `rate`) d
 
 ### Constraint: Post-processing functions operate on result sets, not in SQL
 
-Functions like `cutOffMin`, `ewma`, `median`, `timeShift`, `fillZero`, `runningDiff`, and `cumulativeSum` are applied in Go on the returned time series, not pushed into ClickHouse SQL.
+Functions like `cutOffMin`, `ewma`, `median`, `timeShift`, `fillZero`, `runningDiff`, and `cumulativeSum` are applied in Go on the returned time series, not pushed into Datastore SQL.
 
 **Why:** These are sequential time-series transformations that require complete, ordered result sets. Pushing them into SQL would complicate query generation, prevent caching of raw results, and make the functions harder to test. They are applied via `ApplyFunctions` after query execution.
 
@@ -202,11 +202,11 @@ Fields inside JSON body columns (`body.response.errors[].code`) need pre-compute
 
 ## Summary of Inviolable Rules
 
-1. **User-facing types never contain ClickHouse column names or SQL fragments.**
+1. **User-facing types never contain Datastore column names or SQL fragments.**
 2. **Field-to-column translation only happens in FieldMapper.**
 3. **Normalization happens once at the API boundary, never deeper.**
 4. **Historical aliases in fieldContexts and fieldDataTypes must not be removed.**
-5. **Formula evaluation stays in Go — do not push it into ClickHouse JOINs.**
+5. **Formula evaluation stays in Go — do not push it into Datastore JOINs.**
 6. **Zero-defaulting is aggregation-type-dependent — do not universally default to zero.**
 7. **Positive operators imply existence, negative operators do not.**
 8. **Post-processing functions operate on Go result sets, not in SQL.**

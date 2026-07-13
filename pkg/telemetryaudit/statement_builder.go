@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
@@ -13,7 +15,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetryresourcefilter"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 type auditQueryStatementBuilder struct {
@@ -276,7 +278,7 @@ func (b *auditQueryStatementBuilder) buildListQuery(
 		sb.Offset(query.Offset)
 	}
 
-	mainSQL, mainArgs := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	mainSQL, mainArgs := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	finalSQL := querybuilder.CombineCTEs(cteFragments) + mainSQL
 	finalArgs := querybuilder.PrependArgs(cteArgs, mainArgs)
@@ -386,7 +388,7 @@ func (b *auditQueryStatementBuilder) buildTimeSeriesQuery(
 		}
 
 		combinedArgs := append(allGroupByArgs, allAggChArgs...)
-		mainSQL, mainArgs := sb.BuildWithFlavor(sqlbuilder.ClickHouse, combinedArgs...)
+		mainSQL, mainArgs := sb.BuildWithFlavor(datastoresql.Flavor, combinedArgs...)
 
 		finalSQL = querybuilder.CombineCTEs(cteFragments) + mainSQL
 		finalArgs = querybuilder.PrependArgs(cteArgs, mainArgs)
@@ -413,7 +415,7 @@ func (b *auditQueryStatementBuilder) buildTimeSeriesQuery(
 		}
 
 		combinedArgs := append(allGroupByArgs, allAggChArgs...)
-		mainSQL, mainArgs := sb.BuildWithFlavor(sqlbuilder.ClickHouse, combinedArgs...)
+		mainSQL, mainArgs := sb.BuildWithFlavor(datastoresql.Flavor, combinedArgs...)
 
 		finalSQL = querybuilder.CombineCTEs(cteFragments) + mainSQL
 		finalArgs = querybuilder.PrependArgs(cteArgs, mainArgs)
@@ -516,7 +518,7 @@ func (b *auditQueryStatementBuilder) buildScalarQuery(
 
 	combinedArgs := append(allGroupByArgs, allAggChArgs...)
 
-	mainSQL, mainArgs := sb.BuildWithFlavor(sqlbuilder.ClickHouse, combinedArgs...)
+	mainSQL, mainArgs := sb.BuildWithFlavor(datastoresql.Flavor, combinedArgs...)
 
 	finalSQL := querybuilder.CombineCTEs(cteFragments) + mainSQL
 	finalArgs := querybuilder.PrependArgs(cteArgs, mainArgs)

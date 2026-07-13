@@ -9,7 +9,7 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 	"golang.org/x/exp/maps"
 )
 
@@ -282,8 +282,8 @@ func (m *defaultFieldMapper) FieldFor(
 			if key.FieldContext != telemetrytypes.FieldContextResource {
 				return "", errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "only resource context fields are supported for json columns, got %s", key.FieldContext.String)
 			}
-			// have to add ::string as clickHouse throws an error :- data types Variant/Dynamic are not allowed in GROUP BY
-			// once clickHouse dependency is updated, we need to check if we can remove it.
+			// have to add ::string as datastore throws an error :- data types Variant/Dynamic are not allowed in GROUP BY
+			// once datastore dependency is updated, we need to check if we can remove it.
 			exprs = append(exprs, fmt.Sprintf("%s.`%s`::String", columnName, key.Name))
 			existExpr = append(existExpr, fmt.Sprintf("%s.`%s` IS NOT NULL", columnName, key.Name))
 		case schema.ColumnTypeEnumString,

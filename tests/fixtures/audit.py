@@ -288,7 +288,7 @@ class AuditLog(ABC):
 
 @pytest.fixture(name="insert_audit_logs", scope="function")
 def insert_audit_logs(
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
 ) -> Generator[Callable[[list[AuditLog]], None], Any]:
     def _insert_audit_logs(logs: list[AuditLog]) -> None:
         resources: list[AuditResource] = []
@@ -296,7 +296,7 @@ def insert_audit_logs(
             resources.extend(log.resource)
 
         if len(resources) > 0:
-            clickhouse.conn.insert(
+            datastore.conn.insert(
                 database="o11y_audit",
                 table="distributed_logs_resource",
                 data=[resource.np_arr() for resource in resources],
@@ -312,7 +312,7 @@ def insert_audit_logs(
             tag_attributes.extend(log.tag_attributes)
 
         if len(tag_attributes) > 0:
-            clickhouse.conn.insert(
+            datastore.conn.insert(
                 database="o11y_audit",
                 table="distributed_tag_attributes",
                 data=[ta.np_arr() for ta in tag_attributes],
@@ -332,7 +332,7 @@ def insert_audit_logs(
             attribute_keys.extend(log.attribute_keys)
 
         if len(attribute_keys) > 0:
-            clickhouse.conn.insert(
+            datastore.conn.insert(
                 database="o11y_audit",
                 table="distributed_logs_attribute_keys",
                 data=[ak.np_arr() for ak in attribute_keys],
@@ -344,14 +344,14 @@ def insert_audit_logs(
             resource_keys.extend(log.resource_keys)
 
         if len(resource_keys) > 0:
-            clickhouse.conn.insert(
+            datastore.conn.insert(
                 database="o11y_audit",
                 table="distributed_logs_resource_keys",
                 data=[rk.np_arr() for rk in resource_keys],
                 column_names=["name", "datatype"],
             )
 
-        clickhouse.conn.insert(
+        datastore.conn.insert(
             database="o11y_audit",
             table="distributed_logs",
             data=[log.np_arr() for log in logs],
@@ -380,7 +380,7 @@ def insert_audit_logs(
 
     yield _insert_audit_logs
 
-    cluster = clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
+    cluster = datastore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"]
     for table in [
         "logs",
         "logs_resource",
@@ -388,4 +388,4 @@ def insert_audit_logs(
         "logs_attribute_keys",
         "logs_resource_keys",
     ]:
-        clickhouse.conn.query(f"TRUNCATE TABLE o11y_audit.{table} ON CLUSTER '{cluster}' SYNC")
+        datastore.conn.query(f"TRUNCATE TABLE o11y_audit.{table} ON CLUSTER '{cluster}' SYNC")

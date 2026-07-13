@@ -200,7 +200,7 @@ function toUrlCompositeQuery(
 		return {
 			queryType: actionQuery.queryType ?? 'builder',
 			promql: actionQuery.promql ?? [],
-			clickhouse_sql: actionQuery.clickhouse_sql ?? [],
+			datastore_sql: actionQuery.datastore_sql ?? [],
 			id: uuidv4(),
 			unit: actionQuery.unit ?? '',
 			...actionQuery,

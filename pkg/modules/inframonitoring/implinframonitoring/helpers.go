@@ -6,6 +6,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
@@ -15,10 +17,10 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
-// quoteIdentifier wraps s in backticks for use as a ClickHouse identifier,
+// quoteIdentifier wraps s in backticks for use as a Datastore identifier,
 // escaping any embedded backticks by doubling them.
 func quoteIdentifier(s string) string {
 	return fmt.Sprintf("`%s`", strings.ReplaceAll(s, "`", "``"))
@@ -456,7 +458,7 @@ func (m *module) getEarliestMetricTime(ctx context.Context, metricNames []string
 	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
 	sb.Where(sb.In("metric_name", sqlbuilder.List(metricNames)))
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var minFirstReported uint64
 	if err := m.telemetryStore.DatastoreDB().QueryRow(ctx, query, args...).Scan(&minFirstReported); err != nil {
@@ -483,7 +485,7 @@ func (m *module) getMetricsExistence(ctx context.Context, metricNames []string) 
 	sb.Where(sb.In("metric_name", sqlbuilder.List(metricNames)))
 	sb.GroupBy("metric_name")
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := m.telemetryStore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
@@ -531,7 +533,7 @@ func (m *module) getAttributesExistence(ctx context.Context, metricNames, attrNa
 	)
 	sb.GroupBy("attr_name")
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := m.telemetryStore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
@@ -683,7 +685,7 @@ func (m *module) getMetadata(
 	}
 	innerSB.GroupBy(groupByAliases...)
 
-	innerQuery, innerArgs := innerSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	innerQuery, innerArgs := innerSB.BuildWithFlavor(datastoresql.Flavor)
 
 	// --- Build outer query ---
 	// Outer SELECT columns: groupBy cols directly + tupleElement(latest_attrs, N) for each additionalCol
@@ -701,7 +703,7 @@ func (m *module) getMetadata(
 	outerSB.Select(outerSelectCols...)
 	outerSB.From(fmt.Sprintf("(%s)", innerQuery))
 
-	outerQuery, _ := outerSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	outerQuery, _ := outerSB.BuildWithFlavor(datastoresql.Flavor)
 	// All ? params are in innerArgs; outer query introduces none of its own.
 
 	rows, err := m.telemetryStore.DatastoreDB().Query(ctx, outerQuery, innerArgs...)

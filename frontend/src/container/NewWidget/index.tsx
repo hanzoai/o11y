@@ -683,8 +683,8 @@ function NewWidget({
 			isNewPanel,
 			dataSource: currentQuery?.builder?.queryData?.[0]?.dataSource,
 			...(currentQuery.queryType === EQueryType.DATASTORE && {
-				clickhouseQueryCount: currentQuery.datastore_sql.length,
-				clickhouseQueries: currentQuery.datastore_sql.map((q) => ({
+				datastoreQueryCount: currentQuery.datastore_sql.length,
+				datastoreQueries: currentQuery.datastore_sql.map((q) => ({
 					name: q.name,
 					query: (q.query ?? '')
 						.replace(/--[^\n]*/g, '') // strip line comments

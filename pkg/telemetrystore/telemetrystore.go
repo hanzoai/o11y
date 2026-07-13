@@ -3,13 +3,13 @@ package telemetrystore
 import (
 	"context"
 
-	clickhouse "github.com/hanzoai/datastore-go/v2"
+	"github.com/hanzoai/datastore-go/v2"
 	"github.com/hanzoai/o11y/pkg/types/telemetrystoretypes"
 )
 
 type TelemetryStore interface {
-	// DatastoreDB returns the clickhouse connection, which can also EXPLAIN.
-	DatastoreDB() clickhouse.Conn
+	// DatastoreDB returns the datastore connection, which can also EXPLAIN.
+	DatastoreDB() datastore.Conn
 
 	// Cluster returns the cluster name.
 	Cluster() string

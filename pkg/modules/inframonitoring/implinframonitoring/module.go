@@ -173,7 +173,7 @@ func (m *module) ListHosts(ctx context.Context, orgID valuer.UUID, req *inframon
 		return resp, nil
 	}
 
-	// TOD(nikhilmantri0902): replace this separate ClickHouse query with a sub-query inside the main query builder query
+	// TOD(nikhilmantri0902): replace this separate Datastore query with a sub-query inside the main query builder query
 	// once QB supports sub-queries.
 	// Determine active hosts: those with metrics reported in the last 10 minutes.
 	// Compute the cutoff once so every downstream query/subquery agrees on what "active" means.

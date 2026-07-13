@@ -24,7 +24,7 @@ import { FormContainer, StepHeading } from './styles';
 
 import './QuerySection.styles.scss';
 
-const ANOMALY_QUERY_SUPPORT_CLICKHOUSE_ISSUE =
+const ANOMALY_QUERY_SUPPORT_DATASTORE_ISSUE =
 	'https://github.com/SigNoz/signoz/issues/11034';
 
 const ANOMALY_QUERY_SUPPORT_PROMQL_ISSUE =

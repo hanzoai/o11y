@@ -6,12 +6,14 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
 	"github.com/hanzoai/o11y/pkg/types/inframonitoringtypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 // buildNodeRecords assembles the page records. Condition counts come from
@@ -225,7 +227,7 @@ func (m *module) getPerGroupNodeConditionCounts(
 		timeSeriesFPsGroupBy = append(timeSeriesFPsGroupBy, quoteIdentifier(key.Name))
 	}
 	timeSeriesFPs.GroupBy(timeSeriesFPsGroupBy...)
-	timeSeriesFPsSQL, timeSeriesFPsArgs := timeSeriesFPs.BuildWithFlavor(sqlbuilder.ClickHouse)
+	timeSeriesFPsSQL, timeSeriesFPsArgs := timeSeriesFPs.BuildWithFlavor(datastoresql.Flavor)
 
 	// ----- latestConditionPerNode -----
 	latestConditionPerNode := sqlbuilder.NewSelectBuilder()
@@ -251,7 +253,7 @@ func (m *module) getPerGroupNodeConditionCounts(
 		"tsfp.node_name != ''",
 	)
 	latestConditionPerNode.GroupBy(latestConditionPerNodeGroupBy...)
-	latestConditionPerNodeSQL, latestConditionPerNodeArgs := latestConditionPerNode.BuildWithFlavor(sqlbuilder.ClickHouse)
+	latestConditionPerNodeSQL, latestConditionPerNodeArgs := latestConditionPerNode.BuildWithFlavor(datastoresql.Flavor)
 
 	// ----- countNodesPerCondition (outer SELECT) -----
 	countNodesPerConditionSelectCols := make([]string, 0, len(groupBy)+2)

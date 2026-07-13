@@ -1,0 +1,33 @@
+package queryprogress
+
+import (
+	"log/slog"
+
+	"github.com/hanzoai/datastore-go/v2"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
+)
+
+type QueryProgressTracker interface {
+	// Tells the tracker that query with id `queryId` has started.
+	// Progress can only be reported for and tracked for a query that is in progress.
+	// Returns a cleanup function that must be called after the query finishes.
+	ReportQueryStarted(queryId string) (postQueryCleanup func(), apiErr *model.ApiError)
+
+	// Report progress stats received from datastore for `queryId`
+	ReportQueryProgress(queryId string, chProgress *datastore.Progress) *model.ApiError
+
+	// Subscribe to progress updates for `queryId`
+	// The returned channel will produce `QueryProgress` instances representing
+	// the latest state of query progress stats. Also returns a function that
+	// can be called to unsubscribe before the query finishes, if needed.
+	SubscribeToQueryProgress(queryId string) (ch <-chan model.QueryProgress, unsubscribe func(), apiErr *model.ApiError)
+}
+
+func NewQueryProgressTracker(logger *slog.Logger) QueryProgressTracker {
+	// InMemory tracker is useful only for single replica query service setups.
+	// Multi replica setups must use a centralized store for tracking and subscribing to query progress
+	return &inMemoryQueryProgressTracker{
+		logger:  logger,
+		queries: map[string]*queryTracker{},
+	}
+}

@@ -6,7 +6,9 @@ import (
 	"log/slog"
 	"strings"
 
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
+	"github.com/hanzoai/sqlbuilder"
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
@@ -80,18 +82,18 @@ func (b *traceOperatorCTEBuilder) build(ctx context.Context, requestType qbtypes
 
 		// rootCTEName holds one row per matching *span*, not per *trace*, so it can
 		// contain many rows for the same trace_id. DISTINCT de-duplicates that set
-		// before ClickHouse builds the hash table for the IN check, keeping memory
+		// before Datastore builds the hash table for the IN check, keeping memory
 		// usage proportional to the number of distinct traces rather than spans.
 		matchingTracedSB := sqlbuilder.NewSelectBuilder()
 		matchingTracedSB.Select("DISTINCT trace_id")
 		matchingTracedSB.From(rootCTEName)
-		matchedTracesSQL, matchedTracesArgs := matchingTracedSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+		matchedTracesSQL, matchedTracesArgs := matchingTracedSB.BuildWithFlavor(datastoresql.Flavor)
 
 		filteredSB := sqlbuilder.NewSelectBuilder()
 		filteredSB.Select("*")
 		filteredSB.From(sourceQueryCTE)
 		filteredSB.Where(fmt.Sprintf("trace_id IN (%s)", matchedTracesSQL))
-		filteredSQL, filteredArgs := filteredSB.BuildWithFlavor(sqlbuilder.ClickHouse, matchedTracesArgs...)
+		filteredSQL, filteredArgs := filteredSB.BuildWithFlavor(datastoresql.Flavor, matchedTracesArgs...)
 
 		b.addCTE(filteredCTEName, filteredSQL, filteredArgs, []string{sourceQueryCTE, rootCTEName})
 		selectFromCTE = filteredCTEName
@@ -143,7 +145,7 @@ func (b *traceOperatorCTEBuilder) buildAllSpansCTE(ctx context.Context) {
 		sb.GE("ts_bucket_start", startBucket),
 		sb.LE("ts_bucket_start", endBucket),
 	)
-	sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	sql, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	b.stmtBuilder.logger.DebugContext(ctx, "Built all_spans CTE")
 	b.addCTE("all_spans", sql, args, nil)
 }
@@ -288,7 +290,7 @@ func (b *traceOperatorCTEBuilder) buildQueryCTE(ctx context.Context, queryName s
 		}
 	}
 
-	sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	sql, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	b.stmtBuilder.logger.DebugContext(ctx, "Built query CTE",
 		slog.String("query_name", queryName),
 		slog.String("cte_name", cteName))
@@ -367,7 +369,7 @@ func (b *traceOperatorCTEBuilder) buildDirectDescendantCTE(parentCTE, childCTE s
 		"p.trace_id = c.trace_id AND p.span_id = c.parent_span_id",
 	)
 
-	sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	sql, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	return sql, args, []string{parentCTE, childCTE}
 }
 
@@ -387,7 +389,7 @@ func (b *traceOperatorCTEBuilder) buildAndCTE(leftCTE, rightCTE string) (string,
 		"l.trace_id = r.trace_id",
 	)
 
-	sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	sql, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	return sql, args, []string{leftCTE, rightCTE}
 }
 
@@ -408,7 +410,7 @@ func (b *traceOperatorCTEBuilder) buildNotCTE(leftCTE, rightCTE string) (string,
 			"b.trace_id GLOBAL NOT IN (SELECT DISTINCT trace_id FROM %s)",
 			leftCTE,
 		))
-		sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+		sql, args := sb.BuildWithFlavor(datastoresql.Flavor)
 		return sql, args, []string{"all_spans", leftCTE}
 	}
 
@@ -419,7 +421,7 @@ func (b *traceOperatorCTEBuilder) buildNotCTE(leftCTE, rightCTE string) (string,
 		rightCTE,
 	))
 
-	sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	sql, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	return sql, args, []string{leftCTE, rightCTE}
 }
 
@@ -530,7 +532,7 @@ func (b *traceOperatorCTEBuilder) buildListQuery(ctx context.Context, selectFrom
 		sb.Offset(b.operator.Offset)
 	}
 
-	sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	sql, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	return &qbtypes.Statement{
 		Query: sql,
 		Args:  args,
@@ -708,7 +710,7 @@ func (b *traceOperatorCTEBuilder) buildTimeSeriesQuery(ctx context.Context, sele
 		return nil, err
 	}
 
-	sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse, combinedArgs...)
+	sql, args := sb.BuildWithFlavor(datastoresql.Flavor, combinedArgs...)
 	return &qbtypes.Statement{
 		Query: sql,
 		Args:  args,
@@ -727,7 +729,7 @@ func (b *traceOperatorCTEBuilder) buildTraceSummaryCTE(selectFromCTE string) {
 	sb.Where(fmt.Sprintf("trace_id GLOBAL IN (SELECT DISTINCT trace_id FROM %s)", selectFromCTE))
 	sb.GroupBy("trace_id")
 
-	sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	sql, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	b.addCTE("trace_summary", sql, args, []string{"all_spans", selectFromCTE})
 }
 
@@ -866,7 +868,7 @@ func (b *traceOperatorCTEBuilder) buildTraceQuery(ctx context.Context, selectFro
 
 	combinedArgs := append(allGroupByArgs, allAggChArgs...)
 
-	sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse, combinedArgs...)
+	sql, args := sb.BuildWithFlavor(datastoresql.Flavor, combinedArgs...)
 	return &qbtypes.Statement{
 		Query: sql,
 		Args:  args,
@@ -961,7 +963,7 @@ func (b *traceOperatorCTEBuilder) buildScalarQuery(ctx context.Context, selectFr
 		return nil, err
 	}
 
-	sql, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse, combinedArgs...)
+	sql, args := sb.BuildWithFlavor(datastoresql.Flavor, combinedArgs...)
 	return &qbtypes.Statement{
 		Query: sql,
 		Args:  args,

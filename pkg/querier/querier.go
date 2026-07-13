@@ -200,10 +200,10 @@ func (q *querier) buildQueries(
 			promqlQuery := newPromqlQuery(q.logger, q.promEngine, promQuery, qbtypes.TimeRange{From: req.Start, To: req.End}, req.RequestType, tmplVars)
 			queries[promQuery.Name] = promqlQuery
 			steps[promQuery.Name] = promQuery.Step
-		case qbtypes.QueryTypeClickHouseSQL:
-			chQuery, ok := query.Spec.(qbtypes.ClickHouseQuery)
+		case qbtypes.QueryTypeDatastoreSQL:
+			chQuery, ok := query.Spec.(qbtypes.DatastoreQuery)
 			if !ok {
-				return nil, nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid clickhouse query spec %T", query.Spec)
+				return nil, nil, errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid datastore query spec %T", query.Spec)
 			}
 			chSQLQuery := newchSQLQuery(q.logger, q.telemetryStore, chQuery, nil, qbtypes.TimeRange{From: req.Start, To: req.End}, req.RequestType, tmplVars)
 			queries[chQuery.Name] = chSQLQuery
@@ -293,7 +293,7 @@ func (q *querier) populateQBEvent(event *qbtypes.QBEvent, queries []qbtypes.Quer
 			event.MetricsUsed = true
 		case qbtypes.QueryTypeTraceOperator:
 			event.TracesUsed = true
-		case qbtypes.QueryTypeClickHouseSQL:
+		case qbtypes.QueryTypeDatastoreSQL:
 			sql := query.GetQuery()
 			if strings.TrimSpace(sql) != "" {
 				event.MetricsUsed = strings.Contains(sql, "o11y_metrics")

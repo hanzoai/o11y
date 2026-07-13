@@ -3,7 +3,7 @@ package telemetrystorehook
 import (
 	"context"
 
-	clickhouse "github.com/hanzoai/datastore-go/v2"
+	"github.com/hanzoai/datastore-go/v2"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
@@ -21,12 +21,12 @@ func NewSettingsFactory() factory.ProviderFactory[telemetrystore.TelemetryStoreH
 
 func NewSettings(ctx context.Context, providerSettings factory.ProviderSettings, config telemetrystore.Config) (telemetrystore.TelemetryStoreHook, error) {
 	return &provider{
-		settings: config.Clickhouse.QuerySettings,
+		settings: config.Datastore.QuerySettings,
 	}, nil
 }
 
 func (h *provider) BeforeQuery(ctx context.Context, _ *telemetrystore.QueryEvent) context.Context {
-	settings := clickhouse.Settings{}
+	settings := datastore.Settings{}
 
 	settings["log_comment"] = ctxtypes.CommentFromContext(ctx).String()
 
@@ -54,8 +54,8 @@ func (h *provider) BeforeQuery(ctx context.Context, _ *telemetrystore.QueryEvent
 		settings["ignore_data_skipping_indices"] = h.settings.IgnoreDataSkippingIndices
 	}
 
-	if ctx.Value("clickhouse_max_threads") != nil {
-		if maxThreads, ok := ctx.Value("clickhouse_max_threads").(int); ok {
+	if ctx.Value("datastore_max_threads") != nil {
+		if maxThreads, ok := ctx.Value("datastore_max_threads").(int); ok {
 			settings["max_threads"] = maxThreads
 		}
 	}
@@ -72,11 +72,11 @@ func (h *provider) BeforeQuery(ctx context.Context, _ *telemetrystore.QueryEvent
 		settings["result_overflow_mode"] = ctx.Value("result_overflow_mode")
 	}
 
-	// TODO(srikanthccv): enable it when the "Cannot read all data" issue is fixed
-	// https://github.com/ClickHouse/ClickHouse/issues/82283
+	// TODO(srikanthccv): enable it when the upstream "Cannot read all data"
+	// bulk-filtering bug on secondary indices is fixed.
 	settings["secondary_indices_enable_bulk_filtering"] = false
 
-	ctx = clickhouse.Context(ctx, clickhouse.WithSettings(settings))
+	ctx = datastore.Context(ctx, datastore.WithSettings(settings))
 	return ctx
 }
 

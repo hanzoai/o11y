@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
@@ -25,7 +25,7 @@ type queryMatcherAny struct{}
 func (m *queryMatcherAny) Match(string, string) error { return nil }
 
 // mockMetricStmtBuilder implements qbtypes.StatementBuilder[qbtypes.MetricAggregation]
-// and returns a fixed query string so the mock ClickHouse can match it.
+// and returns a fixed query string so the mock Datastore can match it.
 type mockMetricStmtBuilder struct{}
 
 func (m *mockMetricStmtBuilder) Build(_ context.Context, _, _ uint64, _ qbtypes.RequestType, _ qbtypes.QueryBuilderQuery[qbtypes.MetricAggregation], _ map[string]qbtypes.VariableItem) (*qbtypes.Statement, error) {
@@ -101,11 +101,11 @@ func TestQueryRange_MetricTypeFromStore(t *testing.T) {
 
 	telemetryStore := telemetrystoretest.New(telemetrystore.Config{}, &queryMatcherAny{})
 
-	cols := []cmock.ColumnType{
+	cols := []dsmock.ColumnType{
 		{Name: "ts", Type: "DateTime"},
 		{Name: "value", Type: "Float64"},
 	}
-	rows := cmock.NewRows(cols, [][]any{
+	rows := dsmock.NewRows(cols, [][]any{
 		{time.Now(), float64(42)},
 	})
 	telemetryStore.Mock().

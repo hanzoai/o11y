@@ -13,8 +13,8 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/flagger"
-	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
@@ -42,7 +42,7 @@ func getqueryInfo(spec any) queryInfo {
 		return queryInfo{Name: s.Name, Disabled: s.Disabled}
 	case qbtypes.PromQuery:
 		return queryInfo{Name: s.Name, Disabled: s.Disabled, Step: s.Step}
-	case qbtypes.ClickHouseQuery:
+	case qbtypes.DatastoreQuery:
 		return queryInfo{Name: s.Name, Disabled: s.Disabled}
 	}
 	return queryInfo{}
@@ -99,7 +99,7 @@ func (q *querier) postProcessResults(ctx context.Context, orgID valuer.UUID, res
 
 		// merge result only needed for non-CH query
 		if len(req.CompositeQuery.Queries) == 1 {
-			if req.CompositeQuery.Queries[0].Type == qbtypes.QueryTypeClickHouseSQL {
+			if req.CompositeQuery.Queries[0].Type == qbtypes.QueryTypeDatastoreSQL {
 				retResult := map[string]any{}
 				for name, v := range typedResults {
 					retResult[name] = v.Value
