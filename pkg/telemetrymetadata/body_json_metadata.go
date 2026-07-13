@@ -10,7 +10,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
-	"github.com/hanzoai/datastore-go/v2/lib/chcol"
+	"github.com/hanzoai/datastore-go/v2/lib/dscol"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrylogs"
@@ -324,13 +324,13 @@ func (t *telemetryMetaStore) ListJSONValues(ctx context.Context, path string, li
 							values.BoolValues = append(values.BoolValues, *boolVal)
 						}
 					}
-				case chcol.Variant:
+				case dscol.Variant:
 					if !value.Nil() {
 						if err := consume([]any{value.Any()}); err != nil {
 							return err
 						}
 					}
-				case []chcol.Variant:
+				case []dscol.Variant:
 					extractedValues := make([]any, len(value))
 					for idx, variant := range value {
 						if !variant.Nil() && variant.Type() != "JSON" { // skip JSON values cuz they're relevant for nested keys
