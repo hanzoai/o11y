@@ -30,8 +30,8 @@ func New(_ telemetrystore.Config, matcher sqlmock.QueryMatcher) *Provider {
 	}
 }
 
-// DatastoreDB returns the mock Datastore connection.
-func (p *Provider) DatastoreDB() datastore.Conn {
+// Datastore returns the mock Datastore connection.
+func (p *Provider) Datastore() datastore.Conn {
 	return p.datastoreDB.(datastore.Conn)
 }
 

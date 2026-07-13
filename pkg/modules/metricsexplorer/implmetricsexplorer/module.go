@@ -111,7 +111,7 @@ func (m *module) listMeterMetrics(ctx context.Context, params *metricsexplorerty
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "failed to list meter metrics")
@@ -195,7 +195,7 @@ func (m *module) listMetrics(ctx context.Context, orgID valuer.UUID, params *met
 	}
 
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "failed to list metrics")
@@ -519,7 +519,7 @@ func (m *module) CheckMetricExists(ctx context.Context, orgID valuer.UUID, metri
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	var exists bool
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 
@@ -541,7 +541,7 @@ func (m *module) HasNonO11yMetrics(ctx context.Context) (bool, error) {
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	var hasMetrics bool
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 
@@ -588,7 +588,7 @@ func (m *module) InspectMetrics(
 	tsSb.Limit(50)
 
 	tsQuery, tsArgs := tsSb.BuildWithFlavor(datastoresql.Flavor)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 
 	tsRows, err := db.Query(valueCtx, tsQuery, tsArgs...)
@@ -726,7 +726,7 @@ func (m *module) fetchUpdatedMetadata(ctx context.Context, orgID valuer.UUID, me
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "failed to fetch updated metrics metadata")
@@ -786,7 +786,7 @@ func (m *module) fetchTimeseriesMetadata(ctx context.Context, orgID valuer.UUID,
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "failed to fetch metrics metadata from timeseries table")
@@ -902,7 +902,7 @@ func (m *module) checkForLabelInMetric(ctx context.Context, metricName string, l
 
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	var hasLabel bool
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	err := db.QueryRow(valueCtx, query, args...).Scan(&hasLabel)
 	if err != nil {
 		return false, errors.WrapInternalf(err, errors.CodeInternal, "error checking metric label %q", label)
@@ -931,7 +931,7 @@ func (m *module) insertMetricsMetadata(ctx context.Context, orgID valuer.UUID, r
 	query, args := ib.BuildWithFlavor(datastoresql.Flavor)
 
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	if err := db.Exec(valueCtx, query, args...); err != nil {
 		return errors.WrapInternalf(err, errors.CodeInternal, "failed to insert metrics metadata")
 	}
@@ -1178,7 +1178,7 @@ func (m *module) fetchMetricsStatsWithSamples(
 	}
 
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
 		return nil, 0, errors.WrapInternalf(err, errors.CodeInternal, "failed to execute metrics stats with samples query")
@@ -1302,7 +1302,7 @@ func (m *module) computeTimeseriesTreemap(ctx context.Context, orgID valuer.UUID
 	}
 
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "failed to execute timeseries treemap query")
@@ -1525,7 +1525,7 @@ func (m *module) computeSamplesTreemap(ctx context.Context, orgID valuer.UUID, r
 	}
 
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "failed to execute samples treemap query")
@@ -1559,7 +1559,7 @@ func (m *module) getMetricDataPoints(ctx context.Context, metricName string) (ui
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	var dataPoints uint64
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	err := db.QueryRow(valueCtx, query, args...).Scan(&dataPoints)
@@ -1580,7 +1580,7 @@ func (m *module) getMetricLastReceived(ctx context.Context, metricName string) (
 	sb.Where(sb.E("metric_name", metricName))
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	var lastReceived sql.NullInt64
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	err := db.QueryRow(valueCtx, query, args...).Scan(&lastReceived)
@@ -1606,7 +1606,7 @@ func (m *module) getTotalTimeSeriesForMetricName(ctx context.Context, metricName
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	var timeSeriesCount uint64
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	err := db.QueryRow(valueCtx, query, args...).Scan(&timeSeriesCount)
@@ -1630,7 +1630,7 @@ func (m *module) getActiveTimeSeriesForMetricName(ctx context.Context, metricNam
 	sb.Where(sb.GTE("unix_milli", milli))
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	var activeTimeSeries uint64
 	err := db.QueryRow(valueCtx, query, args...).Scan(&activeTimeSeries)
@@ -1670,7 +1670,7 @@ func (m *module) fetchMetricAttributes(ctx context.Context, metricName string, s
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
-	db := m.telemetryStore.DatastoreDB()
+	db := m.telemetryStore.Datastore()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "failed to fetch metric attributes")

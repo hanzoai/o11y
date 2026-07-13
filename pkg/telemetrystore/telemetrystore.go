@@ -8,8 +8,8 @@ import (
 )
 
 type TelemetryStore interface {
-	// DatastoreDB returns the datastore connection, which can also EXPLAIN.
-	DatastoreDB() datastore.Conn
+	// Datastore returns the datastore connection, which can also EXPLAIN.
+	Datastore() datastore.Conn
 
 	// Cluster returns the cluster name.
 	Cluster() string

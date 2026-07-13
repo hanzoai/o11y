@@ -127,7 +127,7 @@ func (s *eventStore) ensureSchema(ctx context.Context) error {
 	if s.ensureDone {
 		return nil
 	}
-	conn := s.store.DatastoreDB()
+	conn := s.store.Datastore()
 	if err := conn.Exec(ctx, fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", s.db)); err != nil {
 		return err
 	}
@@ -145,7 +145,7 @@ func (s *eventStore) Insert(ctx context.Context, orgID, projectID valuer.UUID, e
 	if err := s.ensureSchema(ctx); err != nil {
 		return err
 	}
-	batch, err := s.store.DatastoreDB().PrepareBatch(ctx,
+	batch, err := s.store.Datastore().PrepareBatch(ctx,
 		fmt.Sprintf(insertSQL, s.db, s.table), driver.WithReleaseConnection())
 	if err != nil {
 		return err
@@ -176,7 +176,7 @@ func (s *eventStore) Discover(ctx context.Context, orgID, projectID valuer.UUID,
 	if err != nil {
 		return nil, err
 	}
-	rows, err := s.store.DatastoreDB().Query(ctx, sql, args...)
+	rows, err := s.store.Datastore().Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +240,7 @@ func (s *eventStore) DistinctFingerprints(ctx context.Context, orgID, projectID 
 		return nil, err
 	}
 	sql, args := buildDistinctFingerprints(s.db, s.table, orgID.String(), projectID.String(), w)
-	rows, err := s.store.DatastoreDB().Query(ctx, sql, args...)
+	rows, err := s.store.Datastore().Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -261,7 +261,7 @@ func (s *eventStore) ListTraces(ctx context.Context, orgID, projectID valuer.UUI
 		return nil, err
 	}
 	sql, args := buildListTraces(s.db, s.table, orgID.String(), projectID.String(), w, limit)
-	rows, err := s.store.DatastoreDB().Query(ctx, sql, args...)
+	rows, err := s.store.Datastore().Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -285,7 +285,7 @@ func (s *eventStore) Stats(ctx context.Context, orgID, projectID valuer.UUID, fi
 	if err != nil {
 		return nil, err
 	}
-	rows, err := s.store.DatastoreDB().Query(ctx, sql, args...)
+	rows, err := s.store.Datastore().Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +303,7 @@ func (s *eventStore) Stats(ctx context.Context, orgID, projectID valuer.UUID, fi
 
 // queryEvents runs a fixed-projection (selectColumns) query and scans rows into Events.
 func (s *eventStore) queryEvents(ctx context.Context, sql string, args []any) ([]*sentrytypes.Event, error) {
-	rows, err := s.store.DatastoreDB().Query(ctx, sql, args...)
+	rows, err := s.store.Datastore().Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
