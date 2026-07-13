@@ -9,7 +9,7 @@ import (
 
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzoai/sqlbuilder"
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -98,7 +98,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorILike,
 			value:         "%admin%",
-			expectedSQL:   "(LOWER(attributes_string['user.id']) LIKE LOWER(?) AND mapContains(attributes_string, 'user.id') = ?)",
+			expectedSQL:   "(attributes_string['user.id'] ILIKE ? AND mapContains(attributes_string, 'user.id') = ?)",
 			expectedArgs:  []any{"%admin%", true},
 			expectedError: nil,
 		},
@@ -111,7 +111,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotILike,
 			value:         "%admin%",
-			expectedSQL:   "WHERE LOWER(attributes_string['user.id']) NOT LIKE LOWER(?)",
+			expectedSQL:   "WHERE attributes_string['user.id'] NOT ILIKE ?",
 			expectedArgs:  []any{"%admin%", true},
 			expectedError: nil,
 		},
@@ -124,7 +124,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorContains,
 			value:         521509198310,
-			expectedSQL:   "LOWER(attributes_string['user.id']) LIKE LOWER(?)",
+			expectedSQL:   "attributes_string['user.id'] ILIKE ?",
 			expectedArgs:  []any{"%521509198310%", true},
 			expectedError: nil,
 		},
@@ -246,7 +246,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorContains,
 			value:         "admin",
-			expectedSQL:   "(LOWER(attributes_string['user.id']) LIKE LOWER(?) AND mapContains(attributes_string, 'user.id') = ?)",
+			expectedSQL:   "(attributes_string['user.id'] ILIKE ? AND mapContains(attributes_string, 'user.id') = ?)",
 			expectedArgs:  []any{"%admin%", true},
 			expectedError: nil,
 		},

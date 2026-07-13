@@ -7,6 +7,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	dsmock "github.com/hanzoai/datastore-go-mock"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoremock"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/cache/cachetest"
 	"github.com/hanzoai/o11y/pkg/errors"
@@ -77,7 +78,7 @@ func newFlagger(t *testing.T, reductionEnabled bool) flagger.Flagger {
 // newTestModule builds the metricsexplorer module backed by a mocked datastore
 // connection, a mock metadata store, and an in-memory cache. reductionEnabled
 // toggles the metrics-reduction feature flag.
-func newTestModule(t *testing.T, matcher sqlmock.QueryMatcher, reductionEnabled bool) (metricsexplorer.Module, dsmock.ClickConnMockCommon, *telemetrytypestest.MockMetadataStore) {
+func newTestModule(t *testing.T, matcher sqlmock.QueryMatcher, reductionEnabled bool) (metricsexplorer.Module, datastoremock.Conn, *telemetrytypestest.MockMetadataStore) {
 	t.Helper()
 
 	ts := telemetrystoretest.New(telemetrystore.Config{}, matcher)

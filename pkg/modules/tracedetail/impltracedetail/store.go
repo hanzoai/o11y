@@ -8,7 +8,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
-	sqlbuilder "github.com/hanzoai/sqlbuilder"
+	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"

@@ -11,7 +11,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
-	sqlbuilder "github.com/hanzoai/sqlbuilder"
+	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/hanzoai/o11y/pkg/cache"

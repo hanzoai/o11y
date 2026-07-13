@@ -19,7 +19,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schemamigrator "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
 	"github.com/hanzoai/otel-collector/constants"
-	"github.com/hanzoai/sqlbuilder"
+	"github.com/hanzo-ds/sqlbuilder"
 )
 
 var (

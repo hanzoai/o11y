@@ -14,7 +14,7 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 
-	sqlbuilder "github.com/hanzoai/sqlbuilder"
+	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 )
 
 var searchTroubleshootingGuideURL = "https://o11y.io/docs/userguide/search-troubleshooting/"

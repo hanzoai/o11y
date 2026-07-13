@@ -5,6 +5,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	dsmock "github.com/hanzoai/datastore-go-mock"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoremock"
 	"github.com/hanzoai/datastore-go/v2"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoretelemetrystore"
@@ -15,7 +16,7 @@ var _ telemetrystore.TelemetryStore = (*Provider)(nil)
 
 // Provider represents a mock telemetry store provider for testing.
 type Provider struct {
-	datastoreDB dsmock.ClickConnMockCommon
+	datastoreDB datastoremock.Conn
 }
 
 // New creates a new mock telemetry store provider.
@@ -56,6 +57,6 @@ func (p *Provider) Indexes(ctx context.Context, stmt string, args ...any) (telem
 }
 
 // Mock returns the underlying Datastore mock instance for setting expectations.
-func (p *Provider) Mock() dsmock.ClickConnMockCommon {
+func (p *Provider) Mock() datastoremock.Conn {
 	return p.datastoreDB
 }

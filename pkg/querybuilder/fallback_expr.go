@@ -15,7 +15,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzoai/sqlbuilder"
+	"github.com/hanzo-ds/sqlbuilder"
 	"golang.org/x/exp/maps"
 )
 
@@ -230,12 +230,12 @@ func DataTypeCollisionHandledFieldName(key *telemetrytypes.TelemetryFieldKey, va
 		telemetrytypes.FieldDataTypeFloat64,
 		telemetrytypes.FieldDataTypeArrayFloat64:
 		switch v := value.(type) {
-		// why? ; CH returns an error for a simple check
+		// why? ; Datastore returns an error for a simple check
 		// attributes_number['http.status_code'] = 200 but not for attributes_number['http.status_code'] >= 200
 		// DB::Exception: Bad get: has UInt64, requested Float64.
 		// How is it working in v4? v4 prepares the full query with values in query string
 		// When we format the float it becomes attributes_number['http.status_code'] = 200.000
-		// Which CH gladly accepts and doesn't throw error
+		// Which Datastore gladly accepts and doesn't throw error
 		// However, when passed as query args, the default formatter
 		// (see github.com/hanzoai/datastore-go/v2 bind.go format())
 		// is used which prepares the
