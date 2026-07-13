@@ -211,7 +211,7 @@ require (
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
 	github.com/hanzo-ds/native v0.72.0 // indirect
-	github.com/hanzoai/ai v1.806.9 // indirect
+	github.com/hanzoai/ai v1.806.10 // indirect
 	github.com/hanzoai/beego/v2 v2.4.1 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/dashscope-go-sdk v0.0.2 // indirect
@@ -425,7 +425,6 @@ require (
 	github.com/hanzo-ds/sqlbuilder v1.42.2
 	github.com/hanzo-ds/sqlparser v0.4.16
 	github.com/hanzoai/cloud v1.786.112
-	github.com/hanzoai/datastore-go/v2 v2.47.2 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.5 // indirect
