@@ -8,7 +8,7 @@ import (
 
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzoai/sqlbuilder"
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -35,7 +35,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorILike,
 			value:         "%admin%",
-			expectedSQL:   "WHERE if(mapContains(attributes, ?), LOWER(attributes['user.id']) LIKE LOWER(?), true)",
+			expectedSQL:   "WHERE if(mapContains(attributes, ?), attributes['user.id'] ILIKE ?, true)",
 			expectedError: nil,
 		},
 		{
@@ -47,7 +47,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotILike,
 			value:         "%admin%",
-			expectedSQL:   "WHERE if(mapContains(attributes, ?), LOWER(attributes['user.id']) NOT LIKE LOWER(?), true)",
+			expectedSQL:   "WHERE if(mapContains(attributes, ?), attributes['user.id'] NOT ILIKE ?, true)",
 			expectedError: nil,
 		},
 	}

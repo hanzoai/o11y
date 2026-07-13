@@ -937,7 +937,6 @@ var (
 		// So recovery only triggers when the value climbs back above 30%, not just above 20%.
 		// The zone between 20%–30% is the hysteresis band to avoid flapping when
 		// the value oscillates around the alert threshold.
-		// TODO(srikanthccv): https://github.com/SigNoz/engineering-pod/issues/4332
 		{
 			description: "Category 1: Below operator - value in recovery zone, no active alert -> no alert returned",
 			values: &qbtypes.TimeSeries{
@@ -957,7 +956,6 @@ var (
 			activeAlerts:    map[uint64]struct{}{}, // No active alerts
 			thresholdName:   "test_threshold",
 		},
-		// TODO(srikanthccv): https://github.com/SigNoz/engineering-pod/issues/4333
 		{
 			description: "Category 1: NotEq operator - value in recovery zone, no active alert -> no alert returned",
 			values: &qbtypes.TimeSeries{
@@ -1280,7 +1278,6 @@ var (
 			expectedRecoveryTarget: 70.0,
 			thresholdName:          "cat1_atleastonce_below_recovery",
 		},
-		// TODO(srikanthccv): https://github.com/SigNoz/engineering-pod/issues/4333
 		{
 			description: "Category 1: AtleastOnce + Equals - active alert, one value equals recovery -> IsRecovering=true",
 			values: &qbtypes.TimeSeries{

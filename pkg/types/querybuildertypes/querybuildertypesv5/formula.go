@@ -144,12 +144,12 @@ type seriesLookup struct {
 
 // FormulaEvaluator handles formula evaluation b/w time series from different aggregations
 // Why do we evaluate the formula expression in query-service?
-// In the initial iteration, we let the CH take care of the formula evaluation.
+// In the initial iteration, we let the Datastore take care of the formula evaluation.
 // Look at the query here https://github.com/hanzoai/o11y/blob/ad2d4ed56cf8457a0feee2b6947aed95c355c957/pkg/query-service/app/queryBuilder/query_builder_test.go#L459
 // This was achieved using the INNER JOIN between the query results.
 //
 // What are the issues with this approach?
-// The way CH handles the join evaluation is not the best suited for us in this scenario.
+// The way Datastore handles the join evaluation is not the best suited for us in this scenario.
 // It runs the right most side of the join before running anything else and progressively
 // completes the join from right to left. This becomes inefficient for simple cases like apdex (A+B/2)/C.
 // There is no need to wait for the right most side to complete before starting the evaluation for A and B.

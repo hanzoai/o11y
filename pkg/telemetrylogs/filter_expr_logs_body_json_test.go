@@ -126,7 +126,7 @@ func TestFilterExprLogsBodyJSON(t *testing.T) {
 			category:              "json",
 			query:                 `body.message CONTAINS "hello 'world'"`,
 			shouldPass:            true,
-			expectedQuery:         `WHERE (LOWER(JSON_VALUE(body, '$."message"')) LIKE LOWER(?) AND JSON_EXISTS(body, '$."message"'))`,
+			expectedQuery:         `WHERE (JSON_VALUE(body, '$."message"') ILIKE ? AND JSON_EXISTS(body, '$."message"'))`,
 			expectedArgs:          []any{"%hello 'world'%"},
 			expectedErrorContains: "",
 		},

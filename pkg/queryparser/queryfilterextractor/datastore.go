@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	dsparser "github.com/hanzoai/datastore-sql-parser/parser"
+	dsparser "github.com/hanzo-ds/sqlparser/parser"
 	"github.com/hanzoai/o11y/pkg/errors"
 )
 
@@ -308,7 +308,7 @@ func (e *DatastoreFilterExtractor) extractColumnStrByExpr(expr dsparser.Expr) st
 	// Ident is a simple identifier like "region" or "timestamp"
 	case *dsparser.Ident:
 		// Handling for backticks which are native to Datastore and used for literal names.
-		// CH Parser removes the backticks from the identifier, so we need to add them back.
+		// Datastore Parser removes the backticks from the identifier, so we need to add them back.
 		if ex.QuoteType == dsparser.BackTicks {
 			return "`" + ex.Name + "`"
 		}

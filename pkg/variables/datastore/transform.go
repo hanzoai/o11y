@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/hanzoai/datastore-sql-parser/parser"
+	"github.com/hanzo-ds/sqlparser/parser"
 	"github.com/hanzoai/o11y/pkg/variables"
 )
 

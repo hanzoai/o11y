@@ -8,7 +8,7 @@ import (
 
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzoai/sqlbuilder"
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -54,7 +54,7 @@ func TestConditionBuilder(t *testing.T) {
 			},
 			op:           qbtypes.FilterOperatorLike,
 			value:        "_mango%",
-			expected:     "LOWER(simpleJSONExtractString(labels, 'k8s.namespace.name')) LIKE LOWER(?) AND labels LIKE ? AND LOWER(labels) LIKE LOWER(?)",
+			expected:     "simpleJSONExtractString(labels, 'k8s.namespace.name') ILIKE ? AND labels LIKE ? AND labels ILIKE ?",
 			expectedArgs: []any{"_mango%", "%k8s.namespace.name%", `%k8s.namespace.name%_mango%%`},
 		},
 		{
@@ -65,7 +65,7 @@ func TestConditionBuilder(t *testing.T) {
 			},
 			op:           qbtypes.FilterOperatorNotLike,
 			value:        "_mango%",
-			expected:     "LOWER(simpleJSONExtractString(labels, 'k8s.namespace.name')) NOT LIKE LOWER(?)",
+			expected:     "simpleJSONExtractString(labels, 'k8s.namespace.name') NOT ILIKE ?",
 			expectedArgs: []any{"_mango%"},
 		},
 		{
@@ -76,7 +76,7 @@ func TestConditionBuilder(t *testing.T) {
 			},
 			op:           qbtypes.FilterOperatorContains,
 			value:        "banana",
-			expected:     "LOWER(simpleJSONExtractString(labels, 'k8s.namespace.name')) LIKE LOWER(?) AND labels LIKE ? AND LOWER(labels) LIKE LOWER(?)",
+			expected:     "simpleJSONExtractString(labels, 'k8s.namespace.name') ILIKE ? AND labels LIKE ? AND labels ILIKE ?",
 			expectedArgs: []any{"%banana%", "%k8s.namespace.name%", `%k8s.namespace.name%banana%`},
 		},
 		{
@@ -88,7 +88,7 @@ func TestConditionBuilder(t *testing.T) {
 			},
 			op:           qbtypes.FilterOperatorContains,
 			value:        521509198310,
-			expected:     "LOWER(simpleJSONExtractString(labels, 'company.id')) LIKE LOWER(?) AND labels LIKE ? AND LOWER(labels) LIKE LOWER(?)",
+			expected:     "simpleJSONExtractString(labels, 'company.id') ILIKE ? AND labels LIKE ? AND labels ILIKE ?",
 			expectedArgs: []any{"%521509198310%", "%company.id%", `%company.id%521509198310%`},
 		},
 		{
@@ -99,7 +99,7 @@ func TestConditionBuilder(t *testing.T) {
 			},
 			op:           qbtypes.FilterOperatorNotContains,
 			value:        "banana",
-			expected:     "LOWER(simpleJSONExtractString(labels, 'k8s.namespace.name')) NOT LIKE LOWER(?)",
+			expected:     "simpleJSONExtractString(labels, 'k8s.namespace.name') NOT ILIKE ?",
 			expectedArgs: []any{"%banana%"},
 		},
 		{

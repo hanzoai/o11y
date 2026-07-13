@@ -9,7 +9,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
-	"github.com/hanzoai/sqlbuilder"
+	"github.com/hanzo-ds/sqlbuilder"
 	"golang.org/x/exp/maps"
 
 	"github.com/hanzoai/o11y/pkg/errors"

@@ -97,7 +97,7 @@ func (q *querier) postProcessResults(ctx context.Context, orgID valuer.UUID, res
 	// Apply table formatting for UI if requested
 	if req.FormatOptions != nil && req.FormatOptions.FormatTableResultForUI && req.RequestType == qbtypes.RequestTypeScalar {
 
-		// merge result only needed for non-CH query
+		// merge result only needed for non-Datastore query
 		if len(req.CompositeQuery.Queries) == 1 {
 			if req.CompositeQuery.Queries[0].Type == qbtypes.QueryTypeDatastoreSQL {
 				retResult := map[string]any{}
