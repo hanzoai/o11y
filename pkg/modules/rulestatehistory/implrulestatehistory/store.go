@@ -59,7 +59,7 @@ func (s *store) AddRuleStateHistory(ctx context.Context, entries []rulestatehist
 	)
 	insertQuery, _ := ib.BuildWithFlavor(datastoresql.Flavor)
 
-	statement, err := s.telemetryStore.DatastoreDB().PrepareBatch(
+	statement, err := s.telemetryStore.Datastore().PrepareBatch(
 		ctx,
 		insertQuery,
 	)
@@ -98,7 +98,7 @@ func (s *store) GetLastSavedRuleStateHistory(ctx context.Context, ruleID string)
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	history := make([]rulestatehistorytypes.RuleStateHistory, 0)
-	if err := s.telemetryStore.DatastoreDB().Select(ctx, &history, query, args...); err != nil {
+	if err := s.telemetryStore.Datastore().Select(ctx, &history, query, args...); err != nil {
 		return nil, err
 	}
 	return history, nil
@@ -136,7 +136,7 @@ func (s *store) ReadRuleStateHistoryByRuleID(ctx context.Context, ruleID string,
 	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	history := []rulestatehistorytypes.RuleStateHistory{}
-	if err := s.telemetryStore.DatastoreDB().Select(ctx, &history, selectQuery, args...); err != nil {
+	if err := s.telemetryStore.Datastore().Select(ctx, &history, selectQuery, args...); err != nil {
 		return nil, 0, err
 	}
 
@@ -150,7 +150,7 @@ func (s *store) ReadRuleStateHistoryByRuleID(ctx context.Context, ruleID string,
 
 	var total uint64
 	countQuery, countArgs := countSB.BuildWithFlavor(datastoresql.Flavor)
-	if err := s.telemetryStore.DatastoreDB().QueryRow(ctx, countQuery, countArgs...).Scan(&total); err != nil {
+	if err := s.telemetryStore.Datastore().QueryRow(ctx, countQuery, countArgs...).Scan(&total); err != nil {
 		return nil, 0, err
 	}
 
@@ -186,7 +186,7 @@ func (s *store) ReadRuleStateHistoryFilterKeysByRuleID(ctx context.Context, rule
 	sb.Limit(int(limit + 1))
 	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	rows, err := s.telemetryStore.DatastoreDB().Query(ctx, selectQuery, args...)
+	rows, err := s.telemetryStore.Datastore().Query(ctx, selectQuery, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -258,7 +258,7 @@ func (s *store) ReadRuleStateHistoryFilterValuesByRuleID(ctx context.Context, ru
 	sb.Limit(int(limit + 1))
 	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	rows, err := s.telemetryStore.DatastoreDB().Query(ctx, selectQuery, args...)
+	rows, err := s.telemetryStore.Datastore().Query(ctx, selectQuery, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +321,7 @@ func (s *store) ReadRuleStateHistoryTopContributorsByRuleID(ctx context.Context,
 	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	contributors := []rulestatehistorytypes.RuleStateHistoryContributor{}
-	if err := s.telemetryStore.DatastoreDB().Select(ctx, &contributors, selectQuery, args...); err != nil {
+	if err := s.telemetryStore.Datastore().Select(ctx, &contributors, selectQuery, args...); err != nil {
 		return nil, err
 	}
 	return contributors, nil
@@ -374,7 +374,7 @@ GROUP BY unix_milli`,
 	args = append(args, outerArgs...)
 
 	windows := []rulestatehistorytypes.GettableRuleStateWindow{}
-	if err := s.telemetryStore.DatastoreDB().Select(ctx, &windows, selectQuery, args...); err != nil {
+	if err := s.telemetryStore.Datastore().Select(ctx, &windows, selectQuery, args...); err != nil {
 		return nil, err
 	}
 
@@ -388,7 +388,7 @@ func (s *store) GetAvgResolutionTime(ctx context.Context, ruleID string, query *
 	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var avg float64
-	if err := s.telemetryStore.DatastoreDB().QueryRow(ctx, selectQuery, args...).Scan(&avg); err != nil {
+	if err := s.telemetryStore.Datastore().QueryRow(ctx, selectQuery, args...).Scan(&avg); err != nil {
 		return 0, err
 	}
 	return avg, nil
@@ -420,7 +420,7 @@ func (s *store) GetTotalTriggers(ctx context.Context, ruleID string, query *rule
 	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var total uint64
-	if err := s.telemetryStore.DatastoreDB().QueryRow(ctx, selectQuery, args...).Scan(&total); err != nil {
+	if err := s.telemetryStore.Datastore().QueryRow(ctx, selectQuery, args...).Scan(&total); err != nil {
 		return 0, err
 	}
 	return total, nil
@@ -446,7 +446,7 @@ func (s *store) GetTriggersByInterval(ctx context.Context, ruleID string, query 
 }
 
 func (s *store) querySeries(ctx context.Context, selectQuery string, args ...any) (*qbtypes.TimeSeries, error) {
-	rows, err := s.telemetryStore.DatastoreDB().Query(ctx, selectQuery, args...)
+	rows, err := s.telemetryStore.Datastore().Query(ctx, selectQuery, args...)
 	if err != nil {
 		return nil, err
 	}

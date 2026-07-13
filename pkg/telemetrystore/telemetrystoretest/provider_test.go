@@ -12,5 +12,5 @@ func TestNew(t *testing.T) {
 	provider := New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherRegexp)
 	assert.NotNil(t, provider)
 	assert.NotNil(t, provider.Mock())
-	assert.NotNil(t, provider.DatastoreDB())
+	assert.NotNil(t, provider.Datastore())
 }

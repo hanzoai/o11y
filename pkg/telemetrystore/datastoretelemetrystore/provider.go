@@ -159,7 +159,7 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 	return p, nil
 }
 
-func (p *provider) DatastoreDB() datastore.Conn {
+func (p *provider) Datastore() datastore.Conn {
 	return p
 }
 
