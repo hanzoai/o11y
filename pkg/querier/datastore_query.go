@@ -56,7 +56,7 @@ func newchSQLQuery(
 }
 
 func (q *chSQLQuery) Fingerprint() string {
-	// No caching for CH queries for now
+	// No caching for Datastore queries for now
 	return ""
 }
 

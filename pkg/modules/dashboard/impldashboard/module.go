@@ -200,7 +200,7 @@ func (module *module) GetByMetricNames(ctx context.Context, orgID valuer.UUID, m
 			}
 
 			// Track which metrics were found in this widget, along with the
-			// group-by and filter labels referenced for each metric. CH/PromQL
+			// group-by and filter labels referenced for each metric. Datastore/PromQL
 			// paths are presence-only and leave the label sets empty.
 			foundMetrics := make(map[string]bool)
 			groupByByMetric := make(map[string][]string)

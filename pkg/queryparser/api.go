@@ -21,7 +21,7 @@ func NewAPI(settings factory.ProviderSettings, queryParser QueryParser) *API {
 
 // AnalyzeQueryFilter analyzes a query and extracts metric names and grouping columns.
 func (a *API) AnalyzeQueryFilter(w http.ResponseWriter, r *http.Request) {
-	// Limit request body size to 255 KB (CH query limit is 256 KB)
+	// Limit request body size to 255 KB (Datastore query limit is 256 KB)
 	r.Body = http.MaxBytesReader(w, r.Body, 255*1024)
 
 	var req parsertypes.QueryFilterAnalyzeRequest

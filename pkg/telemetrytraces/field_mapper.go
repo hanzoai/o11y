@@ -9,7 +9,7 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/hanzoai/sqlbuilder"
+	"github.com/hanzo-ds/sqlbuilder"
 	"golang.org/x/exp/maps"
 )
 
@@ -201,7 +201,7 @@ func (m *defaultFieldMapper) getColumn(
 		}
 
 		// TODO(srikanthccv): remove this when it's safe to remove
-		// issue with CH aliasing
+		// issue with Datastore aliasing
 
 		/*
 			NOTE: There are fields which are deprecated for only to not show up as user suggestion and is possible that

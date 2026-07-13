@@ -15,7 +15,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetryresourcefilter"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzoai/sqlbuilder"
+	"github.com/hanzo-ds/sqlbuilder"
 )
 
 type auditQueryStatementBuilder struct {

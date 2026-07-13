@@ -499,7 +499,7 @@ func (r *BaseRule) FilterNewSeries(ctx context.Context, ts time.Time, series []*
 		return series, nil
 	}
 
-	// Build lookup keys from series which will be used to query metadata from CH
+	// Build lookup keys from series which will be used to query metadata from Datastore
 	lookupKeys := make([]telemetrytypes.MetricMetadataLookupKey, 0)
 	seriesIdxToLookupKeys := make(map[int][]telemetrytypes.MetricMetadataLookupKey) // series index -> lookup keys
 
