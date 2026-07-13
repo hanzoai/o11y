@@ -11,7 +11,7 @@ import (
 	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	sqlbuilder "github.com/hanzoai/sqlbuilder"
+	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 )
 
