@@ -76,7 +76,7 @@ services:
         mv histogram-quantile /var/lib/clickhouse/user_scripts/histogramQuantile
     restart: on-failure
     volumes:
-      - ../common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
+      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
   zookeeper-1:
     !!merge <<: *zookeeper-defaults
     container_name: o11y-zookeeper-1
@@ -100,13 +100,13 @@ services:
     #   - "8123:8123"
     #   - "9181:9181"
     volumes:
-      - ../common/clickhouse/config.xml:/etc/clickhouse-server/config.xml
-      - ../common/clickhouse/users.xml:/etc/clickhouse-server/users.xml
-      - ../common/clickhouse/custom-function.xml:/etc/clickhouse-server/custom-function.xml
-      - ../common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
-      - ../common/clickhouse/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml
+      - ../common/datastore/config.xml:/etc/clickhouse-server/config.xml
+      - ../common/datastore/users.xml:/etc/clickhouse-server/users.xml
+      - ../common/datastore/custom-function.xml:/etc/clickhouse-server/custom-function.xml
+      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
+      - ../common/datastore/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml
       - clickhouse:/var/lib/clickhouse/
-      # - ../common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
+      # - ../common/datastore/storage.xml:/etc/clickhouse-server/config.d/storage.xml
   observe:
     !!merge <<: *db-depend
     image: ghcr.io/hanzoai/o11y:${VERSION:-v0.115.0}

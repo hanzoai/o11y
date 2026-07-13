@@ -7,13 +7,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	sqlbuilder "github.com/huandu/go-sqlbuilder"
+	sqlbuilder "github.com/hanzoai/sqlbuilder"
 )
 
 const (
@@ -55,7 +57,7 @@ func (s *store) AddRuleStateHistory(ctx context.Context, entries []rulestatehist
 		"fingerprint",
 		"value",
 	)
-	insertQuery, _ := ib.BuildWithFlavor(sqlbuilder.ClickHouse)
+	insertQuery, _ := ib.BuildWithFlavor(datastoresql.Flavor)
 
 	statement, err := s.telemetryStore.DatastoreDB().PrepareBatch(
 		ctx,
@@ -94,7 +96,7 @@ func (s *store) GetLastSavedRuleStateHistory(ctx context.Context, ruleID string)
 	sb.OrderBy("unix_milli DESC")
 	sb.SQL("LIMIT 1 BY fingerprint")
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	history := make([]rulestatehistorytypes.RuleStateHistory, 0)
 	if err := s.telemetryStore.DatastoreDB().Select(ctx, &history, query, args...); err != nil {
 		return nil, err
@@ -131,7 +133,7 @@ func (s *store) ReadRuleStateHistoryByRuleID(ctx context.Context, ruleID string,
 	sb.Limit(int(query.Limit))
 	sb.Offset(int(query.Offset))
 
-	selectQuery, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	history := []rulestatehistorytypes.RuleStateHistory{}
 	if err := s.telemetryStore.DatastoreDB().Select(ctx, &history, selectQuery, args...); err != nil {
@@ -147,7 +149,7 @@ func (s *store) ReadRuleStateHistoryByRuleID(ctx context.Context, ruleID string,
 	}
 
 	var total uint64
-	countQuery, countArgs := countSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	countQuery, countArgs := countSB.BuildWithFlavor(datastoresql.Flavor)
 	if err := s.telemetryStore.DatastoreDB().QueryRow(ctx, countQuery, countArgs...).Scan(&total); err != nil {
 		return nil, 0, err
 	}
@@ -182,7 +184,7 @@ func (s *store) ReadRuleStateHistoryFilterKeysByRuleID(ctx context.Context, rule
 
 	sb.OrderBy("key ASC")
 	sb.Limit(int(limit + 1))
-	selectQuery, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := s.telemetryStore.DatastoreDB().Query(ctx, selectQuery, args...)
 	if err != nil {
@@ -254,7 +256,7 @@ func (s *store) ReadRuleStateHistoryFilterValuesByRuleID(ctx context.Context, ru
 
 	sb.OrderBy("val ASC")
 	sb.Limit(int(limit + 1))
-	selectQuery, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := s.telemetryStore.DatastoreDB().Query(ctx, selectQuery, args...)
 	if err != nil {
@@ -316,7 +318,7 @@ func (s *store) ReadRuleStateHistoryTopContributorsByRuleID(ctx context.Context,
 	sb.GroupBy("fingerprint")
 	sb.Having("labels != '{}'")
 	sb.OrderBy("count DESC")
-	selectQuery, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	contributors := []rulestatehistorytypes.RuleStateHistoryContributor{}
 	if err := s.telemetryStore.DatastoreDB().Select(ctx, &contributors, selectQuery, args...); err != nil {
@@ -362,13 +364,13 @@ GROUP BY unix_milli`,
 	)
 	innerSB.From(fmt.Sprintf("(%s) AS events", eventsSubquery))
 	innerSB.OrderBy("start ASC")
-	innerQuery, args := innerSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	innerQuery, args := innerSB.BuildWithFlavor(datastoresql.Flavor)
 
 	outerSB := sqlbuilder.NewSelectBuilder()
 	outerSB.Select("state", "start", "end")
 	outerSB.From(fmt.Sprintf("(%s) AS windows", innerQuery))
 	outerSB.Where("start < end")
-	selectQuery, outerArgs := outerSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	selectQuery, outerArgs := outerSB.BuildWithFlavor(datastoresql.Flavor)
 	args = append(args, outerArgs...)
 
 	windows := []rulestatehistorytypes.GettableRuleStateWindow{}
@@ -383,7 +385,7 @@ func (s *store) GetAvgResolutionTime(ctx context.Context, ruleID string, query *
 	cte := s.buildMatchedEventsCTE(ruleID, query)
 	sb := cte.Select("ifNull(toFloat64(avg(resolution_time - firing_time)) / 1000, 0) AS avg_resolution_time")
 	sb.From("matched_events")
-	selectQuery, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var avg float64
 	if err := s.telemetryStore.DatastoreDB().QueryRow(ctx, selectQuery, args...).Scan(&avg); err != nil {
@@ -401,7 +403,7 @@ func (s *store) GetAvgResolutionTimeByInterval(ctx context.Context, ruleID strin
 	sb.From("matched_events")
 	sb.GroupBy("ts")
 	sb.OrderBy("ts ASC")
-	selectQuery, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	return s.querySeries(ctx, selectQuery, args...)
 }
@@ -415,7 +417,7 @@ func (s *store) GetTotalTriggers(ctx context.Context, ruleID string, query *rule
 	sb.Where(sb.E("state", ruletypes.StateFiring.StringValue()))
 	sb.Where(sb.GE("unix_milli", query.Start))
 	sb.Where(sb.LT("unix_milli", query.End))
-	selectQuery, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	var total uint64
 	if err := s.telemetryStore.DatastoreDB().QueryRow(ctx, selectQuery, args...).Scan(&total); err != nil {
@@ -438,7 +440,7 @@ func (s *store) GetTriggersByInterval(ctx context.Context, ruleID string, query 
 	sb.Where(sb.LT("unix_milli", query.End))
 	sb.GroupBy("ts")
 	sb.OrderBy("ts ASC")
-	selectQuery, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	selectQuery, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	return s.querySeries(ctx, selectQuery, args...)
 }

@@ -86,7 +86,7 @@ type QueryType struct {
 
 var (
 	QueryTypeBuilder       = QueryType{String: valuer.NewString("builder")}
-	QueryTypeClickHouseSQL = QueryType{valuer.NewString("clickhouse_sql")}
+	QueryTypeDatastoreSQL = QueryType{valuer.NewString("datastore_sql")}
 	QueryTypePromQL        = QueryType{valuer.NewString("promql")}
 )
 
@@ -94,7 +94,7 @@ var (
 func (QueryType) Enum() []any {
 	return []any{
 		QueryTypeBuilder,
-		QueryTypeClickHouseSQL,
+		QueryTypeDatastoreSQL,
 		QueryTypePromQL,
 	}
 }
@@ -147,7 +147,7 @@ func (rc *RuleCondition) SelectedQueryName() string {
 			if !spec.Disabled {
 				queryNames[spec.Name] = struct{}{}
 			}
-		case qbtypes.ClickHouseQuery:
+		case qbtypes.DatastoreQuery:
 			if !spec.Disabled {
 				queryNames[spec.Name] = struct{}{}
 			}

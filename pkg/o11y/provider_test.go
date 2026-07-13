@@ -51,13 +51,13 @@ func TestNewProviderFactories(t *testing.T) {
 		NewSQLMigrationProviderFactories(
 			sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual),
 			sqlschematest.New(map[string]*sqlschema.Table{}, map[string][]*sqlschema.UniqueConstraint{}, map[string]sqlschema.Index{}),
-			telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherEqual),
+			telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherEqual),
 			instrumentationtest.New().ToProviderSettings(),
 		)
 	})
 
 	assert.NotPanics(t, func() {
-		NewPrometheusProviderFactories(telemetrystoretest.New(telemetrystore.Config{Provider: "clickhouse"}, sqlmock.QueryMatcherEqual))
+		NewPrometheusProviderFactories(telemetrystoretest.New(telemetrystore.Config{Provider: "datastore"}, sqlmock.QueryMatcherEqual))
 	})
 
 	assert.NotPanics(t, func() {

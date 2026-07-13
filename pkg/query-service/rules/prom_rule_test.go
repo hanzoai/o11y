@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	pql "github.com/prometheus/prometheus/promql"
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/prometheus"
@@ -769,13 +769,13 @@ func TestPromRuleUnitCombinations(t *testing.T) {
 	}
 
 	// time_series_v4 cols of interest
-	fingerprintCols := []cmock.ColumnType{
+	fingerprintCols := []dsmock.ColumnType{
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "any(labels)", Type: "String"},
 	}
 
 	// samples_v4 columns
-	samplesCols := []cmock.ColumnType{
+	samplesCols := []dsmock.ColumnType{
 		{Name: "metric_name", Type: "String"},
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "unix_milli", Type: "Int64"},
@@ -910,7 +910,7 @@ func TestPromRuleUnitCombinations(t *testing.T) {
 		fingerprintData := [][]any{
 			{fingerprint, labelsJSON},
 		}
-		fingerprintRows := cmock.NewRows(fingerprintCols, fingerprintData)
+		fingerprintRows := dsmock.NewRows(fingerprintCols, fingerprintData)
 
 		// create samples data from test case values
 		samplesData := make([][]any, len(c.values))
@@ -923,7 +923,7 @@ func TestPromRuleUnitCombinations(t *testing.T) {
 				uint32(0), // flags - 0 means normal value, 1 means stale, we are not doing staleness tests
 			}
 		}
-		samplesRows := cmock.NewRows(samplesCols, samplesData)
+		samplesRows := dsmock.NewRows(samplesCols, samplesData)
 
 		// args: $1=metric_name, $2=label_name, $3=label_value
 		telemetryStore.Mock().
@@ -1030,7 +1030,7 @@ func TestPromRuleNoData(t *testing.T) {
 	}
 
 	// time_series_v4 cols of interest
-	fingerprintCols := []cmock.ColumnType{
+	fingerprintCols := []dsmock.ColumnType{
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "any(labels)", Type: "String"},
 	}
@@ -1058,7 +1058,7 @@ func TestPromRuleNoData(t *testing.T) {
 
 		// no data
 		fingerprintData := [][]any{}
-		fingerprintRows := cmock.NewRows(fingerprintCols, fingerprintData)
+		fingerprintRows := dsmock.NewRows(fingerprintCols, fingerprintData)
 
 		// no rows == no data
 		telemetryStore.Mock().
@@ -1141,12 +1141,12 @@ func TestMultipleThresholdPromRule(t *testing.T) {
 		},
 	}
 
-	fingerprintCols := []cmock.ColumnType{
+	fingerprintCols := []dsmock.ColumnType{
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "any(labels)", Type: "String"},
 	}
 
-	samplesCols := []cmock.ColumnType{
+	samplesCols := []dsmock.ColumnType{
 		{Name: "metric_name", Type: "String"},
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "unix_milli", Type: "Int64"},
@@ -1257,7 +1257,7 @@ func TestMultipleThresholdPromRule(t *testing.T) {
 		fingerprintData := [][]any{
 			{fingerprint, labelsJSON},
 		}
-		fingerprintRows := cmock.NewRows(fingerprintCols, fingerprintData)
+		fingerprintRows := dsmock.NewRows(fingerprintCols, fingerprintData)
 
 		samplesData := make([][]any, len(c.values))
 		for i, v := range c.values {
@@ -1269,7 +1269,7 @@ func TestMultipleThresholdPromRule(t *testing.T) {
 				uint32(0),
 			}
 		}
-		samplesRows := cmock.NewRows(samplesCols, samplesData)
+		samplesRows := dsmock.NewRows(samplesCols, samplesData)
 
 		telemetryStore.Mock().
 			ExpectQuery("SELECT fingerprint, any").
@@ -1383,13 +1383,13 @@ func TestPromRule_NoData(t *testing.T) {
 	}
 
 	// time_series_v4 cols of interest
-	fingerprintCols := []cmock.ColumnType{
+	fingerprintCols := []dsmock.ColumnType{
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "any(labels)", Type: "String"},
 	}
 
 	// samples_v4 columns
-	samplesCols := []cmock.ColumnType{
+	samplesCols := []dsmock.ColumnType{
 		{Name: "metric_name", Type: "String"},
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "unix_milli", Type: "Int64"},
@@ -1440,12 +1440,12 @@ func TestPromRule_NoData(t *testing.T) {
 			telemetryStore.Mock().
 				ExpectQuery("SELECT fingerprint, any").
 				WithArgs("test_metric", "__name__", "test_metric").
-				WillReturnRows(cmock.NewRows(fingerprintCols, [][]any{{fingerprint, labelsJSON}}))
+				WillReturnRows(dsmock.NewRows(fingerprintCols, [][]any{{fingerprint, labelsJSON}}))
 
 			telemetryStore.Mock().
 				ExpectQuery("SELECT metric_name, fingerprint, unix_milli").
 				WithArgs("test_metric", "test_metric", "__name__", "test_metric", queryStart, queryEnd).
-				WillReturnRows(cmock.NewRows(samplesCols, [][]any{}))
+				WillReturnRows(dsmock.NewRows(samplesCols, [][]any{}))
 
 			promProvider := prometheustest.New(
 				context.Background(),
@@ -1514,12 +1514,12 @@ func TestPromRule_NoData_AbsentFor(t *testing.T) {
 		},
 	}
 
-	fingerprintCols := []cmock.ColumnType{
+	fingerprintCols := []dsmock.ColumnType{
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "any(labels)", Type: "String"},
 	}
 
-	samplesCols := []cmock.ColumnType{
+	samplesCols := []dsmock.ColumnType{
 		{Name: "metric_name", Type: "String"},
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "unix_milli", Type: "Int64"},
@@ -1576,11 +1576,11 @@ func TestPromRule_NoData_AbsentFor(t *testing.T) {
 			telemetryStore.Mock().
 				ExpectQuery("SELECT fingerprint, any").
 				WithArgs("test_metric", "__name__", "test_metric").
-				WillReturnRows(cmock.NewRows(fingerprintCols, [][]any{{fingerprint, labelsJSON}}))
+				WillReturnRows(dsmock.NewRows(fingerprintCols, [][]any{{fingerprint, labelsJSON}}))
 			telemetryStore.Mock().
 				ExpectQuery("SELECT metric_name, fingerprint, unix_milli").
 				WithArgs("test_metric", "test_metric", "__name__", "test_metric", queryStart1, queryEnd1).
-				WillReturnRows(cmock.NewRows(samplesCols, [][]any{
+				WillReturnRows(dsmock.NewRows(samplesCols, [][]any{
 					// Data points in the past relative to t1
 					{"test_metric", fingerprint, baseTime.UnixMilli(), 100.0, uint32(0)},
 					{"test_metric", fingerprint, baseTime.Add(1 * time.Minute).UnixMilli(), 100.0, uint32(0)},
@@ -1592,11 +1592,11 @@ func TestPromRule_NoData_AbsentFor(t *testing.T) {
 			telemetryStore.Mock().
 				ExpectQuery("SELECT fingerprint, any").
 				WithArgs("test_metric", "__name__", "test_metric").
-				WillReturnRows(cmock.NewRows(fingerprintCols, [][]any{{fingerprint, labelsJSON}}))
+				WillReturnRows(dsmock.NewRows(fingerprintCols, [][]any{{fingerprint, labelsJSON}}))
 			telemetryStore.Mock().
 				ExpectQuery("SELECT metric_name, fingerprint, unix_milli").
 				WithArgs("test_metric", "test_metric", "__name__", "test_metric", queryStart2, queryEnd2).
-				WillReturnRows(cmock.NewRows(samplesCols, [][]any{})) // empty - no data
+				WillReturnRows(dsmock.NewRows(samplesCols, [][]any{})) // empty - no data
 
 			promProvider := prometheustest.New(
 				context.Background(),
@@ -1656,14 +1656,14 @@ func TestPromRuleEval_RequireMinPoints(t *testing.T) {
 		},
 	}
 
-	fingerprintCols := []cmock.ColumnType{
+	fingerprintCols := []dsmock.ColumnType{
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "any(labels)", Type: "String"},
 	}
 	fingerprint := uint64(12345)
 	fingerprintData := [][]any{{fingerprint, `{"__name__":"test_metric"}`}}
 
-	samplesCols := []cmock.ColumnType{
+	samplesCols := []dsmock.ColumnType{
 		{Name: "metric_name", Type: "String"},
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "unix_milli", Type: "Int64"},
@@ -1753,11 +1753,11 @@ func TestPromRuleEval_RequireMinPoints(t *testing.T) {
 			telemetryStore.Mock().
 				ExpectQuery("SELECT fingerprint, any").
 				WithArgs("test_metric", "__name__", "test_metric").
-				WillReturnRows(cmock.NewRows(fingerprintCols, fingerprintData))
+				WillReturnRows(dsmock.NewRows(fingerprintCols, fingerprintData))
 			telemetryStore.Mock().
 				ExpectQuery("SELECT metric_name, fingerprint, unix_milli").
 				WithArgs("test_metric", "test_metric", "__name__", "test_metric", queryStart, queryEnd).
-				WillReturnRows(cmock.NewRows(samplesCols, samplesData))
+				WillReturnRows(dsmock.NewRows(samplesCols, samplesData))
 			promProvider := prometheustest.New(
 				context.Background(),
 				instrumentationtest.New().ToProviderSettings(),

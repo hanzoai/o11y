@@ -9,7 +9,9 @@ import (
 	"strings"
 	"time"
 
-	sqlbuilder "github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
+	sqlbuilder "github.com/hanzoai/sqlbuilder"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/hanzoai/o11y/pkg/cache"
@@ -106,9 +108,9 @@ func (m *module) listMeterMetrics(ctx context.Context, params *metricsexplorerty
 	sb.OrderBy("metric_name ASC")
 	sb.Limit(params.Limit)
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	db := m.telemetryStore.DatastoreDB()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
@@ -185,14 +187,14 @@ func (m *module) listMetrics(ctx context.Context, orgID valuer.UUID, params *met
 		sb.From(sb.BuilderAs(sqlbuilder.UnionAll(rawSB, reducedSB), "__all_metrics"))
 		sb.OrderBy("metric_name ASC")
 		sb.Limit(params.Limit)
-		query, args = sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+		query, args = sb.BuildWithFlavor(datastoresql.Flavor)
 	} else {
 		rawSB.OrderBy("metric_name ASC")
 		rawSB.Limit(params.Limit)
-		query, args = rawSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+		query, args = rawSB.BuildWithFlavor(datastoresql.Flavor)
 	}
 
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	db := m.telemetryStore.DatastoreDB()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
@@ -515,11 +517,11 @@ func (m *module) CheckMetricExists(ctx context.Context, orgID valuer.UUID, metri
 	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
 	sb.Where(sb.E("metric_name", metricName))
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	db := m.telemetryStore.DatastoreDB()
 	var exists bool
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 
 	err := db.QueryRow(valueCtx, query, args...).Scan(&exists)
 	if err != nil {
@@ -537,11 +539,11 @@ func (m *module) HasNonO11yMetrics(ctx context.Context) (bool, error) {
 	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV41weekTableName))
 	sb.Where("metric_name NOT LIKE 'o11y_%'")
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	db := m.telemetryStore.DatastoreDB()
 	var hasMetrics bool
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 
 	err := db.QueryRow(valueCtx, query, args...).Scan(&hasMetrics)
 	if err != nil {
@@ -585,9 +587,9 @@ func (m *module) InspectMetrics(
 	tsSb.GroupBy("fingerprint", "labels")
 	tsSb.Limit(50)
 
-	tsQuery, tsArgs := tsSb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	tsQuery, tsArgs := tsSb.BuildWithFlavor(datastoresql.Flavor)
 	db := m.telemetryStore.DatastoreDB()
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 
 	tsRows, err := db.Query(valueCtx, tsQuery, tsArgs...)
 	if err != nil {
@@ -634,7 +636,7 @@ func (m *module) InspectMetrics(
 	)
 	samplesSb.OrderBy("fingerprint", "unix_milli")
 
-	samplesQuery, samplesArgs := samplesSb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	samplesQuery, samplesArgs := samplesSb.BuildWithFlavor(datastoresql.Flavor)
 	samplesRows, err := db.Query(valueCtx, samplesQuery, samplesArgs...)
 	if err != nil {
 		return nil, errors.WrapInternalf(err, errors.CodeInternal, "failed to query samples for inspect")
@@ -721,9 +723,9 @@ func (m *module) fetchUpdatedMetadata(ctx context.Context, orgID valuer.UUID, me
 	sb.Where(sb.In("metric_name", args...))
 	sb.GroupBy("metric_name")
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	db := m.telemetryStore.DatastoreDB()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
@@ -781,9 +783,9 @@ func (m *module) fetchTimeseriesMetadata(ctx context.Context, orgID valuer.UUID,
 	sb.Where(sb.In("metric_name", args...))
 	sb.GroupBy("metric_name")
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	db := m.telemetryStore.DatastoreDB()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
@@ -896,9 +898,9 @@ func (m *module) checkForLabelInMetric(ctx context.Context, metricName string, l
 	sb.Where(sb.E("attr_name", label))
 	sb.Limit(1)
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	var hasLabel bool
 	db := m.telemetryStore.DatastoreDB()
 	err := db.QueryRow(valueCtx, query, args...).Scan(&hasLabel)
@@ -926,9 +928,9 @@ func (m *module) insertMetricsMetadata(ctx context.Context, orgID valuer.UUID, r
 		createdAt,
 	)
 
-	query, args := ib.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := ib.BuildWithFlavor(datastoresql.Flavor)
 
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	db := m.telemetryStore.DatastoreDB()
 	if err := db.Exec(valueCtx, query, args...); err != nil {
 		return errors.WrapInternalf(err, errors.CodeInternal, "failed to insert metrics metadata")
@@ -1169,13 +1171,13 @@ func (m *module) fetchMetricsStatsWithSamples(
 	finalSB.Limit(req.Limit)
 	finalSB.Offset(req.Offset)
 
-	query, args := finalSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := finalSB.BuildWithFlavor(datastoresql.Flavor)
 	if reductionEnabled {
 		// unmatched FULL JOIN columns must be NULL (not '') for the COALESCE name/keys to resolve
 		query += " SETTINGS join_use_nulls = 1"
 	}
 
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	db := m.telemetryStore.DatastoreDB()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
@@ -1293,13 +1295,13 @@ func (m *module) computeTimeseriesTreemap(ctx context.Context, orgID valuer.UUID
 	finalSB.OrderByDesc("percentage")
 	finalSB.Limit(req.Limit)
 
-	query, args := finalSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := finalSB.BuildWithFlavor(datastoresql.Flavor)
 	if reductionEnabled {
 		// unmatched FULL JOIN columns must be NULL (not '') so COALESCE on metric_name resolves
 		query += " SETTINGS join_use_nulls = 1"
 	}
 
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	db := m.telemetryStore.DatastoreDB()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
@@ -1516,13 +1518,13 @@ func (m *module) computeSamplesTreemap(ctx context.Context, orgID valuer.UUID, r
 	finalSB.OrderBy("percentage DESC")
 	finalSB.Limit(req.Limit)
 
-	query, args := finalSB.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := finalSB.BuildWithFlavor(datastoresql.Flavor)
 	if reductionEnabled {
 		// unmatched LEFT JOIN sample columns must be NULL (not 0/'') so COALESCE applies
 		query += " SETTINGS join_use_nulls = 1"
 	}
 
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	db := m.telemetryStore.DatastoreDB()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {
@@ -1555,11 +1557,11 @@ func (m *module) getMetricDataPoints(ctx context.Context, metricName string) (ui
 	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4Agg30mTableName))
 	sb.Where(sb.E("metric_name", metricName))
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	db := m.telemetryStore.DatastoreDB()
 	var dataPoints uint64
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	err := db.QueryRow(valueCtx, query, args...).Scan(&dataPoints)
 	if err != nil {
 		return 0, errors.WrapInternalf(err, errors.CodeInternal, "failed to get metrics data points")
@@ -1576,11 +1578,11 @@ func (m *module) getMetricLastReceived(ctx context.Context, metricName string) (
 	sb.Select("MAX(last_reported_unix_milli) AS last_received_time")
 	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
 	sb.Where(sb.E("metric_name", metricName))
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	db := m.telemetryStore.DatastoreDB()
 	var lastReceived sql.NullInt64
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	err := db.QueryRow(valueCtx, query, args...).Scan(&lastReceived)
 	if err != nil {
 		return 0, errors.WrapInternalf(err, errors.CodeInternal, "failed to get last received timestamp")
@@ -1602,11 +1604,11 @@ func (m *module) getTotalTimeSeriesForMetricName(ctx context.Context, metricName
 	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV41weekTableName))
 	sb.Where(sb.E("metric_name", metricName))
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	db := m.telemetryStore.DatastoreDB()
 	var timeSeriesCount uint64
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	err := db.QueryRow(valueCtx, query, args...).Scan(&timeSeriesCount)
 	if err != nil {
 		return 0, errors.WrapInternalf(err, errors.CodeInternal, "failed to get total time series count")
@@ -1627,9 +1629,9 @@ func (m *module) getActiveTimeSeriesForMetricName(ctx context.Context, metricNam
 	sb.Where(sb.E("metric_name", metricName))
 	sb.Where(sb.GTE("unix_milli", milli))
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	db := m.telemetryStore.DatastoreDB()
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	var activeTimeSeries uint64
 	err := db.QueryRow(valueCtx, query, args...).Scan(&activeTimeSeries)
 	if err != nil {
@@ -1665,9 +1667,9 @@ func (m *module) fetchMetricAttributes(ctx context.Context, metricName string, s
 
 	sb.GroupBy("attr_name")
 	sb.OrderBy("valueCount DESC")
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	valueCtx := ctxtypes.SetClickhouseMaxThreads(ctx, m.config.TelemetryStore.Threads)
+	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
 	db := m.telemetryStore.DatastoreDB()
 	rows, err := db.Query(valueCtx, query, args...)
 	if err != nil {

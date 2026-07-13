@@ -6,13 +6,15 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	"github.com/hanzoai/o11y/pkg/types/inframonitoringtypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 // getPerGroupHostStatusCounts computes the number of active and inactive hosts per group
@@ -127,7 +129,7 @@ func (m *module) getPerGroupHostStatusCounts(
 	}
 	sb.GroupBy(groupByAliases...)
 
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := m.telemetryStore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {
@@ -372,7 +374,7 @@ func (m *module) getActiveHostsQuery(metricNames []string, hostNameAttr string, 
 // It queries distributed_metadata for hosts where last_reported_unix_milli >= sinceUnixMilli.
 func (m *module) getActiveHosts(ctx context.Context, metricNames []string, hostNameAttr string, sinceUnixMilli int64) (map[string]bool, error) {
 	sb := m.getActiveHostsQuery(metricNames, hostNameAttr, sinceUnixMilli)
-	query, args := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
 	rows, err := m.telemetryStore.DatastoreDB().Query(ctx, query, args...)
 	if err != nil {

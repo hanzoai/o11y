@@ -2,10 +2,10 @@
 readonly NAME="volume-migration"
 readonly DOCKER_COMPOSE_DIR="deploy/docker"
 readonly DOCKER_SWARM_COMPOSE_DIR="deploy/docker-swarm"
-readonly STANDALONE_DATA_DIR="${DOCKER_COMPOSE_DIR}/clickhouse-setup/data"
-readonly SWARM_DATA_DIR="${DOCKER_SWARM_COMPOSE_DIR}/clickhouse-setup/data"
+readonly STANDALONE_DATA_DIR="${DOCKER_COMPOSE_DIR}/datastore-setup/data"
+readonly SWARM_DATA_DIR="${DOCKER_SWARM_COMPOSE_DIR}/datastore-setup/data"
 readonly O11Y_NETWORK="o11y-net"
-readonly O11Y_NETWORK_OLD="clickhouse-setup_default"
+readonly O11Y_NETWORK_OLD="datastore-setup_default"
 
 # Exit on error, undefined variables, and pipe failures
 set -uo pipefail
@@ -45,7 +45,7 @@ help() {
   printf "\t%s [-d deployment-type] [-m migration-component] [-o operation] [-p o11y-root-dir] [-s silent] [-h]\n\n" "${NAME}"
   printf "OPTIONS:\n"
   printf "\t-d\tDeployment type (standalone, swarm)\n"
-  printf "\t-m\tMigration component (all, clickhouse, zookeeper, o11y, alertmanager)\n"
+  printf "\t-m\tMigration component (all, datastore, zookeeper, o11y, alertmanager)\n"
   printf "\t-o\tOperation (migrate, post-migrate)\n"
   printf "\t-p\tO11y root directory (default: ~/o11y)\n"
   printf "\t-s\tSilent mode (true, false)\n"
@@ -160,9 +160,9 @@ cleanup_standalone() {
 
   print "Stopping Docker Standalone services"
   ${DOCKER_COMPOSE_CMD} -f "${compose_dir}/docker-compose.yaml" down
-  print "Cleaning up all containers and networks associated to old clickhouse-setup project"
-  docker ps -q --filter "label=com.docker.compose.project=clickhouse-setup" | xargs docker stop >/dev/null 2>&1
-  docker ps -aq --filter "label=com.docker.compose.project=clickhouse-setup" | xargs docker rm >/dev/null 2>&1
+  print "Cleaning up all containers and networks associated to old datastore-setup project"
+  docker ps -q --filter "label=com.docker.compose.project=datastore-setup" | xargs docker stop >/dev/null 2>&1
+  docker ps -aq --filter "label=com.docker.compose.project=datastore-setup" | xargs docker rm >/dev/null 2>&1
 
   if ! docker_network_check "${O11Y_NETWORK}"; then
     o11y_network="${O11Y_NETWORK}"
@@ -259,15 +259,15 @@ get_data_dir() {
 ## Component Functions
 ################################################################################
 
-migrate_clickhouse() {
+migrate_datastore() {
   local data_dir=$1
   local uidgid="101:101"
-  migrate "clickhouse" "${data_dir}/clickhouse" "o11y-clickhouse" "${uidgid}"
-  if [[ -f "${data_dir}/clickhouse-2/uuid" ]]; then
-    migrate "clickhouse-2" "${data_dir}/clickhouse-2" "o11y-clickhouse-2" "${uidgid}"
+  migrate "datastore" "${data_dir}/datastore" "o11y-datastore" "${uidgid}"
+  if [[ -f "${data_dir}/datastore-2/uuid" ]]; then
+    migrate "datastore-2" "${data_dir}/datastore-2" "o11y-datastore-2" "${uidgid}"
   fi
-  if [[ -f "${data_dir}/clickhouse-3/uuid" ]]; then
-    migrate "clickhouse-3" "${data_dir}/clickhouse-3" "o11y-clickhouse-3" "${uidgid}"
+  if [[ -f "${data_dir}/datastore-3/uuid" ]]; then
+    migrate "datastore-3" "${data_dir}/datastore-3" "o11y-datastore-3" "${uidgid}"
   fi
 }
 
@@ -293,15 +293,15 @@ migrate_alertmanager() {
   migrate "alertmanager" "${data_dir}/alertmanager" "o11y-alertmanager" ""
 }
 
-post_migrate_clickhouse() {
+post_migrate_datastore() {
   local data_dir=$1
 
-  post_migrate "clickhouse" "${data_dir}/clickhouse"
-  if [[ -d "${data_dir}/clickhouse-2" ]]; then
-    post_migrate "clickhouse-2" "${data_dir}/clickhouse-2"
+  post_migrate "datastore" "${data_dir}/datastore"
+  if [[ -d "${data_dir}/datastore-2" ]]; then
+    post_migrate "datastore-2" "${data_dir}/datastore-2"
   fi
-  if [[ -d "${data_dir}/clickhouse-3" ]]; then
-    post_migrate "clickhouse-3" "${data_dir}/clickhouse-3"
+  if [[ -d "${data_dir}/datastore-3" ]]; then
+    post_migrate "datastore-3" "${data_dir}/datastore-3"
   fi
 }
 
@@ -334,7 +334,7 @@ post_migrate_alertmanager() {
 ##############################################################################
 # Migrate data from bind mounts to new volume
 # Arguments:
-#   migration_component component name: all, clickhouse, zookeeper, o11y, alertmanager
+#   migration_component component name: all, datastore, zookeeper, o11y, alertmanager
 #   bind_mounts path to the directory of the bind mounts
 #   new_volume name of the new volume
 # Returns:
@@ -351,8 +351,8 @@ migrate() {
   docker volume create "${new_volume}" --label "com.docker.compose.project=o11y" >/dev/null 2>&1
 
   echo "Migrating ${migration_component} from bind mounts to the new volume ${new_volume}"
-  if [[ "${migration_component}" == "clickhouse" ]]; then
-    echo "Please be patient, this may take a while for clickhouse migration..."
+  if [[ "${migration_component}" == "datastore" ]]; then
+    echo "Please be patient, this may take a while for datastore migration..."
   fi
   if [[ -n "${owner_uidgid}" ]]; then
     commands="cp -rp /data/* /volume; chown -R ${owner_uidgid} /volume"
@@ -370,7 +370,7 @@ migrate() {
 ##############################################################################
 # Post-migration cleanup
 # Arguments:
-#   migration_component component name: clickhouse, zookeeper, o11y, alertmanager
+#   migration_component component name: datastore, zookeeper, o11y, alertmanager
 #   data_dir path to the directory of the data
 # Returns:
 #   None
@@ -379,8 +379,8 @@ post_migrate() {
   local migration_component=$1
   local data_dir=$2
   echo "Running post-migration cleanup for ${migration_component}"
-  if [[ "${migration_component}" == "clickhouse" ]]; then
-    echo "Please be patient, this may take a while for clickhouse post-migration cleanup..."
+  if [[ "${migration_component}" == "datastore" ]]; then
+    echo "Please be patient, this may take a while for datastore post-migration cleanup..."
   fi
   if docker run --rm -v "${data_dir}":/data alpine sh -c "rm -rf /data/*" 2>&1; then
     echo "Post-migration cleanup for ${migration_component} completed successfully"
@@ -394,7 +394,7 @@ post_migrate() {
 # Run the migration
 # Arguments:
 #   deployment_type deployment type (standalone, swarm)
-#   migration_component migration component (all, clickhouse, zookeeper, o11y, alertmanager)
+#   migration_component migration component (all, datastore, zookeeper, o11y, alertmanager)
 #   o11y_root_dir o11y root directory (default: ~/o11y)
 # Returns:
 #   None
@@ -411,13 +411,13 @@ run_migration() {
 
   case "${migration_component}" in
     "all")
-      migrate_clickhouse "${data_dir}"
+      migrate_datastore "${data_dir}"
       migrate_zookeeper "${data_dir}"
       migrate_o11y "${data_dir}"
       migrate_alertmanager "${data_dir}"
       ;;
-    "clickhouse")
-      migrate_clickhouse "${data_dir}"
+    "datastore")
+      migrate_datastore "${data_dir}"
       ;;
     "zookeeper")
       migrate_zookeeper "${data_dir}"
@@ -441,7 +441,7 @@ run_migration() {
 # Run post-migration cleanup
 # Arguments:
 #   deployment_type deployment type (standalone, swarm)
-#   migration_component migration component (all, clickhouse, zookeeper, o11y, alertmanager)
+#   migration_component migration component (all, datastore, zookeeper, o11y, alertmanager)
 #   o11y_root_dir o11y root directory (default: ~/o11y)
 # Returns:
 #   None
@@ -455,13 +455,13 @@ run_post_migration() {
 
   case "${migration_component}" in
     "all")
-      post_migrate_clickhouse "${data_dir}"
+      post_migrate_datastore "${data_dir}"
       post_migrate_zookeeper "${data_dir}"
       post_migrate_o11y "${data_dir}"
       post_migrate_alertmanager "${data_dir}"
       ;;
-    "clickhouse")
-      post_migrate_clickhouse "${data_dir}"
+    "datastore")
+      post_migrate_datastore "${data_dir}"
       ;;
     "zookeeper")
       post_migrate_zookeeper "${data_dir}"
@@ -547,11 +547,11 @@ parse_args() {
   fi
 
   if [[ "${MIGRATION_COMPONENT}" != "all" &&
-    "${MIGRATION_COMPONENT}" != "clickhouse" &&
+    "${MIGRATION_COMPONENT}" != "datastore" &&
     "${MIGRATION_COMPONENT}" != "zookeeper" &&
     "${MIGRATION_COMPONENT}" != "o11y" &&
     "${MIGRATION_COMPONENT}" != "alertmanager" ]]; then
-    err "Invalid migration type: ${MIGRATION_COMPONENT}. Must be one of: all, clickhouse, zookeeper, o11y, alertmanager"
+    err "Invalid migration type: ${MIGRATION_COMPONENT}. Must be one of: all, datastore, zookeeper, o11y, alertmanager"
     return 1
   fi
 

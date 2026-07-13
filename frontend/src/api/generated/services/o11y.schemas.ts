@@ -4080,7 +4080,7 @@ export enum Querybuildertypesv5QueryTypeDTO {
 	builder_query = 'builder_query',
 	builder_formula = 'builder_formula',
 	builder_trace_operator = 'builder_trace_operator',
-	clickhouse_sql = 'clickhouse_sql',
+	datastore_sql = 'datastore_sql',
 	promql = 'promql',
 }
 export interface Querybuildertypesv5QueryEnvelopeBuilderTraceDTO {
@@ -4227,7 +4227,7 @@ export interface Querybuildertypesv5QueryEnvelopePromQLDTO {
 	type?: Querybuildertypesv5QueryTypeDTO;
 }
 
-export interface Querybuildertypesv5ClickHouseQueryDTO {
+export interface Querybuildertypesv5DatastoreQueryDTO {
 	/**
 	 * @type boolean
 	 */
@@ -4246,8 +4246,8 @@ export interface Querybuildertypesv5ClickHouseQueryDTO {
 	query?: string;
 }
 
-export interface Querybuildertypesv5QueryEnvelopeClickHouseSQLDTO {
-	spec?: Querybuildertypesv5ClickHouseQueryDTO;
+export interface Querybuildertypesv5QueryEnvelopeDatastoreSQLDTO {
+	spec?: Querybuildertypesv5DatastoreQueryDTO;
 	type?: Querybuildertypesv5QueryTypeDTO;
 }
 
@@ -4276,7 +4276,7 @@ export type Querybuildertypesv5QueryEnvelopeDTO =
 			spec?: unknown;
 			type?: Querybuildertypesv5QueryTypeDTO;
 	  })
-	| (Querybuildertypesv5QueryEnvelopeClickHouseSQLDTO & {
+	| (Querybuildertypesv5QueryEnvelopeDatastoreSQLDTO & {
 			spec?: unknown;
 			type?: Querybuildertypesv5QueryTypeDTO;
 	  });
@@ -4324,16 +4324,16 @@ export interface DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQueryb
 	spec: Querybuildertypesv5PromQueryDTO;
 }
 
-export enum DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQueryDTOKind {
-	'o11y/ClickHouseSQL' = 'o11y/ClickHouseSQL',
+export enum DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5DatastoreQueryDTOKind {
+	'o11y/DatastoreSQL' = 'o11y/DatastoreSQL',
 }
-export interface DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQueryDTO {
+export interface DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5DatastoreQueryDTO {
 	/**
-	 * @enum o11y/ClickHouseSQL
+	 * @enum o11y/DatastoreSQL
 	 * @type string
 	 */
-	kind: DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQueryDTOKind;
-	spec: Querybuildertypesv5ClickHouseQueryDTO;
+	kind: DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5DatastoreQueryDTOKind;
+	spec: Querybuildertypesv5DatastoreQueryDTO;
 }
 
 export enum DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderTraceOperatorDTOKind {
@@ -4353,7 +4353,7 @@ export type DashboardtypesQueryPluginDTO =
 	| DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5CompositeQueryDTO
 	| DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormulaDTO
 	| DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5PromQueryDTO
-	| DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQueryDTO
+	| DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5DatastoreQueryDTO
 	| DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderTraceOperatorDTO;
 
 export interface DashboardtypesQuerySpecDTO {
@@ -4702,7 +4702,7 @@ export enum DashboardtypesQueryPluginKindDTO {
 	'o11y/CompositeQuery' = 'o11y/CompositeQuery',
 	'o11y/Formula' = 'o11y/Formula',
 	'o11y/PromQLQuery' = 'o11y/PromQLQuery',
-	'o11y/ClickHouseSQL' = 'o11y/ClickHouseSQL',
+	'o11y/DatastoreSQL' = 'o11y/DatastoreSQL',
 	'o11y/TraceOperator' = 'o11y/TraceOperator',
 }
 export interface DashboardtypesUpdatablePublicDashboardDTO {
@@ -6890,7 +6890,7 @@ export enum Querybuildertypesv5RequestTypeDTO {
 	trace = 'trace',
 }
 /**
- * Request body for the v5 query range endpoint. Supports builder queries (traces, logs, metrics), formulas, joins, trace operators, PromQL, and ClickHouse SQL queries.
+ * Request body for the v5 query range endpoint. Supports builder queries (traces, logs, metrics), formulas, joins, trace operators, PromQL, and Datastore SQL queries.
  */
 export interface Querybuildertypesv5QueryRangeRequestDTO {
 	compositeQuery?: Querybuildertypesv5CompositeQueryDTO;
@@ -7075,7 +7075,7 @@ export enum RuletypesPanelTypeDTO {
 }
 export enum RuletypesQueryTypeDTO {
 	builder = 'builder',
-	clickhouse_sql = 'clickhouse_sql',
+	datastore_sql = 'datastore_sql',
 	promql = 'promql',
 }
 export interface RuletypesAlertCompositeQueryDTO {

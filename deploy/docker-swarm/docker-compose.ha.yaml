@@ -81,7 +81,7 @@ services:
       restart_policy:
         condition: on-failure
     volumes:
-      - ../common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
+      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
   zookeeper-1:
     !!merge <<: *zookeeper-defaults
     # ports:
@@ -89,7 +89,7 @@ services:
     #   - "2888:2888"
     #   - "3888:3888"
     volumes:
-      - ./clickhouse-setup/data/zookeeper-1:/bitnami/zookeeper
+      - ./datastore-setup/data/zookeeper-1:/bitnami/zookeeper
     environment:
       - ZOO_SERVER_ID=1
       - ZOO_SERVERS=0.0.0.0:2888:3888,zookeeper-2:2888:3888,zookeeper-3:2888:3888
@@ -104,7 +104,7 @@ services:
     #   - "2889:2888"
     #   - "3889:3888"
     volumes:
-      - ./clickhouse-setup/data/zookeeper-2:/bitnami/zookeeper
+      - ./datastore-setup/data/zookeeper-2:/bitnami/zookeeper
     environment:
       - ZOO_SERVER_ID=2
       - ZOO_SERVERS=zookeeper-1:2888:3888,0.0.0.0:2888:3888,zookeeper-3:2888:3888
@@ -119,7 +119,7 @@ services:
     #   - "2890:2888"
     #   - "3890:3888"
     volumes:
-      - ./clickhouse-setup/data/zookeeper-3:/bitnami/zookeeper
+      - ./datastore-setup/data/zookeeper-3:/bitnami/zookeeper
     environment:
       - ZOO_SERVER_ID=3
       - ZOO_SERVERS=zookeeper-1:2888:3888,zookeeper-2:2888:3888,0.0.0.0:2888:3888
@@ -145,9 +145,9 @@ services:
       - source: clickhouse-cluster
         target: /etc/clickhouse-server/config.d/cluster.ha.xml
     volumes:
-      - ../common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
-      - ./clickhouse-setup/data/clickhouse/:/var/lib/clickhouse/
-      # - ../common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
+      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
+      - ./datastore-setup/data/datastore/:/var/lib/clickhouse/
+      # - ../common/datastore/storage.xml:/etc/clickhouse-server/config.d/storage.xml
   clickhouse-2:
     !!merge <<: *clickhouse-defaults
     hostname: clickhouse-2
@@ -165,9 +165,9 @@ services:
       - source: clickhouse-cluster
         target: /etc/clickhouse-server/config.d/cluster.ha.xml
     volumes:
-      - ../common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
-      - ./clickhouse-setup/data/clickhouse-2/:/var/lib/clickhouse/
-      # - ../common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
+      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
+      - ./datastore-setup/data/datastore-2/:/var/lib/clickhouse/
+      # - ../common/datastore/storage.xml:/etc/clickhouse-server/config.d/storage.xml
   clickhouse-3:
     !!merge <<: *clickhouse-defaults
     hostname: clickhouse-3
@@ -185,9 +185,9 @@ services:
       - source: clickhouse-cluster
         target: /etc/clickhouse-server/config.d/cluster.ha.xml
     volumes:
-      - ../common/clickhouse/user_scripts:/var/lib/clickhouse/user_scripts/
-      - ./clickhouse-setup/data/clickhouse-3/:/var/lib/clickhouse/
-      # - ../common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
+      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
+      - ./datastore-setup/data/datastore-3/:/var/lib/clickhouse/
+      # - ../common/datastore/storage.xml:/etc/clickhouse-server/config.d/storage.xml
   observe:
     !!merge <<: *db-depend
     image: ghcr.io/hanzoai/o11y:v0.115.0
@@ -195,7 +195,7 @@ services:
       - "8080:8080" # observe port
     #   - "6060:6060"     # pprof port
     volumes:
-      - ./clickhouse-setup/data/observe/:/var/lib/observe/
+      - ./datastore-setup/data/observe/:/var/lib/observe/
     environment:
       - O11Y_ALERTMANAGER_PROVIDER=observe
       - O11Y_DATASTORE_DSN=tcp://clickhouse:9000
@@ -275,13 +275,13 @@ volumes:
     name: o11y-zookeeper-3
 configs:
   clickhouse-config:
-    file: ../common/clickhouse/config.xml
+    file: ../common/datastore/config.xml
   clickhouse-users:
-    file: ../common/clickhouse/users.xml
+    file: ../common/datastore/users.xml
   clickhouse-custom-function:
-    file: ../common/clickhouse/custom-function.xml
+    file: ../common/datastore/custom-function.xml
   clickhouse-cluster:
-    file: ../common/clickhouse/cluster.ha.xml
+    file: ../common/datastore/cluster.ha.xml
   otel-collector-config:
     file: ./otel-collector-config.yaml
   otel-manager-config:

@@ -4,10 +4,12 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
+	"github.com/antlr4-go/antlr/v4"
 	"github.com/hanzoai/o11y/pkg/errors"
 	grammar "github.com/hanzoai/o11y/pkg/parser/havingexpression/grammar"
-	"github.com/antlr4-go/antlr/v4"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 // havingExpressionRewriteVisitor walks the parse tree of a HavingExpression in a single
@@ -121,11 +123,11 @@ func (v *havingExpressionRewriteVisitor) visitComparison(ctx grammar.IComparison
 		}
 		if ctx.NOT() != nil {
 			// Here we need to compile because In generates lhs IN $1 syntax
-			sql, _ := v.sb.Args.CompileWithFlavor(v.sb.NotIn(lhs, vals...), sqlbuilder.ClickHouse)
+			sql, _ := v.sb.Args.CompileWithFlavor(v.sb.NotIn(lhs, vals...), datastoresql.Flavor)
 			return sql
 		}
 		// Here we need to compile because In generates lhs IN $1 syntax
-		sql, _ := v.sb.Args.CompileWithFlavor(v.sb.In(lhs, vals...), sqlbuilder.ClickHouse)
+		sql, _ := v.sb.Args.CompileWithFlavor(v.sb.In(lhs, vals...), datastoresql.Flavor)
 		return sql
 	}
 	if ctx.CompOp() == nil || ctx.Operand(0) == nil || ctx.Operand(1) == nil {

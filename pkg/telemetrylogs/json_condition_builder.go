@@ -10,7 +10,7 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schemamigrator "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 var (
@@ -178,7 +178,7 @@ func (c *jsonConditionBuilder) terminalIndexedCondition(node *telemetrytypes.JSO
 
 	indexedExpr := schemamigrator.JSONSubColumnIndexExpr(node.Parent.Name, node.Name, node.TerminalConfig.ElemType.StringValue())
 	// TODO(Piyush): indexedExpr should not be formatted here instead value should be formatted
-	// else ClickHouse may not utilize index
+	// else Datastore may not utilize index
 	indexedExpr, formattedValue := querybuilder.DataTypeCollisionHandledFieldName(node.TerminalConfig.Key, value, indexedExpr, operator)
 	return c.applyOperator(sb, indexedExpr, operator, formattedValue)
 }
@@ -224,7 +224,7 @@ func (c *jsonConditionBuilder) buildPrimitiveTerminalCondition(node *telemetryty
 	fieldExpr := fmt.Sprintf("dynamicElement(%s, '%s')", fieldPath, node.TerminalConfig.ElemType.StringValue())
 
 	// For non-nested paths with a negative comparison operator (e.g. !=, NOT LIKE, NOT IN),
-	// wrap in assumeNotNull so ClickHouse treats absent paths as the zero value rather than NULL,
+	// wrap in assumeNotNull so Datastore treats absent paths as the zero value rather than NULL,
 	// which would otherwise cause them to be silently dropped from results.
 	// NOT EXISTS is excluded: we want a true NULL check there, not a zero-value stand-in.
 	//

@@ -1,22 +1,22 @@
 package spantypestest
 
 import (
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 	"github.com/hanzoai/o11y/pkg/types/spantypes"
 )
 
-// TraceStoreTest pairs a TraceStore with the ClickHouse mock.
+// TraceStoreTest pairs a TraceStore with the Datastore mock.
 type TraceStoreTest struct {
 	store spantypes.TraceStore
-	mock  cmock.ClickConnMockCommon
+	mock  dsmock.ClickConnMockCommon
 }
 
-func New(store spantypes.TraceStore, mock cmock.ClickConnMockCommon) *TraceStoreTest {
+func New(store spantypes.TraceStore, mock dsmock.ClickConnMockCommon) *TraceStoreTest {
 	return &TraceStoreTest{store: store, mock: mock}
 }
 
 // Store returns the TraceStore for calling methods under test.
 func (t *TraceStoreTest) Store() spantypes.TraceStore { return t.store }
 
-// Mock returns the ClickHouse mock for setting query expectations.
-func (t *TraceStoreTest) Mock() cmock.ClickConnMockCommon { return t.mock }
+// Mock returns the Datastore mock for setting query expectations.
+func (t *TraceStoreTest) Mock() dsmock.ClickConnMockCommon { return t.mock }

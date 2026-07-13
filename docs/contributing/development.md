@@ -20,7 +20,7 @@ Before diving in, make sure you have these tools installed:
 - **Pnpm** - Our frontend package manager
   - Follow the [installation guide](https://pnpm.io/installation)
 
-- **Docker** - For running Clickhouse and Postgres locally
+- **Docker** - For running Datastore and Postgres locally
   - Get it from [docs.docker.com/get-docker](https://docs.docker.com/get-docker/)
 
 > 💡 **Tip**: Run `make help` to see all available commands with descriptions
@@ -39,18 +39,18 @@ Before diving in, make sure you have these tools installed:
 
 ## How do I run it locally?
 
-Hanzo O11y has three main components: Clickhouse, Backend, and Frontend. Let's set them up one by one.
+Hanzo O11y has three main components: Datastore, Backend, and Frontend. Let's set them up one by one.
 
-### 1. Setting up ClickHouse
+### 1. Setting up Datastore
 
-First, we need to get ClickHouse running:
+First, we need to get Datastore running:
 
 ```bash
-make devenv-clickhouse
+make devenv-datastore
 ```
 
 This command:
-- Starts ClickHouse in a single-shard, single-replica cluster
+- Starts Datastore in a single-shard, single-replica cluster
 - Sets up Zookeeper
 - Runs the latest schema migrations
 
@@ -65,9 +65,9 @@ make devenv-otel-collector
 This command:
 - Starts the Hanzo O11y OpenTelemetry Collector
 - Listens on port 4317 (gRPC) and 4318 (HTTP) for incoming telemetry data
-- Forwards data to ClickHouse for storage
+- Forwards data to Datastore for storage
 
-> 💡 **Quick Setup**: Use `make devenv-up` to start both ClickHouse and OTel Collector together
+> 💡 **Quick Setup**: Use `make devenv-up` to start both Datastore and OTel Collector together
 
 ### 3. Starting the Backend
 
@@ -114,7 +114,7 @@ Now you're all set to start developing! Happy coding! 🎉
 ## Verifying Your Setup
 To verify everything is working correctly:
 
-1. **Check ClickHouse**: `curl http://localhost:8123/ping` (should return "Ok.")
+1. **Check Datastore**: `curl http://localhost:8123/ping` (should return "Ok.")
 2. **Check OTel Collector**: `curl http://localhost:13133` (should return health status)
 3. **Check Backend**: `curl http://localhost:8080/api/v1/health` (should return `{"status":"ok"}`)
 4. **Check Frontend**: Open `http://localhost:3301` in your browser

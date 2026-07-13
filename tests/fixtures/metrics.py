@@ -414,7 +414,7 @@ class Metrics(ABC):
         return metrics
 
 
-def insert_metrics_to_clickhouse(conn, metrics: list[Metrics]) -> None:
+def insert_metrics_to_datastore(conn, metrics: list[Metrics]) -> None:
     """
     Insert metrics into ClickHouse tables.
     Handles insertion into:
@@ -563,16 +563,16 @@ def truncate_metrics_tables(conn, cluster: str) -> None:
 
 @pytest.fixture(name="insert_metrics", scope="function")
 def insert_metrics(
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
 ) -> Generator[Callable[[list[Metrics]], None], Any]:
     def _insert_metrics(metrics: list[Metrics]) -> None:
-        insert_metrics_to_clickhouse(clickhouse.conn, metrics)
+        insert_metrics_to_datastore(datastore.conn, metrics)
 
     yield _insert_metrics
 
     truncate_metrics_tables(
-        clickhouse.conn,
-        clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"],
+        datastore.conn,
+        datastore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"],
     )
 
 
@@ -594,7 +594,7 @@ def remove_metrics_ttl_and_storage_settings(o11y: types.O11y):
         "metadata",
     ]
 
-    cluster = o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"]
+    cluster = o11y.telemetrystore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"]
     for table in tables:
         try:
             o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_metrics.{table} ON CLUSTER '{cluster}' REMOVE TTL")

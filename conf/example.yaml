@@ -128,7 +128,7 @@ querier:
 
 ##################### TelemetryStore #####################
 # Uses Hanzo Datastore (hanzoai/datastore) as the telemetry storage backend.
-# The datastore is a high-performance columnar database (ClickHouse-compatible).
+# The datastore is a high-performance columnar OLAP database.
 telemetrystore:
   # Maximum number of idle connections in the connection pool.
   max_idle_conns: 50
@@ -137,7 +137,7 @@ telemetrystore:
   # Maximum time to wait for a connection to be established.
   dial_timeout: 5s
   # Specifies the telemetrystore provider to use.
-  provider: clickhouse
+  provider: datastore
   datastore:
     # The DSN for Hanzo Datastore. Canonical env override: O11Y_DATASTORE_DSN
     # (e.g. tcp://datastore.hanzo.svc:9000/?database=o11y).

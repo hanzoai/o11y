@@ -300,7 +300,7 @@ func TestQueryRangeRequest_ValidateAllQueriesNotDisabled(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "all ClickHouse queries disabled should return error",
+			name: "all Datastore queries disabled should return error",
 			request: QueryRangeRequest{
 				Start:       1640995200000,
 				End:         1640998800000,
@@ -308,8 +308,8 @@ func TestQueryRangeRequest_ValidateAllQueriesNotDisabled(t *testing.T) {
 				CompositeQuery: CompositeQuery{
 					Queries: []QueryEnvelope{
 						{
-							Type: QueryTypeClickHouseSQL,
-							Spec: ClickHouseQuery{
+							Type: QueryTypeDatastoreSQL,
+							Spec: DatastoreQuery{
 								Name:     "CH1",
 								Query:    "SELECT count() FROM logs",
 								Disabled: true,
@@ -542,7 +542,7 @@ func TestQueryRangeRequest_ValidateCompositeQuery(t *testing.T) {
 			errMsg:  "PromQL query is required",
 		},
 		{
-			name: "clickhouse with empty query should return error",
+			name: "datastore with empty query should return error",
 			request: QueryRangeRequest{
 				Start:       1640995200000,
 				End:         1640998800000,
@@ -550,8 +550,8 @@ func TestQueryRangeRequest_ValidateCompositeQuery(t *testing.T) {
 				CompositeQuery: CompositeQuery{
 					Queries: []QueryEnvelope{
 						{
-							Type: QueryTypeClickHouseSQL,
-							Spec: ClickHouseQuery{
+							Type: QueryTypeDatastoreSQL,
+							Spec: DatastoreQuery{
 								Name:  "CH1",
 								Query: "",
 							},
@@ -560,7 +560,7 @@ func TestQueryRangeRequest_ValidateCompositeQuery(t *testing.T) {
 				},
 			},
 			wantErr: true,
-			errMsg:  "ClickHouse SQL query is required",
+			errMsg:  "Datastore SQL query is required",
 		},
 		{
 			name: "trace operator with empty expression should return error",
@@ -604,7 +604,7 @@ func TestQueryRangeRequest_ValidateCompositeQuery(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "valid clickhouse query should pass",
+			name: "valid datastore query should pass",
 			request: QueryRangeRequest{
 				Start:       1640995200000,
 				End:         1640998800000,
@@ -612,8 +612,8 @@ func TestQueryRangeRequest_ValidateCompositeQuery(t *testing.T) {
 				CompositeQuery: CompositeQuery{
 					Queries: []QueryEnvelope{
 						{
-							Type: QueryTypeClickHouseSQL,
-							Spec: ClickHouseQuery{
+							Type: QueryTypeDatastoreSQL,
+							Spec: DatastoreQuery{
 								Name:  "CH1",
 								Query: "SELECT count() FROM logs",
 							},
@@ -889,17 +889,17 @@ func TestValidateQueryEnvelope(t *testing.T) {
 			errMsg:      "PromQL query is required",
 		},
 		{
-			name: "clickhouse with empty query should fail",
+			name: "datastore with empty query should fail",
 			envelope: QueryEnvelope{
-				Type: QueryTypeClickHouseSQL,
-				Spec: ClickHouseQuery{
+				Type: QueryTypeDatastoreSQL,
+				Spec: DatastoreQuery{
 					Name:  "CH1",
 					Query: "",
 				},
 			},
 			requestType: RequestTypeTimeSeries,
 			wantErr:     true,
-			errMsg:      "ClickHouse SQL query is required",
+			errMsg:      "Datastore SQL query is required",
 		},
 	}
 
@@ -956,8 +956,8 @@ func TestQueryEnvelope_Helpers(t *testing.T) {
 				want:     "P1",
 			},
 			{
-				name:     "clickhouse",
-				envelope: QueryEnvelope{Type: QueryTypeClickHouseSQL, Spec: ClickHouseQuery{Name: "CH1"}},
+				name:     "datastore",
+				envelope: QueryEnvelope{Type: QueryTypeDatastoreSQL, Spec: DatastoreQuery{Name: "CH1"}},
 				want:     "CH1",
 			},
 			{
@@ -1013,8 +1013,8 @@ func TestQueryEnvelope_Helpers(t *testing.T) {
 				want:     false,
 			},
 			{
-				name:     "disabled clickhouse",
-				envelope: QueryEnvelope{Type: QueryTypeClickHouseSQL, Spec: ClickHouseQuery{Disabled: true}},
+				name:     "disabled datastore",
+				envelope: QueryEnvelope{Type: QueryTypeDatastoreSQL, Spec: DatastoreQuery{Disabled: true}},
 				want:     true,
 			},
 			{
@@ -1077,10 +1077,10 @@ func TestGetQueryIdentifier(t *testing.T) {
 			want:     "PromQL query 'P1'",
 		},
 		{
-			name:     "clickhouse with name",
-			envelope: QueryEnvelope{Type: QueryTypeClickHouseSQL, Spec: ClickHouseQuery{Name: "CH1"}},
+			name:     "datastore with name",
+			envelope: QueryEnvelope{Type: QueryTypeDatastoreSQL, Spec: DatastoreQuery{Name: "CH1"}},
 			index:    0,
-			want:     "ClickHouse query 'CH1'",
+			want:     "Datastore query 'CH1'",
 		},
 		{
 			name:     "trace operator with name",

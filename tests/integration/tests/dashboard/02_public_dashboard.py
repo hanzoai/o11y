@@ -142,7 +142,7 @@ def test_public_dashboard_widget_query_range(
                         "queryFormulas": [],
                         "queryTraceOperator": [],
                     },
-                    "clickhouse_sql": [{"disabled": False, "legend": "", "name": "A", "query": ""}],
+                    "datastore_sql": [{"disabled": False, "legend": "", "name": "A", "query": ""}],
                     "id": "80f12506-ef72-4013-8282-2713c8114c9e",
                     "promql": [{"disabled": False, "legend": "", "name": "A", "query": ""}],
                     "queryType": "builder",

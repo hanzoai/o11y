@@ -10,7 +10,7 @@ logger = setup_logger(__name__)
 
 def create_migrator(
     network: Network,
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
     cache_key: str = "migrator",
@@ -29,7 +29,7 @@ def create_migrator(
 
         container = client.containers.run(
             image=f"o11y/o11y-schema-migrator:{version}",
-            command=f"sync --replication=true --cluster-name=cluster --up= --dsn={clickhouse.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_DSN']}",
+            command=f"sync --replication=true --cluster-name=cluster --up= --dsn={datastore.env['O11Y_TELEMETRYSTORE_DATASTORE_DSN']}",
             detach=True,
             auto_remove=False,
             network=network.id,
@@ -48,7 +48,7 @@ def create_migrator(
 
         container = client.containers.run(
             image=f"o11y/o11y-schema-migrator:{version}",
-            command=f"async --replication=true --cluster-name=cluster --up= --dsn={clickhouse.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_DSN']}",
+            command=f"async --replication=true --cluster-name=cluster --up= --dsn={datastore.env['O11Y_TELEMETRYSTORE_DATASTORE_DSN']}",
             detach=True,
             auto_remove=False,
             network=network.id,
@@ -87,7 +87,7 @@ def create_migrator(
 @pytest.fixture(name="migrator", scope="package")
 def migrator(
     network: Network,
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
 ) -> types.Operation:
@@ -96,7 +96,7 @@ def migrator(
     """
     return create_migrator(
         network=network,
-        clickhouse=clickhouse,
+        datastore=datastore,
         request=request,
         pytestconfig=pytestconfig,
     )

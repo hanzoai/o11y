@@ -79,7 +79,7 @@ class TestContainerSQL:
 
 
 @dataclass
-class TestContainerClickhouse:
+class TestContainerDatastore:
     __test__ = False
     container: TestContainerDocker
     conn: clickhouse_connect.driver.client.Client
@@ -92,7 +92,7 @@ class TestContainerClickhouse:
         }
 
     def __log__(self) -> str:
-        return f"TestContainerClickhouse(container={self.container.__log__()}, env={self.env})"
+        return f"TestContainerDatastore(container={self.container.__log__()}, env={self.env})"
 
 
 @dataclass
@@ -114,7 +114,7 @@ class O11y:
     __test__ = False
     self: TestContainerDocker
     sqlstore: TestContainerSQL
-    telemetrystore: TestContainerClickhouse
+    telemetrystore: TestContainerDatastore
     zeus: TestContainerDocker
     gateway: TestContainerDocker
 

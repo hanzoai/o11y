@@ -245,7 +245,7 @@ func readFileIfUri(fs embed.FS, maybeFileUri string, basedir string) (interface{
 	return nil, fmt.Errorf("unsupported file type %s", maybeFileUri)
 }
 
-// copied from o11y clickhouse exporter's `sanitize` which
+// copied from o11y datastore exporter's `sanitize` which
 // in turn is copied from prometheus-go-metric-exporter
 //
 // replaces non-alphanumeric characters with underscores in s.

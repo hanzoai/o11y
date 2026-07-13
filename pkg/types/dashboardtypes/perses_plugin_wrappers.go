@@ -91,7 +91,7 @@ func (QueryPlugin) PrepareJSONSchema(s *jsonschema.Schema) error {
 		string(QueryKindComposite):     schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5CompositeQuery"),
 		string(QueryKindFormula):       schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormula"),
 		string(QueryKindPromQL):        schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5PromQuery"),
-		string(QueryKindClickHouseSQL): schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQuery"),
+		string(QueryKindDatastoreSQL): schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5DatastoreQuery"),
 		string(QueryKindTraceOperator): schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderTraceOperator"),
 	})
 }
@@ -120,7 +120,7 @@ func (QueryPlugin) JSONSchemaOneOf() []any {
 		QueryPluginVariant[CompositeQuerySpec]{Kind: string(QueryKindComposite)},
 		QueryPluginVariant[FormulaSpec]{Kind: string(QueryKindFormula)},
 		QueryPluginVariant[PromQLQuerySpec]{Kind: string(QueryKindPromQL)},
-		QueryPluginVariant[ClickHouseSQLQuerySpec]{Kind: string(QueryKindClickHouseSQL)},
+		QueryPluginVariant[DatastoreSQLQuerySpec]{Kind: string(QueryKindDatastoreSQL)},
 		QueryPluginVariant[TraceOperatorSpec]{Kind: string(QueryKindTraceOperator)},
 	}
 }
@@ -253,7 +253,7 @@ var (
 		QueryKindComposite:     func() any { return new(CompositeQuerySpec) },
 		QueryKindFormula:       func() any { return new(FormulaSpec) },
 		QueryKindPromQL:        func() any { return new(PromQLQuerySpec) },
-		QueryKindClickHouseSQL: func() any { return new(ClickHouseSQLQuerySpec) },
+		QueryKindDatastoreSQL: func() any { return new(DatastoreSQLQuerySpec) },
 		QueryKindTraceOperator: func() any { return new(TraceOperatorSpec) },
 	}
 	variablePluginSpecs = map[VariablePluginKind]func() any{
@@ -266,12 +266,12 @@ var (
 	}
 
 	allowedQueryKinds = map[PanelPluginKind][]QueryPluginKind{
-		PanelKindTimeSeries: {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindPromQL, QueryKindClickHouseSQL},
-		PanelKindBarChart:   {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindPromQL, QueryKindClickHouseSQL},
-		PanelKindNumber:     {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindPromQL, QueryKindClickHouseSQL},
-		PanelKindHistogram:  {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindPromQL, QueryKindClickHouseSQL},
-		PanelKindPieChart:   {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindClickHouseSQL},
-		PanelKindTable:      {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindClickHouseSQL},
+		PanelKindTimeSeries: {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindPromQL, QueryKindDatastoreSQL},
+		PanelKindBarChart:   {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindPromQL, QueryKindDatastoreSQL},
+		PanelKindNumber:     {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindPromQL, QueryKindDatastoreSQL},
+		PanelKindHistogram:  {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindPromQL, QueryKindDatastoreSQL},
+		PanelKindPieChart:   {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindDatastoreSQL},
+		PanelKindTable:      {QueryKindBuilder, QueryKindComposite, QueryKindFormula, QueryKindTraceOperator, QueryKindDatastoreSQL},
 		PanelKindList:       {QueryKindBuilder},
 	}
 )

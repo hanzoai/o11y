@@ -4,10 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/hanzoai/o11y/pkg/datastoresql"
+
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -95,7 +97,7 @@ func TestSpanScopeFilterExpression(t *testing.T) {
 
 				// Apply the where clause to the builder and get the SQL
 				sb.AddWhereClause(whereClause.WhereClause)
-				whereSQL, _ := sb.BuildWithFlavor(sqlbuilder.ClickHouse)
+				whereSQL, _ := sb.BuildWithFlavor(datastoresql.Flavor)
 				t.Logf("Generated SQL: %s", whereSQL)
 				assert.Contains(t, whereSQL, tt.expectedCondition)
 			}

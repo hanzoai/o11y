@@ -84,7 +84,7 @@ type ViewQuery struct {
 	// every span. It has NO `query` tag on purpose: it is server-set by the handler
 	// from the validated identity AFTER binding, never populated from client input.
 	// It is a MANDATORY, non-empty equality predicate on every span-view query —
-	// the sole tenant boundary for ClickHouse telemetry (the span views carry no
+	// the sole tenant boundary for Datastore telemetry (the span views carry no
 	// other org column), so an empty value must fail closed, never read all orgs.
 	OrgSlug string `json:"-"`
 }

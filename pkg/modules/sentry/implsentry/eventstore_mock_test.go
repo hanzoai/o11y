@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	cmock "github.com/hanzoai/clickhouse-go-mock"
+	dsmock "github.com/hanzoai/datastore-go-mock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
@@ -21,7 +21,7 @@ type anyMatcher struct{}
 func (anyMatcher) Match(string, string) error { return nil }
 
 // TestEventStore_EnsureSchemaAndQuery exercises the REAL datastore IO path against the
-// clickhouse-go-mock: ensureSchema runs the CREATE DATABASE + CREATE TABLE DDL exactly
+// datastore-go-mock: ensureSchema runs the CREATE DATABASE + CREATE TABLE DDL exactly
 // once, and a read binds + decodes rows. This verifies the wiring (query executes,
 // rows scan) — it does NOT verify a live datastore accepts the DDL (see the honest
 // caveat on createSchemaDDL; no live datastore was reachable in this build).
@@ -37,9 +37,9 @@ func TestEventStore_EnsureSchemaAndQuery(t *testing.T) {
 	// DistinctFingerprints → one String column. The 4 bound args are the (org,
 	// project, from, to) tenant+window scope every read carries.
 	mock.ExpectQuery("SELECT DISTINCT fingerprint").
-		WithArgs(nil, nil, nil, nil). // nil = match-any (cmock.matchArg); 4 = the tenant+window scope
-		WillReturnRows(cmock.NewRows(
-			[]cmock.ColumnType{{Name: "fingerprint", Type: "String"}},
+		WithArgs(nil, nil, nil, nil). // nil = match-any (dsmock.matchArg); 4 = the tenant+window scope
+		WillReturnRows(dsmock.NewRows(
+			[]dsmock.ColumnType{{Name: "fingerprint", Type: "String"}},
 			[][]any{{"fp-1"}, {"fp-2"}},
 		))
 

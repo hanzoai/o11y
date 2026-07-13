@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
 
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 )
 
 type conditionBuilder struct {

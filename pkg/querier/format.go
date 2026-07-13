@@ -10,7 +10,7 @@ func toStrArrayString(strs ...string) string {
 	return fmt.Sprintf("[%s]", strings.Join(strs, ","))
 }
 
-// formatValue formats the value to be used in clickhouse query.
+// formatValue formats the value to be used in datastore query.
 func formatValueForCH(v any) string {
 	// if it's pointer convert it to a value
 	v = getPointerValue(v)
@@ -143,7 +143,7 @@ func getPointerValue(v any) any {
 }
 
 func quoteEscapedString(str string) string {
-	// https://clickhouse.com/docs/en/sql-reference/syntax#string
+	// https://datastore.com/docs/en/sql-reference/syntax#string
 	str = strings.ReplaceAll(str, `\`, `\\`)
 	str = strings.ReplaceAll(str, `'`, `\'`)
 	return str

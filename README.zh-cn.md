@@ -161,7 +161,7 @@ Jaeger 仅仅是一个分布式追踪系统。 但是 Hanzo O11y 可以提供 me
 
 ### Hanzo O11y vs Elastic
 
-- Hanzo O11y 的日志管理是基于 ClickHouse 实现的，可以使日志的聚合更加高效，因为它是基于 OLAP 的数据仓储。
+- Hanzo O11y 的日志管理基于列式 OLAP 数据仓储实现，可以使日志的聚合更加高效。
 
 - 与 Elastic 相比，可以节省 50% 的资源成本
 

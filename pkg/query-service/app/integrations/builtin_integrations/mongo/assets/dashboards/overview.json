@@ -143,7 +143,7 @@
                     ],
                     "queryFormulas": []
                 },
-                "clickhouse_sql": [
+                "datastore_sql": [
                     {
                         "disabled": false,
                         "legend": "",
@@ -218,7 +218,7 @@
                     ],
                     "queryFormulas": []
                 },
-                "clickhouse_sql": [
+                "datastore_sql": [
                     {
                         "disabled": false,
                         "legend": "",
@@ -293,7 +293,7 @@
                     ],
                     "queryFormulas": []
                 },
-                "clickhouse_sql": [
+                "datastore_sql": [
                     {
                         "disabled": false,
                         "legend": "",
@@ -359,7 +359,7 @@
                     ],
                     "queryFormulas": []
                 },
-                "clickhouse_sql": [
+                "datastore_sql": [
                     {
                         "disabled": false,
                         "legend": "",
@@ -425,7 +425,7 @@
                     ],
                     "queryFormulas": []
                 },
-                "clickhouse_sql": [
+                "datastore_sql": [
                     {
                         "disabled": false,
                         "legend": "",
@@ -491,7 +491,7 @@
                     ],
                     "queryFormulas": []
                 },
-                "clickhouse_sql": [
+                "datastore_sql": [
                     {
                         "disabled": false,
                         "legend": "",
@@ -601,7 +601,7 @@
                     ],
                     "queryFormulas": []
                 },
-                "clickhouse_sql": [
+                "datastore_sql": [
                     {
                         "disabled": false,
                         "legend": "",

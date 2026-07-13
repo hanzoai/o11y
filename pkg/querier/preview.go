@@ -80,7 +80,7 @@ func (q *querier) QueryRangePreview(
 	}
 	providers, buildErrs := q.buildPreviewProviders(req, dependencyQueries, missingMetricQuerySet, skip)
 
-	// Render each executing query's statement and collect the ClickHouse-bound
+	// Render each executing query's statement and collect the Datastore-bound
 	// analysis work to run concurrently.
 	var previewTasks []qbtypes.PreviewTask
 	for _, query := range req.CompositeQuery.Queries {
@@ -130,14 +130,14 @@ func (q *querier) QueryRangePreview(
 
 		ps.Warnings = append(ps.Warnings, stmt.Warnings...)
 
-		if query.Type == qbtypes.QueryTypeClickHouseSQL {
+		if query.Type == qbtypes.QueryTypeDatastoreSQL {
 			if bindErr := q.telemetryStore.Plan(ctx, stmt.Query, stmt.Args...); bindErr != nil {
 				if errors.Ast(bindErr, errors.TypeInvalidInput) || errors.Ast(bindErr, errors.TypeNotFound) {
 					ps.Error = bindErr
 					results[name] = ps
 					continue
 				}
-				ps.Warnings = append(ps.Warnings, "could not validate ClickHouse SQL: "+bindErr.Error())
+				ps.Warnings = append(ps.Warnings, "could not validate Datastore SQL: "+bindErr.Error())
 			}
 		}
 
@@ -150,7 +150,7 @@ func (q *querier) QueryRangePreview(
 			if pq, ok := provider.(*promqlQuery); ok {
 				sqlStmts, pErr := pq.PreviewStatements(ctx)
 				if pErr != nil {
-					ps.Warnings = append(ps.Warnings, "could not render underlying ClickHouse SQL: "+pErr.Error())
+					ps.Warnings = append(ps.Warnings, "could not render underlying Datastore SQL: "+pErr.Error())
 				} else {
 					for _, s := range sqlStmts {
 						ps.Statements = append(ps.Statements, qbtypes.PreviewStatement{Query: s.Query, Args: orEmpty(s.Args), Estimate: []telemetrystoretypes.EstimateEntry{}})
@@ -249,7 +249,7 @@ func rendersStandaloneStatement(t qbtypes.QueryType) bool {
 	switch t {
 	case qbtypes.QueryTypeBuilder,
 		qbtypes.QueryTypePromQL,
-		qbtypes.QueryTypeClickHouseSQL,
+		qbtypes.QueryTypeDatastoreSQL,
 		qbtypes.QueryTypeTraceOperator:
 		return true
 	default:

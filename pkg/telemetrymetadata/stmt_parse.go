@@ -3,7 +3,7 @@ package telemetrymetadata
 import (
 	"strings"
 
-	"github.com/AfterShip/clickhouse-sql-parser/parser"
+	"github.com/hanzoai/datastore-sql-parser/parser"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
@@ -100,7 +100,7 @@ func (v *TelemetryFieldVisitor) VisitColumnDef(expr *parser.ColumnDef) error {
 }
 
 func ExtractFieldKeysFromTblStatement(statement string) ([]*telemetrytypes.TelemetryFieldKey, error) {
-	// Parse the CREATE TABLE statement using the ClickHouse parser
+	// Parse the CREATE TABLE statement using the Datastore parser
 	p := parser.NewParser(statement)
 	stmts, err := p.ParseStmts()
 	if err != nil {

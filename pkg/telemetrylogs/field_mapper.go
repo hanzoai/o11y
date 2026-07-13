@@ -13,7 +13,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
 	"github.com/hanzoai/otel-collector/utils"
-	"github.com/huandu/go-sqlbuilder"
+	"github.com/hanzoai/sqlbuilder"
 
 	"golang.org/x/exp/maps"
 )

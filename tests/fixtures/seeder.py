@@ -16,7 +16,7 @@ logger = setup_logger(__name__)
 @pytest.fixture(name="seeder", scope="package")
 def seeder(
     network: Network,
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
 ) -> types.TestContainerDocker:
@@ -32,11 +32,11 @@ def seeder(
         )
 
         container = DockerContainer("o11y-tests-seeder:latest")
-        container.with_env("CH_HOST", clickhouse.container.container_configs["8123"].address)
-        container.with_env("CH_PORT", str(clickhouse.container.container_configs["8123"].port))
-        container.with_env("CH_USER", clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_USERNAME"])
-        container.with_env("CH_PASSWORD", clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_PASSWORD"])
-        container.with_env("CH_CLUSTER", clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"])
+        container.with_env("CH_HOST", datastore.container.container_configs["8123"].address)
+        container.with_env("CH_PORT", str(datastore.container.container_configs["8123"].port))
+        container.with_env("CH_USER", datastore.env["O11Y_TELEMETRYSTORE_DATASTORE_USERNAME"])
+        container.with_env("CH_PASSWORD", datastore.env["O11Y_TELEMETRYSTORE_DATASTORE_PASSWORD"])
+        container.with_env("CH_CLUSTER", datastore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"])
         container.with_exposed_ports(8080)
         container.with_network(network=network)
         container.start()

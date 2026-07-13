@@ -2920,7 +2920,7 @@ components:
       - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5CompositeQuery'
       - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormula'
       - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5PromQuery'
-      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQuery'
+      - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5DatastoreQuery'
       - $ref: '#/components/schemas/DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderTraceOperator'
     DashboardtypesQueryPluginKind:
       enum:
@@ -2928,7 +2928,7 @@ components:
       - o11y/CompositeQuery
       - o11y/Formula
       - o11y/PromQLQuery
-      - o11y/ClickHouseSQL
+      - o11y/DatastoreSQL
       - o11y/TraceOperator
       type: string
     DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesDashboardtypesBuilderQuerySpec:
@@ -2943,14 +2943,14 @@ components:
       - kind
       - spec
       type: object
-    DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5ClickHouseQuery:
+    DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5DatastoreQuery:
       properties:
         kind:
           enum:
-          - o11y/ClickHouseSQL
+          - o11y/DatastoreSQL
           type: string
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5ClickHouseQuery'
+          $ref: '#/components/schemas/Querybuildertypesv5DatastoreQuery'
       required:
       - kind
       - spec
@@ -5095,7 +5095,7 @@ components:
           format: double
           type: number
       type: object
-    Querybuildertypesv5ClickHouseQuery:
+    Querybuildertypesv5DatastoreQuery:
       properties:
         disabled:
           type: boolean
@@ -5561,7 +5561,7 @@ components:
       - $ref: '#/components/schemas/Querybuildertypesv5QueryEnvelopeFormula'
       - $ref: '#/components/schemas/Querybuildertypesv5QueryEnvelopeTraceOperator'
       - $ref: '#/components/schemas/Querybuildertypesv5QueryEnvelopePromQL'
-      - $ref: '#/components/schemas/Querybuildertypesv5QueryEnvelopeClickHouseSQL'
+      - $ref: '#/components/schemas/Querybuildertypesv5QueryEnvelopeDatastoreSQL'
       properties:
         spec: {}
         type:
@@ -5588,10 +5588,10 @@ components:
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object
-    Querybuildertypesv5QueryEnvelopeClickHouseSQL:
+    Querybuildertypesv5QueryEnvelopeDatastoreSQL:
       properties:
         spec:
-          $ref: '#/components/schemas/Querybuildertypesv5ClickHouseQuery'
+          $ref: '#/components/schemas/Querybuildertypesv5DatastoreQuery'
         type:
           $ref: '#/components/schemas/Querybuildertypesv5QueryType'
       type: object
@@ -5619,7 +5619,7 @@ components:
     Querybuildertypesv5QueryRangeRequest:
       description: Request body for the v5 query range endpoint. Supports builder
         queries (traces, logs, metrics), formulas, joins, trace operators, PromQL,
-        and ClickHouse SQL queries.
+        and Datastore SQL queries.
       properties:
         compositeQuery:
           $ref: '#/components/schemas/Querybuildertypesv5CompositeQuery'
@@ -5661,7 +5661,7 @@ components:
       - builder_query
       - builder_formula
       - builder_trace_operator
-      - clickhouse_sql
+      - datastore_sql
       - promql
       type: string
     Querybuildertypesv5QueryWarnData:
@@ -6186,7 +6186,7 @@ components:
     RuletypesQueryType:
       enum:
       - builder
-      - clickhouse_sql
+      - datastore_sql
       - promql
       type: string
     RuletypesRenotify:
@@ -20171,15 +20171,15 @@ paths:
     post:
       deprecated: false
       description: Execute a composite query over a time range. Supports builder queries
-        (traces, logs, metrics), formulas, trace operators, PromQL, and ClickHouse
+        (traces, logs, metrics), formulas, trace operators, PromQL, and Datastore
         SQL.
       operationId: QueryRangeV5
       requestBody:
         content:
           application/json:
             examples:
-              clickhouse_sql_logs_raw:
-                summary: 'ClickHouse SQL: raw logs with resource filter'
+              datastore_sql_logs_raw:
+                summary: 'Datastore SQL: raw logs with resource filter'
                 value:
                   compositeQuery:
                     queries:
@@ -20195,13 +20195,13 @@ paths:
                           >= $start_timestamp - 1800 AND ts_bucket_start <= $end_timestamp
                           AND severity_text = 'ERROR' ORDER BY timestamp DESC LIMIT
                           100
-                      type: clickhouse_sql
+                      type: datastore_sql
                   end: 1640998800000
                   requestType: raw
                   schemaVersion: v1
                   start: 1640995200000
-              clickhouse_sql_traces_scalar:
-                summary: 'ClickHouse SQL: scalar aggregate with resource filter'
+              datastore_sql_traces_scalar:
+                summary: 'Datastore SQL: scalar aggregate with resource filter'
                 value:
                   compositeQuery:
                     queries:
@@ -20215,13 +20215,13 @@ paths:
                           FROM __resource_filter) AND timestamp >= $start_datetime
                           AND timestamp <= $end_datetime AND ts_bucket_start >= $start_timestamp
                           - 1800 AND ts_bucket_start <= $end_timestamp
-                      type: clickhouse_sql
+                      type: datastore_sql
                   end: 1640998800000
                   requestType: scalar
                   schemaVersion: v1
                   start: 1640995200000
-              clickhouse_sql_traces_time_series:
-                summary: 'ClickHouse SQL: traces time series with resource filter'
+              datastore_sql_traces_time_series:
+                summary: 'Datastore SQL: traces time series with resource filter'
                 value:
                   compositeQuery:
                     queries:
@@ -20237,7 +20237,7 @@ paths:
                           AND timestamp <= $end_datetime AND ts_bucket_start >= $start_timestamp
                           - 1800 AND ts_bucket_start <= $end_timestamp GROUP BY ts
                           ORDER BY ts
-                      type: clickhouse_sql
+                      type: datastore_sql
                   end: 1640998800000
                   requestType: time_series
                   schemaVersion: v1

@@ -28,7 +28,7 @@ type Reader interface {
 	GetCustomRetentionTTL(ctx context.Context, orgID string) (*retentiontypes.GetCustomRetentionTTLResponse, error)
 
 	// GetDisks returns a list of disks configured in the underlying DB. It is supported by
-	// clickhouse only.
+	// datastore only.
 	GetDisks(ctx context.Context) (*[]model.DiskItem, *model.ApiError)
 	GetTraceAggregateAttributes(ctx context.Context, req *v3.AggregateAttributeRequest) (*v3.AggregateAttributeResponse, error)
 	GetTraceAttributeKeys(ctx context.Context, req *v3.FilterAttributeKeyRequest) (*v3.FilterAttributeKeyResponse, error)
@@ -79,7 +79,7 @@ type Reader interface {
 	) (*v3.QBFilterSuggestionsResponse, *model.ApiError)
 
 	QueryDashboardVars(ctx context.Context, query string) (*model.DashboardVar, error)
-	CheckClickHouse(ctx context.Context) error
+	CheckDatastore(ctx context.Context) error
 
 	GetMetricMetadata(context.Context, valuer.UUID, string, string) (*v3.MetricMetadataResponse, error)
 

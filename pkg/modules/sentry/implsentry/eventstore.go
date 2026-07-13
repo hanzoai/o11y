@@ -27,7 +27,7 @@ const insertSQL = "INSERT INTO %s.%s (org_id, project_id, event_id, timestamp, r
 // createSchemaDDL is the events-plane schema.
 //
 // HONEST STATUS — NOT LIVE-VERIFIED. This DDL was designed against the o11y datastore
-// conventions and is exercised by the clickhouse-go-mock round-trip test, but it has
+// conventions and is exercised by the datastore-go-mock round-trip test, but it has
 // NOT been byte-verified against a live datastore in this build (no datastore was
 // reachable — localhost:9000 closed, no O11Y_DATASTORE_DSN). Two things a live run
 // must confirm before this is called done:

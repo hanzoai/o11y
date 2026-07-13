@@ -13,8 +13,8 @@ type Config struct {
 	// Connection is the connection configuration
 	Connection ConnectionConfig `mapstructure:",squash"`
 
-	// Clickhouse is the datastore (ClickHouse-protocol) configuration
-	Clickhouse ClickhouseConfig `mapstructure:"datastore"`
+	// Datastore is the datastore (Datastore-protocol) configuration
+	Datastore DatastoreConfig `mapstructure:"datastore"`
 }
 
 type ConnectionConfig struct {
@@ -28,14 +28,14 @@ type ConnectionConfig struct {
 	DialTimeout time.Duration `mapstructure:"dial_timeout"`
 }
 
-type ClickhouseConfig struct {
+type DatastoreConfig struct {
 	// DSN is the database source name.
 	DSN string `mapstructure:"dsn"`
 
-	// Cluster is the cluster name to use for clickhouse.
+	// Cluster is the cluster name to use for datastore.
 	Cluster string `mapstructure:"cluster"`
 
-	// QuerySettings is the query settings for clickhouse.
+	// QuerySettings is the query settings for datastore.
 	QuerySettings QuerySettings `mapstructure:"settings"`
 }
 
@@ -55,13 +55,13 @@ func NewConfigFactory() factory.ConfigFactory {
 
 func newConfig() factory.Config {
 	return Config{
-		Provider: "clickhouse",
+		Provider: "datastore",
 		Connection: ConnectionConfig{
 			MaxOpenConns: 100,
 			MaxIdleConns: 50,
 			DialTimeout:  5 * time.Second,
 		},
-		Clickhouse: ClickhouseConfig{
+		Datastore: DatastoreConfig{
 			DSN:     "tcp://localhost:9000",
 			Cluster: "cluster",
 		},

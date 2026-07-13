@@ -2,7 +2,7 @@ import pytest
 
 pytest_plugins = [
     "fixtures.auth",
-    "fixtures.clickhouse",
+    "fixtures.datastore",
     "fixtures.fs",
     "fixtures.http",
     "fixtures.migrator",
@@ -75,7 +75,7 @@ def pytest_addoption(parser: pytest.Parser):
         help="postgres version",
     )
     parser.addoption(
-        "--clickhouse-version",
+        "--datastore-version",
         action="store",
         default="25.5.6",
         help="clickhouse version",

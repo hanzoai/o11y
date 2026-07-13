@@ -659,7 +659,7 @@ class Traces(ABC):
         return traces
 
 
-def insert_traces_to_clickhouse(conn, traces: list[Traces]) -> None:
+def insert_traces_to_datastore(conn, traces: list[Traces]) -> None:
     """
     Insert traces into ClickHouse tables following the same logic as the Go exporter.
     Handles insertion into:
@@ -785,16 +785,16 @@ def truncate_traces_tables(conn, cluster: str) -> None:
 
 @pytest.fixture(name="insert_traces", scope="function")
 def insert_traces(
-    clickhouse: types.TestContainerClickhouse,
+    datastore: types.TestContainerDatastore,
 ) -> Generator[Callable[[list[Traces]], None], Any]:
     def _insert_traces(traces: list[Traces]) -> None:
-        insert_traces_to_clickhouse(clickhouse.conn, traces)
+        insert_traces_to_datastore(datastore.conn, traces)
 
     yield _insert_traces
 
     truncate_traces_tables(
-        clickhouse.conn,
-        clickhouse.env["O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER"],
+        datastore.conn,
+        datastore.env["O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER"],
     )
 
 
@@ -816,7 +816,7 @@ def remove_traces_ttl_and_storage_settings(o11y: types.O11y):
 
     for table in tables:
         try:
-            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_traces.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' REMOVE TTL")
-            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_traces.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_CLICKHOUSE_CLUSTER']}' RESET SETTING storage_policy;")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_traces.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}' REMOVE TTL")
+            o11y.telemetrystore.conn.query(f"ALTER TABLE o11y_traces.{table} ON CLUSTER '{o11y.telemetrystore.env['O11Y_TELEMETRYSTORE_DATASTORE_CLUSTER']}' RESET SETTING storage_policy;")
         except Exception as e:  # pylint: disable=broad-exception-caught
             print(f"ttl and storage policy reset failed for {table}: {e}")

@@ -37,7 +37,7 @@ func TestServiceConfig(t *testing.T) {
 					"o11yspanmetrics/cumulative", "batch",
 				},
 				"exporters": []interface{}{
-					"clickhousetraces",
+					"datastoretraces",
 				},
 			},
 			"metrics": map[string]interface{}{
@@ -48,7 +48,7 @@ func TestServiceConfig(t *testing.T) {
 					"batch",
 				},
 				"exporters": []interface{}{
-					"clickhousemetricswrite",
+					"datastoremetricswrite",
 				},
 			},
 		},

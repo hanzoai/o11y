@@ -345,7 +345,7 @@
           "queryFormulas": [],
           "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-totallatency",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder",
@@ -432,7 +432,7 @@
           "queryFormulas": [],
           "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-originlatency",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder",
@@ -519,7 +519,7 @@
           "queryFormulas": [],
           "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-avgwsconnectionduration",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder",
@@ -611,7 +611,7 @@
           "queryFormulas": [],
           "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-originhealthpercentage",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder",
@@ -703,7 +703,7 @@
           "queryFormulas": [],
           "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-bytehitratio",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder",
@@ -790,7 +790,7 @@
           "queryFormulas": [],
           "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-percentage4xx",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder",
@@ -877,7 +877,7 @@
           "queryFormulas": [],
           "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-percentage5xx",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder",
@@ -925,7 +925,7 @@
           }],
           "queryFormulas": [], "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-requestcount",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder", "unit": ""
@@ -960,7 +960,7 @@
           }],
           "queryFormulas": [], "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-originrequestcount",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder", "unit": ""
@@ -995,7 +995,7 @@
           }],
           "queryFormulas": [], "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-requestsize",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder", "unit": ""
@@ -1030,7 +1030,7 @@
           }],
           "queryFormulas": [], "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-responsesize",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder", "unit": ""
@@ -1065,7 +1065,7 @@
           }],
           "queryFormulas": [], "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-activewebsocketconnections",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder", "unit": ""
@@ -1100,7 +1100,7 @@
           }],
           "queryFormulas": [], "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-websocketconnections",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder", "unit": ""
@@ -1135,7 +1135,7 @@
           }],
           "queryFormulas": [], "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-wafrequestcount",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder", "unit": ""
@@ -1170,7 +1170,7 @@
           }],
           "queryFormulas": [], "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-wafcaptcharequestcount",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder", "unit": ""
@@ -1205,7 +1205,7 @@
           }],
           "queryFormulas": [], "queryTraceOperator": []
         },
-        "clickhouse_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
+        "datastore_sql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "id": "q-w-wafjsrequestcount",
         "promql": [{ "disabled": false, "legend": "", "name": "A", "query": "" }],
         "queryType": "builder", "unit": ""

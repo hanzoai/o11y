@@ -1419,17 +1419,17 @@ func TestPanelTypeQueryTypeCompatibility(t *testing.T) {
 	}{
 		// Top-level: allowed
 		{"TimeSeries+PromQL", mkQuery("o11y/TimeSeriesPanel", "o11y/PromQLQuery", `{"name":"A","query":"up"}`), false},
-		{"Table+ClickHouse", mkQuery("o11y/TablePanel", "o11y/ClickHouseSQL", `{"name":"A","query":"SELECT 1"}`), false},
+		{"Table+Datastore", mkQuery("o11y/TablePanel", "o11y/DatastoreSQL", `{"name":"A","query":"SELECT 1"}`), false},
 		{"List+Builder", mkQuery("o11y/ListPanel", "o11y/BuilderQuery", `{"name":"A","signal":"logs"}`), false},
 		// Top-level: rejected
 		{"Table+PromQL", mkQuery("o11y/TablePanel", "o11y/PromQLQuery", `{"name":"A","query":"up"}`), true},
-		{"List+ClickHouse", mkQuery("o11y/ListPanel", "o11y/ClickHouseSQL", `{"name":"A","query":"SELECT 1"}`), true},
+		{"List+Datastore", mkQuery("o11y/ListPanel", "o11y/DatastoreSQL", `{"name":"A","query":"SELECT 1"}`), true},
 		{"List+PromQL", mkQuery("o11y/ListPanel", "o11y/PromQLQuery", `{"name":"A","query":"up"}`), true},
 		{"List+Composite", mkQuery("o11y/ListPanel", "o11y/CompositeQuery", `{"queries":[]}`), true},
 		{"List+Formula", mkQuery("o11y/ListPanel", "o11y/Formula", `{"name":"F1","expression":"A+B"}`), true},
 		// Composite sub-queries
 		{"Table+Composite(promql)", mkComposite("o11y/TablePanel", "promql", `{"name":"A","query":"up"}`), true},
-		{"Table+Composite(clickhouse)", mkComposite("o11y/TablePanel", "clickhouse_sql", `{"name":"A","query":"SELECT 1"}`), false},
+		{"Table+Composite(datastore)", mkComposite("o11y/TablePanel", "datastore_sql", `{"name":"A","query":"SELECT 1"}`), false},
 	}
 
 	for _, tc := range cases {
