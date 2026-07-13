@@ -5,7 +5,7 @@ import (
 	"sort"
 	"testing"
 
-	dsmock "github.com/hanzoai/datastore-go-mock"
+	dsmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/stretchr/testify/require"
 
@@ -32,7 +32,7 @@ func TestClient_QuerySamples(t *testing.T) {
 		metricName         string
 		subQuery           string
 		args               []any
-		setupMock          func(mock dsmock.ClickConnMockCommon, args ...any)
+		setupMock          func(mock dsmock.DatastoreConnMockCommon, args ...any)
 		expectedTimeSeries int
 		expectError        bool
 		description        string
@@ -57,7 +57,7 @@ func TestClient_QuerySamples(t *testing.T) {
 			expectedTimeSeries: 2,
 			expectError:        false,
 			description:        "Should successfully retrieve samples for multiple time series",
-			setupMock: func(mock dsmock.ClickConnMockCommon, args ...any) {
+			setupMock: func(mock dsmock.DatastoreConnMockCommon, args ...any) {
 				values := [][]interface{}{
 					{"cpu_usage", uint64(123), int64(1001), float64(1.1), uint32(0)},
 					{"cpu_usage", uint64(123), int64(1001), float64(1.1), uint32(0)},
@@ -136,7 +136,7 @@ func TestClient_getFingerprintsFromDatastoreQuery(t *testing.T) {
 		metricName string
 		subQuery   string
 		args       []any
-		setupMock  func(m dsmock.ClickConnMockCommon, args ...any)
+		setupMock  func(m dsmock.DatastoreConnMockCommon, args ...any)
 		want       map[uint64][]prompb.Label
 		wantErr    bool
 	}{
@@ -149,7 +149,7 @@ func TestClient_getFingerprintsFromDatastoreQuery(t *testing.T) {
 			// args slice is empty here, but test‑case still owns it
 			args: []any{},
 
-			setupMock: func(m dsmock.ClickConnMockCommon, args ...any) {
+			setupMock: func(m dsmock.DatastoreConnMockCommon, args ...any) {
 				rows := [][]any{
 					{uint64(123), `{"t1":"s1","t2":"s2"}`},
 					{uint64(234), `{"t1":"s1","t2":"s2"}`},

@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	dsparser "github.com/hanzoai/datastore-sql-parser/parser"
+	dsparser "github.com/hanzo-ds/sqlparser/parser"
 	"github.com/hanzoai/o11y/pkg/errors"
 )
 
