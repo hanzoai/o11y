@@ -905,8 +905,8 @@ github.com/hanzo-ds/sqlbuilder v1.42.2 h1:739sudcAav513tsIj57CUjADCcEUzrztpOPYHy
 github.com/hanzo-ds/sqlbuilder v1.42.2/go.mod h1:Nk+F+SDxtsqAeI63jT7JPACZQ60top3rQCmKXUhfKQw=
 github.com/hanzo-ds/sqlparser v0.4.16 h1:OeWiLSL6u/I/RzhUKHHbE33MevQ2b0QVyDgSJur6OTs=
 github.com/hanzo-ds/sqlparser v0.4.16/go.mod h1:b+9oCGF3WYGz4FfVo9eZ4wJiF7fiLa9aCWFGCcbqQbY=
-github.com/hanzoai/ai v1.806.9 h1:D9mYBiWL7SWgrKHK7/gMxDBa4ZUovs3Al60NZzNftKw=
-github.com/hanzoai/ai v1.806.9/go.mod h1:dpcWcO9pLWZaBFl+1yJeyazgLDn8gmbFynB/zwtxldg=
+github.com/hanzoai/ai v1.806.10 h1:lABt5PYvXBn/mLmklOQkjsva/OqsahDfw3STh+yNk68=
+github.com/hanzoai/ai v1.806.10/go.mod h1:eLhOiogCCO/Kw6k5V4zcMYfZ0ezy1AZjGnyLz6fxAzE=
 github.com/hanzoai/beego/v2 v2.4.1 h1:rChSPaueQtzriNxmt4jonobe6ujeqho0WTcPVYaH8Ac=
 github.com/hanzoai/beego/v2 v2.4.1/go.mod h1:eDGRL/NJSqjoYHtWa5eMb2ze0gnlEabs1UO/naIfuX0=
 github.com/hanzoai/csqlite v0.1.0 h1:suwC3dh0INlfP/U0Es6cDf6JNQ+2+GVLLATPWCUux6k=
@@ -915,8 +915,6 @@ github.com/hanzoai/dashscope-go-sdk v0.0.2 h1:L/FlStjXeehrNSBqU8y/ecSG/MnaAJqfyf
 github.com/hanzoai/dashscope-go-sdk v0.0.2/go.mod h1:DSUNMIR7RvSoO8B/VOQLGTqsMAnE6boJm9MjeodsVF4=
 github.com/hanzoai/dashscopego v0.6.0 h1:sLUepwcnVajaDgzlgfuJWkZblBg9UIalkpFUjXHx0Fg=
 github.com/hanzoai/dashscopego v0.6.0/go.mod h1:ciV938pktk0Tw6ssGYzEdxwS8OaHgv3xCWiy7W5664E=
-github.com/hanzoai/datastore-go/v2 v2.47.2 h1:SThITu8+otmlWuAiSmZ2L3z+2suLIAdAfwoliwO8qLs=
-github.com/hanzoai/datastore-go/v2 v2.47.2/go.mod h1:MQYk/Ztzt+WoT1SMx2wS2XvvdETWgXJQfUwT/bBj8qw=
 github.com/hanzoai/dbx v1.16.0 h1:C8wsb9BIiit4nYnXizpcB4SyzVaepPkQFwq5i9fxAV0=
 github.com/hanzoai/dbx v1.16.0/go.mod h1:ynP6HSiDDoFZ8M3DC+XvSglBPFRygfTd/gjTWabh4yA=
 github.com/hanzoai/expr v1.17.8 h1:qDKAhoS5DOU9gjPR/tBmucQhI0W9ysZM1l5hrdlhgAY=
