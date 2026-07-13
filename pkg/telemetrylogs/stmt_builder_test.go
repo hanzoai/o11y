@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	dsmock "github.com/hanzoai/datastore-go-mock"
+	dsmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"

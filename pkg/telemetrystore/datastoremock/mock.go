@@ -3,7 +3,7 @@
 // contract rather than the mock driver's exported type name.
 package datastoremock
 
-import dsmock "github.com/hanzoai/datastore-go-mock"
+import dsmock "github.com/hanzo-ds/mock"
 
 // Conn is the subset of the datastore mock driver used to set query
 // expectations in tests. The mock connection satisfies it structurally.

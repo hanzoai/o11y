@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	dsmock "github.com/hanzoai/datastore-go-mock"
+	dsmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
