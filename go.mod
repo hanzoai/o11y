@@ -29,7 +29,7 @@ require (
 	github.com/hanzoai/datastore-go-mock v0.14.3
 	github.com/hanzoai/datastore-sql-parser v0.4.17
 	github.com/hanzoai/govaluate v0.1.0
-	github.com/hanzoai/otel-collector v0.144.9
+	github.com/hanzoai/otel-collector v0.144.13
 	github.com/hanzoai/sqlbuilder v1.39.2
 	github.com/hanzoai/sqlite v0.3.0
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12
@@ -94,7 +94,6 @@ require (
 	cloud.google.com/go v0.123.0 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/compute/armcompute v1.0.0 // indirect
-	github.com/ClickHouse/clickhouse-go/v2 v2.46.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/ThinkInAIXYZ/go-mcp v0.2.24 // indirect
@@ -213,14 +212,16 @@ require (
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
-	github.com/hanzoai/ai v1.806.6 // indirect
+	github.com/hanzo-ds/go v1.0.0 // indirect
+	github.com/hanzo-ds/native v0.72.0 // indirect
+	github.com/hanzoai/ai v1.806.9 // indirect
 	github.com/hanzoai/beego/v2 v2.4.1 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/dashscope-go-sdk v0.0.2 // indirect
 	github.com/hanzoai/dashscopego v0.6.0 // indirect
 	github.com/hanzoai/dbx v1.16.0 // indirect
 	github.com/hanzoai/go-openrouter v1.0.0 // indirect
-	github.com/hanzoai/iam v1.31.22 // indirect
+	github.com/hanzoai/iam v1.31.24 // indirect
 	github.com/hanzoai/pdf v1.2.0 // indirect
 	github.com/hanzoai/search-go v0.36.0 // indirect
 	github.com/hanzoai/tasks v1.51.0 // indirect

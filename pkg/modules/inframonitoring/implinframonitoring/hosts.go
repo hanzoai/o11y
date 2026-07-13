@@ -131,7 +131,7 @@ func (m *module) getPerGroupHostStatusCounts(
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	rows, err := m.telemetryStore.DatastoreDB().Query(ctx, query, args...)
+	rows, err := m.telemetryStore.Datastore().Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -376,7 +376,7 @@ func (m *module) getActiveHosts(ctx context.Context, metricNames []string, hostN
 	sb := m.getActiveHostsQuery(metricNames, hostNameAttr, sinceUnixMilli)
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
-	rows, err := m.telemetryStore.DatastoreDB().Query(ctx, query, args...)
+	rows, err := m.telemetryStore.Datastore().Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
