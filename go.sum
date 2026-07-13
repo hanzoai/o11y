@@ -103,8 +103,6 @@ github.com/AzureAD/microsoft-authentication-library-for-go v1.7.0 h1:4iB+IesclUX
 github.com/AzureAD/microsoft-authentication-library-for-go v1.7.0/go.mod h1:HKpQxkWaGLJ+D/5H8QRpyQXA1eKjxkFlOMwck5+33Jk=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/ClickHouse/ch-go v0.72.0 h1:DSyUd4kuxisOVXlZSXyIQYBAajSErZWC379651DpAMU=
-github.com/ClickHouse/ch-go v0.72.0/go.mod h1:eeWlJavWDsMf5fZzLNCYaBiMxVoREJYK00aiZ9FJ3E0=
 github.com/Code-Hex/go-generics-cache v1.5.1 h1:6vhZGc5M7Y/YD8cIUcY8kcuQLB4cHR7U+0KMqAA0KcU=
 github.com/Code-Hex/go-generics-cache v1.5.1/go.mod h1:qxcC9kRVrct9rHeiYpFWSoW1vxyillCVzX13KZG8dl4=
 github.com/DATA-DOG/go-sqlmock v1.5.2 h1:OcvFkGmslmlZibjAjaHm3L//6LiuBgolP7OputlJIzU=
@@ -915,8 +913,8 @@ github.com/hanzoai/dashscopego v0.6.0 h1:sLUepwcnVajaDgzlgfuJWkZblBg9UIalkpFUjXH
 github.com/hanzoai/dashscopego v0.6.0/go.mod h1:ciV938pktk0Tw6ssGYzEdxwS8OaHgv3xCWiy7W5664E=
 github.com/hanzoai/datastore-go-mock v0.14.3 h1:n3fsY8yr9h9ewzgmtb38qugT2UqhjIML7N9NiYmcroU=
 github.com/hanzoai/datastore-go-mock v0.14.3/go.mod h1:bWEdo98i6P0K2Z/0CIabxh/ML0BvqY8bocm6bsO7N7U=
-github.com/hanzoai/datastore-go/v2 v2.47.0 h1:3mTf0jZy4XAdr8+SbKU6ePWuSEAZq4VMzbk4RdNfgPY=
-github.com/hanzoai/datastore-go/v2 v2.47.0/go.mod h1:WJOH+9PH/4qHRccZOwPR3DjHS0mRN0GI6aGT62+bH1U=
+github.com/hanzoai/datastore-go/v2 v2.47.2 h1:SThITu8+otmlWuAiSmZ2L3z+2suLIAdAfwoliwO8qLs=
+github.com/hanzoai/datastore-go/v2 v2.47.2/go.mod h1:MQYk/Ztzt+WoT1SMx2wS2XvvdETWgXJQfUwT/bBj8qw=
 github.com/hanzoai/datastore-sql-parser v0.4.17 h1:I12ZticgPs6dz0lrI44dwCC3hvzdemIOShOUukAqMwk=
 github.com/hanzoai/datastore-sql-parser v0.4.17/go.mod h1:r5c3YMxBZzeuAlWJ0uAn8AHReHDtZYb3NYyt0jVLUMU=
 github.com/hanzoai/dbx v1.16.0 h1:C8wsb9BIiit4nYnXizpcB4SyzVaepPkQFwq5i9fxAV0=
