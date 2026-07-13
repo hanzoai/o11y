@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/bytedance/sonic"
-	"github.com/hanzoai/datastore-go/v2/lib/driver"
+	"github.com/hanzo-ds/go/lib/driver"
 	"github.com/hanzoai/o11y/pkg/errors"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/spantypes"

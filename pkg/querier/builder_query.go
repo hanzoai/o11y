@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hanzoai/datastore-go/v2"
+	"github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrytraces"

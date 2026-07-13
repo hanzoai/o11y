@@ -7,7 +7,7 @@ import (
 
 	"strconv"
 
-	"github.com/hanzoai/datastore-go/v2"
+	"github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/modules/services"
 	"github.com/hanzoai/o11y/pkg/querier"

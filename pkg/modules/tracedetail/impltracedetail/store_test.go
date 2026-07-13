@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	dsmock "github.com/hanzoai/datastore-go-mock"
+	dsmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/modules/tracedetail/impltracedetail"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
