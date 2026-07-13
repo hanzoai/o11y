@@ -76,7 +76,7 @@ func (q *traceOperatorQuery) executeWithContext(ctx context.Context, query strin
 		elapsed += p.Elapsed
 	}))
 
-	rows, err := q.telemetryStore.DatastoreDB().Query(ctx, query, args...)
+	rows, err := q.telemetryStore.Datastore().Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
