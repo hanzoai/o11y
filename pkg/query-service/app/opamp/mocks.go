@@ -8,7 +8,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/opamptypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/google/uuid"
-	"github.com/knadh/koanf"
+	"github.com/knadh/koanf/v2"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/rawbytes"
 	"github.com/open-telemetry/opamp-go/protobufs"

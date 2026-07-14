@@ -27,12 +27,18 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/hanzo-ds/go v1.0.1
+	github.com/hanzoai/cloud v1.786.112
 	github.com/hanzoai/govaluate v0.1.0
-	github.com/hanzoai/otel-collector v0.144.13
+	github.com/hanzoai/otel-collector v1.2.0
 	github.com/hanzoai/sqlite v0.3.0
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12
-	github.com/knadh/koanf v1.5.0
-	github.com/knadh/koanf/v2 v2.3.3
+	github.com/knadh/koanf/parsers/json v1.0.0
+	github.com/knadh/koanf/parsers/yaml v1.1.0
+	github.com/knadh/koanf/providers/confmap v1.0.0
+	github.com/knadh/koanf/providers/env v1.1.0
+	github.com/knadh/koanf/providers/file v1.2.1
+	github.com/knadh/koanf/providers/rawbytes v1.0.0
+	github.com/knadh/koanf/v2 v2.3.5
 	github.com/luxfi/zap v1.2.1
 	github.com/mailru/easyjson v0.9.0
 	github.com/open-telemetry/opamp-go v0.22.0
@@ -137,7 +143,6 @@ require (
 	github.com/aws/smithy-go v1.24.2 // indirect
 	github.com/baidubce/bce-qianfan-sdk/go/qianfan v0.0.14 // indirect
 	github.com/baidubce/bce-sdk-go v0.9.264 // indirect
-	github.com/beego/beego v1.12.14 // indirect
 	github.com/bits-and-blooms/bitset v1.24.4 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/buger/goterm v1.0.4 // indirect
@@ -211,14 +216,17 @@ require (
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
 	github.com/hanzo-ds/native v0.72.0 // indirect
-	github.com/hanzoai/ai v1.806.10 // indirect
-	github.com/hanzoai/beego/v2 v2.4.1 // indirect
+	github.com/hanzoai/ai v1.808.0 // indirect
+	github.com/hanzoai/beego v1.12.13 // indirect
+	github.com/hanzoai/beego/v2 v2.4.2 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/dashscope-go-sdk v0.0.2 // indirect
 	github.com/hanzoai/dashscopego v0.6.0 // indirect
 	github.com/hanzoai/dbx v1.16.0 // indirect
+	github.com/hanzoai/decimal v0.1.1 // indirect
 	github.com/hanzoai/go-openrouter v1.0.0 // indirect
-	github.com/hanzoai/iam v1.31.24 // indirect
+	github.com/hanzoai/iam v1.31.25 // indirect
+	github.com/hanzoai/money v0.2.1 // indirect
 	github.com/hanzoai/pdf v1.2.0 // indirect
 	github.com/hanzoai/search-go v0.36.0 // indirect
 	github.com/hanzoai/tasks v1.51.0 // indirect
@@ -235,6 +243,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
+	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/leverly/ChatGLM v1.2.0 // indirect
 	github.com/lib/pq v1.12.3 // indirect
@@ -251,7 +260,7 @@ require (
 	github.com/luxfi/crypto v1.20.0 // indirect
 	github.com/luxfi/crypto/ipa v1.2.4 // indirect
 	github.com/luxfi/database v1.19.3 // indirect
-	github.com/luxfi/geth v1.17.11 // indirect
+	github.com/luxfi/geth v1.17.12 // indirect
 	github.com/luxfi/ids v1.3.0 // indirect
 	github.com/luxfi/math v1.4.1 // indirect
 	github.com/luxfi/math/big v0.1.0 // indirect
@@ -424,7 +433,6 @@ require (
 	github.com/hanzo-ds/mock v0.14.4
 	github.com/hanzo-ds/sqlbuilder v1.42.2
 	github.com/hanzo-ds/sqlparser v0.4.16
-	github.com/hanzoai/cloud v1.786.112
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.5 // indirect
