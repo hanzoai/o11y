@@ -4,8 +4,8 @@ service:
     traces:
       receivers: [jaeger, otlp]
       processors: [o11yspanmetrics/cumulative, batch]
-      exporters: [clickhousetraces]
+      exporters: [datastoretraces]
     metrics:
       receivers: [otlp, hostmetrics]
       processors: [batch]
-      exporters: [clickhousemetricswrite]
+      exporters: [datastoremetricswrite]
