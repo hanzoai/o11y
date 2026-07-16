@@ -3,6 +3,8 @@ import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
 
 import { useUrlSearchState } from './useUrlSearchState';
 
+import type { JSX } from 'react';
+
 jest.useFakeTimers();
 
 const DEFAULT_DEBOUNCE_MS = 300;

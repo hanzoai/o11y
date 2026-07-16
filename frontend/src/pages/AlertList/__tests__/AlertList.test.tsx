@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import AlertList from '../index';
 
+import type { JSX } from 'react';
+
 const ALERTS_PATH = '/alerts';
 const TAB_SELECTOR = '.ant-tabs-tab';
 const LIST_ALERT_RULES_TEXT = 'List Alert Rules Component';

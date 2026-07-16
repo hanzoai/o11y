@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Row, Select, Spin } from 'antd';
 import {
@@ -26,10 +26,10 @@ export function FilterSelect({
 	placeholder,
 	queryParam,
 	filterType,
-	values,
-	shouldSetQueryParams,
-	onChange,
-	isMultiple,
+	values = [],
+	shouldSetQueryParams = true,
+	onChange = (): void => {},
+	isMultiple = true,
 }: SelectOptionConfig): JSX.Element {
 	const { handleSearch, isFetching, options } =
 		useCeleryFilterOptions(filterType);
@@ -117,13 +117,6 @@ export function FilterSelect({
 		/>
 	);
 }
-
-FilterSelect.defaultProps = {
-	shouldSetQueryParams: true,
-	onChange: (): void => {},
-	values: [],
-	isMultiple: true,
-};
 
 function CeleryOverviewConfigOptions(): JSX.Element {
 	const selectConfigs: SelectOptionConfig[] = [

@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { useQueryClient } from 'react-query';
 import * as Sentry from '@sentry/react';
 import getLocalStorageKey from 'api/browser/localstorage/get';
@@ -76,9 +83,9 @@ function LogsExplorer(): JSX.Element {
 
 	const isAIAssistantEnabled = useIsAIAssistantEnabled();
 
-	const listQueryKeyRef = useRef<any>();
+	const listQueryKeyRef = useRef<any>(undefined);
 
-	const chartQueryKeyRef = useRef<any>();
+	const chartQueryKeyRef = useRef<any>(undefined);
 
 	const [isLoadingQueries, setIsLoadingQueries] = useState<boolean>(false);
 	const [isCancelled, setIsCancelled] = useState(false);

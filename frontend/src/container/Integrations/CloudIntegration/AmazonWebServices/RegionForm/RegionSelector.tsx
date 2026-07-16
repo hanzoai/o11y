@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, type JSX } from 'react';
 import { Checkbox } from 'components/ui/checkbox';
 import { useRegionSelection } from 'hooks/integration/aws/useRegionSelection';
 import { regions } from 'utils/regions';

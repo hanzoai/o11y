@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useQueryClient } from 'react-query';
 import { generatePath, matchPath, useLocation } from 'react-router-dom';
 import { Input } from 'components/ui/input';
@@ -23,7 +23,7 @@ interface CreateFunnelProps {
 function CreateFunnel({
 	isOpen,
 	onClose,
-	redirectToDetails,
+	redirectToDetails = true,
 }: CreateFunnelProps): JSX.Element {
 	const [funnelName, setFunnelName] = useState<string>('');
 	const [inputError, setInputError] = useState<string>('');
@@ -141,7 +141,4 @@ function CreateFunnel({
 	);
 }
 
-CreateFunnel.defaultProps = {
-	redirectToDetails: true,
-};
 export default CreateFunnel;

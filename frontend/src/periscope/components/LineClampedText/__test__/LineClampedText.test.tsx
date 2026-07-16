@@ -58,7 +58,10 @@ describe('LineClampedText', () => {
 		// Verify the text is rendered correctly
 		expect(screen.getByText(text)).toBeInTheDocument();
 
-		// Verify the default props
-		expect(LineClampedText.defaultProps?.lines).toBe(1);
+		// Verify the default line count of 1 is applied
+		const style = screen.getByText(text).style as CSSStyleDeclaration & {
+			WebkitLineClamp?: string;
+		};
+		expect(style.WebkitLineClamp).toBe('1');
 	});
 });

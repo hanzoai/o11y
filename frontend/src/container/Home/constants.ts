@@ -31,7 +31,8 @@ export const DOCS_LINKS = {
 	ADD_DATA_SOURCE: 'https://o11y.hanzo.ai/docs/instrumentation/overview/',
 	SEND_LOGS: 'https://o11y.hanzo.ai/docs/userguide/logs/',
 	SEND_TRACES: 'https://o11y.hanzo.ai/docs/userguide/traces/',
-	SEND_METRICS: 'https://o11y.hanzo.ai/docs/metrics-management/metrics-explorer/',
+	SEND_METRICS:
+		'https://o11y.hanzo.ai/docs/metrics-management/metrics-explorer/',
 	SETUP_ALERTS: 'https://o11y.hanzo.ai/docs/userguide/alerts-management/',
 	SETUP_SAVED_VIEWS:
 		'https://o11y.hanzo.ai/docs/product-features/saved-view/#step-2-save-your-view',

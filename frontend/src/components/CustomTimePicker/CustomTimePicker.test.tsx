@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import dayjs from 'dayjs';
 import * as timeUtils from 'utils/timeUtils';

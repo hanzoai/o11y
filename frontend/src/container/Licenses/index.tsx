@@ -7,6 +7,8 @@ import ApplyLicenseForm from './ApplyLicenseForm';
 
 import './Licenses.styles.scss';
 
+import type { JSX } from 'react';
+
 function Licenses(): JSX.Element {
 	const { t, ready: translationsReady } = useTranslation(['licenses']);
 	const { activeLicenseRefetch } = useAppContext();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Button } from '@hanzo/ui';
 import { Color } from 'constants/designTokens';
 import { DialogWrapper } from 'components/ui/dialog';
@@ -193,7 +193,7 @@ export default function CustomDomainEditModal({
 					) : (
 						<Button
 							variant="solid"
-							size="md"
+							size={16}
 							color="primary"
 							className="edit-modal-apply-btn"
 							onClick={handleSubmit}

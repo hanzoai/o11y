@@ -3,6 +3,8 @@ import { FunnelStepData } from 'types/api/traceFunnels';
 
 import FunnelTopTracesTable from './FunnelTopTracesTable';
 
+import type { JSX } from 'react';
+
 interface TopSlowestTracesProps {
 	funnelId: string;
 	stepAOrder: number;

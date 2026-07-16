@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Button } from 'antd';
 import ErrorIcon from 'assets/Error';
@@ -19,7 +19,10 @@ interface ErrorContentProps {
 	icon?: ReactNode;
 }
 
-function ErrorContent({ error, icon }: ErrorContentProps): JSX.Element {
+function ErrorContent({
+	error,
+	icon = undefined,
+}: ErrorContentProps): JSX.Element {
 	const {
 		url: errorUrl,
 		errors: errorMessages,
@@ -106,9 +109,5 @@ function ErrorContent({ error, icon }: ErrorContentProps): JSX.Element {
 		</section>
 	);
 }
-
-ErrorContent.defaultProps = {
-	icon: undefined,
-};
 
 export default ErrorContent;

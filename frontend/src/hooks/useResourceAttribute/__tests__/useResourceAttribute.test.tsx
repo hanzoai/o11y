@@ -7,6 +7,8 @@ import { AppProvider } from 'providers/App/App';
 import ResourceProvider from '../ResourceProvider';
 import useResourceAttribute from '../useResourceAttribute';
 
+import type { JSX } from 'react';
+
 const queryClient = new QueryClient();
 
 jest.mock('hooks/useSafeNavigate', () => ({

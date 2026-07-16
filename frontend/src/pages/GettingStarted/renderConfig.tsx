@@ -142,8 +142,7 @@ export const GetStartedContent = (): TGetStartedContentSection[] => {
 				{
 					title: 'Configure alert notification channels',
 					icon: <Volume2 style={{ fontSize: '3.5rem' }} />,
-					url:
-						'https://o11y.hanzo.ai/docs/userguide/alerts-management/#setting-up-a-notification-channel',
+					url: 'https://o11y.hanzo.ai/docs/userguide/alerts-management/#setting-up-a-notification-channel',
 				},
 			],
 		},

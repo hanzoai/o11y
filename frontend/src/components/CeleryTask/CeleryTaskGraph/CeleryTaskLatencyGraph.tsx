@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -43,7 +43,7 @@ export enum CeleryTaskGraphState {
 
 function CeleryTaskLatencyGraph({
 	queryEnabled,
-	checkIfDataExists,
+	checkIfDataExists = undefined,
 }: {
 	queryEnabled: boolean;
 	checkIfDataExists?: (isDataAvailable: boolean) => void;
@@ -253,7 +253,3 @@ function CeleryTaskLatencyGraph({
 }
 
 export default CeleryTaskLatencyGraph;
-
-CeleryTaskLatencyGraph.defaultProps = {
-	checkIfDataExists: undefined,
-};

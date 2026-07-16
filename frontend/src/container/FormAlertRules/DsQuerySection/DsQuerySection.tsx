@@ -1,6 +1,8 @@
 import DatastoreQueryBuilder from 'container/NewWidget/LeftContainer/QuerySection/QueryBuilder/datastore/query';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 
+import type { JSX } from 'react';
+
 function DsQuerySection(): JSX.Element {
 	const { currentQuery } = useQueryBuilder();
 

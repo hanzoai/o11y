@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { Input } from 'components/ui/input';
 import { Button, Select, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';

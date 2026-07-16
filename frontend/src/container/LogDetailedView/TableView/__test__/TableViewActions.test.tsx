@@ -7,6 +7,8 @@ import { ExplorerViews } from 'pages/LogsExplorer/utils';
 import TableViewActions from '../TableViewActions';
 import useAsyncJSONProcessing from '../useAsyncJSONProcessing';
 
+import type { JSX } from 'react';
+
 // Mock data for tests
 let mockCopyToClipboard: jest.Mock;
 let mockNotificationsSuccess: jest.Mock;

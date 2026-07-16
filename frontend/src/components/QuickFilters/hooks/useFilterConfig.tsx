@@ -9,7 +9,7 @@ import { getFilterConfig } from '../utils';
 
 interface UseFilterConfigProps {
 	signal?: SignalType;
-	config: IQuickFiltersConfig[];
+	config?: IQuickFiltersConfig[];
 }
 interface UseFilterConfigReturn {
 	filterConfig: IQuickFiltersConfig[];

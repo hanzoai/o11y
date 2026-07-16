@@ -8,6 +8,8 @@ import { withBasePath } from 'utils/basePath';
 
 import './ServiceDashboards.styles.scss';
 
+import type { JSX } from 'react';
+
 function ServiceDashboards({
 	service,
 	isInteractive = true,

@@ -1,4 +1,11 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import {
+	Dispatch,
+	SetStateAction,
+	useEffect,
+	useMemo,
+	useState,
+	type JSX,
+} from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { Color } from 'components/ui/design-tokens';
 import { Button } from 'components/ui/button';

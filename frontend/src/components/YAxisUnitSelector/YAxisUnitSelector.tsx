@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { SolidAlertTriangle } from 'components/ui/icons';
 import { Select, Tooltip } from 'antd';
 import type { DefaultOptionType } from 'antd/es/select';
@@ -85,7 +85,7 @@ function YAxisUnitSelector({
 				suffixIcon={
 					incompatibleUnitMessage ? (
 						<Tooltip title={incompatibleUnitMessage}>
-							<SolidAlertTriangle role="img" aria-label="warning" size="md" />
+							<SolidAlertTriangle role="img" aria-label="warning" size={16} />
 						</Tooltip>
 					) : undefined
 				}

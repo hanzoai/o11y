@@ -35,7 +35,9 @@ export type PopoverProps = {
  * Root component that manages the open state and accessibility wiring for a popover.
  */
 function Popover({ testId, ...props }: PopoverProps) {
-	return <PopoverPrimitive.Root data-slot="popover" data-testid={testId} {...props} />;
+	return (
+		<PopoverPrimitive.Root data-slot="popover" data-testid={testId} {...props} />
+	);
 }
 
 export type PopoverTriggerProps = Omit<
@@ -69,7 +71,7 @@ const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
 			className={className}
 			{...props}
 		/>
-	)
+	),
 );
 PopoverTrigger.displayName = 'PopoverTrigger';
 
@@ -104,11 +106,13 @@ const PopoverAnchor = React.forwardRef<HTMLDivElement, PopoverAnchorProps>(
 			className={className}
 			{...props}
 		/>
-	)
+	),
 );
 PopoverAnchor.displayName = 'PopoverAnchor';
 
-export type PopoverPortalProps = React.ComponentProps<typeof PopoverPrimitive.Portal> & {
+export type PopoverPortalProps = React.ComponentProps<
+	typeof PopoverPrimitive.Portal
+> & {
 	/**
 	 * The test id of the popover portal.
 	 */
@@ -119,7 +123,13 @@ export type PopoverPortalProps = React.ComponentProps<typeof PopoverPrimitive.Po
  * Portals the popover content into `document.body`. Used internally by `PopoverContent`.
  */
 const PopoverPortal = ({ testId, ...props }: PopoverPortalProps) => {
-	return <PopoverPrimitive.Portal data-slot="popover-portal" data-testid={testId} {...props} />;
+	return (
+		<PopoverPrimitive.Portal
+			data-slot="popover-portal"
+			data-testid={testId}
+			{...props}
+		/>
+	);
 };
 
 export type PopoverArrowProps = {
@@ -147,11 +157,13 @@ const PopoverArrow = React.forwardRef<SVGSVGElement, PopoverArrowProps>(
 				<path d="M 0,0 L 15,10 L 30,0" data-slot="popover-arrow-path" />
 			</svg>
 		</PopoverPrimitive.Arrow>
-	)
+	),
 );
 PopoverArrow.displayName = 'PopoverArrow';
 
-type OriginalPopoverContentProps = React.ComponentProps<typeof PopoverPrimitive.Content>;
+type OriginalPopoverContentProps = React.ComponentProps<
+	typeof PopoverPrimitive.Content
+>;
 
 export type PopoverContentProps = {
 	/**
@@ -255,7 +267,10 @@ export type PopoverContentProps = {
 	 * @default true
 	 */
 	withPortal?: boolean;
-} & Pick<React.ComponentProps<'div'>, 'id' | 'className' | 'style' | 'children'>;
+} & Pick<
+	React.ComponentProps<'div'>,
+	'id' | 'className' | 'style' | 'children'
+>;
 
 /**
  * The content that pops out when the popover is open. Rendered in a portal.
@@ -263,8 +278,17 @@ export type PopoverContentProps = {
  */
 const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
 	(
-		{ className, align = 'center', sideOffset = 4, testId, children, arrow = false, withPortal = true, ...props },
-		ref
+		{
+			className,
+			align = 'center',
+			sideOffset = 4,
+			testId,
+			children,
+			arrow = false,
+			withPortal = true,
+			...props
+		},
+		ref,
 	) => {
 		const popoverContent = (
 			<PopoverPrimitive.Content
@@ -284,11 +308,13 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
 			return popoverContent;
 		}
 		return <PopoverPortal>{popoverContent}</PopoverPortal>;
-	}
+	},
 );
 PopoverContent.displayName = 'PopoverContent';
 
-export type PopoverCloseProps = React.ComponentProps<typeof PopoverPrimitive.Close> & {
+export type PopoverCloseProps = React.ComponentProps<
+	typeof PopoverPrimitive.Close
+> & {
 	/**
 	 * The test id of the popover close.
 	 */
@@ -306,7 +332,7 @@ const PopoverClose = React.forwardRef<HTMLButtonElement, PopoverCloseProps>(
 			data-testid={testId}
 			{...props}
 		/>
-	)
+	),
 );
 PopoverClose.displayName = 'PopoverClose';
 

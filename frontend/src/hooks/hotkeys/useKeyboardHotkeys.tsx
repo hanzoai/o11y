@@ -1,12 +1,12 @@
 import {
 	// eslint-disable-next-line no-restricted-imports
 	createContext,
-	useCallback,
-	// eslint-disable-next-line no-restricted-imports
+	useCallback, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useEffect,
 	useMemo,
 	useRef,
+	type JSX,
 } from 'react';
 import { noop, unset } from 'lodash-es';
 

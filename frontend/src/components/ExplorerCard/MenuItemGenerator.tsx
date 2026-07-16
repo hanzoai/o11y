@@ -1,4 +1,4 @@
-import { MouseEvent, useCallback } from 'react';
+import { MouseEvent, useCallback, type JSX } from 'react';
 import { Trash2 } from 'components/ui/icons';
 import { Col, Row, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
@@ -91,7 +91,7 @@ function MenuItemGenerator({
 							role="img"
 							aria-label="Delete view"
 							onClick={onDeleteHandler}
-							size="md"
+							size={16}
 						/>
 					</Typography.Link>
 				</Col>

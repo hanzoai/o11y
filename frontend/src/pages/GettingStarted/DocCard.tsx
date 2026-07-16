@@ -6,6 +6,8 @@ import { DocCardContainer } from './styles';
 import { TGetStartedContentDoc } from './types';
 import UTMParams from './utmParams';
 
+import type { JSX } from 'react';
+
 interface IDocCardProps {
 	text: TGetStartedContentDoc['title'];
 	icon: TGetStartedContentDoc['icon'];

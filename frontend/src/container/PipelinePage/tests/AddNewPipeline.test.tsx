@@ -5,6 +5,8 @@ import { PipelineData } from 'types/api/pipeline/def';
 import { pipelineMockData } from '../mocks/pipeline';
 import AddNewPipeline from '../PipelineListsView/AddNewPipeline';
 
+import type { JSX } from 'react';
+
 export function matchMedia(): void {
 	Object.defineProperty(window, 'matchMedia', {
 		writable: true,

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, type JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button } from 'antd';
 import { Badge } from 'components/ui/badge';

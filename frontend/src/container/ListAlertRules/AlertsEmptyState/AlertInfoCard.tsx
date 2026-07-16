@@ -4,6 +4,8 @@ import { openInNewTab } from 'utils/navigation';
 
 import styles from './AlertsEmptyState.module.scss';
 
+import type { JSX } from 'react';
+
 interface AlertInfoCardProps {
 	header: string;
 	subheader: string;
@@ -33,7 +35,7 @@ function AlertInfoCard({
 					{subheader}
 				</Typography.Text>
 			</div>
-			<ArrowRight size="md" />
+			<ArrowRight size={16} />
 		</div>
 	);
 }

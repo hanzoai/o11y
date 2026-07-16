@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { toast } from 'components/ui/sonner';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';

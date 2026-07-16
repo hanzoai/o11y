@@ -10,6 +10,8 @@ import PublicDashboardContainer from '../../container/PublicDashboardContainer';
 
 import './PublicDashboard.styles.scss';
 
+import type { JSX } from 'react';
+
 function PublicDashboardPage(): JSX.Element {
 	// read the dashboard id from the url
 	const { dashboardId } = useParams<{ dashboardId: string }>();

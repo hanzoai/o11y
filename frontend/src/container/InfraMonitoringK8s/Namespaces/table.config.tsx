@@ -10,6 +10,8 @@ import { InfraMonitoringEntity } from '../constants';
 import { K8sNamespacesData, K8sNamespacesListPayload } from './api';
 import { FilePenLine } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export function getK8sNamespaceRowKey(namespace: K8sNamespacesData): string {
 	return namespace.namespaceName || namespace.meta.k8s_namespace_name;
 }

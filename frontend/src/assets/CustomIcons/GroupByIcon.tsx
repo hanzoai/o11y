@@ -1,6 +1,8 @@
 import { Color } from 'constants/designTokens';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 
+import type { JSX } from 'react';
+
 function GroupByIcon(): JSX.Element {
 	const isDarkMode = useIsDarkMode();
 	return (

@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import * as Sentry from '@sentry/react';
 import { Button, CollapseProps } from 'antd';
 import { Collapse, Tooltip } from 'antd';
@@ -339,7 +346,7 @@ export default function InfraMonitoringK8s(): JSX.Element {
 									<ArrowUpToLine
 										style={{ transform: 'rotate(270deg)' }}
 										onClick={handleFilterVisibilityChange}
-										size="md"
+										size={16}
 									/>
 								</Tooltip>
 							</div>

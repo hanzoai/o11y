@@ -17,6 +17,8 @@ import { ANOMALY_TAB_TOOLTIP, THRESHOLD_TAB_TOOLTIP } from './constants';
 
 import './styles.scss';
 
+import type { JSX } from 'react';
+
 function AlertCondition(): JSX.Element {
 	const { alertType, setAlertType } = useCreateAlertState();
 

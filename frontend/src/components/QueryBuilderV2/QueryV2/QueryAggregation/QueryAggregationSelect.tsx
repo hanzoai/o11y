@@ -1,6 +1,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable sonarjs/cognitive-complexity */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { useQuery } from 'react-query';
 import {
 	autocompletion,
@@ -146,9 +153,9 @@ const stopEventsExtension = EditorView.domEventHandlers({
 });
 
 function QueryAggregationSelect({
-	onChange,
+	onChange = undefined,
 	queryData,
-	maxAggregations,
+	maxAggregations = undefined,
 }: {
 	onChange?: (value: string) => void;
 	queryData: IBuilderQuery;
@@ -730,10 +737,5 @@ function QueryAggregationSelect({
 		</div>
 	);
 }
-
-QueryAggregationSelect.defaultProps = {
-	onChange: undefined,
-	maxAggregations: undefined,
-};
 
 export default QueryAggregationSelect;

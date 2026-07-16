@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type JSX } from 'react';
 import cx from 'classnames';
 import { ChevronDown, ChevronRight, Sparkles } from 'components/ui/icons';
 
@@ -112,7 +112,6 @@ export default function ActivityGroup({
 					<ChevronRight size={12} className={styles.toggleChevron} />
 				)}
 			</div>
-
 			{expanded && (
 				<div className={styles.activityBody}>
 					{isSingle ? (

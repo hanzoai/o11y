@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Tooltip } from 'antd';
 import { Clock } from 'components/ui/icons';
 

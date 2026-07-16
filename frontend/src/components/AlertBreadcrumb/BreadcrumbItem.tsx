@@ -4,6 +4,8 @@ import { isModifierKeyPressed } from 'utils/app';
 
 import styles from './BreadcrumbItem.module.scss';
 
+import type { JSX } from 'react';
+
 export type BreadcrumbItemConfig =
 	| {
 			title: string | null;

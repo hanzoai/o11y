@@ -6,6 +6,8 @@ import { ArrowDown, ArrowUp, Ban } from 'components/ui/icons';
 
 import './ShowButton.styles.scss';
 
+import type { JSX } from 'react';
+
 interface ShowButtonProps {
 	isLoading: boolean;
 	isDisabled: boolean;

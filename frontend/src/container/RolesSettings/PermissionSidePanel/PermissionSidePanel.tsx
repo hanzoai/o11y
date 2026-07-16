@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { Button, Label, RadioGroup, RadioGroupItem } from '@hanzo/ui';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import { Select, Skeleton } from 'antd';
@@ -71,8 +71,8 @@ function ResourceRow({
 					<RadioGroup
 						value={config.scope}
 						onChange={(val: string): void =>
-						onScopeChange(resource.id, val as ScopeType)
-					}
+							onScopeChange(resource.id, val as ScopeType)
+						}
 						color="robin"
 						className="psp-resource__radio-group"
 					>
@@ -102,9 +102,7 @@ function ResourceRow({
 								value={PermissionScope.NONE}
 								id={`${resource.id}-none`}
 							/>
-							<Label htmlFor={`${resource.id}-only-selected`}>
-								Only selected
-							</Label>
+							<Label htmlFor={`${resource.id}-only-selected`}>Only selected</Label>
 						</div>
 					</RadioGroup>
 

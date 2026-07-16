@@ -2,6 +2,8 @@ import { Tooltip } from 'antd';
 
 import './ChartManager.styles.scss';
 
+import type { JSX } from 'react';
+
 interface SeriesLabelProps {
 	label: string;
 	labelIndex: number;

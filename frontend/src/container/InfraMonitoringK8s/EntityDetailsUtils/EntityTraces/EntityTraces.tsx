@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, type JSX } from 'react';
 import logEvent from 'api/common/logEvent';
 import {
 	QuerySearchV2Provider,

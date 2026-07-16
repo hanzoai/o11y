@@ -12,8 +12,8 @@ import { ITraceMetadata } from '../types';
 import { clamp } from '../utils';
 
 interface UseFlamegraphDragArgs {
-	canvasRef: RefObject<HTMLCanvasElement>;
-	containerRef: RefObject<HTMLDivElement>;
+	canvasRef: RefObject<HTMLCanvasElement | null>;
+	containerRef: RefObject<HTMLDivElement | null>;
 	traceMetadata: ITraceMetadata;
 	viewStartRef: MutableRefObject<number>;
 	viewEndRef: MutableRefObject<number>;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Col, Input, Select, Space, Tooltip } from 'antd';
 import { ToggleGroupSimple } from 'components/ui/toggle-group';
@@ -202,7 +202,7 @@ function GeneralDashboardSettings(): JSX.Element {
 						placement="top"
 						mouseEnterDelay={0.5}
 					>
-						<SolidInfoCircle size="md" className={styles.crossPanelSyncInfoIcon} />
+						<SolidInfoCircle size={16} className={styles.crossPanelSyncInfoIcon} />
 					</Tooltip>
 				</div>
 				<div className={styles.crossPanelSyncRow}>

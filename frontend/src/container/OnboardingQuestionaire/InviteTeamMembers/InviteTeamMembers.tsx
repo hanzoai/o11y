@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useMutation } from 'react-query';
 import { Button } from '@hanzo/ui';
 import { Callout } from 'components/ui/callout';

@@ -37,6 +37,8 @@ import {
 
 import './RuleOptions.styles.scss';
 
+import type { JSX } from 'react';
+
 function RuleOptions({
 	alertDef,
 	setAlertDef,

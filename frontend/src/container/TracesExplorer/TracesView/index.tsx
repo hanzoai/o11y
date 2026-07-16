@@ -6,6 +6,7 @@ import {
 	SetStateAction,
 	useEffect,
 	useMemo,
+	type JSX,
 } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
@@ -47,7 +48,7 @@ function TracesView({
 	isFilterApplied,
 	setWarning,
 	setIsLoadingQueries,
-	queryKeyRef,
+	queryKeyRef = undefined,
 }: TracesViewProps): JSX.Element {
 	const { stagedQuery, panelType } = useQueryBuilder();
 
@@ -194,9 +195,5 @@ function TracesView({
 		</Container>
 	);
 }
-
-TracesView.defaultProps = {
-	queryKeyRef: undefined,
-};
 
 export default memo(TracesView);

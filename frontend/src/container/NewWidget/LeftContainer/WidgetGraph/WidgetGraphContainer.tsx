@@ -11,6 +11,8 @@ import { NotFoundContainer } from './styles';
 import { populateMultipleResults } from './util';
 import WidgetGraph from './WidgetGraphs';
 
+import type { JSX } from 'react';
+
 function WidgetGraphContainer({
 	selectedGraph,
 	queryResponse,

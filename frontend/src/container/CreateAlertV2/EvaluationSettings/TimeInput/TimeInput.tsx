@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, type JSX } from 'react';
 import { Input } from 'components/ui/input';
 import './TimeInput.scss';
 
@@ -11,7 +11,7 @@ export interface TimeInputProps {
 
 function TimeInput({
 	value = '00:00:00',
-	onChange,
+	onChange = undefined,
 	disabled = false,
 	className = '',
 }: TimeInputProps): JSX.Element {
@@ -186,12 +186,5 @@ function TimeInput({
 		</div>
 	);
 }
-
-TimeInput.defaultProps = {
-	value: '00:00:00',
-	onChange: undefined,
-	disabled: false,
-	className: '',
-};
 
 export default TimeInput;

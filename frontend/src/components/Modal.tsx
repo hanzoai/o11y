@@ -1,11 +1,11 @@
-import { ReactElement } from 'react';
+import { ReactElement, type JSX } from 'react';
 import { Modal, ModalProps as Props } from 'antd';
 
 function CustomModal({
 	title,
 	children,
 	isModalVisible,
-	footer,
+	footer = undefined,
 	closable = true,
 }: ModalProps): JSX.Element {
 	return (
@@ -27,10 +27,5 @@ interface ModalProps {
 	title: string;
 	children: ReactElement;
 }
-
-CustomModal.defaultProps = {
-	closable: undefined,
-	footer: undefined,
-};
 
 export default CustomModal;

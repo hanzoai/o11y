@@ -4,6 +4,8 @@ import emptyStateUrl from '@/assets/Icons/emptyState.svg';
 
 import styles from './NoResultsState.module.scss';
 
+import type { JSX } from 'react';
+
 interface Props {
 	searchString: string;
 }

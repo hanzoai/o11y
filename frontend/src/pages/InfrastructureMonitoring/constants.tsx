@@ -4,6 +4,8 @@ import InfraMonitoringHosts from 'container/InfraMonitoringHosts';
 import InfraMonitoringK8s from 'container/InfraMonitoringK8s';
 import { Inbox } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export const Hosts: TabRoutes = {
 	Component: (): JSX.Element => <InfraMonitoringHosts />,
 	name: (

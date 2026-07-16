@@ -11,6 +11,8 @@ import { InfraMonitoringEntity } from '../constants';
 import { K8sDeploymentsData } from './api';
 import { Computer } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export function getK8sDeploymentRowKey(deployment: K8sDeploymentsData): string {
 	return deployment.meta.k8s_deployment_name || deployment.deploymentName;
 }

@@ -1,6 +1,8 @@
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import { useTimezone } from 'providers/Timezone';
 
+import type { JSX } from 'react';
+
 function DeploymentTime(deployTime: string): JSX.Element {
 	const { formatTimezoneAdjustedTimestamp } = useTimezone();
 	return (

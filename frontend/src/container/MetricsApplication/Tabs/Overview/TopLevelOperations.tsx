@@ -9,6 +9,8 @@ import { Card, GraphContainer } from 'container/MetricsApplication/styles';
 import { OnClickPluginOpts } from 'lib/uPlotLib/plugins/onClickPlugin';
 import { Widgets } from 'types/api/dashboard/getAll';
 
+import type { JSX } from 'react';
+
 function TopLevelOperation({
 	name,
 	opName,

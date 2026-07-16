@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { DEFAULT_ENTITY_VERSION } from 'constants/app';
 import {
 	initialFilters,

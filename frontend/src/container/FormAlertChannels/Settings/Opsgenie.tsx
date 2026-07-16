@@ -4,6 +4,8 @@ import { MarkdownRenderer } from 'components/MarkdownRenderer/MarkdownRenderer';
 
 import { OpsgenieChannel } from '../../CreateAlertChannels/config';
 
+import type { JSX } from 'react';
+
 const { TextArea } = Input;
 
 function OpsgenieForm({ setSelectedConfig }: OpsgenieFormProps): JSX.Element {

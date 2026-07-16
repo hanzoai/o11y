@@ -89,6 +89,9 @@ describe('AlertNotFound', () => {
 		const user = userEvent.setup();
 		render(<AlertNotFound isTestAlert={false} />);
 		await user.click(screen.getByText('Contact Support'));
-		expect(window.open).toHaveBeenCalledWith('https://o11y.hanzo.ai/slack', '_blank');
+		expect(window.open).toHaveBeenCalledWith(
+			'https://o11y.hanzo.ai/slack',
+			'_blank',
+		);
 	});
 });

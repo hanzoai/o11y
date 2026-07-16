@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 export default function RedisIcon(): JSX.Element {
 	return (
 		<svg

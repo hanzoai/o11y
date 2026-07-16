@@ -8,6 +8,8 @@ import { SPAN_ATTRIBUTES } from '../Explorer/Domains/DomainDetails/constants';
 import TopErrors from '../Explorer/Domains/DomainDetails/TopErrors';
 import { getTopErrorsQueryPayload } from '../utils';
 
+import type { JSX } from 'react';
+
 // Mock the EndPointsDropDown component to avoid issues
 jest.mock(
 	'../Explorer/Domains/DomainDetails/components/EndPointsDropDown',

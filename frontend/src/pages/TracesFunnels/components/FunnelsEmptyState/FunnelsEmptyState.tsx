@@ -7,12 +7,14 @@ import alertEmojiUrl from '@/assets/Icons/alert_emoji.svg';
 
 import './FunnelsEmptyState.styles.scss';
 
+import type { JSX } from 'react';
+
 interface FunnelsEmptyStateProps {
 	onCreateFunnel?: () => void;
 }
 
 function FunnelsEmptyState({
-	onCreateFunnel,
+	onCreateFunnel = undefined,
 }: FunnelsEmptyStateProps): JSX.Element {
 	const { hasEditPermission } = useAppContext();
 
@@ -50,9 +52,5 @@ function FunnelsEmptyState({
 		</div>
 	);
 }
-
-FunnelsEmptyState.defaultProps = {
-	onCreateFunnel: undefined,
-};
 
 export default FunnelsEmptyState;

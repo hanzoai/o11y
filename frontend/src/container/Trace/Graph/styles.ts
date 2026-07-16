@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components';
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
 	center?: boolean;
-	ref?: RefObject<HTMLDivElement> | null; // The ref type provided by react-use is incorrect -> https://github.com/streamich/react-use/issues/1264 Open Issue
+	ref?: RefObject<HTMLDivElement | null> | null; // The ref type provided by react-use is incorrect -> https://github.com/streamich/react-use/issues/1264 Open Issue
 }
 
 export const Container = styled.div<Props>`

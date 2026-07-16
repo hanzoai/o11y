@@ -1,6 +1,8 @@
 import { HavingFilterTagProps } from './HavingFilterTag.interfaces';
 import { StyledTag, StyledText } from './HavingFilterTag.styled';
 
+import type { JSX } from 'react';
+
 export function HavingFilterTag({
 	value,
 	closable,

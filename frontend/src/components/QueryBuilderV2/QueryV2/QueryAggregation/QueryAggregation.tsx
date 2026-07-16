@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Tooltip } from 'antd';
 import InputWithLabel from 'components/InputWithLabel/InputWithLabel';
 import { PANEL_TYPES } from 'constants/queryBuilder';
@@ -14,13 +14,13 @@ import './QueryAggregation.styles.scss';
 
 function QueryAggregationOptions({
 	dataSource,
-	panelType,
+	panelType = null,
 	onAggregationIntervalChange,
-	onChange,
+	onChange = undefined,
 	queryData,
 }: {
 	dataSource: DataSource;
-	panelType?: string;
+	panelType?: string | null;
 	onAggregationIntervalChange: (value: number) => void;
 	onChange?: (value: string) => void;
 	queryData: IBuilderQuery | IBuilderTraceOperator;
@@ -101,10 +101,5 @@ function QueryAggregationOptions({
 		</div>
 	);
 }
-
-QueryAggregationOptions.defaultProps = {
-	panelType: null,
-	onChange: undefined,
-};
 
 export default QueryAggregationOptions;

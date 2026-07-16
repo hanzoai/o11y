@@ -5,19 +5,27 @@ import { Drawer as DrawerPrimitive } from 'vaul';
 
 import { cn } from '../lib/utils';
 
-function Drawer({ ...props }: React.ComponentProps<typeof DrawerPrimitive.Root>) {
+function Drawer({
+	...props
+}: React.ComponentProps<typeof DrawerPrimitive.Root>) {
 	return <DrawerPrimitive.Root data-slot="drawer" {...props} />;
 }
 
-function DrawerTrigger({ ...props }: React.ComponentProps<typeof DrawerPrimitive.Trigger>) {
+function DrawerTrigger({
+	...props
+}: React.ComponentProps<typeof DrawerPrimitive.Trigger>) {
 	return <DrawerPrimitive.Trigger data-slot="drawer-trigger" {...props} />;
 }
 
-function DrawerPortal({ ...props }: React.ComponentProps<typeof DrawerPrimitive.Portal>) {
+function DrawerPortal({
+	...props
+}: React.ComponentProps<typeof DrawerPrimitive.Portal>) {
 	return <DrawerPrimitive.Portal data-slot="drawer-portal" {...props} />;
 }
 
-function DrawerClose({ ...props }: React.ComponentProps<typeof DrawerPrimitive.Close>) {
+function DrawerClose({
+	...props
+}: React.ComponentProps<typeof DrawerPrimitive.Close>) {
 	return <DrawerPrimitive.Close data-slot="drawer-close" {...props} />;
 }
 
@@ -30,7 +38,7 @@ function DrawerOverlay({
 			data-slot="drawer-overlay"
 			className={cn(
 				'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50',
-				className
+				className,
 			)}
 			{...props}
 		/>
@@ -59,7 +67,7 @@ function DrawerContent({
 					'data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:left-0 data-[vaul-drawer-direction=left]:border-r',
 					'border border-[var(--drawer-border)]',
 					type === 'drawer' ? 'rounded-md m-4' : 'rounded-none',
-					className
+					className,
 				)}
 				{...props}
 			>
@@ -90,7 +98,10 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<'div'>) {
 	);
 }
 
-function DrawerTitle({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Title>) {
+function DrawerTitle({
+	className,
+	...props
+}: React.ComponentProps<typeof DrawerPrimitive.Title>) {
 	return (
 		<DrawerPrimitive.Title
 			data-slot="drawer-title"
@@ -181,9 +192,18 @@ function DrawerWrapper({
 }: DrawerWrapperProps) {
 	const resolvedHeader = header ?? (title ? { title } : undefined);
 	const body = content ?? children;
-	const panelWidth = width ? DRAWER_WIDTH_PX[width] : type === 'panel' ? '720px' : 'auto';
+	const panelWidth = width
+		? DRAWER_WIDTH_PX[width]
+		: type === 'panel'
+			? '720px'
+			: 'auto';
 	return (
-		<Drawer direction={direction} modal={allowOutsideClick} open={open} onOpenChange={onOpenChange}>
+		<Drawer
+			direction={direction}
+			modal={allowOutsideClick}
+			open={open}
+			onOpenChange={onOpenChange}
+		>
 			{trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
 			<DrawerContent className={className} showOverlay={showOverlay} type={type}>
 				<div

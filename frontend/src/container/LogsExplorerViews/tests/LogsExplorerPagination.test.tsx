@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { VirtuosoMockContext } from 'react-virtuoso';
 import { ENVIRONMENT } from 'constants/env';
 import { initialQueriesMap, PANEL_TYPES } from 'constants/queryBuilder';
@@ -347,7 +347,7 @@ interface LogsExplorerWithMockContextProps {
 function LogsExplorerWithMockContext({
 	initialStagedQuery,
 	initialCurrentQuery,
-	onStateChange,
+	onStateChange = undefined,
 }: LogsExplorerWithMockContextProps): JSX.Element {
 	const [stagedQuery, setStagedQuery] = React.useState(initialStagedQuery);
 	const [currentQuery, setCurrentQuery] = React.useState(initialCurrentQuery);
@@ -429,10 +429,6 @@ function LogsExplorerWithMockContext({
 		</AllTheProviders>
 	);
 }
-
-LogsExplorerWithMockContext.defaultProps = {
-	onStateChange: undefined,
-};
 
 describe('Logs Explorer -> stage and run query', () => {
 	let mockStagedQuery: Query;

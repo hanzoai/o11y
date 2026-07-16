@@ -7,6 +7,8 @@ import LogsCountInInterval from './components/LogsCountInInterval';
 
 import './styles.scss';
 
+import type { JSX } from 'react';
+
 function PreviewIntervalSelector({
 	previewFilter,
 	value,

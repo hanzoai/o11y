@@ -4,6 +4,8 @@ import { render, screen, userEvent } from 'tests/test-utils';
 
 import SpanLogs from '../SpanLogs';
 
+import type { JSX } from 'react';
+
 // Mock external dependencies
 jest.mock('hooks/queryBuilder/useQueryBuilder', () => ({
 	useQueryBuilder: (): any => ({

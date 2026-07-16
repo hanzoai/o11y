@@ -3,6 +3,8 @@ import { formatTime } from 'utils/timeUtils';
 
 import StatsCard from '../StatsCard/StatsCard';
 
+import type { JSX } from 'react';
+
 type TotalTriggeredCardProps = {
 	currentAvgResolutionTime: AlertRuleStats['currentAvgResolutionTime'];
 	pastAvgResolutionTime: AlertRuleStats['pastAvgResolutionTime'];

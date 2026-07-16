@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import ErrorContent from 'components/ErrorModal/components/ErrorContent';
 import APIError from 'types/api/error';
 
@@ -37,13 +37,13 @@ interface ErrorInPlaceProps {
 function ErrorInPlace({
 	error,
 	className = '',
-	style,
+	style = undefined,
 	bordered = false,
-	background,
+	background = undefined,
 	padding = 16,
 	height = '100%',
 	width = '100%',
-	children,
+	children = undefined,
 }: ErrorInPlaceProps): JSX.Element {
 	const containerStyle: React.CSSProperties = {
 		display: 'flex',
@@ -64,16 +64,5 @@ function ErrorInPlace({
 		</div>
 	);
 }
-
-ErrorInPlace.defaultProps = {
-	className: undefined,
-	style: undefined,
-	bordered: undefined,
-	background: undefined,
-	padding: undefined,
-	height: undefined,
-	width: undefined,
-	children: undefined,
-};
 
 export default ErrorInPlace;

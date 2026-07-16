@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type JSX } from 'react';
 import { Input, InputProps, InputRef, Tooltip } from 'antd';
 import cx from 'classnames';
 

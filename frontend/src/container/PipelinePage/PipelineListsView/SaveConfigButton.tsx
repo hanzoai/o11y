@@ -3,6 +3,8 @@ import { Button } from 'antd';
 
 import { SaveConfigWrapper } from './styles';
 
+import type { JSX } from 'react';
+
 function SaveConfigButton({
 	showSaveButton,
 	onSaveConfigurationHandler,

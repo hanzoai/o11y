@@ -11,6 +11,8 @@ import dayjs from 'dayjs';
 import { RowData } from 'lib/query/createTableColumnsFromQuery';
 import { BaseAutocompleteData } from 'types/api/queryBuilder/queryAutocompleteResponse';
 
+import type { JSX } from 'react';
+
 const keyToLabelMap: Record<string, string> = {
 	timestamp: 'Timestamp',
 	serviceName: 'Service Name',

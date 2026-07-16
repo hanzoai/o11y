@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { VirtuosoMockContext } from 'react-virtuoso';
 import userEvent from '@testing-library/user-event';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Modal } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { Calendar, Info } from 'components/ui/icons';

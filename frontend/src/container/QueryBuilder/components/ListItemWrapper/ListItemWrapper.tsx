@@ -3,6 +3,8 @@ import { ListItemWrapperProps } from './ListItemWrapper.interfaces';
 // ** Styles
 import { StyledDeleteEntity, StyledRow } from './ListItemWrapper.styled';
 
+import type { JSX } from 'react';
+
 export function ListItemWrapper({
 	children,
 	onDelete,

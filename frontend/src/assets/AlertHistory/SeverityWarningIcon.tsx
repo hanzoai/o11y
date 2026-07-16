@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 interface SeverityWarningIconProps {
 	width?: number;
 	height?: number;
@@ -7,11 +8,11 @@ interface SeverityWarningIconProps {
 }
 
 function SeverityWarningIcon({
-	width,
-	height,
-	fill,
-	stroke,
-	strokeWidth,
+	width = 2,
+	height = 6,
+	fill = 'none',
+	stroke = '#FFD778',
+	strokeWidth = '0.978299',
 }: SeverityWarningIconProps): JSX.Element {
 	return (
 		<svg
@@ -30,13 +31,5 @@ function SeverityWarningIcon({
 		</svg>
 	);
 }
-
-SeverityWarningIcon.defaultProps = {
-	width: 2,
-	height: 6,
-	fill: 'none',
-	stroke: '#FFD778',
-	strokeWidth: '0.978299',
-};
 
 export default SeverityWarningIcon;

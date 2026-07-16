@@ -6,6 +6,8 @@ import { AlertTypes } from 'types/api/alerts/alertTypes';
 import { CreateAlertProvider } from '../../context';
 import AlertCondition from '../AlertCondition';
 
+import type { JSX } from 'react';
+
 jest.mock('uplot', () => {
 	const paths = {
 		spline: jest.fn(),

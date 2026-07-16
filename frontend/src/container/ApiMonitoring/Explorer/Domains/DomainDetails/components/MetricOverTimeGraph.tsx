@@ -3,6 +3,8 @@ import { ENTITY_VERSION_V5 } from 'constants/app';
 import GridCard from 'container/GridCardLayout/GridCard';
 import { Widgets } from 'types/api/dashboard/getAll';
 
+import type { JSX } from 'react';
+
 function MetricOverTimeGraph({
 	widget,
 	timeRange,

@@ -56,7 +56,7 @@ Object.defineProperty(window, 'location', {
 const mockLogEvent = logEvent as jest.Mock;
 const mockUseLocation = useLocation as jest.Mock;
 const mockUseUrlQuery = useUrlQuery as jest.Mock;
-const mockUseSelector = useSelector as jest.Mock;
+const mockUseSelector = jest.mocked(useSelector);
 const mockGetMinMax = GetMinMax as jest.Mock;
 const mockUseCopyToClipboard = useCopyToClipboard as jest.Mock;
 const mockMatchPath = matchPath as jest.Mock;

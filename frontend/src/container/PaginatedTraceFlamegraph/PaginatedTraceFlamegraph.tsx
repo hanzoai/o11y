@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 import { useParams } from 'react-router-dom';
 import { Skeleton, Tooltip } from 'antd';
 import { Progress } from 'components/ui/progress';

@@ -12,6 +12,8 @@ import {
 
 import styles from './EntityProgressBar.module.scss';
 
+import type { JSX } from 'react';
+
 type EntityProgressBarType = 'request' | 'limit' | 'cpu' | 'memory';
 
 function getStrokeColor(type: EntityProgressBarType, value: number): string {

@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { useLocation } from 'react-router-dom';
 import { Switch } from 'components/ui/switch';
 import { Typography } from 'components/ui/typography';
@@ -30,7 +37,7 @@ interface LiveLogsContainerProps {
 }
 
 function LiveLogsContainer({
-	handleChangeSelectedView,
+	handleChangeSelectedView = undefined,
 }: LiveLogsContainerProps): JSX.Element {
 	const location = useLocation();
 	const [logs, setLogs] = useState<ILiveLogsLog[]>([]);
@@ -280,9 +287,5 @@ function LiveLogsContainer({
 		</div>
 	);
 }
-
-LiveLogsContainer.defaultProps = {
-	handleChangeSelectedView: undefined,
-};
 
 export default LiveLogsContainer;

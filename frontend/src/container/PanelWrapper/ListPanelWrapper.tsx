@@ -4,6 +4,8 @@ import { DataSource } from 'types/common/queryBuilder';
 
 import { PanelWrapperProps } from './panelWrapper.types';
 
+import type { JSX } from 'react';
+
 function ListPanelWrapper({
 	widget,
 	queryResponse,

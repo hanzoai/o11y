@@ -1,6 +1,10 @@
 import { EQueryType } from 'types/common/dashboard';
 
-function QueryTypeTag({ queryType }: IQueryTypeTagProps): JSX.Element {
+import type { JSX } from 'react';
+
+function QueryTypeTag({
+	queryType = EQueryType.QUERY_BUILDER,
+}: IQueryTypeTagProps): JSX.Element {
 	switch (queryType) {
 		case EQueryType.QUERY_BUILDER:
 			return <span>Query Builder</span>;
@@ -17,9 +21,5 @@ function QueryTypeTag({ queryType }: IQueryTypeTagProps): JSX.Element {
 interface IQueryTypeTagProps {
 	queryType?: EQueryType;
 }
-
-QueryTypeTag.defaultProps = {
-	queryType: EQueryType.QUERY_BUILDER,
-};
 
 export default QueryTypeTag;

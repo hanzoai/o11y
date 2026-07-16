@@ -2,10 +2,12 @@ import { Input } from 'components/ui/input';
 import { Form } from 'antd';
 import { CloudintegrationtypesCredentialsDTO } from 'api/generated/services/o11y.schemas';
 
+import type { JSX } from 'react';
+
 function RenderConnectionFields({
-	isConnectionParamsLoading,
-	connectionParams,
-	isFormDisabled,
+	isConnectionParamsLoading = false,
+	connectionParams = null,
+	isFormDisabled = false,
 }: {
 	isConnectionParamsLoading?: boolean;
 	connectionParams?: CloudintegrationtypesCredentialsDTO | null;
@@ -62,11 +64,5 @@ function RenderConnectionFields({
 		</Form.Item>
 	);
 }
-
-RenderConnectionFields.defaultProps = {
-	connectionParams: null,
-	isFormDisabled: false,
-	isConnectionParamsLoading: false,
-};
 
 export default RenderConnectionFields;

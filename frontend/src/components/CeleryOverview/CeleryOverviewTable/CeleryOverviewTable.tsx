@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { useMutation } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
@@ -77,7 +84,7 @@ function ProgressRender(item: string | number): JSX.Element {
 }
 
 const getColumnSearchProps = (
-	searchInput: React.RefObject<InputRef>,
+	searchInput: React.RefObject<InputRef | null>,
 	handleReset: (
 		clearFilters: () => void,
 		confirm: FilterDropdownProps['confirm'],
@@ -110,7 +117,7 @@ const getColumnSearchProps = (
 					onClick={(): void => handleSearch(selectedKeys as string[], confirm)}
 				>
 					<Flex align="center" gap={4}>
-						<Search size="md" />
+						<Search size={16} />
 						Search
 					</Flex>
 				</Button>
@@ -136,7 +143,7 @@ const getColumnSearchProps = (
 	filterIcon: (filtered: boolean): JSX.Element => (
 		<Search
 			style={{ color: filtered ? Color.BG_ROBIN_500 : undefined }}
-			size="md"
+			size={16}
 		/>
 	),
 	onFilter: (value, record): boolean =>
@@ -487,7 +494,7 @@ export default function CeleryOverviewTable({
 		[getFilteredData, tableData],
 	);
 
-	const prevTableDataRef = useRef<string>();
+	const prevTableDataRef = useRef<string>(undefined);
 
 	useEffect(() => {
 		if (tableData.length > 0) {

@@ -2,6 +2,8 @@ import { Typography } from 'components/ui/typography';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 import { useTimezone } from 'providers/Timezone';
 
+import type { JSX } from 'react';
+
 function Time({ CreatedOrUpdateTime }: DateProps): JSX.Element {
 	const { formatTimezoneAdjustedTimestamp } = useTimezone();
 	const time = new Date(CreatedOrUpdateTime);

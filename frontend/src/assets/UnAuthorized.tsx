@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 function UnAuthorized({
 	width = 137,
 	height = 137,

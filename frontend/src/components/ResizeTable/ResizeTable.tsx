@@ -5,6 +5,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import ReactDragListView from 'react-drag-listview';
 import { ResizeCallbackData } from 'react-resizable';
@@ -22,7 +23,7 @@ import { ResizeTableProps } from './types';
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function ResizeTable({
 	columns,
-	onDragColumn,
+	onDragColumn = undefined,
 	pagination,
 	columnWidths,
 	onColumnWidthsChange,
@@ -154,9 +155,5 @@ function ResizeTable({
 		<Table {...tableParams} />
 	);
 }
-
-ResizeTable.defaultProps = {
-	onDragColumn: undefined,
-};
 
 export default ResizeTable;

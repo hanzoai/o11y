@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Button, Divider, Tooltip } from 'antd';
 import { useIsDarkMode } from 'hooks/useDarkMode';

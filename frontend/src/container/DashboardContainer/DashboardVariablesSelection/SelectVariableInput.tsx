@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type JSX } from 'react';
 import { orange } from '@ant-design/colors';
 import { Popover, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
@@ -139,7 +139,7 @@ function SelectVariableInput({
 			{errorMessage && (
 				<span style={errorIconStyle}>
 					<Popover placement="top" content={<Typography>{errorMessage}</Typography>}>
-						<SolidAlertTriangle style={{ color: orange[5] }} size="md" />
+						<SolidAlertTriangle style={{ color: orange[5] }} size={16} />
 					</Popover>
 				</span>
 			)}

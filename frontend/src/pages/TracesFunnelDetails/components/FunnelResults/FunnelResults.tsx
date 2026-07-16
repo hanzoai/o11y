@@ -10,6 +10,8 @@ import StepsTransitionResults from './StepsTransitionResults';
 
 import './FunnelResults.styles.scss';
 
+import type { JSX } from 'react';
+
 function FunnelResults(): JSX.Element {
 	const {
 		validTracesCount,

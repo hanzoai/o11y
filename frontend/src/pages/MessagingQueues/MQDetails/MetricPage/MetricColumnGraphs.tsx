@@ -24,6 +24,8 @@ import {
 	getRequestTimesWidgetData,
 } from './MetricPageUtil';
 
+import type { JSX } from 'react';
+
 interface MetricSectionProps {
 	title: string;
 	description: string;
@@ -35,7 +37,7 @@ function MetricSection({
 	title,
 	description,
 	graphCount,
-	checkIfDataExists,
+	checkIfDataExists = (): void => {},
 }: MetricSectionProps): JSX.Element {
 	const isDarkMode = useIsDarkMode();
 
@@ -61,10 +63,6 @@ function MetricSection({
 		</div>
 	);
 }
-
-MetricSection.defaultProps = {
-	checkIfDataExists: (): void => {},
-};
 
 function MetricColumnGraphs({
 	checkIfDataExists,

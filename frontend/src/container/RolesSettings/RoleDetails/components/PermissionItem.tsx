@@ -2,6 +2,8 @@ import { ChevronRight } from 'lucide-react';
 
 import { PermissionType } from '../../utils';
 
+import type { JSX } from 'react';
+
 interface PermissionItemProps {
 	permissionType: PermissionType;
 	isManaged: boolean;

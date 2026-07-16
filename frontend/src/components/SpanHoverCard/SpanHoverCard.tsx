@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { Popover } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';

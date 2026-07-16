@@ -12,6 +12,8 @@ import MQDetailPage from './MQDetailPage/MQDetailPage';
 
 import './MessagingQueuesMainPage.styles.scss';
 
+import type { JSX } from 'react';
+
 export const Kafka: TabRoutes = {
 	Component: MessagingQueues,
 	name: (

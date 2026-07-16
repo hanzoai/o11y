@@ -5,8 +5,12 @@ import * as React from 'react';
 
 import { cn } from '../lib/utils';
 
-type OriginalContentProps = React.ComponentProps<typeof DropdownMenuPrimitive.Content>;
-type OriginalSubContentProps = React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>;
+type OriginalContentProps = React.ComponentProps<
+	typeof DropdownMenuPrimitive.Content
+>;
+type OriginalSubContentProps = React.ComponentProps<
+	typeof DropdownMenuPrimitive.SubContent
+>;
 
 export type DropdownMenuProps = {
 	children?: React.ReactNode;
@@ -25,13 +29,17 @@ function DropdownMenu(props: DropdownMenuProps) {
 	return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
 }
 
-export type DropdownMenuPortalProps = React.ComponentProps<typeof DropdownMenuPrimitive.Portal>;
+export type DropdownMenuPortalProps = React.ComponentProps<
+	typeof DropdownMenuPrimitive.Portal
+>;
 
 /**
  * Portals the dropdown menu content into `document.body`. Used internally by `DropdownMenuContent`.
  */
 function DropdownMenuPortal(props: DropdownMenuPortalProps) {
-	return <DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />;
+	return (
+		<DropdownMenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />
+	);
 }
 
 export type DropdownMenuTriggerProps = React.ComponentProps<
@@ -43,16 +51,17 @@ export type DropdownMenuTriggerProps = React.ComponentProps<
 /**
  * The button that toggles the dropdown menu. Use `asChild` to delegate to a child element.
  */
-const DropdownMenuTrigger = React.forwardRef<HTMLButtonElement, DropdownMenuTriggerProps>(
-	({ testId, ...props }, ref) => (
-		<DropdownMenuPrimitive.Trigger
-			ref={ref}
-			data-slot="dropdown-menu-trigger"
-			data-testid={testId}
-			{...props}
-		/>
-	)
-);
+const DropdownMenuTrigger = React.forwardRef<
+	HTMLButtonElement,
+	DropdownMenuTriggerProps
+>(({ testId, ...props }, ref) => (
+	<DropdownMenuPrimitive.Trigger
+		ref={ref}
+		data-slot="dropdown-menu-trigger"
+		data-testid={testId}
+		{...props}
+	/>
+));
 DropdownMenuTrigger.displayName = 'DropdownMenuTrigger';
 
 export type DropdownMenuContentProps = {
@@ -95,37 +104,45 @@ export type DropdownMenuContentProps = {
 /**
  * The content that pops out when the dropdown menu is open. Rendered in a portal by default.
  */
-const DropdownMenuContent = React.forwardRef<HTMLDivElement, DropdownMenuContentProps>(
-	({ className, sideOffset = 4, testId, id, onClick, ...props }, ref) => (
-		<DropdownMenuPortal>
-			<DropdownMenuPrimitive.Content
-				ref={ref}
-				data-slot="dropdown-menu-content"
-				data-testid={testId}
-				id={id}
-				sideOffset={sideOffset}
-				className={cn(className)}
-				onClick={(event) => {
-					onClick?.(event);
-					event.stopPropagation();
-				}}
-				{...props}
-			/>
-		</DropdownMenuPortal>
-	)
-);
+const DropdownMenuContent = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuContentProps
+>(({ className, sideOffset = 4, testId, id, onClick, ...props }, ref) => (
+	<DropdownMenuPortal>
+		<DropdownMenuPrimitive.Content
+			ref={ref}
+			data-slot="dropdown-menu-content"
+			data-testid={testId}
+			id={id}
+			sideOffset={sideOffset}
+			className={cn(className)}
+			onClick={(event) => {
+				onClick?.(event);
+				event.stopPropagation();
+			}}
+			{...props}
+		/>
+	</DropdownMenuPortal>
+));
 DropdownMenuContent.displayName = 'DropdownMenuContent';
 
-export type DropdownMenuGroupProps = React.ComponentProps<typeof DropdownMenuPrimitive.Group>;
+export type DropdownMenuGroupProps = React.ComponentProps<
+	typeof DropdownMenuPrimitive.Group
+>;
 
 /**
  * Groups related menu items together. Use with `DropdownMenuLabel` for a heading.
  */
-const DropdownMenuGroup = React.forwardRef<HTMLDivElement, DropdownMenuGroupProps>(
-	(props, ref) => (
-		<DropdownMenuPrimitive.Group ref={ref} data-slot="dropdown-menu-group" {...props} />
-	)
-);
+const DropdownMenuGroup = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuGroupProps
+>((props, ref) => (
+	<DropdownMenuPrimitive.Group
+		ref={ref}
+		data-slot="dropdown-menu-group"
+		{...props}
+	/>
+));
 DropdownMenuGroup.displayName = 'DropdownMenuGroup';
 
 export type DropdownMenuItemProps = Omit<
@@ -152,8 +169,24 @@ export type DropdownMenuItemProps = Omit<
 /**
  * A selectable item in the dropdown menu.
  */
-const DropdownMenuItem = React.forwardRef<HTMLDivElement, DropdownMenuItemProps>(
-	({ className, inset, leftIcon, rightIcon, destructive, clickable, children, testId, ...props }, ref) => (
+const DropdownMenuItem = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuItemProps
+>(
+	(
+		{
+			className,
+			inset,
+			leftIcon,
+			rightIcon,
+			destructive,
+			clickable,
+			children,
+			testId,
+			...props
+		},
+		ref,
+	) => (
 		<DropdownMenuPrimitive.Item
 			ref={ref}
 			data-slot="dropdown-menu-item"
@@ -166,9 +199,11 @@ const DropdownMenuItem = React.forwardRef<HTMLDivElement, DropdownMenuItemProps>
 		>
 			{leftIcon && <span data-slot="dropdown-menu-item-icon">{leftIcon}</span>}
 			{children}
-			{rightIcon && <span data-slot="dropdown-menu-item-right-icon">{rightIcon}</span>}
+			{rightIcon && (
+				<span data-slot="dropdown-menu-item-right-icon">{rightIcon}</span>
+			)}
 		</DropdownMenuPrimitive.Item>
-	)
+	),
 );
 DropdownMenuItem.displayName = 'DropdownMenuItem';
 
@@ -187,34 +222,35 @@ export type DropdownMenuCheckboxItemProps = Omit<
 /**
  * A checkbox item in the dropdown menu that can be checked or unchecked.
  */
-const DropdownMenuCheckboxItem = React.forwardRef<HTMLDivElement, DropdownMenuCheckboxItemProps>(
-	({ className, children, checked, onSelect, ...props }, ref) => {
-		const handleSelect = React.useCallback(
-			(event: Event) => {
-				event.preventDefault();
-				onSelect?.(event);
-			},
-			[onSelect]
-		);
-		return (
-			<DropdownMenuPrimitive.CheckboxItem
-				ref={ref}
-				data-slot="dropdown-menu-checkbox-item"
-				className={cn(className)}
-				checked={checked}
-				onSelect={handleSelect}
-				{...props}
-			>
-				<span data-slot="dropdown-menu-checkbox-indicator">
-					<DropdownMenuPrimitive.ItemIndicator>
-						<Check size={14} />
-					</DropdownMenuPrimitive.ItemIndicator>
-				</span>
-				{children}
-			</DropdownMenuPrimitive.CheckboxItem>
-		);
-	}
-);
+const DropdownMenuCheckboxItem = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuCheckboxItemProps
+>(({ className, children, checked, onSelect, ...props }, ref) => {
+	const handleSelect = React.useCallback(
+		(event: Event) => {
+			event.preventDefault();
+			onSelect?.(event);
+		},
+		[onSelect],
+	);
+	return (
+		<DropdownMenuPrimitive.CheckboxItem
+			ref={ref}
+			data-slot="dropdown-menu-checkbox-item"
+			className={cn(className)}
+			checked={checked}
+			onSelect={handleSelect}
+			{...props}
+		>
+			<span data-slot="dropdown-menu-checkbox-indicator">
+				<DropdownMenuPrimitive.ItemIndicator>
+					<Check size={14} />
+				</DropdownMenuPrimitive.ItemIndicator>
+			</span>
+			{children}
+		</DropdownMenuPrimitive.CheckboxItem>
+	);
+});
 DropdownMenuCheckboxItem.displayName = 'DropdownMenuCheckboxItem';
 
 export type DropdownMenuRadioGroupProps = React.ComponentProps<
@@ -224,15 +260,16 @@ export type DropdownMenuRadioGroupProps = React.ComponentProps<
 /**
  * Groups multiple `DropdownMenuRadioItem` components together.
  */
-const DropdownMenuRadioGroup = React.forwardRef<HTMLDivElement, DropdownMenuRadioGroupProps>(
-	(props, ref) => (
-		<DropdownMenuPrimitive.RadioGroup
-			ref={ref}
-			data-slot="dropdown-menu-radio-group"
-			{...props}
-		/>
-	)
-);
+const DropdownMenuRadioGroup = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuRadioGroupProps
+>((props, ref) => (
+	<DropdownMenuPrimitive.RadioGroup
+		ref={ref}
+		data-slot="dropdown-menu-radio-group"
+		{...props}
+	/>
+));
 DropdownMenuRadioGroup.displayName = 'DropdownMenuRadioGroup';
 
 export type DropdownMenuRadioItemProps = Omit<
@@ -249,23 +286,24 @@ export type DropdownMenuRadioItemProps = Omit<
 /**
  * A radio item in the dropdown menu. Must be used inside `DropdownMenuRadioGroup`.
  */
-const DropdownMenuRadioItem = React.forwardRef<HTMLDivElement, DropdownMenuRadioItemProps>(
-	({ className, children, ...props }, ref) => (
-		<DropdownMenuPrimitive.RadioItem
-			ref={ref}
-			data-slot="dropdown-menu-radio-item"
-			className={cn(className)}
-			{...props}
-		>
-			<span data-slot="dropdown-menu-radio-indicator">
-				<DropdownMenuPrimitive.ItemIndicator>
-					<Check size={14} />
-				</DropdownMenuPrimitive.ItemIndicator>
-			</span>
-			{children}
-		</DropdownMenuPrimitive.RadioItem>
-	)
-);
+const DropdownMenuRadioItem = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuRadioItemProps
+>(({ className, children, ...props }, ref) => (
+	<DropdownMenuPrimitive.RadioItem
+		ref={ref}
+		data-slot="dropdown-menu-radio-item"
+		className={cn(className)}
+		{...props}
+	>
+		<span data-slot="dropdown-menu-radio-indicator">
+			<DropdownMenuPrimitive.ItemIndicator>
+				<Check size={14} />
+			</DropdownMenuPrimitive.ItemIndicator>
+		</span>
+		{children}
+	</DropdownMenuPrimitive.RadioItem>
+));
 DropdownMenuRadioItem.displayName = 'DropdownMenuRadioItem';
 
 export type DropdownMenuLabelProps = Omit<
@@ -280,17 +318,18 @@ export type DropdownMenuLabelProps = Omit<
 /**
  * A label for a group of items.
  */
-const DropdownMenuLabel = React.forwardRef<HTMLDivElement, DropdownMenuLabelProps>(
-	({ className, inset, ...props }, ref) => (
-		<DropdownMenuPrimitive.Label
-			ref={ref}
-			data-slot="dropdown-menu-label"
-			data-inset={inset ? '' : undefined}
-			className={cn(className)}
-			{...props}
-		/>
-	)
-);
+const DropdownMenuLabel = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuLabelProps
+>(({ className, inset, ...props }, ref) => (
+	<DropdownMenuPrimitive.Label
+		ref={ref}
+		data-slot="dropdown-menu-label"
+		data-inset={inset ? '' : undefined}
+		className={cn(className)}
+		{...props}
+	/>
+));
 DropdownMenuLabel.displayName = 'DropdownMenuLabel';
 
 export type DropdownMenuSeparatorProps = Omit<
@@ -303,30 +342,38 @@ export type DropdownMenuSeparatorProps = Omit<
 /**
  * A visual divider between sections in the dropdown menu.
  */
-const DropdownMenuSeparator = React.forwardRef<HTMLDivElement, DropdownMenuSeparatorProps>(
-	({ className, ...props }, ref) => (
-		<DropdownMenuPrimitive.Separator
-			ref={ref}
-			data-slot="dropdown-menu-separator"
-			className={cn(className)}
-			{...props}
-		/>
-	)
-);
+const DropdownMenuSeparator = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuSeparatorProps
+>(({ className, ...props }, ref) => (
+	<DropdownMenuPrimitive.Separator
+		ref={ref}
+		data-slot="dropdown-menu-separator"
+		className={cn(className)}
+		{...props}
+	/>
+));
 DropdownMenuSeparator.displayName = 'DropdownMenuSeparator';
 
-export type DropdownMenuShortcutProps = React.HTMLAttributes<HTMLSpanElement> & {
-	className?: string;
-};
+export type DropdownMenuShortcutProps =
+	React.HTMLAttributes<HTMLSpanElement> & {
+		className?: string;
+	};
 
 /**
  * Right-aligned helper text, typically used to display keyboard shortcuts.
  */
-const DropdownMenuShortcut = React.forwardRef<HTMLSpanElement, DropdownMenuShortcutProps>(
-	({ className, ...props }, ref) => (
-		<span ref={ref} data-slot="dropdown-menu-shortcut" className={cn(className)} {...props} />
-	)
-);
+const DropdownMenuShortcut = React.forwardRef<
+	HTMLSpanElement,
+	DropdownMenuShortcutProps
+>(({ className, ...props }, ref) => (
+	<span
+		ref={ref}
+		data-slot="dropdown-menu-shortcut"
+		className={cn(className)}
+		{...props}
+	/>
+));
 DropdownMenuShortcut.displayName = 'DropdownMenuShortcut';
 
 export type DropdownMenuSubProps = {
@@ -372,18 +419,19 @@ export type DropdownMenuSubContentProps = {
 /**
  * The content that pops out when a submenu is open. Must be rendered inside `DropdownMenuSub`.
  */
-const DropdownMenuSubContent = React.forwardRef<HTMLDivElement, DropdownMenuSubContentProps>(
-	({ className, ...props }, ref) => (
-		<DropdownMenuPortal>
-			<DropdownMenuPrimitive.SubContent
-				ref={ref}
-				data-slot="dropdown-menu-sub-content"
-				className={cn(className)}
-				{...props}
-			/>
-		</DropdownMenuPortal>
-	)
-);
+const DropdownMenuSubContent = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuSubContentProps
+>(({ className, ...props }, ref) => (
+	<DropdownMenuPortal>
+		<DropdownMenuPrimitive.SubContent
+			ref={ref}
+			data-slot="dropdown-menu-sub-content"
+			className={cn(className)}
+			{...props}
+		/>
+	</DropdownMenuPortal>
+));
 DropdownMenuSubContent.displayName = 'DropdownMenuSubContent';
 
 export type DropdownMenuSubTriggerProps = Omit<
@@ -402,21 +450,24 @@ export type DropdownMenuSubTriggerProps = Omit<
 /**
  * An item that opens a submenu. Must be rendered inside `DropdownMenuSub`.
  */
-const DropdownMenuSubTrigger = React.forwardRef<HTMLDivElement, DropdownMenuSubTriggerProps>(
-	({ className, inset, leftIcon, children, ...props }, ref) => (
-		<DropdownMenuPrimitive.SubTrigger
-			ref={ref}
-			data-slot="dropdown-menu-sub-trigger"
-			data-inset={inset ? '' : undefined}
-			className={cn(className)}
-			{...props}
-		>
-			{leftIcon && <span data-slot="dropdown-menu-sub-trigger-icon">{leftIcon}</span>}
-			{children}
-			<ChevronRight data-slot="dropdown-menu-sub-trigger-chevron" />
-		</DropdownMenuPrimitive.SubTrigger>
-	)
-);
+const DropdownMenuSubTrigger = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuSubTriggerProps
+>(({ className, inset, leftIcon, children, ...props }, ref) => (
+	<DropdownMenuPrimitive.SubTrigger
+		ref={ref}
+		data-slot="dropdown-menu-sub-trigger"
+		data-inset={inset ? '' : undefined}
+		className={cn(className)}
+		{...props}
+	>
+		{leftIcon && (
+			<span data-slot="dropdown-menu-sub-trigger-icon">{leftIcon}</span>
+		)}
+		{children}
+		<ChevronRight data-slot="dropdown-menu-sub-trigger-chevron" />
+	</DropdownMenuPrimitive.SubTrigger>
+));
 DropdownMenuSubTrigger.displayName = 'DropdownMenuSubTrigger';
 
 export type DropdownMenuLoadingProps = {
@@ -428,14 +479,15 @@ export type DropdownMenuLoadingProps = {
 /**
  * A loading state indicator for the dropdown menu.
  */
-const DropdownMenuLoading = React.forwardRef<HTMLDivElement, DropdownMenuLoadingProps>(
-	({ className, text = 'Loading...' }, ref) => (
-		<div ref={ref} data-slot="dropdown-menu-loading" className={cn(className)}>
-			<LoaderCircle data-slot="dropdown-menu-loading-spinner" />
-			<span>{text}</span>
-		</div>
-	)
-);
+const DropdownMenuLoading = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuLoadingProps
+>(({ className, text = 'Loading...' }, ref) => (
+	<div ref={ref} data-slot="dropdown-menu-loading" className={cn(className)}>
+		<LoaderCircle data-slot="dropdown-menu-loading-spinner" />
+		<span>{text}</span>
+	</div>
+));
 DropdownMenuLoading.displayName = 'DropdownMenuLoading';
 
 export type DropdownMenuBackProps = Omit<
@@ -452,23 +504,24 @@ export type DropdownMenuBackProps = Omit<
 /**
  * A back button for navigating in multi-step dropdown menus.
  */
-const DropdownMenuBack = React.forwardRef<HTMLDivElement, DropdownMenuBackProps>(
-	({ className, label, onBack, ...props }, ref) => (
-		<DropdownMenuPrimitive.Item
-			ref={ref}
-			data-slot="dropdown-menu-back"
-			className={cn(className)}
-			onSelect={(e) => {
-				e.preventDefault();
-				onBack?.();
-			}}
-			{...props}
-		>
-			<ChevronLeft data-slot="dropdown-menu-back-icon" />
-			<span>{label}</span>
-		</DropdownMenuPrimitive.Item>
-	)
-);
+const DropdownMenuBack = React.forwardRef<
+	HTMLDivElement,
+	DropdownMenuBackProps
+>(({ className, label, onBack, ...props }, ref) => (
+	<DropdownMenuPrimitive.Item
+		ref={ref}
+		data-slot="dropdown-menu-back"
+		className={cn(className)}
+		onSelect={(e) => {
+			e.preventDefault();
+			onBack?.();
+		}}
+		{...props}
+	>
+		<ChevronLeft data-slot="dropdown-menu-back-icon" />
+		<span>{label}</span>
+	</DropdownMenuPrimitive.Item>
+));
 DropdownMenuBack.displayName = 'DropdownMenuBack';
 
 export {

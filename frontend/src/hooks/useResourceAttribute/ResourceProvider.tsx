@@ -1,4 +1,11 @@
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+	ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	type JSX,
+} from 'react';
 import { useLocation } from 'react-router-dom';
 import { QueryParams } from 'constants/query';
 import ROUTES from 'constants/routes';

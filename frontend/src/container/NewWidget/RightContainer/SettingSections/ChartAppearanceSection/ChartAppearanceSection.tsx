@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, type JSX } from 'react';
 import { Switch } from 'components/ui/switch';
 import { Typography } from 'components/ui/typography';
 import {

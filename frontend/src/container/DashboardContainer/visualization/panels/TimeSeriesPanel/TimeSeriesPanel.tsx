@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import TimeSeries from 'container/DashboardContainer/visualization/charts/TimeSeries/TimeSeries';
 import ChartManager from 'container/DashboardContainer/visualization/components/ChartManager/ChartManager';
 import { usePanelContextMenu } from 'container/DashboardContainer/visualization/hooks/usePanelContextMenu';

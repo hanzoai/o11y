@@ -31,6 +31,8 @@ import {
 	mockSpanWithShortStatusMessage,
 } from './mockData';
 
+import type { JSX } from 'react';
+
 // Get typed mocks
 const mockGetSpanPercentiles = jest.mocked(getSpanPercentiles);
 const mockGetUserPreference = jest.mocked(getUserPreference);

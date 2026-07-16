@@ -4,9 +4,11 @@ import emptyFunnelIconUrl from '@/assets/Icons/empty-funnel-icon.svg';
 
 import './EmptyFunnelResults.styles.scss';
 
+import type { JSX } from 'react';
+
 function EmptyFunnelResults({
-	title,
-	description,
+	title = 'No spans selected yet.',
+	description = 'Add spans to the funnel steps to start seeing analytics here.',
 }: {
 	title?: string;
 	description?: string;
@@ -26,10 +28,5 @@ function EmptyFunnelResults({
 		</div>
 	);
 }
-
-EmptyFunnelResults.defaultProps = {
-	title: 'No spans selected yet.',
-	description: 'Add spans to the funnel steps to start seeing analytics here.',
-};
 
 export default EmptyFunnelResults;

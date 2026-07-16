@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 function HerokuIcon(): JSX.Element {
 	return (
 		<svg

@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 interface ConfigureIconProps {
 	width?: number;
 	height?: number;
@@ -5,9 +6,9 @@ interface ConfigureIconProps {
 }
 
 function ConfigureIcon({
-	width,
-	height,
-	color,
+	width = 16,
+	height = 16,
+	color = 'currentColor',
 }: ConfigureIconProps): JSX.Element {
 	return (
 		<svg
@@ -33,9 +34,4 @@ function ConfigureIcon({
 	);
 }
 
-ConfigureIcon.defaultProps = {
-	width: 16,
-	height: 16,
-	color: 'currentColor',
-};
 export default ConfigureIcon;

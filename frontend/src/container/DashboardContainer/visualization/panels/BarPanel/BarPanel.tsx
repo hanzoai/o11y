@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { PanelWrapperProps } from 'container/PanelWrapper/panelWrapper.types';
 import { useDashboardCursorSyncMode } from 'hooks/dashboard/useDashboardCursorSyncMode';
 import { useSyncTooltipFilterMode } from 'hooks/dashboard/useSyncTooltipFilterMode';

@@ -4,6 +4,8 @@ import { DraftingCompass, ScrollText, Binoculars } from 'components/ui/icons';
 
 import './GraphControlsPanel.styles.scss';
 
+import type { JSX } from 'react';
+
 interface GraphControlsPanelProps {
 	id: string;
 	onViewLogsClick?: (e: React.MouseEvent) => void;
@@ -13,9 +15,9 @@ interface GraphControlsPanelProps {
 
 function GraphControlsPanel({
 	id,
-	onViewLogsClick,
+	onViewLogsClick = undefined,
 	onViewTracesClick,
-	onViewAPIMonitoringClick,
+	onViewAPIMonitoringClick = undefined,
 }: GraphControlsPanelProps): JSX.Element {
 	return (
 		<div id={id} className="graph-controls-panel">
@@ -53,10 +55,5 @@ function GraphControlsPanel({
 		</div>
 	);
 }
-
-GraphControlsPanel.defaultProps = {
-	onViewLogsClick: undefined,
-	onViewAPIMonitoringClick: undefined,
-};
 
 export default GraphControlsPanel;

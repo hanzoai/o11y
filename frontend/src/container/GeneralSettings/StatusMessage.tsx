@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { green, orange, volcano } from '@ant-design/colors';
 import { SolidInfoCircle } from 'components/ui/icons';
@@ -58,7 +58,7 @@ function StatusMessage({
 				}}
 			>
 				<Col xs={1}>
-					<SolidInfoCircle size="md" />
+					<SolidInfoCircle size={16} />
 				</Col>
 
 				<Col

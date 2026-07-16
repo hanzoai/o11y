@@ -5,6 +5,7 @@ import {
 	useEffect,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { ListRange, Virtuoso, VirtuosoHandle } from 'react-virtuoso';

@@ -6,6 +6,8 @@ import loadingPlaneUrl from '@/assets/Icons/loading-plane.gif';
 
 import './MetricsLoading.styles.scss';
 
+import type { JSX } from 'react';
+
 export function MetricsLoading(): JSX.Element {
 	const { t } = useTranslation('common');
 	return (

@@ -5,6 +5,7 @@ import {
 	SetStateAction,
 	useEffect,
 	useMemo,
+	type JSX,
 } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
@@ -25,7 +26,7 @@ import { GlobalReducer } from 'types/reducer/globalTime';
 function TableView({
 	setWarning,
 	setIsLoadingQueries,
-	queryKeyRef,
+	queryKeyRef = undefined,
 }: {
 	setWarning: Dispatch<SetStateAction<Warning | undefined>>;
 	setIsLoadingQueries: Dispatch<SetStateAction<boolean>>;
@@ -108,9 +109,5 @@ function TableView({
 		</Space.Compact>
 	);
 }
-
-TableView.defaultProps = {
-	queryKeyRef: undefined,
-};
 
 export default memo(TableView);

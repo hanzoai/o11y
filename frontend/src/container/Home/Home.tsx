@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, type JSX } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { Color } from 'constants/designTokens';
 import { ClipboardList, Compass, Dot, House, Plus, Wrench } from 'lucide-react';

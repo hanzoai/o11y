@@ -13,6 +13,8 @@ import { FunnelStepData } from 'types/api/traceFunnels';
 import '../RenameFunnel/RenameFunnel.styles.scss';
 import './DeleteFunnel.styles.scss';
 
+import type { JSX } from 'react';
+
 interface DeleteFunnelProps {
 	isOpen: boolean;
 	onClose: () => void;
@@ -24,7 +26,7 @@ function DeleteFunnel({
 	isOpen,
 	onClose,
 	funnelId,
-	shouldRedirectToTracesListOnDeleteSuccess,
+	shouldRedirectToTracesListOnDeleteSuccess = true,
 }: DeleteFunnelProps): JSX.Element {
 	const deleteFunnelMutation = useDeleteFunnel();
 	const { notifications } = useNotifications();
@@ -105,9 +107,5 @@ function DeleteFunnel({
 		</O11yModal>
 	);
 }
-
-DeleteFunnel.defaultProps = {
-	shouldRedirectToTracesListOnDeleteSuccess: true,
-};
 
 export default DeleteFunnel;

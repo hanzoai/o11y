@@ -7,6 +7,8 @@ import { IDashboardVariable } from 'types/api/dashboard/getAll';
 
 import VariableItem from '../DashboardSettings/DashboardVariableSettings/VariableItem/VariableItem';
 
+import type { JSX } from 'react';
+
 // Mock dependencies
 jest.mock('api/dashboard/variables/dashboardVariablesQuery');
 jest.mock('hooks/dynamicVariables/useGetFieldValues', () => ({

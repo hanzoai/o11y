@@ -2,6 +2,8 @@ import { ActionMode } from 'types/api/pipeline/def';
 
 import { ModeAndConfigWrapper } from './styles';
 
+import type { JSX } from 'react';
+
 function ModeAndConfiguration({
 	isActionMode,
 	version,

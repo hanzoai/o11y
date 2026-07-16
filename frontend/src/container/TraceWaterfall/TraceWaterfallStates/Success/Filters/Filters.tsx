@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type JSX } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import {
 	ChevronDown,
@@ -206,9 +206,5 @@ function Filters({
 		</div>
 	);
 }
-
-Filters.defaultProps = {
-	onFilteredSpansChange: undefined,
-};
 
 export default Filters;

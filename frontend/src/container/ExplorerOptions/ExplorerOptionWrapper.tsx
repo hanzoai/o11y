@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 
 import ExplorerOptions, { ExplorerOptionsProps } from './ExplorerOptions';
 import { getExplorerToolBarVisibility } from './utils';

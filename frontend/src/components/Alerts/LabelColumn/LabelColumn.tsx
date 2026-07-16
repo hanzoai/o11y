@@ -6,7 +6,7 @@ import {
 	TooltipRoot,
 	TooltipTrigger,
 } from 'components/ui/tooltip';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 
 import LabelTag from './LabelTag';

@@ -2,13 +2,13 @@ import {
 	// eslint-disable-next-line no-restricted-imports
 	createContext,
 	PropsWithChildren,
-	useCallback,
-	// eslint-disable-next-line no-restricted-imports
+	useCallback, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useEffect,
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useQueryClient } from 'react-query';
 import { apiV3 } from 'api/apiV1';

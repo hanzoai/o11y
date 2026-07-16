@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Button, Flex, Form, Input, Modal, Select } from 'antd';
 import { Typography } from 'components/ui/typography';
 import ROUTES from 'constants/routes';

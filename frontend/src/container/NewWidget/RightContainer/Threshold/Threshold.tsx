@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, type JSX } from 'react';
 import { useDrag, useDrop, XYCoord } from 'react-dnd';
 import { Button, Input, InputNumber, Select, Space } from 'antd';
 import { Typography } from 'components/ui/typography';
@@ -38,7 +38,7 @@ function Threshold({
 	thresholdUnit = 'ms',
 	thresholdColor = 'Red',
 	thresholdFormat = 'Text',
-	thresholdDeleteHandler,
+	thresholdDeleteHandler = undefined,
 	setThresholds,
 	keyIndex,
 	moveThreshold,
@@ -407,16 +407,5 @@ function Threshold({
 		</div>
 	);
 }
-
-Threshold.defaultProps = {
-	thresholdOperator: undefined,
-	thresholdValue: undefined,
-	thresholdUnit: undefined,
-	thresholdColor: undefined,
-	thresholdFormat: undefined,
-	thresholdLabel: undefined,
-	isEditEnabled: false,
-	thresholdDeleteHandler: undefined,
-};
 
 export default Threshold;

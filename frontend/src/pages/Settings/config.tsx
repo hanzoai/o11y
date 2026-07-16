@@ -34,6 +34,8 @@ import MembersSettings from 'pages/MembersSettings';
 import ServiceAccountsSettings from 'pages/ServiceAccountsSettings';
 import Shortcuts from 'pages/Shortcuts';
 
+import type { JSX } from 'react';
+
 export const organizationSettings = (t: TFunction): RouteTabProps['routes'] => [
 	{
 		Component: OrganizationSettings,

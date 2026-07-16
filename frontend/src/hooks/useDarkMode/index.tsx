@@ -4,12 +4,12 @@ import {
 	Dispatch,
 	ReactNode,
 	SetStateAction,
-	useCallback,
-	// eslint-disable-next-line no-restricted-imports
+	useCallback, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useEffect,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import { theme as antdTheme, ThemeConfig } from 'antd';
 import get from 'api/browser/localstorage/get';

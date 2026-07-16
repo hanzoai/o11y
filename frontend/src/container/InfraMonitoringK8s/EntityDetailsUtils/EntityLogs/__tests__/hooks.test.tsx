@@ -7,6 +7,8 @@ import {
 } from '../../../../../__tests__/query_range_v5.util';
 import { useInfiniteEntityLogs } from '../hooks';
 
+import type { JSX } from 'react';
+
 const createWrapper = (): React.FC<{ children: React.ReactNode }> => {
 	const queryClient = new QueryClient({
 		defaultOptions: {

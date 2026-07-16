@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Button } from '@hanzo/ui';
 import { Skeleton } from 'antd';
 import logEvent from 'api/common/logEvent';

@@ -6,6 +6,8 @@ import { useCreateAlertState } from '../context';
 import AdvancedOptionItem from './AdvancedOptionItem';
 import EvaluationCadence from './EvaluationCadence';
 
+import type { JSX } from 'react';
+
 function AdvancedOptions(): JSX.Element {
 	const { advancedOptions, setAdvancedOptions } = useCreateAlertState();
 

@@ -6,7 +6,7 @@
 // - Handling multiple rows correctly
 // - Handling widgets with different heights
 
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { I18nextProvider } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom-v5-compat';
 import { screen } from '@testing-library/react';

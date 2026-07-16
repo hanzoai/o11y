@@ -14,6 +14,8 @@ import {
 
 import './StatsCard.styles.scss';
 
+import type { JSX } from 'react';
+
 type ChangePercentageProps = {
 	percentage: number;
 	direction: number;
@@ -67,12 +69,12 @@ type StatsCardProps = {
 };
 
 function StatsCard({
-	displayValue,
-	totalCurrentCount,
-	totalPastCount,
+	displayValue = '',
+	totalCurrentCount = 0,
+	totalPastCount = 0,
 	title,
-	isEmpty,
-	emptyMessage,
+	isEmpty = false,
+	emptyMessage = 'No Data',
 	timeSeries = [],
 }: StatsCardProps): JSX.Element {
 	const urlQuery = useUrlQuery();
@@ -144,14 +146,5 @@ function StatsCard({
 		</div>
 	);
 }
-
-StatsCard.defaultProps = {
-	totalCurrentCount: 0,
-	totalPastCount: 0,
-	isEmpty: false,
-	emptyMessage: 'No Data',
-	displayValue: '',
-	timeSeries: [],
-};
 
 export default StatsCard;

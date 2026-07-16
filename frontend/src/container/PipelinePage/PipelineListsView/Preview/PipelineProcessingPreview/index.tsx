@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { RelativeDurationOptions } from 'container/TopNav/DateTimeSelectionV2/constants';
 import { PipelineData } from 'types/api/pipeline/def';
 

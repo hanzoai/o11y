@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Button } from 'antd';
 import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';

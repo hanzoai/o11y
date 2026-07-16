@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { FullScreen, FullScreenHandle } from 'react-full-screen';
 import { ItemCallback, Layout } from 'react-grid-layout';
 import { useIsFetching } from 'react-query';
@@ -600,7 +607,3 @@ function GraphLayout(props: GraphLayoutProps): JSX.Element {
 }
 
 export default GraphLayout;
-
-GraphLayout.defaultProps = {
-	enableDrillDown: false,
-};

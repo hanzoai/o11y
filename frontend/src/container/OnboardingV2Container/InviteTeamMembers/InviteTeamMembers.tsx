@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useMutation } from 'react-query';
 import { Color } from 'constants/designTokens';
 import { Button, Input, Select, Typography } from 'antd';

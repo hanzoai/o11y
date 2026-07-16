@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, type JSX } from 'react';
 import { Button } from 'antd';
 import getSessionStorageApi from 'api/browser/sessionstorage/get';
 import ROUTES from 'constants/routes';

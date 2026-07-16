@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { Empty } from 'antd';
 import type { RadioChangeEvent } from 'antd/lib';
 import O11yRadioGroup from 'components/O11yRadioGroup/O11yRadioGroup';

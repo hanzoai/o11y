@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tooltip } from 'antd';
 import refreshPaymentStatus from 'api/v3/licenses/put';
@@ -7,8 +7,8 @@ import { RefreshCcw } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 
 function RefreshPaymentStatus({
-	btnShape,
-	type,
+	btnShape = 'default',
+	type = 'button',
 }: {
 	btnShape?: 'default' | 'round' | 'circle';
 	type?: 'button' | 'text' | 'tooltip';
@@ -48,9 +48,5 @@ function RefreshPaymentStatus({
 		</span>
 	);
 }
-RefreshPaymentStatus.defaultProps = {
-	btnShape: 'default',
-	type: 'button',
-};
 
 export default RefreshPaymentStatus;

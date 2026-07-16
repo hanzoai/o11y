@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Button, Input, Popover, Tooltip, Typography } from 'antd';
 import { ArrowDownWideNarrow, Check, Plus, Search } from 'lucide-react';

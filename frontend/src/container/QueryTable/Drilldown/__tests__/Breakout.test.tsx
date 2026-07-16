@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';

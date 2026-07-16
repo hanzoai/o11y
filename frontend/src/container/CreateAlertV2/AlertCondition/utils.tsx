@@ -22,6 +22,8 @@ import { openInNewTab } from 'utils/navigation';
 import { ROUTING_POLICIES_ROUTE } from './constants';
 import { RoutingPolicyBannerProps } from './types';
 
+import type { JSX } from 'react';
+
 export function getQueryNames(currentQuery: Query): BaseOptionType[] {
 	const involvedQueriesInTraceOperator = getInvolvedQueriesInTraceOperator(
 		currentQuery.builder.queryTraceOperator,

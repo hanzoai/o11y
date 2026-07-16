@@ -7,6 +7,8 @@ import { SpanV3 } from 'types/api/trace/getTraceV3';
 
 import styles from './SpanDetailsPanel.module.scss';
 
+import type { JSX } from 'react';
+
 interface TraceIdFieldProps {
 	span: SpanV3;
 }

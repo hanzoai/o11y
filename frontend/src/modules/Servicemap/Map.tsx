@@ -1,6 +1,6 @@
 /* eslint-disable  */
 //@ts-nocheck
-import { memo } from 'react';
+import { memo, type JSX } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 

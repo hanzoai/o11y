@@ -1,6 +1,8 @@
 import useSampleLogs, { SampleLogsRequest } from '../../hooks/useSampleLogs';
 import LogsResponseDisplay from './SampleLogsResponseDisplay';
 
+import type { JSX } from 'react';
+
 function SampleLogs(props: SampleLogsRequest): JSX.Element {
 	const sampleLogsResponse = useSampleLogs(props);
 

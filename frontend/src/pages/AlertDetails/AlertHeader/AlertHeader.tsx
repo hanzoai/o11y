@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, type JSX } from 'react';
 import type { RuletypesRuleDTO } from 'api/generated/services/o11y.schemas';
 import CreateAlertV2Header from 'container/CreateAlertV2/CreateAlertHeader';
 import LineClampedText from 'periscope/components/LineClampedText/LineClampedText';

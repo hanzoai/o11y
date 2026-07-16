@@ -6,6 +6,8 @@ import { TIMEZONE_DATA } from '../constants';
 import EvaluationCadence from '../EvaluationCadence';
 import { createMockAlertContextState } from './testUtils';
 
+import type { JSX } from 'react';
+
 jest.mock('../EvaluationCadence/EditCustomSchedule', () => ({
 	__esModule: true,
 	default: ({

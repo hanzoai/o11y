@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Form, Modal } from 'antd';
 import {
@@ -18,7 +18,7 @@ import ProcessorForm from './ProcessorForm';
 function AddNewProcessor({
 	isActionType,
 	setActionType,
-	selectedProcessorData,
+	selectedProcessorData = undefined,
 	setShowSaveButton,
 	expandedPipelineData,
 	setExpandedPipelineData,
@@ -197,11 +197,6 @@ function AddNewProcessor({
 		</Modal>
 	);
 }
-
-AddNewProcessor.defaultProps = {
-	selectedProcessorData: undefined,
-	expandedPipelineData: {},
-};
 
 interface AddNewProcessorProps {
 	isActionType: string;

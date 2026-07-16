@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { Button } from '@hanzo/ui';
 import BrandMark from 'components/BrandMark';
 import { LifeBuoy } from 'lucide-react';

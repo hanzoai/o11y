@@ -37,7 +37,9 @@ export const TimeContainer = styled.div<Props & HTMLAttributes<HTMLDivElement>>`
 	}
 `;
 
-export const GraphContainer = styled.div<GraphContainerProps & HTMLAttributes<HTMLDivElement>>`
+export const GraphContainer = styled.div<
+	GraphContainerProps & HTMLAttributes<HTMLDivElement>
+>`
 	height: ${({ isGraphLegendToggleAvailable }): string =>
 		isGraphLegendToggleAvailable ? '50%' : '100%'};
 `;

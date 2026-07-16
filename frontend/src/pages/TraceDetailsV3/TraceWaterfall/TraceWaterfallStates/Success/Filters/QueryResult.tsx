@@ -11,6 +11,8 @@ import cx from 'classnames';
 
 import styles from './QueryResult.module.scss';
 
+import type { JSX } from 'react';
+
 type QueryResultProps = {
 	hasExpression: boolean;
 	hasResults: boolean;
@@ -103,9 +105,5 @@ function QueryResult({
 		</>
 	);
 }
-
-QueryResult.defaultProps = {
-	showNavigation: true,
-};
 
 export default QueryResult;

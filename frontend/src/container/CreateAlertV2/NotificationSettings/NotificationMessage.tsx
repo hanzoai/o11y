@@ -4,6 +4,8 @@ import { Info } from 'components/ui/icons';
 
 import { useCreateAlertState } from '../context';
 
+import type { JSX } from 'react';
+
 function NotificationMessage(): JSX.Element {
 	const { notificationSettings, setNotificationSettings } =
 		useCreateAlertState();

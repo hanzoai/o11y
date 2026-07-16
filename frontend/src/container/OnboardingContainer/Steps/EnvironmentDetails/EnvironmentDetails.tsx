@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Check, Server, LoaderCircle } from 'components/ui/icons';
 import { Input } from 'components/ui/input';
@@ -185,7 +185,7 @@ export default function EnvironmentDetails(): JSX.Element {
 							className="periscope-btn primary"
 							icon={
 								isSubmittingRequestForEnvironment ? (
-									<LoaderCircle size="md" className="animate-spin" />
+									<LoaderCircle size={16} className="animate-spin" />
 								) : (
 									<Check size={12} />
 								)

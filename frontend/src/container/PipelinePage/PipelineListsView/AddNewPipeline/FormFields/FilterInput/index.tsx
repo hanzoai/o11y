@@ -11,6 +11,8 @@ import LogsFilterPreview from '../../../Preview/LogsFilterPreview';
 
 import './styles.scss';
 
+import type { JSX } from 'react';
+
 function TagFilterInput({
 	value,
 	onChange,

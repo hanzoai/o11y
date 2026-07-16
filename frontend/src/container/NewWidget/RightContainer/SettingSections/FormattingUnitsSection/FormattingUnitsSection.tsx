@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, type JSX } from 'react';
 import { Select } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { PrecisionOption } from 'components/Graph/types';

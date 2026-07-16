@@ -1,5 +1,7 @@
 import { Typography } from 'components/ui/typography';
 
+import type { JSX } from 'react';
+
 function AnnouncementsModal(): JSX.Element {
 	return (
 		<div className="announcements-modal-container">

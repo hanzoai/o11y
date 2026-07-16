@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Input } from 'components/ui/input';
 import { Button } from 'antd';
 import { Typography } from 'components/ui/typography';
@@ -9,14 +9,14 @@ import './InputWithLabel.styles.scss';
 
 function InputWithLabel({
 	label,
-	initialValue,
+	initialValue = undefined,
 	placeholder,
-	type,
-	onClose,
-	labelAfter,
+	type = 'text',
+	onClose = undefined,
+	labelAfter = false,
 	onChange,
-	className,
-	closeIcon,
+	className = undefined,
+	closeIcon = undefined,
 }: {
 	label: string;
 	initialValue?: string | number | null;
@@ -64,14 +64,5 @@ function InputWithLabel({
 		</div>
 	);
 }
-
-InputWithLabel.defaultProps = {
-	type: 'text',
-	onClose: undefined,
-	labelAfter: false,
-	initialValue: undefined,
-	className: undefined,
-	closeIcon: undefined,
-};
 
 export default InputWithLabel;

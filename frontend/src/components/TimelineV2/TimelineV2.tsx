@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useMeasure } from 'react-use';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 

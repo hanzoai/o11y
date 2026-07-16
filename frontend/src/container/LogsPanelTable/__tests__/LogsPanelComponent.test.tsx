@@ -11,6 +11,8 @@ import { act, fireEvent, render, screen, waitFor } from 'tests/test-utils';
 import { QueryRangePayload } from 'types/api/metrics/getQueryRange';
 import { IBuilderQuery } from 'types/api/queryBuilder/queryBuilderData';
 
+import type { JSX } from 'react';
+
 // Constants
 const QUERY_RANGE_URL = `${ENVIRONMENT.baseURL}/api/v3/query_range`;
 const MOCK_SEARCH_PARAMS =

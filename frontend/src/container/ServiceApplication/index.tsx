@@ -7,6 +7,8 @@ import ServiceMetrics from './ServiceMetrics';
 import ServiceTraces from './ServiceTraces';
 import { Container } from './styles';
 
+import type { JSX } from 'react';
+
 function Services(): JSX.Element {
 	const { featureFlags } = useAppContext();
 	const isSpanMetricEnabled =

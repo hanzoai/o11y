@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Skeleton, Tooltip } from 'antd';
@@ -65,7 +66,7 @@ function WidgetGraphComponent({
 	customErrorMessage,
 	customOnRowClick,
 	customTimeRangeWindowForCoRelation,
-	enableDrillDown,
+	enableDrillDown = false,
 }: WidgetGraphComponentProps): JSX.Element {
 	const { safeNavigate } = useSafeNavigate();
 	const [deleteModal, setDeleteModal] = useState(false);
@@ -76,14 +77,14 @@ function WidgetGraphComponent({
 
 	const isFullViewOpen = params.get(QueryParams.expandedWidgetId) === widget.id;
 
-	const lineChartRef = useRef<ToggleGraphProps>();
+	const lineChartRef = useRef<ToggleGraphProps>(undefined);
 	const [graphVisibility, setGraphVisibility] = useState<boolean[]>(
 		Array(queryResponse.data?.payload?.data?.result?.length || 0).fill(true),
 	);
 	const graphRef = useRef<HTMLDivElement>(null);
 
 	const [currentGraphRef, setCurrentGraphRef] =
-		useState<RefObject<HTMLDivElement> | null>(graphRef);
+		useState<RefObject<HTMLDivElement | null> | null>(graphRef);
 
 	useEffect(() => {
 		if (!lineChartRef.current) {
@@ -437,13 +438,5 @@ function WidgetGraphComponent({
 		</div>
 	);
 }
-
-WidgetGraphComponent.defaultProps = {
-	yAxisUnit: undefined,
-	setLayout: undefined,
-	onClickHandler: undefined,
-	customTimeRangeWindowForCoRelation: undefined,
-	enableDrillDown: false,
-};
 
 export default WidgetGraphComponent;

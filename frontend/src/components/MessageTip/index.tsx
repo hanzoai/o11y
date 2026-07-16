@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 
 import { StyledAlert } from './styles';
 
@@ -9,7 +9,7 @@ interface MessageTipProps {
 }
 
 function MessageTip({
-	show,
+	show = false,
 	message,
 	action,
 }: MessageTipProps): JSX.Element | null {
@@ -21,9 +21,5 @@ function MessageTip({
 		<StyledAlert showIcon description={message} type="info" action={action} />
 	);
 }
-
-MessageTip.defaultProps = {
-	show: false,
-};
 
 export default MessageTip;

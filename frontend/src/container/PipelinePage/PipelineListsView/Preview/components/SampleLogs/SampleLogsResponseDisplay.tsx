@@ -1,6 +1,8 @@
 import { SampleLogsResponse } from '../../hooks/useSampleLogs';
 import LogsList from '../LogsList';
 
+import type { JSX } from 'react';
+
 function SampleLogsResponseDisplay({
 	response,
 }: SampleLogsResponseDisplayProps): JSX.Element {

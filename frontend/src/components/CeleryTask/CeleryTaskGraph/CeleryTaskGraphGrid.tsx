@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { Card } from 'antd';
@@ -35,7 +35,7 @@ const CardContainer = CardContainerBase as unknown as React.ComponentType<
 export default function CeleryTaskGraphGrid({
 	onClick,
 	queryEnabled,
-	configureOptionComponent,
+	configureOptionComponent = null,
 }: {
 	onClick: (task: CaptureDataProps) => void;
 	queryEnabled: boolean;
@@ -229,7 +229,3 @@ export default function CeleryTaskGraphGrid({
 		</div>
 	);
 }
-
-CeleryTaskGraphGrid.defaultProps = {
-	configureOptionComponent: null,
-};

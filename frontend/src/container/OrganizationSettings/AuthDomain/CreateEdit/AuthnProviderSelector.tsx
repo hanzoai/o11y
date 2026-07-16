@@ -5,6 +5,8 @@ import { AuthtypesAuthNProviderDTO } from 'api/generated/services/o11y.schemas';
 import './CreateEdit.styles.scss';
 import { Key, SolidGoogle } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 interface AuthNProvider {
 	key: AuthtypesAuthNProviderDTO;
 	title: string;

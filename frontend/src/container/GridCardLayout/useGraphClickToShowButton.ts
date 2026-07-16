@@ -4,7 +4,7 @@ import { isUndefined } from 'lodash-es';
 import './GridCardLayout.styles.scss';
 
 interface ClickToShowButtonProps {
-	graphRef: React.RefObject<HTMLDivElement>;
+	graphRef: React.RefObject<HTMLDivElement | null>;
 	buttonClassName?: string;
 	isButtonEnabled?: boolean;
 }

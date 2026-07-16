@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, type JSX } from 'react';
 import { Button, Tooltip } from 'antd';
 import { Divider } from 'components/ui/divider';
 import cx from 'classnames';
@@ -30,10 +30,10 @@ interface FunnelConfigurationProps {
 
 function FunnelConfiguration({
 	funnel,
-	isTraceDetailsPage,
-	span,
-	triggerAutoSave,
-	showNotifications,
+	isTraceDetailsPage = false,
+	span = undefined,
+	triggerAutoSave = false,
+	showNotifications = false,
 }: FunnelConfigurationProps): JSX.Element {
 	const { hasEditPermission } = useAppContext();
 	const { triggerSave } = useFunnelContext();
@@ -124,12 +124,5 @@ function FunnelConfiguration({
 		</div>
 	);
 }
-
-FunnelConfiguration.defaultProps = {
-	isTraceDetailsPage: false,
-	span: undefined,
-	triggerAutoSave: false,
-	showNotifications: false,
-};
 
 export default memo(FunnelConfiguration);

@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import Uplot from 'components/Uplot';
 import { useResizeObserver } from 'hooks/useDimensions';

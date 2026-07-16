@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { Table } from 'antd';
 import { SA_QUERY_PARAMS } from 'container/ServiceAccountsSettings/constants';
 import { ServiceAccountRow } from 'container/ServiceAccountsSettings/utils';

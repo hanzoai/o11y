@@ -11,6 +11,8 @@ import { DataSource } from 'types/common/queryBuilder';
 
 import { usePreferenceContext } from '../context/PreferenceContextProvider';
 
+import type { JSX } from 'react';
+
 const ROUTE_LOGS = '/logs';
 const ROUTE_TRACES = '/traces';
 const TESTID_LOGS = 'logs';

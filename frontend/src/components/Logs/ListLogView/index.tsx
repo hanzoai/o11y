@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, type JSX } from 'react';
 import { blue } from '@ant-design/colors';
 import { Typography } from 'components/ui/typography';
 import cx from 'classnames';
@@ -246,14 +246,5 @@ function ListLogView({
 		</>
 	);
 }
-
-ListLogView.defaultProps = {
-	activeLog: null,
-	handleChangeSelectedView: undefined,
-};
-
-LogGeneralField.defaultProps = {
-	linesPerRow: 1,
-};
 
 export default memo(ListLogView);

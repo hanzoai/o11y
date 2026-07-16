@@ -3,6 +3,8 @@ import type { Table } from '@tanstack/react-table';
 import type { TableColumnDef } from './types';
 import { getColumnWidthStyle } from './utils';
 
+import type { JSX } from 'react';
+
 export function VirtuosoTableColGroup<TData>({
 	columns,
 	table,

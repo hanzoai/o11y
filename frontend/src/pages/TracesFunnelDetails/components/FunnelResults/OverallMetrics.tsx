@@ -3,6 +3,8 @@ import { useFunnelMetrics } from 'hooks/TracesFunnels/useFunnelMetrics';
 
 import FunnelMetricsTable from './FunnelMetricsTable';
 
+import type { JSX } from 'react';
+
 function OverallMetrics(): JSX.Element {
 	const { funnelId } = useParams<{ funnelId: string }>();
 	const { isLoading, metricsData, conversionRate, isError } = useFunnelMetrics({

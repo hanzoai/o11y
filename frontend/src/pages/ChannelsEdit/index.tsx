@@ -19,6 +19,8 @@ import APIError from 'types/api/error';
 
 import './ChannelsEdit.styles.scss';
 
+import type { JSX } from 'react';
+
 function ChannelsEdit(): JSX.Element {
 	const { t } = useTranslation();
 

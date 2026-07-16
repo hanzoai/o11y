@@ -14,6 +14,8 @@ import LineClampedText from 'periscope/components/LineClampedText/LineClampedTex
 import { ILog } from 'types/api/logs/log';
 import { QueryDataV3 } from 'types/api/widgets/getQuery';
 
+import type { JSX } from 'react';
+
 export function BlockLink({
 	children,
 	to,

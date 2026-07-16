@@ -13,6 +13,8 @@ import {
 	formatTimestampToReadableDate,
 } from './utils';
 
+import type { JSX } from 'react';
+
 const TOOLTIP_CONTENT_PROPS = {
 	className: 'metric-highlights-tooltip-content',
 };

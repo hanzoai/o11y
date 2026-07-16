@@ -1,5 +1,7 @@
 import { Typography } from 'components/ui/typography';
 
+import type { JSX } from 'react';
+
 interface FieldKeyProps {
 	name: string;
 	type: string;

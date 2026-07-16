@@ -6,6 +6,8 @@ import CopyIconButton from '../CopyIconButton';
 
 import './AuthCard.styles.scss';
 
+import type { JSX } from 'react';
+
 interface AuthCardProps {
 	isAdmin: boolean;
 	instanceUrl: string;
@@ -30,8 +32,8 @@ function AuthCard({
 				Authenticate from your client
 			</h3>
 			<p className="mcp-auth-card__description">
-				On first connect, your client opens a O11y authorization page asking for
-				two values:
+				On first connect, your client opens a O11y authorization page asking for two
+				values:
 			</p>
 
 			<div className="mcp-auth-card__field">

@@ -2,6 +2,8 @@ import { Typography } from 'components/ui/typography';
 
 import { Container } from './styles';
 
+import type { JSX } from 'react';
+
 function EmptyWidget(): JSX.Element {
 	return (
 		<Container>

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { Input } from 'components/ui/input';
 import { Typography } from 'components/ui/typography';
 import cx from 'classnames';
@@ -25,7 +25,7 @@ interface IAttributesProps {
 }
 
 function Attributes(props: IAttributesProps): JSX.Element {
-	const { span, isSearchVisible, shouldFocusOnToggle } = props;
+	const { span, isSearchVisible, shouldFocusOnToggle = false } = props;
 	const [fieldSearchInput, setFieldSearchInput] = useState<string>('');
 
 	const flattenSpanData: Record<string, string> = useMemo(
@@ -127,9 +127,5 @@ function Attributes(props: IAttributesProps): JSX.Element {
 		</div>
 	);
 }
-
-Attributes.defaultProps = {
-	shouldFocusOnToggle: false,
-};
 
 export default Attributes;

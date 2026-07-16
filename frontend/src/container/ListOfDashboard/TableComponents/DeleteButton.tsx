@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { CircleAlert, Trash2 } from 'components/ui/icons';
@@ -28,7 +28,7 @@ export function DeleteButton({
 	name,
 	id,
 	isLocked,
-	routeToListPage,
+	routeToListPage = false,
 }: DeleteButtonProps): JSX.Element {
 	const [modal, contextHolder] = Modal.useModal();
 	const { user } = useAppContext();
@@ -133,10 +133,6 @@ export function DeleteButton({
 		</>
 	);
 }
-
-DeleteButton.defaultProps = {
-	routeToListPage: false,
-};
 
 // This is to avoid the type collision
 function Wrapper(props: Data): JSX.Element {

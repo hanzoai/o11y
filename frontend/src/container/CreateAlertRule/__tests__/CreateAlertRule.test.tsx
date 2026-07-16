@@ -13,6 +13,8 @@ import { DataSource } from 'types/common/queryBuilder';
 
 import CreateAlertRule from '../index';
 
+import type { JSX } from 'react';
+
 jest.mock('react-router-dom-v5-compat', () => ({
 	...jest.requireActual('react-router-dom-v5-compat'),
 	useNavigationType: jest.fn(() => 'PUSH'),

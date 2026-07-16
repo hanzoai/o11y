@@ -3,6 +3,8 @@ import { Button } from 'antd';
 import EmptyQuickFilterIcon from 'assets/CustomIcons/EmptyQuickFilterIcon';
 import { ArrowUpRight } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 const QUICK_FILTER_DOC_PATHS: Record<string, string> = {
 	severity_text: 'severity-text',
 	'deployment.environment': 'environment',

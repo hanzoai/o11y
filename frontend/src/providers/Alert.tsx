@@ -1,9 +1,9 @@
 import React, {
 	// eslint-disable-next-line no-restricted-imports
-	createContext,
-	// eslint-disable-next-line no-restricted-imports
+	createContext, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useState,
+	type JSX,
 } from 'react';
 
 interface AlertRuleContextType {

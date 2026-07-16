@@ -2,6 +2,8 @@ import { Check, Copy } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
 import { DialogWrapper } from 'components/ui/dialog';
 
+import type { JSX } from 'react';
+
 interface ResetLinkDialogProps {
 	open: boolean;
 	linkType: 'invite' | 'reset' | null;

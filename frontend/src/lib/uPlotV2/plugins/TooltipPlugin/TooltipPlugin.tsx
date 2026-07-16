@@ -1,4 +1,11 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { createPortal } from 'react-dom';
 import cx from 'classnames';
 import uPlot from 'uplot';
@@ -55,7 +62,7 @@ export default function TooltipPlugin({
 	const containerRef = useRef<HTMLDivElement>(null);
 	const rafId = useRef<number | null>(null);
 	const dismissTimeoutId = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const layoutRef = useRef<TooltipLayoutInfo>();
+	const layoutRef = useRef<TooltipLayoutInfo>(undefined);
 	const renderRef = useRef(render);
 	renderRef.current = render;
 	const [portalRoot, setPortalRoot] = useState<HTMLElement>(

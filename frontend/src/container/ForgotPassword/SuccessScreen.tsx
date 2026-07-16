@@ -1,6 +1,8 @@
 import { Button } from '@hanzo/ui';
 import { ArrowLeft, Mail } from 'lucide-react';
 
+import type { JSX } from 'react';
+
 interface SuccessScreenProps {
 	onBackToLogin: () => void;
 }

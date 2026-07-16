@@ -38,7 +38,8 @@
 	left: 0;
 }
 
-[data-slot='resizable-handle'][aria-orientation='horizontal'] [data-slot='resizable-handle-icon-wrapper'] {
+[data-slot='resizable-handle'][aria-orientation='horizontal']
+	[data-slot='resizable-handle-icon-wrapper'] {
 	transform: rotate(90deg);
 }
 

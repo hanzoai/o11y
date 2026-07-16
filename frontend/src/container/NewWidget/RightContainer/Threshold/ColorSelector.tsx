@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState, type JSX } from 'react';
 import { ChevronDown } from 'components/ui/icons';
 import { DropdownMenuSimple, type MenuItem } from 'components/ui/dropdown-menu';
 import { Button, ColorPicker, Space } from 'antd';
@@ -70,7 +70,7 @@ function ColorSelector({
 			>
 				<Space className="color-selector-space">
 					<CustomColor color={thresholdColor} />
-					<ChevronDown size="md" />
+					<ChevronDown size={16} />
 				</Space>
 			</Button>
 		</DropdownMenuSimple>
@@ -81,9 +81,5 @@ interface ColorSelectorProps {
 	thresholdColor?: string;
 	setColor: Dispatch<SetStateAction<string>>;
 }
-
-ColorSelector.defaultProps = {
-	thresholdColor: undefined,
-};
 
 export default ColorSelector;

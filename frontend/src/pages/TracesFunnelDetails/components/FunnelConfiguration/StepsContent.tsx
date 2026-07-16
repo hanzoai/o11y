@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback, type JSX } from 'react';
 import { Button, Steps, Tooltip } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { Plus, Undo2 } from 'components/ui/icons';
@@ -14,8 +14,8 @@ import './StepsContent.styles.scss';
 const { Step } = Steps;
 
 function StepsContent({
-	isTraceDetailsPage,
-	span,
+	isTraceDetailsPage = false,
+	span = undefined,
 }: {
 	isTraceDetailsPage?: boolean;
 	span?: Span;
@@ -107,10 +107,5 @@ function StepsContent({
 		</div>
 	);
 }
-
-StepsContent.defaultProps = {
-	isTraceDetailsPage: false,
-	span: undefined,
-};
 
 export default memo(StepsContent);

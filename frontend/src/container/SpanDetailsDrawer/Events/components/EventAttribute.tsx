@@ -3,6 +3,8 @@ import { Typography } from 'components/ui/typography';
 
 import AttributeWithExpandablePopover from './AttributeWithExpandablePopover';
 
+import type { JSX } from 'react';
+
 const EXPANDABLE_ATTRIBUTE_KEYS = ['exception.stacktrace', 'exception.message'];
 const ATTRIBUTE_LENGTH_THRESHOLD = 100;
 

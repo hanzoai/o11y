@@ -4,6 +4,8 @@ import { Loader, Trash2, X } from 'components/ui/icons';
 
 import { DeleteRoutingPolicyProps } from './types';
 
+import type { JSX } from 'react';
+
 function DeleteRoutingPolicy({
 	handleClose,
 	handleDelete,

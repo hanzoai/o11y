@@ -2,6 +2,8 @@ import { Button } from '@hanzo/ui';
 import { Trash2, X } from 'lucide-react';
 import { Modal } from 'antd';
 
+import type { JSX } from 'react';
+
 interface DeleteRoleModalProps {
 	isOpen: boolean;
 	roleName: string;

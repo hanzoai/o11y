@@ -5,6 +5,7 @@ import {
 	Info,
 	CircleX,
 	X,
+	type LucideProps,
 } from 'lucide-react';
 import { cva } from 'class-variance-authority';
 import React from 'react';
@@ -36,17 +37,20 @@ const defaultIcons = {
 	error: <CircleX />,
 };
 
-const calloutVariants = cva('relative w-full rounded-lg border flex gap-[10px]', {
-	variants: {
-		size: {
-			small: 'p-3 pb-[14px] text-sm',
-			medium: 'p-4 text-base',
+const calloutVariants = cva(
+	'relative w-full rounded-lg border flex gap-[10px]',
+	{
+		variants: {
+			size: {
+				small: 'p-3 pb-[14px] text-sm',
+				medium: 'p-4 text-base',
+			},
+		},
+		defaultVariants: {
+			size: 'small',
 		},
 	},
-	defaultVariants: {
-		size: 'small',
-	},
-});
+);
 
 function Callout({
 	className,
@@ -72,10 +76,10 @@ function Callout({
 			{...props}
 		>
 			{IconComponent ? (
-				React.isValidElement(IconComponent) ? (
-					React.cloneElement(IconComponent as React.ReactElement, {
+				React.isValidElement<LucideProps>(IconComponent) ? (
+					React.cloneElement(IconComponent, {
 						'aria-hidden': true,
-						className: cn('mt-1', (IconComponent as React.ReactElement).props?.className),
+						className: cn('mt-1', IconComponent.props.className),
 						color: 'var(--callout-icon-color)',
 						size: size === 'medium' ? 16 : 12,
 					})
@@ -93,7 +97,7 @@ function Callout({
 						data-slot="callout-title"
 						className={cn(
 							'line-clamp-1 min-h-4 font-medium tracking-tight text-[var(--callout-title-color)]',
-							size === 'medium' && 'text-base'
+							size === 'medium' && 'text-base',
 						)}
 					>
 						{message}
@@ -104,7 +108,7 @@ function Callout({
 						data-slot="callout-description"
 						className={cn(
 							'grid justify-items-start gap-1 [&_p]:leading-relaxed text-[var(--callout-description-color)] font-normal leading-5',
-							size === 'medium' ? 'text-base' : 'text-sm'
+							size === 'medium' ? 'text-base' : 'text-sm',
 						)}
 					>
 						{description}

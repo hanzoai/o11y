@@ -590,7 +590,11 @@
 
 		color: var(--primary-foreground);
 		font-variant-numeric: lining-nums tabular-nums slashed-zero;
-		font-feature-settings: 'case' on, 'cpsp' on, 'dlig' on, 'salt' on;
+		font-feature-settings:
+			'case' on,
+			'cpsp' on,
+			'dlig' on,
+			'salt' on;
 		font-family: 'Geist Sans';
 		font-size: 9px;
 		font-style: normal;
@@ -603,7 +607,11 @@
 	.sidenav-beta-tag {
 		color: var(--l1-foreground);
 		font-variant-numeric: lining-nums tabular-nums slashed-zero;
-		font-feature-settings: 'case' on, 'cpsp' on, 'dlig' on, 'salt' on;
+		font-feature-settings:
+			'case' on,
+			'cpsp' on,
+			'dlig' on,
+			'salt' on;
 		font-family: 'Geist Sans';
 		font-size: 9px;
 		font-style: normal;

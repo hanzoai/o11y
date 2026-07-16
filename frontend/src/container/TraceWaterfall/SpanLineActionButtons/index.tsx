@@ -5,6 +5,8 @@ import { Span } from 'types/api/trace/getTraceV2';
 
 import './SpanLineActionButtons.styles.scss';
 
+import type { JSX } from 'react';
+
 export interface SpanLineActionButtonsProps {
 	span: Span;
 }

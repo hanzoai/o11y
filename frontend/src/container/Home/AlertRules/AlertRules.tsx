@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button, Skeleton } from 'antd';
 import { Badge } from 'components/ui/badge';

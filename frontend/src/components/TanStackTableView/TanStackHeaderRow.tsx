@@ -2,6 +2,7 @@ import type {
 	CSSProperties,
 	MouseEvent as ReactMouseEvent,
 	TouchEvent as ReactTouchEvent,
+	JSX,
 } from 'react';
 import { useCallback, useMemo } from 'react';
 import {
@@ -219,7 +220,7 @@ function TanStackHeaderRow<TData>({
 									event.stopPropagation();
 								}}
 							>
-								<Ellipsis size="md" />
+								<Ellipsis size={16} />
 							</span>
 						</PopoverTrigger>
 						<PopoverContent
@@ -236,7 +237,7 @@ function TanStackHeaderRow<TData>({
 									onRemoveColumn?.(column.id);
 								}}
 							>
-								<X size="md" className={headerStyles.tanstackRemoveColumnActionIcon} />
+								<X size={16} className={headerStyles.tanstackRemoveColumnActionIcon} />
 								Remove column
 							</button>
 						</PopoverContent>

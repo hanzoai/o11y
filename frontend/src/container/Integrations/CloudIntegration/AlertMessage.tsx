@@ -5,6 +5,8 @@ import { Callout } from 'components/ui/callout';
 
 import { ModalStateEnum } from '../HeroSection/types';
 
+import type { JSX } from 'react';
+
 function AlertMessage({
 	modalState,
 }: {

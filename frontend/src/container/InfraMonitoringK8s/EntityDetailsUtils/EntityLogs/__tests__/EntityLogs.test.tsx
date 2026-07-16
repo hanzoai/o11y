@@ -15,6 +15,8 @@ import { QueryRangePayloadV5 } from 'types/api/v5/queryRange';
 import EntityLogs from '../EntityLogs';
 import { K8S_ENTITY_LOGS_EXPRESSION_KEY } from '../hooks';
 
+import type { JSX } from 'react';
+
 function verifyEntityLogsV5Request({
 	payload,
 	expectedOffset,

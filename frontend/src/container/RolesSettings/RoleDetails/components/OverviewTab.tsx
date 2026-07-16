@@ -4,6 +4,8 @@ import { PermissionType, TimestampBadge } from '../../utils';
 import PermissionItem from './PermissionItem';
 import { AuthtypesRelationDTO } from 'api/generated/services/o11y.schemas';
 
+import type { JSX } from 'react';
+
 interface OverviewTabProps {
 	role: {
 		description?: string;

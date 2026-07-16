@@ -3,6 +3,8 @@ import Spinner from 'components/Spinner';
 
 import './FunnelMetricsTable.styles.scss';
 
+import type { JSX } from 'react';
+
 export interface MetricItem {
 	title: string;
 	value: string | number;
@@ -22,9 +24,9 @@ interface FunnelMetricsTableProps {
 
 function FunnelMetricsContentRenderer({
 	data,
-	isLoading,
-	isError,
-	emptyState,
+	isLoading = false,
+	isError = false,
+	emptyState = <Empty className="funnel-metrics--empty-state" />,
 }: {
 	data: MetricItem[];
 	isLoading?: boolean;
@@ -59,19 +61,14 @@ function FunnelMetricsContentRenderer({
 		</div>
 	);
 }
-FunnelMetricsContentRenderer.defaultProps = {
-	isLoading: false,
-	isError: false,
-	emptyState: <Empty className="funnel-metrics--empty-state" />,
-};
 
 function FunnelMetricsTable({
 	title,
-	subtitle,
+	subtitle = undefined,
 	data,
-	isLoading,
-	isError,
-	emptyState,
+	isLoading = false,
+	isError = false,
+	emptyState = <Empty className="funnel-metrics--empty-state" />,
 }: FunnelMetricsTableProps): JSX.Element {
 	return (
 		<div className="funnel-metrics">
@@ -94,12 +91,5 @@ function FunnelMetricsTable({
 		</div>
 	);
 }
-
-FunnelMetricsTable.defaultProps = {
-	subtitle: undefined,
-	isLoading: false,
-	emptyState: <Empty className="funnel-metrics--empty-state" />,
-	isError: false,
-};
 
 export default FunnelMetricsTable;

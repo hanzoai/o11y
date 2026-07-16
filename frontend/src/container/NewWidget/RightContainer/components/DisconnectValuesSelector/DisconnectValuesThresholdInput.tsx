@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState, type JSX } from 'react';
 import { rangeUtil } from '@grafana/data';
 import { Callout } from 'components/ui/callout';
 import { Input } from 'antd';

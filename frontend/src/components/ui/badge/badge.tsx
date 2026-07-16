@@ -23,8 +23,10 @@ export type BadgeColor =
 	| 'vanilla';
 export type TextEllipsisPosition = 'start' | 'center' | 'end';
 
-export interface BadgeProps
-	extends Pick<React.ComponentProps<'span'>, 'className' | 'children' | 'id' | 'style'> {
+export interface BadgeProps extends Pick<
+	React.ComponentProps<'span'>,
+	'className' | 'children' | 'id' | 'style'
+> {
 	testId?: string;
 	asChild?: boolean;
 	variant?: BadgeVariant;

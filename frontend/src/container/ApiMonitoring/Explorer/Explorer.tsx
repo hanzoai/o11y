@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import * as Sentry from '@sentry/react';
 import logEvent from 'api/common/logEvent';
 import cx from 'classnames';

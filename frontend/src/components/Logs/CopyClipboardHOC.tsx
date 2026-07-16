@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useEffect } from 'react';
+import { ReactNode, useCallback, useEffect, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Popover } from 'antd';
 import { useNotifications } from 'hooks/useNotifications';
@@ -49,6 +49,3 @@ interface CopyClipboardHOCProps {
 }
 
 export default CopyClipboardHOC;
-CopyClipboardHOC.defaultProps = {
-	tooltipText: 'Copy to clipboard',
-};

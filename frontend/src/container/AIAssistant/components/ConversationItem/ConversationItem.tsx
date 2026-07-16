@@ -1,4 +1,11 @@
-import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
+import {
+	KeyboardEvent,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { useCopyToClipboard } from 'react-use';
 import cx from 'classnames';
 import ROUTES from 'constants/routes';

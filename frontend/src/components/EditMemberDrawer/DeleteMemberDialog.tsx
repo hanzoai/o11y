@@ -3,6 +3,8 @@ import { Button } from 'components/ui/button';
 import { DialogWrapper } from 'components/ui/dialog';
 import { MemberRow } from 'components/MembersTable/MembersTable';
 
+import type { JSX } from 'react';
+
 interface DeleteMemberDialogProps {
 	open: boolean;
 	isInvited: boolean;

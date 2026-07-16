@@ -21,6 +21,8 @@ import APIError from 'types/api/error';
 
 import './CreateServiceAccountModal.styles.scss';
 
+import type { JSX } from 'react';
+
 interface FormValues {
 	name: string;
 }

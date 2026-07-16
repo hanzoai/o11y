@@ -1,18 +1,19 @@
-import React, { CSSProperties, ReactElement } from 'react';
+import React, { CSSProperties, ReactElement, type JSX } from 'react';
 import useInitializeOverlayScrollbar from 'hooks/useInitializeOverlayScrollbar/useInitializeOverlayScrollbar';
 import { PartialOptions } from 'overlayscrollbars';
 
 import './virtuosoOverlayScrollbar.scss';
 
 interface VirtuosoOverlayScrollbarProps {
-	children: ReactElement;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	children: ReactElement<any>;
 	style?: CSSProperties;
 	options: PartialOptions;
 }
 
 export default function VirtuosoOverlayScrollbar({
 	children,
-	style,
+	style = {},
 	options,
 }: VirtuosoOverlayScrollbarProps): JSX.Element {
 	const { rootRef, setScroller } = useInitializeOverlayScrollbar(options);
@@ -33,5 +34,3 @@ export default function VirtuosoOverlayScrollbar({
 		</div>
 	);
 }
-
-VirtuosoOverlayScrollbar.defaultProps = { style: {} };

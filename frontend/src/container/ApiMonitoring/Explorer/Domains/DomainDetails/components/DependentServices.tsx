@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { UseQueryResult } from 'react-query';
 import { Skeleton, Table, TablePaginationConfig } from 'antd';
 import { Typography } from 'components/ui/typography';

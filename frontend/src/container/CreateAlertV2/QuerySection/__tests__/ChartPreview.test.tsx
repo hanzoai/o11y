@@ -16,6 +16,8 @@ import { EQueryType } from 'types/common/dashboard';
 import { CreateAlertProvider } from '../../context';
 import ChartPreview from '../ChartPreview/ChartPreview';
 
+import type { JSX } from 'react';
+
 const REQUESTS_PER_SEC = 'requests/sec';
 const QUERY_TYPE_TEST_ID = 'query-type';
 const GRAPH_TYPE_TEST_ID = 'graph-type';

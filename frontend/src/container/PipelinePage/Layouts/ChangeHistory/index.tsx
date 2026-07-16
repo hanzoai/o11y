@@ -5,6 +5,8 @@ import { changeHistoryColumns } from '../../PipelineListsView/config';
 import { HistoryTableWrapper } from '../../styles';
 import { historyPagination } from '../config';
 
+import type { JSX } from 'react';
+
 function ChangeHistory({ pipelineData }: ChangeHistoryProps): JSX.Element {
 	return (
 		<HistoryTableWrapper>

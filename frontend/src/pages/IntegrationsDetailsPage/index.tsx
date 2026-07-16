@@ -2,6 +2,8 @@ import IntegrationDetailPage from 'container/Integrations/IntegrationDetailPage/
 
 import './IntegrationsDetailsPage.styles.scss';
 
+import type { JSX } from 'react';
+
 function IntegrationsDetailsPage(): JSX.Element {
 	return (
 		<div className="integrations-details-page">

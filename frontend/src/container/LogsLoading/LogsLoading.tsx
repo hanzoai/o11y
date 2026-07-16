@@ -6,6 +6,8 @@ import loadingPlaneUrl from '@/assets/Icons/loading-plane.gif';
 
 import './LogsLoading.styles.scss';
 
+import type { JSX } from 'react';
+
 export function LogsLoading(): JSX.Element {
 	const { t } = useTranslation('common');
 	return (

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { Button } from 'components/ui/button';
 import { X } from 'components/ui/icons';
 

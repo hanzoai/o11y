@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, type JSX } from 'react';
 import { Form } from 'antd';
 import { useGetAccount } from 'api/generated/services/cloudintegration';
 import cx from 'classnames';

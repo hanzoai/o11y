@@ -2,6 +2,8 @@ import { AlertRuleStats } from 'types/api/alerts/def';
 
 import StatsCard from '../StatsCard/StatsCard';
 
+import type { JSX } from 'react';
+
 type TotalTriggeredCardProps = {
 	totalCurrentTriggers: AlertRuleStats['totalCurrentTriggers'];
 	totalPastTriggers: AlertRuleStats['totalPastTriggers'];

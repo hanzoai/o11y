@@ -1,5 +1,5 @@
-import React from 'react';
-import { DropResult } from 'react-beautiful-dnd';
+import React, { type JSX } from 'react';
+import { DragEndEvent } from '@dnd-kit/core';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -15,38 +15,41 @@ import ExplorerColumnsRenderer from '../ExplorerColumnsRenderer';
 jest.mock('hooks/queryBuilder/useQueryBuilder');
 jest.mock('hooks/querySuggestions/useGetQueryKeySuggestions');
 
-// Mock react-beautiful-dnd
-let onDragEndMock: ((result: DropResult) => void) | undefined;
+// Stub out dnd-kit's DOM machinery so the reorder handler can be driven
+// directly; arrayMove stays real because onDragEnd's result depends on it.
+let onDragEndMock: ((event: DragEndEvent) => void) | undefined;
 
-jest.mock('react-beautiful-dnd', () => ({
-	DragDropContext: jest.fn(
+jest.mock('@dnd-kit/core', () => ({
+	closestCenter: jest.fn(),
+	PointerSensor: jest.fn(),
+	useSensor: jest.fn(),
+	useSensors: jest.fn(() => []),
+	DndContext: jest.fn(
 		({
 			children,
 			onDragEnd,
 		}: {
 			children: React.ReactNode;
-			onDragEnd: (result: any) => void;
+			onDragEnd: (event: DragEndEvent) => void;
 		}) => {
 			onDragEndMock = onDragEnd;
 			return children;
 		},
 	),
-	Droppable: jest.fn(
-		({ children }: { children: (provided: any) => React.ReactNode }) =>
-			children({
-				draggableProps: { style: {} },
-				innerRef: jest.fn(),
-				placeholder: null,
-			}),
+}));
+
+jest.mock('@dnd-kit/sortable', () => ({
+	...jest.requireActual('@dnd-kit/sortable'),
+	SortableContext: jest.fn(
+		({ children }: { children: React.ReactNode }) => children,
 	),
-	Draggable: jest.fn(
-		({ children }: { children: (provided: any) => React.ReactNode }) =>
-			children({
-				draggableProps: { style: {} },
-				innerRef: jest.fn(),
-				dragHandleProps: {},
-			}),
-	),
+	useSortable: jest.fn(() => ({
+		attributes: {},
+		listeners: {},
+		setNodeRef: jest.fn(),
+		transform: null,
+		transition: undefined,
+	})),
 }));
 
 // Create a wrapper component with QueryClient
@@ -283,23 +286,18 @@ describe('ExplorerColumnsRenderer', () => {
 			const dragDropContext = field1Element.closest('.explorer-columns');
 
 			if (dragDropContext && onDragEndMock) {
-				// Simulate onDragEnd directly
+				// Simulate onDragEnd directly: drag field1 over field2
 				onDragEndMock({
-					source: { index: 0, droppableId: 'drag-drop-list' },
-					destination: { index: 1, droppableId: 'drag-drop-list' },
-					draggableId: '0',
-					type: 'DEFAULT',
-					reason: 'DROP',
-					combine: undefined,
-					mode: 'FLUID',
-				});
+					active: { id: 'field1' },
+					over: { id: 'field2' },
+				} as DragEndEvent);
 
 				expect(mockSetSelectedLogFields).toHaveBeenCalledWith([
 					{ dataType: 'string', name: 'field2', type: '' },
 					{ dataType: 'string', name: 'field1', type: '' },
 				]);
 			} else {
-				fail('DragDropContext or onDragEndMock not found');
+				fail('DndContext or onDragEndMock not found');
 			}
 		});
 	});
@@ -428,23 +426,18 @@ describe('ExplorerColumnsRenderer', () => {
 			const traceField1Element = screen.getByText('trace_field1');
 			const dragDropContext = traceField1Element.closest('.explorer-columns');
 			if (dragDropContext && onDragEndMock) {
-				// Simulate onDragEnd directly
+				// Simulate onDragEnd directly: drag trace_field1 over trace_field2
 				onDragEndMock({
-					source: { index: 0, droppableId: 'drag-drop-list' },
-					destination: { index: 1, droppableId: 'drag-drop-list' },
-					draggableId: '0',
-					type: 'DEFAULT',
-					reason: 'DROP',
-					combine: undefined,
-					mode: 'FLUID',
-				});
+					active: { id: 'trace_field1' },
+					over: { id: 'trace_field2' },
+				} as DragEndEvent);
 
 				expect(mockSetSelectedTracesFields).toHaveBeenCalledWith([
 					{ name: 'trace_field2', fieldDataType: 'string', fieldContext: 'tag' },
 					{ name: 'trace_field1', fieldDataType: 'string', fieldContext: 'tag' },
 				]);
 			} else {
-				fail('DragDropContext or onDragEndMock not found');
+				fail('DndContext or onDragEndMock not found');
 			}
 		});
 	});

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import type { TableColumnsType as ColumnsType } from 'antd';
 import { Button, Collapse, Input, Menu, Popover, Tooltip } from 'antd';
@@ -41,7 +41,7 @@ function AllAttributes({
 	const [keyPopoverOpen, setKeyPopoverOpen] = useState<string | null>(null);
 	const [copiedKey, setCopiedKey] = useState<string | null>(null);
 	const [, copyToClipboard] = useCopyToClipboard();
-	const copyTimerRef = useRef<ReturnType<typeof setTimeout>>();
+	const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
 	const {
 		data: attributesData,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { X } from 'components/ui/icons';
 import { Card, InputNumber } from 'antd';
 import Spinner from 'components/Spinner';
@@ -26,9 +26,9 @@ import { ApDexSettingsProps } from './types';
 function ApDexSettings({
 	servicename,
 	handlePopOverClose,
-	isLoading,
-	data,
-	refetchGetApDexSetting,
+	isLoading = undefined,
+	data = undefined,
+	refetchGetApDexSetting = undefined,
 }: ApDexSettingsProps): JSX.Element {
 	const [thresholdValue, setThresholdValue] = useState(() => {
 		if (data) {
@@ -109,11 +109,5 @@ function ApDexSettings({
 		</Card>
 	);
 }
-
-ApDexSettings.defaultProps = {
-	isLoading: undefined,
-	data: undefined,
-	refetchGetApDexSetting: undefined,
-};
 
 export default ApDexSettings;

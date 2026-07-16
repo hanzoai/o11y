@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 export default function MongoDBIcon(): JSX.Element {
 	return (
 		<svg

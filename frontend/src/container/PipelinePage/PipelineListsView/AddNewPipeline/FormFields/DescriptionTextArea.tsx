@@ -3,6 +3,8 @@ import { Form, Input } from 'antd';
 
 import { ProcessorFormField } from '../../AddNewProcessor/config';
 
+import type { JSX } from 'react';
+
 function DescriptionTextArea({
 	fieldData,
 }: DescriptionTextAreaProps): JSX.Element {

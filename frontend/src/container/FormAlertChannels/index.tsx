@@ -1,4 +1,4 @@
-import { Dispatch, ReactElement, SetStateAction } from 'react';
+import { Dispatch, ReactElement, SetStateAction, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Input } from 'components/ui/input';
 import { Switch } from 'components/ui/switch';
@@ -187,9 +187,5 @@ interface FormAlertChannelsProps {
 	// editing indicates if the form is opened in edit mode
 	editing?: boolean;
 }
-
-FormAlertChannels.defaultProps = {
-	editing: undefined,
-};
 
 export default FormAlertChannels;

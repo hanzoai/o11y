@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, type JSX } from 'react';
 
 import AuthFooter from './AuthFooter';
 import AuthHeader from './AuthHeader';
@@ -33,9 +33,5 @@ function AuthPageContainer({
 		</div>
 	);
 }
-
-AuthPageContainer.defaultProps = {
-	isOnboarding: false,
-};
 
 export default AuthPageContainer;

@@ -11,6 +11,8 @@ import { InfraMonitoringEntity } from '../constants';
 import { K8sJobsData } from './api';
 import { Bolt } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export function getK8sJobRowKey(job: K8sJobsData): string {
 	return job.jobName || job.meta.k8s_job_name || '';
 }

@@ -8,6 +8,8 @@ import infraContainersUrl from '@/assets/Icons/infraContainers.svg';
 
 import 'components/HostMetricsDetail/Processes/Processes.styles.scss';
 
+import type { JSX } from 'react';
+
 const { Text } = Typography;
 
 function EntityProcesses(): JSX.Element {

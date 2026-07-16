@@ -2,12 +2,12 @@ import {
 	// eslint-disable-next-line no-restricted-imports
 	createContext,
 	PropsWithChildren,
-	useCallback,
-	// eslint-disable-next-line no-restricted-imports
+	useCallback, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useEffect,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import { useQuery } from 'react-query';
 import getLocalStorageApi from 'api/browser/localstorage/get';

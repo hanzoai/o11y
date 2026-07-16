@@ -6,6 +6,8 @@ import Graph from '../Graph/Graph';
 
 import '../Graph/Graph.styles.scss';
 
+import type { JSX } from 'react';
+
 function GraphWrapper({
 	totalCurrentTriggers,
 }: {

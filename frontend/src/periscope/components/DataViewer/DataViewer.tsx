@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { ChevronDown, Copy } from 'components/ui/icons';
 import { Button } from 'components/ui/button';

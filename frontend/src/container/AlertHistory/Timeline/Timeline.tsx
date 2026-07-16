@@ -4,6 +4,8 @@ import TabsAndFilters from './TabsAndFilters/TabsAndFilters';
 
 import './Timeline.styles.scss';
 
+import type { JSX } from 'react';
+
 function TimelineTableRenderer(): JSX.Element {
 	return <TimelineTable />;
 }

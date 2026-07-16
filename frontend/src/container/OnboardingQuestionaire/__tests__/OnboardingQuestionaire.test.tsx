@@ -233,10 +233,7 @@ describe('OnboardingQuestionaire Component', () => {
 			await user.click(othersCheckbox);
 
 			expect(
-				await screen.findByPlaceholderText(
-					/what got you interested in o11y/i,
-					{},
-				),
+				await screen.findByPlaceholderText(/what got you interested in o11y/i, {}),
 			).toBeInTheDocument();
 		});
 	});

@@ -6,6 +6,8 @@ import { render, screen, waitFor } from 'tests/test-utils';
 
 import DashboardWidget from '../index';
 
+import type { JSX } from 'react';
+
 const DASHBOARD_ID = 'dash-1';
 const WIDGET_ID = 'widget-abc';
 

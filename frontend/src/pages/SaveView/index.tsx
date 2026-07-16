@@ -1,15 +1,8 @@
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { Color } from 'constants/designTokens';
-import {
-	ColorPicker,
-	Input,
-	Modal,
-	Table,
-	TableProps,
-	Typography,
-} from 'antd';
+import { ColorPicker, Input, Modal, Table, TableProps, Typography } from 'antd';
 import { Button } from 'components/ui/button';
 import logEvent from 'api/common/logEvent';
 import {

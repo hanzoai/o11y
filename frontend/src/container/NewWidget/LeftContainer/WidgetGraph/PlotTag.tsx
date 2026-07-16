@@ -4,6 +4,8 @@ import { EQueryType } from 'types/common/dashboard';
 
 import QueryTypeTag from '../QueryTypeTag';
 
+import type { JSX } from 'react';
+
 interface IPlotTagProps {
 	queryType: EQueryType;
 	panelType: PANEL_TYPES;
