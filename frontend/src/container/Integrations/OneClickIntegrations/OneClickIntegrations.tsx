@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Badge } from 'components/ui/badge';
 import { IntegrationsProps } from 'types/api/integrations/types';
 

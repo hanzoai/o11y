@@ -4,6 +4,8 @@ import noDataUrl from '@/assets/Icons/no-data.svg';
 
 import './NoData.styles.scss';
 
+import type { JSX } from 'react';
+
 interface INoDataProps {
 	name: string;
 }

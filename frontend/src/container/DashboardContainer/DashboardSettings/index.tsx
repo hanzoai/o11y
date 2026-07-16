@@ -11,6 +11,8 @@ import PublicDashboardSetting from './PublicDashboard';
 
 import './DashboardSettingsContent.styles.scss';
 
+import type { JSX } from 'react';
+
 function DashboardSettings({
 	variablesSettingsTabHandle,
 }: {

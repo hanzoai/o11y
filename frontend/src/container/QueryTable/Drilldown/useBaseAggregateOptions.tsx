@@ -94,7 +94,7 @@ const useBaseAggregateOptions = ({
 			return allLinks.map(({ id, label, url }) => (
 				<ContextMenu.Item
 					key={id}
-					icon={<Link size="md" />}
+					icon={<Link size={16} />}
 					onClick={(): void => {
 						openInNewTab(url);
 						onClose?.();
@@ -178,7 +178,7 @@ const useBaseAggregateOptions = ({
 											key={key}
 											icon={
 												isLoading ? (
-													<Loader className="animate-spin" size="md" />
+													<Loader className="animate-spin" size={16} />
 												) : (
 													<span style={{ color: aggregateData?.seriesColor }}>{icon}</span>
 												)

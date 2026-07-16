@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Switch } from '@hanzo/ui';
 import { ErrorResponseHandlerV2 } from 'api/ErrorResponseHandlerV2';
 import { useUpdateAuthDomain } from 'api/generated/services/authdomains';

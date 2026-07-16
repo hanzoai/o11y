@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { render, screen, userEvent, waitFor } from 'tests/test-utils';
 import { SpanV3 } from 'types/api/trace/getTraceV3';
 

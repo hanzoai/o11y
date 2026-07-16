@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { CircleCheck, CircleX, LoaderCircle } from 'components/ui/icons';
@@ -338,13 +338,13 @@ export default function ConnectionStatus(): JSX.Element {
 
 					<div className="status">
 						{isQueryServiceLoading && (
-							<LoaderCircle className="animate-spin" size="md" />
+							<LoaderCircle className="animate-spin" size={16} />
 						)}
 						{!isQueryServiceLoading &&
 							isReceivingData &&
 							(getStartedSource !== 'kafka' ? (
 								<>
-									<CircleCheck size="md" color="#52c41a" />
+									<CircleCheck size={16} color="#52c41a" />
 									<span> Success </span>
 								</>
 							) : (
@@ -356,7 +356,7 @@ export default function ConnectionStatus(): JSX.Element {
 							!isReceivingData &&
 							(getStartedSource !== 'kafka' ? (
 								<>
-									<CircleX size="md" color="#e84749" />
+									<CircleX size={16} color="#e84749" />
 									<span> Failed </span>
 								</>
 							) : (

@@ -7,6 +7,8 @@ import { getMaskedKey } from 'utils/maskedKey';
 
 import './LicenseKeyRow.styles.scss';
 
+import type { JSX } from 'react';
+
 function LicenseKeyRow(): JSX.Element | null {
 	const { activeLicense } = useAppContext();
 	const [, copyToClipboard] = useCopyToClipboard();

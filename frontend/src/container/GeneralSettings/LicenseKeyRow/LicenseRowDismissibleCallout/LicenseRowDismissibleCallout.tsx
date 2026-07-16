@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Link } from 'react-router-dom';
 import { Callout } from 'components/ui/callout';
 import getLocalStorageApi from 'api/browser/localstorage/get';
@@ -49,32 +49,32 @@ function LicenseRowDismissibleCallout(): JSX.Element | null {
 			className="license-key-callout"
 			description={
 				<div className="license-key-callout__description">
-				This is <strong>NOT</strong> your ingestion or Service account key.
-				{(hasServiceAccountsAccess || hasIngestionAccess) && (
-					<>
-						{' '}
-						Find your{' '}
-						{hasServiceAccountsAccess && (
-							<Link
-								to={ROUTES.SERVICE_ACCOUNTS_SETTINGS}
-								className="license-key-callout__link"
-							>
-								Service account here
-							</Link>
-						)}
-						{hasServiceAccountsAccess && hasIngestionAccess && ' and '}
-						{hasIngestionAccess && (
-							<Link
-								to={ROUTES.INGESTION_SETTINGS}
-								className="license-key-callout__link"
-							>
-								Ingestion key here
-							</Link>
-						)}
-						.
-					</>
-				)}
-			</div>
+					This is <strong>NOT</strong> your ingestion or Service account key.
+					{(hasServiceAccountsAccess || hasIngestionAccess) && (
+						<>
+							{' '}
+							Find your{' '}
+							{hasServiceAccountsAccess && (
+								<Link
+									to={ROUTES.SERVICE_ACCOUNTS_SETTINGS}
+									className="license-key-callout__link"
+								>
+									Service account here
+								</Link>
+							)}
+							{hasServiceAccountsAccess && hasIngestionAccess && ' and '}
+							{hasIngestionAccess && (
+								<Link
+									to={ROUTES.INGESTION_SETTINGS}
+									className="license-key-callout__link"
+								>
+									Ingestion key here
+								</Link>
+							)}
+							.
+						</>
+					)}
+				</div>
 			}
 		/>
 	) : null;

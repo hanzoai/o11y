@@ -49,7 +49,10 @@ export type ComboboxTriggerProps = Omit<
  * Trigger button that opens the combobox popover and displays the selected value.
  */
 const ComboboxTrigger = forwardRef<HTMLButtonElement, ComboboxTriggerProps>(
-	({ className, placeholder, value, testId, id, asChild, children, ...props }, ref) => {
+	(
+		{ className, placeholder, value, testId, id, asChild, children, ...props },
+		ref,
+	) => {
 		if (asChild) {
 			return (
 				<PopoverPrimitive.Trigger ref={ref} asChild {...props}>
@@ -65,7 +68,7 @@ const ComboboxTrigger = forwardRef<HTMLButtonElement, ComboboxTriggerProps>(
 				data-testid={testId}
 				className={cn(
 					'flex h-8 w-full items-center justify-between gap-2 whitespace-nowrap rounded-[calc(var(--radius)-2px)] border border-[var(--input)] bg-transparent px-3 py-2 text-[13px] leading-5 shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50',
-					className
+					className,
 				)}
 				{...props}
 			>
@@ -75,14 +78,19 @@ const ComboboxTrigger = forwardRef<HTMLButtonElement, ComboboxTriggerProps>(
 				>
 					{value || placeholder || 'Select an option...'}
 				</span>
-				<ChevronDown data-slot="combobox-icon" className="size-4 shrink-0 opacity-50" />
+				<ChevronDown
+					data-slot="combobox-icon"
+					className="size-4 shrink-0 opacity-50"
+				/>
 			</PopoverPrimitive.Trigger>
 		);
-	}
+	},
 );
 ComboboxTrigger.displayName = 'ComboboxTrigger';
 
-export type ComboboxContentProps = ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> & {
+export type ComboboxContentProps = ComponentPropsWithoutRef<
+	typeof PopoverPrimitive.Content
+> & {
 	testId?: string;
 	/**
 	 * Only change to false when you want to include this component inside a popover.
@@ -95,7 +103,17 @@ export type ComboboxContentProps = ComponentPropsWithoutRef<typeof PopoverPrimit
  * Popover content container that wraps the combobox command and list.
  */
 const ComboboxContent = forwardRef<HTMLDivElement, ComboboxContentProps>(
-	({ className, testId, withPortal = true, align = 'start', sideOffset = 4, ...props }, ref) => {
+	(
+		{
+			className,
+			testId,
+			withPortal = true,
+			align = 'start',
+			sideOffset = 4,
+			...props
+		},
+		ref,
+	) => {
 		const content = (
 			<PopoverPrimitive.Content
 				ref={ref}
@@ -106,7 +124,7 @@ const ComboboxContent = forwardRef<HTMLDivElement, ComboboxContentProps>(
 				className={cn(
 					'z-50 min-w-[var(--radix-popover-trigger-width)] overflow-hidden rounded-[2px] border border-[var(--border)] bg-[var(--popover)] p-0 text-[var(--popover-foreground)] shadow-md',
 					'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-					className
+					className,
 				)}
 				{...props}
 			/>
@@ -115,7 +133,7 @@ const ComboboxContent = forwardRef<HTMLDivElement, ComboboxContentProps>(
 			return content;
 		}
 		return <PopoverPrimitive.Portal>{content}</PopoverPrimitive.Portal>;
-	}
+	},
 );
 ComboboxContent.displayName = 'ComboboxContent';
 
@@ -135,11 +153,13 @@ const ComboboxCommand = forwardRef<HTMLDivElement, ComboboxCommandProps>(
 			className={cn('flex h-full w-full flex-col overflow-hidden', className)}
 			{...props}
 		/>
-	)
+	),
 );
 ComboboxCommand.displayName = 'ComboboxCommand';
 
-export type ComboboxInputProps = ComponentPropsWithoutRef<typeof CommandInput> & {
+export type ComboboxInputProps = ComponentPropsWithoutRef<
+	typeof CommandInput
+> & {
 	testId?: string;
 	containerClassName?: string;
 	containerStyle?: CSSProperties;
@@ -152,8 +172,16 @@ export type ComboboxInputProps = ComponentPropsWithoutRef<typeof CommandInput> &
  */
 const ComboboxInput = forwardRef<HTMLInputElement, ComboboxInputProps>(
 	(
-		{ className, testId, containerClassName, containerStyle, containerId, containerTestId, ...props },
-		ref
+		{
+			className,
+			testId,
+			containerClassName,
+			containerStyle,
+			containerId,
+			containerTestId,
+			...props
+		},
+		ref,
 	) => (
 		<div
 			data-slot="combobox-input-wrapper"
@@ -162,7 +190,7 @@ const ComboboxInput = forwardRef<HTMLInputElement, ComboboxInputProps>(
 			style={containerStyle}
 			className={cn(
 				'flex items-center gap-2 border-b border-[var(--border)] px-3',
-				containerClassName
+				containerClassName,
 			)}
 		>
 			<Search className="size-4 shrink-0 opacity-50" />
@@ -172,12 +200,12 @@ const ComboboxInput = forwardRef<HTMLInputElement, ComboboxInputProps>(
 				data-testid={testId}
 				className={cn(
 					'flex h-9 w-full bg-transparent py-2 text-[13px] leading-5 outline-none placeholder:text-[var(--muted-foreground)] disabled:cursor-not-allowed disabled:opacity-50',
-					className
+					className,
 				)}
 				{...props}
 			/>
 		</div>
-	)
+	),
 );
 ComboboxInput.displayName = 'ComboboxInput';
 
@@ -191,10 +219,13 @@ const ComboboxList = forwardRef<HTMLDivElement, ComboboxListProps>(
 		<CommandList
 			ref={ref}
 			data-slot="combobox-list"
-			className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden p-1', className)}
+			className={cn(
+				'max-h-[300px] overflow-y-auto overflow-x-hidden p-1',
+				className,
+			)}
 			{...props}
 		/>
-	)
+	),
 );
 ComboboxList.displayName = 'ComboboxList';
 
@@ -208,14 +239,19 @@ const ComboboxEmpty = forwardRef<HTMLDivElement, ComboboxEmptyProps>(
 		<CommandEmpty
 			ref={ref}
 			data-slot="combobox-empty"
-			className={cn('py-6 text-center text-[13px] text-[var(--muted-foreground)]', className)}
+			className={cn(
+				'py-6 text-center text-[13px] text-[var(--muted-foreground)]',
+				className,
+			)}
 			{...props}
 		/>
-	)
+	),
 );
 ComboboxEmpty.displayName = 'ComboboxEmpty';
 
-export type ComboboxLoadingProps = ComponentPropsWithoutRef<typeof CommandLoading> & {
+export type ComboboxLoadingProps = ComponentPropsWithoutRef<
+	typeof CommandLoading
+> & {
 	testId?: string;
 };
 
@@ -230,15 +266,17 @@ const ComboboxLoading = forwardRef<HTMLDivElement, ComboboxLoadingProps>(
 			data-testid={testId}
 			className={cn(
 				'flex items-center justify-center gap-2 px-2 py-3 text-[13px] text-[var(--muted-foreground)]',
-				className
+				className,
 			)}
 			{...props}
 		/>
-	)
+	),
 );
 ComboboxLoading.displayName = 'ComboboxLoading';
 
-export type ComboboxGroupProps = ComponentPropsWithoutRef<typeof CommandGroup> & {
+export type ComboboxGroupProps = ComponentPropsWithoutRef<
+	typeof CommandGroup
+> & {
 	testId?: string;
 };
 
@@ -253,13 +291,13 @@ const ComboboxGroup = forwardRef<HTMLDivElement, ComboboxGroupProps>(
 			data-testid={testId}
 			className={cn(
 				'overflow-hidden text-[var(--popover-foreground)] [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-[var(--muted-foreground)]',
-				className
+				className,
 			)}
 			{...props}
 		>
 			{children}
 		</CommandGroup>
-	)
+	),
 );
 ComboboxGroup.displayName = 'ComboboxGroup';
 
@@ -297,7 +335,7 @@ const ComboboxItem = forwardRef<HTMLDivElement, ComboboxItemProps>(
 			children,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const resolvedPrefix =
 			prefix === undefined ? (
@@ -332,23 +370,31 @@ const ComboboxItem = forwardRef<HTMLDivElement, ComboboxItemProps>(
 				{...props}
 			>
 				{resolvedPrefix != null && (
-					<span data-slot="combobox-item-prefix" className="flex shrink-0 items-center">
+					<span
+						data-slot="combobox-item-prefix"
+						className="flex shrink-0 items-center"
+					>
 						{resolvedPrefix}
 					</span>
 				)}
 				{children}
 				{suffix != null && (
-					<span data-slot="combobox-item-suffix" className="ml-auto flex shrink-0 items-center">
+					<span
+						data-slot="combobox-item-suffix"
+						className="ml-auto flex shrink-0 items-center"
+					>
 						{suffix}
 					</span>
 				)}
 			</CommandItem>
 		);
-	}
+	},
 );
 ComboboxItem.displayName = 'ComboboxItem';
 
-export type ComboboxSeparatorProps = ComponentPropsWithoutRef<typeof CommandSeparator>;
+export type ComboboxSeparatorProps = ComponentPropsWithoutRef<
+	typeof CommandSeparator
+>;
 
 /**
  * Visual divider between groups inside the combobox list.
@@ -361,7 +407,7 @@ const ComboboxSeparator = forwardRef<HTMLDivElement, ComboboxSeparatorProps>(
 			className={cn('-mx-1 my-1 h-px bg-[var(--border)]', className)}
 			{...props}
 		/>
-	)
+	),
 );
 ComboboxSeparator.displayName = 'ComboboxSeparator';
 
@@ -386,7 +432,7 @@ const ComboboxPill = forwardRef<HTMLSpanElement, ComboboxPillProps>(
 			data-slot="combobox-pill"
 			className={cn(
 				'inline-flex h-5 items-center gap-0.5 rounded-[2px] bg-[var(--accent)] px-1.5 text-xs leading-none text-[var(--accent-foreground)]',
-				className
+				className,
 			)}
 		>
 			<span
@@ -409,7 +455,7 @@ const ComboboxPill = forwardRef<HTMLSpanElement, ComboboxPillProps>(
 				<X />
 			</button>
 		</span>
-	)
+	),
 );
 ComboboxPill.displayName = 'ComboboxPill';
 
@@ -430,10 +476,25 @@ export type ComboboxMultiTriggerProps = {
 /**
  * Multi-select trigger with inline input and pills.
  */
-const ComboboxMultiTrigger = forwardRef<HTMLDivElement, ComboboxMultiTriggerProps>(
+const ComboboxMultiTrigger = forwardRef<
+	HTMLDivElement,
+	ComboboxMultiTriggerProps
+>(
 	(
-		{ className, style, id, testId, placeholder, inputValue, onInputChange, onKeyDown, onFocus, disabled, children },
-		ref
+		{
+			className,
+			style,
+			id,
+			testId,
+			placeholder,
+			inputValue,
+			onInputChange,
+			onKeyDown,
+			onFocus,
+			disabled,
+			children,
+		},
+		ref,
 	) => {
 		const inputRef = useRef<HTMLInputElement>(null);
 		const handleContainerClick = (): void => {
@@ -453,7 +514,7 @@ const ComboboxMultiTrigger = forwardRef<HTMLDivElement, ComboboxMultiTriggerProp
 				style={style}
 				className={cn(
 					'flex min-h-8 w-full flex-wrap items-center gap-1 rounded-[calc(var(--radius)-2px)] border border-[var(--input)] bg-transparent px-2 py-1 text-[13px] leading-5 shadow-sm cursor-text focus-within:outline-none focus-within:ring-1 focus-within:ring-[var(--ring)] data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50',
-					className
+					className,
 				)}
 				onClick={handleContainerClick}
 			>
@@ -472,7 +533,7 @@ const ComboboxMultiTrigger = forwardRef<HTMLDivElement, ComboboxMultiTriggerProp
 				/>
 			</div>
 		);
-	}
+	},
 );
 ComboboxMultiTrigger.displayName = 'ComboboxMultiTrigger';
 
@@ -491,13 +552,19 @@ const ComboboxCreateItem = forwardRef<HTMLDivElement, ComboboxCreateItemProps>(
 		<CommandItem
 			ref={ref}
 			data-slot="combobox-create-item"
-			className={cn(itemBaseClass, 'italic text-[var(--muted-foreground)]', className)}
+			className={cn(
+				itemBaseClass,
+				'italic text-[var(--muted-foreground)]',
+				className,
+			)}
 			{...props}
 		>
-			{prefix != null && <span className="flex shrink-0 items-center">{prefix}</span>}
+			{prefix != null && (
+				<span className="flex shrink-0 items-center">{prefix}</span>
+			)}
 			{children ?? `Create "${inputValue}"`}
 		</CommandItem>
-	)
+	),
 );
 ComboboxCreateItem.displayName = 'ComboboxCreateItem';
 
@@ -514,18 +581,27 @@ export type ComboboxHintProps = Omit<ComboboxItemProps, 'onSelect'> & {
  * Hint item that inserts a value into the input instead of selecting it.
  */
 const ComboboxHint = forwardRef<HTMLDivElement, ComboboxHintProps>(
-	({ insertValue, onInsert, children, className, prefix = null, ...props }, ref) => (
+	(
+		{ insertValue, onInsert, children, className, prefix = null, ...props },
+		ref,
+	) => (
 		<CommandItem
 			ref={ref}
 			data-slot="combobox-hint"
-			className={cn(itemBaseClass, 'italic text-[var(--muted-foreground)]', className)}
+			className={cn(
+				itemBaseClass,
+				'italic text-[var(--muted-foreground)]',
+				className,
+			)}
 			onSelect={(): void => onInsert(insertValue)}
 			{...props}
 		>
-			{prefix != null && <span className="flex shrink-0 items-center">{prefix}</span>}
+			{prefix != null && (
+				<span className="flex shrink-0 items-center">{prefix}</span>
+			)}
 			{children}
 		</CommandItem>
-	)
+	),
 );
 ComboboxHint.displayName = 'ComboboxHint';
 

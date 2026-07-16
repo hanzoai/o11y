@@ -30,6 +30,8 @@ import {
 	mockTagFilter,
 } from './mockData';
 
+import type { JSX } from 'react';
+
 // Mock the useContextLogData hook
 const mockHandleRunQuery = jest.fn();
 

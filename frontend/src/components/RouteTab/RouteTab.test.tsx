@@ -5,6 +5,8 @@ import { fireEvent, render, screen } from 'tests/test-utils';
 import RouteTab from './index';
 import { RouteTabProps } from './types';
 
+import type { JSX } from 'react';
+
 function DummyComponent1(): JSX.Element {
 	return <div>Dummy Component 1</div>;
 }

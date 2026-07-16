@@ -3,6 +3,8 @@ import { Button } from 'components/ui/button';
 
 import styles from './NoResultsEmptyState.module.scss';
 
+import type { JSX } from 'react';
+
 interface NoResultsEmptyStateProps {
 	title?: string;
 	subtitle?: string;

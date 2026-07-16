@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
 import { useMutation } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
@@ -234,7 +234,7 @@ function DropRateView(): JSX.Element {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [minTime, maxTime, evaluationTime]);
 
-	const prevTableDataRef = useRef<string>();
+	const prevTableDataRef = useRef<string>(undefined);
 
 	useEffect(() => {
 		if (tableData.length > 0) {

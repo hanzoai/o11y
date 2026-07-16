@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import cx from 'classnames';
 import { Button } from 'components/ui/button';
 import { Checkbox } from 'components/ui/checkbox';

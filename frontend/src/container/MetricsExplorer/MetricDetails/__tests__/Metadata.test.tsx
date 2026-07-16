@@ -18,6 +18,8 @@ import { MetricMetadata } from '../types';
 import { transformMetricMetadata } from '../utils';
 import { getMockMetricMetadataData, MOCK_METRIC_NAME } from './testUtlls';
 
+import type { JSX } from 'react';
+
 // Mock antd select for testing
 jest.mock('antd', () => ({
 	...jest.requireActual('antd'),

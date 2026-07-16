@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from 'react-query';
 import type { TabsProps } from 'antd';
@@ -125,7 +125,9 @@ export default function WorkspaceBlocked(): JSX.Element {
 			description: (
 				<Typography>
 					{t('extendTrialMsgPart1')}{' '}
-					<a href="mailto:cloud-support@o11y.hanzo.ai">cloud-support@o11y.hanzo.ai</a>{' '}
+					<a href="mailto:cloud-support@o11y.hanzo.ai">
+						cloud-support@o11y.hanzo.ai
+					</a>{' '}
 					{t('extendTrialMsgPart2')}
 				</Typography>
 			),

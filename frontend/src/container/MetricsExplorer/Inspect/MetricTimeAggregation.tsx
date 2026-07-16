@@ -9,6 +9,8 @@ import { InspectionStep } from './types';
 import { MetricTimeAggregationProps } from './types';
 import { getDefaultTimeAggregationInterval } from './utils';
 
+import type { JSX } from 'react';
+
 function MetricTimeAggregation({
 	currentMetricInspectionOptions,
 	dispatchMetricInspectionOptions,

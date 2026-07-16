@@ -4,6 +4,7 @@ import {
 	SetStateAction,
 	useEffect,
 	useMemo,
+	type JSX,
 } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
@@ -29,7 +30,7 @@ function TimeSeriesViewContainer({
 	isFilterApplied,
 	setWarning,
 	setIsLoadingQueries,
-	queryKeyRef,
+	queryKeyRef = undefined,
 }: TimeSeriesViewProps): JSX.Element {
 	const { stagedQuery, currentQuery, panelType } = useQueryBuilder();
 
@@ -140,10 +141,5 @@ interface TimeSeriesViewProps {
 	setIsLoadingQueries: Dispatch<SetStateAction<boolean>>;
 	queryKeyRef?: MutableRefObject<any>;
 }
-
-TimeSeriesViewContainer.defaultProps = {
-	dataSource: DataSource.TRACES,
-	queryKeyRef: undefined,
-};
 
 export default TimeSeriesViewContainer;

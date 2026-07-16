@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { Button, InputNumber, Popover, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
 import cx from 'classnames';
@@ -279,7 +279,7 @@ function LogsFormatOptionsMenu({
 			<Tooltip title="Options">
 				<Button
 					className="periscope-btn ghost"
-					icon={<SlidersVertical size="md" />}
+					icon={<SlidersVertical size={16} />}
 					data-testid="periscope-btn-format-options"
 				/>
 			</Tooltip>

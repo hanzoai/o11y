@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import type { MenuItem } from 'components/ui/dropdown-menu';
 import { Button } from 'components/ui/button';
 import { DropdownMenuSimple as Dropdown } from 'components/ui/dropdown-menu';

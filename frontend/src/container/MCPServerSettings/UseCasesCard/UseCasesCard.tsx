@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import LearnMore from 'components/LearnMore/LearnMore';
 import { MCP_USE_CASES_URL } from '../clients';
 

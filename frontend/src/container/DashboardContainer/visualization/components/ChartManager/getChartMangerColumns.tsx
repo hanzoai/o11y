@@ -9,6 +9,8 @@ import {
 	getTableColumnTitle,
 } from './utils';
 
+import type { JSX } from 'react';
+
 export interface GetChartManagerColumnsParams {
 	tableDataSet: ExtendedChartDataset[];
 	graphVisibilityState: boolean[];

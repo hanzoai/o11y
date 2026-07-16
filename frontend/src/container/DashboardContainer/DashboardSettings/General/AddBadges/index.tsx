@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useState, type JSX } from 'react';
 import { Col, Tooltip } from 'antd';
 import { Badge } from 'components/ui/badge';
 import Input from 'components/Input';

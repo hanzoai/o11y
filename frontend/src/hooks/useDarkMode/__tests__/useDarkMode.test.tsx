@@ -7,6 +7,8 @@ import {
 	useThemeMode,
 } from '../index';
 
+import type { JSX } from 'react';
+
 // Mock localStorage
 const localStorageMock = {
 	getItem: jest.fn(),

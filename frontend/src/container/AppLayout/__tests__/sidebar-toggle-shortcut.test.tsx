@@ -9,6 +9,8 @@ import {
 	useKeyboardHotkeys,
 } from 'hooks/hotkeys/useKeyboardHotkeys';
 
+import type { JSX } from 'react';
+
 // Mock dependencies
 jest.mock('providers/cmdKProvider', () => ({
 	useCmdK: (): {

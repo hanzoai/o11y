@@ -1,5 +1,7 @@
 import { Container, Service, Span, SpanWrapper } from './styles';
 
+import type { JSX } from 'react';
+
 function SpanNameComponent({
 	name,
 	serviceName,

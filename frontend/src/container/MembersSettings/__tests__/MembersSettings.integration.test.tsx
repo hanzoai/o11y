@@ -103,8 +103,8 @@ describe('MembersSettings (integration)', () => {
 
 		fireEvent.click(await screen.findByText('Dave Deleted'));
 
-		expect(await screen.findAllByPlaceholderText('john@o11y.hanzo.ai')).toHaveLength(
-			3,
-		);
+		expect(
+			await screen.findAllByPlaceholderText('john@o11y.hanzo.ai'),
+		).toHaveLength(3);
 	});
 });

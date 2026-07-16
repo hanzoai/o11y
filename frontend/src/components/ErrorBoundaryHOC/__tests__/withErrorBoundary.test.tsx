@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { render, screen } from '@testing-library/react';
 
 import withErrorBoundary, {
@@ -89,11 +89,6 @@ function TestComponent({
 	}
 	return <div data-testid="test-component">{message}</div>;
 }
-
-TestComponent.defaultProps = {
-	shouldThrow: false,
-	message: 'Test Component',
-};
 
 // Test component with display name
 function NamedComponent(): JSX.Element {

@@ -2,6 +2,8 @@ import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import { Typography } from 'components/ui/typography';
 import { DisconnectedValuesMode } from 'lib/uPlotV2/config/types';
 
+import type { JSX } from 'react';
+
 interface DisconnectValuesModeToggleProps {
 	value: DisconnectedValuesMode;
 	onChange: (value: DisconnectedValuesMode) => void;

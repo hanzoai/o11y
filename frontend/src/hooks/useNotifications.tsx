@@ -1,9 +1,9 @@
 import {
 	// eslint-disable-next-line no-restricted-imports
-	createContext,
-	// eslint-disable-next-line no-restricted-imports
+	createContext, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useMemo,
+	type JSX,
 } from 'react';
 import { notification } from 'antd';
 import type { NotificationInstance } from 'antd/es/notification/interface';

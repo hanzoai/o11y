@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Typography } from 'antd';
 import { MetrictypesTypeDTO } from 'api/generated/services/o11y.schemas';

@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Button, Popover, PopoverProps } from 'antd';
 import ErrorIcon from 'assets/Error';
@@ -127,13 +127,13 @@ function PopoverMessage({
 
 interface WarningPopoverProps extends PopoverProps {
 	children?: ReactNode;
-	warningData?: Warning;
+	warningData?: Warning | null;
 	message?: string | ReactNode;
 }
 
 function WarningPopover({
-	children,
-	warningData,
+	children = undefined,
+	warningData = null,
 	message = '',
 	...popoverProps
 }: WarningPopoverProps): JSX.Element {
@@ -165,11 +165,5 @@ function WarningPopover({
 		</Popover>
 	);
 }
-
-WarningPopover.defaultProps = {
-	children: undefined,
-	warningData: null,
-	message: null,
-};
 
 export default WarningPopover;

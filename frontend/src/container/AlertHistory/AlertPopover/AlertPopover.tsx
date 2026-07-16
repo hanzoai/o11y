@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { Link } from 'react-router-dom';
 import { Color } from 'constants/designTokens';
 import { Popover } from 'antd';
@@ -16,8 +16,8 @@ type Props = {
 };
 
 function PopoverContent({
-	relatedTracesLink,
-	relatedLogsLink,
+	relatedTracesLink = '',
+	relatedLogsLink = '',
 }: {
 	relatedTracesLink?: Props['relatedTracesLink'];
 	relatedLogsLink?: Props['relatedLogsLink'];
@@ -53,15 +53,11 @@ function PopoverContent({
 		</div>
 	);
 }
-PopoverContent.defaultProps = {
-	relatedTracesLink: '',
-	relatedLogsLink: '',
-};
 
 function AlertPopover({
 	children,
-	relatedTracesLink,
-	relatedLogsLink,
+	relatedTracesLink = '',
+	relatedLogsLink = '',
 }: Props): JSX.Element {
 	return (
 		<div className="alert-popover-trigger-action">
@@ -84,11 +80,6 @@ function AlertPopover({
 		</div>
 	);
 }
-
-AlertPopover.defaultProps = {
-	relatedTracesLink: '',
-	relatedLogsLink: '',
-};
 
 type ConditionalAlertPopoverProps = {
 	relatedTracesLink: string;

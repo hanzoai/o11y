@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 import { Button } from 'antd';
 import cx from 'classnames';
 import { useOnboardingStatus } from 'hooks/messagingQueue/useOnboardingStatus';

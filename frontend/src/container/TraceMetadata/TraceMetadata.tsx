@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useLocation, useRouteMatch } from 'react-router-dom';
 import { Skeleton, Tooltip } from 'antd';
 import { Button } from 'components/ui/button';
@@ -102,7 +102,7 @@ function TraceMetadata(props: ITraceMetadataProps): JSX.Element {
 						<Button
 							variant="solid"
 							color="primary"
-							size="md"
+								size="md"
 							className="new-view-btn"
 							onClick={handleSwitchToNewView}
 						>

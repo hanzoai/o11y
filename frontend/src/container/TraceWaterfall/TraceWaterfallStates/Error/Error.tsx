@@ -4,6 +4,8 @@ import { AxiosError } from 'axios';
 
 import './Error.styles.scss';
 
+import type { JSX } from 'react';
+
 interface IErrorProps {
 	error: AxiosError;
 }

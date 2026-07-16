@@ -4,6 +4,8 @@ import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 
 import './DeleteFunnelStep.styles.scss';
 
+import type { JSX } from 'react';
+
 interface DeleteFunnelStepProps {
 	isOpen: boolean;
 	onClose: () => void;

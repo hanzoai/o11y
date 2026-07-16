@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type JSX } from 'react';
 import { Input } from 'antd';
 import { Checkbox } from 'components/ui/checkbox';
 import { Typography } from 'components/ui/typography';

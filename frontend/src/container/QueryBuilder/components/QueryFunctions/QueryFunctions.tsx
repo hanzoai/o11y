@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Button, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
 import cx from 'classnames';

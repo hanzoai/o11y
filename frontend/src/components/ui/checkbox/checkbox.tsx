@@ -25,7 +25,10 @@ const colorMap: Record<string, CheckboxColor> = {
 	primary: 'robin',
 };
 
-export const CheckboxColors: Record<Capitalize<CheckboxColor>, CheckboxColor> = {
+export const CheckboxColors: Record<
+	Capitalize<CheckboxColor>,
+	CheckboxColor
+> = {
 	Primary: 'primary',
 	Success: 'success',
 	Warning: 'warning',
@@ -39,11 +42,10 @@ export const CheckboxColors: Record<Capitalize<CheckboxColor>, CheckboxColor> = 
 	Aqua: 'aqua',
 };
 
-export interface CheckboxProps
-	extends Pick<
-		React.ComponentPropsWithoutRef<'button'>,
-		'id' | 'disabled' | 'className' | 'children' | 'onClick'
-	> {
+export interface CheckboxProps extends Pick<
+	React.ComponentPropsWithoutRef<'button'>,
+	'id' | 'disabled' | 'className' | 'children' | 'onClick'
+> {
 	/**
 	 * The name of the checkbox. Submitted with its owning form as part of a name/value pair.
 	 */
@@ -78,8 +80,14 @@ export interface CheckboxProps
 	onChange?(checked: CheckedState): void;
 }
 
-const CheckboxBase = React.forwardRef<HTMLButtonElement, Omit<CheckboxProps, 'testId'>>(
-	({ className, color = 'primary', onChange, value, defaultValue, ...props }, ref) => (
+const CheckboxBase = React.forwardRef<
+	HTMLButtonElement,
+	Omit<CheckboxProps, 'testId'>
+>(
+	(
+		{ className, color = 'primary', onChange, value, defaultValue, ...props },
+		ref,
+	) => (
 		<CheckboxPrimitive.Root
 			ref={ref}
 			data-slot="checkbox"
@@ -95,7 +103,7 @@ const CheckboxBase = React.forwardRef<HTMLButtonElement, Omit<CheckboxProps, 'te
 				<Check data-slot="checkbox-icon-check" />
 			</CheckboxPrimitive.Indicator>
 		</CheckboxPrimitive.Root>
-	)
+	),
 );
 CheckboxBase.displayName = CheckboxPrimitive.Root.displayName;
 
@@ -103,7 +111,11 @@ const CheckboxWrapper = React.forwardRef<HTMLButtonElement, CheckboxProps>(
 	({ id, children, testId, className, ...props }, ref) => {
 		const fallbackId = React.useId();
 		return (
-			<div data-slot="checkbox-wrapper" className={cn(className)} data-testid={testId}>
+			<div
+				data-slot="checkbox-wrapper"
+				className={cn(className)}
+				data-testid={testId}
+			>
 				<CheckboxBase ref={ref} id={id || fallbackId} {...props} />
 				{children && (
 					<label htmlFor={id || fallbackId} data-slot="checkbox-label">
@@ -112,7 +124,7 @@ const CheckboxWrapper = React.forwardRef<HTMLButtonElement, CheckboxProps>(
 				)}
 			</div>
 		);
-	}
+	},
 );
 CheckboxWrapper.displayName = 'Checkbox';
 

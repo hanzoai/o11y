@@ -1,4 +1,4 @@
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Progress, Table, TableColumnsType as ColumnsType } from 'antd';
 import logEvent from 'api/common/logEvent';

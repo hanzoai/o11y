@@ -54,7 +54,11 @@ export function SliderThumb({
 			<TooltipPrimitive.Root open={isDragging || isHovering}>
 				<TooltipPrimitive.Trigger asChild>{thumb}</TooltipPrimitive.Trigger>
 				<TooltipPrimitive.Portal>
-					<TooltipPrimitive.Content data-slot="slider-tooltip" side="top" sideOffset={6}>
+					<TooltipPrimitive.Content
+						data-slot="slider-tooltip"
+						side="top"
+						sideOffset={6}
+					>
 						{tooltip.formatter ? tooltip.formatter(value) : value}
 					</TooltipPrimitive.Content>
 				</TooltipPrimitive.Portal>

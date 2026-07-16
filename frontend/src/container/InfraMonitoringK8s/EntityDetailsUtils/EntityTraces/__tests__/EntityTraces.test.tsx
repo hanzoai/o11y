@@ -7,6 +7,8 @@ import { QueryRangePayloadV5 } from 'types/api/v5/queryRange';
 import EntityTraces from '../EntityTraces';
 import { K8S_ENTITY_TRACES_EXPRESSION_KEY } from '../hooks';
 
+import type { JSX } from 'react';
+
 function verifyEntityTracesV5Request({
 	payload,
 	expectedOffset,

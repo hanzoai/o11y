@@ -8,6 +8,8 @@ import { Explorer, Meter, Views } from './constants';
 
 import './MeterExplorer.styles.scss';
 
+import type { JSX } from 'react';
+
 function MeterExplorerPage(): JSX.Element {
 	const { pathname } = useLocation();
 

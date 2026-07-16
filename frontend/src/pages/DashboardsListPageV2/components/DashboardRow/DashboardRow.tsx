@@ -17,6 +17,8 @@ import ActionsPopover from '../ActionsPopover/ActionsPopover';
 
 import styles from './DashboardRow.module.scss';
 
+import type { JSX } from 'react';
+
 interface Props {
 	dashboard: DashboardListItem;
 	index: number;

@@ -24,7 +24,7 @@ describe('useScrollWidgetIntoView', () => {
 		>;
 
 	let mockElement: MockHTMLElement;
-	let ref: React.RefObject<HTMLDivElement>;
+	let ref: React.RefObject<HTMLDivElement | null>;
 	let setToScrollWidgetId: jest.Mock;
 
 	function mockStore(toScrollWidgetId: string): void {
@@ -42,7 +42,7 @@ describe('useScrollWidgetIntoView', () => {
 		mockElement = createMockElement();
 		ref = {
 			current: mockElement,
-		} as unknown as React.RefObject<HTMLDivElement>;
+		} as unknown as React.RefObject<HTMLDivElement | null>;
 		setToScrollWidgetId = jest.fn();
 	});
 

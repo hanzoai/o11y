@@ -7,6 +7,8 @@ import { IngestionDataType } from 'types/api/settings/ingestion';
 
 import './IngestionSettings.styles.scss';
 
+import type { JSX } from 'react';
+
 export default function IngestionSettings(): JSX.Element {
 	const { user } = useAppContext();
 

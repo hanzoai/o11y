@@ -5,6 +5,7 @@ import {
 	useCallback,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import { DropdownMenuSimple } from 'components/ui/dropdown-menu';
 import cx from 'classnames';

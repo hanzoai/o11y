@@ -14,6 +14,8 @@ import { UseSpanPercentileReturn } from './useSpanPercentile';
 
 import styles from './SpanPercentilePanel.module.scss';
 
+import type { JSX } from 'react';
+
 const DEFAULT_RESOURCE_ATTRIBUTES = {
 	serviceName: 'service.name',
 	name: 'name',

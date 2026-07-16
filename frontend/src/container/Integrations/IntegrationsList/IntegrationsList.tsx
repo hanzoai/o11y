@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Color } from 'components/ui/design-tokens';
 import { Badge } from 'components/ui/badge';
 import { Button, Skeleton } from 'antd';

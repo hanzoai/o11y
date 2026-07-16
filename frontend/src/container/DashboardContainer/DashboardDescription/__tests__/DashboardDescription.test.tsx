@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { useDashboardBootstrap } from 'hooks/dashboard/useDashboardBootstrap';
 import {

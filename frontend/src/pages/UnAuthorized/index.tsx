@@ -1,4 +1,4 @@
-import { ComponentType, PropsWithChildren, useCallback } from 'react';
+import { ComponentType, PropsWithChildren, useCallback, type JSX } from 'react';
 import { Space } from 'antd';
 import { Typography } from 'components/ui/typography';
 import UnAuthorized from 'assets/UnAuthorized';

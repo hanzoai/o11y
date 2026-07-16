@@ -2,6 +2,8 @@ import { CSSProperties, LabelHTMLAttributes } from 'react';
 import { Card, Form } from 'antd';
 import styled from 'styled-components';
 
+import type { FormValues } from './types';
+
 export const FormWrapper = styled(Card)`
 	display: flex;
 	justify-content: center;
@@ -34,7 +36,7 @@ export const MarginTop = styled.div<Props>`
 	margin-top: ${({ marginTop = 0 }): number | string => marginTop};
 `;
 
-export const FormContainer = styled(Form)`
+export const FormContainer = styled(Form<FormValues>)`
 	& .ant-form-item {
 		margin-bottom: 0px;
 	}

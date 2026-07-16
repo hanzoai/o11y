@@ -5,6 +5,8 @@ import { fireEvent, render, screen, waitFor } from 'tests/test-utils';
 
 import CustomDomainSettings from '../CustomDomainSettings';
 
+import type { JSX } from 'react';
+
 jest.mock('components/LaunchChatSupport/LaunchChatSupport', () => ({
 	__esModule: true,
 	default: ({ buttonText }: { buttonText?: string }): JSX.Element => (

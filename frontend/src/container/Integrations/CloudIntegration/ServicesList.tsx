@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, type JSX } from 'react';
 import { useNavigate } from 'react-router-dom-v5-compat';
 import { Skeleton } from 'antd';
 import { useListServicesMetadata } from 'api/generated/services/cloudintegration';

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useQueryClient } from 'react-query';
 import { Input } from 'antd';
 import O11yModal from 'components/O11yModal/O11yModal';

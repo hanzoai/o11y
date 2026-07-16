@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Color } from 'constants/designTokens';
 import { Button, Tabs, Tooltip, Typography } from 'antd';
@@ -40,8 +40,8 @@ function QuerySection({
 	alertDef,
 	panelType,
 	ruleId,
-	hideTitle,
-	isAnomalyDetection,
+	hideTitle = false,
+	isAnomalyDetection = false,
 }: QuerySectionProps): JSX.Element {
 	// init namespace for translations
 	const { t } = useTranslation('alerts');
@@ -289,10 +289,5 @@ interface QuerySectionProps {
 	hideTitle?: boolean;
 	isAnomalyDetection?: boolean;
 }
-
-QuerySection.defaultProps = {
-	hideTitle: false,
-	isAnomalyDetection: false,
-};
 
 export default QuerySection;

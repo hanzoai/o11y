@@ -4,6 +4,8 @@ import ROUTES from 'constants/routes';
 
 import './FunnelBreadcrumb.styles.scss';
 
+import type { JSX } from 'react';
+
 interface FunnelBreadcrumbProps {
 	funnelName: string;
 }

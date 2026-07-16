@@ -2,6 +2,8 @@ import { TagFilter } from 'types/api/queryBuilder/queryBuilderData';
 
 import './QueryBuilderSearch.styles.scss';
 
+import type { JSX } from 'react';
+
 function ExampleQueriesRendererForLogs({
 	label,
 	value,

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, type JSX } from 'react';
 import { InfraMonitoringEvents } from 'constants/events';
 import { FeatureKeys } from 'constants/features';
 import { useAppContext } from 'providers/App/App';

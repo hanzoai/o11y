@@ -15,6 +15,8 @@ import { disabledDate } from '../utils';
 import type { FormValues } from './types';
 import { ExpiryMode, FORM_ID } from './types';
 
+import type { JSX } from 'react';
+
 export interface KeyFormPhaseProps {
 	register: UseFormRegister<FormValues>;
 	control: Control<FormValues>;

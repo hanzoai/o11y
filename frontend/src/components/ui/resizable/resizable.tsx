@@ -29,7 +29,13 @@ export type {
 	PanelImperativeHandle,
 	PanelSize,
 };
-export { useDefaultLayout, useGroupCallbackRef, useGroupRef, usePanelCallbackRef, usePanelRef };
+export {
+	useDefaultLayout,
+	useGroupCallbackRef,
+	useGroupRef,
+	usePanelCallbackRef,
+	usePanelRef,
+};
 
 export type ResizablePanelGroupProps = React.ComponentProps<typeof Group> & {
 	/**
@@ -38,17 +44,18 @@ export type ResizablePanelGroupProps = React.ComponentProps<typeof Group> & {
 	testId?: string;
 };
 
-export const ResizablePanelGroup = React.forwardRef<HTMLDivElement, ResizablePanelGroupProps>(
-	({ className, testId, ...props }, ref) => (
-		<Group
-			data-slot="resizable-panel-group"
-			className={cn('resizable-panel-group', className)}
-			data-testid={testId}
-			elementRef={ref}
-			{...props}
-		/>
-	)
-);
+export const ResizablePanelGroup = React.forwardRef<
+	HTMLDivElement,
+	ResizablePanelGroupProps
+>(({ className, testId, ...props }, ref) => (
+	<Group
+		data-slot="resizable-panel-group"
+		className={cn('resizable-panel-group', className)}
+		data-testid={testId}
+		elementRef={ref}
+		{...props}
+	/>
+));
 ResizablePanelGroup.displayName = 'ResizablePanelGroup';
 
 export type ResizablePanelProps = React.ComponentProps<typeof Panel> & {
@@ -58,17 +65,18 @@ export type ResizablePanelProps = React.ComponentProps<typeof Panel> & {
 	testId?: string;
 };
 
-export const ResizablePanel = React.forwardRef<HTMLDivElement, ResizablePanelProps>(
-	({ className, testId, ...props }, ref) => (
-		<Panel
-			data-slot="resizable-panel"
-			className={className}
-			data-testid={testId}
-			elementRef={ref}
-			{...props}
-		/>
-	)
-);
+export const ResizablePanel = React.forwardRef<
+	HTMLDivElement,
+	ResizablePanelProps
+>(({ className, testId, ...props }, ref) => (
+	<Panel
+		data-slot="resizable-panel"
+		className={className}
+		data-testid={testId}
+		elementRef={ref}
+		{...props}
+	/>
+));
 ResizablePanel.displayName = 'ResizablePanel';
 
 export type ResizableHandleProps = React.ComponentProps<typeof Separator> & {
@@ -82,21 +90,28 @@ export type ResizableHandleProps = React.ComponentProps<typeof Separator> & {
 	withHandle?: boolean;
 };
 
-export const ResizableHandle = React.forwardRef<HTMLDivElement, ResizableHandleProps>(
-	({ withHandle, className, testId, ...props }, ref) => (
-		<Separator
-			data-slot="resizable-handle"
-			className={cn('resizable-handle', className)}
-			data-testid={testId}
-			elementRef={ref}
-			{...props}
-		>
-			{withHandle && (
-				<div data-slot="resizable-handle-icon-wrapper" className="resizable-handle-icon-wrapper">
-					<GripVertical data-slot="resizable-handle-icon" className="resizable-handle-icon" />
-				</div>
-			)}
-		</Separator>
-	)
-);
+export const ResizableHandle = React.forwardRef<
+	HTMLDivElement,
+	ResizableHandleProps
+>(({ withHandle, className, testId, ...props }, ref) => (
+	<Separator
+		data-slot="resizable-handle"
+		className={cn('resizable-handle', className)}
+		data-testid={testId}
+		elementRef={ref}
+		{...props}
+	>
+		{withHandle && (
+			<div
+				data-slot="resizable-handle-icon-wrapper"
+				className="resizable-handle-icon-wrapper"
+			>
+				<GripVertical
+					data-slot="resizable-handle-icon"
+					className="resizable-handle-icon"
+				/>
+			</div>
+		)}
+	</Separator>
+));
 ResizableHandle.displayName = 'ResizableHandle';

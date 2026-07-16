@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Tooltip } from 'antd';
 import cx from 'classnames';

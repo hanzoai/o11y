@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	type JSX,
+} from 'react';
 import { Check, Info } from 'components/ui/icons';
 import {
 	Button,
@@ -260,6 +266,10 @@ export function PlannedDowntimeForm(
 
 	const handleAlertRulesChange: SelectProps['onChange'] = (_value, options) => {
 		form.setFieldValue(alertRuleFormName, options);
+		if (!options) {
+			setSelectedTags([]);
+			return;
+		}
 		setSelectedTags(Array.isArray(options) ? options : [options]);
 	};
 

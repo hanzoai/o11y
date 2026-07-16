@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, type JSX } from 'react';
 import { useQuery } from 'react-query';
 import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';

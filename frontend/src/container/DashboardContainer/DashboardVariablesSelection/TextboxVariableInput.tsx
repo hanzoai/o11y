@@ -1,4 +1,4 @@
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState, type JSX } from 'react';
 import { Input, InputRef } from 'antd';
 
 import { VariableItemProps } from './VariableItem';

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import cx from 'classnames';
 import { ChevronDown, ChevronRight, LoaderCircle } from 'components/ui/icons';
 

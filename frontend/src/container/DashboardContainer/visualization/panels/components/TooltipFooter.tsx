@@ -7,6 +7,8 @@ import { MousePointerClick, X } from 'components/ui/icons';
 import logEvent from 'api/common/logEvent';
 import { Events } from 'constants/events';
 
+import type { JSX } from 'react';
+
 interface TooltipFooterProps {
 	id: string;
 	pinKey?: string;

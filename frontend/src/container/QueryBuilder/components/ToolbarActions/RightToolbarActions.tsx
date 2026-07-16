@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import { LogsExplorerShortcuts } from 'constants/shortcuts/logsExplorerShortcuts';
 import { useKeyboardHotkeys } from 'hooks/hotkeys/useKeyboardHotkeys';
 
@@ -17,7 +17,7 @@ export default function RightToolbarActions({
 	onStageRunQuery,
 	isLoadingQueries,
 	handleCancelQuery,
-	showLiveLogs,
+	showLiveLogs = false,
 }: RightToolbarActionsProps): JSX.Element {
 	const { registerShortcut, deregisterShortcut } = useKeyboardHotkeys();
 
@@ -52,7 +52,3 @@ export default function RightToolbarActions({
 		</div>
 	);
 }
-
-RightToolbarActions.defaultProps = {
-	showLiveLogs: false,
-};

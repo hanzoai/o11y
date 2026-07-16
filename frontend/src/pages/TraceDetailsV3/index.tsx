@@ -1,5 +1,12 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { useParams } from 'react-router-dom';
 import { ChartNoAxesGantt, TriangleAlert } from 'components/ui/icons';
 import getLocalStorageKey from 'api/browser/localstorage/get';

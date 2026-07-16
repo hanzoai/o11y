@@ -1,11 +1,18 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import {
-	DragDropContext,
-	Draggable,
-	Droppable,
-	DropResult,
-} from 'react-beautiful-dnd';
+	closestCenter,
+	DndContext,
+	DragEndEvent,
+	PointerSensor,
+	useSensor,
+	useSensors,
+} from '@dnd-kit/core';
+import {
+	arrayMove,
+	horizontalListSortingStrategy,
+	SortableContext,
+} from '@dnd-kit/sortable';
 import { Button, Input, Tooltip } from 'antd';
 import { Color } from 'constants/designTokens';
 import {
@@ -21,17 +28,12 @@ import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useGetQueryKeySuggestions } from 'hooks/querySuggestions/useGetQueryKeySuggestions';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import useDebouncedFn from 'hooks/useDebouncedFunction';
-import {
-	CircleAlert,
-	CirclePlus,
-	GripVertical,
-	Search,
-	Trash2,
-} from 'components/ui/icons';
+import { CircleAlert, CirclePlus, Search } from 'components/ui/icons';
 import { DataSource } from 'types/common/queryBuilder';
 
 import { WidgetGraphProps } from '../types';
 import ExplorerAttributeColumns from './ExplorerAttributeColumns';
+import ExplorerColumnCard from './ExplorerColumnCard';
 
 import './ExplorerColumnsRenderer.styles.scss';
 
@@ -41,6 +43,11 @@ type LogColumnsRendererProps = {
 	selectedTracesFields: WidgetGraphProps['selectedTracesFields'];
 	setSelectedTracesFields: WidgetGraphProps['setSelectedTracesFields'];
 };
+
+// Trace fields have historically arrived under either shape; the column is
+// identified by whichever is present, and that name is also its sortable id.
+const columnName = (field: { name?: string; key?: string }): string =>
+	field?.name || field?.key || '';
 
 function ExplorerColumnsRenderer({
 	selectedLogFields,
@@ -193,8 +200,8 @@ function ExplorerColumnsRenderer({
 		}
 	};
 
-	const onDragEnd = (result: DropResult): void => {
-		if (!result.destination) {
+	const onDragEnd = ({ active, over }: DragEndEvent): void => {
+		if (!over || active.id === over.id) {
 			return;
 		}
 
@@ -203,26 +210,33 @@ function ExplorerColumnsRenderer({
 			selectedLogFields &&
 			setSelectedLogFields
 		) {
-			const items = [...selectedLogFields];
-			const [reorderedItem] = items.splice(result.source.index, 1);
-			items.splice(result.destination.index, 0, reorderedItem);
-
-			setSelectedLogFields(items);
+			const oldIndex = selectedLogFields.findIndex((f) => f.name === active.id);
+			const newIndex = selectedLogFields.findIndex((f) => f.name === over.id);
+			setSelectedLogFields(arrayMove(selectedLogFields, oldIndex, newIndex));
 		}
 		if (
 			initialDataSource === DataSource.TRACES &&
 			selectedTracesFields &&
 			setSelectedTracesFields
 		) {
-			const items = [...selectedTracesFields];
-			const [reorderedItem] = items.splice(result.source.index, 1);
-			items.splice(result.destination.index, 0, reorderedItem);
-
-			setSelectedTracesFields(items);
+			const oldIndex = selectedTracesFields.findIndex(
+				(f) => columnName(f) === active.id,
+			);
+			const newIndex = selectedTracesFields.findIndex(
+				(f) => columnName(f) === over.id,
+			);
+			setSelectedTracesFields(arrayMove(selectedTracesFields, oldIndex, newIndex));
 		}
 	};
 
 	const isDarkMode = useIsDarkMode();
+
+	const sensors = useSensors(useSensor(PointerSensor));
+
+	const sortableColumnNames =
+		(initialDataSource === DataSource.LOGS
+			? selectedLogFields?.map((field) => field.name)
+			: selectedTracesFields?.map(columnName)) ?? [];
 
 	return (
 		<div className="explorer-columns-renderer">
@@ -237,72 +251,26 @@ function ExplorerColumnsRenderer({
 			<Divider className="explorer-columns-renderer__divider" />
 			{!isError && (
 				<div className="explorer-columns-contents">
-					<DragDropContext onDragEnd={onDragEnd}>
-						<Droppable droppableId="drag-drop-list" direction="horizontal">
-							{(provided): JSX.Element => (
-								<div
-									className="explorer-columns"
-									{...provided.droppableProps}
-									ref={provided.innerRef}
-								>
-									{initialDataSource === DataSource.LOGS &&
-										selectedLogFields &&
-										selectedLogFields.map((field, index) => (
-											// eslint-disable-next-line react/no-array-index-key
-											<Draggable key={index} draggableId={index.toString()} index={index}>
-												{(dragProvided): JSX.Element => (
-													<div
-														className="explorer-column-card"
-														ref={dragProvided.innerRef}
-														{...dragProvided.draggableProps}
-														{...dragProvided.dragHandleProps}
-													>
-														<div className="explorer-column-title">
-															<GripVertical size={12} color="#5A5A5A" />
-															{field.name}
-														</div>
-														<Trash2
-															size={12}
-															color="red"
-															onClick={(): void => removeSelectedLogField(field.name)}
-															data-testid="trash-icon"
-														/>
-													</div>
-												)}
-											</Draggable>
-										))}
-									{initialDataSource === DataSource.TRACES &&
-										selectedTracesFields &&
-										selectedTracesFields.map((field, index) => (
-											// eslint-disable-next-line react/no-array-index-key
-											<Draggable key={index} draggableId={index.toString()} index={index}>
-												{(dragProvided): JSX.Element => (
-													<div
-														className="explorer-column-card"
-														ref={dragProvided.innerRef}
-														{...dragProvided.draggableProps}
-														{...dragProvided.dragHandleProps}
-													>
-														<div className="explorer-column-title">
-															<GripVertical size={12} color="#5A5A5A" />
-															{field?.name || (field as any)?.key}
-														</div>
-														<Trash2
-															size={12}
-															color="red"
-															onClick={(): void =>
-																removeSelectedLogField(field?.name || (field as any)?.key)
-															}
-															data-testid="trash-icon"
-														/>
-													</div>
-												)}
-											</Draggable>
-										))}
-								</div>
-							)}
-						</Droppable>
-					</DragDropContext>
+					<DndContext
+						sensors={sensors}
+						collisionDetection={closestCenter}
+						onDragEnd={onDragEnd}
+					>
+						<SortableContext
+							items={sortableColumnNames}
+							strategy={horizontalListSortingStrategy}
+						>
+							<div className="explorer-columns">
+								{sortableColumnNames.map((name) => (
+									<ExplorerColumnCard
+										key={name}
+										name={name}
+										onRemove={removeSelectedLogField}
+									/>
+								))}
+							</div>
+						</SortableContext>
+					</DndContext>
 					<div>
 						<DropdownMenu open={open} onOpenChange={handleOpenChange}>
 							<DropdownMenuTrigger asChild>

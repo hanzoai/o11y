@@ -81,7 +81,10 @@ function cleanupMenuItems(items: MenuItem[]): MenuItem[] {
 	return cleaned;
 }
 
-function renderMenuItems(items: MenuItem[], keyPath: string[] = []): React.ReactNode[] {
+function renderMenuItems(
+	items: MenuItem[],
+	keyPath: string[] = [],
+): React.ReactNode[] {
 	return items.map((item, index) => {
 		const itemKey = ('key' in item && item.key) || `item-${index}`;
 		const currentKeyPath = [...keyPath, itemKey];
@@ -167,7 +170,9 @@ function renderMenuItems(items: MenuItem[], keyPath: string[] = []): React.React
 				className={baseItem.className}
 			>
 				{baseItem.label}
-				{baseItem.shortcut && <DropdownMenuShortcut>{baseItem.shortcut}</DropdownMenuShortcut>}
+				{baseItem.shortcut && (
+					<DropdownMenuShortcut>{baseItem.shortcut}</DropdownMenuShortcut>
+				)}
 			</DropdownMenuItem>
 		);
 	});
@@ -181,12 +186,21 @@ const MENU_ITEM_SELECTOR =
  * dropdown menu from a declarative `menu` configuration.
  */
 const DropdownMenuSimple = React.forwardRef<HTMLDivElement, DropdownProps>(
-	({ menu, children, sideOffset = 4, className, onOpenAutoFocus, ...props }, ref) => {
+	(
+		{ menu, children, sideOffset = 4, className, onOpenAutoFocus, ...props },
+		ref,
+	) => {
 		const searchInputRef = React.useRef<HTMLInputElement>(null);
 		const contentRef = React.useRef<HTMLDivElement | null>(null);
 
-		const cleanedItems = React.useMemo(() => cleanupMenuItems(menu.items), [menu.items]);
-		const menuItems = React.useMemo(() => renderMenuItems(cleanedItems), [cleanedItems]);
+		const cleanedItems = React.useMemo(
+			() => cleanupMenuItems(menu.items),
+			[menu.items],
+		);
+		const menuItems = React.useMemo(
+			() => renderMenuItems(cleanedItems),
+			[cleanedItems],
+		);
 
 		const handleOpenAutoFocus = React.useCallback(
 			(event: Event) => {
@@ -196,7 +210,7 @@ const DropdownMenuSimple = React.forwardRef<HTMLDivElement, DropdownProps>(
 				}
 				onOpenAutoFocus?.(event);
 			},
-			[menu.search, onOpenAutoFocus]
+			[menu.search, onOpenAutoFocus],
 		);
 
 		const handleNavigateDown = React.useCallback(() => {
@@ -213,11 +227,16 @@ const DropdownMenuSimple = React.forwardRef<HTMLDivElement, DropdownProps>(
 				if (!content) {
 					return;
 				}
-				const items = Array.from(content.querySelectorAll<HTMLElement>(MENU_ITEM_SELECTOR));
+				const items = Array.from(
+					content.querySelectorAll<HTMLElement>(MENU_ITEM_SELECTOR),
+				);
 				const activeElement = document.activeElement as HTMLElement | null;
 				const currentIndex = activeElement ? items.indexOf(activeElement) : -1;
 
-				if ((e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) && menu.search) {
+				if (
+					(e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) &&
+					menu.search
+				) {
 					if (activeElement === items[0]) {
 						e.preventDefault();
 						searchInputRef.current?.focus();
@@ -235,7 +254,11 @@ const DropdownMenuSimple = React.forwardRef<HTMLDivElement, DropdownProps>(
 						items[nextIndex].focus();
 					} else if (nextIndex === items.length && searchInputRef.current) {
 						searchInputRef.current.focus();
-					} else if (nextIndex === items.length && !searchInputRef.current && items.length > 0) {
+					} else if (
+						nextIndex === items.length &&
+						!searchInputRef.current &&
+						items.length > 0
+					) {
 						items[0].focus();
 					}
 					return;
@@ -247,12 +270,16 @@ const DropdownMenuSimple = React.forwardRef<HTMLDivElement, DropdownProps>(
 						items[prevIndex].focus();
 					} else if (prevIndex === -1 && searchInputRef.current) {
 						searchInputRef.current.focus();
-					} else if (prevIndex === -1 && !searchInputRef.current && items.length > 0) {
+					} else if (
+						prevIndex === -1 &&
+						!searchInputRef.current &&
+						items.length > 0
+					) {
 						items[items.length - 1].focus();
 					}
 				}
 			},
-			[menu.search]
+			[menu.search],
 		);
 
 		const mergedContentRef = React.useCallback(
@@ -264,7 +291,7 @@ const DropdownMenuSimple = React.forwardRef<HTMLDivElement, DropdownProps>(
 					ref.current = node;
 				}
 			},
-			[ref]
+			[ref],
 		);
 
 		const handleOpenChange = React.useCallback(
@@ -275,7 +302,7 @@ const DropdownMenuSimple = React.forwardRef<HTMLDivElement, DropdownProps>(
 					menu.search?.onSearchChange?.('');
 				}
 			},
-			[menu.search]
+			[menu.search],
 		);
 
 		return (
@@ -311,7 +338,7 @@ const DropdownMenuSimple = React.forwardRef<HTMLDivElement, DropdownProps>(
 				</DropdownMenuContent>
 			</DropdownMenu>
 		);
-	}
+	},
 );
 DropdownMenuSimple.displayName = 'DropdownMenuSimple';
 

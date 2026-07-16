@@ -10,6 +10,8 @@ import noDataUrl from '@/assets/Icons/no-data.svg';
 
 import './NoData.styles.scss';
 
+import type { JSX } from 'react';
+
 function NoData(): JSX.Element {
 	const { isCloudUser: isCloudUserVal } = useGetTenantLicense();
 

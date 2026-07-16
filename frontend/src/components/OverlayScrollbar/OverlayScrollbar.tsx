@@ -13,9 +13,9 @@ type Props = {
 
 function OverlayScrollbar({
 	children,
-	isVirtuoso,
-	style,
-	options: customOptions,
+	isVirtuoso = false,
+	style = {},
+	options: customOptions = {},
 }: Props): any {
 	const isDarkMode = useIsDarkMode();
 	const options = useMemo(
@@ -25,6 +25,7 @@ function OverlayScrollbar({
 					autoHide: 'scroll',
 					theme: isDarkMode ? 'os-theme-light' : 'os-theme-dark',
 				},
+
 				...(customOptions || {}),
 			}) as PartialOptions,
 		[customOptions, isDarkMode],
@@ -44,11 +45,5 @@ function OverlayScrollbar({
 		</TypicalOverlayScrollbar>
 	);
 }
-
-OverlayScrollbar.defaultProps = {
-	isVirtuoso: false,
-	style: {},
-	options: {},
-};
 
 export default OverlayScrollbar;

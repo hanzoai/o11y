@@ -1,4 +1,4 @@
-import { ReactChild, useCallback, useEffect, useMemo } from 'react';
+import { ReactElement, useCallback, useEffect, useMemo, type JSX } from 'react';
 import { matchPath, Redirect, useHistory, useLocation } from 'react-router-dom';
 import getLocalStorageApi from 'api/browser/localstorage/get';
 import setLocalStorageApi from 'api/browser/localstorage/set';
@@ -442,7 +442,7 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 }
 
 interface PrivateRouteProps {
-	children: ReactChild;
+	children: ReactElement | string | number;
 }
 
 export default PrivateRoute;

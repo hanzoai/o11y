@@ -3,6 +3,8 @@ import { Typography } from 'components/ui/typography';
 
 import { TableLabel } from '../types';
 
+import type { JSX } from 'react';
+
 function TabLabel({ routeKey, label }: TableLabel): JSX.Element {
 	const { pathname } = useLocation();
 

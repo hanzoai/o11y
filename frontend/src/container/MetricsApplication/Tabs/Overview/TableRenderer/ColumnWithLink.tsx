@@ -8,6 +8,8 @@ import { v4 as uuid } from 'uuid';
 
 import { useGetAPMToTracesQueries } from '../../util';
 
+import type { JSX } from 'react';
+
 function ColumnWithLink({
 	servicename,
 	minTime,

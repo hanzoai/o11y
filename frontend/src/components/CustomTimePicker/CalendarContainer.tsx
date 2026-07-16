@@ -7,6 +7,8 @@ import { useTimezone } from 'providers/Timezone';
 
 import { DateRange } from './CustomTimePickerPopoverContent';
 
+import type { JSX } from 'react';
+
 function CalendarContainer({
 	dateRange,
 	onSelectDateRange,

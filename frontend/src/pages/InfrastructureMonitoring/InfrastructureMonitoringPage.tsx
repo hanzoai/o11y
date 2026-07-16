@@ -7,6 +7,8 @@ import { Hosts, Kubernetes } from './constants';
 
 import './InfrastructureMonitoring.styles.scss';
 
+import type { JSX } from 'react';
+
 export default function InfrastructureMonitoringPage(): JSX.Element {
 	const { pathname } = useLocation();
 

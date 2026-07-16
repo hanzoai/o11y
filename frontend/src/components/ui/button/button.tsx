@@ -29,10 +29,14 @@ export const ButtonColor = {
 	None: 'none',
 } as const;
 
-export type ButtonVariantValue = (typeof ButtonVariant)[keyof typeof ButtonVariant];
+export type ButtonVariantValue =
+	(typeof ButtonVariant)[keyof typeof ButtonVariant];
 export type ButtonSizeValue = (typeof ButtonSize)[keyof typeof ButtonSize];
-export type ButtonBackgroundValue = (typeof ButtonBackground)[keyof typeof ButtonBackground];
-export type ButtonColorValue = (typeof ButtonColor)[keyof typeof ButtonColor] | (string & {});
+export type ButtonBackgroundValue =
+	(typeof ButtonBackground)[keyof typeof ButtonBackground];
+export type ButtonColorValue =
+	| (typeof ButtonColor)[keyof typeof ButtonColor]
+	| (string & {});
 
 export interface ButtonGroupContextValue {
 	size?: ButtonSizeValue;
@@ -40,7 +44,9 @@ export interface ButtonGroupContextValue {
 	color?: ButtonColorValue;
 	inGroup: boolean;
 }
-export const ButtonGroupContext = createContext<ButtonGroupContextValue | null>(null);
+export const ButtonGroupContext = createContext<ButtonGroupContextValue | null>(
+	null,
+);
 
 export function buttonVariants({
 	variant = 'solid',
@@ -66,67 +72,69 @@ export type ButtonProps = {
 	testId?: string;
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'prefix' | 'color'>;
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
-	const group = useContext(ButtonGroupContext);
-	const {
-		variant = group?.variant ?? 'solid',
-		size = group?.size ?? 'md',
-		asChild = false,
-		color = group?.color ?? 'primary',
-		prefix,
-		suffix,
-		loading = false,
-		background,
-		testId,
-		className,
-		children,
-		disabled,
-		type = 'button',
-		...rest
-	} = props;
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+	(props, ref) => {
+		const group = useContext(ButtonGroupContext);
+		const {
+			variant = group?.variant ?? 'solid',
+			size = group?.size ?? 'md',
+			asChild = false,
+			color = group?.color ?? 'primary',
+			prefix,
+			suffix,
+			loading = false,
+			background,
+			testId,
+			className,
+			children,
+			disabled,
+			type = 'button',
+			...rest
+		} = props;
 
-	const classNames = cn(buttonVariants({ variant, size }), className);
+		const classNames = cn(buttonVariants({ variant, size }), className);
 
-	if (asChild) {
+		if (asChild) {
+			return (
+				<Slot
+					ref={ref as never}
+					className={classNames}
+					data-slot="button"
+					data-variant={variant}
+					data-color={color}
+					data-size={size}
+					data-testid={testId}
+					{...rest}
+				>
+					{children}
+				</Slot>
+			);
+		}
+
 		return (
-			<Slot
-				ref={ref as never}
+			<button
+				ref={ref}
+				// eslint-disable-next-line react/button-has-type
+				type={type}
 				className={classNames}
 				data-slot="button"
 				data-variant={variant}
 				data-color={color}
 				data-size={size}
+				data-background={variant === 'action' ? background : undefined}
 				data-testid={testId}
+				disabled={disabled || loading}
 				{...rest}
 			>
+				{loading ? (
+					<LoaderCircle className="hz-btn__spinner" size={14} />
+				) : (
+					prefix && <span className="hz-btn__affix">{prefix}</span>
+				)}
 				{children}
-			</Slot>
+				{!loading && suffix && <span className="hz-btn__affix">{suffix}</span>}
+			</button>
 		);
-	}
-
-	return (
-		<button
-			ref={ref}
-			// eslint-disable-next-line react/button-has-type
-			type={type}
-			className={classNames}
-			data-slot="button"
-			data-variant={variant}
-			data-color={color}
-			data-size={size}
-			data-background={variant === 'action' ? background : undefined}
-			data-testid={testId}
-			disabled={disabled || loading}
-			{...rest}
-		>
-			{loading ? (
-				<LoaderCircle className="hz-btn__spinner" size={14} />
-			) : (
-				prefix && <span className="hz-btn__affix">{prefix}</span>
-			)}
-			{children}
-			{!loading && suffix && <span className="hz-btn__affix">{suffix}</span>}
-		</button>
-	);
-});
+	},
+);
 Button.displayName = 'Button';

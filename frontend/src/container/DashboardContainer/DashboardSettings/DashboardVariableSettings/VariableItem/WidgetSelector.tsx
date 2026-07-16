@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { CustomMultiSelect } from 'components/NewSelect';
 import { PANEL_GROUP_TYPES } from 'constants/queryBuilder';
 import { generateGridTitle } from 'container/GridPanelSwitch/utils';

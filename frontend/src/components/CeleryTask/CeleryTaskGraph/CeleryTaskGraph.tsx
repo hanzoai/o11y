@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -25,19 +25,19 @@ import { celeryTimeSeriesTablesWidgetData } from './CeleryTaskGraphUtils';
 
 function CeleryTaskGraph({
 	widgetData,
-	onClick,
-	getGraphData,
+	onClick = undefined,
+	getGraphData = undefined,
 	queryEnabled,
-	rightPanelTitle,
-	panelType,
-	openTracesButton,
-	onOpenTraceBtnClick,
-	applyCeleryTaskFilter,
-	customErrorMessage,
-	start,
-	end,
-	checkIfDataExists,
-	analyticsEvent,
+	rightPanelTitle = undefined,
+	panelType = PANEL_TYPES.TIME_SERIES,
+	openTracesButton = false,
+	onOpenTraceBtnClick = undefined,
+	applyCeleryTaskFilter = false,
+	customErrorMessage = undefined,
+	start = undefined,
+	end = undefined,
+	checkIfDataExists = undefined,
+	analyticsEvent = undefined,
 }: {
 	widgetData: Widgets;
 	onClick?: (task: CaptureDataProps) => void;
@@ -136,20 +136,5 @@ function CeleryTaskGraph({
 		</Card>
 	);
 }
-
-CeleryTaskGraph.defaultProps = {
-	getGraphData: undefined,
-	onClick: undefined,
-	rightPanelTitle: undefined,
-	panelType: PANEL_TYPES.TIME_SERIES,
-	openTracesButton: false,
-	onOpenTraceBtnClick: undefined,
-	applyCeleryTaskFilter: false,
-	customErrorMessage: undefined,
-	start: undefined,
-	end: undefined,
-	checkIfDataExists: undefined,
-	analyticsEvent: undefined,
-};
 
 export default CeleryTaskGraph;

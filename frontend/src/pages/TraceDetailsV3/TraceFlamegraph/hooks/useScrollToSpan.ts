@@ -15,7 +15,7 @@ interface UseScrollToSpanArgs {
 	firstSpanAtFetchLevel: string;
 	spans: FlamegraphSpan[][];
 	traceMetadata: ITraceMetadata;
-	containerRef: RefObject<HTMLDivElement>;
+	containerRef: RefObject<HTMLDivElement | null>;
 	viewStartRef: MutableRefObject<number>;
 	viewEndRef: MutableRefObject<number>;
 	scrollTopRef: MutableRefObject<number>;

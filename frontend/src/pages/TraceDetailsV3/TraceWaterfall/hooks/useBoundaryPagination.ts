@@ -6,7 +6,7 @@ import { IInterestedSpan } from '../types';
 const MIN_SPANS_FOR_PAGINATION = 500;
 
 interface UseBoundaryPaginationProps {
-	scrollContainerRef: RefObject<HTMLDivElement>;
+	scrollContainerRef: RefObject<HTMLDivElement | null>;
 	spans: SpanV3[];
 	isFetching: boolean | undefined;
 	isFullDataLoaded: boolean;
@@ -14,8 +14,8 @@ interface UseBoundaryPaginationProps {
 }
 
 interface UseBoundaryPaginationResult {
-	topSentinelRef: RefObject<HTMLDivElement>;
-	bottomSentinelRef: RefObject<HTMLDivElement>;
+	topSentinelRef: RefObject<HTMLDivElement | null>;
+	bottomSentinelRef: RefObject<HTMLDivElement | null>;
 }
 
 /**

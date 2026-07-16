@@ -1,13 +1,15 @@
 import { Form } from 'antd';
 import styled from 'styled-components';
 
+import type { FormValues } from './types';
+
 export const ApplyFormContainer = styled.div`
 	&&& {
 		padding: 16px;
 	}
 `;
 
-export const ApplyForm = styled(Form)`
+export const ApplyForm = styled(Form<FormValues>)`
 	&&& {
 		width: 100%;
 	}

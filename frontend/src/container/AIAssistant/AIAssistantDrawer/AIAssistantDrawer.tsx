@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button } from 'components/ui/button';
 import { TooltipSimple } from 'components/ui/tooltip';

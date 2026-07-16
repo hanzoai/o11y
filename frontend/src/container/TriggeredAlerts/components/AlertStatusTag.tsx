@@ -1,5 +1,7 @@
 import { Badge } from 'components/ui/badge';
 
+import type { JSX } from 'react';
+
 interface AlertStatusTagProps {
 	state: string;
 }

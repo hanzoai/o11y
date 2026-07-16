@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { Color, Spacing } from 'constants/designTokens';
 import { Button, Divider, Drawer, RadioChangeEvent, Typography } from 'antd';
 import LogsIcon from 'assets/AlertHistory/LogsIcon';

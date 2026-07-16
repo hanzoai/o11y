@@ -2,6 +2,8 @@ import { BaseAutocompleteData } from 'types/api/queryBuilder/queryAutocompleteRe
 import { Query } from 'types/api/queryBuilder/queryBuilderData';
 import { DataSource } from 'types/common/queryBuilder';
 
+import type { JSX } from 'react';
+
 export enum FiltersType {
 	SLIDER = 'SLIDER',
 	CHECKBOX = 'CHECKBOX',
@@ -38,7 +40,7 @@ export interface IQuickFiltersConfig {
 }
 
 export interface IQuickFiltersProps {
-	config: IQuickFiltersConfig[];
+	config?: IQuickFiltersConfig[];
 	handleFilterVisibilityChange: () => void;
 	source: QuickFiltersSource;
 	onFilterChange?: (query: Query) => void;

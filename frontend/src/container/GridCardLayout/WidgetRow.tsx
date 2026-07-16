@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Layout } from 'react-grid-layout';
 import { Button, Popover } from 'antd';
 import useComponentPermission from 'hooks/useComponentPermission';

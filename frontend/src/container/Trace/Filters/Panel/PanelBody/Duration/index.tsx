@@ -5,6 +5,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
@@ -40,8 +41,8 @@ function Duration(): JSX.Element {
 		(state) => state.globalTime,
 	);
 
-	const preLocalMaxDuration = useRef<number>();
-	const preLocalMinDuration = useRef<number>();
+	const preLocalMaxDuration = useRef<number>(undefined);
+	const preLocalMinDuration = useRef<number>(undefined);
 
 	const getDuration = useMemo(() => {
 		const selectedDuration = selectedFilter.get('duration');

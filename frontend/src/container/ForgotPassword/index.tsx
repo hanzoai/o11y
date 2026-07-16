@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, type JSX } from 'react';
 import { Button } from '@hanzo/ui';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Input } from 'components/ui/input';

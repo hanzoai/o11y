@@ -4,6 +4,8 @@ import { ChecklistItem } from '../HomeChecklist/HomeChecklist';
 
 import './StepsProgress.styles.scss';
 
+import type { JSX } from 'react';
+
 function StepsProgress({
 	checklistItems,
 }: {

@@ -4,6 +4,8 @@ import { LineInterpolation } from 'lib/uPlotV2/config/types';
 
 import './LineInterpolationSelector.styles.scss';
 
+import type { JSX } from 'react';
+
 interface LineInterpolationSelectorProps {
 	value: LineInterpolation;
 	onChange: (value: LineInterpolation) => void;

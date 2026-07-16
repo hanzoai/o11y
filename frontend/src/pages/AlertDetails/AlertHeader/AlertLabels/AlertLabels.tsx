@@ -3,6 +3,8 @@ import SeeMore from 'periscope/components/SeeMore';
 
 import './AlertLabels.styles.scss';
 
+import type { JSX } from 'react';
+
 export type AlertLabelsProps = {
 	labels: Record<string, any>;
 	initialCount?: number;
@@ -22,9 +24,5 @@ function AlertLabels({
 		</div>
 	);
 }
-
-AlertLabels.defaultProps = {
-	initialCount: 2,
-};
 
 export default AlertLabels;

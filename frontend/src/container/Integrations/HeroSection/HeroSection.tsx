@@ -5,6 +5,8 @@ import { getIntegrationMetadata } from '../CloudIntegration/utils';
 
 import './HeroSection.style.scss';
 
+import type { JSX } from 'react';
+
 function HeroSection({ type }: { type: IntegrationType }): JSX.Element {
 	const {
 		title,

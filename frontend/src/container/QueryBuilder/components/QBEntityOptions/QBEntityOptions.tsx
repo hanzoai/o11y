@@ -22,6 +22,8 @@ import QueryFunctions from '../QueryFunctions/QueryFunctions';
 
 import './QBEntityOptions.styles.scss';
 
+import type { JSX } from 'react';
+
 interface QBEntityOptionsProps {
 	query?: IBuilderQuery;
 	isMetricsDataSource?: boolean;
@@ -46,25 +48,25 @@ interface QBEntityOptionsProps {
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
 export default function QBEntityOptions({
-	query,
-	isMetricsDataSource,
+	query = undefined,
+	isMetricsDataSource = false,
 	isCollapsed,
-	showFunctions,
+	showFunctions = false,
 	entityType,
 	entityData,
 	onToggleVisibility,
 	onCollapseEntity,
-	onQueryFunctionsUpdates,
-	isListViewPanel,
-	onDelete,
-	showDeleteButton,
-	showCloneOption,
-	onCloneQuery,
-	index,
-	queryVariant,
+	onQueryFunctionsUpdates = undefined,
+	isListViewPanel = false,
+	onDelete = noop,
+	showDeleteButton = false,
+	showCloneOption = true,
+	onCloneQuery = noop,
+	index = 0,
+	queryVariant = 'static',
 	hasTraceOperator = false,
 	showTraceOperator = false,
-	onChangeDataSource,
+	onChangeDataSource = noop,
 }: QBEntityOptionsProps): JSX.Element {
 	const handleCloneEntity = (): void => {
 		if (isFunction(onCloneQuery)) {
@@ -177,20 +179,3 @@ export default function QBEntityOptions({
 		</Col>
 	);
 }
-
-QBEntityOptions.defaultProps = {
-	isListViewPanel: false,
-	query: undefined,
-	isMetricsDataSource: false,
-	onQueryFunctionsUpdates: undefined,
-	showFunctions: false,
-	onCloneQuery: noop,
-	index: 0,
-	onDelete: noop,
-	showDeleteButton: false,
-	showCloneOption: true,
-	queryVariant: 'static',
-	onChangeDataSource: noop,
-	hasTraceOperator: false,
-	showTraceOperator: false,
-};

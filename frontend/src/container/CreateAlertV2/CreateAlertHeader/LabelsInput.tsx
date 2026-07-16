@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, type JSX } from 'react';
 import { X } from 'components/ui/icons';
 import { useNotifications } from 'hooks/useNotifications';
 
@@ -136,7 +136,7 @@ function LabelsInput({
 								aria-label={`Remove label ${key}`}
 								onClick={(): void => handleRemoveLabel(key)}
 							>
-								<X size="md" />
+								<X size={16} />
 							</button>
 						</span>
 					))}

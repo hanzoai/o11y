@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { Button, Tooltip } from 'antd';
 import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import InputWithLabel from 'components/InputWithLabel/InputWithLabel';
@@ -9,7 +9,12 @@ import { ReduceToFilter } from 'container/QueryBuilder/filters/ReduceToFilter/Re
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useQueryOperations } from 'hooks/queryBuilder/useQueryBuilderOperations';
 import { get, isEmpty } from 'lodash-es';
-import { BarChart, ChevronUp, ExternalLink, ScrollText } from 'components/ui/icons';
+import {
+	BarChart,
+	ChevronUp,
+	ExternalLink,
+	ScrollText,
+} from 'components/ui/icons';
 import { IBuilderQuery } from 'types/api/queryBuilder/queryBuilderData';
 import { MetricAggregation } from 'types/api/v5/queryRange';
 import { DataSource, ReduceOperators } from 'types/common/queryBuilder';
@@ -464,27 +469,28 @@ function QueryAddOns({
 						</div>
 					)}
 
-					{selectedViews.find((view) => view.key === 'reduce_to') && showReduceTo && (
-						<div className="add-on-content" data-testid="reduce-to-content">
-							<div className="periscope-input-with-label">
-								<Tooltip
-									title={
-										<TooltipContent
-											label="Reduce to"
-											description="Apply mathematical operations like sum, average, min, max, or percentiles to reduce multiple time series into a single value."
-											docLink="https://o11y.hanzo.ai/docs/userguide/query-builder-v5/#reduce-operations"
-										/>
-									}
-									placement="top"
-									mouseEnterDelay={0.5}
-								>
-									<div className="label" style={{ cursor: 'help' }}>
-										Reduce to
+					{selectedViews.find((view) => view.key === 'reduce_to') &&
+						showReduceTo && (
+							<div className="add-on-content" data-testid="reduce-to-content">
+								<div className="periscope-input-with-label">
+									<Tooltip
+										title={
+											<TooltipContent
+												label="Reduce to"
+												description="Apply mathematical operations like sum, average, min, max, or percentiles to reduce multiple time series into a single value."
+												docLink="https://o11y.hanzo.ai/docs/userguide/query-builder-v5/#reduce-operations"
+											/>
+										}
+										placement="top"
+										mouseEnterDelay={0.5}
+									>
+										<div className="label" style={{ cursor: 'help' }}>
+											Reduce to
+										</div>
+									</Tooltip>
+									<div className="input">
+										<ReduceToFilter query={query} onChange={handleChangeReduceToV5} />
 									</div>
-								</Tooltip>
-								<div className="input">
-									<ReduceToFilter query={query} onChange={handleChangeReduceToV5} />
-								</div>
 
 									<Button
 										className="close-btn periscope-btn ghost"

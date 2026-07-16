@@ -5,6 +5,8 @@ import ExplorerPage from 'container/MeterExplorer/Explorer';
 import { Compass, TowerControl } from 'components/ui/icons';
 import SaveView from 'pages/SaveView';
 
+import type { JSX } from 'react';
+
 export const Explorer: TabRoutes = {
 	Component: (): JSX.Element => <ExplorerPage />,
 	name: (

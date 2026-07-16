@@ -5,6 +5,7 @@ import {
 	useEffect,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { UseQueryResult } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
@@ -41,7 +42,7 @@ function WidgetGraph({
 	enableDrillDown = false,
 }: WidgetGraphProps): JSX.Element {
 	const graphRef = useRef<HTMLDivElement>(null);
-	const lineChartRef = useRef<ToggleGraphProps>();
+	const lineChartRef = useRef<ToggleGraphProps>(undefined);
 	const dispatch = useDispatch();
 	const urlQuery = useUrlQuery();
 	const location = useLocation();
@@ -212,7 +213,3 @@ interface WidgetGraphProps {
 }
 
 export default WidgetGraph;
-
-WidgetGraph.defaultProps = {
-	enableDrillDown: false,
-};

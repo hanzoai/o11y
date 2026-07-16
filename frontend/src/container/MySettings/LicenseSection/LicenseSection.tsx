@@ -8,6 +8,8 @@ import { getMaskedKey } from 'utils/maskedKey';
 
 import './LicenseSection.styles.scss';
 
+import type { JSX } from 'react';
+
 function LicenseSection(): JSX.Element | null {
 	const { activeLicense } = useAppContext();
 	const { notifications } = useNotifications();

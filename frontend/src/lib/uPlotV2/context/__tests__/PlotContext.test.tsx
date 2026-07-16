@@ -7,6 +7,8 @@ import {
 } from 'lib/uPlotV2/context/PlotContext';
 import type uPlot from 'uplot';
 
+import type { JSX } from 'react';
+
 jest.mock(
 	'container/DashboardContainer/visualization/panels/utils/legendVisibilityUtils',
 	() => ({

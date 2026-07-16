@@ -57,7 +57,9 @@ export interface FullViewProps {
 	yAxisUnit?: string;
 	isDependedDataLoaded?: boolean;
 	onToggleModelHandler?: GraphManagerProps['onToggleModelHandler'];
-	setCurrentGraphRef: Dispatch<SetStateAction<RefObject<HTMLDivElement> | null>>;
+	setCurrentGraphRef: Dispatch<
+		SetStateAction<RefObject<HTMLDivElement | null> | null>
+	>;
 	enableDrillDown?: boolean;
 }
 

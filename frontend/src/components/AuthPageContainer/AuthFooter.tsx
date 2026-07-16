@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { ArrowUpRight } from 'components/ui/icons';
 
 import './AuthFooter.styles.scss';

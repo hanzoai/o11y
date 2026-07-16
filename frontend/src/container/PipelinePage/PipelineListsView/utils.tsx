@@ -9,6 +9,8 @@ import { ProcessorData } from 'types/api/pipeline/def';
 
 import TableComponents, { Record } from './TableComponents';
 
+import type { JSX } from 'react';
+
 function toCanonicalFilterOperator(op: string): string {
 	const normalized = op.trim();
 	if (!normalized) {

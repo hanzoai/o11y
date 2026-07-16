@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type JSX } from 'react';
 import { Button } from '@hanzo/ui';
 import { toast } from '@hanzo/ui';
 import { Form, Modal } from 'antd';
@@ -272,9 +272,5 @@ function CreateOrEdit(props: CreateOrEditProps): JSX.Element {
 		</Modal>
 	);
 }
-
-CreateOrEdit.defaultProps = {
-	record: null,
-};
 
 export default CreateOrEdit;

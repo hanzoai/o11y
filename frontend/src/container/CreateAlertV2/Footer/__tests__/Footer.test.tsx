@@ -9,6 +9,8 @@ import * as createAlertState from '../../context';
 import Footer from '../Footer';
 import MockQueryClientProvider from 'providers/test/MockQueryClientProvider';
 
+import type { JSX } from 'react';
+
 // Mock the hooks used by Footer component
 jest.mock('hooks/queryBuilder/useQueryBuilder', () => ({
 	useQueryBuilder: jest.fn(),

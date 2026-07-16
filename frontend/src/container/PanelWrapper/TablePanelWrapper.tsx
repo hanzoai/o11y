@@ -5,6 +5,8 @@ import { QueryRangeRequestV5 } from 'types/api/v5/queryRange';
 
 import { PanelWrapperProps } from './panelWrapper.types';
 
+import type { JSX } from 'react';
+
 function TablePanelWrapper({
 	widget,
 	queryResponse,

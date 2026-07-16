@@ -5,6 +5,8 @@ import ContextLogRenderer from './ContextLogRenderer';
 
 import './ContextView.styles.scss';
 
+import type { JSX } from 'react';
+
 interface LogContextProps {
 	log: ILog;
 	contextQuery: Query | undefined;

@@ -7,6 +7,8 @@ import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
 
 import type { AlertRule } from './types';
 
+import type { JSX } from 'react';
+
 const STATE_CONFIG: Record<string, { color: BadgeColor; label: string }> = {
 	firing: { color: 'error', label: 'Firing' },
 	inactive: { color: 'success', label: 'OK' },

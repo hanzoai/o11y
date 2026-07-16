@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { Button, Form, Space, Tooltip } from 'antd';
 import { DropdownMenuSimple, type MenuItem } from 'components/ui/dropdown-menu';
 import { Divider } from 'components/ui/divider';

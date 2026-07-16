@@ -1,5 +1,7 @@
 import './styles.scss';
 
+import type { JSX } from 'react';
+
 interface StepperProps {
 	stepNumber: number;
 	label: string;

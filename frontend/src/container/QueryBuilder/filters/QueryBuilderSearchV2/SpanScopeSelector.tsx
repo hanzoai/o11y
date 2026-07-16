@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Select } from 'antd';
 import { removeKeysFromExpression } from 'components/QueryBuilderV2/utils';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
@@ -53,9 +53,9 @@ const SELECT_OPTIONS = [
 ];
 
 function SpanScopeSelector({
-	onChange,
-	query,
-	skipQueryBuilderRedirect,
+	onChange = undefined,
+	query = undefined,
+	skipQueryBuilderRedirect = false,
 }: SpanScopeSelectorProps): JSX.Element {
 	const { currentQuery, redirectWithQueryBuilderData } = useQueryBuilder();
 	const [selectedScope, setSelectedScope] = useState<SpanScope>(
@@ -153,11 +153,5 @@ function SpanScopeSelector({
 		/>
 	);
 }
-
-SpanScopeSelector.defaultProps = {
-	onChange: undefined,
-	query: undefined,
-	skipQueryBuilderRedirect: false,
-};
 
 export default SpanScopeSelector;

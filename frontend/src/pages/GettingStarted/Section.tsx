@@ -5,6 +5,8 @@ import { map } from 'lodash-es';
 import DocCard from './DocCard';
 import { TGetStartedContentSection } from './types';
 
+import type { JSX } from 'react';
+
 interface IDocSectionProps {
 	sectionData: TGetStartedContentSection;
 }

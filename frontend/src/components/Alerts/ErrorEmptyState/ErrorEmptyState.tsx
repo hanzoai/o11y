@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { LifeBuoy, RefreshCw, TriangleAlert } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
 import { handleContactSupport } from 'container/Integrations/utils';

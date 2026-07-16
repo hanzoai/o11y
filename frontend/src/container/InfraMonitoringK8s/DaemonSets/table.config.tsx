@@ -11,6 +11,8 @@ import { InfraMonitoringEntity } from '../constants';
 import { K8sDaemonSetsData } from './api';
 import { Group } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export function getK8sDaemonSetRowKey(daemonSet: K8sDaemonSetsData): string {
 	return (
 		daemonSet.daemonSetName ||

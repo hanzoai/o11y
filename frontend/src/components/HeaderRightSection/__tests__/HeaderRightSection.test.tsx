@@ -7,6 +7,8 @@ import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 
 import HeaderRightSection from '../HeaderRightSection';
 
+import type { JSX } from 'react';
+
 jest.mock('api/common/logEvent', () => ({
 	__esModule: true,
 	default: jest.fn(),

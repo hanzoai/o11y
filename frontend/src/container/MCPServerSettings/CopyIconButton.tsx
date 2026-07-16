@@ -3,6 +3,8 @@ import { TooltipSimple, TooltipProvider } from 'components/ui/tooltip';
 import { Copy } from 'components/ui/icons';
 import './CopyIconButton.styles.scss';
 
+import type { JSX } from 'react';
+
 interface CopyIconButtonProps {
 	ariaLabel: string;
 	onCopy: () => void;

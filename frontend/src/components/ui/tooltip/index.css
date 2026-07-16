@@ -32,8 +32,14 @@
 	color: var(--tooltip-foreground, var(--l1-foreground));
 	z-index: var(--tooltip-z-index, 50);
 	width: var(--tooltip-width, fit-content);
-	transform-origin: var(--tooltip-transform-origin, var(--radix-tooltip-content-transform-origin));
-	border-radius: var(--tooltip-border-radius, calc(var(--radius-sm, 0.5rem) - 4px));
+	transform-origin: var(
+		--tooltip-transform-origin,
+		var(--radix-tooltip-content-transform-origin)
+	);
+	border-radius: var(
+		--tooltip-border-radius,
+		calc(var(--radius-sm, 0.5rem) - 4px)
+	);
 	padding: var(--tooltip-padding, var(--spacing-2) var(--spacing-4));
 	font-size: var(--tooltip-font-size, var(--periscope-font-size-small));
 	text-wrap: var(--tooltip-text-wrap, balance);

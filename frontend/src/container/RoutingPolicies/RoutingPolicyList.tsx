@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Button, Table, TableProps } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { RotateCw } from 'components/ui/icons';

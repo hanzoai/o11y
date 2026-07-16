@@ -7,6 +7,8 @@ import { userEvent } from 'tests/test-utils';
 import MetricDetails from '../MetricDetails';
 import { getMockMetricMetadataData } from './testUtlls';
 
+import type { JSX } from 'react';
+
 const mockMetricName = 'test-metric';
 const mockOpenInspectModal = jest.fn();
 const mockOnClose = jest.fn();

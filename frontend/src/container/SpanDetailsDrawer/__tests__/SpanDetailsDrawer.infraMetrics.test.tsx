@@ -21,6 +21,8 @@ import {
 	mockSpanWithPodOnly,
 } from './infraMetricsTestData';
 
+import type { JSX } from 'react';
+
 // Mock external dependencies
 jest.mock('react-router-dom', () => ({
 	...jest.requireActual('react-router-dom'),

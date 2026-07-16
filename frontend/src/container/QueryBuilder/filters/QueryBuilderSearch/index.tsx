@@ -7,6 +7,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, Select, Spin, Tooltip } from 'antd';
@@ -86,14 +87,14 @@ function getOperatorValueForContext(
 function QueryBuilderSearch({
 	query,
 	onChange,
-	whereClauseConfig,
-	className,
-	placeholder,
-	suffixIcon,
-	isInfraMonitoring,
-	isMetricsExplorer,
-	disableNavigationShortcuts,
-	entity,
+	whereClauseConfig = undefined,
+	className = '',
+	placeholder = PLACEHOLDER,
+	suffixIcon = undefined,
+	isInfraMonitoring = false,
+	isMetricsExplorer = false,
+	disableNavigationShortcuts = false,
+	entity = null,
 }: QueryBuilderSearchProps): JSX.Element {
 	const { pathname } = useLocation();
 	const isLogsExplorerPage = useMemo(
@@ -543,17 +544,6 @@ interface QueryBuilderSearchProps {
 	entity?: InfraMonitoringEntity | null;
 	isMetricsExplorer?: boolean;
 }
-
-QueryBuilderSearch.defaultProps = {
-	whereClauseConfig: undefined,
-	className: '',
-	placeholder: PLACEHOLDER,
-	suffixIcon: undefined,
-	isInfraMonitoring: false,
-	disableNavigationShortcuts: false,
-	entity: null,
-	isMetricsExplorer: false,
-};
 
 export interface CustomTagProps {
 	label: ReactNode;

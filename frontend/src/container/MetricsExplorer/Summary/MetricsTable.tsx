@@ -1,8 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { Info, Loader } from 'components/ui/icons';
 import { Spin, Table, TablePaginationConfig, TableProps, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
-import type { SorterResult } from 'antd/es/table/interface';
+import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import { Querybuildertypesv5OrderDirectionDTO } from 'api/generated/services/o11y.schemas';
 import ErrorInPlace from 'components/ErrorInPlace/ErrorInPlace';
 
@@ -29,7 +29,7 @@ function MetricsTable({
 		useCallback(
 			(
 				_pagination: TablePaginationConfig,
-				_filters: Record<string, (string | number | boolean)[] | null>,
+				_filters: Record<string, FilterValue | null>,
 				sorter:
 					| SorterResult<MetricsListItemRowData>
 					| SorterResult<MetricsListItemRowData>[],

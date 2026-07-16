@@ -1,5 +1,7 @@
 import cx from 'classnames';
 
+import type { JSX } from 'react';
+
 interface HeaderProps {
 	entity: string;
 	heading: string;

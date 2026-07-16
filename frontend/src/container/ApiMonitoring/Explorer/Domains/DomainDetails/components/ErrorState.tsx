@@ -4,6 +4,8 @@ import { RotateCw } from 'components/ui/icons';
 
 import awwSnapUrl from '@/assets/Icons/awwSnap.svg';
 
+import type { JSX } from 'react';
+
 function ErrorState({ refetch }: { refetch: () => void }): JSX.Element {
 	return (
 		<div className="error-state-container">

@@ -1,5 +1,7 @@
 import { Badge } from 'components/ui/badge';
 
+import type { JSX } from 'react';
+
 function Tags({ tags }: TagsProps): JSX.Element {
 	return (
 		<span>

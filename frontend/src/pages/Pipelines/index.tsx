@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import * as Sentry from '@sentry/react';

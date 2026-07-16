@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Button, Modal, Tag } from 'antd';
 import { CircleAlert, X } from 'lucide-react';
@@ -13,7 +13,7 @@ import { Badge } from 'components/ui/badge';
 
 type Props = {
 	error: APIError;
-	triggerComponent?: React.ReactElement;
+	triggerComponent?: React.ReactElement<{ onClick?: () => void }>;
 	onClose?: () => void;
 	open?: boolean;
 };
@@ -27,10 +27,10 @@ const classNames = {
 };
 
 function ErrorModal({
-	open,
+	open = false,
 	error,
-	triggerComponent,
-	onClose,
+	triggerComponent = undefined,
+	onClose = undefined,
 }: Props): JSX.Element {
 	const [visible, setVisible] = React.useState(open);
 
@@ -96,11 +96,5 @@ function ErrorModal({
 		</>
 	);
 }
-
-ErrorModal.defaultProps = {
-	onClose: undefined,
-	triggerComponent: null,
-	open: false,
-};
 
 export default ErrorModal;

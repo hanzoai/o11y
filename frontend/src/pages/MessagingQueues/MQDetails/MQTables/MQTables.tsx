@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
 import { useMutation } from 'react-query';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Skeleton, Table } from 'antd';
@@ -272,7 +272,7 @@ function MessagingQueuesTable({
 					configDetailQueryData?.topic || ''
 				} ${configDetailQueryData?.partition || ''}`;
 
-	const prevTableDataRef = useRef<string>();
+	const prevTableDataRef = useRef<string>(undefined);
 
 	useEffect(() => {
 		if (tableData.length > 0 && type === 'Overview') {

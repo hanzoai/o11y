@@ -6,6 +6,8 @@ import { EQueryType } from 'types/common/dashboard';
 import { QueryButton } from '../../styles';
 import PromQLQueryBuilder from './query';
 
+import type { JSX } from 'react';
+
 function PromQLQueryContainer(): JSX.Element | null {
 	const { addNewQueryItem, currentQuery } = useQueryBuilder();
 
@@ -27,7 +29,7 @@ function PromQLQueryContainer(): JSX.Element | null {
 			)}
 			<QueryButton
 				onClick={addQueryHandler}
-				icon={<Plus size="md" />}
+				icon={<Plus size={16} />}
 				style={{ margin: '0.4rem 1rem' }}
 			>
 				Query

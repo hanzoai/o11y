@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useImperativeHandle,
 	useRef,
+	type JSX,
 } from 'react';
 import * as Sentry from '@sentry/react';
 import { Typography } from 'components/ui/typography';
@@ -193,11 +194,5 @@ const Uplot = forwardRef<ToggleGraphProps | undefined, UplotProps>(
 );
 
 Uplot.displayName = 'Uplot';
-
-Uplot.defaultProps = {
-	onDelete: undefined,
-	onCreate: undefined,
-	resetScales: true,
-};
 
 export default memo(Uplot);

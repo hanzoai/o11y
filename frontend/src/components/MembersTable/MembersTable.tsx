@@ -8,6 +8,8 @@ import { useTimezone } from 'providers/Timezone';
 
 import './MembersTable.styles.scss';
 
+import type { JSX } from 'react';
+
 export interface MemberRow {
 	id: string;
 	name?: string;

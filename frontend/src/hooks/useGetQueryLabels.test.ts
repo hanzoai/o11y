@@ -71,7 +71,7 @@ describe('useGetQueryLabels', () => {
 		it('returns empty array when datastore_sql is undefined', () => {
 			const query = buildQuery({
 				queryType: EQueryType.DATASTORE,
-				datastore_sql: (undefined as unknown) as IDatastoreQuery[],
+				datastore_sql: undefined as unknown as IDatastoreQuery[],
 			});
 
 			const { result } = renderHook(() => useGetQueryLabels(query));
@@ -83,8 +83,8 @@ describe('useGetQueryLabels', () => {
 			const query = buildQuery({
 				queryType: EQueryType.DATASTORE,
 				datastore_sql: [
-					({ name: 'query_a' } as unknown) as IDatastoreQuery,
-					({ name: 'query_b' } as unknown) as IDatastoreQuery,
+					{ name: 'query_a' } as unknown as IDatastoreQuery,
+					{ name: 'query_b' } as unknown as IDatastoreQuery,
 				],
 			});
 

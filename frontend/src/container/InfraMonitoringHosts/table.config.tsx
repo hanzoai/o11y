@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { Tooltip } from 'antd';
 import { Badge } from 'components/ui/badge';
 import { HostData } from 'api/infraMonitoring/getHostLists';
@@ -83,7 +83,7 @@ export const hostColumnsConfig: TableColumnDef<HostData>[] = [
 			<div className={styles.statusHeader}>
 				Status
 				<Tooltip title="Sent system metrics in last 10 mins">
-					<Info size="md" />
+					<Info size={16} />
 				</Tooltip>
 			</div>
 		),
@@ -132,7 +132,7 @@ export const hostColumnsConfig: TableColumnDef<HostData>[] = [
 			<div className={`${styles.columnHeaderRight} ${styles.memoryUsageHeader}`}>
 				Memory Usage
 				<Tooltip title="Excluding cache memory">
-					<Info size="md" />
+					<Info size={16} />
 				</Tooltip>
 			</div>
 		),

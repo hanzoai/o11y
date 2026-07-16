@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { generatePath } from 'react-router-dom';
 import { Color } from 'constants/designTokens';
 import { Skeleton, Typography } from 'antd';

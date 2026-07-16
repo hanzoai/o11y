@@ -2,7 +2,7 @@ import { RefObject, useCallback, useEffect } from 'react';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 
 interface UseFlamegraphCrosshairArgs {
-	overlayCanvasRef: RefObject<HTMLCanvasElement>;
+	overlayCanvasRef: RefObject<HTMLCanvasElement | null>;
 	cursorX: number | null;
 }
 

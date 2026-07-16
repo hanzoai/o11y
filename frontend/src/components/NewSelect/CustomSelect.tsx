@@ -262,7 +262,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 	const clearIcon = useCallback(
 		() => (
 			<X
-				size="md"
+				size={16}
 				onClick={(e): void => {
 					e.stopPropagation();
 					if (onChange) {
@@ -584,7 +584,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 					{loading && (
 						<div className="navigation-loading">
 							<div className="navigation-icons">
-								<Loader size="md" className="animate-spin" />
+								<Loader size={16} className="animate-spin" />
 							</div>
 							<div className="navigation-text">Refreshing values...</div>
 						</div>
@@ -592,7 +592,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 					{!loading && waitingMessage && (
 						<div className="navigation-loading">
 							<div className="navigation-icons">
-								<Loader size="md" className="animate-spin" />
+								<Loader size={16} className="animate-spin" />
 							</div>
 							<div className="navigation-text" title={waitingMessage}>
 								{waitingMessage}
@@ -608,7 +608,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 								<div className="navigation-icons">
 									<RefreshCw
 										data-testid="retry-button"
-										size="md"
+										size={16}
 										color={Color.BG_CHERRY_400}
 										onClick={(e): void => {
 											e.stopPropagation();
@@ -735,7 +735,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 			popupMatchSelectWidth={popupMatchSelectWidth}
 			allowClear={allowClear ? { clearIcon } : false}
 			getPopupContainer={getPopupContainer ?? popupContainer}
-			suffixIcon={<ChevronDown style={{ cursor: 'default' }} size="md" />}
+			suffixIcon={<ChevronDown style={{ cursor: 'default' }} size={16} />}
 			dropdownRender={customDropdownRender}
 			menuItemSelectedIcon={null}
 			popupClassName={cx('custom-select-dropdown-container', popupClassName)}

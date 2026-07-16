@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type JSX } from 'react';
 import HeaderRightSection from 'components/HeaderRightSection/HeaderRightSection';
 
 import DashboardBreadcrumbs from './DashboardBreadcrumbs';

@@ -4,6 +4,7 @@ import {
 	useEffect,
 	useState,
 	ReactNode,
+	type JSX,
 } from 'react';
 
 export interface TenantBranding {
@@ -38,7 +39,11 @@ const DEFAULT_TENANT: TenantBranding = {
 
 const TenantContext = createContext<TenantBranding>(DEFAULT_TENANT);
 
-export function TenantProvider({ children }: { children: ReactNode }): JSX.Element {
+export function TenantProvider({
+	children,
+}: {
+	children: ReactNode;
+}): JSX.Element {
 	const [tenant, setTenant] = useState<TenantBranding>(DEFAULT_TENANT);
 
 	useEffect(() => {
@@ -64,9 +69,10 @@ export function TenantProvider({ children }: { children: ReactNode }): JSX.Eleme
 				);
 
 				// Page title: "Brand Product" or just "Product"
-				const title = merged.name !== merged.productName
-					? `${merged.name} ${merged.productName}`
-					: merged.productName;
+				const title =
+					merged.name !== merged.productName
+						? `${merged.name} ${merged.productName}`
+						: merged.productName;
 				document.title = title;
 
 				// Update favicon if provided

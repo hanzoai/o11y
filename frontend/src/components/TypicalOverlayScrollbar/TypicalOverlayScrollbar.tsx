@@ -12,8 +12,8 @@ interface Props {
 
 export default function TypicalOverlayScrollbar({
 	children,
-	style,
-	options,
+	style = {},
+	options = {},
 }: Props): ReturnType<typeof OverlayScrollbarsComponent> {
 	return (
 		<OverlayScrollbarsComponent
@@ -27,5 +27,3 @@ export default function TypicalOverlayScrollbar({
 		</OverlayScrollbarsComponent>
 	);
 }
-
-TypicalOverlayScrollbar.defaultProps = { style: {}, options: {} };

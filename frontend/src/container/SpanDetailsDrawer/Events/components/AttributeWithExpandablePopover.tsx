@@ -4,6 +4,8 @@ import { Fullscreen } from 'components/ui/icons';
 
 import './AttributeWithExpandablePopover.styles.scss';
 
+import type { JSX } from 'react';
+
 interface AttributeWithExpandablePopoverProps {
 	attributeKey: string;
 	attributeValue: string;

@@ -4,6 +4,8 @@ import { ROLES } from '../../types/roles';
 import { ShiftOverlay } from './ShiftOverlay';
 import { useShiftHoldOverlay } from './useShiftHoldOverlay';
 
+import type { JSX } from 'react';
+
 export function ShiftHoldOverlayController({
 	userRole,
 }: {

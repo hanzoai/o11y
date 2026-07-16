@@ -5,6 +5,8 @@ import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import useScrollToTop from 'hooks/useScrollToTop';
 import { ArrowUp } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 function GoToTop(): JSX.Element | null {
 	const { isVisible, scrollToTop } = useScrollToTop();
 
@@ -20,7 +22,7 @@ function GoToTop(): JSX.Element | null {
 				onClick={scrollToTop}
 				shape="circle"
 				type="primary"
-				icon={<ArrowUp size="md" />}
+				icon={<ArrowUp size={16} />}
 			/>
 		);
 	}

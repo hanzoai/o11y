@@ -5,11 +5,10 @@ import { cn } from '../lib/utils';
 import { SliderThumb } from './slider-thumb';
 import { toArray } from './slider-utils';
 
-export interface SliderProps
-	extends Omit<
-		React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>,
-		'onChange' | 'value' | 'defaultValue'
-	> {
+export interface SliderProps extends Omit<
+	React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>,
+	'onChange' | 'value' | 'defaultValue'
+> {
 	value?: number | number[];
 	defaultValue?: number | number[];
 	/**
@@ -90,12 +89,18 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 			testId,
 			...props
 		},
-		ref
+		ref,
 	) => {
-		const internalValue = React.useMemo(() => toArray(controlledValue), [controlledValue]);
-		const internalDefaultValue = React.useMemo(() => toArray(defaultValue), [defaultValue]);
+		const internalValue = React.useMemo(
+			() => toArray(controlledValue),
+			[controlledValue],
+		);
+		const internalDefaultValue = React.useMemo(
+			() => toArray(defaultValue),
+			[defaultValue],
+		);
 		const [localValues, setLocalValues] = React.useState<number[]>(
-			internalValue || internalDefaultValue || [min]
+			internalValue || internalDefaultValue || [min],
 		);
 
 		React.useEffect(() => {
@@ -113,7 +118,7 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 					onChange(range ? newValues : newValues[0]);
 				}
 			},
-			[internalValue, onChange, range]
+			[internalValue, onChange, range],
 		);
 
 		const handleValueCommit = React.useCallback(
@@ -122,7 +127,7 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 					onAfterChange(range ? newValues : newValues[0]);
 				}
 			},
-			[onAfterChange, range]
+			[onAfterChange, range],
 		);
 
 		const markList = React.useMemo(() => {
@@ -133,13 +138,21 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 				const markVal = Number(key);
 				const percent = ((markVal - min) / (max - min)) * 100;
 				const isObject =
-					typeof markObj === 'object' && markObj !== null && !React.isValidElement(markObj);
-				const objMark = markObj as { style?: React.CSSProperties; label: React.ReactNode };
+					typeof markObj === 'object' &&
+					markObj !== null &&
+					!React.isValidElement(markObj);
+				const objMark = markObj as {
+					style?: React.CSSProperties;
+					label: React.ReactNode;
+				};
 				return {
 					key,
 					markVal,
 					percent,
-					label: isObject && 'label' in objMark ? objMark.label : (markObj as React.ReactNode),
+					label:
+						isObject && 'label' in objMark
+							? objMark.label
+							: (markObj as React.ReactNode),
 					markStyle: isObject && 'style' in objMark ? objMark.style : {},
 				};
 			});
@@ -150,9 +163,11 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 				if (localValues.length === 1) {
 					return markVal <= localValues[0];
 				}
-				return markVal >= localValues[0] && markVal <= localValues[localValues.length - 1];
+				return (
+					markVal >= localValues[0] && markVal <= localValues[localValues.length - 1]
+				);
 			},
-			[localValues]
+			[localValues],
 		);
 
 		const handleMarkClick = React.useCallback(
@@ -163,7 +178,8 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 				} else {
 					const lastIndex = localValues.length - 1;
 					newValues =
-						Math.abs(localValues[0] - markVal) <= Math.abs(localValues[lastIndex] - markVal)
+						Math.abs(localValues[0] - markVal) <=
+						Math.abs(localValues[lastIndex] - markVal)
 							? [markVal, ...localValues.slice(1)]
 							: [...localValues.slice(0, lastIndex), markVal];
 					newValues = [...newValues].sort((a, b) => a - b);
@@ -178,7 +194,7 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 					onAfterChange(range ? newValues : newValues[0]);
 				}
 			},
-			[localValues, internalValue, onChange, onAfterChange, range]
+			[localValues, internalValue, onChange, onAfterChange, range],
 		);
 
 		const internalId = React.useId();
@@ -256,7 +272,7 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 				)}
 			</SliderPrimitive.Root>
 		);
-	}
+	},
 );
 Slider.displayName = 'Slider';
 

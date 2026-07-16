@@ -10,7 +10,12 @@ import {
 	StyledSelect,
 } from '../styles';
 
-function TypeSelect({ onChange, value }: TypeSelectProps): JSX.Element {
+import type { JSX } from 'react';
+
+function TypeSelect({
+	onChange,
+	value = DEFAULT_PROCESSOR_TYPE,
+}: TypeSelectProps): JSX.Element {
 	const { t } = useTranslation('pipeline');
 
 	return (
@@ -32,10 +37,6 @@ function TypeSelect({ onChange, value }: TypeSelectProps): JSX.Element {
 		</ProcessorTypeWrapper>
 	);
 }
-
-TypeSelect.defaultProps = {
-	value: DEFAULT_PROCESSOR_TYPE,
-};
 
 interface TypeSelectProps {
 	onChange: (value: string | unknown) => void;

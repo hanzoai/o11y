@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Form, FormInstance, Modal } from 'antd';
 import sendInvite from 'api/v1/invite/create';

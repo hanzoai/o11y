@@ -11,6 +11,8 @@ import { DataSource, ReduceOperators } from 'types/common/queryBuilder';
 
 import QueryAddOns from '../QueryV2/QueryAddOns/QueryAddOns';
 
+import type { JSX } from 'react';
+
 // Mocks: only what is required for this component to render and for us to assert handler calls
 const mockHandleChangeQueryData = jest.fn();
 const mockHandleSetQueryData = jest.fn();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Input } from 'antd';
 import O11yModal from 'components/O11yModal/O11yModal';
 import { useUpdateFunnelSteps } from 'hooks/TracesFunnels/useFunnels';

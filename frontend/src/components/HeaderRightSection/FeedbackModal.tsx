@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import { toast } from '@hanzo/ui';
 import { Button, Input, Radio, RadioChangeEvent, Typography } from 'antd';

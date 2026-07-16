@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type JSX } from 'react';
 import ErrorInPlace from 'components/ErrorInPlace/ErrorInPlace';
 import { initialQueriesMap } from 'constants/queryBuilder';
 import { LogsLoading } from 'container/LogsLoading/LogsLoading';

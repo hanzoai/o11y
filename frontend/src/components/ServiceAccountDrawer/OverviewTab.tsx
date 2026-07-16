@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { LockKeyhole } from 'components/ui/icons';
 import { Badge } from 'components/ui/badge';
 import { Input } from 'components/ui/input';

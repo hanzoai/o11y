@@ -4,6 +4,7 @@ import {
 	MouseEventHandler,
 	useCallback,
 	useMemo,
+	type JSX,
 } from 'react';
 import { Color } from 'constants/designTokens';
 import { Tooltip } from 'antd';
@@ -28,12 +29,12 @@ import { InfoIconWrapper, RawLogContent, RawLogViewContainer } from './styles';
 import { RawLogViewProps } from './types';
 
 function RawLogView({
-	isActiveLog,
-	isReadOnly,
+	isActiveLog = false,
+	isReadOnly = false,
 	data,
 	linesPerRow,
-	isTextOverflowEllipsisDisabled,
-	isHighlighted,
+	isTextOverflowEllipsisDisabled = false,
+	isHighlighted = false,
 	helpTooltip,
 	selectedFields = [],
 	fontSize,
@@ -202,11 +203,5 @@ function RawLogView({
 		</RawLogViewContainer>
 	);
 }
-RawLogView.defaultProps = {
-	isActiveLog: false,
-	isReadOnly: false,
-	isTextOverflowEllipsisDisabled: false,
-	isHighlighted: false,
-};
 
 export default memo(RawLogView);

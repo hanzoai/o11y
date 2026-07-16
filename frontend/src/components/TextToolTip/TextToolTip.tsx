@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, type JSX } from 'react';
 import { blue, grey } from '@ant-design/colors';
 import { CircleHelp } from 'components/ui/icons';
 import { Tooltip } from 'antd';
@@ -11,11 +11,11 @@ import './TextToolTip.style.scss';
 
 function TextToolTip({
 	text,
-	url,
+	url = '',
 	useFilledIcon = true,
-	urlText,
-	filledIcon,
-	outlinedIcon,
+	urlText = '',
+	filledIcon = undefined,
+	outlinedIcon = undefined,
 }: TextToolTipProps): JSX.Element {
 	const isDarkMode = useIsDarkMode();
 
@@ -91,13 +91,6 @@ function TextToolTip({
 	return <Tooltip overlay={overlay}>{renderIcon()}</Tooltip>;
 }
 
-TextToolTip.defaultProps = {
-	url: '',
-	urlText: '',
-	useFilledIcon: true,
-	filledIcon: undefined,
-	outlinedIcon: undefined,
-};
 interface TextToolTipProps {
 	url?: string;
 	text: string;

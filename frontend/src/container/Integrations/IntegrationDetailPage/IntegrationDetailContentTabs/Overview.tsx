@@ -3,6 +3,8 @@ import { MarkdownRenderer } from 'components/MarkdownRenderer/MarkdownRenderer';
 
 import './IntegrationDetailContentTabs.styles.scss';
 
+import type { JSX } from 'react';
+
 interface OverviewProps {
 	categories: string[];
 	assets: {

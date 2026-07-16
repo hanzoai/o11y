@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Button, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
 import WarningPopover from 'components/WarningPopover/WarningPopover';

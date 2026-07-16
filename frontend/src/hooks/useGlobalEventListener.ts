@@ -9,7 +9,7 @@ export function useGlobalEventListener<K extends keyof WindowEventMap>(
 	handler: EventHandler<K>,
 	options?: AddEventListenerOptions,
 ): void {
-	const savedHandler = useRef<EventHandler<K> | undefined>();
+	const savedHandler = useRef<EventHandler<K> | undefined>(undefined);
 
 	useEffect(() => {
 		savedHandler.current = handler;

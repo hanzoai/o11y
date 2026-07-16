@@ -6,6 +6,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { Virtualizer } from '@tanstack/react-virtual';
@@ -416,7 +417,7 @@ function Success(props: ISuccessProps): JSX.Element {
 
 	const [filteredSpanIds, setFilteredSpanIds] = useState<string[]>([]);
 	const [isFilterActive, setIsFilterActive] = useState<boolean>(false);
-	const virtualizerRef = useRef<Virtualizer<HTMLDivElement, Element>>();
+	const virtualizerRef = useRef<Virtualizer<HTMLDivElement, Element>>(undefined);
 
 	const handleFilteredSpansChange = useCallback(
 		(spanIds: string[], isActive: boolean) => {

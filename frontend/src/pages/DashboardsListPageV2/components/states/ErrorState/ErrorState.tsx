@@ -8,6 +8,8 @@ import awwSnapUrl from '@/assets/Icons/awwSnap.svg';
 import { formatQueryErrorMessage } from '../../../utils';
 import styles from './ErrorState.module.scss';
 
+import type { JSX } from 'react';
+
 interface Props {
 	isCloudUser: boolean;
 	onRetry: () => void;

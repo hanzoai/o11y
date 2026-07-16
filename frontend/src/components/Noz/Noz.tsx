@@ -2,6 +2,8 @@ import cx from 'classnames';
 
 import styles from './Noz.module.scss';
 
+import type { JSX } from 'react';
+
 interface NozProps {
 	size?: number;
 	className?: string;
@@ -15,7 +17,10 @@ interface NozProps {
  *  - To make a parent element (e.g. a Button) trigger the wave on its own
  *    hover, add the class `noz-wave` to that parent.
  */
-export default function Noz({ size = 24, className }: NozProps): JSX.Element {
+export default function Noz({
+	size = 24,
+	className = undefined,
+}: NozProps): JSX.Element {
 	return (
 		<span
 			className={cx(styles.noz, className)}
@@ -93,8 +98,3 @@ export default function Noz({ size = 24, className }: NozProps): JSX.Element {
 		</span>
 	);
 }
-
-Noz.defaultProps = {
-	size: 24,
-	className: undefined,
-};

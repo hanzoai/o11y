@@ -5,6 +5,8 @@ import SummaryPage from 'container/MetricsExplorer/Summary';
 import { BarChart, Compass, TowerControl } from 'components/ui/icons';
 import SaveView from 'pages/SaveView';
 
+import type { JSX } from 'react';
+
 export const Summary: TabRoutes = {
 	Component: SummaryPage,
 	name: (

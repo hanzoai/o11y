@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Typography } from 'components/ui/typography';
 import { getYAxisFormattedValue } from 'components/Graph/yAxisConfig';

@@ -1,3 +1,9 @@
+// antd 5's static APIs (message.*, notification.*, Modal.confirm) render through
+// ReactDOM.render, which React 19 removed — they no-op without this patch, and no
+// typecheck catches it. Must be imported before antd is used. Retire it when antd
+// reaches a major that speaks React 19 natively.
+import '@ant-design/v5-patch-for-react-19';
+
 import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import { QueryClient, QueryClientProvider } from 'react-query';

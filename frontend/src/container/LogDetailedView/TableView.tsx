@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
@@ -67,8 +67,8 @@ function TableView({
 	onClickActionItem,
 	isListViewPanel = false,
 	selectedOptions,
-	listViewPanelSelectedFields,
-	handleChangeSelectedView,
+	listViewPanelSelectedFields = null,
+	handleChangeSelectedView = undefined,
 }: Props): JSX.Element | null {
 	const dispatch = useDispatch<Dispatch<AppActions>>();
 	const [isfilterInLoading, setIsFilterInLoading] = useState<boolean>(false);
@@ -350,12 +350,6 @@ function TableView({
 		/>
 	);
 }
-
-TableView.defaultProps = {
-	isListViewPanel: false,
-	listViewPanelSelectedFields: null,
-	handleChangeSelectedView: undefined,
-};
 
 export interface DataType {
 	key: string;

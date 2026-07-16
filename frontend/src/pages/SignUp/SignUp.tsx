@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { Button } from '@hanzo/ui';
 import { Callout } from 'components/ui/callout';
 import { Input } from 'components/ui/input';
@@ -15,17 +15,9 @@ import { ArrowRight } from 'components/ui/icons';
 import APIError from 'types/api/error';
 
 import { FormContainer, Label } from './styles';
+import type { FormValues } from './types';
 
 import './SignUp.styles.scss';
-
-type FormValues = {
-	email: string;
-	organizationName: string;
-	password: string;
-	confirmPassword: string;
-	hasOptedUpdates: boolean;
-	isAnonymous: boolean;
-};
 
 function SignUp(): JSX.Element {
 	const [loading, setLoading] = useState(false);

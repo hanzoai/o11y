@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import cx from 'classnames';
 import { Button } from 'components/ui/button';

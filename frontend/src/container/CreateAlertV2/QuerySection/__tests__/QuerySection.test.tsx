@@ -18,6 +18,8 @@ import { DataSource } from 'types/common/queryBuilder';
 import { CreateAlertProvider } from '../../context';
 import QuerySection from '../QuerySection';
 
+import type { JSX } from 'react';
+
 jest.mock('uuid', () => ({
 	v4: (): string => 'test-uuid-12345',
 }));

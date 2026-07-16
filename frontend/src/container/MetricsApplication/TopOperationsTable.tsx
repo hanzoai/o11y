@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -104,7 +104,7 @@ function TopOperationsTable({
 
 	const getSearchOption = (): ColumnType<TopOperationList> => ({
 		filterDropdown,
-		filterIcon: <Search size="md" />,
+		filterIcon: <Search size={16} />,
 		onFilter: (value, record): boolean =>
 			record.name
 				.toString()
@@ -197,8 +197,7 @@ function TopOperationsTable({
 
 	const entryPointSpanInfo = {
 		text: 'Shows the spans where requests enter new services for the first time',
-		url:
-			'https://o11y.hanzo.ai/docs/traces-management/guides/entry-point-spans-service-overview/',
+		url: 'https://o11y.hanzo.ai/docs/traces-management/guides/entry-point-spans-service-overview/',
 		urlText: 'Learn more about Entrypoint Spans.',
 	};
 

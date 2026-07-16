@@ -10,6 +10,8 @@ import FunnelResults from './components/FunnelResults/FunnelResults';
 
 import './TracesFunnelDetails.styles.scss';
 
+import type { JSX } from 'react';
+
 function TracesFunnelDetails(): JSX.Element {
 	const { funnelId } = useParams<{ funnelId: string }>();
 	const { data, isLoading, isError } = useFunnelDetails({ funnelId });

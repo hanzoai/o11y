@@ -4,6 +4,7 @@ import {
 	useLayoutEffect,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useQueryClient } from 'react-query';
 import cx from 'classnames';

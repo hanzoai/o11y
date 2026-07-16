@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import { Button, Select, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
 import classNames from 'classnames';

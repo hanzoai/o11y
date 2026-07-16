@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CircleAlert, CircleX } from 'components/ui/icons';
 import { Button, Input, InputRef, message, Modal, Tooltip } from 'antd';

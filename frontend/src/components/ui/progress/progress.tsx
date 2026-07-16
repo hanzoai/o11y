@@ -3,8 +3,9 @@ import * as ProgressPrimitive from '@radix-ui/react-progress';
 import React from 'react';
 import { cn } from '../lib/utils';
 
-export interface ProgressProps
-	extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> {
+export interface ProgressProps extends React.ComponentPropsWithoutRef<
+	typeof ProgressPrimitive.Root
+> {
 	/**
 	 * The completion value from 0 to 100.
 	 * @defaultValue 0
@@ -72,7 +73,7 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
 			style,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const internalId = React.useId();
 		const clampedPercent = Math.min(Math.max(percent, 0), 100);
@@ -122,7 +123,7 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
 				{showInfo && <span data-slot="progress-info">{clampedPercent}%</span>}
 			</div>
 		);
-	}
+	},
 );
 Progress.displayName = 'Progress';
 

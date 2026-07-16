@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Color } from 'constants/designTokens';
 import { Button } from 'antd';

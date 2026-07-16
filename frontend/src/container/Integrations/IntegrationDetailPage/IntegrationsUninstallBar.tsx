@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useMutation } from 'react-query';
 import { Button, Modal } from 'antd';
 import { Typography } from 'components/ui/typography';
@@ -103,9 +103,5 @@ function IntergrationsUninstallBar(
 		</div>
 	);
 }
-
-IntergrationsUninstallBar.defaultProps = {
-	removeIntegrationTitle: 'Remove from Hanzo',
-};
 
 export default IntergrationsUninstallBar;

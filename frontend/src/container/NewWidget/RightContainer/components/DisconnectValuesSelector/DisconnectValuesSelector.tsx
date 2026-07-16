@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Typography } from 'components/ui/typography';
 import { DisconnectedValuesMode } from 'lib/uPlotV2/config/types';
 

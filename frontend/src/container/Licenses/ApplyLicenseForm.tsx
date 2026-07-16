@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Input } from 'components/ui/input';
 import { Button, Form } from 'antd';
@@ -13,6 +13,7 @@ import {
 	KeyPreview,
 	LicenseInput,
 } from './styles';
+import type { FormValues } from './types';
 
 function ApplyLicenseForm({
 	licenseRefetch,
@@ -87,10 +88,6 @@ function ApplyLicenseForm({
 
 interface ApplyLicenseFormProps {
 	licenseRefetch: () => void;
-}
-
-interface FormValues {
-	key: string;
 }
 
 export default ApplyLicenseForm;

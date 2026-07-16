@@ -5,8 +5,10 @@ import { cn } from '../lib/utils';
 
 export type KbdSize = 'sm' | 'default' | 'lg';
 
-export interface KbdProps
-	extends Pick<React.ComponentProps<'kbd'>, 'className' | 'children' | 'id' | 'style'> {
+export interface KbdProps extends Pick<
+	React.ComponentProps<'kbd'>,
+	'className' | 'children' | 'id' | 'style'
+> {
 	/**
 	 * The testId associated with the kbd element.
 	 */
@@ -27,7 +29,18 @@ export interface KbdProps
 }
 
 export const Kbd = React.forwardRef<HTMLElement, KbdProps>(
-	({ className, size = 'default', asChild = false, active = false, testId, children, ...props }, ref) => {
+	(
+		{
+			className,
+			size = 'default',
+			asChild = false,
+			active = false,
+			testId,
+			children,
+			...props
+		},
+		ref,
+	) => {
 		const Comp = asChild ? Slot : 'kbd';
 		return (
 			<Comp
@@ -42,6 +55,6 @@ export const Kbd = React.forwardRef<HTMLElement, KbdProps>(
 				{children}
 			</Comp>
 		);
-	}
+	},
 );
 Kbd.displayName = 'Kbd';

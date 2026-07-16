@@ -1,6 +1,6 @@
 //@ts-nocheck
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { connect } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
@@ -64,7 +64,7 @@ export interface graphDataType {
 }
 
 function ServiceMap(props: ServiceMapProps): JSX.Element {
-	const fgRef = useRef();
+	const fgRef = useRef(undefined);
 
 	const { getDetailedServiceMapItems, globalTime, serviceMap } = props;
 

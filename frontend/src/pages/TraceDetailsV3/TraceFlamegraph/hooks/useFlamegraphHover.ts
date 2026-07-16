@@ -95,7 +95,7 @@ export interface TooltipContent {
 }
 
 interface UseFlamegraphHoverArgs {
-	canvasRef: RefObject<HTMLCanvasElement>;
+	canvasRef: RefObject<HTMLCanvasElement | null>;
 	spanRectsRef: MutableRefObject<SpanRect[]>;
 	eventRectsRef: MutableRefObject<EventRect[]>;
 	traceMetadata: ITraceMetadata;

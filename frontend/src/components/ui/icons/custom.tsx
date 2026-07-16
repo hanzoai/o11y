@@ -6,7 +6,7 @@
  * lucide-compatible prop surface ({ size, color, strokeWidth, className }).
  * Every other icon in the app comes straight from lucide-react (see ./index).
  */
-import type { SVGProps } from 'react';
+import type { SVGProps, JSX } from 'react';
 import { forwardRef } from 'react';
 
 export interface IconProps extends Omit<SVGProps<SVGSVGElement>, 'ref'> {
@@ -22,7 +22,12 @@ type SolidSpec = {
 	body: JSX.Element;
 };
 
-function makeIcon({ name, viewBox = '0 0 16 16', fill = 'none', body }: SolidSpec) {
+function makeIcon({
+	name,
+	viewBox = '0 0 16 16',
+	fill = 'none',
+	body,
+}: SolidSpec) {
 	const Icon = forwardRef<SVGSVGElement, IconProps>(
 		({ size = 16, color = 'currentColor', className, ...rest }, ref) => (
 			<svg

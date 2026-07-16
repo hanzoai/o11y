@@ -222,9 +222,7 @@ describe('MultiIngestionSettings Page', () => {
 		expect(firstQueryData.filter.expression).toContain(
 			"signoz.workspace.key.id='k2'",
 		);
-		expect(firstQueryData.aggregations[0].metricName).toBe(
-			'o11y.meter.log.size',
-		);
+		expect(firstQueryData.aggregations[0].metricName).toBe('o11y.meter.log.size');
 
 		expect(urlParams.get(QueryParams.yAxisUnit)).toBe('bytes');
 		expect(urlParams.get(QueryParams.ruleName)).toContain('logs');
@@ -312,9 +310,7 @@ describe('MultiIngestionSettings Page', () => {
 		);
 
 		// Verify metric name for logs signal
-		expect(firstQueryData.aggregations[0].metricName).toBe(
-			'o11y.meter.log.size',
-		);
+		expect(firstQueryData.aggregations[0].metricName).toBe('o11y.meter.log.size');
 	});
 
 	it('switches to search API when search text is entered', async () => {

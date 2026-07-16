@@ -6,6 +6,8 @@ import { EXCLUDED_COLUMNS } from 'container/OptionsMenu/constants';
 import { QueryKeySuggestionsResponseProps } from 'types/api/querySuggestions/types';
 import { DataSource } from 'types/common/queryBuilder';
 
+import type { JSX } from 'react';
+
 type ExplorerAttributeColumnsProps = {
 	isLoading: boolean;
 	data: AxiosResponse<QueryKeySuggestionsResponseProps> | undefined;

@@ -2,6 +2,8 @@ import { Skeleton } from 'antd';
 
 import styles from './LoadingContainer.module.scss';
 
+import type { JSX } from 'react';
+
 function LoadingContainer(): JSX.Element {
 	return (
 		<div className={styles.loadingState} data-testid="loader">

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState, type JSX } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Color } from 'constants/designTokens';
 import { Button, Flex, Form, Input, Tooltip, Typography } from 'antd';

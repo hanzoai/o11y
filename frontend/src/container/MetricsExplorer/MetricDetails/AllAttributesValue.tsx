@@ -1,8 +1,13 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Button, Input, Menu, Popover, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
-import { Check, Copy, Search, SquareArrowOutUpRight } from 'components/ui/icons';
+import {
+	Check,
+	Copy,
+	Search,
+	SquareArrowOutUpRight,
+} from 'components/ui/icons';
 
 import MetricDetailsErrorState from './MetricDetailsErrorState';
 import { AllAttributesEmptyTextProps, AllAttributesValueProps } from './types';
@@ -39,7 +44,7 @@ export function AllAttributesValue({
 	const [allValuesSearch, setAllValuesSearch] = useState('');
 	const [copiedValue, setCopiedValue] = useState<string | null>(null);
 	const [, copyToClipboard] = useCopyToClipboard();
-	const copyTimerRef = useRef<ReturnType<typeof setTimeout>>();
+	const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
 	const handleCopyWithFeedback = useCallback(
 		(value: string): void => {

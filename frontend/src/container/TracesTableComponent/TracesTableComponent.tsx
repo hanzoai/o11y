@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import { UseQueryResult } from 'react-query';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';

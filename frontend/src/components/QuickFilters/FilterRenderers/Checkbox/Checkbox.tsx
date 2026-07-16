@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-identical-functions */
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState, type JSX } from 'react';
 import { Input } from 'components/ui/input';
 import { Button, Skeleton } from 'antd';
 import { Checkbox } from 'components/ui/checkbox';
@@ -701,7 +701,3 @@ export default function CheckboxFilter(props: ICheckboxProps): JSX.Element {
 		</div>
 	);
 }
-
-CheckboxFilter.defaultProps = {
-	onFilterChange: null,
-};

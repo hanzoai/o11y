@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type JSX } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import cx from 'classnames';
 import { useIsDarkMode } from 'hooks/useDarkMode';

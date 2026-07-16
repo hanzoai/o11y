@@ -4,6 +4,8 @@ import { TagContainer, TagLabel, TagValue } from './style';
 
 import './OptionRenderer.styles.scss';
 
+import type { JSX } from 'react';
+
 function OptionRenderer({
 	label,
 	value,

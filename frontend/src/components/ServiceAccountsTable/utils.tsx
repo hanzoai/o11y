@@ -4,6 +4,8 @@ import { Tooltip } from 'antd';
 import type { ColumnsType } from 'antd/es/table/interface';
 import { ServiceAccountRow } from 'container/ServiceAccountsSettings/utils';
 
+import type { JSX } from 'react';
+
 export function NameEmailCell({
 	name,
 	email,

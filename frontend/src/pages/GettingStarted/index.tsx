@@ -3,6 +3,8 @@ import { Typography } from 'components/ui/typography';
 import { GetStartedContent } from './renderConfig';
 import DocSection from './Section';
 
+import type { JSX } from 'react';
+
 function InstrumentationPage(): JSX.Element {
 	return (
 		<>

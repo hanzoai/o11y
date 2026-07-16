@@ -1,4 +1,12 @@
-import { HTMLAttributes, memo, ReactNode, useCallback, useEffect, useMemo } from 'react';
+import {
+	HTMLAttributes,
+	memo,
+	ReactNode,
+	useCallback,
+	useEffect,
+	useMemo,
+	type JSX,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { CircleAlert, Compass } from 'components/ui/icons';
 import { Space, Tooltip } from 'antd';

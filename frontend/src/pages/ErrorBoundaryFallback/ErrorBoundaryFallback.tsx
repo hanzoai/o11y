@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { Button } from 'antd';
 import ROUTES from 'constants/routes';
 import { handleContactSupport } from 'container/Integrations/utils';

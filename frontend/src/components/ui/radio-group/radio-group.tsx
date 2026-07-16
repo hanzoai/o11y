@@ -3,7 +3,14 @@ import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import React from 'react';
 import { cn } from '../lib/utils';
 
-export type RadioColorProps = 'robin' | 'forest' | 'amber' | 'sienna' | 'cherry' | 'sakura' | 'aqua';
+export type RadioColorProps =
+	| 'robin'
+	| 'forest'
+	| 'amber'
+	| 'sienna'
+	| 'cherry'
+	| 'sakura'
+	| 'aqua';
 
 export type RadioGroupProps = Pick<
 	React.ComponentPropsWithoutRef<'div'>,
@@ -114,9 +121,11 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
 			data-testid={testId}
 			className={cn(className)}
 			onValueChange={onChange}
-			{...(props as React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>)}
+			{...(props as React.ComponentPropsWithoutRef<
+				typeof RadioGroupPrimitive.Root
+			>)}
 		/>
-	)
+	),
 );
 RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
 
@@ -151,7 +160,7 @@ const RadioGroupItem = React.forwardRef<HTMLButtonElement, RadioGroupItemProps>(
 			onCheck: _onCheck,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const fallbackId = React.useId();
 		const radioId = props.id || fallbackId;
@@ -193,7 +202,7 @@ const RadioGroupItem = React.forwardRef<HTMLButtonElement, RadioGroupItemProps>(
 				<RadioGroupPrimitive.Indicator data-slot="radio-group-indicator" />
 			</RadioGroupPrimitive.Item>
 		);
-	}
+	},
 );
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
 

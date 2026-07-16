@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Pipeline } from 'types/api/pipeline/def';
 
 import PipelineListsView from '../../PipelineListsView';

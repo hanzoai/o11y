@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Button, Tooltip } from 'antd';
 import { Disc3, X } from 'components/ui/icons';
@@ -22,9 +22,9 @@ interface DroppableAreaProps {
 function ExplorerOptionsHideArea({
 	viewName,
 	isQueryUpdated,
-	isExplorerOptionHidden,
+	isExplorerOptionHidden = undefined,
 	sourcepage,
-	setIsExplorerOptionHidden,
+	setIsExplorerOptionHidden = undefined,
 	handleClearSelect,
 	onUpdateQueryHandler,
 	isEditDeleteSupported,
@@ -75,10 +75,5 @@ function ExplorerOptionsHideArea({
 		</div>
 	);
 }
-
-ExplorerOptionsHideArea.defaultProps = {
-	isExplorerOptionHidden: undefined,
-	setIsExplorerOptionHidden: undefined,
-};
 
 export default ExplorerOptionsHideArea;

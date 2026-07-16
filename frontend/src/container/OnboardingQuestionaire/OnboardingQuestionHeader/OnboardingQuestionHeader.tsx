@@ -2,6 +2,8 @@ import { Typography } from 'components/ui/typography';
 
 import barberPoolUrl from '@/assets/svgs/barber-pool.svg';
 
+import type { JSX } from 'react';
+
 interface OnboardingQuestionHeaderProps {
 	title: string;
 	subtitle: string;

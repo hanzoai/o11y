@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, type JSX } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { dragHandler, dropHandler } from './utils';

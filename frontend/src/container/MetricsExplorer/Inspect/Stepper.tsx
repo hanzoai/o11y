@@ -8,6 +8,8 @@ import { InspectionStep, StepperProps } from './types';
 
 import '../../Home/HomeChecklist/HomeChecklist.styles.scss';
 
+import type { JSX } from 'react';
+
 function Stepper({
 	inspectionStep,
 	resetInspection,

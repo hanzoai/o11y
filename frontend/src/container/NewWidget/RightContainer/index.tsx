@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useMemo } from 'react';
+import { Dispatch, SetStateAction, useMemo, type JSX } from 'react';
 import { UseQueryResult } from 'react-query';
 import { Typography } from 'components/ui/typography';
 import { ExecStats } from 'api/v5/v5';
@@ -90,7 +90,7 @@ function RightContainer({
 	combineHistogram,
 	setCombineHistogram,
 	setThresholds,
-	selectedWidget,
+	selectedWidget = undefined,
 	isFillSpans,
 	setIsFillSpans,
 	softMax,
@@ -393,11 +393,5 @@ export interface RightContainerProps {
 	spanGaps: boolean | number;
 	setSpanGaps: Dispatch<SetStateAction<boolean | number>>;
 }
-
-RightContainer.defaultProps = {
-	selectedWidget: undefined,
-	queryResponse: null,
-	enableDrillDown: false,
-};
 
 export default RightContainer;

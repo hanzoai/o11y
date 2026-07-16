@@ -85,9 +85,9 @@ describe('useGetYAxisUnit', () => {
 
 	it('should return undefined yAxisUnit when queryType is DATASTORE', async () => {
 		const mockCurrentQuery = createMockCurrentQuery(EQueryType.DATASTORE);
-		mockUseQueryBuilder.mockReturnValueOnce(({
+		mockUseQueryBuilder.mockReturnValueOnce({
 			currentQuery: mockCurrentQuery,
-		} as Partial<QueryBuilderContextType>) as QueryBuilderContextType);
+		} as Partial<QueryBuilderContextType> as QueryBuilderContextType);
 
 		const { result } = renderHook(() => useGetYAxisUnit());
 

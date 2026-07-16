@@ -1,4 +1,10 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import {
+	useCallback,
+	useLayoutEffect,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { matchPath, useHistory, useLocation } from 'react-router-dom';
 import { Button } from 'components/ui/button';
 import { TooltipSimple } from 'components/ui/tooltip';

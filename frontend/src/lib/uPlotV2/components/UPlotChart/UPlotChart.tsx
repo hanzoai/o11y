@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type JSX } from 'react';
 import * as Sentry from '@sentry/react';
 import { Typography } from 'components/ui/typography';
 import { isEqual } from 'lodash-es';

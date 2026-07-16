@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Info, Search } from 'components/ui/icons';
 import { Popconfirm, PopconfirmProps } from 'antd';
 import type { ColumnType } from 'antd/es/table';
+import type { Key } from 'antd/es/table/interface';
 import ROUTES from 'constants/routes';
 import { routeConfig } from 'container/SideNav/config';
 import { getQueryString } from 'container/SideNav/helper';
@@ -11,6 +12,8 @@ import { ServicesList } from 'types/api/metrics/getService';
 import { filterDropdown } from '../Filter/FilterDropdown';
 
 import '../ServiceApplication.styles.scss';
+
+import type { JSX } from 'react';
 
 const MAX_TOP_LEVEL_OPERATIONS = 2500;
 
@@ -26,11 +29,8 @@ export const getColumnSearchProps = (
 	search: string,
 ): ColumnType<ServicesList> => ({
 	filterDropdown,
-	filterIcon: <Search size="md" />,
-	onFilter: (
-		value: string | number | boolean,
-		record: ServicesList,
-	): boolean => {
+	filterIcon: <Search size={16} />,
+	onFilter: (value: boolean | Key, record: ServicesList): boolean => {
 		if (record[dataIndex]) {
 			return (
 				record[dataIndex]

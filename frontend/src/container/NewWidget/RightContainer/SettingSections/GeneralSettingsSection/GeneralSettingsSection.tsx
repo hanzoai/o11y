@@ -5,6 +5,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import type { InputRef } from 'antd';
 import { AutoComplete, Input } from 'antd';

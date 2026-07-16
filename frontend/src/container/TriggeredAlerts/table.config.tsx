@@ -10,6 +10,8 @@ import styles from './TriggeredAlerts.module.scss';
 import type { Alert, GroupedAlert } from './types';
 import { GroupTagsCell } from 'container/TriggeredAlerts/components/GroupTagsCell';
 
+import type { JSX } from 'react';
+
 export function getAlertColumns(
 	formatTimezoneAdjustedTimestamp: (date: string, format: string) => string,
 ): TableColumnDef<Alert>[] {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Button } from '@hanzo/ui';
 import { Plus } from 'lucide-react';
 import AuthZTooltip from 'components/AuthZTooltip/AuthZTooltip';

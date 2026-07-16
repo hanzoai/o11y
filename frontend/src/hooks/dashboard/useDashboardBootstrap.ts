@@ -50,8 +50,8 @@ export function useDashboardBootstrap(
 	const { setDashboardData, setLayouts, setPanelMap, resetDashboardStore } =
 		useDashboardStore();
 
-	const dashboardRef = useRef<Dashboard>();
-	const modalRef = useRef<ReturnType<typeof Modal.confirm>>();
+	const dashboardRef = useRef<Dashboard>(undefined);
+	const modalRef = useRef<ReturnType<typeof Modal.confirm>>(undefined);
 
 	const isVisible = useTabVisibility();
 

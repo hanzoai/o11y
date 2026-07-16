@@ -12,6 +12,8 @@ import { SaveButton } from './styles';
 import { SaveViewFormProps, SaveViewWithNameProps } from './types';
 import { saveViewHandler } from './utils';
 
+import type { JSX } from 'react';
+
 function SaveViewWithName({
 	sourcePage,
 	handlePopOverClose,

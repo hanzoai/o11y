@@ -2,6 +2,8 @@ import { FullScreenHandle } from 'react-full-screen';
 
 import GraphLayoutContainer from './GridCardLayout';
 
+import type { JSX } from 'react';
+
 interface GridGraphProps {
 	handle: FullScreenHandle;
 	enableDrillDown?: boolean;
@@ -14,7 +16,3 @@ function GridGraph(props: GridGraphProps): JSX.Element {
 }
 
 export default GridGraph;
-
-GridGraph.defaultProps = {
-	enableDrillDown: false,
-};

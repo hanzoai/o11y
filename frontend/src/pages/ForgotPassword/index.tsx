@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import AuthPageContainer from 'components/AuthPageContainer';
 import ROUTES from 'constants/routes';

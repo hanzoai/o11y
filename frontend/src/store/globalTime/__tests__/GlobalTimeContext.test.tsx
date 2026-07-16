@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 import set from 'api/browser/localstorage/set';

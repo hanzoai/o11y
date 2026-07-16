@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, type JSX } from 'react';
 import { useQueries, UseQueryResult } from 'react-query';
 import { Card, Skeleton } from 'antd';
 import { Typography } from 'components/ui/typography';

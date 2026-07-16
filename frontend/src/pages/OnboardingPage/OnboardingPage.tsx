@@ -3,6 +3,8 @@ import { OnboardingContextProvider } from 'container/OnboardingContainer/context
 
 import './OnboardingPage.styles.scss';
 
+import type { JSX } from 'react';
+
 function OnboardingPage(): JSX.Element {
 	return (
 		<OnboardingContextProvider>

@@ -18,7 +18,7 @@ const range = (start: number, end: number): number[] => {
 export const renderPageNumbers = (
 	totalPages: number,
 	current: number,
-	siblingCount = 1
+	siblingCount = 1,
 ): (number | 'ellipsis')[] => {
 	if (totalPages <= 2 * siblingCount + 5) return range(1, totalPages);
 	const leftSiblingIndex = Math.max(current - siblingCount, 1);
@@ -67,19 +67,20 @@ export type PaginationContainerProps = Pick<
 /**
  * Root component for building custom pagination layouts.
  */
-export const PaginationContainer = React.forwardRef<HTMLElement, PaginationContainerProps>(
-	({ className, testId, align = 'start', ...props }, ref) => (
-		<nav
-			ref={ref}
-			data-testid={testId}
-			aria-label="pagination"
-			data-slot="pagination"
-			data-align={align}
-			className={cn('pagination-root', className)}
-			{...props}
-		/>
-	)
-);
+export const PaginationContainer = React.forwardRef<
+	HTMLElement,
+	PaginationContainerProps
+>(({ className, testId, align = 'start', ...props }, ref) => (
+	<nav
+		ref={ref}
+		data-testid={testId}
+		aria-label="pagination"
+		data-slot="pagination"
+		data-align={align}
+		className={cn('pagination-root', className)}
+		{...props}
+	/>
+));
 PaginationContainer.displayName = 'PaginationContainer';
 
 export type PaginationContentProps = Pick<
@@ -91,17 +92,18 @@ export type PaginationContentProps = Pick<
 };
 
 /** Wrapper for the list of pagination items. */
-export const PaginationContent = React.forwardRef<HTMLUListElement, PaginationContentProps>(
-	({ className, testId, ...props }, ref) => (
-		<ul
-			ref={ref}
-			data-testid={testId}
-			data-slot="pagination-content"
-			className={cn('pagination-content', className)}
-			{...props}
-		/>
-	)
-);
+export const PaginationContent = React.forwardRef<
+	HTMLUListElement,
+	PaginationContentProps
+>(({ className, testId, ...props }, ref) => (
+	<ul
+		ref={ref}
+		data-testid={testId}
+		data-slot="pagination-content"
+		className={cn('pagination-content', className)}
+		{...props}
+	/>
+));
 PaginationContent.displayName = 'PaginationContent';
 
 export type PaginationItemProps = Pick<
@@ -113,17 +115,18 @@ export type PaginationItemProps = Pick<
 };
 
 /** Wraps each pagination control (link, previous/next button, or ellipsis). */
-export const PaginationItem = React.forwardRef<HTMLLIElement, PaginationItemProps>(
-	({ className, testId, ...props }, ref) => (
-		<li
-			ref={ref}
-			data-testid={testId}
-			data-slot="pagination-item"
-			className={cn('pagination-item', className)}
-			{...props}
-		/>
-	)
-);
+export const PaginationItem = React.forwardRef<
+	HTMLLIElement,
+	PaginationItemProps
+>(({ className, testId, ...props }, ref) => (
+	<li
+		ref={ref}
+		data-testid={testId}
+		data-slot="pagination-item"
+		className={cn('pagination-item', className)}
+		{...props}
+	/>
+));
 PaginationItem.displayName = 'PaginationItem';
 
 export type PaginationLinkProps = {
@@ -139,8 +142,14 @@ export type PaginationLinkProps = {
 } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'color'>;
 
 /** Button for a specific page number. Set `isActive` when it is the current page. */
-export const PaginationLink = React.forwardRef<HTMLButtonElement, PaginationLinkProps>(
-	({ className, testId, isActive, size = 'icon', disabled, children, ...props }, ref) => (
+export const PaginationLink = React.forwardRef<
+	HTMLButtonElement,
+	PaginationLinkProps
+>(
+	(
+		{ className, testId, isActive, size = 'icon', disabled, children, ...props },
+		ref,
+	) => (
 		<button
 			ref={ref}
 			type="button"
@@ -156,46 +165,59 @@ export const PaginationLink = React.forwardRef<HTMLButtonElement, PaginationLink
 		>
 			{children}
 		</button>
-	)
+	),
 );
 PaginationLink.displayName = 'PaginationLink';
 
-export type PaginationNavProps = Omit<PaginationLinkProps, 'children' | 'isActive'>;
+export type PaginationNavProps = Omit<
+	PaginationLinkProps,
+	'children' | 'isActive'
+>;
 
 /** Button to navigate to the previous page. Disable when on the first page. */
-export const PaginationPrevious = React.forwardRef<HTMLButtonElement, PaginationNavProps>(
-	({ className, testId, disabled, size = 'icon', ...props }, ref) => (
-		<PaginationLink
-			ref={ref}
-			testId={testId}
-			aria-label="Go to previous page"
-			size={size}
-			className={cn(className)}
-			disabled={disabled}
-			{...props}
-		>
-			<ChevronLeft data-slot="pagination-nav-icon" className="pagination-nav-icon" size={16} />
-		</PaginationLink>
-	)
-);
+export const PaginationPrevious = React.forwardRef<
+	HTMLButtonElement,
+	PaginationNavProps
+>(({ className, testId, disabled, size = 'icon', ...props }, ref) => (
+	<PaginationLink
+		ref={ref}
+		testId={testId}
+		aria-label="Go to previous page"
+		size={size}
+		className={cn(className)}
+		disabled={disabled}
+		{...props}
+	>
+		<ChevronLeft
+			data-slot="pagination-nav-icon"
+			className="pagination-nav-icon"
+			size={16}
+		/>
+	</PaginationLink>
+));
 PaginationPrevious.displayName = 'PaginationPrevious';
 
 /** Button to navigate to the next page. Disable when on the last page. */
-export const PaginationNext = React.forwardRef<HTMLButtonElement, PaginationNavProps>(
-	({ className, testId, disabled, size, ...props }, ref) => (
-		<PaginationLink
-			ref={ref}
-			testId={testId}
-			aria-label="Go to next page"
-			size={size}
-			className={cn(className)}
-			disabled={disabled}
-			{...props}
-		>
-			<ChevronRight data-slot="pagination-nav-icon" className="pagination-nav-icon" size={16} />
-		</PaginationLink>
-	)
-);
+export const PaginationNext = React.forwardRef<
+	HTMLButtonElement,
+	PaginationNavProps
+>(({ className, testId, disabled, size, ...props }, ref) => (
+	<PaginationLink
+		ref={ref}
+		testId={testId}
+		aria-label="Go to next page"
+		size={size}
+		className={cn(className)}
+		disabled={disabled}
+		{...props}
+	>
+		<ChevronRight
+			data-slot="pagination-nav-icon"
+			className="pagination-nav-icon"
+			size={16}
+		/>
+	</PaginationLink>
+));
 PaginationNext.displayName = 'PaginationNext';
 
 export type PaginationEllipsisProps = Pick<
@@ -207,23 +229,24 @@ export type PaginationEllipsisProps = Pick<
 };
 
 /** Placeholder for omitted page numbers when there are many pages. */
-export const PaginationEllipsis = React.forwardRef<HTMLSpanElement, PaginationEllipsisProps>(
-	({ className, testId, ...props }, ref) => (
-		<span
-			ref={ref}
-			data-testid={testId}
-			aria-hidden
-			data-slot="pagination-ellipsis"
-			className={cn('pagination-ellipsis', className)}
-			{...props}
-		>
-			<Minus height="100%" width={32} />{' '}
-			<span data-slot="pagination-sr-only" className="pagination-sr-only">
-				More pages
-			</span>
+export const PaginationEllipsis = React.forwardRef<
+	HTMLSpanElement,
+	PaginationEllipsisProps
+>(({ className, testId, ...props }, ref) => (
+	<span
+		ref={ref}
+		data-testid={testId}
+		aria-hidden
+		data-slot="pagination-ellipsis"
+		className={cn('pagination-ellipsis', className)}
+		{...props}
+	>
+		<Minus height="100%" width={32} />{' '}
+		<span data-slot="pagination-sr-only" className="pagination-sr-only">
+			More pages
 		</span>
-	)
-);
+	</span>
+));
 PaginationEllipsis.displayName = 'PaginationEllipsis';
 
 /* -------------------------------------------------------------------------- */
@@ -255,12 +278,22 @@ export type PaginationProps = PaginationContainerProps & {
  */
 export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
 	(
-		{ total, pageSize = 10, current: controlledCurrent, defaultCurrent = 1, onPageChange, className, align = 'start', testId, ...props },
-		ref
+		{
+			total,
+			pageSize = 10,
+			current: controlledCurrent,
+			defaultCurrent = 1,
+			onPageChange,
+			className,
+			align = 'start',
+			testId,
+			...props
+		},
+		ref,
 	) => {
 		const totalPages = Math.ceil(total / pageSize);
 		const [internalCurrent, setInternalCurrent] = React.useState(
-			controlledCurrent ?? defaultCurrent
+			controlledCurrent ?? defaultCurrent,
 		);
 		React.useEffect(() => {
 			if (controlledCurrent !== undefined) setInternalCurrent(controlledCurrent);
@@ -278,7 +311,13 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
 		if (totalPages <= 1) return null;
 
 		return (
-			<PaginationContainer ref={ref} className={className} align={align} testId={testId} {...props}>
+			<PaginationContainer
+				ref={ref}
+				className={className}
+				align={align}
+				testId={testId}
+				{...props}
+			>
 				<PaginationContent>
 					<PaginationItem>
 						<PaginationPrevious
@@ -309,6 +348,6 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(
 				</PaginationContent>
 			</PaginationContainer>
 		);
-	}
+	},
 );
 Pagination.displayName = 'Pagination';

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, type JSX } from 'react';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { Antenna } from 'components/ui/icons';
 import { ColumnUnit } from 'types/api/dashboard/getAll';

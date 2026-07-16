@@ -4,6 +4,8 @@ import { CustomColorProps } from './types';
 
 import './CustomColor.styles.scss';
 
+import type { JSX } from 'react';
+
 function CustomColor({ color }: CustomColorProps): JSX.Element {
 	return (
 		<div className="custom-color-container">

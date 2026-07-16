@@ -1,6 +1,8 @@
 import { PencilLine } from 'components/ui/icons';
 import { iconStyle, smallIconStyle } from '../../config';
 
+import type { JSX } from 'react';
+
 function EditAction({
 	isPipelineAction,
 	editAction,

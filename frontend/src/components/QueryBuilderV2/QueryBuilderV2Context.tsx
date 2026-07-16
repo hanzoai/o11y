@@ -2,11 +2,11 @@ import {
 	// eslint-disable-next-line no-restricted-imports
 	createContext,
 	ReactNode,
-	useCallback,
-	// eslint-disable-next-line no-restricted-imports
+	useCallback, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 
 // Types for the context state

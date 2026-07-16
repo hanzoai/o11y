@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type JSX } from 'react';
 import { Card, Modal } from 'antd';
 import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';

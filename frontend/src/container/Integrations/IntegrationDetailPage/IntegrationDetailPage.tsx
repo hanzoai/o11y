@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { Button } from 'components/ui/button';
 import { Flex, Skeleton } from 'antd';

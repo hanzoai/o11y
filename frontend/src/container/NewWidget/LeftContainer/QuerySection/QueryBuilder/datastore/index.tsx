@@ -7,6 +7,8 @@ import DOCLINKS from 'utils/docLinks';
 import { QueryButton } from '../../styles';
 import DatastoreQueryBuilder from './query';
 
+import type { JSX } from 'react';
+
 function DatastoreQueryContainer(): JSX.Element | null {
 	const { currentQuery, addNewQueryItem } = useQueryBuilder();
 	const addQueryHandler = (): void => {
@@ -25,7 +27,7 @@ function DatastoreQueryContainer(): JSX.Element | null {
 			))}
 			<QueryButton
 				onClick={addQueryHandler}
-				icon={<Plus size="md" />}
+				icon={<Plus size={16} />}
 				style={{ margin: '0.4rem 1rem' }}
 			>
 				Query

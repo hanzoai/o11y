@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import cx from 'classnames';
 import type { Timezone } from 'components/CustomTimePicker/timezoneUtils';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';

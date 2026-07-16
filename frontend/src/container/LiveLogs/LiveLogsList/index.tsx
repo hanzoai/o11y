@@ -1,4 +1,4 @@
-import type { CSSProperties, MouseEvent, ReactNode } from 'react';
+import type { CSSProperties, MouseEvent, ReactNode, JSX } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
@@ -189,7 +189,6 @@ function LiveLogsList({
 		<div className="live-logs-list">
 			{(formattedLogs.length === 0 || isLoading || isLoadingList) &&
 				renderLoading()}
-
 			{formattedLogs.length !== 0 && (
 				<InfinityWrapperStyled>
 					{options.format === OptionFormatTypes.TABLE ? (
@@ -210,6 +209,7 @@ function LiveLogsList({
 										isDarkMode,
 										getLogIndicatorType(log),
 									),
+
 									'--row-hover-bg': getRowBackgroundColor(
 										isDarkMode,
 										getLogIndicatorType(log),
@@ -247,7 +247,6 @@ function LiveLogsList({
 					)}
 				</InfinityWrapperStyled>
 			)}
-
 			{activeLog && selectedTab && (
 				<LogDetail
 					selectedTab={selectedTab}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useMutation } from 'react-query';
 import { Badge } from 'components/ui/badge';
 import { Switch } from 'components/ui/switch';
@@ -196,8 +196,8 @@ function MySettings(): JSX.Element {
 						</div>
 
 						<div className="user-preference-section-content-item-description">
-							Select if Hanzo&apos;s appearance should be light, dark, or
-							automatically follow your system preference
+							Select if Hanzo&apos;s appearance should be light, dark, or automatically
+							follow your system preference
 						</div>
 
 						{autoSwitch && (

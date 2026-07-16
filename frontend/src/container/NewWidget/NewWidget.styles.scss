@@ -42,23 +42,23 @@
 	}
 }
 
-	.save-btn {
-		display: flex;
-		height: 32px;
-		width: 121px;
-		padding: 4px 12px 4px 10px;
-		justify-content: center;
-		align-items: center;
-		gap: 4px;
-		border-radius: 2px;
-		background: var(--bg-robin-500);
-		color: var(--bg-vanilla-100);
-		text-align: center;
-		font-family: 'Geist Sans';
-		font-size: 12px;
-		font-style: normal;
-		font-weight: 500;
-		line-height: 18px; /* 150% */
+.save-btn {
+	display: flex;
+	height: 32px;
+	width: 121px;
+	padding: 4px 12px 4px 10px;
+	justify-content: center;
+	align-items: center;
+	gap: 4px;
+	border-radius: 2px;
+	background: var(--bg-robin-500);
+	color: var(--bg-vanilla-100);
+	text-align: center;
+	font-family: 'Geist Sans';
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 500;
+	line-height: 18px; /* 150% */
 
 	.resizable-panel-right-container {
 		overflow-y: auto !important;

@@ -54,9 +54,7 @@ export const spanServiceNameToColorMapping = (
 
 		allServiceMap.set(
 			spanItem[3],
-			o11yUiColorKeyIndex === -1
-				? undefined
-				: spanItem[8][o11yUiColorKeyIndex],
+			o11yUiColorKeyIndex === -1 ? undefined : spanItem[8][o11yUiColorKeyIndex],
 		);
 	});
 

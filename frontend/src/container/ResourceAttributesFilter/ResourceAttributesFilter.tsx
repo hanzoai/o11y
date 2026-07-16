@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState, type JSX } from 'react';
 import { SolidXCircle } from 'components/ui/icons';
 import { Button, Select, Spin } from 'antd';
 import useResourceAttribute, {
@@ -22,7 +22,7 @@ import { QueryChipItem, SearchContainer } from './styles';
 import './ResourceAttributesFilter.styles.scss';
 
 function ResourceAttributesFilter({
-	suffixIcon,
+	suffixIcon = undefined,
 }: ResourceAttributesFilterProps): JSX.Element | null {
 	const {
 		queries,
@@ -162,9 +162,5 @@ function ResourceAttributesFilter({
 interface ResourceAttributesFilterProps {
 	suffixIcon?: ReactNode;
 }
-
-ResourceAttributesFilter.defaultProps = {
-	suffixIcon: undefined,
-};
 
 export default ResourceAttributesFilter;

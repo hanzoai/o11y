@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, type JSX } from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-use';
 import { AxiosError } from 'axios';

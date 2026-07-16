@@ -1,10 +1,10 @@
 import { RefObject, useCallback, useEffect } from 'react';
 
 export function useCanvasSetup(
-	canvasRef: RefObject<HTMLCanvasElement>,
-	containerRef: RefObject<HTMLDivElement>,
+	canvasRef: RefObject<HTMLCanvasElement | null>,
+	containerRef: RefObject<HTMLDivElement | null>,
 	onDraw: () => void,
-	overlayCanvasRef?: RefObject<HTMLCanvasElement>,
+	overlayCanvasRef?: RefObject<HTMLCanvasElement | null>,
 ): void {
 	const updateCanvasSize = useCallback(() => {
 		const canvas = canvasRef.current;

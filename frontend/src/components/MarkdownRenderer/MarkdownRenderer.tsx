@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 
-import ReactMarkdown from 'react-markdown';
-import { CodeProps } from 'react-markdown/lib/ast-to-react';
+import ReactMarkdown, { type ExtraProps } from 'react-markdown';
 import logEvent from 'api/common/logEvent';
 import { isEmpty } from 'lodash-es';
 import rehypeRaw from 'rehype-raw';
 
 import CodeCopyBtn from './CodeCopyBtn/CodeCopyBtn';
 import SyntaxHighlighter, { a11yDark } from './syntaxHighlighter';
+
+import type { ComponentProps, JSX } from 'react';
 
 interface LinkProps {
 	href: string;
@@ -42,13 +43,12 @@ function Pre({
 }
 
 function Code({
-	inline,
 	className = 'blog-code',
 	children,
 	...props
-}: CodeProps): JSX.Element {
+}: ComponentProps<'code'> & ExtraProps): JSX.Element {
 	const match = /language-(\w+)/.exec(className || '');
-	return !inline && match ? (
+	return match ? (
 		<SyntaxHighlighter
 			// @ts-expect-error
 			style={a11yDark}
@@ -98,8 +98,8 @@ function CustomTag({ color }: { color: string }): JSX.Element {
 function MarkdownRenderer({
 	markdownContent,
 	variables,
-	trackCopyAction,
-	elementDetails,
+	trackCopyAction = false,
+	elementDetails = {},
 	className,
 }: {
 	markdownContent: any;
@@ -113,7 +113,7 @@ function MarkdownRenderer({
 	return (
 		<ReactMarkdown
 			className={className}
-			rehypePlugins={[rehypeRaw as any]}
+			rehypePlugins={[rehypeRaw]}
 			components={{
 				// @ts-expect-error
 				a: Link,
@@ -131,10 +131,5 @@ function MarkdownRenderer({
 		</ReactMarkdown>
 	);
 }
-
-MarkdownRenderer.defaultProps = {
-	elementDetails: {},
-	trackCopyAction: false,
-};
 
 export { Code, Link, MarkdownRenderer, Pre };

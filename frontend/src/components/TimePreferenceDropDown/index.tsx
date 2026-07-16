@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
+import {
+	Dispatch,
+	SetStateAction,
+	useCallback,
+	useMemo,
+	type JSX,
+} from 'react';
 import { ChevronDown, Globe } from 'components/ui/icons';
 import { DropdownMenuSimple } from 'components/ui/dropdown-menu';
 import { Button } from 'antd';
@@ -45,7 +51,7 @@ function TimePreference({
 						{selectedTime.name}
 					</Typography.Text>
 				</div>
-				<ChevronDown size="md" />
+				<ChevronDown size={16} />
 			</Button>
 		</DropdownMenuSimple>
 	);

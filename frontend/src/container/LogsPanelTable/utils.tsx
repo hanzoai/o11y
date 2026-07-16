@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { TableColumnsType as ColumnsType } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { TimestampInput } from 'hooks/useTimezoneFormatter/useTimezoneFormatter';

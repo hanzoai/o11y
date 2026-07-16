@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState, type JSX } from 'react';
 import { Input } from 'components/ui/input';
 import { Button, Modal } from 'antd';
 import { Typography } from 'components/ui/typography';

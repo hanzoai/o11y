@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { MarkdownRenderer } from 'components/MarkdownRenderer/MarkdownRenderer';
 import { QueryParams } from 'constants/query';
 import { ApmDocFilePaths } from 'container/OnboardingContainer/constants/apmDocFilePaths';

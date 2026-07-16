@@ -8,6 +8,8 @@ import awwSnapUrl from '@/assets/Icons/awwSnap.svg';
 
 import styles from './EntityError.module.scss';
 
+import type { JSX } from 'react';
+
 export default function EntityError(): JSX.Element {
 	const { isCloudUser: isCloudUserVal } = useGetTenantLicense();
 
