@@ -40,6 +40,32 @@ consistent upstream version. Keep it that way: bump by re-syncing to a newer O11
 The real server binary is `./cmd/community` (NOT `./cmd/server`, which does not
 exist). Build check: `GOPRIVATE='github.com/hanzoai/*' GOSUMDB=off go build ./cmd/community`.
 
+### go.mod is paired with the ci.yaml cloud pin — bump BOTH or CI goes red
+
+Root `mount.go` imports `github.com/hanzoai/cloud`, and go.mod resolves it via
+`replace => ../cloud`. There is no such sibling in CI, so `ci.yaml` checks one out
+**at an exact commit** (`ref:` under "Checkout hanzoai/cloud") — deliberately, since
+cloud's `main` drifts independently. That makes go.mod and the ci.yaml ref **ONE fact
+in two places**: touch either alone and `go build ./...` dies with the misleading
+`go: updates to go.mod needed; to update it: go mod tidy`. This kept CI red for weeks.
+
+To re-tidy: `go mod tidy` against the sibling, then **bump the ci.yaml `ref` to the
+same cloud commit in the same PR**. Two traps:
+
+- Tidy resolves against **whatever `../cloud` is checked out right now** — that clone
+  is a working copy, often on someone's feature branch, and it moves under you. Derive
+  versions from the commit you are pinning (`git -C ../cloud show <sha>:go.mod`), not
+  from the branch that happens to be there. Same class of hazard as the stale luxfi
+  clones.
+- The resulting version jumps are **not upgrade decisions** — MVS forces them, because
+  cloud already requires them. Do not "fix" them back down; re-pair the two sides.
+
+Since a green build is NOT sufficient evidence (`hanzoai/zip` → `zap-proto/zip` can
+boot-panic while CI stays green), smoke-test the binary: it must reach
+`Query server started listening on 0.0.0.0:8080`. `TestEmailRejected`
+(`alertmanagernotify/email`) fails on any go.mod — upstream string mismatch; ci.yaml
+already `-skip`s it by name.
+
 ## Container image (`ghcr.io/hanzoai/o11y`)
 
 Root `Dockerfile` + `.github/workflows/docker.yaml` build a standalone community
@@ -123,6 +149,33 @@ identn middleware's `IsMyOwnedKey` check — do **not** switch to `singlesharder
 data (llmobs observations/scores/sessions, dashboards, …) is scoped by
 `claims.OrgID`; ClickHouse telemetry is isolated only insofar as the emit path tags
 the same org id via resource attributes.
+
+## No third-party trackers — analytics is Insights, support chat is Hanzo Chat
+
+o11y ships **zero** third-party SaaS trackers. The upstream fork wired in product
+analytics, onboarding tours and a support-chat widget, and the frontend build gated
+each on `VITE_*_ENABLED !== 'false'` — **opt-OUT**, so an operator who set nothing
+shipped all three: a self-hosted observability tool phoning home to third parties with
+its users' data, `index.html` injecting vendor `<script>` tags on every page load, and
+the chat block HMAC-hashing the logged-in user's email for the vendor. All removed
+(`web.Settings`/`SettingsConfig`, `docs/config/web-settings.json`, index.html, vite
+defines, window typings). Do not reintroduce them.
+
+**Sentry stays** — our own fork (`hanzoai/sentry`) — and is **opt-IN** (`=== 'true'`).
+Product analytics is Hanzo Insights (`@hanzo/insights`, first-party). `logEvent` →
+`/event` on our own backend is likewise first-party; it is not a tracker.
+
+`frontend/src/types/generated/webSettings.ts` is GENERATED from
+`docs/config/web-settings.json` — edit the schema and run
+`pnpm generate:config:web-settings`, never hand-edit the `.ts`.
+
+Support chat is **one way**: `utils/supportChat.ts` → `openSupportChat()` (Hanzo Chat).
+All call sites (SideNav, Support, LaunchChatSupport) route through it — no per-component
+chat integration. It delegates to `utils/navigation.ts` → `openInNewTab`, which the
+repo's own `o11y/no-raw-absolute-path` lint rule mandates over a bare `window.open`
+(`withBasePath` passes external URLs through untouched). `openInNewTab` passes
+`noopener`: `window.open`, unlike `<a target="_blank">`, does not imply it, and without
+it every opened tab can navigate us back via `window.opener` (reverse tabnabbing).
 
 ## Config env naming (debranded — no O11Y/CLICKHOUSE)
 
