@@ -2,6 +2,8 @@ import { IconListStyle } from '../styles';
 import DeleteAction from './TableActions/DeleteAction';
 import EditAction from './TableActions/EditAction';
 
+import type { JSX } from 'react';
+
 function ProcessorActions({
 	editAction,
 	deleteAction,

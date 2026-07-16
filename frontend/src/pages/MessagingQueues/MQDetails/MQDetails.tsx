@@ -1,4 +1,11 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import {
+	Dispatch,
+	SetStateAction,
+	useEffect,
+	useMemo,
+	useState,
+	type JSX,
+} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { ToggleGroupSimple } from 'components/ui/toggle-group';

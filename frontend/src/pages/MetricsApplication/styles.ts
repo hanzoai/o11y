@@ -27,7 +27,9 @@ export const Typography = styled(TypographyComponent)`
 	}
 `;
 
-export const SaveAndCancelContainer = styled.div<HTMLAttributes<HTMLDivElement>>`
+export const SaveAndCancelContainer = styled.div<
+	HTMLAttributes<HTMLDivElement>
+>`
 	display: flex;
 	justify-content: flex-end;
 	margin-right: 1rem;

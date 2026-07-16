@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
 import { useCopyToClipboard } from 'react-use';
@@ -1701,7 +1701,6 @@ function MultiIngestionSettings(): JSX.Element {
 					className="ingestion-keys-table"
 				/>
 			</div>
-
 			{/* Delete Key Modal */}
 			<Modal
 				className="delete-ingestion-key-modal"
@@ -1741,7 +1740,6 @@ function MultiIngestionSettings(): JSX.Element {
 					})}
 				</Typography.Text>
 			</Modal>
-
 			{/* Delete Limit Modal */}
 			<Modal
 				className="delete-ingestion-key-modal"
@@ -1782,7 +1780,6 @@ function MultiIngestionSettings(): JSX.Element {
 					})}
 				</Typography.Text>
 			</Modal>
-
 			{/* Edit Modal */}
 			<Modal
 				className="ingestion-key-modal"
@@ -1852,7 +1849,6 @@ function MultiIngestionSettings(): JSX.Element {
 					</Form.Item>
 				</Form>
 			</Modal>
-
 			{/* Create New Key Modal */}
 			<Modal
 				className="ingestion-key-modal"

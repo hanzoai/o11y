@@ -8,7 +8,7 @@ import { convertTimeToRelevantUnit } from 'container/TraceDetail/utils';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { useTraceStore } from 'pages/TraceDetailsV3/stores/traceStore';
 import { getSpanAttribute, resolveSpanColor } from 'pages/TraceDetailsV3/utils';
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { SpanV3 } from 'types/api/trace/getTraceV3';
 import { toFixed } from 'utils/toFixed';
 

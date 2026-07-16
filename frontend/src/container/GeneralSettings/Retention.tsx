@@ -6,6 +6,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { Input as O11yInput } from 'components/ui/input';
 import { Col, Row, Select } from 'antd';
@@ -186,8 +187,4 @@ interface RetentionProps {
 	compact?: boolean;
 }
 
-Retention.defaultProps = {
-	isS3Field: false,
-	compact: false,
-};
 export default Retention;

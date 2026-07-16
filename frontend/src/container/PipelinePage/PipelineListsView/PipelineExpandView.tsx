@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, type JSX } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useTranslation } from 'react-i18next';
@@ -242,10 +242,6 @@ function PipelineExpandView({
 		</DndProvider>
 	);
 }
-
-PipelineExpandView.defaultProps = {
-	expandedPipelineData: {},
-};
 
 interface PipelineExpandViewProps {
 	handleAlert: (props: AlertMessage) => void;

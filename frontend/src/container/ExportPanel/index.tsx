@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type JSX } from 'react';
 import { Modal } from 'antd';
 import { Dashboard } from 'types/api/dashboard/getAll';
 import { Query } from 'types/api/queryBuilder/queryBuilderData';
@@ -6,7 +6,7 @@ import { Query } from 'types/api/queryBuilder/queryBuilderData';
 import ExportPanelContainer from './ExportPanelContainer';
 
 function ExportPanel({
-	isLoading,
+	isLoading = false,
 	onExport,
 	query,
 }: ExportPanelProps): JSX.Element {
@@ -43,7 +43,5 @@ export interface ExportPanelProps {
 	onExport: (dashboard: Dashboard | null, isNewDashboard?: boolean) => void;
 	query: Query | null;
 }
-
-ExportPanel.defaultProps = { isLoading: false };
 
 export default ExportPanel;

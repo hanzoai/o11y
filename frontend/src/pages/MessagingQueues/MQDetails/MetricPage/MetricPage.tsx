@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
@@ -40,7 +40,7 @@ function CollapsibleMetricSection({
 	graphCount,
 	isCollapsed,
 	onToggle,
-	checkIfDataExists,
+	checkIfDataExists = undefined,
 }: CollapsibleMetricSectionProps): JSX.Element {
 	const isDarkMode = useIsDarkMode();
 
@@ -77,10 +77,6 @@ function CollapsibleMetricSection({
 		</div>
 	);
 }
-
-CollapsibleMetricSection.defaultProps = {
-	checkIfDataExists: undefined,
-};
 
 function MetricPage(): JSX.Element {
 	const [collapsedSections, setCollapsedSections] = useState<{

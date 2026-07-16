@@ -18,6 +18,8 @@ import { IDashboardVariable } from 'types/api/dashboard/getAll';
 
 import DashboardVariableSelection from '../DashboardVariableSelection';
 
+import type { JSX } from 'react';
+
 // Mutable container to capture the onValueUpdate callback from VariableItem
 const mockVariableItemCallbacks: {
 	onValueUpdate?: (

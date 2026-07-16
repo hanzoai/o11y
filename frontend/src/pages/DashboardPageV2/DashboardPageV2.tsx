@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 function DashboardPageV2(): JSX.Element {
 	return <>DashboardPageV2</>;
 }

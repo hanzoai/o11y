@@ -5,6 +5,8 @@ import { AlertRuleStats, AlertRuleTopContributors } from 'types/api/alerts/def';
 
 import TopContributorsRows from './TopContributorsRows';
 
+import type { JSX } from 'react';
+
 function ViewAllDrawer({
 	isViewAllVisible,
 	toggleViewAllDrawer,

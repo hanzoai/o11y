@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import ROUTES from 'constants/routes';
 import LiveLogsPauseResume from 'container/LiveLogs/LiveLogsPauseResume/LiveLogsPauseResume';
@@ -21,13 +21,13 @@ interface ToolbarProps {
 
 export default function Toolbar({
 	showAutoRefresh,
-	leftActions,
-	rightActions,
-	showOldCTA,
-	warningElement,
-	showLiveLogs,
-	onGoLive,
-	onExitLiveLogs,
+	leftActions = <div />,
+	rightActions = <div />,
+	showOldCTA = false,
+	warningElement = <div />,
+	showLiveLogs = false,
+	onGoLive = (): void => noop(),
+	onExitLiveLogs = (): void => {},
 }: ToolbarProps): JSX.Element {
 	const { pathname } = useLocation();
 
@@ -65,13 +65,3 @@ export default function Toolbar({
 		</div>
 	);
 }
-
-Toolbar.defaultProps = {
-	leftActions: <div />,
-	rightActions: <div />,
-	showOldCTA: false,
-	warningElement: <div />,
-	showLiveLogs: false,
-	onGoLive: (): void => noop(),
-	onExitLiveLogs: (): void => {},
-};

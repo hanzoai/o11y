@@ -16,8 +16,8 @@ import {
 } from '../utils';
 
 interface UseFlamegraphDrawArgs {
-	canvasRef: RefObject<HTMLCanvasElement>;
-	containerRef: RefObject<HTMLDivElement>;
+	canvasRef: RefObject<HTMLCanvasElement | null>;
+	containerRef: RefObject<HTMLDivElement | null>;
 	spans: FlamegraphSpan[][];
 	connectors: ConnectorLine[];
 	viewStartTs: number;
@@ -36,8 +36,8 @@ interface UseFlamegraphDrawArgs {
 
 interface UseFlamegraphDrawResult {
 	drawFlamegraph: () => void;
-	spanRectsRef: RefObject<SpanRect[]>;
-	eventRectsRef: RefObject<EventRect[]>;
+	spanRectsRef: RefObject<SpanRect[] | null>;
+	eventRectsRef: RefObject<EventRect[] | null>;
 }
 
 const OVERSCAN_ROWS = 4;

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Progress, TableColumnType as ColumnType, Tag, Tooltip } from 'antd';
 import { Badge } from 'components/ui/badge';
@@ -15,7 +15,12 @@ import { convertNanoToMilliseconds } from 'container/MetricsExplorer/Summary/uti
 import dayjs from 'dayjs';
 import { GetQueryResultsProps } from 'lib/dashboard/getQueryResults';
 import { cloneDeep } from 'lodash-es';
-import { ArrowUpDown, ChevronDown, ChevronRight, Info } from 'components/ui/icons';
+import {
+	ArrowUpDown,
+	ChevronDown,
+	ChevronRight,
+	Info,
+} from 'components/ui/icons';
 import { getWidgetQuery } from 'pages/MessagingQueues/MQDetails/MetricPage/MetricPageUtil';
 import { Widgets } from 'types/api/dashboard/getAll';
 import { MetricRangePayloadProps } from 'types/api/metrics/getQueryRange';

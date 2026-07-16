@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useMutation } from 'react-query';
 import { Button, Modal, Skeleton, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
@@ -292,8 +292,7 @@ function IntegrationDetailHeader(
 						<div className="data-test-connection">
 							<div className="last-data">
 								We have not received data from your {title} Instance yet. You need to
-								manually configure your {title} instance to start sending data to
-								Hanzo.
+								manually configure your {title} instance to start sending data to Hanzo.
 							</div>
 							<div className="last-data">
 								If you have already configured your resources to send data, sit tight

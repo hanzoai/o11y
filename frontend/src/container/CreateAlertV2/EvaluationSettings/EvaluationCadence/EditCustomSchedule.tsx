@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Button } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { useCreateAlertState } from 'container/CreateAlertV2/context';

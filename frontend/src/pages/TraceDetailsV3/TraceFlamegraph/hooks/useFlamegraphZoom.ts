@@ -22,7 +22,7 @@ import { ITraceMetadata } from '../types';
 import { clamp } from '../utils';
 
 interface UseFlamegraphZoomArgs {
-	canvasRef: RefObject<HTMLCanvasElement>;
+	canvasRef: RefObject<HTMLCanvasElement | null>;
 	traceMetadata: ITraceMetadata;
 	viewStartRef: MutableRefObject<number>;
 	viewEndRef: MutableRefObject<number>;
@@ -38,7 +38,7 @@ interface UseFlamegraphZoomResult {
 }
 
 function getCanvasPointer(
-	canvasRef: RefObject<HTMLCanvasElement>,
+	canvasRef: RefObject<HTMLCanvasElement | null>,
 	clientX: number,
 ): { cssX: number; cssWidth: number } | null {
 	const canvas = canvasRef.current;

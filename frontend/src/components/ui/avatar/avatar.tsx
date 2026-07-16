@@ -19,8 +19,10 @@ export type AvatarColor =
 	| 'aqua'
 	| 'vanilla';
 
-export interface AvatarProps
-	extends Pick<React.ComponentProps<'span'>, 'className' | 'children' | 'id' | 'style'> {
+export interface AvatarProps extends Pick<
+	React.ComponentProps<'span'>,
+	'className' | 'children' | 'id' | 'style'
+> {
 	size?: AvatarSize;
 	src?: string;
 	alt?: string;
@@ -40,11 +42,22 @@ const colorMap: Partial<Record<AvatarColor, AvatarColor>> = {
 
 export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
 	(
-		{ className, size = 'md', src, alt, shape = 'circle', color, loading = false, testId, children, ...props },
-		ref
+		{
+			className,
+			size = 'md',
+			src,
+			alt,
+			shape = 'circle',
+			color,
+			loading = false,
+			testId,
+			children,
+			...props
+		},
+		ref,
 	) => {
 		const [imgError, setImgError] = React.useState(false);
-		const resolvedColor = color ? colorMap[color] ?? color : undefined;
+		const resolvedColor = color ? (colorMap[color] ?? color) : undefined;
 		return (
 			<span
 				ref={ref}
@@ -74,6 +87,6 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(
 				)}
 			</span>
 		);
-	}
+	},
 );
 Avatar.displayName = 'Avatar';

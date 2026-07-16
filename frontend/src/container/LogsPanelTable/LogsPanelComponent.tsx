@@ -5,6 +5,7 @@ import {
 	useCallback,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import { UseQueryResult } from 'react-query';
 import LogDetail from 'components/LogDetail';

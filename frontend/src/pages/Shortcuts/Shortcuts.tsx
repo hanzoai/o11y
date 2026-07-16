@@ -5,6 +5,8 @@ import { ALL_SHORTCUTS, generateTableData, shortcutColumns } from './utils';
 
 import './Shortcuts.styles.scss';
 
+import type { JSX } from 'react';
+
 function Shortcuts(): JSX.Element {
 	function getShortcutTable(shortcutSection: string): JSX.Element {
 		const tableData = generateTableData(shortcutSection);

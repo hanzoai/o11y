@@ -5,6 +5,8 @@ import LogsExplorer from 'pages/LogsExplorer';
 import Pipelines from 'pages/Pipelines';
 import SaveView from 'pages/SaveView';
 
+import type { JSX } from 'react';
+
 export const logsExplorer: TabRoutes = {
 	Component: (): JSX.Element => <LogsExplorer />,
 	name: (

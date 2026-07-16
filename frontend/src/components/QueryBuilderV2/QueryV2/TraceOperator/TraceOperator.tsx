@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { Button, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
 import cx from 'classnames';

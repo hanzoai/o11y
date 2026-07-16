@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
@@ -209,10 +209,5 @@ interface AutoRefreshProps {
 	disabled?: boolean;
 	showAutoRefreshBtnPrimary?: boolean;
 }
-
-AutoRefresh.defaultProps = {
-	disabled: false,
-	showAutoRefreshBtnPrimary: true,
-};
 
 export default AutoRefresh;

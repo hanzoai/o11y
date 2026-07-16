@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 import { useQueries } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
@@ -28,7 +28,7 @@ import { getQueryPayloadFromWidgetsData } from '../CeleryOverviewUtils';
 import './ValueInfo.styles.scss';
 
 export default function ValueInfo({
-	filters,
+	filters = undefined,
 }: {
 	filters?: TagFilterItem[];
 }): JSX.Element {
@@ -156,7 +156,7 @@ export default function ValueInfo({
 					</div>
 					<Button
 						type="primary"
-						icon={<FileSearch size="md" />}
+						icon={<FileSearch size={16} />}
 						className="trace-button"
 						disabled={isLoading}
 						onClick={(): void => {
@@ -191,7 +191,7 @@ export default function ValueInfo({
 					</div>
 					<Button
 						type="primary"
-						icon={<FileSearch size="md" />}
+						icon={<FileSearch size={16} />}
 						className="trace-button"
 						disabled={isLoading}
 						onClick={(): void => {
@@ -239,7 +239,7 @@ export default function ValueInfo({
 					</div>
 					<Button
 						type="primary"
-						icon={<FileSearch size="md" />}
+						icon={<FileSearch size={16} />}
 						className="trace-button"
 						disabled={isLoading}
 						onClick={(): void => {
@@ -264,7 +264,3 @@ export default function ValueInfo({
 		</Card>
 	);
 }
-
-ValueInfo.defaultProps = {
-	filters: undefined,
-};

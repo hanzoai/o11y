@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import {
 	ArrowUpToLine,
 	Filter,
@@ -169,7 +169,7 @@ export default function QuickFilters(props: IQuickFiltersProps): JSX.Element {
 	// Helpers to reduce cognitive complexity in main render
 	const renderLeftActions = (): JSX.Element => (
 		<section className="left-actions">
-			<Filter size="md" />
+			<Filter size={16} />
 			<Typography.Text className="text">
 				{displayedQueryName ? 'Filters for' : 'Filters'}
 			</Typography.Text>
@@ -202,7 +202,7 @@ export default function QuickFilters(props: IQuickFiltersProps): JSX.Element {
 		<section className="right-actions">
 			<Tooltip title="Reset All">
 				<div className="right-action-icon-container">
-					<RefreshCw className="sync-icon" size="md" onClick={handleReset} />
+					<RefreshCw className="sync-icon" size={16} onClick={handleReset} />
 				</div>
 			</Tooltip>
 			{showFilterCollapse && (
@@ -210,7 +210,7 @@ export default function QuickFilters(props: IQuickFiltersProps): JSX.Element {
 					<div className="right-action-icon-container">
 						<ArrowUpToLine
 							style={{ rotate: '270deg', cursor: 'pointer' }}
-							size="md"
+							size={16}
 							onClick={handleFilterVisibilityChange}
 						/>
 					</div>
@@ -346,11 +346,3 @@ export default function QuickFilters(props: IQuickFiltersProps): JSX.Element {
 		</div>
 	);
 }
-
-QuickFilters.defaultProps = {
-	onFilterChange: null,
-	signal: '',
-	config: [],
-	showFilterCollapse: true,
-	showQueryName: true,
-};

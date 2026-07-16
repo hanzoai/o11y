@@ -13,7 +13,7 @@ const useInitializeOverlayScrollbar = (
 	options: PartialOptions,
 ): {
 	setScroller: Dispatch<SetStateAction<null>>;
-	rootRef: RefObject<HTMLDivElement>;
+	rootRef: RefObject<HTMLDivElement | null>;
 } => {
 	const rootRef = useRef(null);
 	const [scroller, setScroller] = useState(null);

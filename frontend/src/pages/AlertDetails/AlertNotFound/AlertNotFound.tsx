@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { Button } from 'antd';
 import { Typography } from 'components/ui/typography';
 import ROUTES from 'constants/routes';

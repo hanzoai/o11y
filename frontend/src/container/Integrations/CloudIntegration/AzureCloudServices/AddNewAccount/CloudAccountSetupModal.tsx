@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, type JSX } from 'react';
 import { Color } from 'components/ui/design-tokens';
 import {
 	ChevronDown,
@@ -232,8 +232,8 @@ function CloudAccountSetupModal({
 					{isHowItWorksOpen && (
 						<div className="cloud-account-setup-how-it-works-accordion__description">
 							<div className="cloud-account-setup-how-it-works-accordion__description-item">
-								O11y will create new resource-group to manage the resources required
-								for this integration. The following steps will create a User-Assigned
+								O11y will create new resource-group to manage the resources required for
+								this integration. The following steps will create a User-Assigned
 								Managed Identity with the necessary permissions and follows the
 								Principle of Least Privilege.
 							</div>

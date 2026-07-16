@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Flex } from 'antd';
@@ -117,7 +117,7 @@ function LogControls(): JSX.Element | null {
 				onClick={handleGoToLatest}
 			>
 				<Flex align="center" gap="4px">
-					<SkipBack size="md" /> Go to latest
+					<SkipBack size={16} /> Go to latest
 				</Flex>
 			</Button>
 			<Divider type="vertical" />

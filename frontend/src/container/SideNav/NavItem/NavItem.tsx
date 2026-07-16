@@ -7,15 +7,17 @@ import { SidebarItem } from '../sideNav.types';
 
 import './NavItem.styles.scss';
 
+import type { JSX } from 'react';
+
 export default function NavItem({
 	item,
 	isActive,
 	onClick,
 	isDisabled,
-	onTogglePin,
-	isPinned,
-	showIcon,
-	dataTestId,
+	onTogglePin = undefined,
+	isPinned = false,
+	showIcon = false,
+	dataTestId = undefined,
 }: {
 	item: SidebarItem;
 	isActive: boolean;
@@ -116,10 +118,3 @@ export default function NavItem({
 		navItem
 	);
 }
-
-NavItem.defaultProps = {
-	onTogglePin: undefined,
-	isPinned: false,
-	showIcon: false,
-	dataTestId: undefined,
-};

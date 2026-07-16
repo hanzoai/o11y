@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Space } from 'antd';
 import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
 import { Typography } from 'components/ui/typography';

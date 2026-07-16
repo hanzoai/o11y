@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { UseQueryResult } from 'react-query';
 import { Select } from 'antd';
 import { getFormattedEndPointDropDownData } from 'container/ApiMonitoring/utils';
@@ -12,18 +12,12 @@ interface EndPointsDropDownProps {
 	dropdownStyle?: React.CSSProperties;
 }
 
-const defaultProps = {
-	selectedEndPointName: '',
-	parentContainerDiv: '',
-	dropdownStyle: {},
-};
-
 function EndPointsDropDown({
-	selectedEndPointName,
+	selectedEndPointName = '',
 	setSelectedEndPointName,
 	endPointDropDownDataQuery,
-	parentContainerDiv,
-	dropdownStyle,
+	parentContainerDiv = '',
+	dropdownStyle = {},
 }: EndPointsDropDownProps): JSX.Element {
 	const { data, isLoading, isFetching } = endPointDropDownDataQuery;
 
@@ -59,7 +53,5 @@ function EndPointsDropDown({
 		/>
 	);
 }
-
-EndPointsDropDown.defaultProps = defaultProps;
 
 export default EndPointsDropDown;

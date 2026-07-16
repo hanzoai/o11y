@@ -8,6 +8,8 @@ import {
 } from '../utils/getUnstableCurrentSearchParams';
 import { queryClient, TestWrapper } from './testUtils';
 
+import type { JSX } from 'react';
+
 const mockSafeNavigate = jest.fn();
 jest.mock('hooks/useSafeNavigate', () => ({
 	useSafeNavigate: (): { safeNavigate: jest.Mock } => ({

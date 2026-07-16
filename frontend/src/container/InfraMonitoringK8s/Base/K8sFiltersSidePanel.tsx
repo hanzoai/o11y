@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Button } from 'components/ui/button';
 import { DrawerWrapper } from 'components/ui/drawer';
 import {

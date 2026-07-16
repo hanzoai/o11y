@@ -30,6 +30,8 @@ import {
 	mockUpdateSuccessResponse,
 } from './mocks';
 
+import type { JSX } from 'react';
+
 describe('SSOEnforcementToggle', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();

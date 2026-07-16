@@ -5,6 +5,7 @@ import {
 	useEffect,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import { Button, Collapse } from 'antd';
 import { Divider } from 'components/ui/divider';

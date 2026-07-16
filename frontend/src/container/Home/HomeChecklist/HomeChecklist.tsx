@@ -1,10 +1,14 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Button } from 'antd';
 import logEvent from 'api/common/logEvent';
 import ROUTES from 'constants/routes';
 import history from 'lib/history';
-import { ArrowRight, ArrowRightToLine, BookOpenText } from 'components/ui/icons';
+import {
+	ArrowRight,
+	ArrowRightToLine,
+	BookOpenText,
+} from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { LicensePlatform } from 'types/api/licensesV3/getActive';
 import { USER_ROLES } from 'types/roles';

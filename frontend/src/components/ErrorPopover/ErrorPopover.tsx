@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { Popover, PopoverProps } from 'antd';
 
 interface ErrorPopoverProps extends Omit<PopoverProps, 'content'> {

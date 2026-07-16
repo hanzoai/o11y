@@ -1,8 +1,9 @@
+import type { JSX } from 'react';
 interface ISlackProps {
 	width?: number | string;
 	height?: number | string;
 }
-function Slack({ width, height }: ISlackProps): JSX.Element {
+function Slack({ width = '1em', height = '1em' }: ISlackProps): JSX.Element {
 	return (
 		<svg
 			width={`${width}`}
@@ -46,9 +47,5 @@ function Slack({ width, height }: ISlackProps): JSX.Element {
 		</svg>
 	);
 }
-Slack.defaultProps = {
-	width: '1em',
-	height: '1em',
-};
 
 export default Slack;

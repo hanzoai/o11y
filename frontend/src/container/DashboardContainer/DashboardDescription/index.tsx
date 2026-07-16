@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { FullScreenHandle } from 'react-full-screen';
 import { Layout } from 'react-grid-layout';
 import { useTranslation } from 'react-i18next';
@@ -496,7 +496,7 @@ function DashboardDescription(props: DashboardDescriptionProps): JSX.Element {
 						<Button
 							className="add-panel-btn"
 							onClick={onEmptyWidgetHandler}
-							icon={<Plus size="md" />}
+							icon={<Plus size={16} />}
 							type="primary"
 							data-testid="add-panel-header"
 						>

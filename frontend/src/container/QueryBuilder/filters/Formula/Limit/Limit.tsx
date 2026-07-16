@@ -4,6 +4,8 @@ import { selectStyle } from '../../QueryBuilderSearch/config';
 import { handleKeyDownLimitFilter } from '../../utils';
 import { LimitFilterProps } from './types';
 
+import type { JSX } from 'react';
+
 function LimitFilter({ onChange, formula }: LimitFilterProps): JSX.Element {
 	return (
 		<InputNumber

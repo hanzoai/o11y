@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { Button, Popover, Tooltip } from 'antd';
 import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
 import { Typography } from 'components/ui/typography';

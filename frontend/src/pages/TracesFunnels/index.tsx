@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Skeleton } from 'antd';
 import { useFunnelsList } from 'hooks/TracesFunnels/useFunnels';
 import useHandleTraceFunnelsSearch from 'hooks/TracesFunnels/useHandleTraceFunnelsSearch';
@@ -26,9 +26,9 @@ export function TracesFunnelsContentRenderer({
 	isLoading,
 	isError,
 	data,
-	onCreateFunnel,
-	onFunnelClick,
-	shouldRedirectToTracesListOnDeleteSuccess,
+	onCreateFunnel = undefined,
+	onFunnelClick = undefined,
+	shouldRedirectToTracesListOnDeleteSuccess = true,
 }: TracesFunnelsContentRendererProps): JSX.Element {
 	if (isLoading) {
 		return (
@@ -68,12 +68,6 @@ export function TracesFunnelsContentRenderer({
 		/>
 	);
 }
-
-TracesFunnelsContentRenderer.defaultProps = {
-	onCreateFunnel: undefined,
-	onFunnelClick: undefined,
-	shouldRedirectToTracesListOnDeleteSuccess: true,
-};
 
 function TracesFunnels(): JSX.Element {
 	const { searchQuery, handleSearch } = useHandleTraceFunnelsSearch();

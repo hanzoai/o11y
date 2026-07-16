@@ -1,6 +1,16 @@
 import './index.css';
-import { CircleAlert, CircleCheckBig, Info, TriangleAlert, X } from 'lucide-react';
-import { type ComponentPropsWithoutRef, forwardRef, type ReactNode } from 'react';
+import {
+	CircleAlert,
+	CircleCheckBig,
+	Info,
+	TriangleAlert,
+	X,
+} from 'lucide-react';
+import {
+	type ComponentPropsWithoutRef,
+	forwardRef,
+	type ReactNode,
+} from 'react';
 import { cn } from '../lib/utils';
 
 export type AnnouncementBannerType = 'warning' | 'info' | 'error' | 'success';
@@ -37,7 +47,10 @@ export type AnnouncementBannerProps = {
 	 * The test id to apply to the banner.
 	 */
 	testId?: string;
-} & Pick<ComponentPropsWithoutRef<'div'>, 'id' | 'className' | 'style' | 'children'>;
+} & Pick<
+	ComponentPropsWithoutRef<'div'>,
+	'id' | 'className' | 'style' | 'children'
+>;
 
 const DEFAULT_ICONS: Record<AnnouncementBannerType, ReactNode> = {
 	warning: <TriangleAlert size={14} />,
@@ -50,7 +63,20 @@ const DEFAULT_ICONS: Record<AnnouncementBannerType, ReactNode> = {
  * A banner component for displaying announcements, alerts, or notices.
  */
 const AnnouncementBanner = forwardRef<HTMLDivElement, AnnouncementBannerProps>(
-	({ children, type = 'warning', icon, action, onClose, className, style, testId, id }, ref) => {
+	(
+		{
+			children,
+			type = 'warning',
+			icon,
+			action,
+			onClose,
+			className,
+			style,
+			testId,
+			id,
+		},
+		ref,
+	) => {
 		const resolvedIcon = icon === null ? null : (icon ?? DEFAULT_ICONS[type]);
 
 		return (
@@ -63,7 +89,7 @@ const AnnouncementBanner = forwardRef<HTMLDivElement, AnnouncementBannerProps>(
 				data-slot="announcement-banner"
 				className={cn(
 					'flex items-center justify-between gap-2 px-4 py-2 text-[13px] font-medium leading-5 tracking-[-0.065px]',
-					className
+					className,
 				)}
 				style={style}
 			>
@@ -110,7 +136,7 @@ const AnnouncementBanner = forwardRef<HTMLDivElement, AnnouncementBannerProps>(
 				)}
 			</div>
 		);
-	}
+	},
 );
 AnnouncementBanner.displayName = 'AnnouncementBanner';
 

@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from 'components/ui/icons';
 import FieldsSelector from 'components/FieldsSelector';
@@ -13,7 +13,7 @@ function TraceExplorerControls({
 	isLoading,
 	totalCount,
 	perPageOptions,
-	config,
+	config = null,
 	showSizeChanger = true,
 }: TraceExplorerControlsProps): JSX.Element | null {
 	const { t } = useTranslation(['trace']);
@@ -35,7 +35,7 @@ function TraceExplorerControls({
 						onClick={(): void => setIsFieldsSelectorOpen(true)}
 					>
 						{t('options_menu.options')}
-						<Settings size="md" />
+						<Settings size={16} />
 					</div>
 					<FieldsSelector
 						isOpen={isFieldsSelectorOpen}
@@ -63,20 +63,12 @@ function TraceExplorerControls({
 	);
 }
 
-TraceExplorerControls.defaultProps = {
-	config: null,
-};
-
 type TraceExplorerControlsProps = Pick<
 	ControlsProps,
 	'isLoading' | 'totalCount' | 'perPageOptions'
 > & {
 	config?: OptionsMenuConfig | null;
 	showSizeChanger?: boolean;
-};
-
-TraceExplorerControls.defaultProps = {
-	showSizeChanger: true,
 };
 
 export default memo(TraceExplorerControls);

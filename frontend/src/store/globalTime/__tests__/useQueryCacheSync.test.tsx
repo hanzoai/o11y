@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 
 import { REACT_QUERY_KEY } from 'constants/reactQueryKeys';
 

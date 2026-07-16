@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Tabs, TabsProps } from 'antd';
 import ConfigureIcon from 'assets/AlertHistory/ConfigureIcon';

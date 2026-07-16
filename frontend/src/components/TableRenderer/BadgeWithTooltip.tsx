@@ -3,9 +3,11 @@ import { Badge } from 'components/ui/badge';
 
 import { getLabelRenderingValue } from './utils';
 
+import type { JSX } from 'react';
+
 function BadgeWithTooltip({
 	label,
-	value,
+	value = undefined,
 }: BadgeWithTooltipProps): JSX.Element {
 	const tooltipTitle =
 		value && value[label] ? `${label}: ${value[label]}` : label;
@@ -25,10 +27,6 @@ type BadgeWithTooltipProps = {
 	value?: {
 		[key: string]: string;
 	};
-};
-
-BadgeWithTooltip.defaultProps = {
-	value: undefined,
 };
 
 export default BadgeWithTooltip;

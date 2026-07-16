@@ -1,6 +1,6 @@
 import './FormatField.styles.scss';
 
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ToggleGroupSimple } from 'components/ui/toggle-group';
 import { LogViewMode } from 'container/LogsTable';

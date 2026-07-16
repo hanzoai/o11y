@@ -2,6 +2,8 @@ import { TraceFilterEnum } from 'types/reducer/trace';
 
 import Panel from './Panel';
 
+import type { JSX } from 'react';
+
 export const AllTraceFilterEnum: TraceFilterEnum[] = [
 	'duration',
 	'status',

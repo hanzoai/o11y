@@ -1,9 +1,10 @@
 import { Color } from 'constants/designTokens';
-import { Tooltip } from 'antd';
-import type { DefaultOptionType } from 'antd/es/select';
+import { Tooltip, type SelectProps } from 'antd';
 import { Info } from 'components/ui/icons';
 
 import './MQCommon.styles.scss';
+
+import type { JSX } from 'react';
 
 export function ComingSoon(): JSX.Element {
 	return (
@@ -34,8 +35,13 @@ export function ComingSoon(): JSX.Element {
 	);
 }
 
+// antd does not re-export rc-select's DisplayValueType — derive it from the prop.
+type OmittedValues = Parameters<
+	Extract<SelectProps['maxTagPlaceholder'], (...args: never[]) => unknown>
+>[0];
+
 export function SelectMaxTagPlaceholder(
-	omittedValues: Partial<DefaultOptionType>[],
+	omittedValues: OmittedValues,
 ): JSX.Element {
 	return (
 		<Tooltip title={omittedValues.map(({ value }) => value).join(', ')}>

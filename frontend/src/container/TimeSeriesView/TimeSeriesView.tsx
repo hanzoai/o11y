@@ -6,6 +6,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
@@ -48,14 +49,14 @@ import { getTimeRange } from 'utils/getTimeRange';
 import './TimeSeriesView.styles.scss';
 
 function TimeSeriesView({
-	data,
+	data = undefined,
 	isLoading,
 	isError,
-	error,
-	yAxisUnit,
+	error = undefined,
+	yAxisUnit = 'short',
 	isFilterApplied,
 	dataSource,
-	setWarning,
+	setWarning = undefined,
 	panelType = PANEL_TYPES.TIME_SERIES,
 }: TimeSeriesViewProps): JSX.Element {
 	const graphRef = useRef<HTMLDivElement>(null);
@@ -283,13 +284,5 @@ interface TimeSeriesViewProps {
 	setWarning?: Dispatch<SetStateAction<Warning | undefined>>;
 	panelType?: PANEL_TYPES;
 }
-
-TimeSeriesView.defaultProps = {
-	data: undefined,
-	yAxisUnit: 'short',
-	error: undefined,
-	setWarning: undefined,
-	panelType: PANEL_TYPES.TIME_SERIES,
-};
 
 export default TimeSeriesView;

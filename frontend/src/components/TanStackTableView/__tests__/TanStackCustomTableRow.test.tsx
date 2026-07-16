@@ -27,6 +27,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import TanStackCustomTableRow from '../TanStackCustomTableRow';
 import type { FlatItem, TableRowContext } from '../types';
 
+import type { JSX } from 'react';
+
 const makeItem = (id: string): FlatItem<{ id: string }> => ({
 	kind: 'row',
 	row: { original: { id }, id } as never,

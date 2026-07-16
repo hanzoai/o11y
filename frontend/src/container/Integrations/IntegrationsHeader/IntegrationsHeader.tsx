@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEvent, useState } from 'react';
+import { ChangeEvent, KeyboardEvent, useState, type JSX } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button } from 'components/ui/button';
 import { DialogWrapper } from 'components/ui/dialog';

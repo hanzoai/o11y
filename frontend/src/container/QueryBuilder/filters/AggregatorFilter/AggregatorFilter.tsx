@@ -1,5 +1,12 @@
 // ** Components
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+	memo,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	type JSX,
+} from 'react';
 import { useQuery, useQueryClient } from 'react-query';
 import { AutoComplete, Spin } from 'antd';
 // ** Api
@@ -238,13 +245,13 @@ export const AggregatorFilter = memo(function AggregatorFilter({
 	const handleChange = useCallback(
 		(
 			value: string,
-			option: ExtendedSelectOption | ExtendedSelectOption[],
+			option?: ExtendedSelectOption | ExtendedSelectOption[],
 		): void => {
-			const currentOption = option as ExtendedSelectOption;
+			const currentOption = option as ExtendedSelectOption | undefined;
 
 			const aggregateAttributes = getAttributesData();
 
-			if (currentOption.key) {
+			if (currentOption?.key) {
 				const attribute = aggregateAttributes.find(
 					(item) => item.id === currentOption.key,
 				);

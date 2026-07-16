@@ -4,6 +4,8 @@ import ROUTES from 'constants/routes';
 import { defaultText } from './constant';
 import { Button, Container, Text, TextContainer } from './styles';
 
+import type { JSX } from 'react';
+
 function NotFound({ text = defaultText }: Props): JSX.Element {
 	return (
 		<Container>
@@ -24,9 +26,5 @@ function NotFound({ text = defaultText }: Props): JSX.Element {
 interface Props {
 	text?: string;
 }
-
-NotFound.defaultProps = {
-	text: defaultText,
-};
 
 export default NotFound;

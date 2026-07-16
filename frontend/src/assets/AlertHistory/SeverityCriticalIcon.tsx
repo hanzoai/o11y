@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 interface SeverityCriticalIconProps {
 	width?: number;
 	height?: number;
@@ -6,10 +7,10 @@ interface SeverityCriticalIconProps {
 }
 
 function SeverityCriticalIcon({
-	width,
-	height,
-	fill,
-	stroke,
+	width = 6,
+	height = 6,
+	fill = 'none',
+	stroke = '#F56C87',
 }: SeverityCriticalIconProps): JSX.Element {
 	return (
 		<svg
@@ -28,12 +29,5 @@ function SeverityCriticalIcon({
 		</svg>
 	);
 }
-
-SeverityCriticalIcon.defaultProps = {
-	width: 6,
-	height: 6,
-	fill: 'none',
-	stroke: '#F56C87',
-};
 
 export default SeverityCriticalIcon;

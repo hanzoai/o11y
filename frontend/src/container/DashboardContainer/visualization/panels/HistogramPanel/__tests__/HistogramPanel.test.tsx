@@ -11,6 +11,8 @@ import {
 
 import HistogramPanel from '../HistogramPanel';
 
+import type { JSX } from 'react';
+
 jest.mock('hooks/useDimensions', () => ({
 	useResizeObserver: jest.fn().mockReturnValue({ width: 800, height: 400 }),
 }));

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { Button } from '@hanzo/ui';
 import { Plus, Trash2, X } from 'lucide-react';
 import { toast } from '@hanzo/ui';
@@ -179,7 +179,7 @@ function AuthDomain(): JSX.Element {
 			<section className="auth-domain-header">
 				<h3 className="auth-domain-title">Authenticated Domains</h3>
 				<Button
-					prefix={<Plus size="md" />}
+					prefix={<Plus size={16} />}
 					onClick={(): void => {
 						setAddDomain(true);
 					}}

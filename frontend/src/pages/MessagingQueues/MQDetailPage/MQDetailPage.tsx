@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Select } from 'antd';
 import logEvent from 'api/common/logEvent';

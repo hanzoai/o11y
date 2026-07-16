@@ -21,6 +21,8 @@ import { parseAsBoolean, useQueryState } from 'nuqs';
 import { useErrorModal } from 'providers/ErrorModalProvider';
 import APIError from 'types/api/error';
 
+import type { JSX } from 'react';
+
 function DeleteAccountModal(): JSX.Element {
 	const queryClient = useQueryClient();
 	const { showErrorModal, isErrorModalVisible } = useErrorModal();

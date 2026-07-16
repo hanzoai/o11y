@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import setLocalStorageApi from 'api/browser/localstorage/set';
@@ -35,13 +35,9 @@ const queryClient = new QueryClient({
 function createWrapper(): ({
 	children,
 }: {
-	children: ReactElement;
+	children: ReactNode;
 }) => ReactElement {
-	return function Wrapper({
-		children,
-	}: {
-		children: ReactElement;
-	}): ReactElement {
+	return function Wrapper({ children }: { children: ReactNode }): ReactElement {
 		return (
 			<QueryClientProvider client={queryClient}>
 				<AppProvider>{children}</AppProvider>

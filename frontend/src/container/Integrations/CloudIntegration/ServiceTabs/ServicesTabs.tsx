@@ -7,6 +7,8 @@ import ServicesList from '../ServicesList';
 
 import './ServicesTabs.style.scss';
 
+import type { JSX } from 'react';
+
 function ServicesTabs({ type }: { type: IntegrationType }): JSX.Element {
 	const urlQuery = useUrlQuery();
 	const cloudAccountId = urlQuery.get('cloudAccountId') || '';

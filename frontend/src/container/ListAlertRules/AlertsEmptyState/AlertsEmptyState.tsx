@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, type JSX } from 'react';
 import { Divider } from 'components/ui/divider';
 import { Plus, RefreshCw } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
@@ -92,7 +92,7 @@ export function AlertsEmptyState({
 									data-testid="add-alert"
 								>
 									<span className={styles.buttonContent}>
-										<Plus size="md" />
+										<Plus size={16} />
 										New Alert Rule
 									</span>
 								</Button>

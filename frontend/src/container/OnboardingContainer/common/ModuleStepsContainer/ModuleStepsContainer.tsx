@@ -1,4 +1,4 @@
-import React, { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useState, type JSX } from 'react';
 import {
 	ArrowLeft,
 	ArrowRight,
@@ -392,7 +392,7 @@ export default function ModuleStepsContainer({
 						<Button
 							style={{ display: 'flex', alignItems: 'center' }}
 							type="default"
-							icon={<CircleArrowLeft size="md" />}
+							icon={<CircleArrowLeft size={16} />}
 							onClick={(e): void => onReselectModule(e)}
 						>
 							{selectedModule.title}
@@ -459,14 +459,14 @@ export default function ModuleStepsContainer({
 					<Button
 						onClick={handlePrev}
 						disabled={current === 0}
-						icon={<ArrowLeft size="md" />}
+						icon={<ArrowLeft size={16} />}
 					>
 						Back
 					</Button>
 					<Button
 						onClick={(e): void => handleNext(e)}
 						type="primary"
-						icon={<ArrowRight size="md" />}
+						icon={<ArrowRight size={16} />}
 					>
 						{current < lastStepIndex ? 'Continue to next step' : 'Done'}
 					</Button>

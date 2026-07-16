@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, type JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Color } from 'constants/designTokens';
 import { Button, Popover, Spin, Tooltip, Tree } from 'antd';
@@ -532,7 +532,3 @@ export default function TableViewActions(
 		</div>
 	);
 }
-
-TableViewActions.defaultProps = {
-	handleChangeSelectedView: undefined,
-};

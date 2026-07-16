@@ -2,6 +2,8 @@ import { Form, Select } from 'antd';
 
 import { PREDEFINED_MAPPING } from '../config';
 
+import type { JSX } from 'react';
+
 interface KeyValueListProps {
 	value?: Record<string, string[]>;
 	onChange?: (value: Record<string, string[]>) => void;
@@ -9,7 +11,7 @@ interface KeyValueListProps {
 
 function KeyValueList({
 	value = PREDEFINED_MAPPING,
-	onChange,
+	onChange = (): void => {},
 }: KeyValueListProps): JSX.Element {
 	const handleValueChange = (key: string, newValue: string[]): void => {
 		const newMapping = {
@@ -38,10 +40,5 @@ function KeyValueList({
 		</div>
 	);
 }
-
-KeyValueList.defaultProps = {
-	value: PREDEFINED_MAPPING,
-	onChange: (): void => {},
-};
 
 export default KeyValueList;

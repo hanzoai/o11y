@@ -12,6 +12,8 @@ import { ExplorerViews } from 'pages/LogsExplorer/utils';
 
 import './ToolbarActions.styles.scss';
 
+import type { JSX } from 'react';
+
 interface LeftToolbarActionsProps {
 	items: any;
 	selectedView: string;

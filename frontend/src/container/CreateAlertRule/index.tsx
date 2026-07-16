@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, type JSX } from 'react';
 import { Form, Tabs, TabsProps } from 'antd';
 import logEvent from 'api/common/logEvent';
 import ConfigureIcon from 'assets/AlertHistory/ConfigureIcon';

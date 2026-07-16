@@ -1,4 +1,4 @@
-import { memo, PropsWithChildren, ReactElement } from 'react';
+import { memo, PropsWithChildren, ReactElement, type JSX } from 'react';
 import { Drawer } from 'antd';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
 

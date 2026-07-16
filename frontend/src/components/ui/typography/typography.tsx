@@ -49,11 +49,10 @@ export type TypographyVariant = 'title' | 'text';
 export type TypographyColor = 'muted' | 'danger' | 'warning' | 'success';
 export type TypographyLevel = 1 | 2 | 3 | 4 | 5;
 
-export interface TypographyProps
-	extends Pick<
-		React.ComponentProps<'div'>,
-		'children' | 'className' | 'id' | 'style' | 'title' | 'role' | 'tabIndex'
-	> {
+export interface TypographyProps extends Pick<
+	React.ComponentProps<'div'>,
+	'children' | 'className' | 'id' | 'style' | 'title' | 'role' | 'tabIndex'
+> {
 	onClick?: React.MouseEventHandler<unknown>;
 	onMouseEnter?: React.MouseEventHandler<unknown>;
 	onMouseLeave?: React.MouseEventHandler<unknown>;
@@ -132,139 +131,154 @@ function defaultElement(
 	href: string | undefined,
 ): TypographyElement {
 	if (href) return 'a';
-	if (variant === 'title') return (`h${level ?? 1}` as TypographyElement);
+	if (variant === 'title') return `h${level ?? 1}` as TypographyElement;
 	return 'p';
 }
 
-const TypographyBase = forwardRef<HTMLElement, TypographyProps>((props, ref) => {
-	const {
-		children,
-		className,
-		style,
-		variant = 'text',
-		as,
-		asChild = false,
-		size,
-		weight,
-		align,
-		truncate,
-		muted = false,
-		color,
-		strong = false,
-		italic = false,
-		code = false,
-		disabled = false,
-		copyable = false,
-		level,
-		href,
-		target,
-		rel,
-		testId,
-		interactive = false,
-		onClick,
-		...rest
-	} = props;
+const TypographyBase = forwardRef<HTMLElement, TypographyProps>(
+	(props, ref) => {
+		const {
+			children,
+			className,
+			style,
+			variant = 'text',
+			as,
+			asChild = false,
+			size,
+			weight,
+			align,
+			truncate,
+			muted = false,
+			color,
+			strong = false,
+			italic = false,
+			code = false,
+			disabled = false,
+			copyable = false,
+			level,
+			href,
+			target,
+			rel,
+			testId,
+			interactive = false,
+			onClick,
+			...rest
+		} = props;
 
-	const [copied, setCopied] = useState(false);
-	const handleCopy = useCallback(() => {
-		const text = typeof children === 'string' ? children : String(children ?? '');
-		navigator.clipboard?.writeText(text).then(() => {
-			setCopied(true);
-			setTimeout(() => setCopied(false), 1500);
-		});
-	}, [children]);
+		const [copied, setCopied] = useState(false);
+		const handleCopy = useCallback(() => {
+			const text =
+				typeof children === 'string' ? children : String(children ?? '');
+			navigator.clipboard?.writeText(text).then(() => {
+				setCopied(true);
+				setTimeout(() => setCopied(false), 1500);
+			});
+		}, [children]);
 
-	const resolvedSize = size ?? (variant === 'title' && level ? LEVEL_SIZE[level] : 'base');
-	const resolvedColor = color ?? (muted ? 'muted' : undefined);
-	const isInteractive = interactive || Boolean(onClick);
+		const resolvedSize =
+			size ?? (variant === 'title' && level ? LEVEL_SIZE[level] : 'base');
+		const resolvedColor = color ?? (muted ? 'muted' : undefined);
+		const isInteractive = interactive || Boolean(onClick);
 
-	const computedStyle: React.CSSProperties = {
-		fontSize: FONT_SIZE[resolvedSize],
-		...(weight ? { fontWeight: FONT_WEIGHT[weight] } : null),
-		...(strong ? { fontWeight: FONT_WEIGHT.semibold } : null),
-		...(variant === 'title' && !weight && !strong ? { fontWeight: FONT_WEIGHT.semibold } : null),
-		...(align ? { textAlign: align } : null),
-		...(italic ? { fontStyle: 'italic' } : null),
-		...(resolvedColor ? { color: COLOR_VAR[resolvedColor] } : null),
-		...(disabled ? { opacity: 0.5, pointerEvents: 'none' } : null),
-		...(isInteractive ? { cursor: 'pointer' } : null),
-		...(truncate
-			? truncate === 1
-				? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
-				: {
-						display: '-webkit-box',
-						WebkitLineClamp: truncate,
-						WebkitBoxOrient: 'vertical',
-						overflow: 'hidden',
-				  }
-			: null),
-		...style,
-	};
+		const computedStyle: React.CSSProperties = {
+			fontSize: FONT_SIZE[resolvedSize],
+			...(weight ? { fontWeight: FONT_WEIGHT[weight] } : null),
+			...(strong ? { fontWeight: FONT_WEIGHT.semibold } : null),
+			...(variant === 'title' && !weight && !strong
+				? { fontWeight: FONT_WEIGHT.semibold }
+				: null),
+			...(align ? { textAlign: align } : null),
+			...(italic ? { fontStyle: 'italic' } : null),
+			...(resolvedColor ? { color: COLOR_VAR[resolvedColor] } : null),
+			...(disabled ? { opacity: 0.5, pointerEvents: 'none' } : null),
+			...(isInteractive ? { cursor: 'pointer' } : null),
+			...(truncate
+				? truncate === 1
+					? { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
+					: {
+							display: '-webkit-box',
+							WebkitLineClamp: truncate,
+							WebkitBoxOrient: 'vertical',
+							overflow: 'hidden',
+						}
+				: null),
+			...style,
+		};
 
-	const Element: React.ElementType = asChild
-		? Slot
-		: as ?? defaultElement(variant, level, href);
+		const Element: React.ElementType = asChild
+			? Slot
+			: (as ?? defaultElement(variant, level, href));
 
-	const anchorProps = href ? { href, target, rel } : {};
+		const anchorProps = href ? { href, target, rel } : {};
 
-	const content = (
-		<Element
-			ref={ref as never}
-			className={cn('hz-typography', code && 'hz-typography--code', className)}
-			style={computedStyle}
-			data-slot="typography"
-			data-variant={variant}
-			data-testid={testId}
-			onClick={onClick}
-			{...anchorProps}
-			{...rest}
-		>
-			{children}
-		</Element>
-	);
-
-	if (!copyable) return content;
-	return (
-		<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-			{content}
-			<button
-				type="button"
-				aria-label="Copy"
-				onClick={handleCopy}
-				style={{
-					background: 'none',
-					border: 'none',
-					cursor: 'pointer',
-					padding: 0,
-					display: 'inline-flex',
-					color: 'inherit',
-				}}
+		const content = (
+			<Element
+				ref={ref as never}
+				className={cn('hz-typography', code && 'hz-typography--code', className)}
+				style={computedStyle}
+				data-slot="typography"
+				data-variant={variant}
+				data-testid={testId}
+				onClick={onClick}
+				{...anchorProps}
+				{...rest}
 			>
-				{copied ? <Check size={14} /> : <Copy size={14} />}
-			</button>
-		</span>
-	);
-});
+				{children}
+			</Element>
+		);
+
+		if (!copyable) return content;
+		return (
+			<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+				{content}
+				<button
+					type="button"
+					aria-label="Copy"
+					onClick={handleCopy}
+					style={{
+						background: 'none',
+						border: 'none',
+						cursor: 'pointer',
+						padding: 0,
+						display: 'inline-flex',
+						color: 'inherit',
+					}}
+				>
+					{copied ? <Check size={14} /> : <Copy size={14} />}
+				</button>
+			</span>
+		);
+	},
+);
 TypographyBase.displayName = 'Typography';
 
-export interface TypographyTextProps extends Omit<TypographyProps, 'variant' | 'level'> {}
-const TypographyText = forwardRef<HTMLElement, TypographyTextProps>((props, ref) => (
-	<TypographyBase ref={ref} variant="text" {...props} />
-));
+export interface TypographyTextProps extends Omit<
+	TypographyProps,
+	'variant' | 'level'
+> {}
+const TypographyText = forwardRef<HTMLElement, TypographyTextProps>(
+	(props, ref) => <TypographyBase ref={ref} variant="text" {...props} />,
+);
 TypographyText.displayName = 'Typography.Text';
 
-export interface TypographyTitleProps extends Omit<TypographyProps, 'variant'> {}
-const TypographyTitle = forwardRef<HTMLElement, TypographyTitleProps>((props, ref) => (
-	<TypographyBase ref={ref} variant="title" {...props} />
-));
+export interface TypographyTitleProps extends Omit<
+	TypographyProps,
+	'variant'
+> {}
+const TypographyTitle = forwardRef<HTMLElement, TypographyTitleProps>(
+	(props, ref) => <TypographyBase ref={ref} variant="title" {...props} />,
+);
 TypographyTitle.displayName = 'Typography.Title';
 
-export interface TypographyLinkProps extends Omit<TypographyProps, 'variant' | 'level'> {
+export interface TypographyLinkProps extends Omit<
+	TypographyProps,
+	'variant' | 'level'
+> {
 	href?: string;
 }
-const TypographyLink = forwardRef<HTMLElement, TypographyLinkProps>((props, ref) => (
-	<TypographyBase ref={ref} variant="text" {...props} />
-));
+const TypographyLink = forwardRef<HTMLElement, TypographyLinkProps>(
+	(props, ref) => <TypographyBase ref={ref} variant="text" {...props} />,
+);
 TypographyLink.displayName = 'Typography.Link';
 
 type TypographyComponent = typeof TypographyBase & {

@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState, type JSX } from 'react';
 import { Button } from 'components/ui/button';
 import { Input, Spin } from 'antd';
 import cx from 'classnames';
@@ -9,7 +9,13 @@ import {
 	useFunnelsList,
 } from 'hooks/TracesFunnels/useFunnels';
 import { isEqual } from 'lodash-es';
-import { ArrowLeft, Check, Plus, Search, LoaderCircle } from 'components/ui/icons';
+import {
+	ArrowLeft,
+	Check,
+	Plus,
+	Search,
+	LoaderCircle,
+} from 'components/ui/icons';
 import FunnelConfiguration from 'pages/TracesFunnelDetails/components/FunnelConfiguration/FunnelConfiguration';
 import { TracesFunnelsContentRenderer } from 'pages/TracesFunnels';
 import CreateFunnel from 'pages/TracesFunnels/components/CreateFunnel/CreateFunnel';

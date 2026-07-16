@@ -8,6 +8,8 @@ import { DataSource, QueryBuilderContextType } from 'types/common/queryBuilder';
 
 import Summary from '../Summary';
 
+import type { JSX } from 'react';
+
 jest.mock('d3-hierarchy', () => ({
 	stratify: jest.fn().mockReturnValue({
 		id: jest.fn().mockReturnValue({

@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback } from 'react';
+import { ChangeEvent, useCallback, type JSX } from 'react';
 import { Input } from 'antd';
 import { LEGEND } from 'constants/global';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 // TODO(components/ui Input): migrate <Input> once components/ui Input
 // supports the `spellCheck` prop on the URL input below.
 import { Button, Col, Form, Input, Input as AntInput, Row } from 'antd';
@@ -32,7 +32,7 @@ function UpdateContextLinks({
 	selectedContextLink,
 	onSave,
 	onCancel,
-	selectedWidget,
+	selectedWidget = undefined,
 }: UpdateContextLinksProps): JSX.Element {
 	const [form] = Form.useForm();
 	// const label = Form.useWatch(CONTEXT_LINK_FIELDS.LABEL, form);
@@ -341,7 +341,6 @@ function UpdateContextLinks({
 					Add URL parameter
 				</Button>
 			</div>
-
 			{/* Footer with Cancel and Save buttons */}
 			<div className="context-link-footer">
 				<Button onClick={onCancel}>Cancel</Button>
@@ -352,9 +351,5 @@ function UpdateContextLinks({
 		</div>
 	);
 }
-
-UpdateContextLinks.defaultProps = {
-	selectedWidget: undefined,
-};
 
 export default UpdateContextLinks;

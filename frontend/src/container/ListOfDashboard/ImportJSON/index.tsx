@@ -1,6 +1,6 @@
 // #TODO: Lucide will be removing brand icons like GitHub in the future. In that case, we can use Simple Icons. https://simpleicons.org/
 // See more: https://github.com/lucide-icons/lucide/issues/94
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { red } from '@ant-design/colors';
@@ -123,7 +123,7 @@ function ImportJSON({
 
 	const getErrorNode = (error: string): JSX.Element => (
 		<Space>
-			<CircleAlert size="md" color={red[7]} />
+			<CircleAlert size={16} color={red[7]} />
 			<Typography style={{ color: 'var(--warning-background)' }}>
 				{error}
 			</Typography>

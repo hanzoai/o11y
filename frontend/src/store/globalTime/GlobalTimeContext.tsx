@@ -1,10 +1,10 @@
 import {
 	// oxlint-disable-next-line no-restricted-imports
 	createContext,
-	ReactNode,
-	// oxlint-disable-next-line no-restricted-imports
+	ReactNode, // oxlint-disable-next-line no-restricted-imports
 	useContext,
 	useState,
+	type JSX,
 } from 'react';
 import { DEFAULT_TIME_RANGE } from 'container/TopNav/DateTimeSelectionV2/constants';
 

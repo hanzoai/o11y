@@ -105,9 +105,9 @@ describe('InviteTeamMembers', () => {
 			expect(
 				screen.getByText(/o11y is a lot more useful with collaborators/i),
 			).toBeInTheDocument();
-			expect(
-				screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i),
-			).toHaveLength(3);
+			expect(screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i)).toHaveLength(
+				3,
+			);
 			expect(screen.getByText('Email address')).toBeInTheDocument();
 			expect(screen.getByText('Roles')).toBeInTheDocument();
 			expect(
@@ -133,24 +133,22 @@ describe('InviteTeamMembers', () => {
 			const user = userEvent.setup({ pointerEventsCheck: 0 });
 			renderComponent();
 
-			expect(
-				screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i),
-			).toHaveLength(3);
+			expect(screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i)).toHaveLength(
+				3,
+			);
 
 			await user.click(screen.getByRole('button', { name: /add another/i }));
 
-			expect(
-				screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i),
-			).toHaveLength(4);
+			expect(screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i)).toHaveLength(
+				4,
+			);
 		});
 
 		it('removes the correct row when its trash icon is clicked', async () => {
 			const user = userEvent.setup({ pointerEventsCheck: 0 });
 			renderComponent();
 
-			const emailInputs = screen.getAllByPlaceholderText(
-				/e\.g\. john@o11y\.io/i,
-			);
+			const emailInputs = screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i);
 			await user.type(emailInputs[0], 'first@example.com');
 			await screen.findByDisplayValue('first@example.com');
 
@@ -196,9 +194,7 @@ describe('InviteTeamMembers', () => {
 			});
 			renderComponent();
 
-			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@o11y\.io/i,
-			);
+			const [firstInput] = screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i);
 
 			await user.type(firstInput, 'not-an-email');
 			jest.advanceTimersByTime(600);
@@ -223,9 +219,7 @@ describe('InviteTeamMembers', () => {
 			});
 			renderComponent();
 
-			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@o11y\.io/i,
-			);
+			const [firstInput] = screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i);
 			await user.type(firstInput, 'a');
 			await user.clear(firstInput);
 			jest.advanceTimersByTime(600);
@@ -251,9 +245,7 @@ describe('InviteTeamMembers', () => {
 				screen.getAllByRole('button', { name: /remove team member/i })[0],
 			);
 
-			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@o11y\.io/i,
-			);
+			const [firstInput] = screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i);
 
 			await user.type(firstInput, 'bad-email');
 			await user.click(screen.getByRole('button', { name: /send invites/i }));
@@ -316,9 +308,7 @@ describe('InviteTeamMembers', () => {
 				screen.getAllByRole('button', { name: /remove team member/i })[0],
 			);
 
-			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@o11y\.io/i,
-			);
+			const [firstInput] = screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i);
 
 			await user.type(firstInput, '   ');
 			await user.click(screen.getByRole('button', { name: /send invites/i }));
@@ -375,9 +365,7 @@ describe('InviteTeamMembers', () => {
 			expect(sendInvitesBtn).toBeDisabled();
 
 			// Type something to make a row touched
-			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@o11y\.io/i,
-			);
+			const [firstInput] = screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i);
 			await user.type(firstInput, 'a');
 
 			expect(sendInvitesBtn).not.toBeDisabled();
@@ -398,9 +386,7 @@ describe('InviteTeamMembers', () => {
 			const user = userEvent.setup({ pointerEventsCheck: 0 });
 			renderComponent();
 
-			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@o11y\.io/i,
-			);
+			const [firstInput] = screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i);
 			await user.type(firstInput, 'only@example.com');
 			await selectRole(user, 0, 'Admin');
 			await user.click(screen.getByRole('button', { name: /send invites/i }));
@@ -422,9 +408,7 @@ describe('InviteTeamMembers', () => {
 			const user = userEvent.setup({ pointerEventsCheck: 0 });
 			renderComponent();
 
-			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@o11y\.io/i,
-			);
+			const [firstInput] = screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i);
 			await user.type(firstInput, 'alice@example.com');
 			await selectRole(user, 0, 'Admin');
 			await user.click(screen.getByRole('button', { name: /send invites/i }));
@@ -458,9 +442,7 @@ describe('InviteTeamMembers', () => {
 			const user = userEvent.setup({ pointerEventsCheck: 0 });
 			renderComponent();
 
-			const [firstInput] = screen.getAllByPlaceholderText(
-				/e\.g\. john@o11y\.io/i,
-			);
+			const [firstInput] = screen.getAllByPlaceholderText(/e\.g\. john@o11y\.io/i);
 			await user.type(firstInput, 'fail@example.com');
 			await selectRole(user, 0, 'Viewer');
 			await user.click(screen.getByRole('button', { name: /send invites/i }));

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -41,9 +41,9 @@ import {
 import './CeleryTaskGraph.style.scss';
 
 function CeleryTaskBar({
-	onClick,
+	onClick = (): void => {},
 	queryEnabled,
-	checkIfDataExists,
+	checkIfDataExists = undefined,
 }: {
 	onClick?: (task: CaptureDataProps) => void;
 
@@ -261,10 +261,5 @@ function CeleryTaskBar({
 		</Card>
 	);
 }
-
-CeleryTaskBar.defaultProps = {
-	onClick: (): void => {},
-	checkIfDataExists: undefined,
-};
 
 export default CeleryTaskBar;

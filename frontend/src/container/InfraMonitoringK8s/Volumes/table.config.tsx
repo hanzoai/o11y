@@ -11,6 +11,8 @@ import { InfraMonitoringEntity } from '../constants';
 import { K8sVolumesData } from './api';
 import { HardDrive } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export function getK8sVolumeRowKey(volume: K8sVolumesData): string {
 	return (
 		volume.persistentVolumeClaimName ||

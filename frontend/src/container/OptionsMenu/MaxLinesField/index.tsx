@@ -4,6 +4,8 @@ import { FieldTitle } from '../styles';
 import { OptionsMenuConfig } from '../types';
 import { MaxLinesFieldWrapper, MaxLinesInput } from './styles';
 
+import type { JSX } from 'react';
+
 function MaxLinesField({ config }: MaxLinesFieldProps): JSX.Element | null {
 	const { t } = useTranslation(['trace']);
 

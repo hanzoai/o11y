@@ -1,5 +1,5 @@
 import { Typography } from 'components/ui/typography';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from 'react-query';
 import { CircleCheck, CloudDownload } from 'components/ui/icons';
@@ -453,7 +453,7 @@ export default function BillingContainer(): JSX.Element {
 							className="periscope-btn"
 						>
 							<Flex align="center" justify="center" gap={4}>
-								<CloudDownload size="md" />
+								<CloudDownload size={16} />
 								Download CSV
 							</Flex>
 						</Button>
@@ -557,15 +557,15 @@ export default function BillingContainer(): JSX.Element {
 					>
 						<Col span={20} className="plan-benefits">
 							<Typography.Text className="plan-benefit">
-								<CircleCheck size="md" />
+								<CircleCheck size={16} />
 								{t('upgrade_now_text')}
 							</Typography.Text>
 							<Typography.Text className="plan-benefit">
-								<CircleCheck size="md" />
+								<CircleCheck size={16} />
 								{t('Your billing will start only after the trial period')}
 							</Typography.Text>
 							<Typography.Text className="plan-benefit">
-								<CircleCheck size="md" />
+								<CircleCheck size={16} />
 								<span>
 									{t('checkout_plans')} &nbsp;
 									<a

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, type JSX } from 'react';
 import {
 	closestCenter,
 	DndContext,
@@ -85,7 +85,7 @@ function SortableContextLink({
 function ContextLinks({
 	contextLinks,
 	setContextLinks,
-	selectedWidget,
+	selectedWidget = undefined,
 }: {
 	contextLinks: ContextLinksData;
 	setContextLinks: Dispatch<SetStateAction<ContextLinksData>>;
@@ -181,9 +181,5 @@ function ContextLinks({
 		</div>
 	);
 }
-
-ContextLinks.defaultProps = {
-	selectedWidget: undefined,
-};
 
 export default ContextLinks;

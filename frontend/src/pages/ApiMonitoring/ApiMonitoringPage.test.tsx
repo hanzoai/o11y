@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react';
 
 import ApiMonitoringPage from './ApiMonitoringPage';
 
+import type { JSX } from 'react';
+
 // Mock the child component to isolate the ApiMonitoringPage logic
 // We are not testing ExplorerPage here, just that ApiMonitoringPage renders it via RouteTab.
 jest.mock('container/ApiMonitoring/Explorer/Explorer', () => ({

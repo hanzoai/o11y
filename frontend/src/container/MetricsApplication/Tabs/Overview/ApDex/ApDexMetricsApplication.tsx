@@ -10,6 +10,8 @@ import { IServiceName } from '../../types';
 import ApDexMetrics from './ApDexMetrics';
 import { ApDexDataSwitcherProps } from './types';
 
+import type { JSX } from 'react';
+
 function ApDexMetricsApplication({
 	handleGraphClick,
 	onDragSelect,

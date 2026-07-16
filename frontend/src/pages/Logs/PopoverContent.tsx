@@ -1,6 +1,8 @@
 import { InputNumber, Row, Space } from 'antd';
 import { Typography } from 'components/ui/typography';
 
+import type { JSX } from 'react';
+
 interface PopoverContentProps {
 	linesPerRow: number;
 	handleLinesPerRowChange: (l: unknown) => void;

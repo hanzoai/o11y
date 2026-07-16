@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type JSX } from 'react';
 import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
 import cx from 'classnames';
@@ -14,13 +14,13 @@ import './EmptyLogsSearch.styles.scss';
 interface EmptyLogsSearchProps {
 	dataSource: DataSource;
 	panelType: PanelTypeKeys;
-	customMessage?: EmptyLogsListConfig;
+	customMessage?: EmptyLogsListConfig | null;
 }
 
 export default function EmptyLogsSearch({
 	dataSource,
 	panelType,
-	customMessage,
+	customMessage = null,
 }: EmptyLogsSearchProps): JSX.Element {
 	const logEventCalledRef = useRef(false);
 	useEffect(() => {
@@ -113,7 +113,3 @@ export default function EmptyLogsSearch({
 		</div>
 	);
 }
-
-EmptyLogsSearch.defaultProps = {
-	customMessage: null,
-};

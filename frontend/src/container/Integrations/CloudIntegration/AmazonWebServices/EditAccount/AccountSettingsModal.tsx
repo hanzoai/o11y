@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback, type JSX } from 'react';
 import { useQueryClient } from 'react-query';
 import { Button } from 'components/ui/button';
 import { DrawerWrapper } from 'components/ui/drawer';

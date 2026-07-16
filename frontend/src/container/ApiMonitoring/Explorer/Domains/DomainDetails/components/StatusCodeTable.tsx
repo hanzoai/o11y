@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { UseQueryResult } from 'react-query';
 import { Table } from 'antd';
 import { Typography } from 'components/ui/typography';

@@ -4,6 +4,7 @@ import React, {
 	SetStateAction,
 	useEffect,
 	useMemo,
+	type JSX,
 } from 'react';
 import {
 	ColumnDef,
@@ -198,8 +199,3 @@ export function TableV3<T>(props: ITableV3Props<T>): JSX.Element {
 		</div>
 	);
 }
-
-TableV3.defaultProps = {
-	customClassName: '',
-	virtualiserRef: null,
-};

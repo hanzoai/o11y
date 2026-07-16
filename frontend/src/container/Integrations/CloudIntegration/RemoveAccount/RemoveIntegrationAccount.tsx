@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Button } from 'components/ui/button';
 import { Modal } from 'antd/lib';
 import logEvent from 'api/common/logEvent';

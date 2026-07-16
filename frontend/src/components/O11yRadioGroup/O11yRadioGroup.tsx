@@ -2,6 +2,8 @@ import { ToggleGroupSimple } from 'components/ui/toggle-group';
 
 import './O11yRadioGroup.styles.scss';
 
+import type { JSX } from 'react';
+
 interface Option {
 	value: string;
 	label: string | React.ReactNode;
@@ -42,10 +44,5 @@ function O11yRadioGroup({
 		/>
 	);
 }
-
-O11yRadioGroup.defaultProps = {
-	className: '',
-	disabled: false,
-};
 
 export default O11yRadioGroup;

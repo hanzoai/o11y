@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, JSX } from 'react';
 import { toast } from '@hanzo/ui';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import {

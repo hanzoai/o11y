@@ -13,10 +13,12 @@ import { FormWrapper, PipelineIndexIcon, StyledSelect } from './styles';
 
 import './styles.scss';
 
+import type { JSX } from 'react';
+
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function ProcessorFieldInput({
 	fieldData,
-	selectedProcessorData,
+	selectedProcessorData = undefined,
 	isAdd,
 }: ProcessorFieldInputProps): JSX.Element | null {
 	const { t } = useTranslation('pipeline');
@@ -118,10 +120,6 @@ function ProcessorFieldInput({
 	);
 }
 
-ProcessorFieldInput.defaultProps = {
-	selectedProcessorData: undefined,
-};
-
 interface ProcessorFieldInputProps {
 	fieldData: ProcessorFormField;
 	selectedProcessorData?: ProcessorData;
@@ -130,7 +128,7 @@ interface ProcessorFieldInputProps {
 
 function ProcessorForm({
 	processorType,
-	selectedProcessorData,
+	selectedProcessorData = undefined,
 	isAdd,
 }: ProcessorFormProps): JSX.Element {
 	return (
@@ -146,10 +144,6 @@ function ProcessorForm({
 		</div>
 	);
 }
-
-ProcessorForm.defaultProps = {
-	selectedProcessorData: undefined,
-};
 
 interface ProcessorFormProps {
 	processorType: string;

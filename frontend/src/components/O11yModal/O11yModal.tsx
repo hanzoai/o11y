@@ -2,6 +2,8 @@ import { Modal, ModalProps } from 'antd';
 
 import './O11yModal.style.scss';
 
+import type { JSX } from 'react';
+
 function O11yModal({
 	children,
 	width = 672,

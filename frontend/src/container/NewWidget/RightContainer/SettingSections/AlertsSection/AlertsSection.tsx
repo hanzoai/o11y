@@ -1,7 +1,13 @@
 import { Typography } from 'components/ui/typography';
-import { ConciergeBell, Plus, SquareArrowOutUpRight } from 'components/ui/icons';
+import {
+	ConciergeBell,
+	Plus,
+	SquareArrowOutUpRight,
+} from 'components/ui/icons';
 
 import './AlertsSection.styles.scss';
+
+import type { JSX } from 'react';
 
 interface AlertsSectionProps {
 	onCreateAlertsHandler: () => void;

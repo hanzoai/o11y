@@ -1,4 +1,4 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, type JSX } from 'react';
 import { useParams } from 'react-router-dom';
 import { Space } from 'antd';
 import { Typography } from 'components/ui/typography';
@@ -110,10 +110,5 @@ function ApDexMetrics({
 		/>
 	);
 }
-
-ApDexMetrics.defaultProps = {
-	delta: undefined,
-	le: undefined,
-};
 
 export default ApDexMetrics;

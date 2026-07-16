@@ -60,7 +60,7 @@ export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(
 			data-testid={testId}
 			{...props}
 		/>
-	)
+	),
 );
 TabsRoot.displayName = 'TabsRoot';
 
@@ -100,13 +100,13 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 				slider.style.width = `${triggerRect.width}px`;
 				slider.style.opacity = '1';
 			},
-			[]
+			[],
 		);
 
 		const updateActiveSlider = React.useCallback(() => {
 			if (variant !== 'primary' || !listRef.current) return;
 			const activeTrigger = listRef.current.querySelector(
-				'[data-slot="tabs-trigger"][data-state="active"]'
+				'[data-slot="tabs-trigger"][data-state="active"]',
 			);
 			updateSliderPosition(activeSliderRef.current, activeTrigger);
 		}, [variant, updateSliderPosition]);
@@ -118,7 +118,10 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 			if (!list) return undefined;
 			const observer = new MutationObserver((mutations) => {
 				for (const mutation of mutations) {
-					if (mutation.type === 'attributes' && mutation.attributeName === 'data-state') {
+					if (
+						mutation.type === 'attributes' &&
+						mutation.attributeName === 'data-state'
+					) {
 						updateActiveSlider();
 						break;
 					}
@@ -142,10 +145,12 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 		const handleMouseOver = React.useCallback(
 			(e: React.MouseEvent) => {
 				if (variant !== 'primary') return;
-				const trigger = (e.target as HTMLElement).closest('[data-slot="tabs-trigger"]');
+				const trigger = (e.target as HTMLElement).closest(
+					'[data-slot="tabs-trigger"]',
+				);
 				if (trigger) updateSliderPosition(hoverSliderRef.current, trigger);
 			},
-			[variant, updateSliderPosition]
+			[variant, updateSliderPosition],
 		);
 
 		const handleMouseLeave = React.useCallback(() => {
@@ -156,9 +161,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 
 		return (
 			<div data-slot="tabs-list-wrapper" data-variant={variant}>
-				{variant === 'secondary' && (
-					<div data-slot="tabs-border-spacer" />
-				)}
+				{variant === 'secondary' && <div data-slot="tabs-border-spacer" />}
 				<TabsPrimitive.List
 					ref={listRef}
 					data-slot="tabs-list"
@@ -180,18 +183,29 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 							data-slot="tabs-hover-slider"
 							style={{ height: '28px', opacity: 0 }}
 						/>
-						<div ref={activeSliderRef} data-slot="tabs-active-slider" style={{ opacity: 0 }} />
+						<div
+							ref={activeSliderRef}
+							data-slot="tabs-active-slider"
+							style={{ opacity: 0 }}
+						/>
 					</>
 				)}
 			</div>
 		);
-	}
+	},
 );
 TabsList.displayName = 'TabsList';
 
 export type TabsTriggerProps = Pick<
 	React.ComponentPropsWithoutRef<'button'>,
-	'id' | 'className' | 'style' | 'children' | 'onMouseEnter' | 'onMouseDown' | 'onMouseLeave' | 'title'
+	| 'id'
+	| 'className'
+	| 'style'
+	| 'children'
+	| 'onMouseEnter'
+	| 'onMouseDown'
+	| 'onMouseLeave'
+	| 'title'
 > & {
 	/** The testId associated with the tabs trigger. */
 	testId?: string;
@@ -206,8 +220,14 @@ export type TabsTriggerProps = Pick<
 /**
  * Interactive button that activates its associated tab content panel.
  */
-export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(
-	({ className, children, variant = 'primary', disabled, testId, ...props }, ref) => (
+export const TabsTrigger = React.forwardRef<
+	HTMLButtonElement,
+	TabsTriggerProps
+>(
+	(
+		{ className, children, variant = 'primary', disabled, testId, ...props },
+		ref,
+	) => (
 		<TabsPrimitive.Trigger
 			ref={ref}
 			data-slot="tabs-trigger"
@@ -219,7 +239,7 @@ export const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>
 		>
 			{children}
 		</TabsPrimitive.Trigger>
-	)
+	),
 );
 TabsTrigger.displayName = 'TabsTrigger';
 
@@ -247,7 +267,7 @@ export const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
 			data-testid={testId}
 			{...props}
 		/>
-	)
+	),
 );
 TabsContent.displayName = 'TabsContent';
 
@@ -287,7 +307,19 @@ export type TabsProps = Pick<
  * Renders a full tabs set from an `items` array.
  */
 export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
-	({ items, onChange, defaultValue, value, variant = 'primary', className, testId, ...props }, ref) => (
+	(
+		{
+			items,
+			onChange,
+			defaultValue,
+			value,
+			variant = 'primary',
+			className,
+			testId,
+			...props
+		},
+		ref,
+	) => (
 		<TabsRoot
 			ref={ref}
 			onValueChange={onChange}
@@ -304,7 +336,9 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
 						value={item.key}
 						disabled={item.disabled}
 						variant={variant}
-						title={item.disabled ? item.disabledReason || 'This tab is disabled' : undefined}
+						title={
+							item.disabled ? item.disabledReason || 'This tab is disabled' : undefined
+						}
 					>
 						{item.disabled ? (
 							<Lock data-slot="tabs-icon" className="tabs-icon" size={16} />
@@ -330,6 +364,6 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(
 				</TabsContent>
 			))}
 		</TabsRoot>
-	)
+	),
 );
 Tabs.displayName = 'Tabs';

@@ -1,5 +1,9 @@
 import React from 'react';
-import { ToggleGroup, ToggleGroupItem, type ToggleGroupProps } from '../toggle-group';
+import {
+	ToggleGroup,
+	ToggleGroupItem,
+	type ToggleGroupProps,
+} from '../toggle-group';
 
 export type ToggleGroupSimpleItem = {
 	/**
@@ -28,17 +32,27 @@ export type ToggleGroupSimpleProps = Omit<ToggleGroupProps, 'children'> & {
  * with minimal configuration. Supports icon-only, label-only, or icon + label via
  * label as ReactNode.
  */
-const ToggleGroupSimpleInner = React.forwardRef<HTMLDivElement, ToggleGroupSimpleProps>(
-	({ items = [], size = 'default', color = 'secondary', ...props }, ref) => (
-		<ToggleGroup ref={ref} size={size} color={color} {...(props as unknown as ToggleGroupProps)}>
-			{items.map((item) => (
-				<ToggleGroupItem key={item.value} value={item.value} aria-label={item['aria-label']}>
-					{item.label}
-				</ToggleGroupItem>
-			))}
-		</ToggleGroup>
-	)
-);
+const ToggleGroupSimpleInner = React.forwardRef<
+	HTMLDivElement,
+	ToggleGroupSimpleProps
+>(({ items = [], size = 'default', color = 'secondary', ...props }, ref) => (
+	<ToggleGroup
+		ref={ref}
+		size={size}
+		color={color}
+		{...(props as unknown as ToggleGroupProps)}
+	>
+		{items.map((item) => (
+			<ToggleGroupItem
+				key={item.value}
+				value={item.value}
+				aria-label={item['aria-label']}
+			>
+				{item.label}
+			</ToggleGroupItem>
+		))}
+	</ToggleGroup>
+));
 ToggleGroupSimpleInner.displayName = 'ToggleGroupSimpleInner';
 
 export const ToggleGroupSimple = React.memo(ToggleGroupSimpleInner);

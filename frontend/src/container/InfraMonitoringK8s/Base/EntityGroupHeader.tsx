@@ -2,6 +2,8 @@ import { Group } from 'components/ui/icons';
 
 import styles from './EntityGroupHeader.module.scss';
 
+import type { JSX } from 'react';
+
 interface EntityGroupHeaderProps {
 	title: string;
 	icon?: React.ReactNode;

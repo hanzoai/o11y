@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useMemo, useState } from 'react';
+import { ReactNode, useCallback, useMemo, useState, type JSX } from 'react';
 import { Loader } from 'components/ui/icons';
 import { Button, Popover, Spin } from 'antd';
 import { Typography } from 'components/ui/typography';

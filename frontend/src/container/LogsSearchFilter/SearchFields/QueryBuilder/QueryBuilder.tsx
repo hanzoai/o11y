@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { SquareX, X } from 'components/ui/icons';
@@ -162,7 +162,7 @@ function QueryField({
 			</div>
 
 			<Button
-				icon={<X size="md" />}
+				icon={<X size={16} />}
 				type="text"
 				size="small"
 				onClick={handleClear}
@@ -248,7 +248,7 @@ function QueryBuilder({
 		<>
 			<Container isMargin={fieldsQuery.length === 0}>
 				<CategoryHeading>LOG QUERY BUILDER</CategoryHeading>
-				<SquareX onClick={onDropDownToggleHandler(false)} size="md" />
+				<SquareX onClick={onDropDownToggleHandler(false)} size={16} />
 			</Container>
 
 			<QueryWrapper key={keyPrefix}>{QueryUI(fieldsQuery)}</QueryWrapper>

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { Popover } from 'antd';
 
@@ -29,8 +29,8 @@ interface ContextMenuItemProps {
 
 function ContextMenuItem({
 	children,
-	onClick,
-	icon,
+	onClick = undefined,
+	icon = undefined,
 	disabled = false,
 	danger = false,
 }: ContextMenuItemProps): JSX.Element {
@@ -61,11 +61,11 @@ function ContextMenuHeader({ children }: ContextMenuHeaderProps): JSX.Element {
 
 export function ContextMenu({
 	coordinates,
-	popoverPosition,
-	title,
-	items,
+	popoverPosition = null,
+	title = '',
+	items = null,
 	onClose,
-	children,
+	children = null,
 }: ContextMenuProps): JSX.Element | null {
 	if (!coordinates || !items) {
 		return null;
@@ -139,21 +139,6 @@ export function ContextMenu({
 ContextMenu.Item = ContextMenuItem;
 ContextMenu.Header = ContextMenuHeader;
 
-// default props for ContextMenuItem
-ContextMenuItem.defaultProps = {
-	onClick: undefined,
-	icon: undefined,
-	disabled: false,
-	danger: false,
-};
-
-// default props
-ContextMenu.defaultProps = {
-	popoverPosition: null,
-	title: '',
-	items: null,
-	children: null,
-};
 export default ContextMenu;
 
 // ENHANCEMENT:

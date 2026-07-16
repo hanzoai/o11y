@@ -1,4 +1,4 @@
-import { memo, MouseEventHandler } from 'react';
+import { memo, MouseEventHandler, type JSX } from 'react';
 import { Link, TextSelect } from 'components/ui/icons';
 import { Button, Tooltip } from 'antd';
 
@@ -36,9 +36,5 @@ function LogLinesActionButtons({
 		</div>
 	);
 }
-
-LogLinesActionButtons.defaultProps = {
-	customClassName: '',
-};
 
 export default memo(LogLinesActionButtons);

@@ -10,6 +10,8 @@ import Overview from './IntegrationDetailContentTabs/Overview';
 
 import './IntegrationDetailPage.styles.scss';
 
+import type { JSX } from 'react';
+
 interface IntegrationDetailContentProps {
 	activeDetailTab: string;
 	integrationData: IntegrationDetailedProps;

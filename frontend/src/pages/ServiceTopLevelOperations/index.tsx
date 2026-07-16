@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
@@ -124,7 +124,6 @@ export default function ServiceTopLevelOperations(): JSX.Element {
 						columns={columns}
 						bordered
 						title={(): string => 'Top Level Operations'}
-						// @ts-expect-error
 						dataSource={topLevelOperations}
 						loading={isLoading}
 						showHeader={false}

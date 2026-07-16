@@ -4,6 +4,8 @@ import { BellOff, CircleCheck, CircleOff, Flame } from 'components/ui/icons';
 
 import './AlertState.styles.scss';
 
+import type { JSX } from 'react';
+
 type AlertStateProps = {
 	state: string;
 	showLabel?: boolean;
@@ -11,7 +13,7 @@ type AlertStateProps = {
 
 export default function AlertState({
 	state,
-	showLabel,
+	showLabel = false,
 }: AlertStateProps): JSX.Element {
 	let icon;
 	let label;
@@ -67,7 +69,3 @@ export default function AlertState({
 		</div>
 	);
 }
-
-AlertState.defaultProps = {
-	showLabel: false,
-};

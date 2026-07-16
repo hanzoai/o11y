@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useState } from 'react';
+import { ChangeEvent, useCallback, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { CirclePlus, X } from 'components/ui/icons';
@@ -62,7 +62,6 @@ function LogsFilters(): JSX.Element {
 		<Col flex="250px">
 			<Input
 				placeholder="Filter Values"
-				onInput={handleSearch}
 				value={filterValuesInput}
 				onChange={handleSearch}
 			/>
@@ -79,7 +78,7 @@ function LogsFilters(): JSX.Element {
 								name={field.name}
 								fieldData={field}
 								fieldIndex={idx}
-								buttonIcon={<X style={ICON_STYLE.CLOSE} size="md" />}
+								buttonIcon={<X style={ICON_STYLE.CLOSE} size={16} />}
 								buttonOnClick={onHandleRemoveSelected({
 									fieldData: field,
 									fieldIndex: idx,
@@ -101,7 +100,7 @@ function LogsFilters(): JSX.Element {
 								name={field.name}
 								fieldData={field}
 								fieldIndex={idx}
-								buttonIcon={<CirclePlus style={ICON_STYLE.PLUS} size="md" />}
+								buttonIcon={<CirclePlus style={ICON_STYLE.PLUS} size={16} />}
 								buttonOnClick={onHandleAddSelectedToInteresting({
 									fieldData: field,
 									fieldIndex: idx,

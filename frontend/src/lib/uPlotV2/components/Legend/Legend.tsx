@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type JSX } from 'react';
 import { VirtuosoGrid } from 'react-virtuoso';
 import { Input, Tooltip as AntdTooltip } from 'antd';
 import cx from 'classnames';

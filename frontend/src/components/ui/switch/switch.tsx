@@ -3,7 +3,14 @@ import * as SwitchPrimitive from '@radix-ui/react-switch';
 import React from 'react';
 import { cn } from '../lib/utils';
 
-type SwitchColor = 'robin' | 'forest' | 'amber' | 'sienna' | 'cherry' | 'sakura' | 'aqua';
+type SwitchColor =
+	| 'robin'
+	| 'forest'
+	| 'amber'
+	| 'sienna'
+	| 'cherry'
+	| 'sakura'
+	| 'aqua';
 
 export type SwitchProps = Pick<
 	React.ComponentPropsWithoutRef<'button'>,
@@ -63,7 +70,19 @@ type SwitchBaseProps = Omit<
 >;
 
 const SwitchBase = React.forwardRef<HTMLButtonElement, SwitchBaseProps>(
-	({ className, style, testId, value, onChange, defaultValue, color = 'robin', ...props }, ref) => (
+	(
+		{
+			className,
+			style,
+			testId,
+			value,
+			onChange,
+			defaultValue,
+			color = 'robin',
+			...props
+		},
+		ref,
+	) => (
 		<SwitchPrimitive.Root
 			ref={ref}
 			data-slot="switch"
@@ -78,7 +97,7 @@ const SwitchBase = React.forwardRef<HTMLButtonElement, SwitchBaseProps>(
 		>
 			<SwitchPrimitive.Thumb data-slot="switch-thumb" />
 		</SwitchPrimitive.Root>
-	)
+	),
 );
 SwitchBase.displayName = SwitchPrimitive.Root.displayName;
 
@@ -99,7 +118,7 @@ const SwitchWrapper = React.forwardRef<HTMLButtonElement, SwitchProps>(
 			containerTestId,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const fallbackId = React.useId();
 		const switchId = id || fallbackId;
@@ -126,7 +145,7 @@ const SwitchWrapper = React.forwardRef<HTMLButtonElement, SwitchProps>(
 				)}
 			</div>
 		);
-	}
+	},
 );
 SwitchWrapper.displayName = 'Switch';
 

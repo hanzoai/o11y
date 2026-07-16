@@ -9,6 +9,8 @@ import HeaderRightSection from 'components/HeaderRightSection/HeaderRightSection
 
 import { RouteTabProps } from './types';
 
+import type { JSX } from 'react';
+
 interface Params {
 	[key: string]: string;
 }
@@ -16,9 +18,9 @@ interface Params {
 function RouteTab({
 	routes,
 	activeKey,
-	onChangeHandler,
+	onChangeHandler = undefined,
 	history,
-	showRightSection,
+	showRightSection = true,
 	...rest
 }: RouteTabProps & TabsProps): JSX.Element {
 	const params = useParams<Params>();
@@ -74,10 +76,5 @@ function RouteTab({
 		/>
 	);
 }
-
-RouteTab.defaultProps = {
-	onChangeHandler: undefined,
-	showRightSection: true,
-};
 
 export default RouteTab;

@@ -4,6 +4,8 @@ import { AlertRuleStats } from 'types/api/alerts/def';
 
 import TopContributorsCard from '../TopContributorsCard/TopContributorsCard';
 
+import type { JSX } from 'react';
+
 type TopContributorsRendererProps = {
 	totalCurrentTriggers: AlertRuleStats['totalCurrentTriggers'];
 };

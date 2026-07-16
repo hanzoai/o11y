@@ -2,6 +2,8 @@ import { TooltipContentItem } from '../../../types';
 
 import Styles from './TooltipItem.module.scss';
 
+import type { JSX } from 'react';
+
 interface TooltipItemProps {
 	item: TooltipContentItem;
 	isItemActive: boolean;

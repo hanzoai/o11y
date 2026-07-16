@@ -1,5 +1,5 @@
 import { Typography } from 'components/ui/typography';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState, type JSX } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
 	OctagonAlert,

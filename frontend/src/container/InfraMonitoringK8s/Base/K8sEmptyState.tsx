@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { Button } from 'components/ui/button';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import history from 'lib/history';
@@ -102,8 +102,8 @@ export function K8sEmptyState({
 				<div className={styles.content}>
 					<img className={styles.eyesEmoji} src={eyesEmojiUrl} alt="eyes emoji" />
 					<span className={styles.message}>
-						To see K8s metrics, upgrade to the latest version of O11y k8s-infra
-						chart. Please contact support if you need help.
+						To see K8s metrics, upgrade to the latest version of O11y k8s-infra chart.
+						Please contact support if you need help.
 					</span>
 				</div>
 			</div>

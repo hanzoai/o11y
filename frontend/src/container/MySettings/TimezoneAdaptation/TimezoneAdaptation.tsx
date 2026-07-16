@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Switch } from 'components/ui/switch';
 import logEvent from 'api/common/logEvent';

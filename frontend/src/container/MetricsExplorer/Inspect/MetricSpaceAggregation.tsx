@@ -6,6 +6,8 @@ import { SPACE_AGGREGATION_OPTIONS } from './constants';
 import { InspectionStep } from './types';
 import { MetricSpaceAggregationProps } from './types';
 
+import type { JSX } from 'react';
+
 function MetricSpaceAggregation({
 	spaceAggregationLabels,
 	currentMetricInspectionOptions,

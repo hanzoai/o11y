@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { matchPath, useHistory } from 'react-router-dom';
 import HeaderRightSection from 'components/HeaderRightSection/HeaderRightSection';
 import ROUTES from 'constants/routes';

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, type JSX } from 'react';
 import { X } from 'components/ui/icons';
 import { Select } from 'antd';
 import { TraceReducer } from 'types/reducer/trace';
@@ -157,7 +157,7 @@ function SingleTags(props: AllTagsProps): JSX.Element {
 			)}
 
 			<IconContainer role="button" onClick={(): void => onDeleteTagHandler(index)}>
-				<X size="md" />
+				<X size={16} />
 			</IconContainer>
 		</Container>
 	);

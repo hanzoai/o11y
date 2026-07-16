@@ -1,5 +1,7 @@
 import notFound404Url from '@/assets/Images/notFound404.png';
 
+import type { JSX } from 'react';
+
 function NotFound(): JSX.Element {
 	return (
 		<img

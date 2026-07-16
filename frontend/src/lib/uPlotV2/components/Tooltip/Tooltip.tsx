@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import cx from 'classnames';
 
 import { TooltipProps } from '../types';

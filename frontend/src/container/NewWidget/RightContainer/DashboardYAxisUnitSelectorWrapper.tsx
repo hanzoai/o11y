@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, type JSX } from 'react';
 import { Typography } from 'components/ui/typography';
 import YAxisUnitSelectorComponent from 'components/YAxisUnitSelector';
 import { YAxisSource } from 'components/YAxisUnitSelector/types';
@@ -14,7 +14,7 @@ function DashboardYAxisUnitSelectorWrapper({
 	onSelect,
 	fieldLabel,
 	shouldUpdateYAxisUnit,
-	selectedQueryName,
+	selectedQueryName = undefined,
 	'data-testid': dataTestId,
 }: {
 	value: string;
@@ -48,9 +48,5 @@ function DashboardYAxisUnitSelectorWrapper({
 		</div>
 	);
 }
-
-DashboardYAxisUnitSelectorWrapper.defaultProps = {
-	selectedQueryName: undefined,
-};
 
 export default DashboardYAxisUnitSelectorWrapper;

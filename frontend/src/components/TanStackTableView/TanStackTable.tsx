@@ -1,4 +1,4 @@
-import type { ComponentProps, CSSProperties } from 'react';
+import type { ComponentProps, CSSProperties, JSX } from 'react';
 import {
 	forwardRef,
 	memo,

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Color, Spacing } from 'constants/designTokens';
 import { Divider, Drawer, Typography } from 'antd';
 import { RowData } from 'components/CeleryOverview/CeleryOverviewTable/CeleryOverviewTable';

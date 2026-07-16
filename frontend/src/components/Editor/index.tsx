@@ -1,14 +1,14 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import MEditor, { EditorProps } from '@monaco-editor/react';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 
 function Editor({
 	value,
-	language,
-	onChange,
-	readOnly,
-	height,
-	options,
+	language = 'yaml',
+	onChange = (): void => {},
+	readOnly = false,
+	height = '40vh',
+	options = {},
 }: MEditorProps): JSX.Element {
 	const isDarkMode = useIsDarkMode();
 
@@ -48,13 +48,5 @@ interface MEditorProps {
 	height?: string;
 	options?: EditorProps['options'];
 }
-
-Editor.defaultProps = {
-	language: 'yaml',
-	readOnly: false,
-	height: '40vh',
-	options: {},
-	onChange: (): void => {},
-};
 
 export default Editor;

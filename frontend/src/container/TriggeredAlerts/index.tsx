@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, JSX } from 'react';
 import { useCallback, useMemo } from 'react';
 import { Search } from 'components/ui/icons';
 import { Input } from 'antd';

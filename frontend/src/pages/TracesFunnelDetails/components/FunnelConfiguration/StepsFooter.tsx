@@ -6,6 +6,8 @@ import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 
 import './StepsFooter.styles.scss';
 
+import type { JSX } from 'react';
+
 interface StepsFooterProps {
 	stepsCount: number;
 	isSaving: boolean;

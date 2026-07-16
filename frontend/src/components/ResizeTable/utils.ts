@@ -20,7 +20,7 @@ export const getVisibleColumns: GetVisibleColumnsFunction = ({
 			columnVisibilityData = JSON.parse(storedData);
 			return dynamicColumns.filter((column) => {
 				if (column.key && !columnsData?.find((c) => c.key === column.key)) {
-					return columnVisibilityData[column.key];
+					return columnVisibilityData[String(column.key)];
 				}
 				return false;
 			});
@@ -50,7 +50,7 @@ export const setVisibleColumns = ({
 			const columnVisibilityData = JSON.parse(storedData);
 			const { key } = dynamicColumns[index];
 			if (key) {
-				columnVisibilityData[key] = checked;
+				columnVisibilityData[String(key)] = checked;
 			}
 			setLocalStorageKey(tablesource, JSON.stringify(columnVisibilityData));
 		}

@@ -4,6 +4,8 @@ import { FillMode } from 'lib/uPlotV2/config/types';
 
 import './FillModeSelector.styles.scss';
 
+import type { JSX } from 'react';
+
 interface FillModeSelectorProps {
 	value: FillMode;
 	onChange: (value: FillMode) => void;

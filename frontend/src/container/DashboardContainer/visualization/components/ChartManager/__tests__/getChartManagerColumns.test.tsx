@@ -5,6 +5,8 @@ import { UniversalYAxisUnit } from 'components/YAxisUnitSelector/types';
 import { getChartManagerColumns } from '../getChartMangerColumns';
 import { ExtendedChartDataset } from '../utils';
 
+import type { JSX } from 'react';
+
 const createMockDataset = (
 	index: number,
 	overrides: Partial<ExtendedChartDataset> = {},

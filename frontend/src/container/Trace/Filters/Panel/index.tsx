@@ -6,6 +6,8 @@ import { TraceFilterEnum, TraceReducer } from 'types/reducer/trace';
 import PanelBody from './PanelBody';
 import PanelHeading from './PanelHeading';
 
+import type { JSX } from 'react';
+
 function Panel(props: PanelProps): JSX.Element {
 	const traces = useSelector<AppState, TraceReducer>((state) => state.traces);
 

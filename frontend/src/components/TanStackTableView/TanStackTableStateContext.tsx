@@ -6,6 +6,7 @@ import {
 	useContext,
 	useEffect,
 	useRef,
+	type JSX,
 } from 'react';
 /* eslint-enable no-restricted-imports */
 import { VisibilityState } from '@tanstack/react-table';

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useHistory } from 'react-router-dom';
 import logEvent from 'api/common/logEvent';
 import ROUTES from 'constants/routes';

@@ -13,6 +13,8 @@ import { useCeleryFilterOptions } from '../useCeleryFilterOptions';
 
 import './CeleryTaskConfigOptions.styles.scss';
 
+import type { JSX } from 'react';
+
 function CeleryTaskConfigOptions(): JSX.Element {
 	const { handleSearch, isFetching, options } =
 		useCeleryFilterOptions('celery.task_name');

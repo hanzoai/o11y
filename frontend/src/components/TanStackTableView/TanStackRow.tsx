@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react';
+import type { MouseEvent, JSX } from 'react';
 import { memo, useCallback } from 'react';
 import { Row as TanStackRowModel } from '@tanstack/react-table';
 

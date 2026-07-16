@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Button } from 'components/ui/button';

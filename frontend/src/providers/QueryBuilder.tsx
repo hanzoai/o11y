@@ -7,6 +7,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import { isQueryUpdatedInView } from 'components/ExplorerCard/utils';

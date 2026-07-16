@@ -1,7 +1,7 @@
 // Uses Popover (not DropdownMenu like the rest of the antd-dropdown migration):
 // DropdownMenuTrigger preventDefaults pointerdown, breaking input focus and
 // dismissing on every keystroke. PopoverAnchor is a passive positioning element.
-import { ReactNode, useRef, useState } from 'react';
+import { ReactNode, useRef, useState, type JSX } from 'react';
 import { Popover, PopoverAnchor, PopoverContent } from 'components/ui/popover';
 import { Typography } from 'components/ui/typography';
 

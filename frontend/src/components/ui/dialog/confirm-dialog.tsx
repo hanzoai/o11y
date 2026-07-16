@@ -23,7 +23,11 @@ export type ConfirmDialogProps = {
 	style?: React.CSSProperties;
 	cancelText?: string;
 	onCancel?: () => void;
-	onConfirm: () => Promise<boolean | undefined | void> | boolean | undefined | void;
+	onConfirm: () =>
+		| Promise<boolean | undefined | void>
+		| boolean
+		| undefined
+		| void;
 	cancelIcon?: React.ReactElement;
 	confirmText: string;
 	confirmColor?: ButtonProps['color'];
@@ -34,86 +38,95 @@ export type ConfirmDialogProps = {
 	heightMode?: 'content' | 'fixed';
 };
 
-export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>((props, ref) => {
-	const {
-		testId,
-		id,
-		open,
-		onOpenChange,
-		title,
-		titleIcon,
-		children,
-		className,
-		style,
-		cancelText = 'Cancel',
-		onCancel,
-		onConfirm,
-		cancelIcon,
-		confirmText,
-		confirmColor = 'destructive',
-		confirmIcon,
-		disableOutsideClick = false,
-		width = 'base',
-	} = props;
+export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
+	(props, ref) => {
+		const {
+			testId,
+			id,
+			open,
+			onOpenChange,
+			title,
+			titleIcon,
+			children,
+			className,
+			style,
+			cancelText = 'Cancel',
+			onCancel,
+			onConfirm,
+			cancelIcon,
+			confirmText,
+			confirmColor = 'destructive',
+			confirmIcon,
+			disableOutsideClick = false,
+			width = 'base',
+		} = props;
 
-	const [uncontrolledOpen, setUncontrolledOpen] = useState(true);
-	const [loading, setLoading] = useState(false);
-	const isControlled = open !== undefined;
-	const isOpen = isControlled ? open : uncontrolledOpen;
+		const [uncontrolledOpen, setUncontrolledOpen] = useState(true);
+		const [loading, setLoading] = useState(false);
+		const isControlled = open !== undefined;
+		const isOpen = isControlled ? open : uncontrolledOpen;
 
-	const setOpen = (next: boolean): void => {
-		if (!isControlled) setUncontrolledOpen(next);
-		onOpenChange?.(next);
-	};
+		const setOpen = (next: boolean): void => {
+			if (!isControlled) setUncontrolledOpen(next);
+			onOpenChange?.(next);
+		};
 
-	const handleCancel = (): void => {
-		onCancel?.();
-		setOpen(false);
-	};
-
-	const handleConfirm = async (): Promise<void> => {
-		setLoading(true);
-		try {
-			const result = await onConfirm();
-			if (result === false) return;
+		const handleCancel = (): void => {
+			onCancel?.();
 			setOpen(false);
-		} finally {
-			setLoading(false);
-		}
-	};
+		};
 
-	return (
-		<Dialog open={isOpen} onOpenChange={setOpen}>
-			<DialogContent
-				ref={ref as never}
-				id={id}
-				data-testid={testId}
-				className={className}
-				style={style}
-				width={width}
-				showCloseButton={false}
-				onPointerDownOutside={disableOutsideClick ? (e) => e.preventDefault() : undefined}
-			>
-				<DialogHeader>
-					<DialogTitle icon={titleIcon}>{title}</DialogTitle>
-				</DialogHeader>
-				<DialogDescription>{children}</DialogDescription>
-				<DialogFooter className="gap-3 p-4 pt-0">
-					<Button variant="outlined" color="secondary" prefix={cancelIcon} onClick={handleCancel}>
-						{cancelText}
-					</Button>
-					<Button
-						variant="solid"
-						color={confirmColor}
-						loading={loading}
-						prefix={confirmIcon}
-						onClick={handleConfirm}
-					>
-						{confirmText}
-					</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
-	);
-});
+		const handleConfirm = async (): Promise<void> => {
+			setLoading(true);
+			try {
+				const result = await onConfirm();
+				if (result === false) return;
+				setOpen(false);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		return (
+			<Dialog open={isOpen} onOpenChange={setOpen}>
+				<DialogContent
+					ref={ref as never}
+					id={id}
+					data-testid={testId}
+					className={className}
+					style={style}
+					width={width}
+					showCloseButton={false}
+					onPointerDownOutside={
+						disableOutsideClick ? (e) => e.preventDefault() : undefined
+					}
+				>
+					<DialogHeader>
+						<DialogTitle icon={titleIcon}>{title}</DialogTitle>
+					</DialogHeader>
+					<DialogDescription>{children}</DialogDescription>
+					<DialogFooter className="gap-3 p-4 pt-0">
+						<Button
+							variant="outlined"
+							color="secondary"
+							prefix={cancelIcon}
+							onClick={handleCancel}
+						>
+							{cancelText}
+						</Button>
+						<Button
+							variant="solid"
+							color={confirmColor}
+							loading={loading}
+							prefix={confirmIcon}
+							onClick={handleConfirm}
+						>
+							{confirmText}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		);
+	},
+);
 ConfirmDialog.displayName = 'ConfirmDialog';

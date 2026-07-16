@@ -1,5 +1,7 @@
 import { Badge } from '@hanzo/ui';
 
+import type { JSX } from 'react';
+
 type BadgeColor =
 	| 'vanilla'
 	| 'robin'

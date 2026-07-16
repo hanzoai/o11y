@@ -4,6 +4,8 @@ import { Divider } from 'components/ui/divider';
 import styles from './AlertBreadcrumb.module.scss';
 import BreadcrumbItem, { BreadcrumbItemConfig } from './BreadcrumbItem';
 
+import type { JSX } from 'react';
+
 export interface AlertBreadcrumbProps {
 	items: BreadcrumbItemConfig[];
 	className?: string;

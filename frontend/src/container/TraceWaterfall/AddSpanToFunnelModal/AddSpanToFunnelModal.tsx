@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState, type JSX } from 'react';
 import { ArrowLeft, Check, Loader, Plus, Search } from 'components/ui/icons';
 import { Button, Input, Spin } from 'antd';
 import cx from 'classnames';
@@ -214,7 +214,7 @@ function AddSpanToFunnelModal({
 					<Spin
 						className="add-span-to-funnel-modal__loading-spinner"
 						spinning={isFunnelDetailsLoading || isFunnelDetailsFetching}
-						indicator={<Loader className="animate-spin" size="md" />}
+						indicator={<Loader className="animate-spin" size={16} />}
 					>
 						{selectedFunnelId && funnelDetails?.payload && (
 							<FunnelProvider

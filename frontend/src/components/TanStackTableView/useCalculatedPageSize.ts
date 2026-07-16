@@ -10,7 +10,7 @@ const MIN_PAGE_SIZE = 5;
 const MAX_PAGE_SIZE = 100;
 
 export type UseCalculatedPageSizeResult = {
-	containerRef: RefObject<HTMLDivElement>;
+	containerRef: RefObject<HTMLDivElement | null>;
 	calculatedPageSize: number | null;
 };
 

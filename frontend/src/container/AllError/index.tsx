@@ -1,5 +1,5 @@
 import { Typography } from 'components/ui/typography';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueries } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
@@ -192,7 +192,7 @@ function AllErrors(): JSX.Element {
 		</Typography>
 	);
 
-	const filterIcon = useCallback(() => <Search size="md" />, []);
+	const filterIcon = useCallback(() => <Search size={16} />, []);
 
 	const handleSearch = useCallback(
 		(
@@ -271,7 +271,7 @@ function AllErrors(): JSX.Element {
 						size="small"
 					>
 						<Flex align="center" justify="center" gap={4}>
-							<Search size="md" />
+							<Search size={16} />
 							Search
 						</Flex>
 					</Button>
@@ -443,7 +443,7 @@ function AllErrors(): JSX.Element {
 					`${pathname}?${createQueryParams({
 						order: updatedOrder,
 						offset: (current - 1) * pageSize,
-						orderParam: columnKey,
+						orderParam: String(columnKey),
 						pageSize,
 						exceptionType,
 						serviceName,

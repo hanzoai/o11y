@@ -26,17 +26,33 @@
 	flex-grow: var(--slider-track-flex-grow, 1);
 	overflow: var(--slider-track-overflow, hidden);
 	border-radius: var(--slider-track-border-radius, 9999px);
-	background-color: var(--slider-track-background, color-mix(in srgb, var(--primary) 10%, transparent));
-	margin-left: var(--slider-track-margin-x, calc(var(--slider-thumb-width, 18px) / 2));
-	margin-right: var(--slider-track-margin-x, calc(var(--slider-thumb-width, 18px) / 2));
+	background-color: var(
+		--slider-track-background,
+		color-mix(in srgb, var(--primary) 10%, transparent)
+	);
+	margin-left: var(
+		--slider-track-margin-x,
+		calc(var(--slider-thumb-width, 18px) / 2)
+	);
+	margin-right: var(
+		--slider-track-margin-x,
+		calc(var(--slider-thumb-width, 18px) / 2)
+	);
 }
-[data-slot='slider-root'][data-orientation='vertical'] [data-slot='slider-track'] {
+[data-slot='slider-root'][data-orientation='vertical']
+	[data-slot='slider-track'] {
 	width: var(--slider-track-vertical-width, 6px);
 	height: var(--slider-track-vertical-height, 100%);
 	margin-left: 0;
 	margin-right: 0;
-	margin-top: var(--slider-track-vertical-margin-y, calc(var(--slider-thumb-height, 18px) / 2));
-	margin-bottom: var(--slider-track-vertical-margin-y, calc(var(--slider-thumb-height, 18px) / 2));
+	margin-top: var(
+		--slider-track-vertical-margin-y,
+		calc(var(--slider-thumb-height, 18px) / 2)
+	);
+	margin-bottom: var(
+		--slider-track-vertical-margin-y,
+		calc(var(--slider-thumb-height, 18px) / 2)
+	);
 }
 
 [data-slot='slider-range'] {
@@ -44,7 +60,8 @@
 	height: var(--slider-range-height, 100%);
 	background-color: var(--slider-range-background, var(--primary));
 }
-[data-slot='slider-root'][data-orientation='vertical'] [data-slot='slider-range'] {
+[data-slot='slider-root'][data-orientation='vertical']
+	[data-slot='slider-range'] {
 	width: var(--slider-range-vertical-width, 100%);
 }
 
@@ -94,7 +111,10 @@
 	height: var(--slider-dot-height, 8px);
 	border-radius: var(--slider-dot-border-radius, 50%);
 	background-color: var(--slider-dot-background, var(--base-white));
-	border: var(--slider-dot-border, 2px solid color-mix(in srgb, var(--primary) 30%, transparent));
+	border: var(
+		--slider-dot-border,
+		2px solid color-mix(in srgb, var(--primary) 30%, transparent)
+	);
 	transform: var(--slider-dot-transform, translate(-50%, -50%));
 	box-sizing: border-box;
 }

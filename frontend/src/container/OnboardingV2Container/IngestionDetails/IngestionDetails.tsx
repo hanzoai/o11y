@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Button, Skeleton, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
@@ -9,7 +9,13 @@ import { DOCS_BASE_URL } from 'constants/app';
 import { convertToApiError } from 'api/ErrorResponseHandlerForGeneratedAPIs';
 import { useGetGlobalConfig } from 'api/generated/services/global';
 import { useNotifications } from 'hooks/useNotifications';
-import { ArrowUpRight, Copy, Info, Key, TriangleAlert } from 'components/ui/icons';
+import {
+	ArrowUpRight,
+	Copy,
+	Info,
+	Key,
+	TriangleAlert,
+} from 'components/ui/icons';
 import { withBasePath } from 'utils/basePath';
 
 import './IngestionDetails.styles.scss';

@@ -7,6 +7,8 @@ import o11yBrandLogoUrl from '@/assets/Logos/o11y-brand-logo.svg';
 
 import './AppLoading.styles.scss';
 
+import type { JSX } from 'react';
+
 function AppLoading(): JSX.Element {
 	// Get theme from localStorage directly to avoid context dependency
 	const getThemeFromStorage = (): boolean => {

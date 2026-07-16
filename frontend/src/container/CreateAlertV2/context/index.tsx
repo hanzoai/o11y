@@ -1,14 +1,14 @@
 import {
 	// eslint-disable-next-line no-restricted-imports
 	createContext,
-	useCallback,
-	// eslint-disable-next-line no-restricted-imports
+	useCallback, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useEffect,
 	useMemo,
 	useReducer,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import {

@@ -4,6 +4,7 @@ import {
 	useCallback,
 	useEffect,
 	useState,
+	type JSX,
 } from 'react';
 import { Color } from 'constants/designTokens';
 import { Input } from 'antd';
@@ -83,7 +84,7 @@ function SearchBar({
 function TimezoneItem({
 	timezone,
 	isSelected = false,
-	onClick,
+	onClick = undefined,
 }: TimezoneItemProps): JSX.Element {
 	return (
 		<button
@@ -111,11 +112,6 @@ function TimezoneItem({
 		</button>
 	);
 }
-
-TimezoneItem.defaultProps = {
-	isSelected: false,
-	onClick: undefined,
-};
 
 interface TimezonePickerProps {
 	setActiveView: Dispatch<SetStateAction<'datetime' | 'timezone'>>;

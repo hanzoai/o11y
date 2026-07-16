@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import cx from 'classnames';
 import { calculateChartDimensions } from 'container/DashboardContainer/visualization/charts/utils';
 import { MAX_LEGEND_WIDTH } from 'lib/uPlotV2/components/Legend/Legend';

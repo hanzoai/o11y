@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 interface EmptyQuickFilterIconProps {
 	width?: number;
 	height?: number;
@@ -7,7 +8,7 @@ interface EmptyQuickFilterIconProps {
 function EmptyQuickFilterIcon({
 	width = 32,
 	height = 32,
-	className,
+	className = '',
 }: EmptyQuickFilterIconProps): JSX.Element {
 	return (
 		<svg
@@ -80,11 +81,5 @@ function EmptyQuickFilterIcon({
 		</svg>
 	);
 }
-
-EmptyQuickFilterIcon.defaultProps = {
-	width: 32,
-	height: 32,
-	className: '',
-};
 
 export default EmptyQuickFilterIcon;

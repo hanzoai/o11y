@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 
 import { createGlobalTimeStore } from '../globalTimeStore';
 import { GlobalTimeContext } from '../GlobalTimeContext';

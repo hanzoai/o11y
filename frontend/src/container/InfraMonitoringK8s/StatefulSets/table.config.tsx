@@ -11,6 +11,8 @@ import { InfraMonitoringEntity } from '../constants';
 import { K8sStatefulSetsData } from './api';
 import { ArrowUpDown } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export function getK8sStatefulSetRowKey(
 	statefulSet: K8sStatefulSetsData,
 ): string {

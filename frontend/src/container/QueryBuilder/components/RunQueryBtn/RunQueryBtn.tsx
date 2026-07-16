@@ -11,6 +11,8 @@ import { getUserOperatingSystem, UserOperatingSystem } from 'utils/getUserOS';
 
 import './RunQueryBtn.scss';
 
+import type { JSX } from 'react';
+
 type RunQueryBtnProps = {
 	className?: string;
 	label?: string;

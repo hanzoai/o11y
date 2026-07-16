@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from 'components/ui/icons';
 import { Flex, Popover } from 'antd';
@@ -17,7 +17,7 @@ interface OptionsMenuProps {
 }
 
 function OptionsMenu({
-	selectedOptionFormat,
+	selectedOptionFormat = 'raw',
 	config,
 }: OptionsMenuProps): JSX.Element {
 	const { t } = useTranslation(['trace']);
@@ -40,7 +40,7 @@ function OptionsMenu({
 			<Popover placement="bottom" trigger="click" content={OptionsContent}>
 				<Flex align="center" gap="4px">
 					{t('options_menu.options')}
-					<Settings size="md" />
+					<Settings size={16} />
 				</Flex>
 			</Popover>
 		</OptionsContainer>
@@ -48,9 +48,5 @@ function OptionsMenu({
 }
 
 export default OptionsMenu;
-
-OptionsMenu.defaultProps = {
-	selectedOptionFormat: 'raw',
-};
 
 export { useOptionsMenu };

@@ -7,7 +7,9 @@ import { getLabelAndValueContent } from './utils';
 
 import './LabelColumn.styles.scss';
 
-function LabelColumn({ labels, value }: LabelColumnProps): JSX.Element {
+import type { JSX } from 'react';
+
+function LabelColumn({ labels, value = {} }: LabelColumnProps): JSX.Element {
 	const newLabels = labels.length > 3 ? labels.slice(0, 3) : labels;
 	const remainingLabels = labels.length > 3 ? labels.slice(3) : [];
 
@@ -45,9 +47,5 @@ function LabelColumn({ labels, value }: LabelColumnProps): JSX.Element {
 		</div>
 	);
 }
-
-LabelColumn.defaultProps = {
-	value: {},
-};
 
 export default LabelColumn;

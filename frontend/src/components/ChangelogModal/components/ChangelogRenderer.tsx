@@ -9,6 +9,8 @@ import {
 
 import './ChangelogRenderer.styles.scss';
 
+import type { JSX } from 'react';
+
 interface Props {
 	changelog: ChangelogSchema;
 }

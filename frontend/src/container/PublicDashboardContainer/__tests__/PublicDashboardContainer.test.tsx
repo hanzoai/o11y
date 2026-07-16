@@ -16,6 +16,8 @@ import { EQueryType } from 'types/common/dashboard';
 
 import PublicDashboardContainer from '../PublicDashboardContainer';
 
+import type { JSX } from 'react';
+
 // Mock dependencies
 jest.mock('hooks/useDarkMode', () => ({
 	useIsDarkMode: jest.fn(() => false),

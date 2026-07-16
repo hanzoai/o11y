@@ -2,6 +2,8 @@ import { Callout } from 'components/ui/callout';
 import cx from 'classnames';
 import styles from './PermissionDeniedCallout.module.scss';
 
+import type { JSX } from 'react';
+
 interface PermissionDeniedCalloutProps {
 	permissionName: string;
 	className?: string;

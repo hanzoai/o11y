@@ -4,6 +4,7 @@ import {
 	useLayoutEffect,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import Color from 'color';
 import { ITraceMetaData } from 'container/GantChart';

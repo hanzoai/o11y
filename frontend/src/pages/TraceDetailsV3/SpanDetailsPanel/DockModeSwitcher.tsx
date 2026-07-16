@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { Dock, PanelBottom, PanelRight } from 'components/ui/icons';
 import { ToggleGroup, ToggleGroupItem } from 'components/ui/toggle-group';
 import {

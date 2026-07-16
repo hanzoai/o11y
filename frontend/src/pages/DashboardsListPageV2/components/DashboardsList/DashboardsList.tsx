@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { generatePath } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Typography } from 'components/ui/typography';

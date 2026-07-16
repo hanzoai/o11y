@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, type JSX } from 'react';
 import MEditor, { EditorProps, Monaco } from '@monaco-editor/react';
 import { Color } from 'constants/designTokens';
 import { Collapse, Divider, Input, Tag, Typography } from 'antd';
@@ -37,8 +37,8 @@ function Overview({
 	onClickActionItem,
 	isListViewPanel = false,
 	selectedOptions,
-	listViewPanelSelectedFields,
-	handleChangeSelectedView,
+	listViewPanelSelectedFields = null,
+	handleChangeSelectedView = undefined,
 }: Props): JSX.Element {
 	const [isWrapWord, setIsWrapWord] = useState<boolean>(true);
 	const [isSearchVisible, setIsSearchVisible] = useState<boolean>(true);
@@ -216,11 +216,5 @@ function Overview({
 		</div>
 	);
 }
-
-Overview.defaultProps = {
-	isListViewPanel: false,
-	listViewPanelSelectedFields: null,
-	handleChangeSelectedView: undefined,
-};
 
 export default Overview;

@@ -5,12 +5,14 @@ export const inputVariants = cva(
 	{
 		variants: {
 			theme: {
-				light: 'border-input text-foreground file:text-foreground focus-visible:ring-ring',
-				dark: 'border-input-dark bg-background-dark text-primary-foreground-dark file:text-foreground-dark placeholder:text-muted-foreground-dark focus-visible:ring-ring-dark',
+				light:
+					'border-input text-foreground file:text-foreground focus-visible:ring-ring',
+				dark:
+					'border-input-dark bg-background-dark text-primary-foreground-dark file:text-foreground-dark placeholder:text-muted-foreground-dark focus-visible:ring-ring-dark',
 			},
 		},
 		defaultVariants: {
 			theme: 'light',
 		},
-	}
+	},
 );

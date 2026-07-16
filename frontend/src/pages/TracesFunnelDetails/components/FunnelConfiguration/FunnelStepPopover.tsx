@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Button, Popover, Tooltip } from 'antd';
 import cx from 'classnames';
 import { Ellipsis, PencilLine, Trash2 } from 'components/ui/icons';
@@ -85,7 +85,7 @@ function FunnelStepPopover({
 	isPopoverOpen,
 	setIsPopoverOpen,
 	stepData,
-	className,
+	className = '',
 	onStepRemove,
 	stepsCount,
 	isAddDetailsModalOpen,
@@ -154,9 +154,5 @@ function FunnelStepPopover({
 		</div>
 	);
 }
-
-FunnelStepPopover.defaultProps = {
-	className: '',
-};
 
 export default FunnelStepPopover;

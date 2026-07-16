@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Button } from 'components/ui/button';
 import { TooltipSimple } from 'components/ui/tooltip';

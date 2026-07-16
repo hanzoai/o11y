@@ -4,6 +4,8 @@ import type { FilterDropdownProps } from 'antd/es/table/interface';
 import { SEARCH_PLACEHOLDER } from '../Columns/ColumnContants';
 import { Search } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export const filterDropdown = ({
 	setSelectedKeys,
 	selectedKeys,
@@ -30,7 +32,7 @@ export const filterDropdown = ({
 				<Button
 					type="primary"
 					onClick={handleSearch}
-					icon={<Search size="md" />}
+					icon={<Search size={16} />}
 					size="small"
 				>
 					Search

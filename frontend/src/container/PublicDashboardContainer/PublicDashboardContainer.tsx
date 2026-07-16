@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import RGL, { WidthProvider } from 'react-grid-layout';
 import { Typography } from 'components/ui/typography';
 import cx from 'classnames';

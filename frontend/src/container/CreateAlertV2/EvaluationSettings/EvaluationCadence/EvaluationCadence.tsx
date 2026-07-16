@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Input, Select, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { Info } from 'components/ui/icons';

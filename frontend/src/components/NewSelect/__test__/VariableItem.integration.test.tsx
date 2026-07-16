@@ -9,6 +9,8 @@ import { IDashboardVariable } from 'types/api/dashboard/getAll';
 
 import VariableItem from '../../../container/DashboardContainer/DashboardVariablesSelection/VariableItem';
 
+import type { JSX } from 'react';
+
 // Mock the dashboard variables query
 jest.mock('api/dashboard/variables/dashboardVariablesQuery', () => ({
 	__esModule: true,

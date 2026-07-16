@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Color, Spacing } from 'constants/designTokens';
 import { Divider, Drawer, Typography } from 'antd';
 import logEvent from 'api/common/logEvent';

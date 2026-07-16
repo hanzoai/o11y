@@ -1,4 +1,4 @@
-import type { CSSProperties, MouseEvent, ReactNode } from 'react';
+import type { CSSProperties, MouseEvent, ReactNode, JSX } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
@@ -220,6 +220,7 @@ function LogsExplorerList({
 								isDarkMode,
 								getLogIndicatorType(log),
 							),
+
 							'--row-hover-bg': getRowBackgroundColor(
 								isDarkMode,
 								getLogIndicatorType(log),

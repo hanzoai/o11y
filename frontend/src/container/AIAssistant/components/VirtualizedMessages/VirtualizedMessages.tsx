@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, type JSX } from 'react';
 import { Button } from 'components/ui/button';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 import {

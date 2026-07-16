@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import Spinner from 'components/Spinner';
 
+import type { JSX } from 'react';
+
 interface DataStateRendererProps<T> {
 	isLoading: boolean;
 	isRefetching: boolean;
@@ -21,8 +23,8 @@ function DataStateRenderer<T>({
 	isRefetching,
 	isError,
 	data,
-	errorMessage,
-	loadingMessage,
+	errorMessage = '',
+	loadingMessage = 'Loading...',
 	children,
 }: DataStateRendererProps<T>): JSX.Element {
 	const { t } = useTranslation('common');
@@ -37,10 +39,5 @@ function DataStateRenderer<T>({
 
 	return <>{children(data)}</>;
 }
-
-DataStateRenderer.defaultProps = {
-	errorMessage: '',
-	loadingMessage: 'Loading...',
-};
 
 export default DataStateRenderer;

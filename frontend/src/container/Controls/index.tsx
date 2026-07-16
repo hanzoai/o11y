@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type JSX } from 'react';
 import { ChevronLeft, ChevronRight } from 'components/ui/icons';
 import { Button, Flex, Select } from 'antd';
 import { DEFAULT_PER_PAGE_OPTIONS, Pagination } from 'hooks/queryPagination';
@@ -77,13 +77,6 @@ function Controls({
 		</Container>
 	);
 }
-
-Controls.defaultProps = {
-	offset: 0,
-	perPageOptions: DEFAULT_PER_PAGE_OPTIONS,
-	isLogPanel: false,
-	showSizeChanger: true,
-};
 
 export interface ControlsProps {
 	offset?: Pagination['offset'];

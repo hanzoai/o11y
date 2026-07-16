@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { act, renderHook } from '@testing-library/react';
 import { AllTheProviders } from 'tests/test-utils';
 

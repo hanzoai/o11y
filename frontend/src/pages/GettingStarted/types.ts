@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 export type TGetStartedContentDoc = {
 	title: string;
 	icon: JSX.Element;

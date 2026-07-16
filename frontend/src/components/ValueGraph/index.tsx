@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
@@ -143,7 +143,7 @@ function ValueGraph({
 						<CircleAlert
 							className="value-graph-icon"
 							data-testid="conflicting-thresholds"
-							size="md"
+							size={16}
 						/>
 					</Tooltip>
 				</div>

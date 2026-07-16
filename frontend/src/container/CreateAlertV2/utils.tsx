@@ -27,6 +27,8 @@ import {
 } from './context/types';
 import { EVALUATION_WINDOW_TIMEFRAME } from './EvaluationSettings/constants';
 
+import type { JSX } from 'react';
+
 export function Spinner(): JSX.Element | null {
 	const { isCreatingAlertRule, isUpdatingAlertRule } = useCreateAlertState();
 

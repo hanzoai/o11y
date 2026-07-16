@@ -6,6 +6,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { ChevronDown, ChevronRight } from 'components/ui/icons';
 import { Col } from 'antd';
@@ -51,7 +52,7 @@ function Trace(props: TraceProps): JSX.Element {
 		isExpandAll,
 		intervalUnit,
 		children,
-		isMissing,
+		isMissing = false,
 	} = props;
 
 	const isDarkMode = useIsDarkMode();
@@ -129,9 +130,9 @@ function Trace(props: TraceProps): JSX.Element {
 	const icon = useMemo(
 		() =>
 			isOpen ? (
-				<ChevronDown size="md" style={iconStyles} />
+				<ChevronDown size={16} style={iconStyles} />
 			) : (
-				<ChevronRight size="md" style={iconStyles} />
+				<ChevronRight size={16} style={iconStyles} />
 			),
 		[isOpen, iconStyles],
 	);
@@ -208,10 +209,6 @@ function Trace(props: TraceProps): JSX.Element {
 		</Wrapper>
 	);
 }
-
-Trace.defaultProps = {
-	isMissing: false,
-};
 
 interface ITraceGlobal {
 	globalSpread: ITraceMetaData['spread'];

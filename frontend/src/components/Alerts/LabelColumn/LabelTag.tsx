@@ -10,6 +10,8 @@ import { useCopyToClipboard } from 'react-use';
 
 import styles from './LabelTag.module.scss';
 
+import type { JSX } from 'react';
+
 export interface LabelTagProps {
 	label: string;
 	color?:

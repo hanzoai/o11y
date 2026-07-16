@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 function NginxIcon(): JSX.Element {
 	return (
 		<svg

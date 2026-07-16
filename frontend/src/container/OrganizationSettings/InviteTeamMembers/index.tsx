@@ -8,6 +8,8 @@ import { requireErrorMessage } from 'utils/form/requireErrorMessage';
 import { InviteMemberFormValues } from '../utils';
 import { SelectDrawer, SpaceContainer, TitleWrapper } from './styles';
 
+import type { JSX } from 'react';
+
 function InviteTeamMembers({ form, onFinish }: Props): JSX.Element {
 	const { t } = useTranslation('organizationsettings');
 
@@ -52,7 +54,7 @@ function InviteTeamMembers({ form, onFinish }: Props): JSX.Element {
 									</Form.Item>
 									<Button
 										type="text"
-										icon={<Trash2 size="md" />}
+										icon={<Trash2 size={16} />}
 										onClick={(): void => remove(name)}
 										danger
 										data-testid={`delete-member-${name}`}
@@ -61,7 +63,7 @@ function InviteTeamMembers({ form, onFinish }: Props): JSX.Element {
 								</Space>
 							))}
 							<Form.Item>
-								<Button onClick={add} icon={<Plus size="md" />} type="default">
+								<Button onClick={add} icon={<Plus size={16} />} type="default">
 									{t('add_another_team_member')}
 								</Button>
 							</Form.Item>

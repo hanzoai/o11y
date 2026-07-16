@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { FunnelStepGraphMetrics } from 'api/traceFunnels';
 import { Chart, ChartConfiguration } from 'chart.js';
@@ -54,7 +54,7 @@ interface UseFunnelGraph {
 	successSteps: number[];
 	errorSteps: number[];
 	totalSteps: number;
-	canvasRef: React.RefObject<HTMLCanvasElement>;
+	canvasRef: React.RefObject<HTMLCanvasElement | null>;
 	renderLegendItem: (
 		step: number,
 		successSpans: number,

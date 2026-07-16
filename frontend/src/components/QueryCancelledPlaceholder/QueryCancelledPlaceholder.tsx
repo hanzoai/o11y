@@ -3,12 +3,14 @@ import eyesEmojiUrl from 'assets/Images/eyesEmoji.svg';
 
 import styles from './QueryCancelledPlaceholder.module.scss';
 
+import type { JSX } from 'react';
+
 interface QueryCancelledPlaceholderProps {
 	subText?: string;
 }
 
 function QueryCancelledPlaceholder({
-	subText,
+	subText = undefined,
 }: QueryCancelledPlaceholderProps): JSX.Element {
 	return (
 		<div className={styles.placeholder}>
@@ -23,9 +25,5 @@ function QueryCancelledPlaceholder({
 		</div>
 	);
 }
-
-QueryCancelledPlaceholder.defaultProps = {
-	subText: undefined,
-};
 
 export default QueryCancelledPlaceholder;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-use';
 import { Button } from '@hanzo/ui';
@@ -17,10 +17,9 @@ import { Label } from 'pages/SignUp/styles';
 import APIError from 'types/api/error';
 
 import { FormContainer } from './styles';
+import type { FormValues } from './types';
 
 import './ResetPassword.styles.scss';
-
-type FormValues = { password: string; confirmPassword: string };
 
 function ResetPassword({ version }: ResetPasswordProps): JSX.Element {
 	const [confirmPasswordError, setConfirmPasswordError] =
@@ -149,9 +148,7 @@ function ResetPassword({ version }: ResetPasswordProps): JSX.Element {
 					<Typography.Text className="reset-password-header-subtitle">
 						Monitor your applications. Find what is causing issues.
 					</Typography.Text>
-					{version && (
-						<div className="reset-password-version-badge">v{version}</div>
-					)}
+					{version && <div className="reset-password-version-badge">v{version}</div>}
 				</div>
 
 				<FormContainer

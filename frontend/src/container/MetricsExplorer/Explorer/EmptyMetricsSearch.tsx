@@ -1,6 +1,8 @@
 import { Empty } from 'antd';
 import { Typography } from 'components/ui/typography';
 
+import type { JSX } from 'react';
+
 interface EmptyMetricsSearchProps {
 	hasQueryResult?: boolean;
 }

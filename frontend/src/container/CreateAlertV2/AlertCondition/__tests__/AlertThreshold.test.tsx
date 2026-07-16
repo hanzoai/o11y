@@ -7,6 +7,8 @@ import { Channels } from 'types/api/channels/getAll';
 import { CreateAlertProvider } from '../../context';
 import AlertThreshold from '../AlertThreshold';
 
+import type { JSX } from 'react';
+
 const mockChannels: Channels[] = [];
 const mockRefreshChannels = jest.fn();
 const mockIsLoadingChannels = false;

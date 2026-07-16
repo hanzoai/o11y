@@ -3,6 +3,8 @@ import { render, screen, userEvent } from 'tests/test-utils';
 
 import ResizeTable from '../ResizeTable';
 
+import type { JSX } from 'react';
+
 jest.mock('react-resizable', () => ({
 	Resizable: ({
 		children,

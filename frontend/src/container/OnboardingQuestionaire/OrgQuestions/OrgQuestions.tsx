@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Button, Label, RadioGroup, RadioGroupItem } from '@hanzo/ui';
 import { Input } from 'components/ui/input';
 import { Typography } from 'antd';
@@ -190,9 +190,7 @@ function OrgQuestions({ orgDetails, onNext }: OrgQuestionsProps): JSX.Element {
 								{Object.entries(migrationTimelineOptions).map(([key, label]) => (
 									<div key={key} className="radio-item migration-timeline-radio-item">
 										<RadioGroupItem value={key} id={`radio-migration-${key}`} />
-										<Label htmlFor={`radio-migration-${key}`}>
-											{label}
-										</Label>
+										<Label htmlFor={`radio-migration-${key}`}>{label}</Label>
 									</div>
 								))}
 							</RadioGroup>

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState, type JSX } from 'react';
 import { UseQueryResult } from 'react-query';
 import { Color } from 'constants/designTokens';
 import { Button, Card, Skeleton, Typography } from 'antd';

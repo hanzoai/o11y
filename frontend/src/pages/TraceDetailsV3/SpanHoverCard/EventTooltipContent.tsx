@@ -5,6 +5,8 @@ import { toFixed } from 'utils/toFixed';
 
 import styles from './EventTooltipContent.module.scss';
 
+import type { JSX } from 'react';
+
 export interface EventTooltipContentProps {
 	eventName: string;
 	timeOffsetMs: number;

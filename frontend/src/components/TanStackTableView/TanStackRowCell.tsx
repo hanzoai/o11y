@@ -1,4 +1,4 @@
-import type { MouseEvent, ReactNode } from 'react';
+import type { MouseEvent, ReactNode, JSX } from 'react';
 import { memo } from 'react';
 import type { Cell } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';

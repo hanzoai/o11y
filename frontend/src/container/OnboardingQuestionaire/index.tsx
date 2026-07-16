@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { toast } from '@hanzo/ui';
 import type { NotificationInstance } from 'antd/es/notification/interface';
@@ -73,10 +73,8 @@ function OnboardingQuestionaire(): JSX.Element {
 		INITIAL_HANZO_DETAILS,
 	);
 
-	const [
-		optimiseO11yDetails,
-		setOptimiseO11yDetails,
-	] = useState<OptimiseO11yDetails>(INITIAL_OPTIMISE_HANZO_DETAILS);
+	const [optimiseO11yDetails, setOptimiseO11yDetails] =
+		useState<OptimiseO11yDetails>(INITIAL_OPTIMISE_HANZO_DETAILS);
 	const [teamMembers, setTeamMembers] = useState<
 		InviteTeamMembersProps[] | null
 	>(null);
@@ -156,11 +154,10 @@ function OnboardingQuestionaire(): JSX.Element {
 						'Others',
 					)
 						? ([
-								...(o11yDetails?.interestInO11y?.filter(
-									(item) => item !== 'Others',
-								) || []),
+								...(o11yDetails?.interestInO11y?.filter((item) => item !== 'Others') ||
+									[]),
 								o11yDetails?.otherInterestInO11y,
-						  ] as string[])
+							] as string[])
 						: (o11yDetails?.interestInO11y as string[]),
 					logs_scale_per_day_in_gb: optimiseO11yDetails?.logsPerDay as number,
 					number_of_hosts: optimiseO11yDetails?.hostsPerDay as number,

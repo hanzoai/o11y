@@ -13,6 +13,8 @@ import MetricNameSearch from './MetricNameSearch';
 import MetricTypeViewRenderer from './MetricTypeViewRenderer';
 import { MetricsListItemRowData, TreemapTile } from './types';
 
+import type { JSX } from 'react';
+
 export const getMetricsTableColumns = (
 	queryFilterExpression: Filter,
 	onFilterChange: (expression: string) => void,

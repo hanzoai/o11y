@@ -4,6 +4,8 @@ import { Switch } from 'components/ui/switch';
 import { holdIconStyle } from '../config';
 import { LastActionColumn } from '../styles';
 
+import type { JSX } from 'react';
+
 function DragAction({ isEnabled, onChange }: DragActionProps): JSX.Element {
 	return (
 		<LastActionColumn>

@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import { renderHook, waitFor } from '@testing-library/react';
 import {
 	AuthtypesGettableTransactionDTO,
@@ -14,7 +14,7 @@ import { BrandedPermission } from './types';
 import { useAuthZ } from './useAuthZ';
 import { buildPermission } from './utils';
 
-const wrapper = ({ children }: { children: ReactElement }): ReactElement => (
+const wrapper = ({ children }: { children: ReactNode }): ReactElement => (
 	<AllTheProviders>{children}</AllTheProviders>
 );
 

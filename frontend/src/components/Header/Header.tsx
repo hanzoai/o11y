@@ -1,5 +1,7 @@
 import './Header.styles.scss';
 
+import type { JSX } from 'react';
+
 export default function Header({
 	leftComponent,
 	rightComponent,

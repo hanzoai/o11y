@@ -4,6 +4,8 @@ import TrimmedText from '../TrimmedText/TrimmedText';
 
 import './KeyValueLabel.styles.scss';
 
+import type { JSX } from 'react';
+
 // Rethink this component later
 type KeyValueLabelProps = {
 	badgeKey: string | React.ReactNode;
@@ -18,7 +20,7 @@ export default function KeyValueLabel({
 	badgeValue,
 	direction = 'row',
 	maxCharacters = 20,
-	onClick,
+	onClick = undefined,
 }: KeyValueLabelProps): JSX.Element | null {
 	if (!badgeKey || !badgeValue) {
 		return null;
@@ -67,9 +69,3 @@ export default function KeyValueLabel({
 		</div>
 	);
 }
-
-KeyValueLabel.defaultProps = {
-	maxCharacters: 20,
-	direction: 'row',
-	onClick: undefined,
-};

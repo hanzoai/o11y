@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import O11yRadioGroup from 'components/O11yRadioGroup/O11yRadioGroup';
 import { useFunnelContext } from 'pages/TracesFunnels/FunnelContext';
 

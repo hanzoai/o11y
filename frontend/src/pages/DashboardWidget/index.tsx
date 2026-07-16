@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import { Card } from 'antd';

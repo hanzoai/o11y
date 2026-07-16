@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, type JSX } from 'react';
 import { UseQueryResult } from 'react-query';
 import { Color } from 'constants/designTokens';
 import {

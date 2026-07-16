@@ -9,6 +9,8 @@ import {
 	buildDependencyGraph,
 } from '../DashboardVariablesSelection/util';
 
+import type { JSX } from 'react';
+
 // Mock scrollIntoView since it's not available in JSDOM
 window.HTMLElement.prototype.scrollIntoView = jest.fn();
 

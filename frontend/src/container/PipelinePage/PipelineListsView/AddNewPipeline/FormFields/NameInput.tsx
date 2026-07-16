@@ -4,6 +4,8 @@ import { Form } from 'antd';
 import { ProcessorFormField } from '../../AddNewProcessor/config';
 import { formValidationRules } from '../../config';
 
+import type { JSX } from 'react';
+
 function NameInput({ fieldData }: NameInputProps): JSX.Element {
 	const { t } = useTranslation('pipeline');
 

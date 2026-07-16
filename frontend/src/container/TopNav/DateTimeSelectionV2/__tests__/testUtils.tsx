@@ -12,6 +12,8 @@ import store from 'store';
 import { getAppContextMock } from 'tests/test-utils';
 import { CompatRouter } from 'react-router-dom-v5-compat';
 
+import type { JSX } from 'react';
+
 export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: { refetchOnWindowFocus: false, retry: false },

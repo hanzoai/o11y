@@ -1,4 +1,4 @@
-import { memo, useEffect } from 'react';
+import { memo, useEffect, type JSX } from 'react';
 import { useParams } from 'react-router-dom';
 import Spinner from 'components/Spinner';
 import { Card, GraphContainer } from 'container/MetricsApplication/styles';

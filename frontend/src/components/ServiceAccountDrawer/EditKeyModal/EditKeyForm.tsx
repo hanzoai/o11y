@@ -19,6 +19,8 @@ import { disabledDate, formatLastObservedAt } from '../utils';
 import type { FormValues } from './types';
 import { ExpiryMode, FORM_ID } from './types';
 
+import type { JSX } from 'react';
+
 export interface EditKeyFormProps {
 	register: UseFormRegister<FormValues>;
 	control: Control<FormValues>;

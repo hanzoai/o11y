@@ -42,6 +42,8 @@ import {
 	redirectWithQueryBuilderData,
 } from './testUtils';
 
+import type { JSX } from 'react';
+
 const currentTestUrl =
 	'/traces-explorer/?panelType=list&selectedExplorerView=list';
 
@@ -371,6 +373,7 @@ describe('TracesExplorer - Filters', () => {
 					(item) =>
 						({
 							...item,
+
 							filters: {
 								...item.filters,
 								items: undefined,

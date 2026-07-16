@@ -5,6 +5,7 @@ import {
 	useEffect,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@hanzo/ui';
@@ -83,14 +84,14 @@ function CustomTimePicker({
 	open,
 	setOpen,
 	onValidCustomDateChange,
-	onCustomTimeStatusUpdate,
-	newPopover,
-	customDateTimeVisible,
-	setCustomDTPickerVisible,
-	onCustomDateHandler,
-	onGoLive,
-	onExitLiveLogs,
-	showLiveLogs,
+	onCustomTimeStatusUpdate = noop,
+	newPopover = false,
+	customDateTimeVisible = false,
+	setCustomDTPickerVisible = noop,
+	onCustomDateHandler = noop,
+	onGoLive = noop,
+	onExitLiveLogs = noop,
+	showLiveLogs = false,
 	showRecentlyUsed = true,
 	minTime,
 	maxTime,
@@ -671,15 +672,3 @@ function CustomTimePicker({
 }
 
 export default CustomTimePicker;
-
-CustomTimePicker.defaultProps = {
-	newPopover: false,
-	customDateTimeVisible: false,
-	setCustomDTPickerVisible: noop,
-	onCustomDateHandler: noop,
-	onGoLive: noop,
-	onCustomTimeStatusUpdate: noop,
-	onExitLiveLogs: noop,
-	showLiveLogs: false,
-	showRecentlyUsed: true,
-};

@@ -7,6 +7,8 @@ import awwSnapUrl from '@/assets/Icons/awwSnap.svg';
 
 import './LogsError.styles.scss';
 
+import type { JSX } from 'react';
+
 export default function LogsError(): JSX.Element {
 	const { isCloudUser: isCloudUserVal } = useGetTenantLicense();
 

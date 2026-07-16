@@ -3,6 +3,8 @@ import { getUPlotChartData } from 'lib/uPlotLib/utils/getUplotChartData';
 
 import { PanelWrapperProps } from './panelWrapper.types';
 
+import type { JSX } from 'react';
+
 function ValuePanelWrapper({
 	widget,
 	queryResponse,

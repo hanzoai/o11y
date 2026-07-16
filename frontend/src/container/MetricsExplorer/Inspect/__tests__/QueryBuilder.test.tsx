@@ -17,6 +17,8 @@ import {
 	TimeAggregationOptions,
 } from '../types';
 
+import type { JSX } from 'react';
+
 jest.mock('react-router-dom', () => ({
 	...jest.requireActual('react-router-dom'),
 	useLocation: (): { pathname: string } => ({

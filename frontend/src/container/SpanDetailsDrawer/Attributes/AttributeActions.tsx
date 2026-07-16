@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { Button, Popover, Spin, Tooltip } from 'antd';
 import GroupByIcon from 'assets/CustomIcons/GroupByIcon';
 import cx from 'classnames';
@@ -27,8 +27,8 @@ interface AttributeActionsProps {
 
 export default function AttributeActions({
 	record,
-	isPinned,
-	onTogglePin,
+	isPinned = false,
+	onTogglePin = undefined,
 	showPinned = true,
 	showCopyOptions = true,
 }: AttributeActionsProps): JSX.Element {
@@ -193,10 +193,3 @@ export default function AttributeActions({
 		</div>
 	);
 }
-
-AttributeActions.defaultProps = {
-	isPinned: false,
-	showPinned: true,
-	showCopyOptions: true,
-	onTogglePin: undefined,
-};

@@ -11,6 +11,8 @@ import { InfraMonitoringEntity } from '../constants';
 import { K8sClusterData, K8sClustersListPayload } from './api';
 import { Boxes } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export function getK8sClusterRowKey(cluster: K8sClusterData): string {
 	return (
 		cluster.clusterUID ||

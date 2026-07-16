@@ -7,6 +7,8 @@ import { LicenseEvent } from 'types/api/licensesV3/getActive';
 import EntityMetrics from '../EntityMetrics';
 import { useEntityMetrics } from '../hooks';
 
+import type { JSX } from 'react';
+
 jest.mock('../hooks', () => ({
 	useEntityMetrics: jest.fn(),
 }));

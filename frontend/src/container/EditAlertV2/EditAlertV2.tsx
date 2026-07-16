@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useShareBuilderUrl } from 'hooks/queryBuilder/useShareBuilderUrl';
 import { mapQueryDataFromApi } from 'lib/newQueryBuilder/queryBuilderMappers/mapQueryDataFromApi';
 import { AlertTypes } from 'types/api/alerts/alertTypes';
@@ -44,9 +44,5 @@ function EditAlertV2({
 		</>
 	);
 }
-
-EditAlertV2.defaultProps = {
-	alertType: AlertTypes.METRICS_BASED_ALERT,
-};
 
 export default EditAlertV2;

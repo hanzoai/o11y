@@ -4,6 +4,8 @@ import { useVariant } from '../../VariantContext';
 
 import styles from './ConversationSkeleton.module.scss';
 
+import type { JSX } from 'react';
+
 /**
  * Each entry is one bubble in the placeholder thread:
  *   role:  who "sent" the bubble — drives left/right alignment + colour

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import { PANEL_TYPES } from 'constants/queryBuilder';
 import { ChangeViewFunctionType } from 'container/ExplorerOptions/types';
 import { liveLogsCompositeQuery } from 'container/LiveLogs/constants';
@@ -11,7 +11,9 @@ interface LiveLogsProps {
 	handleChangeSelectedView?: ChangeViewFunctionType;
 }
 
-function LiveLogs({ handleChangeSelectedView }: LiveLogsProps): JSX.Element {
+function LiveLogs({
+	handleChangeSelectedView = undefined,
+}: LiveLogsProps): JSX.Element {
 	useShareBuilderUrl({ defaultValue: liveLogsCompositeQuery });
 	const { handleSetConfig } = useQueryBuilder();
 
@@ -23,9 +25,5 @@ function LiveLogs({ handleChangeSelectedView }: LiveLogsProps): JSX.Element {
 		<LiveLogsContainer handleChangeSelectedView={handleChangeSelectedView} />
 	);
 }
-
-LiveLogs.defaultProps = {
-	handleChangeSelectedView: undefined,
-};
 
 export default LiveLogs;

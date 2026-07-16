@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -16,7 +16,7 @@ import './MetricPage.styles.scss';
 
 function MetricPageGridGraph({
 	widgetData,
-	checkIfDataExists,
+	checkIfDataExists = (): void => {},
 }: {
 	widgetData: Widgets;
 	checkIfDataExists?: (isDataAvailable: boolean) => void;
@@ -59,9 +59,5 @@ function MetricPageGridGraph({
 		</Card>
 	);
 }
-
-MetricPageGridGraph.defaultProps = {
-	checkIfDataExists: (): void => {},
-};
 
 export default MetricPageGridGraph;

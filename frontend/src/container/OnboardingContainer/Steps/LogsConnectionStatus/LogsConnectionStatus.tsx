@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { CircleCheck, CircleX, LoaderCircle } from 'components/ui/icons';
 import logEvent from 'api/common/logEvent';
 import { DEFAULT_ENTITY_VERSION } from 'constants/app';
@@ -242,17 +242,17 @@ export default function LogsConnectionStatus(): JSX.Element {
 
 					<div className="status">
 						{(loading || isFetching) && (
-							<LoaderCircle size="md" className="animate-spin" />
+							<LoaderCircle size={16} className="animate-spin" />
 						)}
 						{!(loading || isFetching) && isReceivingData && (
 							<>
-								<CircleCheck size="md" color="#52c41a" />
+								<CircleCheck size={16} color="#52c41a" />
 								<span> Success </span>
 							</>
 						)}
 						{!(loading || isFetching) && !isReceivingData && (
 							<>
-								<CircleX size="md" color="#e84749" />
+								<CircleX size={16} color="#e84749" />
 								<span> Failed </span>
 							</>
 						)}

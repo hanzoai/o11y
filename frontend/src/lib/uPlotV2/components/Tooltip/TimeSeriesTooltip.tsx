@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 
 import { TimeSeriesTooltipProps, TooltipContentItem } from '../types';
 import Tooltip from './Tooltip';

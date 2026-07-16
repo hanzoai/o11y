@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, type JSX } from 'react';
 import { Button } from 'components/ui/button';
 import { Select } from 'antd';
 import logEvent from 'api/common/logEvent';

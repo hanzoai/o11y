@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { Select } from 'antd';
 import { HAVING_OPERATORS, initialHavingValues } from 'constants/queryBuilder';
 import { HavingFilterTag } from 'container/QueryBuilder/components';

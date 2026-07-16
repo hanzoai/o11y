@@ -73,10 +73,12 @@ export function Select({
 	};
 
 	const [internalValue, setInternalValue] = React.useState<string[]>(() =>
-		normalizeValue(defaultValue)
+		normalizeValue(defaultValue),
 	);
 	const isControlled = controlledValue !== undefined;
-	const currentValue = isControlled ? normalizeValue(controlledValue) : internalValue;
+	const currentValue = isControlled
+		? normalizeValue(controlledValue)
+		: internalValue;
 
 	const [internalOpen, setInternalOpen] = React.useState(defaultOpen ?? false);
 	const isOpenControlled = open !== undefined;
@@ -87,7 +89,7 @@ export function Select({
 			if (!isOpenControlled) setInternalOpen(newOpen);
 			onOpenChange?.(newOpen);
 		},
-		[isOpenControlled, onOpenChange]
+		[isOpenControlled, onOpenChange],
 	);
 
 	const handleValueChange = React.useCallback(
@@ -104,16 +106,16 @@ export function Select({
 				handleOpenChange(false);
 			}
 		},
-		[multiple, currentValue, isControlled, onChange, handleOpenChange]
+		[multiple, currentValue, isControlled, onChange, handleOpenChange],
 	);
 
 	const handleRemove = React.useCallback(
 		(valueToRemove: string) => {
 			const newValue = currentValue.filter((v) => v !== valueToRemove);
 			if (!isControlled) setInternalValue(newValue);
-			onChange?.(multiple ? newValue : newValue[0] ?? '');
+			onChange?.(multiple ? newValue : (newValue[0] ?? ''));
 		},
-		[currentValue, isControlled, onChange, multiple]
+		[currentValue, isControlled, onChange, multiple],
 	);
 
 	const contextValue = React.useMemo<SelectContextValue>(
@@ -123,7 +125,7 @@ export function Select({
 			onValueChange: handleValueChange,
 			onRemove: handleRemove,
 		}),
-		[multiple, currentValue, handleValueChange, handleRemove]
+		[multiple, currentValue, handleValueChange, handleRemove],
 	);
 
 	if (multiple) {
@@ -193,10 +195,25 @@ export type SelectTriggerProps = {
  * In single-select mode, displays the selected value or placeholder.
  * In multi-select mode, displays removable pills for each selected value.
  */
-export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerProps>(
+export const SelectTrigger = React.forwardRef<
+	HTMLButtonElement,
+	SelectTriggerProps
+>(
 	(
-		{ className, style, id, testId, placeholder, children, renderValue, resolveLabel, maxDisplayedPills, loading = false, ...props },
-		ref
+		{
+			className,
+			style,
+			id,
+			testId,
+			placeholder,
+			children,
+			renderValue,
+			resolveLabel,
+			maxDisplayedPills,
+			loading = false,
+			...props
+		},
+		ref,
 	) => {
 		const context = useSelectContext();
 		const hasValue = context && context.value.length > 0;
@@ -207,9 +224,13 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
 			if (context?.multiple && hasValue) {
 				const values = context.value;
 				const displayedValues =
-					maxDisplayedPills !== undefined ? values.slice(0, maxDisplayedPills) : values;
+					maxDisplayedPills !== undefined
+						? values.slice(0, maxDisplayedPills)
+						: values;
 				const overflowCount =
-					maxDisplayedPills !== undefined ? Math.max(0, values.length - maxDisplayedPills) : 0;
+					maxDisplayedPills !== undefined
+						? Math.max(0, values.length - maxDisplayedPills)
+						: 0;
 				return (
 					<span data-slot="select-pills" className="select-pills">
 						{displayedValues.map((v) => (
@@ -260,15 +281,21 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
 					{renderContent()}
 				</span>
 				{loading ? (
-					<LoaderCircle data-slot="select-trigger-spinner" className="select-trigger-spinner" />
+					<LoaderCircle
+						data-slot="select-trigger-spinner"
+						className="select-trigger-spinner"
+					/>
 				) : (
 					<SelectPrimitive.Icon asChild>
-						<ChevronDown data-slot="select-trigger-icon" className="select-trigger-icon" />
+						<ChevronDown
+							data-slot="select-trigger-icon"
+							className="select-trigger-icon"
+						/>
 					</SelectPrimitive.Icon>
 				)}
 			</SelectPrimitive.Trigger>
 		);
-	}
+	},
 );
 SelectTrigger.displayName = 'SelectTrigger';
 
@@ -331,8 +358,25 @@ export type SelectContentProps = {
 /**
  * Dropdown content container that holds the selectable items.
  */
-export const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps>(
-	({ className, style, id, testId, children, withPortal = true, withViewport = true, position = 'popper', sideOffset = 4, ...props }, ref) => {
+export const SelectContent = React.forwardRef<
+	HTMLDivElement,
+	SelectContentProps
+>(
+	(
+		{
+			className,
+			style,
+			id,
+			testId,
+			children,
+			withPortal = true,
+			withViewport = true,
+			position = 'popper',
+			sideOffset = 4,
+			...props
+		},
+		ref,
+	) => {
 		const content = (
 			<SelectPrimitive.Content
 				ref={ref}
@@ -346,7 +390,10 @@ export const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps
 				{...props}
 			>
 				{withViewport ? (
-					<SelectPrimitive.Viewport data-slot="select-viewport" className="select-viewport">
+					<SelectPrimitive.Viewport
+						data-slot="select-viewport"
+						className="select-viewport"
+					>
 						{children}
 					</SelectPrimitive.Viewport>
 				) : (
@@ -354,9 +401,10 @@ export const SelectContent = React.forwardRef<HTMLDivElement, SelectContentProps
 				)}
 			</SelectPrimitive.Content>
 		);
-		if (withPortal) return <SelectPrimitive.Portal>{content}</SelectPrimitive.Portal>;
+		if (withPortal)
+			return <SelectPrimitive.Portal>{content}</SelectPrimitive.Portal>;
 		return content;
-	}
+	},
 );
 SelectContent.displayName = 'SelectContent';
 
@@ -383,7 +431,10 @@ export type SelectItemProps = {
  * Selectable item within the dropdown.
  */
 export const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
-	({ className, style, id, testId, indicatorClassname, children, ...props }, ref) => {
+	(
+		{ className, style, id, testId, indicatorClassname, children, ...props },
+		ref,
+	) => {
 		const context = useSelectContext();
 		const isSelected = context?.value.includes(props.value) ?? false;
 		const handlePointerUp = (e: React.PointerEvent): void => {
@@ -424,7 +475,7 @@ export const SelectItem = React.forwardRef<HTMLDivElement, SelectItemProps>(
 				</SelectPrimitive.ItemText>
 			</SelectPrimitive.Item>
 		);
-	}
+	},
 );
 SelectItem.displayName = 'SelectItem';
 
@@ -454,7 +505,7 @@ export const SelectGroup = React.forwardRef<HTMLDivElement, SelectGroupProps>(
 			data-testid={testId}
 			{...props}
 		/>
-	)
+	),
 );
 SelectGroup.displayName = 'SelectGroup';
 
@@ -480,7 +531,7 @@ export const SelectLabel = React.forwardRef<HTMLDivElement, SelectLabelProps>(
 			data-testid={testId}
 			{...props}
 		/>
-	)
+	),
 );
 SelectLabel.displayName = 'SelectLabel';
 
@@ -494,17 +545,18 @@ export type SelectSeparatorProps = {
 /**
  * Visual separator between select items or groups.
  */
-export const SelectSeparator = React.forwardRef<HTMLDivElement, SelectSeparatorProps>(
-	({ className, style, id, testId, ...props }, ref) => (
-		<SelectPrimitive.Separator
-			ref={ref}
-			id={id}
-			className={cn('select-separator', className)}
-			style={style}
-			data-slot="select-separator"
-			data-testid={testId}
-			{...props}
-		/>
-	)
-);
+export const SelectSeparator = React.forwardRef<
+	HTMLDivElement,
+	SelectSeparatorProps
+>(({ className, style, id, testId, ...props }, ref) => (
+	<SelectPrimitive.Separator
+		ref={ref}
+		id={id}
+		className={cn('select-separator', className)}
+		style={style}
+		data-slot="select-separator"
+		data-testid={testId}
+		{...props}
+	/>
+));
 SelectSeparator.displayName = 'SelectSeparator';

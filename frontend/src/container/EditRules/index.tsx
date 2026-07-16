@@ -8,6 +8,8 @@ import {
 } from 'types/api/alerts/alertTypesV2';
 import { AlertDef } from 'types/api/alerts/def';
 
+import type { JSX } from 'react';
+
 function EditRules({
 	initialValue,
 	ruleId,

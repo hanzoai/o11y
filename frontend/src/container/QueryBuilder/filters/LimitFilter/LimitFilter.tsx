@@ -5,6 +5,8 @@ import { DataSource } from 'types/common/queryBuilder';
 import { selectStyle } from '../QueryBuilderSearch/config';
 import { handleKeyDownLimitFilter } from '../utils';
 
+import type { JSX } from 'react';
+
 function LimitFilter({ onChange, query }: LimitFilterProps): JSX.Element {
 	const isMetricsDataSource = query.dataSource === DataSource.METRICS;
 

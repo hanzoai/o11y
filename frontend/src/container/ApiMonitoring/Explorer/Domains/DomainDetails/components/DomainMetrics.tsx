@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useQueries } from 'react-query';
 import { Color } from 'constants/designTokens';
 import { Progress, Skeleton, Tooltip, Typography } from 'antd';

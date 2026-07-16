@@ -6,6 +6,8 @@ import emptyStateUrl from '@/assets/Icons/emptyState.svg';
 
 import styles from './EventsNotConfigured.module.scss';
 
+import type { JSX } from 'react';
+
 const K8S_EVENTS_DOCS_URL =
 	'https://o11y.io/docs/infrastructure-monitoring/k8s-metrics/';
 

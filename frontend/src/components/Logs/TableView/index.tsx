@@ -5,6 +5,8 @@ import { tableScroll } from './config';
 import { LogsTableViewProps } from './types';
 import { useTableView } from './useTableView';
 
+import type { JSX } from 'react';
+
 function LogsTableView(props: LogsTableViewProps): JSX.Element {
 	const { dataSource, columns } = useTableView(props);
 

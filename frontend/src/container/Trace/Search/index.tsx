@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { ChevronRight } from 'components/ui/icons';
@@ -109,7 +109,7 @@ function Search({
 					type="search"
 					enterButton={
 						<Flex align="center">
-							<ChevronRight size="md" />
+							<ChevronRight size={16} />
 						</Flex>
 					}
 					onSearch={(string): void => {

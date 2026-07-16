@@ -6,6 +6,8 @@ import { useAppContext } from 'providers/App/App';
 import ServiceMetrics from './ServiceMetrics';
 import ServiceTraces from './ServiceTraces';
 
+import type { JSX } from 'react';
+
 function Services({
 	onUpdateChecklistDoneItem,
 	loadingUserPreferences,

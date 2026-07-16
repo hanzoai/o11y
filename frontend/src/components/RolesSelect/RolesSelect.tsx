@@ -10,6 +10,8 @@ import { popupContainer } from 'utils/selectPopupContainer';
 
 import './RolesSelect.styles.scss';
 
+import type { JSX } from 'react';
+
 export interface RoleOption {
 	label: string;
 	value: string;

@@ -4,6 +4,8 @@ import { isDrilldownEnabled } from 'container/QueryTable/Drilldown/drilldownUtil
 
 import { GridComponentSliderContainer } from './styles';
 
+import type { JSX } from 'react';
+
 interface GridGraphsProps {
 	handle: FullScreenHandle;
 }

@@ -6,6 +6,8 @@ import usePipelinePreview from '../../../hooks/usePipelinePreview';
 
 import './styles.scss';
 
+import type { JSX } from 'react';
+
 function PipelineSimulationResult({
 	inputLogs,
 	pipeline,

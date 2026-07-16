@@ -6,6 +6,8 @@ import { FunnelStepData, LatencyOptions } from 'types/api/traceFunnels';
 
 import './InterStepConfig.styles.scss';
 
+import type { JSX } from 'react';
+
 function InterStepConfig({
 	index,
 	step,

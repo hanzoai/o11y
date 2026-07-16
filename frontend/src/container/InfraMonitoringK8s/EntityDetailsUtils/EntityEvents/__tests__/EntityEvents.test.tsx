@@ -7,6 +7,8 @@ import { QueryRangePayloadV5 } from 'types/api/v5/queryRange';
 import EntityEvents from '../EntityEvents';
 import { K8S_ENTITY_EVENTS_EXPRESSION_KEY } from '../hooks';
 
+import type { JSX } from 'react';
+
 function verifyEntityEventsV5Request({
 	payload,
 	expectedOffset,

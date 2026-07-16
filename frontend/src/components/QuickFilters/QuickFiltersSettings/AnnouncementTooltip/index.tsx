@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Button } from 'components/ui/button';
 import classNames from 'classnames';
 import { Check, X } from 'components/ui/icons';
@@ -17,11 +17,11 @@ type AnnouncementTooltipProps = {
 // TEMPORARY HACK FOR ANNOUNCEMENTS: To be removed once proper system in place.
 function AnnouncementTooltip({
 	position,
-	show,
+	show = false,
 	title,
 	message,
-	className,
-	onClose,
+	className = '',
+	onClose = (): void => {},
 }: AnnouncementTooltipProps): JSX.Element | null {
 	const [visible, setVisible] = useState(show);
 
@@ -74,11 +74,5 @@ function AnnouncementTooltip({
 		</>
 	) : null;
 }
-
-AnnouncementTooltip.defaultProps = {
-	show: false,
-	className: '',
-	onClose: (): void => {},
-};
 
 export default AnnouncementTooltip;

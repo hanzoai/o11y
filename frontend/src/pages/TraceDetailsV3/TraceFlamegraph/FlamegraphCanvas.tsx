@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { createPortal } from 'react-dom';
 import TimelineV3 from 'components/TimelineV3/TimelineV3';
 import { useIsDarkMode } from 'hooks/useDarkMode';

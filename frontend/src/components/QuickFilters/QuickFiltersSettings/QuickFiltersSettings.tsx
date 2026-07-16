@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Input } from 'components/ui/input';
 import { Button } from 'antd';
 import { Check, TableColumnsSplit, X } from 'components/ui/icons';
