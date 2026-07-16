@@ -216,7 +216,7 @@ require (
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
 	github.com/hanzo-ds/native v0.72.0 // indirect
-	github.com/hanzoai/ai v1.808.0 // indirect
+	github.com/hanzoai/ai v1.813.6 // indirect
 	github.com/hanzoai/beego v1.12.13 // indirect
 	github.com/hanzoai/beego/v2 v2.4.2 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
@@ -507,7 +507,7 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	github.com/zap-proto/zip v1.6.0
+	github.com/zap-proto/zip v1.8.2
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/collector/component v1.54.0 // indirect
 	go.opentelemetry.io/collector/component/componentstatus v0.148.0 // indirect
