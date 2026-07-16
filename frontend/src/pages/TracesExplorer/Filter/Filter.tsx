@@ -248,7 +248,7 @@ export function Filter(props: FilterProps): JSX.Element {
 			<Flex justify="space-between" align="center" className="filter-header">
 				<Flex gap={8} align="center">
 					<div className="filter-title">
-						<FilterIcon size="md" />
+						<FilterIcon size={16} />
 						<Typography.Text>Filters</Typography.Text>
 					</div>
 					<Tooltip title="Reset" placement="right">
@@ -257,7 +257,7 @@ export function Filter(props: FilterProps): JSX.Element {
 							className="sync-icon"
 							data-testid="reset-filters"
 						>
-							<RefreshCw size="md" />
+							<RefreshCw size={16} />
 						</Button>
 					</Tooltip>
 				</Flex>
@@ -267,7 +267,7 @@ export function Filter(props: FilterProps): JSX.Element {
 						className="arrow-icon"
 						data-testid="toggle-filter-panel"
 					>
-						<ArrowUpToLine style={{ rotate: '270deg' }} size="md" />
+						<ArrowUpToLine style={{ rotate: '270deg' }} size={16} />
 					</Button>
 				</Tooltip>
 			</Flex>

@@ -36,7 +36,7 @@ function QueryHeader({
 				<Row>
 					<Button
 						type="default"
-						icon={disabled ? <EyeClosed size="md" /> : <EyeOpen size="md" />}
+						icon={disabled ? <EyeClosed size={16} /> : <EyeOpen size={16} />}
 						onClick={onDisable}
 						className="action-btn"
 					>
@@ -44,7 +44,7 @@ function QueryHeader({
 					</Button>
 					<Button
 						type="default"
-						icon={collapse ? <ChevronRight size="md" /> : <ChevronDown size="md" />}
+						icon={collapse ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
 						onClick={(): void => setCollapse(!collapse)}
 						className="action-btn"
 					/>
@@ -54,7 +54,7 @@ function QueryHeader({
 					<Button
 						type="default"
 						danger
-						icon={<Trash2 size="md" />}
+						icon={<Trash2 size={16} />}
 						onClick={onDelete}
 						className="action-btn"
 					/>

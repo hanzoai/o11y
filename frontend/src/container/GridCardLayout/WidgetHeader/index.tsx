@@ -152,35 +152,35 @@ function WidgetHeader({
 		(): MenuItem[] => [
 			{
 				key: MenuItemKeys.View,
-				icon: <Fullscreen size="md" />,
+				icon: <Fullscreen size={16} />,
 				label: MENUITEM_KEYS_VS_LABELS[MenuItemKeys.View],
 				isVisible: headerMenuList?.includes(MenuItemKeys.View) || false,
 				disabled: queryResponse.isFetching,
 			},
 			{
 				key: MenuItemKeys.Edit,
-				icon: <Pencil size="md" />,
+				icon: <Pencil size={16} />,
 				label: MENUITEM_KEYS_VS_LABELS[MenuItemKeys.Edit],
 				isVisible: headerMenuList?.includes(MenuItemKeys.Edit) || false,
 				disabled: !editWidget,
 			},
 			{
 				key: MenuItemKeys.Clone,
-				icon: <Copy size="md" />,
+				icon: <Copy size={16} />,
 				label: MENUITEM_KEYS_VS_LABELS[MenuItemKeys.Clone],
 				isVisible: headerMenuList?.includes(MenuItemKeys.Clone) || false,
 				disabled: !editWidget,
 			},
 			{
 				key: MenuItemKeys.Download,
-				icon: <CloudDownload size="md" />,
+				icon: <CloudDownload size={16} />,
 				label: MENUITEM_KEYS_VS_LABELS[MenuItemKeys.Download],
 				isVisible: widget.panelTypes === PANEL_TYPES.TABLE,
 				disabled: false,
 			},
 			{
 				key: MenuItemKeys.Delete,
-				icon: <Trash2 size="md" />,
+				icon: <Trash2 size={16} />,
 				label: MENUITEM_KEYS_VS_LABELS[MenuItemKeys.Delete],
 				isVisible: headerMenuList?.includes(MenuItemKeys.Delete) || false,
 				disabled: !deleteWidget,
@@ -188,7 +188,7 @@ function WidgetHeader({
 			},
 			{
 				key: MenuItemKeys.CreateAlerts,
-				icon: <Bell size="md" />,
+				icon: <Bell size={16} />,
 				label: MENUITEM_KEYS_VS_LABELS[MenuItemKeys.CreateAlerts],
 				rightIcon: <SquareArrowOutUpRight size="lg" />,
 				isVisible: headerMenuList?.includes(MenuItemKeys.CreateAlerts) || false,
@@ -278,7 +278,7 @@ function WidgetHeader({
 								className="info-tooltip"
 								placement="right"
 							>
-								<SolidInfoCircle size="md" />
+								<SolidInfoCircle size={16} />
 							</Tooltip>
 						)}
 					</div>
@@ -325,7 +325,7 @@ function WidgetHeader({
 									className={`widget-header-more-options ${
 										globalSearchAvailable ? 'widget-header-more-options-visible' : ''
 									}`}
-									icon={<EllipsisVertical size="md" />}
+									icon={<EllipsisVertical size={16} />}
 								/>
 							</DropdownMenuSimple>
 						)}

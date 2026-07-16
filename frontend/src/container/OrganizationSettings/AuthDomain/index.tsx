@@ -179,7 +179,7 @@ function AuthDomain(): JSX.Element {
 			<section className="auth-domain-header">
 				<h3 className="auth-domain-title">Authenticated Domains</h3>
 				<Button
-					prefix={<Plus size="md" />}
+					prefix={<Plus size={16} />}
 					onClick={(): void => {
 						setAddDomain(true);
 					}}

@@ -192,7 +192,7 @@ function AllErrors(): JSX.Element {
 		</Typography>
 	);
 
-	const filterIcon = useCallback(() => <Search size="md" />, []);
+	const filterIcon = useCallback(() => <Search size={16} />, []);
 
 	const handleSearch = useCallback(
 		(
@@ -271,7 +271,7 @@ function AllErrors(): JSX.Element {
 						size="small"
 					>
 						<Flex align="center" justify="center" gap={4}>
-							<Search size="md" />
+							<Search size={16} />
 							Search
 						</Flex>
 					</Button>

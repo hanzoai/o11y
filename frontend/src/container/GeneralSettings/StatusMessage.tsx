@@ -58,7 +58,7 @@ function StatusMessage({
 				}}
 			>
 				<Col xs={1}>
-					<SolidInfoCircle size="md" />
+					<SolidInfoCircle size={16} />
 				</Col>
 
 				<Col

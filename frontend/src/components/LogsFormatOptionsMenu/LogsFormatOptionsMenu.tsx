@@ -279,7 +279,7 @@ function LogsFormatOptionsMenu({
 			<Tooltip title="Options">
 				<Button
 					className="periscope-btn ghost"
-					icon={<SlidersVertical size="md" />}
+					icon={<SlidersVertical size={16} />}
 					data-testid="periscope-btn-format-options"
 				/>
 			</Tooltip>

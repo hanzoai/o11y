@@ -48,7 +48,7 @@ function CreatePipelineButton({
 			{isAddNewPipelineVisible && (
 				<CustomButton onClick={onEnterEditMode} disabled={isDisabled}>
 					<Flex align="center" gap={4}>
-						<PencilLine size="md" />
+						<PencilLine size={16} />
 						{t('enter_edit_mode')}
 					</Flex>
 				</CustomButton>

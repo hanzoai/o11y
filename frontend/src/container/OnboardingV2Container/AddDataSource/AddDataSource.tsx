@@ -730,7 +730,7 @@ function OnboardingAddDataSource(): JSX.Element {
 														placeholder="Search"
 														maxLength={20}
 														onChange={handleSearch}
-														addonAfter={<Search size="md" />}
+														addonAfter={<Search size={16} />}
 													/>
 												</div>
 

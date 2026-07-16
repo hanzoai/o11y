@@ -219,7 +219,7 @@ function LogLiveTail({ getLogsAggregate }: Props): JSX.Element {
 					>
 						<Flex align="center" gap={4}>
 							<span>Pause</span>
-							<Pause size="md" />
+							<Pause size={16} />
 						</Flex>
 					</Button>
 				) : (
@@ -230,7 +230,7 @@ function LogLiveTail({ getLogsAggregate }: Props): JSX.Element {
 						disabled={isDisabled}
 					>
 						<Flex align="center" gap={4}>
-							Go Live <Play size="md" />
+							Go Live <Play size={16} />
 						</Flex>
 					</Button>
 				)}

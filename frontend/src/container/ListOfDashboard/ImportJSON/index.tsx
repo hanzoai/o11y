@@ -123,7 +123,7 @@ function ImportJSON({
 
 	const getErrorNode = (error: string): JSX.Element => (
 		<Space>
-			<CircleAlert size="md" color={red[7]} />
+			<CircleAlert size={16} color={red[7]} />
 			<Typography style={{ color: 'var(--warning-background)' }}>
 				{error}
 			</Typography>

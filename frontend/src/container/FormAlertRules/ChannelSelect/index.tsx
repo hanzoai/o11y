@@ -66,7 +66,7 @@ function ChannelSelect({
 			children.push(
 				<Select.Option key="add-new-channel" value="add-new-channel">
 					<StyledCreateChannelOption>
-						<Plus size="md" />
+						<Plus size={16} />
 						Create a new channel
 					</StyledCreateChannelOption>
 				</Select.Option>,

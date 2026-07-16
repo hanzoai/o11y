@@ -248,7 +248,7 @@ function SpanLogs({
 					variant="action"
 					prefix={<Compass size={14} />}
 					onClick={handleExplorerPageRedirect}
-					size="md"
+					size={16}
 				>
 					View Logs
 				</Button>

@@ -339,7 +339,7 @@ function FullView({
 									{response.isFetching && (
 										<Spin
 											spinning
-											indicator={<Loader size="md" className="animate-spin" />}
+											indicator={<Loader size={16} className="animate-spin" />}
 										/>
 									)}
 									<TimePreference
@@ -354,7 +354,7 @@ function FullView({
 											response.refetch();
 										}}
 										type="primary"
-										icon={<RefreshCw size="md" />}
+										icon={<RefreshCw size={16} />}
 									/>
 								</div>
 							</TimeContainer>

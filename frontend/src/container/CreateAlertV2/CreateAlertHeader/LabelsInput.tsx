@@ -136,7 +136,7 @@ function LabelsInput({
 								aria-label={`Remove label ${key}`}
 								onClick={(): void => handleRemoveLabel(key)}
 							>
-								<X size="md" />
+								<X size={16} />
 							</button>
 						</span>
 					))}

@@ -91,7 +91,7 @@ function MenuItemGenerator({
 							role="img"
 							aria-label="Delete view"
 							onClick={onDeleteHandler}
-							size="md"
+							size={16}
 						/>
 					</Typography.Link>
 				</Col>

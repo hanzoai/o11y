@@ -193,7 +193,7 @@ export default function CustomDomainEditModal({
 					) : (
 						<Button
 							variant="solid"
-							size="md"
+							size={16}
 							color="primary"
 							className="edit-modal-apply-btn"
 							onClick={handleSubmit}

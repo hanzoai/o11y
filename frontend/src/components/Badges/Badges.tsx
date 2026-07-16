@@ -104,7 +104,7 @@ function Badges({ tags, setTags }: AddTagsProps): JSX.Element {
 					onClick={showInput}
 				>
 					<Flex justify="center" align="center" gap={4}>
-						<Plus size="md" />
+						<Plus size={16} />
 						New Tag
 					</Flex>
 				</Button>

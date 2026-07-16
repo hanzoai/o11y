@@ -965,7 +965,7 @@ function FormAlertRules({
 							loading={loading || false}
 							type="primary"
 							onClick={onSaveHandler}
-							icon={<Save size="md" />}
+							icon={<Save size={16} />}
 							disabled={
 								isAlertNameMissing ||
 								!isChannelConfigurationValid ||

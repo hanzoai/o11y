@@ -40,7 +40,7 @@ function OptionsMenu({
 			<Popover placement="bottom" trigger="click" content={OptionsContent}>
 				<Flex align="center" gap="4px">
 					{t('options_menu.options')}
-					<Settings size="md" />
+					<Settings size={16} />
 				</Flex>
 			</Popover>
 		</OptionsContainer>

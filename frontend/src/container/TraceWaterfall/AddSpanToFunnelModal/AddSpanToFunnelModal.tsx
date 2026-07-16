@@ -214,7 +214,7 @@ function AddSpanToFunnelModal({
 					<Spin
 						className="add-span-to-funnel-modal__loading-spinner"
 						spinning={isFunnelDetailsLoading || isFunnelDetailsFetching}
-						indicator={<Loader className="animate-spin" size="md" />}
+						indicator={<Loader className="animate-spin" size={16} />}
 					>
 						{selectedFunnelId && funnelDetails?.payload && (
 							<FunnelProvider

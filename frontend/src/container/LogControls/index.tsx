@@ -117,7 +117,7 @@ function LogControls(): JSX.Element | null {
 				onClick={handleGoToLatest}
 			>
 				<Flex align="center" gap="4px">
-					<SkipBack size="md" /> Go to latest
+					<SkipBack size={16} /> Go to latest
 				</Flex>
 			</Button>
 			<Divider type="vertical" />

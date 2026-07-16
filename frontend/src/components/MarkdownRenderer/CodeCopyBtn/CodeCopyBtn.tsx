@@ -33,7 +33,7 @@ function CodeCopyBtn({
 	return (
 		<div className={cx('code-copy-btn', isSnippetCopied ? 'copied' : '')}>
 			<button type="button" onClick={handleClick}>
-				{!isSnippetCopied ? <Copy size="md" /> : <Check size="md" />}
+				{!isSnippetCopied ? <Copy size={16} /> : <Check size={16} />}
 			</button>
 		</div>
 	);

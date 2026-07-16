@@ -22,7 +22,7 @@ function GoToTop(): JSX.Element | null {
 				onClick={scrollToTop}
 				shape="circle"
 				type="primary"
-				icon={<ArrowUp size="md" />}
+				icon={<ArrowUp size={16} />}
 			/>
 		);
 	}

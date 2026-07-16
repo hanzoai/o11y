@@ -496,7 +496,7 @@ function DashboardDescription(props: DashboardDescriptionProps): JSX.Element {
 						<Button
 							className="add-panel-btn"
 							onClick={onEmptyWidgetHandler}
-							icon={<Plus size="md" />}
+							icon={<Plus size={16} />}
 							type="primary"
 							data-testid="add-panel-header"
 						>

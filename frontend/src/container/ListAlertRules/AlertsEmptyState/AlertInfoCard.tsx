@@ -35,7 +35,7 @@ function AlertInfoCard({
 					{subheader}
 				</Typography.Text>
 			</div>
-			<ArrowRight size="md" />
+			<ArrowRight size={16} />
 		</div>
 	);
 }

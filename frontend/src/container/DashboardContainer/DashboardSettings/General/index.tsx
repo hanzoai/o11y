@@ -202,7 +202,7 @@ function GeneralDashboardSettings(): JSX.Element {
 						placement="top"
 						mouseEnterDelay={0.5}
 					>
-						<SolidInfoCircle size="md" className={styles.crossPanelSyncInfoIcon} />
+						<SolidInfoCircle size={16} className={styles.crossPanelSyncInfoIcon} />
 					</Tooltip>
 				</div>
 				<div className={styles.crossPanelSyncRow}>

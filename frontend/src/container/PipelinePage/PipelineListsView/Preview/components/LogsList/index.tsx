@@ -39,7 +39,7 @@ function LogsList({ logs }: LogsListProps): JSX.Element {
 						tabIndex={0}
 						onKeyUp={makeLogDetailsHandler(log)}
 					>
-						<Expand size="md" />
+						<Expand size={16} />
 					</div>
 				</div>
 			))}

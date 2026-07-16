@@ -83,7 +83,7 @@ function Download({
 				type="link"
 			>
 				<Flex align="center" gap={4}>
-					<CloudDownload size="md" />
+					<CloudDownload size={16} />
 					Download
 				</Flex>
 			</Button>

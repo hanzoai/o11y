@@ -1704,7 +1704,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
 					{loading && (
 						<div className="navigation-loading">
 							<div className="navigation-icons">
-								<Loader size="md" className="animate-spin" />
+								<Loader size={16} className="animate-spin" />
 							</div>
 							<div className="navigation-text">Refreshing values...</div>
 						</div>
@@ -1712,7 +1712,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
 					{!loading && waitingMessage && (
 						<div className="navigation-loading">
 							<div className="navigation-icons">
-								<Loader size="md" className="animate-spin" />
+								<Loader size={16} className="animate-spin" />
 							</div>
 							<div className="navigation-text" title={waitingMessage}>
 								{waitingMessage}
@@ -2013,7 +2013,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
 				popupMatchSelectWidth={dropdownMatchSelectWidth}
 				allowClear={allowClear}
 				getPopupContainer={getPopupContainer ?? popupContainer}
-				suffixIcon={<ChevronDown style={{ cursor: 'default' }} size="md" />}
+				suffixIcon={<ChevronDown style={{ cursor: 'default' }} size={16} />}
 				dropdownRender={customDropdownRender}
 				menuItemSelectedIcon={null}
 				popupClassName={cx('custom-multiselect-dropdown-container', popupClassName)}

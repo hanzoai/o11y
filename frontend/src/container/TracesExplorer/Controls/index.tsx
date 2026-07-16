@@ -35,7 +35,7 @@ function TraceExplorerControls({
 						onClick={(): void => setIsFieldsSelectorOpen(true)}
 					>
 						{t('options_menu.options')}
-						<Settings size="md" />
+						<Settings size={16} />
 					</div>
 					<FieldsSelector
 						isOpen={isFieldsSelectorOpen}

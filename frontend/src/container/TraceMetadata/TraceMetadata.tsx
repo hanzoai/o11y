@@ -102,7 +102,7 @@ function TraceMetadata(props: ITraceMetadataProps): JSX.Element {
 						<Button
 							variant="solid"
 							color="primary"
-							size="md"
+								size="md"
 							className="new-view-btn"
 							onClick={handleSwitchToNewView}
 						>

@@ -81,7 +81,7 @@ function JsonFlattening({
 					<Flex gap="8px" align="center">
 						Enable Mapping
 						<Tooltip title="The order of filled keys will determine the priority of keys i.e. earlier keys have higher precedence">
-							<Info size="md" />
+							<Info size={16} />
 						</Tooltip>
 					</Flex>
 				</Space>

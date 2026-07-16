@@ -61,7 +61,7 @@ function ApDexApplication(): JSX.Element {
 			<div className="ap-dex-settings-popover-content">
 				<Button size="middle">
 					<ButtonContainer>
-						<Settings size="md" /> Settings
+						<Settings size={16} /> Settings
 					</ButtonContainer>
 				</Button>
 			</div>

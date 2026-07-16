@@ -495,7 +495,7 @@ function LogDetailInner({
 								value: VIEW_TYPES.INFRAMETRICS,
 								label: (
 									<div className="view-title">
-										<Histogram size="md" />
+										<Histogram size={16} />
 										Metrics
 									</div>
 								),

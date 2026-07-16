@@ -43,7 +43,7 @@ function AddColumnField({ config }: AddColumnFieldProps): JSX.Element | null {
 					notFoundContent={config.isFetching ? <Spin size="small" /> : null}
 				/>
 				<SearchIconWrapper $isDarkMode={isDarkMode}>
-					<Search size="md" />
+					<Search size={16} />
 				</SearchIconWrapper>
 			</Input.Group>
 
@@ -51,7 +51,7 @@ function AddColumnField({ config }: AddColumnFieldProps): JSX.Element | null {
 				<AddColumnItem direction="horizontal" key={name}>
 					<Typography>{name}</Typography>
 					<DeleteOutlinedIcon
-						size="md"
+						size={16}
 						onClick={(): void => config.onRemove(name)}
 					/>
 				</AddColumnItem>

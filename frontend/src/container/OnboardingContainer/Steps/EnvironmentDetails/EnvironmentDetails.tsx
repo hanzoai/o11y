@@ -185,7 +185,7 @@ export default function EnvironmentDetails(): JSX.Element {
 							className="periscope-btn primary"
 							icon={
 								isSubmittingRequestForEnvironment ? (
-									<LoaderCircle size="md" className="animate-spin" />
+									<LoaderCircle size={16} className="animate-spin" />
 								) : (
 									<Check size={12} />
 								)

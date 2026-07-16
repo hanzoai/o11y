@@ -117,7 +117,7 @@ const getColumnSearchProps = (
 					onClick={(): void => handleSearch(selectedKeys as string[], confirm)}
 				>
 					<Flex align="center" gap={4}>
-						<Search size="md" />
+						<Search size={16} />
 						Search
 					</Flex>
 				</Button>
@@ -143,7 +143,7 @@ const getColumnSearchProps = (
 	filterIcon: (filtered: boolean): JSX.Element => (
 		<Search
 			style={{ color: filtered ? Color.BG_ROBIN_500 : undefined }}
-			size="md"
+			size={16}
 		/>
 	),
 	onFilter: (value, record): boolean =>

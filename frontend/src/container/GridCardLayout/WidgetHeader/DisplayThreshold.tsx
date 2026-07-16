@@ -13,7 +13,7 @@ function DisplayThreshold({ threshold }: DisplayThresholdProps): JSX.Element {
 	return (
 		<DisplayThresholdContainer>
 			<TypographHeading>Threshold </TypographHeading>
-			<Typography>{threshold || <SolidInfoCircle size="md" />}</Typography>
+			<Typography>{threshold || <SolidInfoCircle size={16} />}</Typography>
 		</DisplayThresholdContainer>
 	);
 }

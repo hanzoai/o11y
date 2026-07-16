@@ -80,7 +80,7 @@ function AlertChannels(): JSX.Element {
 					>
 						<Button onClick={onToggleHandler} disabled={!addNewChannelPermission}>
 							<Flex align="center" justify="center" gap={4}>
-								<Plus size="md" /> {t('button_new_channel')}
+								<Plus size={16} /> {t('button_new_channel')}
 							</Flex>
 						</Button>
 					</Tooltip>

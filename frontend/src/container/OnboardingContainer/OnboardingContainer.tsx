@@ -360,7 +360,7 @@ export default function Onboarding(): JSX.Element {
 					<div className="continue-to-next-step">
 						<Button
 							type="primary"
-							icon={<ArrowRight size="md" />}
+							icon={<ArrowRight size={16} />}
 							onClick={(e): void => handleNext(e)}
 						>
 							{t('get_started')}

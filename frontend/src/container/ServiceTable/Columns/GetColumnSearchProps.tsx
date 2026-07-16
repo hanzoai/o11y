@@ -17,7 +17,7 @@ export const getColumnSearchProps = (
 	search: string,
 ): ColumnType<ServicesList> => ({
 	filterDropdown,
-	filterIcon: <Search size="md" />,
+	filterIcon: <Search size={16} />,
 	onFilter: (value: boolean | Key, record: ServicesList): boolean => {
 		if (record[dataIndex]) {
 			record[dataIndex]

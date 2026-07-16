@@ -259,7 +259,7 @@ function BasicInfo({
 							disabled={!addNewChannelPermission}
 						>
 							<Flex align="center" justify="center">
-								<Plus size="md" />
+								<Plus size={16} />
 								Create a notification channel
 							</Flex>
 						</Button>

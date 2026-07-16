@@ -110,7 +110,7 @@ function ImportJSONModal({ open, onClose }: Props): JSX.Element {
 
 	const renderError = (msg: string): JSX.Element => (
 		<div className={styles.jsonError}>
-			<CircleAlert size="md" color={red[7]} />
+			<CircleAlert size={16} color={red[7]} />
 			<Typography className={styles.errorText}>{msg}</Typography>
 		</div>
 	);

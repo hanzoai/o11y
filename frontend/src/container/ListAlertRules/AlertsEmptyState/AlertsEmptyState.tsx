@@ -92,7 +92,7 @@ export function AlertsEmptyState({
 									data-testid="add-alert"
 								>
 									<span className={styles.buttonContent}>
-										<Plus size="md" />
+										<Plus size={16} />
 										New Alert Rule
 									</span>
 								</Button>

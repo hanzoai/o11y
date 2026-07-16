@@ -83,7 +83,7 @@ export const hostColumnsConfig: TableColumnDef<HostData>[] = [
 			<div className={styles.statusHeader}>
 				Status
 				<Tooltip title="Sent system metrics in last 10 mins">
-					<Info size="md" />
+					<Info size={16} />
 				</Tooltip>
 			</div>
 		),
@@ -132,7 +132,7 @@ export const hostColumnsConfig: TableColumnDef<HostData>[] = [
 			<div className={`${styles.columnHeaderRight} ${styles.memoryUsageHeader}`}>
 				Memory Usage
 				<Tooltip title="Excluding cache memory">
-					<Info size="md" />
+					<Info size={16} />
 				</Tooltip>
 			</div>
 		),

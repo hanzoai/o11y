@@ -130,9 +130,9 @@ function Trace(props: TraceProps): JSX.Element {
 	const icon = useMemo(
 		() =>
 			isOpen ? (
-				<ChevronDown size="md" style={iconStyles} />
+				<ChevronDown size={16} style={iconStyles} />
 			) : (
-				<ChevronRight size="md" style={iconStyles} />
+				<ChevronRight size={16} style={iconStyles} />
 			),
 		[isOpen, iconStyles],
 	);

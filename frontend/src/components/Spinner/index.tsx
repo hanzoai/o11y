@@ -21,7 +21,7 @@ function Spinner({
 						className="animate-spin"
 						role="img"
 						aria-label="loading"
-						size="md"
+						size={16}
 					/>
 				}
 			/>

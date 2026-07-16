@@ -51,7 +51,7 @@ function TimePreference({
 						{selectedTime.name}
 					</Typography.Text>
 				</div>
-				<ChevronDown size="md" />
+				<ChevronDown size={16} />
 			</Button>
 		</DropdownMenuSimple>
 	);

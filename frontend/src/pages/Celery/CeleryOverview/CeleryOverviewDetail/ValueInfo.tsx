@@ -156,7 +156,7 @@ export default function ValueInfo({
 					</div>
 					<Button
 						type="primary"
-						icon={<FileSearch size="md" />}
+						icon={<FileSearch size={16} />}
 						className="trace-button"
 						disabled={isLoading}
 						onClick={(): void => {
@@ -191,7 +191,7 @@ export default function ValueInfo({
 					</div>
 					<Button
 						type="primary"
-						icon={<FileSearch size="md" />}
+						icon={<FileSearch size={16} />}
 						className="trace-button"
 						disabled={isLoading}
 						onClick={(): void => {
@@ -239,7 +239,7 @@ export default function ValueInfo({
 					</div>
 					<Button
 						type="primary"
-						icon={<FileSearch size="md" />}
+						icon={<FileSearch size={16} />}
 						className="trace-button"
 						disabled={isLoading}
 						onClick={(): void => {

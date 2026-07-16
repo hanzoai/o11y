@@ -109,7 +109,7 @@ function Search({
 					type="search"
 					enterButton={
 						<Flex align="center">
-							<ChevronRight size="md" />
+							<ChevronRight size={16} />
 						</Flex>
 					}
 					onSearch={(string): void => {

@@ -346,7 +346,7 @@ export default function InfraMonitoringK8s(): JSX.Element {
 									<ArrowUpToLine
 										style={{ transform: 'rotate(270deg)' }}
 										onClick={handleFilterVisibilityChange}
-										size="md"
+										size={16}
 									/>
 								</Tooltip>
 							</div>
