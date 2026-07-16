@@ -29,11 +29,11 @@ function bootSettingsPlugin(env: Record<string, string>): Plugin {
 	return {
 		name: 'boot-settings',
 		transformIndexHtml(html): string {
+			// No third-party trackers. Analytics is Hanzo Insights; support chat
+			// is Hanzo Chat. Sentry is opt-IN (=== 'true'), pointed at our own
+			// fork — never opt-out, which shipped it enabled by default.
 			const settings = {
-				posthog: { enabled: env.VITE_POSTHOG_ENABLED !== 'false' },
-				appcues: { enabled: env.VITE_APPCUES_ENABLED !== 'false' },
-				sentry: { enabled: env.VITE_SENTRY_ENABLED !== 'false' },
-				pylon: { enabled: env.VITE_PYLON_ENABLED !== 'false' },
+				sentry: { enabled: env.VITE_SENTRY_ENABLED === 'true' },
 			};
 			return html.replaceAll('[[.Settings]]', JSON.stringify(settings));
 		},
@@ -68,10 +68,7 @@ export default defineConfig(({ mode }): UserConfig => {
 		react(),
 		createHtmlPlugin({
 			inject: {
-				data: {
-					PYLON_APP_ID: env.VITE_PYLON_APP_ID || '',
-					APPCUES_APP_ID: env.VITE_APPCUES_APP_ID || '',
-				},
+				data: {},
 			},
 		}),
 		vitePluginChecker({
@@ -152,12 +149,6 @@ export default defineConfig(({ mode }): UserConfig => {
 			'process.env.WEBSOCKET_API_ENDPOINT': JSON.stringify(
 				env.VITE_WEBSOCKET_API_ENDPOINT,
 			),
-			'process.env.PYLON_APP_ID': JSON.stringify(env.VITE_PYLON_APP_ID),
-			'process.env.PYLON_IDENTITY_SECRET': JSON.stringify(
-				env.VITE_PYLON_IDENTITY_SECRET,
-			),
-			'process.env.APPCUES_APP_ID': JSON.stringify(env.VITE_APPCUES_APP_ID),
-			'process.env.POSTHOG_KEY': JSON.stringify(env.VITE_POSTHOG_KEY),
 			'process.env.SENTRY_ORG': JSON.stringify(env.VITE_SENTRY_ORG),
 			'process.env.SENTRY_PROJECT_ID': JSON.stringify(env.VITE_SENTRY_PROJECT_ID),
 			'process.env.SENTRY_DSN': JSON.stringify(env.VITE_SENTRY_DSN),

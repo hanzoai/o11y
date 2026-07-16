@@ -23,6 +23,7 @@ import { CheckoutSuccessPayloadProps } from 'types/api/billing/checkout';
 import APIError from 'types/api/error';
 import { getBaseUrl } from 'utils/basePath';
 import { openInNewTab } from 'utils/navigation';
+import { openSupportChat } from 'utils/supportChat';
 
 import './Support.styles.scss';
 
@@ -163,8 +164,8 @@ export default function Support(): JSX.Element {
 				page: pathname,
 			});
 			setIsAddCreditCardModalOpen(true);
-		} else if (window.pylon) {
-			window.Pylon('show');
+		} else {
+			openSupportChat();
 		}
 	};
 

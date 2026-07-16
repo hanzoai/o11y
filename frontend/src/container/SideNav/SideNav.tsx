@@ -72,12 +72,10 @@ import { useAppContext } from 'providers/App/App';
 import { AppState } from 'store/reducers';
 import AppReducer from 'types/reducer/app';
 import { USER_ROLES } from 'types/roles';
-import { checkVersionState } from 'utils/app';
-import { isModifierKeyPressed } from 'utils/app';
+import { checkVersionState, isModifierKeyPressed } from 'utils/app';
 import { showErrorNotification } from 'utils/error';
 import { openInNewTab } from 'utils/navigation';
-
-import o11yBrandLogoUrl from '@/assets/Logos/o11y-brand-logo.svg';
+import { openSupportChat } from 'utils/supportChat';
 
 import { useCmdK } from '../../providers/cmdKProvider';
 import { routeConfig } from './config';
@@ -891,9 +889,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 					}
 					break;
 				case 'chat-support':
-					if (window.pylon) {
-						window.Pylon('show');
-					}
+					openSupportChat();
 					break;
 				case 'changelog-1':
 				case 'changelog-2':
