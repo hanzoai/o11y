@@ -412,7 +412,7 @@ test.describe('Dashboard Detail — Configure drawer', () => {
 		await dialog.getByRole('tab', { name: 'Variables' }).click();
 		const tabpanel = dialog.getByRole('tabpanel', { name: 'Variables' });
 
-		// Hover the row to reveal the edit button (Pylon overlay can intercept,
+		// Hover the row to reveal the edit button (an overlay can intercept,
 		// so dispatchEvent fires the click directly on the React onClick).
 		const nameCell = tabpanel.getByText('tb_env', { exact: true }).first();
 		await nameCell.hover();
