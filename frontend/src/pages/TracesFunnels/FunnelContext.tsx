@@ -3,11 +3,11 @@ import {
 	createContext,
 	Dispatch,
 	SetStateAction,
-	useCallback,
-	// eslint-disable-next-line no-restricted-imports
+	useCallback, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import { useQueryClient } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
@@ -311,10 +311,6 @@ export function FunnelProvider({
 		<FunnelContext.Provider value={value}>{children}</FunnelContext.Provider>
 	);
 }
-
-FunnelProvider.defaultProps = {
-	hasSingleStep: false,
-};
 
 export function useFunnelContext(): FunnelContextType {
 	const context = useContext(FunnelContext);

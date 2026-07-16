@@ -26,6 +26,8 @@ import {
 	__setSearchParamsGetterForTest,
 } from '../utils/getUnstableCurrentSearchParams';
 
+import type { JSX } from 'react';
+
 const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: { refetchOnWindowFocus: false, retry: false },

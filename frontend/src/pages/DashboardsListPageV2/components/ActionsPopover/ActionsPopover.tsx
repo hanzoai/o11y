@@ -13,6 +13,8 @@ import { openInNewTab } from 'utils/navigation';
 import DeleteActionItem from './DeleteActionItem';
 import styles from './ActionsPopover.module.scss';
 
+import type { JSX } from 'react';
+
 interface Props {
 	link: string;
 	dashboardId: string;

@@ -4,6 +4,8 @@ import { getDeploymentStage, getDeploymentStageIcon } from './utils';
 
 import { Flex } from 'antd';
 
+import type { JSX } from 'react';
+
 function DeploymentStage(deployStatus: string): JSX.Element {
 	return (
 		<Flex align="center" justify="center" gap="2px">

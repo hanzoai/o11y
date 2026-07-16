@@ -6,6 +6,8 @@ import { getUniversalNameFromMetricUnit } from 'components/YAxisUnitSelector/uti
 import { TreemapViewType } from '../types';
 import { formatDataForMetricsTable, getMetricsTableColumns } from '../utils';
 
+import type { JSX } from 'react';
+
 const mockQueryExpression: Filter = {
 	expression: '',
 };

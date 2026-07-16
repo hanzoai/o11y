@@ -4,6 +4,8 @@ import { BarChart, ScrollText } from 'components/ui/icons';
 
 import './IntegrationDetailContentTabs.styles.scss';
 
+import type { JSX } from 'react';
+
 interface DataCollectedProps {
 	logsData: Array<any>;
 	metricsData: Array<any>;

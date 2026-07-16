@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, type JSX } from 'react';
 import { Link } from 'components/ui/icons';
 import { ContextLinksData, Widgets } from 'types/api/dashboard/getAll';
 

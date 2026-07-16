@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
@@ -81,16 +88,16 @@ function ChartPreview({
 	graphType = PANEL_TYPES.TIME_SERIES,
 	selectedTime = 'GLOBAL_TIME',
 	selectedInterval = '5m',
-	headline,
-	userQueryKey,
+	headline = undefined,
+	userQueryKey = '',
 	allowSelectedIntervalForStepGen = false,
-	alertDef,
+	alertDef = undefined,
 	yAxisUnit,
-	setQueryStatus,
+	setQueryStatus = (): void => {},
 	showSideLegend = false,
-	additionalThresholds,
+	additionalThresholds = undefined,
 	isCancelled = false,
-	onFetchingStateChange,
+	onFetchingStateChange = undefined,
 }: ChartPreviewProps): JSX.Element | null {
 	const { t } = useTranslation('alerts');
 	const dispatch = useDispatch();
@@ -156,8 +163,7 @@ function ChartPreview({
 				return query.promql?.length > 0 && query.promql[0].query !== '';
 			case EQueryType.DATASTORE:
 				return (
-					query.datastore_sql?.length > 0 &&
-					query.datastore_sql[0].query?.length > 0
+					query.datastore_sql?.length > 0 && query.datastore_sql[0].query?.length > 0
 				);
 			case EQueryType.QUERY_BUILDER:
 				return (
@@ -359,20 +365,5 @@ function ChartPreview({
 		</div>
 	);
 }
-
-ChartPreview.defaultProps = {
-	graphType: PANEL_TYPES.TIME_SERIES,
-	selectedTime: 'GLOBAL_TIME',
-	selectedInterval: '5min',
-	headline: undefined,
-	userQueryKey: '',
-	allowSelectedIntervalForStepGen: false,
-	alertDef: undefined,
-	setQueryStatus: (): void => {},
-	showSideLegend: false,
-	additionalThresholds: undefined,
-	isCancelled: false,
-	onFetchingStateChange: undefined,
-};
 
 export default ChartPreview;

@@ -1,6 +1,8 @@
 import { Select } from 'antd';
 import { ATTRIBUTE_TYPES, PANEL_TYPES } from 'constants/queryBuilder';
 
+import type { JSX } from 'react';
+
 interface SpaceAggregationOptionsProps {
 	panelType: PANEL_TYPES | null;
 	selectedValue: string | undefined;
@@ -18,7 +20,7 @@ export default function SpaceAggregationOptions({
 	disabled,
 	onSelect,
 	operators,
-	qbVersion,
+	qbVersion = 'v2',
 }: SpaceAggregationOptionsProps): JSX.Element {
 	return (
 		<div
@@ -41,7 +43,3 @@ export default function SpaceAggregationOptions({
 		</div>
 	);
 }
-
-SpaceAggregationOptions.defaultProps = {
-	qbVersion: 'v2',
-};

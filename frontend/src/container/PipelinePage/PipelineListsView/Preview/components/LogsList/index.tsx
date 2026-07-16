@@ -9,6 +9,8 @@ import { ILog } from 'types/api/logs/log';
 
 import './styles.scss';
 
+import type { JSX } from 'react';
+
 function LogsList({ logs }: LogsListProps): JSX.Element {
 	const { activeLog, onSetActiveLog, onClearActiveLog, onAddToQuery } =
 		useActiveLog();
@@ -37,7 +39,7 @@ function LogsList({ logs }: LogsListProps): JSX.Element {
 						tabIndex={0}
 						onKeyUp={makeLogDetailsHandler(log)}
 					>
-						<Expand size="md" />
+						<Expand size={16} />
 					</div>
 				</div>
 			))}

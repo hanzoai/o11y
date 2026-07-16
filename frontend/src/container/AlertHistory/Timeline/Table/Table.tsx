@@ -1,4 +1,4 @@
-import { HTMLAttributes, useMemo, useState } from 'react';
+import { HTMLAttributes, useMemo, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table } from 'antd';
 import logEvent from 'api/common/logEvent';

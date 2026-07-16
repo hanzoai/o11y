@@ -9,6 +9,8 @@ import { ILogsReducer } from 'types/reducer/logs';
 
 import FieldKey from './FieldKey';
 
+import type { JSX } from 'react';
+
 interface SuggestedItemProps {
 	name: string;
 	type: string;

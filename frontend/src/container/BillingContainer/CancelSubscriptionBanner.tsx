@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { SolidInfoCircle, Undo2, X } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
 import { DialogWrapper } from 'components/ui/dialog';

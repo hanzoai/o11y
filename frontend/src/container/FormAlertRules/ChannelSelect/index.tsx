@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'components/ui/icons';
 import { Select, Spin } from 'antd';
@@ -23,8 +23,8 @@ export interface ChannelSelectProps {
 }
 
 function ChannelSelect({
-	disabled,
-	currentValue,
+	disabled = false,
+	currentValue = [],
 	onSelectChannels,
 	onDropdownOpen,
 	channels,
@@ -66,7 +66,7 @@ function ChannelSelect({
 			children.push(
 				<Select.Option key="add-new-channel" value="add-new-channel">
 					<StyledCreateChannelOption>
-						<Plus size="md" />
+						<Plus size={16} />
 						Create a new channel
 					</StyledCreateChannelOption>
 				</Select.Option>,
@@ -113,8 +113,4 @@ function ChannelSelect({
 	);
 }
 
-ChannelSelect.defaultProps = {
-	disabled: false,
-	currentValue: [],
-};
 export default ChannelSelect;

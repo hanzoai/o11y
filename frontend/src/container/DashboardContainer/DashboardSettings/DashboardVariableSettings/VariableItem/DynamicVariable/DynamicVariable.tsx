@@ -5,6 +5,7 @@ import {
 	useEffect,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import { Color } from 'constants/designTokens';
 import { Select, Typography } from 'antd';
@@ -30,7 +31,7 @@ enum AttributeSource {
 function DynamicVariable({
 	setDynamicVariablesSelectedValue,
 	dynamicVariablesSelectedValue,
-	errorAttributeKeyMessage,
+	errorAttributeKeyMessage = '',
 }: {
 	setDynamicVariablesSelectedValue: Dispatch<
 		SetStateAction<
@@ -221,9 +222,5 @@ function DynamicVariable({
 		</div>
 	);
 }
-
-DynamicVariable.defaultProps = {
-	errorAttributeKeyMessage: '',
-};
 
 export default DynamicVariable;

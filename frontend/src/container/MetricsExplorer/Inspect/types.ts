@@ -2,6 +2,8 @@ import { MetrictypesTypeDTO } from 'api/generated/services/o11y.schemas';
 import { IBuilderQuery } from 'types/api/queryBuilder/queryBuilderData';
 import { AlignedData } from 'uplot';
 
+import type { JSX } from 'react';
+
 export interface InspectMetricsTimestampValue {
 	timestamp: number;
 	value: string;
@@ -155,7 +157,7 @@ export interface GraphPopoverOptions {
 export interface GraphPopoverProps {
 	spaceAggregationSeriesMap: Map<string, InspectMetricsSeries[]>;
 	options: GraphPopoverOptions | null;
-	popoverRef: React.RefObject<HTMLDivElement>;
+	popoverRef: React.RefObject<HTMLDivElement | null>;
 	step: InspectionStep;
 	openInExpandedView: () => void;
 }

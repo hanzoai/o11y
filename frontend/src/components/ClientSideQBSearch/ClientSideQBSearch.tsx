@@ -95,8 +95,8 @@ function ClientSideQBSearch(
 ): React.ReactElement {
 	const {
 		onChange,
-		placeholder,
-		className,
+		placeholder = PLACEHOLDER,
+		className = '',
 		suffixIcon,
 		whereClauseConfig,
 		attributeValuesMap,
@@ -661,13 +661,5 @@ function ClientSideQBSearch(
 		</div>
 	);
 }
-
-ClientSideQBSearch.defaultProps = {
-	placeholder: PLACEHOLDER,
-	className: '',
-	suffixIcon: null,
-	whereClauseConfig: {},
-	attributeValuesMap: {},
-};
 
 export default ClientSideQBSearch;

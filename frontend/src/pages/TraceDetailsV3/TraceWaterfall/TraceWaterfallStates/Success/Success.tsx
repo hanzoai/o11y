@@ -8,6 +8,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { Badge } from 'components/ui/badge';
 import { Button } from 'components/ui/button';
@@ -516,7 +517,7 @@ function Success(props: ISuccessProps): JSX.Element {
 	const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_SIDEBAR_WIDTH);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const timelineAreaRef = useRef<HTMLDivElement>(null);
-	const virtualizerRef = useRef<Virtualizer<HTMLDivElement, Element>>();
+	const virtualizerRef = useRef<Virtualizer<HTMLDivElement, Element>>(undefined);
 	const prevHoveredSpanIdRef = useRef<string | null>(null);
 	const autoScrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

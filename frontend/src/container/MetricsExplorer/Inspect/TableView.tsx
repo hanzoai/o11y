@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 import type { TableColumnsType as ColumnsType } from 'antd';
 import { Card, Flex, Table } from 'antd';
 import { Typography } from 'components/ui/typography';

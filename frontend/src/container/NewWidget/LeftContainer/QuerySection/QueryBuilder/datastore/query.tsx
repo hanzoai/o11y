@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback } from 'react';
+import { ChangeEvent, useCallback, type JSX } from 'react';
 import MEditor, { Monaco } from '@monaco-editor/react';
 import { Color } from 'constants/designTokens';
 import { Input } from 'antd';
@@ -22,10 +22,8 @@ function DatastoreQueryBuilder({
 	queryIndex,
 	deletable,
 }: IDatastoreQueryBuilderProps): JSX.Element | null {
-	const {
-		handleSetQueryItemData,
-		removeQueryTypeItemByIndex,
-	} = useQueryBuilder();
+	const { handleSetQueryItemData, removeQueryTypeItemByIndex } =
+		useQueryBuilder();
 
 	const handleRemoveQuery = useCallback(() => {
 		removeQueryTypeItemByIndex(EQueryType.DATASTORE, queryIndex);

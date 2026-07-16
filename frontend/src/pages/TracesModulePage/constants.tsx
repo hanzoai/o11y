@@ -7,6 +7,8 @@ import TracesExplorer from 'pages/TracesExplorer';
 import TracesFunnelDetails from 'pages/TracesFunnelDetails';
 import TracesFunnels from 'pages/TracesFunnels';
 
+import type { JSX } from 'react';
+
 export const tracesExplorer: TabRoutes = {
 	Component: (): JSX.Element => <TracesExplorer />,
 	name: (

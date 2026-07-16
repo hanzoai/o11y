@@ -50,7 +50,7 @@ export interface GridCardGraphProps {
 	threshold?: ReactNode;
 	headerMenuList?: WidgetGraphComponentProps['headerMenuList'];
 	onClickHandler?: OnClickPluginOpts['onClick'];
-	isQueryEnabled: boolean;
+	isQueryEnabled?: boolean;
 	variables?: IDashboardVariables;
 	version?: string;
 	onDragSelect: (start: number, end: number) => void;

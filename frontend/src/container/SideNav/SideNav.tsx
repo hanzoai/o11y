@@ -6,6 +6,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useMutation } from 'react-query';
 // eslint-disable-next-line no-restricted-imports

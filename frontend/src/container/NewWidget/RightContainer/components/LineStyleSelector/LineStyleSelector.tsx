@@ -4,6 +4,8 @@ import { LineStyle } from 'lib/uPlotV2/config/types';
 
 import './LineStyleSelector.styles.scss';
 
+import type { JSX } from 'react';
+
 interface LineStyleSelectorProps {
 	value: LineStyle;
 	onChange: (value: LineStyle) => void;

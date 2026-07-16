@@ -7,6 +7,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
@@ -91,16 +92,16 @@ const allowedRoles = [USER_ROLES.ADMIN, USER_ROLES.AUTHOR, USER_ROLES.EDITOR];
 // eslint-disable-next-line sonarjs/cognitive-complexity
 function ExplorerOptions({
 	disabled,
-	isLoading,
+	isLoading = false,
 	onExport,
 	query,
 	sourcepage,
-	signalSource,
+	signalSource = '',
 	isExplorerOptionHidden = false,
-	setIsExplorerOptionHidden,
+	setIsExplorerOptionHidden = undefined,
 	isOneChartPerQuery = false,
 	splitedQueries = [],
-	handleChangeSelectedView,
+	handleChangeSelectedView = undefined,
 }: ExplorerOptionsProps): JSX.Element {
 	const [isExport, setIsExport] = useState<boolean>(false);
 	const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
@@ -972,7 +973,7 @@ function ExplorerOptions({
 									</div>
 								}
 							>
-								<Info size="md" className="info-icon" />
+								<Info size={16} className="info-icon" />
 							</Tooltip>
 						)}
 
@@ -1072,15 +1073,5 @@ export interface ExplorerOptionsProps {
 	splitedQueries?: Query[];
 	handleChangeSelectedView?: ChangeViewFunctionType;
 }
-
-ExplorerOptions.defaultProps = {
-	isLoading: false,
-	isExplorerOptionHidden: false,
-	setIsExplorerOptionHidden: undefined,
-	isOneChartPerQuery: false,
-	splitedQueries: [],
-	signalSource: '',
-	handleChangeSelectedView: undefined,
-};
 
 export default ExplorerOptions;

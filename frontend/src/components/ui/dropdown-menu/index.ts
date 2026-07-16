@@ -34,7 +34,10 @@ export {
 	type DropdownMenuLoadingProps,
 	type DropdownMenuBackProps,
 } from './dropdown-menu';
-export { DropdownMenuSearch, type DropdownMenuSearchProps } from './dropdown-menu-search';
+export {
+	DropdownMenuSearch,
+	type DropdownMenuSearchProps,
+} from './dropdown-menu-search';
 export {
 	DropdownMenuMultiStep,
 	DropdownMenuMultiStepContent,

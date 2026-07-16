@@ -3,11 +3,11 @@ import React, {
 	createContext,
 	Dispatch,
 	SetStateAction,
-	useCallback,
-	// eslint-disable-next-line no-restricted-imports
+	useCallback, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import getLocalStorageKey from 'api/browser/localstorage/get';
 import setLocalStorageKey from 'api/browser/localstorage/set';

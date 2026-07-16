@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import * as Sentry from '@sentry/react';
 import SeverityCriticalIcon from 'assets/AlertHistory/SeverityCriticalIcon';
 import SeverityErrorIcon from 'assets/AlertHistory/SeverityErrorIcon';

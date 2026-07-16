@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { useMutation } from 'react-query';
 import { Check, ChevronsDown, ScrollText, X } from 'components/ui/icons';
 import { Button, Flex, Modal } from 'antd';
@@ -117,13 +117,13 @@ function ChangelogModal({ changelog, onClose }: Props): JSX.Element {
 						<div className="changelog-modal-footer-ctas">
 							<Button type="default" onClick={onClose}>
 								<Flex align="center" gap="4px">
-									<X size="md" />
+									<X size={16} />
 									Skip for now
 								</Flex>
 							</Button>
 							<Button type="primary" onClick={onClickUpdateWorkspace}>
 								<Flex align="center" gap="4px">
-									<Check size="md" />
+									<Check size={16} />
 									Update my workspace
 								</Flex>
 							</Button>

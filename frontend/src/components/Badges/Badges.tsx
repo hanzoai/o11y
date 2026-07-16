@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useState, type JSX } from 'react';
 import { Check, Plus, X } from 'components/ui/icons';
 import { Button, Flex } from 'antd';
 import { Badge } from 'components/ui/badge';
@@ -104,7 +104,7 @@ function Badges({ tags, setTags }: AddTagsProps): JSX.Element {
 					onClick={showInput}
 				>
 					<Flex justify="center" align="center" gap={4}>
-						<Plus size="md" />
+						<Plus size={16} />
 						New Tag
 					</Flex>
 				</Button>

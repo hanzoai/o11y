@@ -4,6 +4,8 @@ import { ArrowDown, ArrowUp } from 'components/ui/icons';
 
 import './ChangePercentagePill.styles.scss';
 
+import type { JSX } from 'react';
+
 interface ChangePercentagePillProps {
 	percentage: number;
 	direction: number;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { generatePath, Link } from 'react-router-dom';
 import { Button } from 'antd';
 import { DATE_TIME_FORMATS } from 'constants/dateTimeFormats';
@@ -20,9 +20,9 @@ interface FunnelListItemProps {
 
 export function FunnelListItem({
 	funnel,
-	onFunnelClick,
-	shouldRedirectToTracesListOnDeleteSuccess,
-	isSpanDetailsPage,
+	onFunnelClick = undefined,
+	shouldRedirectToTracesListOnDeleteSuccess = true,
+	isSpanDetailsPage = false,
 }: FunnelListItemProps): JSX.Element {
 	const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
 	const funnelDetailsLink = generatePath(ROUTES.TRACES_FUNNELS_DETAIL, {
@@ -91,12 +91,6 @@ export function FunnelListItem({
 	);
 }
 
-FunnelListItem.defaultProps = {
-	onFunnelClick: undefined,
-	shouldRedirectToTracesListOnDeleteSuccess: true,
-	isSpanDetailsPage: false,
-};
-
 interface FunnelsListProps {
 	data: FunnelData[];
 	onFunnelClick?: (funnel: FunnelData) => void;
@@ -105,8 +99,8 @@ interface FunnelsListProps {
 
 function FunnelsList({
 	data,
-	onFunnelClick,
-	shouldRedirectToTracesListOnDeleteSuccess,
+	onFunnelClick = undefined,
+	shouldRedirectToTracesListOnDeleteSuccess = true,
 }: FunnelsListProps): JSX.Element {
 	return (
 		<div className="funnels-list">
@@ -123,10 +117,5 @@ function FunnelsList({
 		</div>
 	);
 }
-
-FunnelsList.defaultProps = {
-	onFunnelClick: undefined,
-	shouldRedirectToTracesListOnDeleteSuccess: true,
-};
 
 export default FunnelsList;

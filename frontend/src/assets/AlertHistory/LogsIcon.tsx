@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 interface LogsIconProps {
 	width?: number;
 	height?: number;
@@ -7,11 +8,11 @@ interface LogsIconProps {
 }
 
 function LogsIcon({
-	width,
-	height,
-	fill,
-	strokeColor,
-	strokeWidth,
+	width = 14,
+	height = 14,
+	fill = 'none',
+	strokeColor = '#C0C1C3',
+	strokeWidth = 1.167,
 }: LogsIconProps): JSX.Element {
 	return (
 		<svg
@@ -53,13 +54,5 @@ function LogsIcon({
 		</svg>
 	);
 }
-
-LogsIcon.defaultProps = {
-	width: 14,
-	height: 14,
-	fill: 'none',
-	strokeColor: '#C0C1C3',
-	strokeWidth: 1.167,
-};
 
 export default LogsIcon;

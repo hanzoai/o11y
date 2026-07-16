@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { Loader } from 'components/ui/icons';
 import { Empty, Spin } from 'antd';
 import {
@@ -99,7 +99,7 @@ function FunnelGraph(): JSX.Element {
 	return (
 		<Spin
 			spinning={isFetching}
-			indicator={<Loader className="animate-spin" size="md" />}
+			indicator={<Loader className="animate-spin" size={16} />}
 		>
 			<div className={cx('funnel-graph', `funnel-graph--${totalSteps}-columns`)}>
 				<div className="funnel-graph__chart-container">

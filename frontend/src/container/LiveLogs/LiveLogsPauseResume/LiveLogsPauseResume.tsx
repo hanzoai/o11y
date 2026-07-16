@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, type JSX } from 'react';
 import { Button } from 'antd';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useEventSource } from 'providers/EventSource';
@@ -75,7 +75,7 @@ function LiveLogsPauseResume(): JSX.Element {
 	return (
 		<div className="live-logs-pause-resume">
 			<Button
-				icon={isPlaying ? <CirclePause size="md" /> : <CirclePlay size="md" />}
+				icon={isPlaying ? <CirclePause size={16} /> : <CirclePlay size={16} />}
 				danger={isPlaying}
 				onClick={onLiveButtonClick}
 				type="primary"

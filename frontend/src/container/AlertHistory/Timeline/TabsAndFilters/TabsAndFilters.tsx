@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Color } from 'constants/designTokens';
 import { TimelineFilter, TimelineTab } from 'container/AlertHistory/types';

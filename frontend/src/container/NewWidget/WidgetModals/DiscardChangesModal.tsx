@@ -2,6 +2,8 @@ import { SolidAlertTriangle } from 'components/ui/icons';
 import { ConfirmDialog } from 'components/ui/dialog';
 import { Typography } from 'components/ui/typography';
 
+import type { JSX } from 'react';
+
 export interface DiscardChangesModalProps {
 	open: boolean;
 	isNewPanel: boolean;

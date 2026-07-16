@@ -6,6 +6,8 @@ import noDataUrl from '@/assets/Icons/no-data.svg';
 
 import './Error.styles.scss';
 
+import type { JSX } from 'react';
+
 interface IErrorProps {
 	error: AxiosError;
 }

@@ -5,6 +5,8 @@ import { TraceDetailV2URLProps } from 'types/api/trace/getTraceV2';
 
 import TraceDetailsV3 from '../TraceDetailsV3';
 
+import type { JSX } from 'react';
+
 export default function TraceDetailV3Page(): JSX.Element {
 	const { id } = useParams<TraceDetailV2URLProps>();
 	const preferOld =

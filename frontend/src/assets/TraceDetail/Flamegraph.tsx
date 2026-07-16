@@ -1,6 +1,8 @@
 import { Color } from 'constants/designTokens';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 
+import type { JSX } from 'react';
+
 function FlamegraphImg(): JSX.Element {
 	const isDarkMode = useIsDarkMode();
 	return (

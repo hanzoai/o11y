@@ -6,6 +6,8 @@ import { IDashboardVariable } from 'types/api/dashboard/getAll';
 
 import QueryVariableInput from '../QueryVariableInput';
 
+import type { JSX } from 'react';
+
 jest.mock('api/dashboard/variables/dashboardVariablesQuery');
 
 jest.mock('react-redux', () => ({

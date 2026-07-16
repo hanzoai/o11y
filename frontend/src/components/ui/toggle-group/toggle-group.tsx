@@ -11,7 +11,8 @@ export const ToggleColorValue = {
 	None: 'none',
 } as const;
 
-export type ToggleColor = (typeof ToggleColorValue)[keyof typeof ToggleColorValue];
+export type ToggleColor =
+	(typeof ToggleColorValue)[keyof typeof ToggleColorValue];
 
 export type ToggleGroupProps = (
 	| {
@@ -83,7 +84,10 @@ export type ToggleGroupProps = (
 	 * @default 'secondary'
 	 */
 	color?: ToggleColor;
-} & Pick<React.ComponentPropsWithoutRef<'div'>, 'id' | 'className' | 'style' | 'children'>;
+} & Pick<
+		React.ComponentPropsWithoutRef<'div'>,
+		'id' | 'className' | 'style' | 'children'
+	>;
 
 /**
  * A set of two-state buttons that can be toggled on or off, in single or multiple selection mode.
@@ -103,7 +107,7 @@ export const ToggleGroup = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
 			testId,
 			...props
 		},
-		ref
+		ref,
 	) => {
 		const rootProps = {
 			'data-slot': 'toggle-group',
@@ -113,13 +117,15 @@ export const ToggleGroup = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
 			className: cn(className),
 			onValueChange: onChange,
 			...props,
-		} as unknown as React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root>;
+		} as unknown as React.ComponentPropsWithoutRef<
+			typeof ToggleGroupPrimitive.Root
+		>;
 		return (
 			<ToggleGroupPrimitive.Root ref={ref} {...rootProps}>
 				{children}
 			</ToggleGroupPrimitive.Root>
 		);
-	}
+	},
 );
 ToggleGroup.displayName = 'ToggleGroup';
 
@@ -134,22 +140,29 @@ export type ToggleGroupItemProps = {
 	testId?: string;
 } & Pick<
 	React.ComponentPropsWithoutRef<'button'>,
-	'className' | 'style' | 'id' | 'disabled' | 'aria-disabled' | 'onClick' | 'children'
+	| 'className'
+	| 'style'
+	| 'id'
+	| 'disabled'
+	| 'aria-disabled'
+	| 'onClick'
+	| 'children'
 >;
 
 /**
  * A single toggle option within ToggleGroup. Use as child of ToggleGroup.
  */
-export const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupItemProps>(
-	({ className, value, testId, ...props }, ref) => (
-		<ToggleGroupPrimitive.Item
-			ref={ref}
-			data-slot="toggle-group-item"
-			data-testid={testId}
-			value={value}
-			className={cn(className)}
-			{...props}
-		/>
-	)
-);
+export const ToggleGroupItem = React.forwardRef<
+	HTMLButtonElement,
+	ToggleGroupItemProps
+>(({ className, value, testId, ...props }, ref) => (
+	<ToggleGroupPrimitive.Item
+		ref={ref}
+		data-slot="toggle-group-item"
+		data-testid={testId}
+		value={value}
+		className={cn(className)}
+		{...props}
+	/>
+));
 ToggleGroupItem.displayName = 'ToggleGroupItem';

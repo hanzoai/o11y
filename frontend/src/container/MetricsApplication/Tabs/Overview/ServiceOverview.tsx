@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useParams } from 'react-router-dom';
 import { Skeleton } from 'antd';
 import { ENTITY_VERSION_V4 } from 'constants/app';

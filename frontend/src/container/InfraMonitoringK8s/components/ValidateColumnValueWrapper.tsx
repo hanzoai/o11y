@@ -6,6 +6,8 @@ import {
 	InfraMonitoringEntity,
 } from '../constants';
 
+import type { JSX } from 'react';
+
 export function ValidateColumnValueWrapper({
 	children,
 	value,

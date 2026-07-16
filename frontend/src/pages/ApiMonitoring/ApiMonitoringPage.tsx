@@ -7,6 +7,8 @@ import { Explorer } from './constants';
 
 import './ApiMonitoringPage.styles.scss';
 
+import type { JSX } from 'react';
+
 function ApiMonitoringPage(): JSX.Element {
 	const { pathname } = useLocation();
 

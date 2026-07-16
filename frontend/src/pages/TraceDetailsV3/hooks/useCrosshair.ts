@@ -1,7 +1,7 @@
 import { RefObject, useCallback, useState } from 'react';
 
 interface UseCrosshairArgs {
-	containerRef: RefObject<HTMLElement>;
+	containerRef: RefObject<HTMLElement | null>;
 	enabled?: boolean;
 }
 

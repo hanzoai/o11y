@@ -7,6 +7,7 @@ import {
 	useEffect,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
@@ -57,7 +58,7 @@ function ListView({
 	isFilterApplied,
 	setWarning,
 	setIsLoadingQueries,
-	queryKeyRef,
+	queryKeyRef = undefined,
 }: ListViewProps): JSX.Element {
 	const { stagedQuery, panelType: panelTypeFromQueryBuilder } =
 		useQueryBuilder();
@@ -295,9 +296,5 @@ function ListView({
 		</Container>
 	);
 }
-
-ListView.defaultProps = {
-	queryKeyRef: undefined,
-};
 
 export default memo(ListView);

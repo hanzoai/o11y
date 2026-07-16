@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useQuery } from 'react-query';
 import { Typography } from 'antd';
 import getVersion from 'api/v1/version/get';
@@ -110,7 +110,9 @@ function Login(): JSX.Element {
 		setRedirecting(true);
 
 		// Use the tenant's org slug domain for OIDC probe
-		const probeDomain = tenant.orgSlug ? `login@${tenant.orgSlug}.ai` : 'login@o11y.local';
+		const probeDomain = tenant.orgSlug
+			? `login@${tenant.orgSlug}.ai`
+			: 'login@o11y.local';
 		get({ email: probeDomain, ref: window.location.origin })
 			.then((response) => {
 				const orgs = response.data.orgs;
@@ -129,8 +131,7 @@ function Login(): JSX.Element {
 						httpStatusCode: 500,
 						error: {
 							code: 'no_sso',
-							message:
-								'No SSO provider configured. Contact your administrator.',
+							message: 'No SSO provider configured. Contact your administrator.',
 							url: '',
 							errors: [],
 						},

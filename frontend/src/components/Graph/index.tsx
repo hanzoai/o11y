@@ -6,6 +6,7 @@ import {
 	useImperativeHandle,
 	useMemo,
 	useRef,
+	type JSX,
 } from 'react';
 import {
 	_adapters,
@@ -91,7 +92,7 @@ const Graph = forwardRef<ToggleGraphProps | undefined, GraphProps>(
 			yAxisUnit = 'short',
 			forceReRender,
 			staticLine,
-			containerHeight,
+			containerHeight = '90%',
 			onDragSelect,
 			dragSelectColor,
 			minTime,
@@ -109,7 +110,7 @@ const Graph = forwardRef<ToggleGraphProps | undefined, GraphProps>(
 		const currentTheme = isDarkMode ? 'dark' : 'light';
 		const xAxisTimeUnit = useXAxisTimeUnit(data, minTime, maxTime); // Computes the relevant time unit for x axis based on data or provided time range
 
-		const lineChartRef = useRef<Chart>();
+		const lineChartRef = useRef<Chart>(undefined);
 
 		useImperativeHandle(
 			ref,
@@ -230,21 +231,6 @@ declare module 'chart.js' {
 		custom: TooltipPositionerFunction<ChartType>;
 	}
 }
-
-Graph.defaultProps = {
-	animate: undefined,
-	title: undefined,
-	isStacked: undefined,
-	onClickHandler: undefined,
-	yAxisUnit: undefined,
-	forceReRender: undefined,
-	staticLine: undefined,
-	containerHeight: '90%',
-	onDragSelect: undefined,
-	dragSelectColor: undefined,
-	minTime: undefined,
-	maxTime: undefined,
-};
 
 Graph.displayName = 'Graph';
 

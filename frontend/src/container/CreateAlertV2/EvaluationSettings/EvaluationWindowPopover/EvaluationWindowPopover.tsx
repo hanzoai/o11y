@@ -17,6 +17,8 @@ import {
 import EvaluationWindowDetails from './EvaluationWindowDetails';
 import { useKeyboardNavigationForEvaluationWindowPopover } from './useKeyboardNavigation';
 
+import type { JSX } from 'react';
+
 function EvaluationWindowPopover({
 	evaluationWindow,
 	setEvaluationWindow,

@@ -5,13 +5,19 @@ import { openInNewTab } from 'utils/navigation';
 
 import './LearnMore.styles.scss';
 
+import type { JSX } from 'react';
+
 type LearnMoreProps = {
 	text?: string;
 	url?: string;
 	onClick?: () => void;
 };
 
-function LearnMore({ text, url, onClick }: LearnMoreProps): JSX.Element {
+function LearnMore({
+	text = 'Learn more',
+	url = '',
+	onClick = (): void => {},
+}: LearnMoreProps): JSX.Element {
 	const handleClick = (): void => {
 		onClick?.();
 		if (url) {
@@ -25,11 +31,5 @@ function LearnMore({ text, url, onClick }: LearnMoreProps): JSX.Element {
 		</Button>
 	);
 }
-
-LearnMore.defaultProps = {
-	text: 'Learn more',
-	url: '',
-	onClick: (): void => {},
-};
 
 export default LearnMore;

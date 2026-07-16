@@ -7,6 +7,8 @@ import { BarChart, ScrollText } from 'components/ui/icons';
 
 import './CloudServiceDataCollected.styles.scss';
 
+import type { JSX } from 'react';
+
 function CloudServiceDataCollected({
 	logsData,
 	metricsData,

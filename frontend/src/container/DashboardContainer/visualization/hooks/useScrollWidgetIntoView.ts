@@ -9,7 +9,7 @@ import { useScrollToWidgetIdStore } from 'providers/Dashboard/helpers/scrollToWi
  */
 export function useScrollWidgetIntoView<T extends HTMLElement>(
 	widgetId: string,
-	widgetContainerRef: RefObject<T>,
+	widgetContainerRef: RefObject<T | null>,
 ): void {
 	const toScrollWidgetId = useScrollToWidgetIdStore((s) => s.toScrollWidgetId);
 	const setToScrollWidgetId = useScrollToWidgetIdStore(

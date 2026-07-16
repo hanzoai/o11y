@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
@@ -68,12 +68,12 @@ function DateTimeSelection({
 	defaultRelativeTime = RelativeTimeMap['6hr'] as Time,
 	isModalTimeSelection = false,
 	onTimeChange,
-	modalSelectedInterval,
+	modalSelectedInterval = RelativeTimeMap['5m'] as Time,
 	modalInitialStartTime,
 	modalInitialEndTime,
 	onGoLive,
 	onExitLiveLogs,
-	showLiveLogs,
+	showLiveLogs = false,
 	disableUrlSync = false,
 	showRecentlyUsed = true,
 }: Props): JSX.Element {
@@ -787,23 +787,6 @@ interface DateTimeSelectionV2Props {
 	showRecentlyUsed?: boolean;
 }
 
-DateTimeSelection.defaultProps = {
-	hideShareModal: false,
-	showOldExplorerCTA: false,
-	showRefreshText: true,
-	showResetButton: false,
-	defaultRelativeTime: RelativeTimeMap['6hr'] as Time,
-	isModalTimeSelection: false,
-	onTimeChange: (): void => {},
-	modalSelectedInterval: RelativeTimeMap['5m'] as Time,
-	modalInitialStartTime: undefined,
-	modalInitialEndTime: undefined,
-	onGoLive: (): void => {},
-	onExitLiveLogs: (): void => {},
-	showLiveLogs: false,
-	disableUrlSync: false,
-	showRecentlyUsed: true,
-};
 interface DispatchProps {
 	updateTimeInterval: (
 		interval: Time | CustomTimeType,

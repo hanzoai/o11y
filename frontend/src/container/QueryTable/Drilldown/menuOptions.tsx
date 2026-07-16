@@ -1,5 +1,10 @@
 import { OPERATORS } from 'constants/queryBuilder';
-import { Braces, ChartBar, DraftingCompass, ScrollText } from 'components/ui/icons';
+import {
+	Braces,
+	ChartBar,
+	DraftingCompass,
+	ScrollText,
+} from 'components/ui/icons';
 
 /**
  * Supported operators for filtering with their display properties

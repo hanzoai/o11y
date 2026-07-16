@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import { Button, Col, Modal, Row, Skeleton, Space } from 'antd';
 import { Typography } from 'components/ui/typography';
 import ROUTES from 'constants/routes';

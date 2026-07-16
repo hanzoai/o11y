@@ -14,6 +14,8 @@ import {
 	renderServiceDetails,
 } from './utils';
 
+import type { JSX } from 'react';
+
 // --- RESIZE OBSERVER (required by @radix-ui in Tabs/Switch) ---
 class ResizeObserverMock {
 	observe(): void {}

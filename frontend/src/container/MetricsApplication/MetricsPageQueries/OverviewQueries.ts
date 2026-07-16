@@ -47,9 +47,7 @@ export const latency = ({
 		? WidgetKeys.Service_name
 		: WidgetKeys.Service_name_norm;
 	const newAutoCompleteData: BaseAutocompleteData = {
-		key: isSpanMetricEnable
-			? o11yLatencyBucketMetrics
-			: WidgetKeys.DurationNano,
+		key: isSpanMetricEnable ? o11yLatencyBucketMetrics : WidgetKeys.DurationNano,
 		dataType: DataTypes.Float64,
 		type: isSpanMetricEnable ? '' : MetricsType.Tag,
 	};

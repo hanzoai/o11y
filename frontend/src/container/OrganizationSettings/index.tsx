@@ -6,6 +6,8 @@ import DisplayName from './DisplayName';
 
 import './OrganizationSettings.styles.scss';
 
+import type { JSX } from 'react';
+
 function OrganizationSettings(): JSX.Element {
 	const { org } = useAppContext();
 

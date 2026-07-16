@@ -1,4 +1,4 @@
-import { ComponentProps } from 'react';
+import { ComponentProps, type JSX } from 'react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 

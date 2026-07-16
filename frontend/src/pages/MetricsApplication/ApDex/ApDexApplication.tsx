@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useParams } from 'react-router-dom';
 import { Popover } from 'antd';
 import { IServiceName } from 'container/MetricsApplication/Tabs/types';
@@ -61,7 +61,7 @@ function ApDexApplication(): JSX.Element {
 			<div className="ap-dex-settings-popover-content">
 				<Button size="middle">
 					<ButtonContainer>
-						<Settings size="md" /> Settings
+						<Settings size={16} /> Settings
 					</ButtonContainer>
 				</Button>
 			</div>

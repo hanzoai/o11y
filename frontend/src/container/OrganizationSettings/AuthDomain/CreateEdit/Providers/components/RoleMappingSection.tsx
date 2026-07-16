@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type JSX } from 'react';
 import { Button } from '@hanzo/ui';
 import { Checkbox } from '@hanzo/ui';
 import { Color, Style } from 'constants/designTokens';

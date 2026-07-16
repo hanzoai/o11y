@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { EyeOpen } from 'components/ui/icons';
 import { Modal } from 'antd';
 import { Divider } from 'components/ui/divider';

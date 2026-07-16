@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Dot } from 'components/ui/icons';
 import { Button } from 'components/ui/button';

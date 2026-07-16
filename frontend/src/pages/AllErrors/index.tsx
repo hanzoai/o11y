@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type JSX } from 'react';
 import { useQueryClient } from 'react-query';
 import { useLocation } from 'react-router-dom';
 import { Filter } from 'components/ui/icons';
@@ -81,7 +81,7 @@ function AllErrors(): JSX.Element {
 								!showFilters ? (
 									<Tooltip title="Show Filters">
 										<Button onClick={handleFilterVisibilityChange} className="filter-btn">
-											<Filter size="md" />
+											<Filter size={16} />
 										</Button>
 									</Tooltip>
 								) : undefined

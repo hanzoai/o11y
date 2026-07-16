@@ -4,6 +4,8 @@ import solidInfoCircleUrl from '@/assets/Icons/solid-info-circle.svg';
 
 import './FunnelTable.styles.scss';
 
+import type { JSX } from 'react';
+
 interface FunnelTableProps {
 	loading?: boolean;
 	data?: any[];
@@ -17,7 +19,7 @@ function FunnelTable({
 	data = [],
 	columns = [],
 	title,
-	tooltip,
+	tooltip = '',
 }: FunnelTableProps): JSX.Element {
 	return (
 		<div className="funnel-table">
@@ -46,11 +48,5 @@ function FunnelTable({
 		</div>
 	);
 }
-
-FunnelTable.defaultProps = {
-	loading: false,
-	data: [],
-	tooltip: '',
-};
 
 export default FunnelTable;

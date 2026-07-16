@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Select } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';

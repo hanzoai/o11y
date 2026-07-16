@@ -18,6 +18,8 @@ import {
 	PREVIOUS_QUERY_KEY,
 } from '../QueryV2/previousQuery.utils';
 
+import type { JSX } from 'react';
+
 // Local mocks for domain-specific heavy child components
 jest.mock(
 	'../QueryV2/QueryAggregation/QueryAggregation',

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'components/ui/button';
 import { Form, FormInstance, Modal } from 'antd';

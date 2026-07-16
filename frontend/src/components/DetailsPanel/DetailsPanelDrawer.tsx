@@ -2,6 +2,8 @@ import { DrawerWrapper } from 'components/ui/drawer';
 
 import './DetailsPanelDrawer.styles.scss';
 
+import type { JSX } from 'react';
+
 interface DetailsPanelDrawerProps {
 	isOpen: boolean;
 	onClose: () => void;

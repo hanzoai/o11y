@@ -3,7 +3,7 @@ import { ChevronDown } from 'components/ui/icons';
 import { ChevronRight } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
 import { GroupedAlert } from 'container/TriggeredAlerts/types';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import styles from '../TriggeredAlerts.module.scss';
 
 export type GroupTagsCellProps = {

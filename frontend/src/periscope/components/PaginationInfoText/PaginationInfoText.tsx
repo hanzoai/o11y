@@ -1,5 +1,7 @@
 import { Typography } from 'components/ui/typography';
 
+import type { JSX } from 'react';
+
 function PaginationInfoText(
 	total: number,
 	[start, end]: number[],

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import TanStackTable, { TableColumnDef } from 'components/TanStackTableView';
 import { SortState } from 'components/TanStackTableView/types';
 

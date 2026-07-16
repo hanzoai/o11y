@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { Button, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
 import logEvent from 'api/common/logEvent';
@@ -146,7 +146,7 @@ function Hosts(): JSX.Element {
 									<ArrowUpToLine
 										style={{ rotate: '270deg', cursor: 'pointer' }}
 										onClick={handleFilterVisibilityChange}
-										size="md"
+										size={16}
 									/>
 								</Tooltip>
 							</div>

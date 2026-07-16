@@ -31,8 +31,14 @@
 [data-slot='progress-indicator'] {
 	width: var(--progress-indicator-width, 100%);
 	height: var(--progress-indicator-height, 100%);
-	background-color: var(--progress-indicator-background, var(--primary-background));
-	transition: var(--progress-indicator-transition, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1));
+	background-color: var(
+		--progress-indicator-background,
+		var(--primary-background)
+	);
+	transition: var(
+		--progress-indicator-transition,
+		transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+	);
 	border-radius: var(--progress-border-radius, var(--radius-round, 9999px));
 }
 [data-slot='progress-indicator'][data-status='active'] {
@@ -56,7 +62,8 @@
 		transparent
 	);
 	background-size: var(--progress-active-stripe-size, 1.5rem 1.5rem);
-	animation: o11y-progress-active var(--progress-active-animation-duration, 1.5s) linear infinite;
+	animation: o11y-progress-active var(--progress-active-animation-duration, 1.5s)
+		linear infinite;
 	border-radius: inherit;
 }
 

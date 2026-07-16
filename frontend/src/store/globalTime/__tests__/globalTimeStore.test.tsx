@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { DEFAULT_TIME_RANGE } from 'container/TopNav/DateTimeSelectionV2/constants';
 
 import { createGlobalTimeStore, useGlobalTimeStore } from '../globalTimeStore';

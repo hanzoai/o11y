@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type JSX } from 'react';
 import { Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { IDashboardVariable } from 'types/api/dashboard/getAll';
@@ -36,7 +36,7 @@ function VariableItem({
 				${name}
 				{description && (
 					<Tooltip title={description}>
-						<SolidInfoCircle className="info-icon" size="md" />
+						<SolidInfoCircle className="info-icon" size={16} />
 					</Tooltip>
 				)}
 			</Typography.Text>

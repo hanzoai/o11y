@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import { CSSProperties, type JSX } from 'react';
 import { useTenant } from 'providers/Tenant';
 
 import './BrandMark.styles.scss';
@@ -28,10 +28,12 @@ function BrandMark({
 	return (
 		<div
 			className={`brand-mark ${className}`}
-			style={{
-				...style,
-				'--brand-mark-size': imgSize,
-			} as CSSProperties}
+			style={
+				{
+					...style,
+					'--brand-mark-size': imgSize,
+				} as CSSProperties
+			}
 		>
 			{tenant.logo ? (
 				<img

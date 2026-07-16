@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, type JSX } from 'react';
 import cx from 'classnames';
 import { useLocation } from 'react-router-dom';
 import {

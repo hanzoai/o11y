@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, type JSX } from 'react';
 import { Plus } from 'components/ui/icons';
 import { Button } from 'antd';
 import { Typography } from 'components/ui/typography';
@@ -143,7 +143,7 @@ export default function DashboardEmptyState(): JSX.Element {
 							<Button
 								className="add-panel-btn"
 								onClick={onEmptyWidgetHandler}
-								icon={<Plus size="md" />}
+								icon={<Plus size={16} />}
 								type="primary"
 								data-testid="add-panel"
 							>

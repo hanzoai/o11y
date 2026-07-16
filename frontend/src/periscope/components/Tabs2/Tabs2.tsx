@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Button, Tag } from 'antd';
 import { Badge } from 'components/ui/badge';
@@ -25,9 +25,9 @@ interface TimelineTabsProps {
 
 function Tabs2({
 	tabs,
-	onSelectTab,
-	initialSelectedTab,
-	hasResetButton,
+	onSelectTab = (): void => {},
+	initialSelectedTab = '',
+	hasResetButton = false,
 	buttonMinWidth = '114px',
 }: TimelineTabsProps): JSX.Element {
 	const [selectedTab, setSelectedTab] = useState<string>(
@@ -73,12 +73,5 @@ function Tabs2({
 		</div>
 	);
 }
-
-Tabs2.defaultProps = {
-	initialSelectedTab: '',
-	onSelectTab: (): void => {},
-	hasResetButton: false,
-	buttonMinWidth: '114px',
-};
 
 export default Tabs2;

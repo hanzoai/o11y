@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 import { useQueryClient } from 'react-query';
 import { Ellipsis } from 'components/ui/icons';
 import { Button } from 'components/ui/button';

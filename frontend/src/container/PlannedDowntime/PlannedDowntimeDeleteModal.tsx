@@ -1,4 +1,4 @@
-import { SetStateAction } from 'react';
+import { SetStateAction, type JSX } from 'react';
 import { Button, Modal } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { Trash2, X } from 'components/ui/icons';

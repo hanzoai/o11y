@@ -1,6 +1,8 @@
 import { getGroupByEl } from './utils';
 import { useInfraMonitoringGroupBy } from '../hooks';
 
+import type { JSX } from 'react';
+
 interface K8sEntityWithMeta {
 	meta?: Record<string, string>;
 }

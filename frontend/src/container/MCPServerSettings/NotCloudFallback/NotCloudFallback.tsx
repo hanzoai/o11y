@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import logEvent from 'api/common/logEvent';
 import LearnMore from 'components/LearnMore/LearnMore';
 

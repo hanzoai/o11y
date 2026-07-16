@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { useQueryClient } from 'react-query';
 import { useSearchParams } from 'react-router-dom-v5-compat';
 import * as Sentry from '@sentry/react';
@@ -87,7 +94,7 @@ function TracesExplorer(): JSX.Element {
 
 	const [searchParams] = useSearchParams();
 	const queryClient = useQueryClient();
-	const listQueryKeyRef = useRef<any>();
+	const listQueryKeyRef = useRef<any>(undefined);
 
 	// Get panel type from URL
 	const panelTypesFromUrl = useGetPanelTypesQueryParam(PANEL_TYPES.LIST);

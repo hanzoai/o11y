@@ -6,6 +6,8 @@ import APIError from 'types/api/error';
 
 import './ResetPassword.styles.scss';
 
+import type { JSX } from 'react';
+
 interface TokenErrorContent {
 	title: string;
 	subtitle: string;

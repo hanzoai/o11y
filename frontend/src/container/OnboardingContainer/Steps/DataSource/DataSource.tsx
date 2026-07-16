@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Blocks, Check, LoaderCircle } from 'components/ui/icons';
 import { Input } from 'components/ui/input';
@@ -272,7 +272,7 @@ export default function DataSource(): JSX.Element {
 										className="periscope-btn primary"
 										icon={
 											isSubmittingRequestForDataSource ? (
-												<LoaderCircle size="md" className="animate-spin" />
+												<LoaderCircle size={16} className="animate-spin" />
 											) : (
 												<Check size={12} />
 											)

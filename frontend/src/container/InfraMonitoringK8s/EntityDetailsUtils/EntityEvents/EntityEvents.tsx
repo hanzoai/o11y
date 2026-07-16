@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { useQuery } from 'react-query';
 import { Button, Table, TableColumnsType } from 'antd';
 import logEvent from 'api/common/logEvent';

@@ -7,6 +7,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import { Input } from 'components/ui/input';

@@ -1,4 +1,3 @@
-import { initialQueriesMap } from 'constants/queryBuilder';
 import { useShareBuilderUrl } from 'hooks/queryBuilder/useShareBuilderUrl';
 import { mapQueryDataFromApi } from 'lib/newQueryBuilder/queryBuilderMappers/mapQueryDataFromApi';
 
@@ -13,6 +12,8 @@ import { CreateAlertV2Props } from './types';
 import { Spinner } from './utils';
 
 import './CreateAlertV2.styles.scss';
+
+import type { JSX } from 'react';
 
 function CreateAlertV2({ alertType }: CreateAlertV2Props): JSX.Element {
 	const queryToRedirect = buildInitialAlertDef(alertType);
@@ -35,9 +36,5 @@ function CreateAlertV2({ alertType }: CreateAlertV2Props): JSX.Element {
 		</CreateAlertProvider>
 	);
 }
-
-CreateAlertV2.defaultProps = {
-	initialQuery: initialQueriesMap.metrics,
-};
 
 export default CreateAlertV2;

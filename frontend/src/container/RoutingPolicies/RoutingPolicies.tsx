@@ -1,4 +1,4 @@
-import { ChangeEvent, useMemo } from 'react';
+import { ChangeEvent, useMemo, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Button, Flex, Input, Tooltip, Typography } from 'antd';
 import { Plus, Search } from 'lucide-react';

@@ -5,6 +5,8 @@ import { Form } from 'antd';
 
 import './DomainMappingList.styles.scss';
 
+import type { JSX } from 'react';
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const validateEmail = (_: unknown, value: string): Promise<void> => {

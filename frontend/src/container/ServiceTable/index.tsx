@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ResizeTable } from 'components/ResizeTable';
 

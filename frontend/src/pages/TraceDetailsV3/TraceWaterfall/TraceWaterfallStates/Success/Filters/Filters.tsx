@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, type JSX } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useCopyToClipboard } from 'react-use';
 import { ChevronsRight, Copy, Search, X } from 'components/ui/icons';
@@ -431,9 +431,5 @@ function Filters({
 		</TooltipProvider>
 	);
 }
-
-Filters.defaultProps = {
-	onFilteredSpansChange: undefined,
-};
 
 export default Filters;

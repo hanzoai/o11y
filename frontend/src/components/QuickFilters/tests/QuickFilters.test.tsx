@@ -19,6 +19,8 @@ import QuickFilters from '../QuickFilters';
 import { IQuickFiltersConfig, QuickFiltersSource, SignalType } from '../types';
 import { QuickFiltersConfig } from './constants';
 
+import type { JSX } from 'react';
+
 jest.mock('hooks/queryBuilder/useQueryBuilder', () => ({
 	useQueryBuilder: jest.fn(),
 }));
@@ -88,11 +90,6 @@ function TestQuickFilters({
 	);
 }
 
-TestQuickFilters.defaultProps = {
-	signal: '',
-	config: QuickFiltersConfig,
-};
-
 function TestQuickFiltersApiMonitoring({
 	signal = SignalType.LOGS,
 	config = QuickFiltersConfig,
@@ -109,11 +106,6 @@ function TestQuickFiltersApiMonitoring({
 		/>
 	);
 }
-
-TestQuickFiltersApiMonitoring.defaultProps = {
-	signal: '',
-	config: QuickFiltersConfig,
-};
 
 beforeAll(() => {
 	server.listen();

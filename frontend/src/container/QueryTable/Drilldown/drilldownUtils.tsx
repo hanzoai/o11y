@@ -1,4 +1,4 @@
-import { PieArcDatum } from '@visx/shape/lib/shapes/Pie';
+import type { PieArcDatum } from '@visx/vendor/d3-shape';
 import { convertFiltersToExpressionWithExistingQuery } from 'components/QueryBuilderV2/utils';
 import {
 	initialQueryBuilderFormValuesMap,

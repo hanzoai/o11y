@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import logEvent from 'api/common/logEvent';
 import TextToolTip from 'components/TextToolTip';
@@ -48,7 +48,7 @@ function CreatePipelineButton({
 			{isAddNewPipelineVisible && (
 				<CustomButton onClick={onEnterEditMode} disabled={isDisabled}>
 					<Flex align="center" gap={4}>
-						<PencilLine size="md" />
+						<PencilLine size={16} />
 						{t('enter_edit_mode')}
 					</Flex>
 				</CustomButton>

@@ -103,7 +103,7 @@ const mapQueryFromV3 = (compositeQuery: ICompositeMetricQuery): Query => {
 				...compositeQuery.chQueries?.[key],
 				name: key,
 				query: compositeQuery.chQueries?.[key]?.query || '',
-		  }))
+			}))
 		: initialQueryState.datastore_sql;
 
 	return {

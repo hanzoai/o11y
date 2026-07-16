@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { getYAxisFormattedValue } from 'components/Graph/yAxisConfig';
 
+import type { JSX } from 'react';
+
 export const topTracesTableColumns = [
 	{
 		title: 'TRACE ID',

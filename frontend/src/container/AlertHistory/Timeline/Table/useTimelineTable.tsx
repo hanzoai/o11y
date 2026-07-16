@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Ellipsis, Search } from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
 import { Button, TableColumnsType as ColumnsType } from 'antd';
@@ -125,7 +125,7 @@ export const timelineTableColumns = ({
 				relatedLogsLink={record.relatedLogsLink}
 			>
 				<Button type="text" ghost>
-					<Ellipsis className="dropdown-icon" size="md" />
+					<Ellipsis className="dropdown-icon" size={16} />
 				</Button>
 			</ConditionalAlertPopover>
 		),

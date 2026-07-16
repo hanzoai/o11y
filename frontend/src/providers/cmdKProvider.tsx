@@ -1,11 +1,11 @@
 import React, {
 	// eslint-disable-next-line no-restricted-imports
 	createContext,
-	ReactNode,
-	// eslint-disable-next-line no-restricted-imports
+	ReactNode, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 
 type CmdKContextType = {

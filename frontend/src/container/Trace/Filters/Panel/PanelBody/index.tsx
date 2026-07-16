@@ -9,6 +9,8 @@ import CommonCheckBox from './CommonCheckBox';
 import Duration from './Duration';
 import TraceID from './SearchTraceID';
 
+import type { JSX } from 'react';
+
 function PanelBody(props: PanelBodyProps): JSX.Element {
 	const { type } = props;
 

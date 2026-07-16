@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { useQuery } from 'react-query';
 import { Input } from 'components/ui/input';
 import { Skeleton } from 'antd';

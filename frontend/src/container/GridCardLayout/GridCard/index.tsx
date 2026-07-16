@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import * as Sentry from '@sentry/react';
@@ -41,11 +41,11 @@ import WidgetGraphComponent from './WidgetGraphComponent';
 function GridCardGraph({
 	widget,
 	headerMenuList = [MenuItemKeys.View],
-	isQueryEnabled,
-	threshold,
+	isQueryEnabled = true,
+	threshold = undefined,
 	variables,
-	version,
-	onClickHandler,
+	version = 'v3',
+	onClickHandler = undefined,
 	onDragSelect,
 	customOnDragSelect,
 	customTooltipElement,
@@ -57,11 +57,11 @@ function GridCardGraph({
 	customErrorMessage,
 	start,
 	end,
-	analyticsEvent,
+	analyticsEvent = undefined,
 	customTimeRange,
 	customOnRowClick,
-	customTimeRangeWindowForCoRelation,
-	enableDrillDown,
+	customTimeRangeWindowForCoRelation = undefined,
+	enableDrillDown = false,
 }: GridCardGraphProps): JSX.Element {
 	const dispatch = useDispatch();
 	const [errorMessage, setErrorMessage] = useState<string>();
@@ -337,17 +337,5 @@ function GridCardGraph({
 		</div>
 	);
 }
-
-GridCardGraph.defaultProps = {
-	onDragSelect: undefined,
-	onClickHandler: undefined,
-	isQueryEnabled: true,
-	threshold: undefined,
-	headerMenuList: [MenuItemKeys.View],
-	version: 'v3',
-	analyticsEvent: undefined,
-	customTimeRangeWindowForCoRelation: undefined,
-	enableDrillDown: false,
-};
 
 export default memo(GridCardGraph);

@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction, JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Form, Select, Switch } from 'antd';
 import { ChevronDown } from 'lucide-react';

@@ -5,6 +5,8 @@ import { getLogTypeBySeverityNumber } from './utils';
 
 import './LogStateIndicator.styles.scss';
 
+import type { JSX } from 'react';
+
 export const SEVERITY_TEXT_TYPE = {
 	TRACE: 'TRACE',
 	TRACE2: 'TRACE2',
@@ -128,8 +130,8 @@ function getSeverityClass(
 
 function LogStateIndicator({
 	fontSize,
-	severityText,
-	severityNumber,
+	severityText = '',
+	severityNumber = 0,
 }: {
 	fontSize: FontSize;
 	severityText?: string;
@@ -143,10 +145,5 @@ function LogStateIndicator({
 		</div>
 	);
 }
-
-LogStateIndicator.defaultProps = {
-	severityText: '',
-	severityNumber: 0,
-};
 
 export default LogStateIndicator;

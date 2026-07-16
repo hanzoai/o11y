@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 import { toast } from '@hanzo/ui';
 import { Tooltip, Typography } from 'antd';
 import type { AxiosError } from 'axios';

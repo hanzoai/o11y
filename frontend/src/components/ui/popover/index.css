@@ -34,7 +34,10 @@
 	background-color: var(--popover-background, var(--l2-background));
 	color: var(--popover-foreground, var(--l1-foreground));
 	width: var(--popover-width, fit-content);
-	transform-origin: var(--popover-transform-origin, var(--radix-popover-content-transform-origin));
+	transform-origin: var(
+		--popover-transform-origin,
+		var(--radix-popover-content-transform-origin)
+	);
 	border-radius: var(--popover-border-radius, var(--radius-2, 4px));
 	padding: var(--popover-padding, var(--spacing-8));
 	border-width: var(--popover-border-width, 1px);

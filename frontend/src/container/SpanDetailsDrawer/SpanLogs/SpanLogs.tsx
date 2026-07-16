@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { Button } from '@hanzo/ui';
 import { Typography } from 'antd';
@@ -61,7 +61,7 @@ function SpanLogs({
 	isFetching,
 	isLogSpanRelated,
 	handleExplorerPageRedirect,
-	emptyStateConfig,
+	emptyStateConfig = undefined,
 }: SpanLogsProps): JSX.Element {
 	const { updateAllQueriesOperators } = useQueryBuilder();
 
@@ -248,7 +248,7 @@ function SpanLogs({
 					variant="action"
 					prefix={<Compass size={14} />}
 					onClick={handleExplorerPageRedirect}
-					size="md"
+					size={16}
 				>
 					View Logs
 				</Button>
@@ -287,8 +287,5 @@ function SpanLogs({
 		</div>
 	);
 }
-SpanLogs.defaultProps = {
-	emptyStateConfig: undefined,
-};
 
 export default SpanLogs;

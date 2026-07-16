@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState, type JSX } from 'react';
 import { Select } from 'antd';
 import { Switch } from 'components/ui/switch';
 import { Typography } from 'components/ui/typography';

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import ReactDOM from 'react-dom';
 import { ROLES } from 'types/roles';
 

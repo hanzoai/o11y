@@ -5,7 +5,7 @@ function useInterval(
 	delay: number,
 	enabled = true,
 ): void {
-	const savedCallback = useRef<() => void>();
+	const savedCallback = useRef<() => void>(undefined);
 
 	useEffect(() => {
 		savedCallback.current = callback;

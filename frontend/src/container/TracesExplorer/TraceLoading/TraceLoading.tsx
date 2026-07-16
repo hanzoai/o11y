@@ -6,6 +6,8 @@ import loadingPlaneUrl from '@/assets/Icons/loading-plane.gif';
 
 import './TraceLoading.styles.scss';
 
+import type { JSX } from 'react';
+
 export function TracesLoading(): JSX.Element {
 	const { t } = useTranslation('common');
 	return (

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { red } from '@ant-design/colors';
@@ -110,7 +110,7 @@ function ImportJSONModal({ open, onClose }: Props): JSX.Element {
 
 	const renderError = (msg: string): JSX.Element => (
 		<div className={styles.jsonError}>
-			<CircleAlert size="md" color={red[7]} />
+			<CircleAlert size={16} color={red[7]} />
 			<Typography className={styles.errorText}>{msg}</Typography>
 		</div>
 	);

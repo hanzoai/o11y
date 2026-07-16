@@ -4,6 +4,8 @@ import { createMockAlertContextState } from 'container/CreateAlertV2/EvaluationS
 
 import NotificationSettings from '../NotificationSettings';
 
+import type { JSX } from 'react';
+
 jest.mock(
 	'container/CreateAlertV2/NotificationSettings/MultipleNotifications',
 	() => ({

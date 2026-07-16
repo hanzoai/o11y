@@ -10,6 +10,8 @@ import {
 
 import GeneralSettings from '../GeneralSettings';
 
+import type { JSX } from 'react';
+
 // Mock dependencies
 jest.mock('api/settings/setRetentionV2');
 

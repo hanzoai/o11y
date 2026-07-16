@@ -142,18 +142,18 @@ function QueryBuilderSearchV2(
 	const {
 		query,
 		onChange,
-		placeholder,
-		className,
-		suffixIcon,
+		placeholder = PLACEHOLDER,
+		className = '',
+		suffixIcon = null,
 		whereClauseConfig,
 		hardcodedAttributeKeys,
-		hasPopupContainer,
-		rootClassName,
+		hasPopupContainer = true,
+		rootClassName = '',
 		maxTagCount,
 		operatorConfigKey,
-		hideSpanScopeSelector,
-		triggerOnChangeOnClose,
-		skipQueryBuilderRedirect,
+		hideSpanScopeSelector = true,
+		triggerOnChangeOnClose = false,
+		skipQueryBuilderRedirect = false,
 		selectProps,
 	} = props;
 
@@ -1077,21 +1077,5 @@ function QueryBuilderSearchV2(
 		</div>
 	);
 }
-
-QueryBuilderSearchV2.defaultProps = {
-	placeholder: PLACEHOLDER,
-	className: '',
-	suffixIcon: null,
-	whereClauseConfig: {},
-	hasPopupContainer: true,
-	rootClassName: '',
-	hardcodedAttributeKeys: undefined,
-	maxTagCount: undefined,
-	operatorConfigKey: undefined,
-	hideSpanScopeSelector: true,
-	triggerOnChangeOnClose: false,
-	skipQueryBuilderRedirect: false,
-	selectProps: undefined,
-};
 
 export default QueryBuilderSearchV2;

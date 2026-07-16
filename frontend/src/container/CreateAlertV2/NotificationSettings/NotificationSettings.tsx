@@ -14,6 +14,8 @@ import NotificationMessage from './NotificationMessage';
 
 import './styles.scss';
 
+import type { JSX } from 'react';
+
 function NotificationSettings(): JSX.Element {
 	const { notificationSettings, setNotificationSettings } =
 		useCreateAlertState();

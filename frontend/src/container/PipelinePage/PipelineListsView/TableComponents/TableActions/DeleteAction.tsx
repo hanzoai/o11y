@@ -2,6 +2,8 @@ import { Trash2 } from 'components/ui/icons';
 
 import { iconStyle, smallIconStyle } from '../../config';
 
+import type { JSX } from 'react';
+
 function DeleteAction({
 	isPipelineAction,
 	deleteAction,

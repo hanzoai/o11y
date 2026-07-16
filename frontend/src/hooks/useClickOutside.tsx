@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 type UseClickOutsideProps = {
-	ref: React.RefObject<HTMLElement>;
+	ref: React.RefObject<HTMLElement | null>;
 	onClickOutside: () => void;
 	eventType?: 'mousedown' | 'mouseup' | 'click' | 'dblclick';
 };

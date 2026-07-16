@@ -9,6 +9,8 @@ import {
 	Table,
 } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export const PanelTypesWithData: ItemsProps[] = [
 	{
 		name: PANEL_TYPES.TIME_SERIES,

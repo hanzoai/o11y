@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, type JSX } from 'react';
 import { KeyRound, X } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
 import { Skeleton, Table, Tooltip } from 'antd';

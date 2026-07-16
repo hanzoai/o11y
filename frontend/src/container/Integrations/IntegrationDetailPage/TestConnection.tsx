@@ -2,6 +2,8 @@ import cx from 'classnames';
 
 import './IntegrationDetailPage.styles.scss';
 
+import type { JSX } from 'react';
+
 export enum ConnectionStates {
 	Connected = 'connected',
 	TestingConnection = 'testingConnection',

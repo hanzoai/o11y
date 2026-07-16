@@ -7,6 +7,8 @@ import { logSaveView, logsExplorer, logsPipelines } from './constants';
 
 import './LogsModulePage.styles.scss';
 
+import type { JSX } from 'react';
+
 export default function LogsModulePage(): JSX.Element {
 	const { pathname } = useLocation();
 
