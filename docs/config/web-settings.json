@@ -1,48 +1,9 @@
 {
   "required": [
-    "posthog",
-    "appcues",
-    "sentry",
-    "pylon"
+    "sentry"
   ],
   "additionalProperties": false,
   "definitions": {
-    "Appcues": {
-      "required": [
-        "enabled"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        }
-      },
-      "type": "object"
-    },
-    "Posthog": {
-      "required": [
-        "enabled"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        }
-      },
-      "type": "object"
-    },
-    "Pylon": {
-      "required": [
-        "enabled"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "enabled": {
-          "type": "boolean"
-        }
-      },
-      "type": "object"
-    },
     "Sentry": {
       "required": [
         "enabled"
@@ -57,15 +18,6 @@
     }
   },
   "properties": {
-    "appcues": {
-      "$ref": "#/definitions/Appcues"
-    },
-    "posthog": {
-      "$ref": "#/definitions/Posthog"
-    },
-    "pylon": {
-      "$ref": "#/definitions/Pylon"
-    },
     "sentry": {
       "$ref": "#/definitions/Sentry"
     }

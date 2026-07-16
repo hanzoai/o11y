@@ -20,7 +20,3 @@ declare interface WindowEventMap {
 	AFTER_LOGIN: CustomEvent;
 	LOGOUT: CustomEvent;
 }
-
-declare interface Window {
-	Pylon: (command: string, ...args: unknown[]) => void;
-}

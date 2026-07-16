@@ -9,19 +9,20 @@ import cx from 'classnames';
 import { FeatureKeys } from 'constants/features';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import { useNotifications } from 'hooks/useNotifications';
-import { defaultTo } from 'lodash-es';
 import { CircleHelp, CreditCard, X } from 'components/ui/icons';
 import { useAppContext } from 'providers/App/App';
 import { SuccessResponseV2 } from 'types/api';
 import { CheckoutSuccessPayloadProps } from 'types/api/billing/checkout';
 import APIError from 'types/api/error';
 import { getBaseUrl } from 'utils/basePath';
+import { openSupportChat } from 'utils/supportChat';
 
 import './LaunchChatSupport.styles.scss';
 
 export interface LaunchChatSupportProps {
 	eventName: string;
 	attributes: Record<string, unknown>;
+	/** Reserved for the in-app @hanzo/chat integration (see utils/supportChat). */
 	message?: string;
 	buttonText?: string;
 	className?: string;
@@ -33,7 +34,6 @@ export interface LaunchChatSupportProps {
 function LaunchChatSupport({
 	attributes,
 	eventName,
-	message = '',
 	buttonText = '',
 	className = '',
 	onHoverText = '',
@@ -112,8 +112,8 @@ function LaunchChatSupport({
 			setIsAddCreditCardModalOpen(true);
 		} else {
 			logEvent(eventName, attributes);
-			if (window.pylon && !chatMessageDisabled) {
-				window.Pylon('showNewMessage', defaultTo(message, ''));
+			if (!chatMessageDisabled) {
+				openSupportChat();
 			}
 		}
 	};

@@ -11,15 +11,12 @@ import { CmdKPalette } from 'components/cmdKPalette/cmdKPalette';
 import NotFound from 'components/NotFound';
 import { ShiftHoldOverlayController } from 'components/ShiftOverlay/ShiftHoldOverlayController';
 import Spinner from 'components/Spinner';
-import { FeatureKeys } from 'constants/features';
 import { LOCALSTORAGE } from 'constants/localStorage';
 import ROUTES from 'constants/routes';
 import AppLayout from 'container/AppLayout';
-import Hex from 'crypto-js/enc-hex';
-import HmacSHA256 from 'crypto-js/hmac-sha256';
 import { KeyboardHotkeysProvider } from 'hooks/hotkeys/useKeyboardHotkeys';
 import { useIsAIAssistantEnabled } from 'hooks/useIsAIAssistantEnabled';
-import { useIsDarkMode, useThemeConfig } from 'hooks/useDarkMode';
+import { useThemeConfig } from 'hooks/useDarkMode';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import { NotificationProvider } from 'hooks/useNotifications';
 import { ResourceProvider } from 'hooks/useResourceAttribute';
@@ -55,7 +52,6 @@ function App(): JSX.Element {
 		isFetchingActiveLicense,
 		activeLicenseFetchError,
 		userFetchError,
-		featureFlagsFetchError,
 		isLoggedIn: isLoggedInState,
 		featureFlags,
 		org,
@@ -117,19 +113,6 @@ function App(): JSX.Element {
 				if (domain) {
 					logEvent('Domain Identified', groupTraits, 'group');
 				}
-				if (window && window.Appcues) {
-					window.Appcues.identify(id, {
-						name: displayName,
-						deployment_name: hostNameParts[0],
-						data_region: hostNameParts[1],
-						deployment_url: hostname,
-						company_domain: domain,
-						companyName: orgName,
-						email,
-						paidUser: !!trialInfo?.trialConvertedToSubscription,
-					});
-				}
-
 				insights?.identify(id, {
 					email,
 					name: displayName,
@@ -242,89 +225,6 @@ function App(): JSX.Element {
 			return prev.filter((r) => r.key !== 'AI_ASSISTANT');
 		});
 	}, [isLoggedInState, isAIAssistantEnabled]);
-
-	const isDarkMode = useIsDarkMode();
-
-	useEffect(() => {
-		window.Pylon?.('setTheme', isDarkMode ? 'dark' : 'light');
-	}, [isDarkMode]);
-
-	useEffect(() => {
-		if (
-			pathname === ROUTES.ONBOARDING ||
-			pathname.startsWith('/public/dashboard/') ||
-			pathname === '/ai-assistant' ||
-			pathname.startsWith('/ai-assistant/')
-		) {
-			window.Pylon?.('hideChatBubble');
-		} else {
-			window.Pylon?.('showChatBubble');
-		}
-	}, [pathname]);
-
-	// eslint-disable-next-line sonarjs/cognitive-complexity
-	useEffect(() => {
-		// feature flag shouldn't be loading and featureFlags or fetchError any one of this should be true indicating that req is complete
-		// licenses should also be present. there is no check for licenses for loading and error as that is mandatory if not present then routing
-		// to something went wrong which would ideally need a reload.
-		if (
-			!isFetchingFeatureFlags &&
-			(featureFlags || featureFlagsFetchError) &&
-			activeLicense &&
-			trialInfo
-		) {
-			let isChatSupportEnabled = false;
-			let isPremiumSupportEnabled = false;
-			if (featureFlags && featureFlags.length > 0) {
-				isChatSupportEnabled =
-					featureFlags.find((flag) => flag.name === FeatureKeys.CHAT_SUPPORT)
-						?.active || false;
-
-				isPremiumSupportEnabled =
-					featureFlags.find((flag) => flag.name === FeatureKeys.PREMIUM_SUPPORT)
-						?.active || false;
-			}
-			const showAddCreditCardModal =
-				!isPremiumSupportEnabled && !trialInfo?.trialConvertedToSubscription;
-
-			if (
-				isLoggedInState &&
-				isChatSupportEnabled &&
-				!showAddCreditCardModal &&
-				(isCloudUser || isEnterpriseSelfHostedUser) &&
-				(window.o11yBootData?.settings?.pylon.enabled ?? true)
-			) {
-				const email = user.email || '';
-				const secret = process.env.PYLON_IDENTITY_SECRET || '';
-				let emailHash = '';
-
-				if (email && secret) {
-					emailHash = HmacSHA256(email, Hex.parse(secret)).toString(Hex);
-				}
-
-				window.pylon = {
-					chat_settings: {
-						app_id: process.env.PYLON_APP_ID,
-						email: user.email,
-						name: user.displayName || user.email,
-						email_hash: emailHash,
-					},
-				};
-			}
-		}
-	}, [
-		isLoggedInState,
-		user,
-		pathname,
-		trialInfo?.trialConvertedToSubscription,
-		featureFlags,
-		isFetchingFeatureFlags,
-		featureFlagsFetchError,
-		activeLicense,
-		trialInfo,
-		isCloudUser,
-		isEnterpriseSelfHostedUser,
-	]);
 
 	useEffect(() => {
 		if (!isFetchingUser && isCloudUser && user && user.email) {
