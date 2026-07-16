@@ -105,60 +105,14 @@
 		<noscript>You need to enable JavaScript to run this app.</noscript>
 		<div id="root"></div>
 
-		<script>
-			var PYLON_APP_ID = '<%- PYLON_APP_ID %>';
-			var pylonSettings =
-				((window.o11yBootData || {}).settings || {}).pylon || {};
-			var pylonEnabled = pylonSettings.enabled !== false;
-			if (PYLON_APP_ID && pylonEnabled) {
-				(function () {
-					var e = window;
-					var t = document;
-					var n = function () {
-						n.e(arguments);
-					};
-					n.q = [];
-					n.e = function (e) {
-						n.q.push(e);
-					};
-					e.Pylon = n;
-					var r = function () {
-						var e = t.createElement('script');
-						e.setAttribute('type', 'text/javascript');
-						e.setAttribute('async', 'true');
-						e.setAttribute(
-							'src',
-							'https://widget.usepylon.com/widget/' + PYLON_APP_ID,
-						);
-						var n = t.getElementsByTagName('script')[0];
-						n.parentNode.insertBefore(e, n);
-					};
-					if (t.readyState === 'complete') {
-						r();
-					} else if (e.addEventListener) {
-						e.addEventListener('load', r, false);
-					}
-				})();
-			}
-		</script>
-		<script type="text/javascript">
-			window.AppcuesSettings = { enableURLDetection: true };
-		</script>
-		<script>
-			var APPCUES_APP_ID = '<%- APPCUES_APP_ID %>';
-			var appcuesSettings =
-				((window.o11yBootData || {}).settings || {}).appcues || {};
-			var appcuesEnabled = appcuesSettings.enabled !== false;
-			if (APPCUES_APP_ID && appcuesEnabled) {
-				(function (d, t) {
-					var a = d.createElement(t);
-					a.async = 1;
-					a.src = '//fast.appcues.com/' + APPCUES_APP_ID + '.js';
-					var s = d.getElementsByTagName(t)[0];
-					s.parentNode.insertBefore(a, s);
-				})(document, 'script');
-			}
-		</script>
+		<!--
+			NO third-party widgets or trackers are loaded here, and none may be
+			added. The upstream fork injected a support-chat widget and an
+			onboarding tracker, both enabled by default — a self-hosted
+			observability tool must never make outbound calls to third parties
+			with our users' data. Support chat is Hanzo Chat (utils/supportChat);
+			analytics is Hanzo Insights. Sentry is opt-in, on our own fork.
+		-->
 		<link rel="stylesheet" href="css/uPlot.min.css" />
 		<script type="module" src="./src/index.tsx"></script>
 	</body>

@@ -20,35 +20,18 @@ type Config struct {
 }
 
 // SettingsConfig holds the configuration for web settings.
+//
+// Third-party trackers (product analytics, onboarding tours, support chat) are
+// NOT part of Hanzo o11y — see settings.go. Analytics is Hanzo Insights; support
+// chat is Hanzo Chat. Only Sentry remains, pointed at our own fork and opt-in.
 type SettingsConfig struct {
-	Posthog PosthogConfig `mapstructure:"posthog"`
-	Appcues AppcuesConfig `mapstructure:"appcues"`
-	Sentry  SentryConfig  `mapstructure:"sentry"`
-	Pylon   PylonConfig   `mapstructure:"pylon"`
-}
-
-type PosthogConfig struct {
-	Enabled bool   `mapstructure:"enabled"`
-	Key     string `mapstructure:"key"`
-	APIHost string `mapstructure:"api_host"`
-	UIHost  string `mapstructure:"ui_host"`
-}
-
-type AppcuesConfig struct {
-	Enabled bool   `mapstructure:"enabled"`
-	AppID   string `mapstructure:"app_id"`
+	Sentry SentryConfig `mapstructure:"sentry"`
 }
 
 type SentryConfig struct {
 	Enabled bool   `mapstructure:"enabled"`
 	DSN     string `mapstructure:"dsn"`
 	Tunnel  string `mapstructure:"tunnel"`
-}
-
-type PylonConfig struct {
-	Enabled        bool   `mapstructure:"enabled"`
-	AppID          string `mapstructure:"app_id"`
-	IdentitySecret string `mapstructure:"identity_secret"`
 }
 
 func NewConfigFactory() factory.ConfigFactory {
@@ -61,16 +44,7 @@ func newConfig() factory.Config {
 		Index:     "index.html",
 		Directory: "/etc/o11y/web",
 		Settings: SettingsConfig{
-			Posthog: PosthogConfig{
-				Enabled: false,
-			},
-			Appcues: AppcuesConfig{
-				Enabled: false,
-			},
 			Sentry: SentryConfig{
-				Enabled: false,
-			},
-			Pylon: PylonConfig{
 				Enabled: false,
 			},
 		},
