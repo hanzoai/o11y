@@ -14,6 +14,8 @@ import {
 	RoutingPolicyListItemProps,
 } from './types';
 
+import type { JSX } from 'react';
+
 function PolicyListItemHeader({
 	name,
 	handleEdit,

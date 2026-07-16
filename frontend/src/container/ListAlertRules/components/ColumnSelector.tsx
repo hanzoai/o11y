@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Columns3 } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
 import { Checkbox } from 'components/ui/checkbox';

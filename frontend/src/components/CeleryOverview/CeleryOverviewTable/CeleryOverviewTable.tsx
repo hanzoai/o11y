@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { useMutation } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
@@ -77,7 +84,7 @@ function ProgressRender(item: string | number): JSX.Element {
 }
 
 const getColumnSearchProps = (
-	searchInput: React.RefObject<InputRef>,
+	searchInput: React.RefObject<InputRef | null>,
 	handleReset: (
 		clearFilters: () => void,
 		confirm: FilterDropdownProps['confirm'],
@@ -487,7 +494,7 @@ export default function CeleryOverviewTable({
 		[getFilteredData, tableData],
 	);
 
-	const prevTableDataRef = useRef<string>();
+	const prevTableDataRef = useRef<string>(undefined);
 
 	useEffect(() => {
 		if (tableData.length > 0) {

@@ -9,8 +9,8 @@ export const useKeyboardNavigationForEvaluationWindowPopover = ({
 	onSelect,
 	onEscape,
 }: UseKeyboardNavigationOptions = {}): {
-	containerRef: React.RefObject<HTMLDivElement>;
-	firstItemRef: React.RefObject<HTMLDivElement>;
+	containerRef: React.RefObject<HTMLDivElement | null>;
+	firstItemRef: React.RefObject<HTMLDivElement | null>;
 } => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const firstItemRef = useRef<HTMLDivElement>(null);
@@ -188,7 +188,7 @@ export const useKeyboardNavigationForEvaluationWindowPopover = ({
 	}, []);
 
 	return {
-		containerRef: containerRef as React.RefObject<HTMLDivElement>,
-		firstItemRef: firstItemRef as React.RefObject<HTMLDivElement>,
+		containerRef: containerRef as React.RefObject<HTMLDivElement | null>,
+		firstItemRef: firstItemRef as React.RefObject<HTMLDivElement | null>,
 	};
 };

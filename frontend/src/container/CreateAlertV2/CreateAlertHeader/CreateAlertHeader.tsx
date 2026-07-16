@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 import { Button } from 'components/ui/button';
 import { Input } from 'components/ui/input';
 import logEvent from 'api/common/logEvent';

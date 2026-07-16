@@ -6,6 +6,8 @@ import { EQueryType } from 'types/common/dashboard';
 import { QueryButton } from '../../styles';
 import PromQLQueryBuilder from './query';
 
+import type { JSX } from 'react';
+
 function PromQLQueryContainer(): JSX.Element | null {
 	const { addNewQueryItem, currentQuery } = useQueryBuilder();
 

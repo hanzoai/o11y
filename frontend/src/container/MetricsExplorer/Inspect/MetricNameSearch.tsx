@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Typography } from 'components/ui/typography';
 import { initialQueriesMap } from 'constants/queryBuilder';
 import { MetricNameSelector } from 'container/QueryBuilder/filters';

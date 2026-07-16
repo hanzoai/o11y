@@ -12,6 +12,8 @@ import eyesEmojiUrl from '@/assets/Images/eyesEmoji.svg';
 
 import './NoLogs.styles.scss';
 
+import type { JSX } from 'react';
+
 export default function NoLogs({
 	dataSource,
 }: {

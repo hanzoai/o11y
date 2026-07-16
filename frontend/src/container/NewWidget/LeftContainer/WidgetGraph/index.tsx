@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type JSX } from 'react';
 import { SolidInfoCircle } from 'components/ui/icons';
 import QueryCancelledPlaceholder from 'components/QueryCancelledPlaceholder';
 import WarningPopover from 'components/WarningPopover/WarningPopover';

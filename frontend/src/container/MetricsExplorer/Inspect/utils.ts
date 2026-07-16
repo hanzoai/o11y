@@ -295,7 +295,7 @@ export function getSeriesIndexFromPixel(
 export function onGraphClick(
 	e: MouseEvent,
 	u: uPlot,
-	popoverRef: React.RefObject<HTMLDivElement>,
+	popoverRef: React.RefObject<HTMLDivElement | null>,
 	setPopoverOptions: (options: GraphPopoverOptions | null) => void,
 	inspectMetricsTimeSeries: InspectMetricsSeries[],
 	showPopover: boolean,

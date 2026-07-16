@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { ChevronDown, ChevronRight } from 'components/ui/icons';
 import { PipelineData } from 'types/api/pipeline/def';
 import { Flex } from 'antd';

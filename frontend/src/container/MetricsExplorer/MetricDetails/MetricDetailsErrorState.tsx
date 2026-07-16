@@ -4,6 +4,8 @@ import { Info } from 'lucide-react';
 
 import { MetricDetailsErrorStateProps } from './types';
 
+import type { JSX } from 'react';
+
 function MetricDetailsErrorState({
 	refetch,
 	errorMessage,

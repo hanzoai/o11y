@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Col, Input, Select, Space, Tooltip } from 'antd';
 import { ToggleGroupSimple } from 'components/ui/toggle-group';

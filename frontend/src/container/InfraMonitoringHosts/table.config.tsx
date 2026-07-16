@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { type JSX } from 'react';
 import { Tooltip } from 'antd';
 import { Badge } from 'components/ui/badge';
 import { HostData } from 'api/infraMonitoring/getHostLists';

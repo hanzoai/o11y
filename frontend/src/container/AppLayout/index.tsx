@@ -5,6 +5,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
@@ -632,14 +633,15 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 				<>
 					Your Hanzo license is terminated, enterprise features have been disabled.
 					Please contact support at{' '}
-					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for new license
+					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for new
+					license
 				</>
 			)}
 			{activeLicense?.state === LicenseState.EXPIRED && (
 				<>
 					Your Hanzo license has expired. Please contact support at{' '}
-					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for renewal to
-					avoid termination of license as per our{' '}
+					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for
+					renewal to avoid termination of license as per our{' '}
 					<a
 						href="https://o11y.hanzo.ai/terms-of-service"
 						target="_blank"
@@ -652,8 +654,8 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 			{activeLicense?.state === LicenseState.CANCELLED && (
 				<>
 					Your Hanzo license is cancelled. Please contact support at{' '}
-					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for reactivation
-					to avoid termination of license as per our{' '}
+					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for
+					reactivation to avoid termination of license as per our{' '}
 					<a
 						href="https://o11y.hanzo.ai/terms-of-service"
 						target="_blank"
@@ -683,8 +685,8 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 			{activeLicense?.state === LicenseState.EVALUATION_EXPIRED && (
 				<>
 					Your Hanzo trial has ended. Please contact support at{' '}
-					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for next steps to
-					avoid termination of license as per our{' '}
+					<a href="mailto:support@o11y.hanzo.ai">support@o11y.hanzo.ai</a> for next
+					steps to avoid termination of license as per our{' '}
 					<a
 						href="https://o11y.hanzo.ai/terms-of-service"
 						target="_blank"
@@ -789,25 +791,25 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 					<title>{pageTitle}</title>
 				</Helmet>
 
-			{isLoggedIn && (
-				<div className={cx('app-banner-wrapper')}>
-					{SHOW_TRIAL_EXPIRY_BANNER && (
-						<div className="trial-expiry-banner">
-							You are in free trial period. Your free trial will end on{' '}
-							<span>{getFormattedDate(trialInfo?.trialEnd || Date.now())}.</span>
-							{user.role === USER_ROLES.ADMIN ? (
-								<span>
-									{' '}
-									Please{' '}
-									<a className="upgrade-link" onClick={handleUpgrade}>
-										upgrade
-									</a>
-									to continue using Hanzo features.
-									<span className="refresh-payment-status">
+				{isLoggedIn && (
+					<div className={cx('app-banner-wrapper')}>
+						{SHOW_TRIAL_EXPIRY_BANNER && (
+							<div className="trial-expiry-banner">
+								You are in free trial period. Your free trial will end on{' '}
+								<span>{getFormattedDate(trialInfo?.trialEnd || Date.now())}.</span>
+								{user.role === USER_ROLES.ADMIN ? (
+									<span>
 										{' '}
-										| Already upgraded? <RefreshPaymentStatus type="text" />
+										Please{' '}
+										<a className="upgrade-link" onClick={handleUpgrade}>
+											upgrade
+										</a>
+										to continue using Hanzo features.
+										<span className="refresh-payment-status">
+											{' '}
+											| Already upgraded? <RefreshPaymentStatus type="text" />
+										</span>
 									</span>
-								</span>
 								) : (
 									'Please contact your administrator for upgrading to a paid plan.'
 								)}

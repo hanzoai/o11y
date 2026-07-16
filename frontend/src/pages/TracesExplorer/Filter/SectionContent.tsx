@@ -5,6 +5,7 @@ import {
 	useEffect,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import { Button, Card, Input, Tooltip } from 'antd';
 import { Checkbox } from 'components/ui/checkbox';

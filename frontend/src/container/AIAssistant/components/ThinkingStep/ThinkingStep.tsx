@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { ChevronDown, ChevronRight } from 'components/ui/icons';
 
 import styles from './ThinkingStep.module.scss';

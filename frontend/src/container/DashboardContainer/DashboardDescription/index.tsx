@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { FullScreenHandle } from 'react-full-screen';
 import { Layout } from 'react-grid-layout';
 import { useTranslation } from 'react-i18next';

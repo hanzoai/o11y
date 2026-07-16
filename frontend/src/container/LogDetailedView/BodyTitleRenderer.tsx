@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { orange } from '@ant-design/colors';
 import { Settings } from 'components/ui/icons';

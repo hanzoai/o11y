@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import { useGetAlertRuleDetailsStats } from 'pages/AlertDetails/hooks';
 import DataStateRenderer from 'periscope/components/DataStateRenderer/DataStateRenderer';
 

@@ -3,6 +3,8 @@ import { PipelineData } from 'types/api/pipeline/def';
 
 import './styles.scss';
 
+import type { JSX } from 'react';
+
 function PipelineFilterSummary({
 	filter,
 }: PipelineFilterSummaryProps): JSX.Element {

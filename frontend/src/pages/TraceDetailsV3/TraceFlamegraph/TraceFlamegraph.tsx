@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { Skeleton } from 'antd';
 import useGetTraceFlamegraph from 'hooks/trace/useGetTraceFlamegraph';

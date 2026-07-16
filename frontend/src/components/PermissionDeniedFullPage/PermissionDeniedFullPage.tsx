@@ -3,6 +3,8 @@ import { CircleSlash2 } from 'components/ui/icons';
 import styles from './PermissionDeniedFullPage.module.scss';
 import { Style } from 'components/ui/design-tokens';
 
+import type { JSX } from 'react';
+
 interface PermissionDeniedFullPageProps {
 	permissionName: string;
 }

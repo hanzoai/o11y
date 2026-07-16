@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button } from '@hanzo/ui';
 import { Check, ChevronDown, Plus } from 'lucide-react';

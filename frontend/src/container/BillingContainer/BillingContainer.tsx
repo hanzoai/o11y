@@ -1,5 +1,5 @@
 import { Typography } from 'components/ui/typography';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from 'react-query';
 import { CircleCheck, CloudDownload } from 'components/ui/icons';

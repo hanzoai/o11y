@@ -22,8 +22,15 @@ import {
 	ComboboxList,
 	ComboboxTrigger,
 } from './combobox';
-import { renderComboboxList, renderComboboxMultiPills } from './combobox-simple-list';
-import type { ComboboxSimpleGroup, ComboboxSimpleItem, ComboboxSimpleProps } from './types';
+import {
+	renderComboboxList,
+	renderComboboxMultiPills,
+} from './combobox-simple-list';
+import type {
+	ComboboxSimpleGroup,
+	ComboboxSimpleItem,
+	ComboboxSimpleProps,
+} from './types';
 
 const triggerClass =
 	'flex h-8 w-full items-center justify-between gap-2 whitespace-nowrap rounded-[calc(var(--radius)-2px)] border border-[var(--input)] bg-transparent px-3 py-2 text-[13px] leading-5 shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-within:ring-1 focus-within:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50 data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50';
@@ -45,7 +52,10 @@ function normalizeValue(v?: string | string[]): string[] {
  * Minimal combobox preset. Accepts a list of items and handles selection,
  * filtering, and value display with minimal configuration.
  */
-const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, ComboboxSimpleProps>(
+const ComboboxSimpleInner = forwardRef<
+	HTMLButtonElement | HTMLDivElement,
+	ComboboxSimpleProps
+>(
 	(
 		{
 			items = [],
@@ -70,11 +80,11 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 			loadingPlaceholder = 'Loading...',
 			disabled = false,
 		},
-		forwardedRef
+		forwardedRef,
 	) => {
 		const listId = useId();
 		const [uncontrolledValue, setUncontrolledValue] = useState<string[]>(() =>
-			normalizeValue(defaultValue)
+			normalizeValue(defaultValue),
 		);
 		const [open, setOpenInternal] = useState(false);
 		const setOpen = useCallback(
@@ -84,7 +94,7 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 				}
 				setOpenInternal(next);
 			},
-			[disabled]
+			[disabled],
 		);
 		const [inputValue, setInputValue] = useState('');
 		const internalRef = useRef<HTMLButtonElement | HTMLDivElement | null>(null);
@@ -98,16 +108,19 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 						forwardedRef.current = node;
 					}
 				},
-			[forwardedRef]
+			[forwardedRef],
 		);
 
 		const isControlled = controlledValue !== undefined;
 		const selectedValues = useMemo(
 			() => (isControlled ? normalizeValue(controlledValue) : uncontrolledValue),
-			[isControlled, controlledValue, uncontrolledValue]
+			[isControlled, controlledValue, uncontrolledValue],
 		);
 
-		const allItems = useMemo(() => (groups ? flattenItems(groups) : items), [groups, items]);
+		const allItems = useMemo(
+			() => (groups ? flattenItems(groups) : items),
+			[groups, items],
+		);
 		const itemsMap = useMemo(() => {
 			const map = new Map<string, ComboboxSimpleItem>();
 			for (const item of allItems) {
@@ -133,7 +146,7 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 				}
 				map.set(
 					item.value,
-					searchable.map((s) => s.toLowerCase())
+					searchable.map((s) => s.toLowerCase()),
 				);
 			}
 			return map;
@@ -159,7 +172,7 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 					setOpen(false);
 				}
 			},
-			[multiple, onChange, selectedValues, isControlled, setOpen]
+			[multiple, onChange, selectedValues, isControlled, setOpen],
 		);
 
 		const handleRemove = useCallback(
@@ -170,7 +183,7 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 				}
 				onChange?.(newValues);
 			},
-			[onChange, selectedValues, isControlled]
+			[onChange, selectedValues, isControlled],
 		);
 
 		const handleCreate = useCallback(
@@ -198,15 +211,20 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 				}
 				setInputValue('');
 			},
-			[multiple, onChange, selectedValues, isControlled, setOpen]
+			[multiple, onChange, selectedValues, isControlled, setOpen],
 		);
 
 		const selectedItem = useMemo(
-			() => (multiple ? undefined : allItems.find((item) => item.value === selectedValues[0])),
-			[multiple, allItems, selectedValues]
+			() =>
+				multiple
+					? undefined
+					: allItems.find((item) => item.value === selectedValues[0]),
+			[multiple, allItems, selectedValues],
 		);
 		const singleCustomValue =
-			!multiple && selectedValues.length > 0 && !selectedItem ? selectedValues[0] : undefined;
+			!multiple && selectedValues.length > 0 && !selectedItem
+				? selectedValues[0]
+				: undefined;
 		const triggerValue = displayValueFn
 			? displayValueFn(selectedItem)
 			: selectedItem
@@ -221,7 +239,7 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 				}
 				return item.displayValue ?? item.label;
 			},
-			[itemsMap]
+			[itemsMap],
 		);
 
 		const handleTriggerKeyDown = useCallback(
@@ -231,7 +249,7 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 					setOpen(true);
 				}
 			},
-			[setOpen]
+			[setOpen],
 		);
 		const handleInputKeyDown = useCallback(
 			(e: KeyboardEvent<HTMLInputElement>) => {
@@ -241,7 +259,7 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 					internalRef.current?.focus();
 				}
 			},
-			[setOpen]
+			[setOpen],
 		);
 		const handleInsert = useCallback((value: string) => {
 			setInputValue(value);
@@ -249,12 +267,15 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 
 		const hintItems = useMemo(
 			() => allItems.filter((item) => item.insertValue !== undefined),
-			[allItems]
+			[allItems],
 		);
 		const showHints =
 			hintItems.length > 0 &&
 			!hintItems.some((item) => inputValue.startsWith(item.insertValue as string));
-		const hintValues = useMemo(() => new Set(hintItems.map((h) => h.value)), [hintItems]);
+		const hintValues = useMemo(
+			() => new Set(hintItems.map((h) => h.value)),
+			[hintItems],
+		);
 
 		const customFilter = useCallback(
 			(value: string, search: string, keywords?: string[]): number => {
@@ -263,11 +284,14 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 				}
 				const searchStrings = searchStringsMap.get(value);
 				if (searchStrings) {
-					return commandDefaultFilter(value, search, [...searchStrings, ...(keywords ?? [])]);
+					return commandDefaultFilter(value, search, [
+						...searchStrings,
+						...(keywords ?? []),
+					]);
 				}
 				return commandDefaultFilter(value, search, keywords);
 			},
-			[hintValues, showHints, searchStringsMap]
+			[hintValues, showHints, searchStringsMap],
 		);
 
 		const trimmedInput = inputValue.trim();
@@ -278,12 +302,14 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 			!allItems.some((item) => item.value === trimmedInput);
 		const customValues = useMemo(
 			() => selectedValues.filter((v) => !itemsMap.has(v)),
-			[selectedValues, itemsMap]
+			[selectedValues, itemsMap],
 		);
 		const filterHints = useCallback(
 			(itemList: ComboboxSimpleItem[]): ComboboxSimpleItem[] =>
-				itemList.filter((item) => (item.insertValue !== undefined ? showHints : true)),
-			[showHints]
+				itemList.filter((item) =>
+					item.insertValue !== undefined ? showHints : true,
+				),
+			[showHints],
 		);
 
 		const listContent = renderComboboxList({
@@ -323,7 +349,10 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 				className="size-4 shrink-0 animate-spin opacity-50"
 			/>
 		) : (
-			<ChevronDown data-slot="combobox-icon" className="size-4 shrink-0 opacity-50" />
+			<ChevronDown
+				data-slot="combobox-icon"
+				className="size-4 shrink-0 opacity-50"
+			/>
 		);
 
 		if (multiple) {
@@ -360,7 +389,11 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 								{spinnerOrChevron}
 							</div>
 						</ComboboxTrigger>
-						{open && <ComboboxContent withPortal={withPortal}>{commandContent}</ComboboxContent>}
+						{open && (
+							<ComboboxContent withPortal={withPortal}>
+								{commandContent}
+							</ComboboxContent>
+						)}
 					</Combobox>
 				</Wrapper>
 			);
@@ -387,11 +420,15 @@ const ComboboxSimpleInner = forwardRef<HTMLButtonElement | HTMLDivElement, Combo
 							{spinnerOrChevron}
 						</button>
 					</ComboboxTrigger>
-					{open && <ComboboxContent withPortal={withPortal}>{commandContent}</ComboboxContent>}
+					{open && (
+						<ComboboxContent withPortal={withPortal}>
+							{commandContent}
+						</ComboboxContent>
+					)}
 				</Combobox>
 			</Wrapper>
 		);
-	}
+	},
 );
 ComboboxSimpleInner.displayName = 'ComboboxSimpleInner';
 

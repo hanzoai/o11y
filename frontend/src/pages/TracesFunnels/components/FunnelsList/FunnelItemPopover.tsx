@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Button, Popover, Tooltip } from 'antd';
 import cx from 'classnames';
 import { Ellipsis, PencilLine, Trash2 } from 'components/ui/icons';
@@ -58,7 +58,7 @@ function FunnelItemPopover({
 	isPopoverOpen,
 	setIsPopoverOpen,
 	funnel,
-	shouldRedirectToTracesListOnDeleteSuccess,
+	shouldRedirectToTracesListOnDeleteSuccess = true,
 }: FunnelItemPopoverProps): JSX.Element {
 	const [isRenameModalOpen, setIsRenameModalOpen] = useState<boolean>(false);
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
@@ -135,7 +135,4 @@ function FunnelItemPopover({
 	);
 }
 
-FunnelItemPopover.defaultProps = {
-	shouldRedirectToTracesListOnDeleteSuccess: true,
-};
 export default FunnelItemPopover;

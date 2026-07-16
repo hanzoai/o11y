@@ -42,7 +42,7 @@ function renderItem(
 	item: ComboboxSimpleItem,
 	selectedValues: string[],
 	onSelect: (value: string) => void,
-	onInsert: (value: string) => void
+	onInsert: (value: string) => void,
 ): ReactNode {
 	if (item.insertValue !== undefined) {
 		return (
@@ -68,7 +68,10 @@ function renderItem(
 	);
 }
 
-function renderCustomGroup(customValues: string[], onSelect: (value: string) => void): ReactNode {
+function renderCustomGroup(
+	customValues: string[],
+	onSelect: (value: string) => void,
+): ReactNode {
 	return (
 		<ComboboxGroup heading="Custom" forceMount>
 			{customValues.map((v) => (
@@ -91,7 +94,9 @@ function renderCreateOption(p: ComboboxListParams): ReactNode {
 			value={`__create__${trimmed}`}
 			onSelect={(): void => p.onCreate(p.inputValue)}
 		>
-			{typeof p.allowCreate === 'function' ? p.allowCreate(trimmed) : `Create "${trimmed}"`}
+			{typeof p.allowCreate === 'function'
+				? p.allowCreate(trimmed)
+				: `Create "${trimmed}"`}
 		</ComboboxCreateItem>
 	);
 }
@@ -103,7 +108,10 @@ function renderEmpty(p: ComboboxListParams): ReactNode {
 	return <ComboboxEmpty>{p.emptyPlaceholder}</ComboboxEmpty>;
 }
 
-function renderGroups(p: ComboboxListParams, groups: ComboboxSimpleGroup[]): ReactNode {
+function renderGroups(
+	p: ComboboxListParams,
+	groups: ComboboxSimpleGroup[],
+): ReactNode {
 	return (
 		<>
 			{p.customValues.length > 0 && (
@@ -122,7 +130,7 @@ function renderGroups(p: ComboboxListParams, groups: ComboboxSimpleGroup[]): Rea
 						{idx > 0 && <ComboboxSeparator />}
 						<ComboboxGroup heading={group.heading}>
 							{filtered.map((item) =>
-								renderItem(item, p.selectedValues, p.onSelect, p.onInsert)
+								renderItem(item, p.selectedValues, p.onSelect, p.onInsert),
 							)}
 						</ComboboxGroup>
 					</Fragment>
@@ -143,9 +151,9 @@ function renderFlat(p: ComboboxListParams): ReactNode {
 					{p.items.length > 0 && <ComboboxSeparator />}
 				</>
 			)}
-			{p.filterHints(p.items).map((item) =>
-				renderItem(item, p.selectedValues, p.onSelect, p.onInsert)
-			)}
+			{p
+				.filterHints(p.items)
+				.map((item) => renderItem(item, p.selectedValues, p.onSelect, p.onInsert))}
 			{renderCreateOption(p)}
 			{renderEmpty(p)}
 		</>
@@ -168,7 +176,9 @@ export function renderComboboxList(p: ComboboxListParams): ReactNode {
 /**
  * Renders the selected pills (with a "+N" overflow tooltip) for multi-select mode.
  */
-export function renderComboboxMultiPills(p: ComboboxMultiPillsParams): ReactNode {
+export function renderComboboxMultiPills(
+	p: ComboboxMultiPillsParams,
+): ReactNode {
 	if (p.selectedValues.length === 0) {
 		return undefined;
 	}
@@ -189,7 +199,10 @@ export function renderComboboxMultiPills(p: ComboboxMultiPillsParams): ReactNode
 		.join(', ');
 
 	return (
-		<span data-slot="combobox-pills" className="flex flex-wrap items-center gap-1">
+		<span
+			data-slot="combobox-pills"
+			className="flex flex-wrap items-center gap-1"
+		>
 			{displayed.map((v) => (
 				<ComboboxPill key={v} value={v} onRemove={p.onRemove}>
 					{p.resolveLabel(v)}

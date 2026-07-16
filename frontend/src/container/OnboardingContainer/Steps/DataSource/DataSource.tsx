@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Blocks, Check, LoaderCircle } from 'components/ui/icons';
 import { Input } from 'components/ui/input';

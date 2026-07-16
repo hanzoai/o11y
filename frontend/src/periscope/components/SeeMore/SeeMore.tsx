@@ -4,6 +4,8 @@ import { useIsDarkMode } from 'hooks/useDarkMode';
 
 import './SeeMore.styles.scss';
 
+import type { JSX } from 'react';
+
 type SeeMoreProps = {
 	children: JSX.Element[];
 	initialCount?: number;
@@ -40,9 +42,5 @@ function SeeMore({
 		</>
 	);
 }
-
-SeeMore.defaultProps = {
-	initialCount: 2,
-};
 
 export default SeeMore;

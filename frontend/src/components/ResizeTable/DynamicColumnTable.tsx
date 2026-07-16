@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState, type JSX } from 'react';
 import type {
 	TableColumnGroupType as ColumnGroupType,
 	TableColumnsType as ColumnsType,
@@ -27,7 +27,7 @@ function DynamicColumnTable({
 	tablesource,
 	columns,
 	dynamicColumns,
-	onDragColumn,
+	onDragColumn = undefined,
 	facingIssueBtn,
 	shouldSendAlertsLogEvent,
 	pagination,
@@ -148,9 +148,5 @@ function DynamicColumnTable({
 		</div>
 	);
 }
-
-DynamicColumnTable.defaultProps = {
-	onDragColumn: undefined,
-};
 
 export default memo(DynamicColumnTable);

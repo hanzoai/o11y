@@ -11,6 +11,8 @@ import { InfraMonitoringEntity } from '../constants';
 import { K8sPodsData } from './api';
 import { Container } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export function getK8sPodRowKey(pod: K8sPodsData): string {
 	return pod.podUID || pod.meta.k8s_pod_uid || pod.meta.k8s_pod_name;
 }

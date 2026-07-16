@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 import { useMeasure } from 'react-use';
 import { resolveTimeFromInterval } from 'components/TimelineV2/utils';
 import { toFixed } from 'utils/toFixed';

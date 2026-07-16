@@ -6,6 +6,8 @@ import { getMs } from 'container/Trace/Filters/Panel/PanelBody/Duration/util';
 import { DEFAULT_PER_PAGE_OPTIONS } from 'hooks/queryPagination';
 import { ListItem } from 'types/api/widgets/getQuery';
 
+import type { JSX } from 'react';
+
 export const PER_PAGE_OPTIONS: number[] = [10, ...DEFAULT_PER_PAGE_OPTIONS];
 
 export const columns: ColumnsType<ListItem['data']> = [

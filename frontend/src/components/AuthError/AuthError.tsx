@@ -4,6 +4,8 @@ import APIError from 'types/api/error';
 
 import './AuthError.styles.scss';
 
+import type { JSX } from 'react';
+
 interface AuthErrorProps {
 	error: APIError;
 }

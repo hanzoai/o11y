@@ -86,9 +86,7 @@ describe('at basePath="/o11y/"', () => {
 	});
 
 	it('getAbsoluteUrl returns origin + prefixed path', () => {
-		expect(m.getAbsoluteUrl('/logs')).toBe(
-			`${window.location.origin}/o11y/logs`,
-		);
+		expect(m.getAbsoluteUrl('/logs')).toBe(`${window.location.origin}/o11y/logs`);
 	});
 
 	it('getBaseUrl returns origin + prefix without trailing slash', () => {

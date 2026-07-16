@@ -1,6 +1,7 @@
 import ROUTES from './routes';
 
-export const DOCS_BASE_URL = process.env.DOCS_BASE_URL || 'https://o11y.hanzo.ai';
+export const DOCS_BASE_URL =
+	process.env.DOCS_BASE_URL || 'https://o11y.hanzo.ai';
 
 export const WITHOUT_SESSION_PATH = ['/redirect'];
 

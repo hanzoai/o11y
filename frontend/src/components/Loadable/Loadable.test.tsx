@@ -1,4 +1,4 @@
-import React, { ComponentType, Suspense } from 'react';
+import React, { ComponentType, Suspense, type JSX } from 'react';
 import {
 	render,
 	screen,

@@ -9,6 +9,8 @@ import { selectStyles } from './styles';
 import { IBuilderUnitsFilterProps } from './types';
 import { filterOption } from './utils';
 
+import type { JSX } from 'react';
+
 function BuilderUnitsFilter({
 	onChange,
 	yAxisUnit,

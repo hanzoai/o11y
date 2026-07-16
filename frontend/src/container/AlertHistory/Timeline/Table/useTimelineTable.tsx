@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { Ellipsis, Search } from 'components/ui/icons';
 import { Color } from 'constants/designTokens';
 import { Button, TableColumnsType as ColumnsType } from 'antd';

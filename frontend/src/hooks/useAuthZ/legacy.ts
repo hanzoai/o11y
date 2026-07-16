@@ -1,9 +1,6 @@
 import { buildPermission } from './utils';
 
-export const IsAdminPermission = buildPermission(
-	'assignee',
-	'role:o11y-admin',
-);
+export const IsAdminPermission = buildPermission('assignee', 'role:o11y-admin');
 export const IsEditorPermission = buildPermission(
 	'assignee',
 	'role:o11y-editor',

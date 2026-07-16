@@ -1,4 +1,4 @@
-import { MouseEvent, useCallback } from 'react';
+import { MouseEvent, useCallback, type JSX } from 'react';
 import { Trash2 } from 'components/ui/icons';
 import { Col, Row, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';

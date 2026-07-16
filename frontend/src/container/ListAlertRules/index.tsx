@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 import { Plus, Search } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
 import { Input } from 'antd';

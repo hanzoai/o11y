@@ -5,6 +5,8 @@ import { UseSpanPercentileReturn } from './useSpanPercentile';
 
 import styles from './SpanPercentileBadge.module.scss';
 
+import type { JSX } from 'react';
+
 type SpanPercentileBadgeProps = Pick<
 	UseSpanPercentileReturn,
 	| 'loading'

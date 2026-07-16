@@ -9,6 +9,8 @@ import TraceDetailsV2 from './TraceDetailV2';
 
 import './TraceDetailV2.styles.scss';
 
+import type { JSX } from 'react';
+
 interface INewTraceDetailProps {
 	items: {
 		label: JSX.Element;

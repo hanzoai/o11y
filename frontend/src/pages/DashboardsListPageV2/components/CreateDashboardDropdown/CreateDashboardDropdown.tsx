@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 // eslint-disable-next-line o11y/no-antd-components -- TODO: migrate Dropdown to components/ui/dropdown-menu
 import { Button, Dropdown, MenuProps } from 'antd';
 import cx from 'classnames';

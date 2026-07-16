@@ -8,6 +8,8 @@ import { getFieldAttributes } from './utils';
 
 import './FieldRenderer.styles.scss';
 
+import type { JSX } from 'react';
+
 const TOOLTIP_CONTENT_PROPS = {
 	className: 'field-renderer-tooltip-content',
 };

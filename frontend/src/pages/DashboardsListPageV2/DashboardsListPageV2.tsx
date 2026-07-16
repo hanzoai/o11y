@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { AnnouncementBanner } from 'components/ui/announcement-banner';
 import { Typography } from 'components/ui/typography';
 import { LayoutGrid } from 'components/ui/icons';

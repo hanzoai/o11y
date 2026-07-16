@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 export default function ApacheIcon(): JSX.Element {
 	return (
 		<svg

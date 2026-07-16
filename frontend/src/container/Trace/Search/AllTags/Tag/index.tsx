@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, type JSX } from 'react';
 import { X } from 'components/ui/icons';
 import { Select } from 'antd';
 import { TraceReducer } from 'types/reducer/trace';

@@ -263,10 +263,10 @@ export function getAppContextMock(
 
 export function AllTheProviders({
 	children,
-	role,
-	appContextOverrides,
-	queryBuilderOverrides,
-	initialRoute,
+	role = 'ADMIN',
+	appContextOverrides = {},
+	queryBuilderOverrides = undefined,
+	initialRoute = '/',
 }: {
 	children: React.ReactNode;
 	role?: string;
@@ -313,13 +313,6 @@ export function AllTheProviders({
 		</MemoryRouter>
 	);
 }
-
-AllTheProviders.defaultProps = {
-	role: 'ADMIN',
-	appContextOverrides: {},
-	queryBuilderOverrides: undefined,
-	initialRoute: '/',
-};
 
 interface ProviderProps {
 	role?: string;

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type JSX } from 'react';
 import { useQueryClient } from 'react-query';
 import { useLocation } from 'react-router-dom';
 import { Filter } from 'components/ui/icons';

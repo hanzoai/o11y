@@ -33,7 +33,11 @@ export type TooltipProviderProps = {
 /**
  * Wraps your app (or a section of it) to provide shared configuration for all tooltips.
  */
-function TooltipProvider({ delayDuration = 0, testId, ...props }: TooltipProviderProps) {
+function TooltipProvider({
+	delayDuration = 0,
+	testId,
+	...props
+}: TooltipProviderProps) {
 	return (
 		<TooltipPrimitive.Provider
 			data-slot="tooltip-provider"
@@ -82,7 +86,9 @@ export type TooltipRootProps = {
  * Root component that manages the open state and accessibility wiring for a tooltip.
  */
 function TooltipRoot({ testId, ...props }: TooltipRootProps) {
-	return <TooltipPrimitive.Root data-slot="tooltip" data-testid={testId} {...props} />;
+	return (
+		<TooltipPrimitive.Root data-slot="tooltip" data-testid={testId} {...props} />
+	);
 }
 
 export type TooltipTriggerProps = {
@@ -112,11 +118,13 @@ const TooltipTrigger = React.forwardRef<HTMLButtonElement, TooltipTriggerProps>(
 			data-testid={testId}
 			{...props}
 		/>
-	)
+	),
 );
 TooltipTrigger.displayName = 'TooltipTrigger';
 
-type OriginalTooltipContentProps = React.ComponentProps<typeof TooltipPrimitive.Content>;
+type OriginalTooltipContentProps = React.ComponentProps<
+	typeof TooltipPrimitive.Content
+>;
 
 export type TooltipContentProps = {
 	/**
@@ -197,10 +205,19 @@ export type TooltipContentProps = {
 	 * The test id of the tooltip content.
 	 */
 	testId?: string;
-} & Pick<React.ComponentProps<'div'>, 'id' | 'className' | 'style' | 'children'>;
+} & Pick<
+	React.ComponentProps<'div'>,
+	'id' | 'className' | 'style' | 'children'
+>;
 
-const TooltipContentInner = React.forwardRef<HTMLDivElement, TooltipContentProps>(
-	({ className, sideOffset = 4, testId, children, arrow = false, ...props }, ref) => (
+const TooltipContentInner = React.forwardRef<
+	HTMLDivElement,
+	TooltipContentProps
+>(
+	(
+		{ className, sideOffset = 4, testId, children, arrow = false, ...props },
+		ref,
+	) => (
 		<TooltipPrimitive.Content
 			ref={ref}
 			data-slot="tooltip-content"
@@ -218,7 +235,7 @@ const TooltipContentInner = React.forwardRef<HTMLDivElement, TooltipContentProps
 				</TooltipPrimitive.Arrow>
 			)}
 		</TooltipPrimitive.Content>
-	)
+	),
 );
 TooltipContentInner.displayName = 'TooltipContentInner';
 
@@ -236,7 +253,7 @@ const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(
 			);
 		}
 		return <TooltipContentInner ref={ref} {...props} />;
-	}
+	},
 );
 TooltipContent.displayName = 'TooltipContent';
 
@@ -284,7 +301,14 @@ export type TooltipSimpleProps = {
 	 */
 	tooltipContentProps?: Omit<
 		TooltipContentProps,
-		'side' | 'align' | 'sideOffset' | 'alignOffset' | 'avoidCollisions' | 'arrow' | 'withPortal' | 'children'
+		| 'side'
+		| 'align'
+		| 'sideOffset'
+		| 'alignOffset'
+		| 'avoidCollisions'
+		| 'arrow'
+		| 'withPortal'
+		| 'children'
 	>;
 	/**
 	 * The test id of the tooltip.
@@ -315,7 +339,7 @@ const TooltipSimple = React.forwardRef<HTMLButtonElement, TooltipSimpleProps>(
 			children,
 			...rootProps
 		},
-		ref
+		ref,
 	) => {
 		return (
 			<TooltipRoot data-testid={testId} {...rootProps}>
@@ -336,8 +360,14 @@ const TooltipSimple = React.forwardRef<HTMLButtonElement, TooltipSimpleProps>(
 				</TooltipContent>
 			</TooltipRoot>
 		);
-	}
+	},
 );
 TooltipSimple.displayName = 'TooltipSimple';
 
-export { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipContent, TooltipSimple };
+export {
+	TooltipProvider,
+	TooltipRoot,
+	TooltipTrigger,
+	TooltipContent,
+	TooltipSimple,
+};

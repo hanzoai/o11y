@@ -4,6 +4,8 @@ import { render } from 'tests/test-utils';
 
 import TraceDetailsHeader from '../TraceDetailsHeader';
 
+import type { JSX } from 'react';
+
 const mockGoBack = jest.fn();
 const mockPush = jest.fn();
 const mockReplace = jest.fn();

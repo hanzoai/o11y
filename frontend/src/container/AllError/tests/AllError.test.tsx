@@ -20,6 +20,8 @@ import {
 	TAG_FROM_QUERY,
 } from './constants';
 
+import type { JSX } from 'react';
+
 jest.mock('hooks/useResourceAttribute', () =>
 	jest.fn(() => ({
 		queries: [],
@@ -55,7 +57,11 @@ jest.spyOn(appContextHooks, 'useAppContext').mockReturnValue({
 	},
 } as any);
 
-function Exceptions({ initUrl }: { initUrl?: string[] }): JSX.Element {
+function Exceptions({
+	initUrl = ['/exceptions'],
+}: {
+	initUrl?: string[];
+}): JSX.Element {
 	return (
 		<MemoryRouter initialEntries={initUrl ?? ['/exceptions']}>
 			<TimezoneProvider>
@@ -69,10 +75,6 @@ function Exceptions({ initUrl }: { initUrl?: string[] }): JSX.Element {
 	);
 }
 
-Exceptions.defaultProps = {
-	initUrl: ['/exceptions'],
-};
-
 const BASE_URL = ENVIRONMENT.baseURL;
 const listErrorsURL = `${BASE_URL}/api/v1/listErrors`;
 const countErrorsURL = `${BASE_URL}/api/v1/countErrors`;
@@ -81,7 +83,7 @@ const postListErrorsSpy = jest.fn();
 
 describe('Exceptions - All Errors', () => {
 	beforeEach(() => {
-		(useSelector as jest.Mock).mockReturnValue({
+		jest.mocked(useSelector).mockReturnValue({
 			maxTime: 1000,
 			minTime: 0,
 			loading: false,

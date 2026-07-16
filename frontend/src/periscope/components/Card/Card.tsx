@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import cx from 'classnames';
 
 import './Card.styles.scss';
@@ -9,7 +9,11 @@ type CardProps = {
 	size?: 'small' | 'medium' | 'large';
 };
 
-function Card({ children, className, size }: CardProps): JSX.Element {
+function Card({
+	children,
+	className = '',
+	size = 'medium',
+}: CardProps): JSX.Element {
 	return <div className={cx('periscope-card', className, size)}>{children}</div>;
 }
 
@@ -28,10 +32,5 @@ function CardFooter({ children }: { children: ReactNode }): JSX.Element {
 Card.Header = CardHeader;
 Card.Content = CardContent;
 Card.Footer = CardFooter;
-
-Card.defaultProps = {
-	className: '',
-	size: 'medium',
-};
 
 export default Card;

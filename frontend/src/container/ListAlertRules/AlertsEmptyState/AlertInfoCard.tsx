@@ -4,6 +4,8 @@ import { openInNewTab } from 'utils/navigation';
 
 import styles from './AlertsEmptyState.module.scss';
 
+import type { JSX } from 'react';
+
 interface AlertInfoCardProps {
 	header: string;
 	subheader: string;

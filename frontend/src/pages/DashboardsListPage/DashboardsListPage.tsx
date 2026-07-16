@@ -6,6 +6,8 @@ import { LayoutGrid } from 'components/ui/icons';
 
 import './DashboardsListPage.styles.scss';
 
+import type { JSX } from 'react';
+
 function DashboardsListPage(): JSX.Element {
 	return (
 		<Space

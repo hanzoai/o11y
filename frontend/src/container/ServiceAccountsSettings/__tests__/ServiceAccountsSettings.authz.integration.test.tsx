@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, JSX } from 'react';
 import userEvent from '@testing-library/user-event';
 import { listRolesSuccessResponse } from 'mocks-server/__mockdata__/roles';
 import { rest, server } from 'mocks-server/server';

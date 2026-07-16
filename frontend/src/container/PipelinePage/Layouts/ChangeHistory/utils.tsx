@@ -7,6 +7,8 @@ import {
 	SolidXCircle,
 } from 'components/ui/icons';
 
+import type { JSX } from 'react';
+
 export function getDeploymentStage(value: string): string {
 	switch (value) {
 		case 'in_progress':

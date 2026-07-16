@@ -1,9 +1,9 @@
 import React, {
 	// eslint-disable-next-line no-restricted-imports
-	createContext,
-	// eslint-disable-next-line no-restricted-imports
+	createContext, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useMemo,
+	type JSX,
 } from 'react';
 import useUrlQuery from 'hooks/useUrlQuery';
 import {

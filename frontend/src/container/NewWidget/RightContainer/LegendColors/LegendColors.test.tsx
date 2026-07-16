@@ -4,6 +4,8 @@ import { render, screen, userEvent } from 'tests/test-utils';
 
 import LegendColors from './LegendColors';
 
+import type { JSX } from 'react';
+
 jest.mock('hooks/queryBuilder/useQueryBuilder', () => ({
 	__esModule: true,
 	useQueryBuilder: (): { currentQuery: unknown } => ({

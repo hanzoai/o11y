@@ -4,6 +4,8 @@ import { render, screen } from 'tests/test-utils';
 
 import ChartManager from '../ChartManager';
 
+import type { JSX } from 'react';
+
 const mockSyncSeriesVisibilityToLocalStorage = jest.fn();
 const mockNotificationsSuccess = jest.fn();
 

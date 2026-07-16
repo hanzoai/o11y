@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Info } from 'components/ui/icons';
 import { Input } from 'components/ui/input';
 import { Switch } from 'components/ui/switch';
@@ -16,7 +16,7 @@ interface JsonFlatteningProps {
 }
 
 function JsonFlattening({
-	selectedProcessorData,
+	selectedProcessorData = undefined,
 	isAdd,
 }: JsonFlatteningProps): JSX.Element | null {
 	const form = Form.useFormInstance();
@@ -98,9 +98,5 @@ function JsonFlattening({
 		</div>
 	);
 }
-
-JsonFlattening.defaultProps = {
-	selectedProcessorData: undefined,
-};
 
 export default JsonFlattening;

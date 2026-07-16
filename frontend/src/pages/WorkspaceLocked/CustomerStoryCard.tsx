@@ -3,6 +3,8 @@ import { Card, Space } from 'antd';
 
 import './customerStoryCard.styles.scss';
 
+import type { JSX } from 'react';
+
 interface CustomerStoryCardProps {
 	avatar: string;
 	personName: string;

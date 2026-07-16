@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { CircleCheck, Plus, RefreshCw } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
 import ROUTES from 'constants/routes';

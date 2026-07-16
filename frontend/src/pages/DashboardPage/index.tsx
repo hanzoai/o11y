@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type JSX } from 'react';
 import { useParams } from 'react-router-dom';
 import { Modal } from 'antd';
 import { Typography } from 'components/ui/typography';

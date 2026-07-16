@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 import cx from 'classnames';
 import { Button } from 'components/ui/button';
 import { Input } from 'antd';

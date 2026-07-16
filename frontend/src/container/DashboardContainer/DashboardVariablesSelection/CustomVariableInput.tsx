@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect, useMemo, type JSX } from 'react';
 import { commaValuesParser } from 'lib/dashboardVariables/customCommaValuesParser';
 import sortValues from 'lib/dashboardVariables/sortVariableValues';
 

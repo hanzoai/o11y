@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useMemo } from 'react';
+import { Dispatch, SetStateAction, useMemo, type JSX } from 'react';
 import { Skeleton } from 'antd';
 import { AxiosError } from 'axios';
 import Spinner from 'components/Spinner';

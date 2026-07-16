@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import {
 	ArrowUpToLine,
 	Filter,
@@ -346,11 +346,3 @@ export default function QuickFilters(props: IQuickFiltersProps): JSX.Element {
 		</div>
 	);
 }
-
-QuickFilters.defaultProps = {
-	onFilterChange: null,
-	signal: '',
-	config: [],
-	showFilterCollapse: true,
-	showQueryName: true,
-};

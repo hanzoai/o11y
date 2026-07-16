@@ -1,4 +1,4 @@
-import { ReactElement, cloneElement, useMemo } from 'react';
+import { ReactElement, cloneElement, useMemo, type JSX } from 'react';
 import {
 	TooltipRoot,
 	TooltipContent,
@@ -12,7 +12,7 @@ import styles from './AuthZTooltip.module.scss';
 
 interface AuthZTooltipProps {
 	checks: BrandedPermission[];
-	children: ReactElement;
+	children: ReactElement<{ disabled?: boolean }>;
 	enabled?: boolean;
 	tooltipMessage?: string;
 }

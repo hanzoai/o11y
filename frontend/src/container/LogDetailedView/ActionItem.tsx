@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, type JSX } from 'react';
 import { CircleMinus, CirclePlus } from 'components/ui/icons';
 import { Button, Col, Popover } from 'antd';
 import { OPERATORS } from 'constants/queryBuilder';

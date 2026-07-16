@@ -1,4 +1,4 @@
-import { SyntheticEvent, useMemo } from 'react';
+import { SyntheticEvent, useMemo, type JSX } from 'react';
 import { Resizable, ResizeCallbackData } from 'react-resizable';
 
 import { enableUserSelectHack } from './config';

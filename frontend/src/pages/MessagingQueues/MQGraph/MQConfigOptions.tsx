@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useCopyToClipboard } from 'react-use';
 import { Color } from 'constants/designTokens';

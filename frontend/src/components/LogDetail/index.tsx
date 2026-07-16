@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	type JSX,
+} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux'; // old code, TODO: fix this correctly
 import { useCopyToClipboard, useLocation } from 'react-use';

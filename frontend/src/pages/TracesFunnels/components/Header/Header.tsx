@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 function Header(): JSX.Element {
 	return (
 		<div className="traces-funnels-header">

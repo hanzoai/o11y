@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -29,8 +29,8 @@ import {
 } from '../CeleryOverviewGraphUtils';
 
 export default function OverviewRightPanelGraph({
-	groupByFilter,
-	filters,
+	groupByFilter = undefined,
+	filters = undefined,
 }: {
 	groupByFilter?: BaseAutocompleteData;
 	filters?: TagFilterItem[];
@@ -206,8 +206,3 @@ export default function OverviewRightPanelGraph({
 		</Card>
 	);
 }
-
-OverviewRightPanelGraph.defaultProps = {
-	groupByFilter: undefined,
-	filters: undefined,
-};

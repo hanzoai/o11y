@@ -5,6 +5,7 @@ import React, {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { useQueryClient } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
@@ -111,7 +112,7 @@ function FullView({
 		[widget],
 	);
 
-	const fullViewChartRef = useRef<ToggleGraphProps>();
+	const fullViewChartRef = useRef<ToggleGraphProps>(undefined);
 
 	const [selectedTime, setSelectedTime] = useState<timePreferance>({
 		name: getSelectedTime()?.name || '',
@@ -434,14 +435,6 @@ function FullView({
 		</div>
 	);
 }
-
-FullView.defaultProps = {
-	fullViewOptions: undefined,
-	onClickHandler: undefined,
-	yAxisUnit: undefined,
-	onDragSelect: undefined,
-	isDependedDataLoaded: undefined,
-};
 
 FullView.displayName = 'FullView';
 

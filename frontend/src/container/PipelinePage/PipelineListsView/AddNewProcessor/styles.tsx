@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { Badge } from 'components/ui/badge';
 import { Select } from 'antd';
 import styled from 'styled-components';

@@ -1,4 +1,4 @@
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 import { TableColumnsType as ColumnsType, TableProps } from 'antd';

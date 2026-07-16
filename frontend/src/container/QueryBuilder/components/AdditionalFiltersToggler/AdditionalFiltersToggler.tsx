@@ -1,4 +1,4 @@
-import { Fragment, memo, ReactNode, useState } from 'react';
+import { Fragment, memo, ReactNode, useState, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import { Col, Row, Typography } from 'antd';
 import { Minus, Plus } from 'lucide-react';

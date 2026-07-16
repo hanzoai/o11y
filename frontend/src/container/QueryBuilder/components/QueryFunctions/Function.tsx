@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { Button, Flex, Select } from 'antd';
 import cx from 'classnames';
 import OverflowInputToolTip from 'components/OverflowInputToolTip';

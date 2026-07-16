@@ -5,6 +5,7 @@ import {
 	useMemo,
 	useRef,
 	useState,
+	type JSX,
 } from 'react';
 import { UseQueryResult } from 'react-query';
 import { Button, Collapse, ColorPicker, Tooltip } from 'antd';
@@ -63,7 +64,7 @@ interface LegendColorsProps {
 function LegendColors({
 	customLegendColors,
 	setCustomLegendColors,
-	queryResponse = null as any,
+	queryResponse,
 }: LegendColorsProps): JSX.Element {
 	const { currentQuery } = useQueryBuilder();
 	const isDarkMode = useIsDarkMode();
@@ -215,9 +216,5 @@ function LegendColors({
 		</div>
 	);
 }
-
-LegendColors.defaultProps = {
-	queryResponse: null,
-};
 
 export default LegendColors;

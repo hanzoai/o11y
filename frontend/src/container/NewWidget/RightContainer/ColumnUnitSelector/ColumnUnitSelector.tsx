@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useCallback, useEffect } from 'react';
+import {
+	Dispatch,
+	SetStateAction,
+	useCallback,
+	useEffect,
+	type JSX,
+} from 'react';
 import { Typography } from 'components/ui/typography';
 import { useQueryBuilder } from 'hooks/queryBuilder/useQueryBuilder';
 import { useGetQueryLabels } from 'hooks/useGetQueryLabels';

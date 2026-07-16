@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, type JSX } from 'react';
 import { useMutation } from 'react-query';
 import updateUserPreferenceAPI from 'api/v1/user/preferences/name/update';
 import { useAppContext } from 'providers/App/App';

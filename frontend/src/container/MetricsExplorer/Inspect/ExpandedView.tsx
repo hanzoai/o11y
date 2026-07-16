@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/no-identical-functions */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type JSX } from 'react';
 import { Color } from 'constants/designTokens';
 import type { TableColumnsType as ColumnsType } from 'antd';
 import { Card, Tooltip } from 'antd';

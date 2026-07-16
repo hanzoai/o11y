@@ -47,7 +47,7 @@ export function getGroupContextMenuConfig({
 	panelType,
 	onColumnClick,
 }: Omit<ContextMenuConfigParams, 'configType'>): GroupContextMenuConfig {
-	const filterKey = clickedData?.column?.dataIndex;
+	const filterKey = clickedData?.column?.dataIndex as string | undefined;
 
 	const filterDataType =
 		getBaseMeta(query, filterKey as string)?.dataType || 'string';

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import { useMutation } from 'react-query';
 import { Check, ChevronsDown, ScrollText, X } from 'components/ui/icons';
 import { Button, Flex, Modal } from 'antd';

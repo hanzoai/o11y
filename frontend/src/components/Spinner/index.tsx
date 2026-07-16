@@ -1,10 +1,15 @@
-import { CSSProperties } from 'react';
+import { CSSProperties, type JSX } from 'react';
 import { Loader } from 'components/ui/icons';
 import { Spin, SpinProps } from 'antd';
 
 import { SpinerStyle } from './styles';
 
-function Spinner({ size, tip, height, style }: SpinnerProps): JSX.Element {
+function Spinner({
+	size = undefined,
+	tip = undefined,
+	height = undefined,
+	style = {},
+}: SpinnerProps): JSX.Element {
 	return (
 		<SpinerStyle height={height} style={style}>
 			<Spin
@@ -30,11 +35,5 @@ interface SpinnerProps {
 	height?: CSSProperties['height'];
 	style?: CSSProperties;
 }
-Spinner.defaultProps = {
-	size: undefined,
-	tip: undefined,
-	height: undefined,
-	style: {},
-};
 
 export default Spinner;

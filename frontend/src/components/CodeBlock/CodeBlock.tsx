@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Check, Copy } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
@@ -21,11 +21,11 @@ export interface CodeBlockProps {
 function CodeBlock({
 	code,
 	language = 'text',
-	className,
+	className = undefined,
 	inline = false,
 	showLineNumbers = false,
 	showCopyButton = true,
-	onCopy,
+	onCopy = undefined,
 }: CodeBlockProps): JSX.Element {
 	const [isCopied, setIsCopied] = useState(false);
 	const [, copyToClipboard] = useCopyToClipboard();
@@ -76,14 +76,5 @@ function CodeBlock({
 		</div>
 	);
 }
-
-CodeBlock.defaultProps = {
-	language: 'text',
-	className: undefined,
-	inline: false,
-	showLineNumbers: false,
-	showCopyButton: true,
-	onCopy: undefined,
-};
 
 export default CodeBlock;

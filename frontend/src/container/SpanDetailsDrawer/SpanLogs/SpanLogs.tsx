@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 import { Button } from '@hanzo/ui';
 import { Typography } from 'antd';
@@ -61,7 +61,7 @@ function SpanLogs({
 	isFetching,
 	isLogSpanRelated,
 	handleExplorerPageRedirect,
-	emptyStateConfig,
+	emptyStateConfig = undefined,
 }: SpanLogsProps): JSX.Element {
 	const { updateAllQueriesOperators } = useQueryBuilder();
 
@@ -287,8 +287,5 @@ function SpanLogs({
 		</div>
 	);
 }
-SpanLogs.defaultProps = {
-	emptyStateConfig: undefined,
-};
 
 export default SpanLogs;

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { GripVertical, PenLine, Plus, Trash2 } from 'components/ui/icons';
 import type { DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
@@ -52,7 +52,7 @@ function TableRow({ children, ...props }: RowProps): JSX.Element {
 	return (
 		<tr {...props} ref={setNodeRef} style={style} {...attributes}>
 			{React.Children.map(children, (child) => {
-				const childElement = child as React.ReactElement;
+				const childElement = child as React.ReactElement<React.PropsWithChildren>;
 				if (childElement.key === 'name') {
 					return React.cloneElement(childElement, {
 						key: 'name-with-drag',

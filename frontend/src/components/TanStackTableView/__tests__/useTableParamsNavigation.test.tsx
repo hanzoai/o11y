@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, type JSX } from 'react';
 import { act, renderHook } from '@testing-library/react';
 import {
 	NuqsTestingAdapter,
@@ -71,9 +71,7 @@ describe('useTableParams navigation scenarios', () => {
 
 			// Verify it's persisted in localStorage
 			expect(
-				localStorage.getItem(
-					'@o11y/table-columns/alert-rules-preferred-page-size',
-				),
+				localStorage.getItem('@o11y/table-columns/alert-rules-preferred-page-size'),
 			).toBe('100');
 
 			// Simulate unmount (user navigates away)

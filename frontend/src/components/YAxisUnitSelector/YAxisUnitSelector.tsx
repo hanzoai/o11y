@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { SolidAlertTriangle } from 'components/ui/icons';
 import { Select, Tooltip } from 'antd';
 import type { DefaultOptionType } from 'antd/es/select';

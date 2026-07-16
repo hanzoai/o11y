@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { Input } from 'components/ui/input';
 import { Collapse, Modal } from 'antd';
 import { Typography } from 'components/ui/typography';

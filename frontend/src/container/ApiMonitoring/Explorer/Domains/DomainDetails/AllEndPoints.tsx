@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { Select } from 'antd';
 import { ENTITY_VERSION_V5 } from 'constants/app';
 import { initialQueriesMap } from 'constants/queryBuilder';

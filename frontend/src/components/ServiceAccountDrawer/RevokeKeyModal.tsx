@@ -24,6 +24,8 @@ import { parseAsString, useQueryState } from 'nuqs';
 import { useErrorModal } from 'providers/ErrorModalProvider';
 import APIError from 'types/api/error';
 
+import type { JSX } from 'react';
+
 export interface RevokeKeyFooterProps {
 	isRevoking: boolean;
 	onCancel: () => void;

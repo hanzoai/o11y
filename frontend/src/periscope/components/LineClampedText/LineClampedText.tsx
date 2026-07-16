@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type JSX } from 'react';
 import { Tooltip, TooltipProps } from 'antd';
 import { isBoolean } from 'lodash-es';
 
@@ -6,8 +6,8 @@ import './LineClampedText.styles.scss';
 
 function LineClampedText({
 	text,
-	lines,
-	tooltipProps,
+	lines = 1,
+	tooltipProps = {},
 }: {
 	text: string | boolean;
 	lines?: number;
@@ -57,10 +57,5 @@ function LineClampedText({
 		content
 	);
 }
-
-LineClampedText.defaultProps = {
-	lines: 1,
-	tooltipProps: {},
-};
 
 export default LineClampedText;

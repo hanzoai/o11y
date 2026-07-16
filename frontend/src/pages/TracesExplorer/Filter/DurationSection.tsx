@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useMemo,
 	useState,
+	type JSX,
 } from 'react';
 import { Input } from 'antd';
 import { Slider } from 'components/ui/slider';

@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type JSX } from 'react';
 import { Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { IDashboardVariable } from 'types/api/dashboard/getAll';

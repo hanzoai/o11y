@@ -1,7 +1,14 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 /* eslint-disable sonarjs/no-identical-functions */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import {
 	autocompletion,
 	closeCompletion,
@@ -72,7 +79,7 @@ function TraceOperatorEditor({
 	onChange,
 	traceOperator,
 	placeholder = 'Enter your trace operator query',
-	onRun,
+	onRun = undefined,
 }: TraceOperatorEditorProps): JSX.Element {
 	const isDarkMode = useIsDarkMode();
 	const [isFocused, setIsFocused] = useState(false);
@@ -483,10 +490,5 @@ function TraceOperatorEditor({
 		</div>
 	);
 }
-
-TraceOperatorEditor.defaultProps = {
-	onRun: undefined,
-	placeholder: 'Enter your trace operator query',
-};
 
 export default TraceOperatorEditor;

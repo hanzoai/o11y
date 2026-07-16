@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, type JSX } from 'react';
 import { EyeClosed, EyeOpen } from 'components/ui/icons';
 import { ButtonProps } from 'antd';
 

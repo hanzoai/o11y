@@ -14,6 +14,8 @@ import useMetricsApplicationTabKey from './useMetricsApplicationTabKey';
 
 import './MetricsApplication.styles.scss';
 
+import type { JSX } from 'react';
+
 function MetricsApplication(): JSX.Element {
 	const { servicename: encodedServiceName } = useParams<{
 		servicename: string;

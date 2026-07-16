@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 
 import Statistics from './Statistics/Statistics';
 import Timeline from './Timeline/Timeline';

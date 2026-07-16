@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, type JSX } from 'react';
 import { Check, Copy } from 'components/ui/icons';
 import cx from 'classnames';
 
@@ -6,7 +6,7 @@ import './CodeCopyBtn.scss';
 
 function CodeCopyBtn({
 	children,
-	onCopyClick,
+	onCopyClick = (): void => {},
 }: {
 	children: React.ReactNode;
 	onCopyClick?: (additionalInfo?: Record<string, unknown>) => void;
@@ -38,9 +38,5 @@ function CodeCopyBtn({
 		</div>
 	);
 }
-
-CodeCopyBtn.defaultProps = {
-	onCopyClick: (): void => {},
-};
 
 export default CodeCopyBtn;

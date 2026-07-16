@@ -1,7 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type JSX } from 'react';
 import cx from 'classnames';
 import { Button } from 'components/ui/button';
-import { Check, LoaderCircle, TriangleAlert, X, Zap } from 'components/ui/icons';
+import {
+	Check,
+	LoaderCircle,
+	TriangleAlert,
+	X,
+	Zap,
+} from 'components/ui/icons';
 
 import { PageActionRegistry } from '../../../pageActions/PageActionRegistry';
 import { AIActionBlock } from '../../../pageActions/types';

@@ -14,6 +14,8 @@ import {
 	SearchIconWrapper,
 } from './styles';
 
+import type { JSX } from 'react';
+
 function AddColumnField({ config }: AddColumnFieldProps): JSX.Element | null {
 	const { t } = useTranslation(['trace']);
 	const isDarkMode = useIsDarkMode();

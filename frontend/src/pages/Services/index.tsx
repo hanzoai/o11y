@@ -1,6 +1,8 @@
 import { Space } from 'antd';
 import ServicesApplication from 'container/ServiceApplication';
 
+import type { JSX } from 'react';
+
 function Metrics(): JSX.Element {
 	return (
 		<Space direction="vertical" style={{ width: '100%' }}>

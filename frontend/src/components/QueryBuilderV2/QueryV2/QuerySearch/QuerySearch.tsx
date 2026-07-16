@@ -1,5 +1,12 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { CircleCheck, Info, TriangleAlert, Filter } from 'components/ui/icons';
 import {
 	autocompletion,
@@ -91,15 +98,15 @@ interface QuerySearchProps {
 }
 
 function QuerySearch({
-	placeholder,
+	placeholder = "Enter your filter query (e.g., http.status_code >= 500 AND service.name = 'frontend')",
 	onChange,
 	queryData,
 	dataSource,
-	onRun,
-	signalSource,
-	hardcodedAttributeKeys,
-	showFilterSuggestionsWithoutMetric,
-	initialExpression,
+	onRun = undefined,
+	signalSource = '',
+	hardcodedAttributeKeys = undefined,
+	showFilterSuggestionsWithoutMetric = false,
+	initialExpression = undefined,
 }: QuerySearchProps): JSX.Element {
 	const isDarkMode = useIsDarkMode();
 	const [valueSuggestions, setValueSuggestions] = useState<any[]>([]);
@@ -177,7 +184,7 @@ function QuerySearch({
 		setIsEditorReady(true);
 	}, []);
 
-	const prevQueryDataExpressionRef = useRef<string | undefined>();
+	const prevQueryDataExpressionRef = useRef<string | undefined>(undefined);
 
 	useEffect(
 		() => {
@@ -1591,15 +1598,5 @@ function QuerySearch({
 		</div>
 	);
 }
-
-QuerySearch.defaultProps = {
-	onRun: undefined,
-	signalSource: '',
-	hardcodedAttributeKeys: undefined,
-	placeholder:
-		"Enter your filter query (e.g., http.status_code >= 500 AND service.name = 'frontend')",
-	showFilterSuggestionsWithoutMetric: false,
-	initialExpression: undefined,
-};
 
 export default QuerySearch;

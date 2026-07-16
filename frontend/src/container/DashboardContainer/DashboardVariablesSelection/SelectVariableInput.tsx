@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type JSX } from 'react';
 import { orange } from '@ant-design/colors';
 import { Popover, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';

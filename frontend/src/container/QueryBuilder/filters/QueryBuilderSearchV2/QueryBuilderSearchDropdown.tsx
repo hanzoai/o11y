@@ -112,7 +112,3 @@ export default function QueryBuilderSearchDropdown(
 		</>
 	);
 }
-
-QueryBuilderSearchDropdown.defaultProps = {
-	currentFilterItem: undefined,
-};

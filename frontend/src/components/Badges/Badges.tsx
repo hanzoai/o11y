@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, { Dispatch, SetStateAction, useState, type JSX } from 'react';
 import { Check, Plus, X } from 'components/ui/icons';
 import { Button, Flex } from 'antd';
 import { Badge } from 'components/ui/badge';

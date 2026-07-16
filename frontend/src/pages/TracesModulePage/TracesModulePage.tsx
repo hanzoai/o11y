@@ -9,6 +9,8 @@ import { tracesExplorer, tracesFunnel, tracesSaveView } from './constants';
 
 import './TracesModulePage.styles.scss';
 
+import type { JSX } from 'react';
+
 function TracesModulePage(): JSX.Element {
 	const { pathname } = useLocation();
 

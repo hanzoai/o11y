@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { CircleCheck, CircleX, LoaderCircle } from 'components/ui/icons';
 import logEvent from 'api/common/logEvent';
 import { DEFAULT_ENTITY_VERSION } from 'constants/app';

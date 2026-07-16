@@ -50,11 +50,16 @@
 	font-size: var(--periscope-font-size-base, 13px);
 	line-height: 1.25rem;
 	cursor: pointer;
-	transition: background-color 150ms ease, color 150ms ease;
+	transition:
+		background-color 150ms ease,
+		color 150ms ease;
 }
 
 [data-slot='pagination-link']:hover:not(:disabled) {
-	background-color: var(--accent, color-mix(in srgb, currentColor 10%, transparent));
+	background-color: var(
+		--accent,
+		color-mix(in srgb, currentColor 10%, transparent)
+	);
 }
 
 [data-slot='pagination-link'][data-active] {

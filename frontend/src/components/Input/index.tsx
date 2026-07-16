@@ -5,21 +5,22 @@ import {
 	LegacyRef,
 	ReactNode,
 	Ref,
+	type JSX,
 } from 'react';
 import { Form, Input, InputProps, InputRef } from 'antd';
 
 function InputComponent({
 	value,
 	type = 'text',
-	onChangeHandler,
-	placeholder,
-	ref,
+	onChangeHandler = undefined,
+	placeholder = undefined,
+	ref = undefined,
 	size = 'small',
-	onBlurHandler,
-	onPressEnterHandler,
-	label,
-	labelOnTop,
-	addonBefore,
+	onBlurHandler = undefined,
+	onPressEnterHandler = undefined,
+	label = undefined,
+	labelOnTop = undefined,
+	addonBefore = undefined,
 	...props
 }: InputComponentProps): JSX.Element {
 	return (
@@ -53,18 +54,5 @@ interface InputComponentProps extends InputProps {
 	labelOnTop?: boolean;
 	addonBefore?: ReactNode;
 }
-
-InputComponent.defaultProps = {
-	type: undefined,
-	onChangeHandler: undefined,
-	placeholder: undefined,
-	ref: undefined,
-	size: undefined,
-	onBlurHandler: undefined,
-	onPressEnterHandler: undefined,
-	label: undefined,
-	labelOnTop: undefined,
-	addonBefore: undefined,
-};
 
 export default InputComponent;

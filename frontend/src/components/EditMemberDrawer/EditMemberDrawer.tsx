@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type JSX } from 'react';
 import type { AxiosError } from 'axios';
 import { useCopyToClipboard } from 'react-use';
 import { Badge } from '@hanzo/ui';

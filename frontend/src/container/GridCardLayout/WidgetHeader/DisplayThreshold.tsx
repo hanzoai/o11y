@@ -7,6 +7,8 @@ import {
 } from './styles';
 import { DisplayThresholdProps } from './types';
 
+import type { JSX } from 'react';
+
 function DisplayThreshold({ threshold }: DisplayThresholdProps): JSX.Element {
 	return (
 		<DisplayThresholdContainer>

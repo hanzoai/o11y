@@ -2,11 +2,11 @@ import {
 	// eslint-disable-next-line no-restricted-imports
 	createContext,
 	PropsWithChildren,
-	useCallback,
-	// eslint-disable-next-line no-restricted-imports
+	useCallback, // eslint-disable-next-line no-restricted-imports
 	useContext,
 	useMemo,
 	useRef,
+	type JSX,
 } from 'react';
 import type { SeriesVisibilityItem } from 'container/DashboardContainer/visualization/panels/types';
 import { updateSeriesVisibilityToLocalStorage } from 'container/DashboardContainer/visualization/panels/utils/legendVisibilityUtils';

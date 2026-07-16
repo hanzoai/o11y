@@ -7,6 +7,8 @@ import { Blocks, LifeBuoy } from 'components/ui/icons';
 
 import './Header.styles.scss';
 
+import type { JSX } from 'react';
+
 function Header({ type }: { type: IntegrationType }): JSX.Element {
 	return (
 		<div className="cloud-header">

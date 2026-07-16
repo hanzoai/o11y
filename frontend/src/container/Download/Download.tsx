@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { CloudDownload } from 'components/ui/icons';
-import { DropdownMenuSimple, type MenuProps } from 'components/ui/dropdown-menu';
+import {
+	DropdownMenuSimple,
+	type MenuProps,
+} from 'components/ui/dropdown-menu';
 import { Button, Flex } from 'antd';
 import { unparse } from 'papaparse';
 
@@ -8,7 +11,11 @@ import { DownloadProps } from './Download.types';
 
 import './Download.styles.scss';
 
-function Download({ data, isLoading, fileName }: DownloadProps): JSX.Element {
+function Download({
+	data,
+	isLoading = undefined,
+	fileName,
+}: DownloadProps): JSX.Element {
 	const [isDownloading, setIsDownloading] = useState(false);
 
 	const downloadExcelFile = async (): Promise<void> => {
@@ -83,9 +90,5 @@ function Download({ data, isLoading, fileName }: DownloadProps): JSX.Element {
 		</DropdownMenuSimple>
 	);
 }
-
-Download.defaultProps = {
-	isLoading: undefined,
-};
 
 export default Download;

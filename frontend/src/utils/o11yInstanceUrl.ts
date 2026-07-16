@@ -4,9 +4,7 @@ import { LOCALSTORAGE } from 'constants/localStorage';
 import { ENVIRONMENT } from 'constants/env';
 
 export function getO11yInstanceUrl(): string {
-	const fromStorage = getLocalStorageApi(
-		LOCALSTORAGE.ACTIVE_O11Y_INSTANCE_URL,
-	);
+	const fromStorage = getLocalStorageApi(LOCALSTORAGE.ACTIVE_O11Y_INSTANCE_URL);
 
 	if (typeof fromStorage === 'string' && fromStorage.trim().length > 0) {
 		return fromStorage;

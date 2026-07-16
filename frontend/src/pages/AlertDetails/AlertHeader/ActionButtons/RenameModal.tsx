@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, type JSX } from 'react';
 import { Button, Input, InputRef, Modal } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { Check, X } from 'components/ui/icons';

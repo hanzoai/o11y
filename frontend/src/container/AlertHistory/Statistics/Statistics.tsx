@@ -5,6 +5,8 @@ import TopContributorsRenderer from './TopContributorsRenderer/TopContributorsRe
 
 import './Statistics.styles.scss';
 
+import type { JSX } from 'react';
+
 function Statistics({
 	setTotalCurrentTriggers,
 	totalCurrentTriggers,

@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, type JSX } from 'react';
 import { QueryBuilderV2 } from 'components/QueryBuilderV2/QueryBuilderV2';
 import {
 	initialQueriesMap,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, type JSX } from 'react';
 import { Check, ChevronDown, Plus } from 'components/ui/icons';
 import { Button } from 'components/ui/button';
 import { DropdownMenuSimple, type MenuItem } from 'components/ui/dropdown-menu';

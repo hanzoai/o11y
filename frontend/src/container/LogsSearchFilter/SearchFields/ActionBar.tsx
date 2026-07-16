@@ -1,5 +1,7 @@
 import { Button, Row } from 'antd';
 
+import type { JSX } from 'react';
+
 interface SearchFieldsActionBarProps {
 	applyUpdate: VoidFunction;
 	clearFilters: VoidFunction;

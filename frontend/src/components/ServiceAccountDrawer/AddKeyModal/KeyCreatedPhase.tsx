@@ -4,6 +4,8 @@ import { Button } from 'components/ui/button';
 import { Callout } from 'components/ui/callout';
 import type { ServiceaccounttypesGettableFactorAPIKeyWithKeyDTO } from 'api/generated/services/o11y.schemas';
 
+import type { JSX } from 'react';
+
 export interface KeyCreatedPhaseProps {
 	createdKey: ServiceaccounttypesGettableFactorAPIKeyWithKeyDTO;
 	hasCopied: boolean;

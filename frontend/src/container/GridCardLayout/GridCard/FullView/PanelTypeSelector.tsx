@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, type JSX } from 'react';
 import { Select } from 'antd';
 import { Typography } from 'components/ui/typography';
 import { QueryParams } from 'constants/query';
@@ -72,9 +72,5 @@ function PanelTypeSelector({
 		</div>
 	);
 }
-
-PanelTypeSelector.defaultProps = {
-	disabled: false,
-};
 
 export default PanelTypeSelector;

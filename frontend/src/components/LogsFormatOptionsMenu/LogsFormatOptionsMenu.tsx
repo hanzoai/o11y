@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type JSX } from 'react';
 import { Button, InputNumber, Popover, Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
 import cx from 'classnames';

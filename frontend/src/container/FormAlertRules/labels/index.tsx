@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CircleAlert, CircleX } from 'components/ui/icons';
 import { Button, Input, message, Modal } from 'antd';

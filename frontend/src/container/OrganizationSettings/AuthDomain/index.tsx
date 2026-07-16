@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type JSX } from 'react';
 import { Button } from '@hanzo/ui';
 import { Plus, Trash2, X } from 'lucide-react';
 import { toast } from '@hanzo/ui';

@@ -8,6 +8,8 @@ import { requireErrorMessage } from 'utils/form/requireErrorMessage';
 import { InviteMemberFormValues } from '../utils';
 import { SelectDrawer, SpaceContainer, TitleWrapper } from './styles';
 
+import type { JSX } from 'react';
+
 function InviteTeamMembers({ form, onFinish }: Props): JSX.Element {
 	const { t } = useTranslation('organizationsettings');
 

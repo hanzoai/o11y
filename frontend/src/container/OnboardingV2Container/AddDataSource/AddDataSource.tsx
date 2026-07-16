@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { Check, Goal, Search, UserPlus, X } from 'components/ui/icons';
 import {
 	Button,
@@ -198,7 +204,9 @@ function OnboardingAddDataSource(): JSX.Element {
 	const [dataSourceRequestSubmitted, setDataSourceRequestSubmitted] =
 		useState<boolean>(false);
 
-	const handleScrollToStep = (ref: React.RefObject<HTMLDivElement>): void => {
+	const handleScrollToStep = (
+		ref: React.RefObject<HTMLDivElement | null>,
+	): void => {
 		setTimeout(() => {
 			ref.current?.scrollIntoView({
 				behavior: 'smooth',

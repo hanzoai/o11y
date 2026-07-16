@@ -8,6 +8,8 @@ import { useAppContext } from '../../../../providers/App/App';
 import { QueryChipContainer, QueryChipItem } from '../../styles';
 import { IQueryChipProps } from './types';
 
+import type { JSX } from 'react';
+
 function QueryChip({ queryData, onClose }: IQueryChipProps): JSX.Element {
 	const onCloseHandler = (): void => {
 		onClose(queryData.id);

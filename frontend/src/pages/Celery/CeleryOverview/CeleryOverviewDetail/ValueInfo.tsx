@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type JSX } from 'react';
 import { useQueries } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
@@ -28,7 +28,7 @@ import { getQueryPayloadFromWidgetsData } from '../CeleryOverviewUtils';
 import './ValueInfo.styles.scss';
 
 export default function ValueInfo({
-	filters,
+	filters = undefined,
 }: {
 	filters?: TagFilterItem[];
 }): JSX.Element {
@@ -264,7 +264,3 @@ export default function ValueInfo({
 		</Card>
 	);
 }
-
-ValueInfo.defaultProps = {
-	filters: undefined,
-};

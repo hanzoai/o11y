@@ -1,4 +1,10 @@
-import { MouseEventHandler, useCallback, useEffect, useState } from 'react';
+import {
+	MouseEventHandler,
+	useCallback,
+	useEffect,
+	useState,
+	type JSX,
+} from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { connect, useDispatch, useSelector } from 'react-redux';
 import * as Sentry from '@sentry/react';

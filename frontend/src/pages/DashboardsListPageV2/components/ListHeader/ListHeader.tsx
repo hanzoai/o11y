@@ -14,6 +14,8 @@ import type {
 
 import styles from './ListHeader.module.scss';
 
+import type { JSX } from 'react';
+
 interface Props {
 	sortColumn: SortColumn;
 	onSortChange: (column: SortColumn) => void;

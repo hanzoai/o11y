@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState, type JSX } from 'react';
 import { ArrowLeft, Check, Loader, Plus, Search } from 'components/ui/icons';
 import { Button, Input, Spin } from 'antd';
 import cx from 'classnames';

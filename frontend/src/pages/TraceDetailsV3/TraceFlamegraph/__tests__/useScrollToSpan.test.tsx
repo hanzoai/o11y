@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react';
+import type { Dispatch, SetStateAction, JSX } from 'react';
 import { useRef } from 'react';
 import { act, render, waitFor } from '@testing-library/react';
 

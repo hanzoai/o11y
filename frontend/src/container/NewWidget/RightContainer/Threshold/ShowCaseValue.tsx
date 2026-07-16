@@ -5,6 +5,8 @@ import { ShowCaseValueProps } from './types';
 
 import './ShowCaseValue.styles.scss';
 
+import type { JSX } from 'react';
+
 function ShowCaseValue({
 	width,
 	value,

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, type JSX } from 'react';
 import { Divider } from 'components/ui/divider';
 import { Plus, RefreshCw } from 'components/ui/icons';
 import { Button } from 'components/ui/button';

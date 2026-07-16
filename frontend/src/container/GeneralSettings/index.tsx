@@ -13,6 +13,8 @@ import { PayloadProps as GetRetentionPeriodAPIPayloadProps } from 'types/api/set
 
 import GeneralSettingsContainer from './GeneralSettings';
 
+import type { JSX } from 'react';
+
 type TRetentionAPIReturn<T extends TTTLType> = Promise<
 	SuccessResponse<GetRetentionPeriodAPIPayloadProps<T>> | ErrorResponse
 >;

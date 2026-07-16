@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import { useQueryClient } from 'react-query';
 import { Key, LayoutGrid, Plus, Trash2, X } from 'components/ui/icons';
 import { Button } from 'components/ui/button';

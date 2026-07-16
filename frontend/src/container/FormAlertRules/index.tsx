@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	type JSX,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 // eslint-disable-next-line no-restricted-imports
@@ -94,7 +100,7 @@ const ALERT_SETUP_GUIDE_URLS: Record<AlertTypes, string> = {
 };
 
 function FormAlertRules({
-	alertType,
+	alertType = AlertTypes.METRICS_BASED_ALERT,
 	formInstance,
 	initialValue,
 	ruleId,
@@ -454,10 +460,7 @@ function FormAlertRules({
 			return retval;
 		}
 
-		if (
-			!currentQuery.datastore_sql ||
-			currentQuery.datastore_sql.length === 0
-		) {
+		if (!currentQuery.datastore_sql || currentQuery.datastore_sql.length === 0) {
 			notifications.error({
 				message: 'Error',
 				description: t('chquery_required'),
@@ -1020,10 +1023,6 @@ function FormAlertRules({
 		</>
 	);
 }
-
-FormAlertRules.defaultProps = {
-	alertType: AlertTypes.METRICS_BASED_ALERT,
-};
 
 interface FormAlertRuleProps {
 	alertType?: AlertTypes;

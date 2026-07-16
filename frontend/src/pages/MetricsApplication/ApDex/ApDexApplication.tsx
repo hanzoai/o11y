@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { useParams } from 'react-router-dom';
 import { Popover } from 'antd';
 import { IServiceName } from 'container/MetricsApplication/Tabs/types';

@@ -1,6 +1,8 @@
 import TopContributorsRows from './TopContributorsRows';
 import { TopContributorsCardProps } from './types';
 
+import type { JSX } from 'react';
+
 function TopContributorsContent({
 	topContributorsData,
 	totalCurrentTriggers,

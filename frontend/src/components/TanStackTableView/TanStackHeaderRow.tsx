@@ -2,6 +2,7 @@ import type {
 	CSSProperties,
 	MouseEvent as ReactMouseEvent,
 	TouchEvent as ReactTouchEvent,
+	JSX,
 } from 'react';
 import { useCallback, useMemo } from 'react';
 import {

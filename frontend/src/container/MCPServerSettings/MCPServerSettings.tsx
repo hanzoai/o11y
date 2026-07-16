@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import logEvent from 'api/common/logEvent';
 import ROUTES from 'constants/routes';
@@ -123,9 +123,9 @@ function MCPServerSettings(): JSX.Element {
 			<header className="mcp-settings__header">
 				<h1 className="mcp-settings__header-title">O11y MCP Server</h1>
 				<p className="mcp-settings__header-subtitle">
-					Connect AI assistants like Claude, Cursor, VS Code, and Codex to your
-					O11y data via the Model Context Protocol. Authenticate from your MCP
-					client with a service-account API key.
+					Connect AI assistants like Claude, Cursor, VS Code, and Codex to your O11y
+					data via the Model Context Protocol. Authenticate from your MCP client with
+					a service-account API key.
 				</p>
 			</header>
 

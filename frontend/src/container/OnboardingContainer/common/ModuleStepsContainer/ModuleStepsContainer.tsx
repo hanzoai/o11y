@@ -1,4 +1,4 @@
-import React, { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useState, type JSX } from 'react';
 import {
 	ArrowLeft,
 	ArrowRight,

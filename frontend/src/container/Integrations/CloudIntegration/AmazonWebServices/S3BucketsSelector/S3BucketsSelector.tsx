@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { Select, Skeleton } from 'antd';
 import { useListAccounts } from 'api/generated/services/cloudintegration';
 import { INTEGRATION_TYPES } from 'container/Integrations/constants';
@@ -20,7 +20,7 @@ interface S3BucketsSelectorProps {
  * Displays a multi-select input for each region in the active AWS account
  */
 function S3BucketsSelector({
-	onChange,
+	onChange = undefined,
 	initialBucketsByRegion = {},
 	disabled: isSelectorDisabled = false,
 }: S3BucketsSelectorProps): JSX.Element {
@@ -140,10 +140,5 @@ function S3BucketsSelector({
 		</div>
 	);
 }
-
-S3BucketsSelector.defaultProps = {
-	onChange: undefined,
-	initialBucketsByRegion: undefined,
-};
 
 export default S3BucketsSelector;

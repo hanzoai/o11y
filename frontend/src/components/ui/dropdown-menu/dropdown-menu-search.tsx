@@ -3,7 +3,10 @@ import * as React from 'react';
 import { Input, type InputProps } from '../input';
 import { cn } from '../lib/utils';
 
-export type DropdownMenuSearchProps = Omit<InputProps, 'onChange' | 'prefix'> & {
+export type DropdownMenuSearchProps = Omit<
+	InputProps,
+	'onChange' | 'prefix'
+> & {
 	/** Callback fired when the search query changes. */
 	onSearchChange?: (value: string) => void;
 	/** Optional icon to display before the input. */
@@ -21,8 +24,21 @@ const navigationKeys = ['ArrowUp', 'ArrowDown', 'Enter', 'Escape', 'Tab'];
  * A search input for filtering dropdown menu items. Typically placed at the top of the
  * dropdown content.
  */
-const DropdownMenuSearch = React.forwardRef<HTMLInputElement, DropdownMenuSearchProps>(
-	({ className, onSearchChange, onNavigateDown, searchIcon, placeholder = 'Search...', ...props }, ref) => {
+const DropdownMenuSearch = React.forwardRef<
+	HTMLInputElement,
+	DropdownMenuSearchProps
+>(
+	(
+		{
+			className,
+			onSearchChange,
+			onNavigateDown,
+			searchIcon,
+			placeholder = 'Search...',
+			...props
+		},
+		ref,
+	) => {
 		const [value, setValue] = React.useState('');
 
 		const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,7 +48,10 @@ const DropdownMenuSearch = React.forwardRef<HTMLInputElement, DropdownMenuSearch
 		};
 
 		const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-			if ((e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) && onNavigateDown) {
+			if (
+				(e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) &&
+				onNavigateDown
+			) {
 				e.preventDefault();
 				onNavigateDown();
 			} else if (!navigationKeys.includes(e.key)) {
@@ -64,7 +83,7 @@ const DropdownMenuSearch = React.forwardRef<HTMLInputElement, DropdownMenuSearch
 				{input}
 			</div>
 		);
-	}
+	},
 );
 DropdownMenuSearch.displayName = 'DropdownMenuSearch';
 

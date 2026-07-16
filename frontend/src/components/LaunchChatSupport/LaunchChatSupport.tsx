@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { useMutation } from 'react-query';
 import { useLocation } from 'react-router-dom';
 import { Button, Modal, Tooltip } from 'antd';
@@ -175,7 +175,6 @@ function LaunchChatSupport({
 					{buttonText || 'Facing issues?'}
 				</Button>
 			</Tooltip>
-
 			{/* Add Credit Card Modal */}
 			<Modal
 				className="add-credit-card-modal"
@@ -215,13 +214,5 @@ function LaunchChatSupport({
 		</div>
 	) : null;
 }
-
-LaunchChatSupport.defaultProps = {
-	message: '',
-	buttonText: '',
-	className: '',
-	onHoverText: '',
-	chatMessageDisabled: false,
-};
 
 export default LaunchChatSupport;

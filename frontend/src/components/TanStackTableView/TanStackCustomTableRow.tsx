@@ -1,4 +1,4 @@
-import { ComponentProps, memo } from 'react';
+import { ComponentProps, memo, type JSX } from 'react';
 import { TableComponents } from 'react-virtuoso';
 import cx from 'classnames';
 

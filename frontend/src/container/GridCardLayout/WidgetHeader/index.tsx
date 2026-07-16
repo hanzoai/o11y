@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useMemo, useState } from 'react';
+import { ReactNode, useCallback, useMemo, useState, type JSX } from 'react';
 import { UseQueryResult } from 'react-query';
 import { Color } from 'constants/designTokens';
 import { Button, Input, Tooltip } from 'antd';
@@ -70,11 +70,11 @@ function WidgetHeader({
 	title,
 	widget,
 	onView,
-	onDelete,
-	onClone,
+	onDelete = undefined,
+	onClone = undefined,
 	queryResponse,
-	threshold,
-	headerMenuList,
+	threshold = undefined,
+	headerMenuList = [MenuItemKeys.View],
 	isWarning,
 	isFetchingResponse,
 	tableProcessedDataRef,
@@ -335,12 +335,5 @@ function WidgetHeader({
 		</div>
 	);
 }
-
-WidgetHeader.defaultProps = {
-	onDelete: undefined,
-	onClone: undefined,
-	threshold: undefined,
-	headerMenuList: [MenuItemKeys.View],
-};
 
 export default WidgetHeader;

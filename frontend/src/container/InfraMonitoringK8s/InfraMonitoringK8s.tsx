@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type JSX,
+} from 'react';
 import * as Sentry from '@sentry/react';
 import { Button, CollapseProps } from 'antd';
 import { Collapse, Tooltip } from 'antd';

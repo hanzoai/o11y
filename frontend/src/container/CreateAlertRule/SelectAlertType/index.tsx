@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Row } from 'antd';
 import { Badge } from 'components/ui/badge';

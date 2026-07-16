@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { green } from '@ant-design/colors';
@@ -88,7 +88,7 @@ function LogLiveTail({ getLogsAggregate }: Props): JSX.Element {
 	const firstLogsId = useMemo(() => logs[0]?.id, [logs]);
 
 	// This ref depicts thats whether the live tail is played from paused state or not.
-	const liveTailSourceRef = useRef<EventSource>();
+	const liveTailSourceRef = useRef<EventSource>(undefined);
 
 	useEffect(() => {
 		if (liveTail === 'PLAYING') {

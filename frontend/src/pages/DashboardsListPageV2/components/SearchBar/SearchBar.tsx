@@ -1,4 +1,4 @@
-import { ChangeEvent, KeyboardEvent, MouseEvent } from 'react';
+import { ChangeEvent, KeyboardEvent, MouseEvent, type JSX } from 'react';
 import { Input } from 'components/ui/input';
 import { Color } from 'components/ui/design-tokens';
 import { CornerDownLeft, Search } from 'components/ui/icons';

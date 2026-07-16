@@ -5,6 +5,8 @@ import DeleteAction from '../TableActions/DeleteAction';
 import EditAction from '../TableActions/EditAction';
 import PreviewAction from './components/PreviewAction';
 
+import type { JSX } from 'react';
+
 function PipelineActions({
 	pipeline,
 	editAction,

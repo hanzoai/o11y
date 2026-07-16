@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { useQueryClient } from 'react-query';
 import { Redirect, useHistory, useLocation } from 'react-router-dom';
 import { Button } from '@hanzo/ui';

@@ -11,6 +11,8 @@ import { useMessageContext } from '../../MessageContext';
 import blockStyles from '../Block.module.scss';
 import styles from './ConfirmBlock.module.scss';
 
+import type { JSX } from 'react';
+
 export interface ConfirmData {
 	message?: string;
 	/** Text sent back when accepted. Defaults to "Yes, proceed." */

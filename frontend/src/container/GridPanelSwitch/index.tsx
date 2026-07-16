@@ -1,4 +1,4 @@
-import { FC, forwardRef, memo, useMemo } from 'react';
+import { FC, forwardRef, memo, useMemo, type JSX } from 'react';
 import { ToggleGraphProps } from 'components/Graph/types';
 import { getComponentForPanelType } from 'constants/panelTypes';
 import { PANEL_TYPES } from 'constants/queryBuilder';

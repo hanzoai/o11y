@@ -4,6 +4,8 @@ import type { FilterDropdownProps } from 'antd/es/table/interface';
 
 import { SEARCH_PLACEHOLDER } from '../Columns/ColumnContants';
 
+import type { JSX } from 'react';
+
 export const filterDropdown = ({
 	setSelectedKeys,
 	selectedKeys,

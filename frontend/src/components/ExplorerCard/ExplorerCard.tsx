@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import { useCopyToClipboard } from 'react-use';
 import { Button, Col, Popover, Row, Select, Space } from 'antd';
-import { DropdownMenuSimple, type MenuProps } from 'components/ui/dropdown-menu';
+import {
+	DropdownMenuSimple,
+	type MenuProps,
+} from 'components/ui/dropdown-menu';
 import { Typography } from 'components/ui/typography';
 import axios from 'axios';
 import TextToolTip from 'components/TextToolTip';

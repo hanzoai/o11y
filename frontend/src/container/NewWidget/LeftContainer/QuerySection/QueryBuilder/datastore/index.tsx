@@ -7,6 +7,8 @@ import DOCLINKS from 'utils/docLinks';
 import { QueryButton } from '../../styles';
 import DatastoreQueryBuilder from './query';
 
+import type { JSX } from 'react';
+
 function DatastoreQueryContainer(): JSX.Element | null {
 	const { currentQuery, addNewQueryItem } = useQueryBuilder();
 	const addQueryHandler = (): void => {

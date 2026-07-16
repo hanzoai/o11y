@@ -8,6 +8,8 @@ import {
 
 import AttributeActions from '../Attributes/AttributeActions';
 
+import type { JSX } from 'react';
+
 // Mock only Popover from antd to simplify hover/open behavior while keeping other components real
 jest.mock('antd', () => {
 	const actual = jest.requireActual('antd');

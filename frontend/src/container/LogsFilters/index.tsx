@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useState } from 'react';
+import { ChangeEvent, useCallback, useState, type JSX } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 import { CirclePlus, X } from 'components/ui/icons';
@@ -62,7 +62,6 @@ function LogsFilters(): JSX.Element {
 		<Col flex="250px">
 			<Input
 				placeholder="Filter Values"
-				onInput={handleSearch}
 				value={filterValuesInput}
 				onChange={handleSearch}
 			/>

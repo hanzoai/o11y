@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'antd';
 import { Typography } from 'components/ui/typography';
