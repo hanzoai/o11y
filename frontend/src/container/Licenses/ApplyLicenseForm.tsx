@@ -27,9 +27,8 @@ function ApplyLicenseForm({
 
 	const isDisabled = isLoading || !key;
 
-	const onFinish = async (values: unknown | { key: string }): Promise<void> => {
-		const params = values as { key: string };
-		if (params.key === '' || !params.key) {
+	const onFinish = async (values: FormValues): Promise<void> => {
+		if (values.key === '' || !values.key) {
 			notifications.error({
 				message: 'Error',
 				description: t('enter_license_key'),
@@ -40,7 +39,7 @@ function ApplyLicenseForm({
 		setIsLoading(true);
 		try {
 			await apply({
-				key: params.key,
+				key: values.key,
 			});
 			await Promise.all([licenseRefetch()]);
 			notifications.success({
