@@ -1,6 +1,7 @@
 import { memo, PropsWithChildren, ReactElement, type JSX } from 'react';
 import { Drawer } from 'antd';
 import OverlayScrollbar from 'components/OverlayScrollbar/OverlayScrollbar';
+import { ScrollerProps } from 'components/VirtuosoOverlayScrollbar/VirtuosoOverlayScrollbar';
 
 import './SettingsDrawer.styles.scss';
 
@@ -26,7 +27,7 @@ function SettingsDrawer({
 			rootClassName="settings-container-root"
 		>
 			{/* Need to type cast because of OverlayScrollbar type definition. We should be good once we remove it. */}
-			<OverlayScrollbar>{children as ReactElement}</OverlayScrollbar>
+			<OverlayScrollbar>{children as ReactElement<ScrollerProps>}</OverlayScrollbar>
 		</Drawer>
 	);
 }

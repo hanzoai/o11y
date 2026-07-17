@@ -20,10 +20,12 @@ export const getColumnSearchProps = (
 	filterIcon: <Search size={16} />,
 	onFilter: (value: boolean | Key, record: ServicesList): boolean => {
 		if (record[dataIndex]) {
-			record[dataIndex]
-				?.toString()
-				.toLowerCase()
-				.includes(value.toString().toLowerCase());
+			return (
+				record[dataIndex]
+					?.toString()
+					.toLowerCase()
+					.includes(value.toString().toLowerCase()) || false
+			);
 		}
 
 		return false;
