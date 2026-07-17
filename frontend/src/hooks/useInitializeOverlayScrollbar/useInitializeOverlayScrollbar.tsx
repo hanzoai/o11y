@@ -12,11 +12,11 @@ import { useOverlayScrollbars } from 'overlayscrollbars-react';
 const useInitializeOverlayScrollbar = (
 	options: PartialOptions,
 ): {
-	setScroller: Dispatch<SetStateAction<null>>;
+	setScroller: Dispatch<SetStateAction<HTMLElement | null>>;
 	rootRef: RefObject<HTMLDivElement | null>;
 } => {
-	const rootRef = useRef(null);
-	const [scroller, setScroller] = useState(null);
+	const rootRef = useRef<HTMLDivElement>(null);
+	const [scroller, setScroller] = useState<HTMLElement | null>(null);
 	const [initialize, osInstance] = useOverlayScrollbars({
 		defer: true,
 		options,

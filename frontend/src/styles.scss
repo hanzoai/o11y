@@ -5,7 +5,29 @@
 
 @import './styles/tokens/themes/tokens.css';
 
-/* Geist Sans + Geist Mono loaded via CDN in index.html */
+/*
+ * The geist package ships no stylesheet — it exposes only next/font loaders,
+ * which a Vite app cannot use — so the faces are declared here and vite emits
+ * the woff2 locally. Its `exports` map blocks `geist/dist/...`, hence the
+ * relative path. Variable files cover 100-900, mirroring geist/font/sans.
+ */
+@font-face {
+	font-family: 'Geist Sans';
+	src: url('../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2')
+		format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Geist Mono';
+	src: url('../node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2')
+		format('woff2');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
 
 #root,
 html,

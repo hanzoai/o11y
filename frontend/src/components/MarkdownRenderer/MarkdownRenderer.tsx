@@ -91,10 +91,6 @@ const interpolateMarkdown = (
 	return interpolatedContent;
 };
 
-function CustomTag({ color }: { color: string }): JSX.Element {
-	return <h1 style={{ color }}>This is custom element</h1>;
-}
-
 function MarkdownRenderer({
 	markdownContent,
 	variables,
@@ -124,7 +120,6 @@ function MarkdownRenderer({
 						trackCopyAction: !!trackCopyAction,
 					}),
 				code: Code,
-				customtag: CustomTag,
 			}}
 		>
 			{interpolatedMarkdown}
