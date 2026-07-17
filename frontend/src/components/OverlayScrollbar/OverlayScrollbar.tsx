@@ -1,11 +1,13 @@
-import { CSSProperties, ReactElement, useMemo } from 'react';
+import { CSSProperties, ReactElement, useMemo, type JSX } from 'react';
 import TypicalOverlayScrollbar from 'components/TypicalOverlayScrollbar/TypicalOverlayScrollbar';
-import VirtuosoOverlayScrollbar from 'components/VirtuosoOverlayScrollbar/VirtuosoOverlayScrollbar';
+import VirtuosoOverlayScrollbar, {
+	ScrollerProps,
+} from 'components/VirtuosoOverlayScrollbar/VirtuosoOverlayScrollbar';
 import { useIsDarkMode } from 'hooks/useDarkMode';
 import { PartialOptions } from 'overlayscrollbars';
 
 type Props = {
-	children: ReactElement;
+	children: ReactElement<ScrollerProps>;
 	isVirtuoso?: boolean;
 	style?: CSSProperties;
 	options?: PartialOptions;
@@ -16,7 +18,7 @@ function OverlayScrollbar({
 	isVirtuoso = false,
 	style = {},
 	options: customOptions = {},
-}: Props): any {
+}: Props): JSX.Element {
 	const isDarkMode = useIsDarkMode();
 	const options = useMemo(
 		() =>

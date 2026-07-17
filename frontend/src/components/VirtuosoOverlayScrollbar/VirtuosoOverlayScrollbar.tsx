@@ -4,9 +4,14 @@ import { PartialOptions } from 'overlayscrollbars';
 
 import './virtuosoOverlayScrollbar.scss';
 
+/** Props this component injects into its child. */
+export interface ScrollerProps {
+	scrollerRef?: (scroller: HTMLElement | null) => void;
+	'data-overlayscrollbars-initialize'?: boolean;
+}
+
 interface VirtuosoOverlayScrollbarProps {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	children: ReactElement<any>;
+	children: ReactElement<ScrollerProps>;
 	style?: CSSProperties;
 	options: PartialOptions;
 }

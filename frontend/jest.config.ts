@@ -44,7 +44,10 @@ const config: Config.InitialOptions = {
 		'^.+\\.(js|jsx)$': 'babel-jest',
 	},
 	transformIgnorePatterns: [
-		'node_modules/(?!(lodash-es|react-dnd|core-dnd|@react-dnd|dnd-core|react-dnd-html5-backend|axios|@o11yhq/design-tokens|@o11yhq/table|@o11yhq/calendar|@o11yhq/input|@o11yhq/popover|@o11yhq/button|@o11yhq/sonner|@o11yhq/*|date-fns|d3-interpolate|d3-color|api|@codemirror|@lezer|@marijn|@grafana|nuqs)/)',
+		// pnpm's real path is node_modules/.pnpm/<pkg>@<ver>/node_modules/<pkg>/…,
+		// so skip the .pnpm indirection segment and let the allowlist below judge
+		// the inner node_modules/<pkg>/, which is identical in either layout.
+		'node_modules/(?!\\.pnpm/|(lodash-es|react-dnd|core-dnd|@react-dnd|dnd-core|react-dnd-html5-backend|axios|@o11yhq/design-tokens|@o11yhq/table|@o11yhq/calendar|@o11yhq/input|@o11yhq/popover|@o11yhq/button|@o11yhq/sonner|@o11yhq/*|date-fns|d3-interpolate|d3-color|api|@codemirror|@lezer|@marijn|@grafana|nuqs)/)',
 	],
 	setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 	testPathIgnorePatterns: ['/node_modules/', '/public/'],
