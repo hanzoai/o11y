@@ -3,7 +3,7 @@ package datastorereader
 import (
 	"time"
 
-	"github.com/hanzoai/datastore-go/v2"
+	"github.com/hanzo-ds/go"
 )
 
 type Encoding string

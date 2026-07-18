@@ -237,7 +237,7 @@ func DataTypeCollisionHandledFieldName(key *telemetrytypes.TelemetryFieldKey, va
 		// When we format the float it becomes attributes_number['http.status_code'] = 200.000
 		// Which CH gladly accepts and doesn't throw error
 		// However, when passed as query args, the default formatter
-		// (see github.com/hanzoai/datastore-go/v2 bind.go format())
+		// (see github.com/hanzo-ds/go bind.go format())
 		// is used which prepares the
 		// final query as attributes_number['http.status_code'] = 200 giving this error
 		// This following is one way to workaround it
