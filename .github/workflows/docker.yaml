@@ -61,6 +61,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
+          # cmd/community pulls PRIVATE hanzoai forks (sqlite, datastore-go); the
+          # Dockerfile mounts this as secret id `gh_token` and configs
+          # url.insteadOf before `go build`. Without it the build 128s on
+          # `git ls-remote https://github.com/hanzoai/sqlite` (auth required).
+          secrets: |
+            gh_token=${{ secrets.GH_PAT }}
           build-args: |
             VERSION=${{ steps.meta.outputs.version }}
             COMMIT_HASH=${{ github.sha }}
