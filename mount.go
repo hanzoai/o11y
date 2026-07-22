@@ -38,6 +38,9 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	}
 	log.Info("o11y: mounting routes", "prefix", "/v1/o11y")
 
+	// Native probe group, registered ahead of the delegation wildcard so Fiber's
+	// in-order match serves it off the mux tree (see health.go).
+	mountHealth(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
