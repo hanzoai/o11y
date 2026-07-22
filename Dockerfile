@@ -8,9 +8,12 @@
 # and no sibling checkout is required — cloud lives only in the root `mount.go`
 # cloud-embed adapter, which `cmd/community` never pulls in.
 #
-# All external modules in cmd/community's graph are public (hanzoai/* forks of
-# otel-collector, govaluate, clickhouse-go-mock, expr), so the module
-# fetch needs no private git auth — only GOPRIVATE + GOSUMDB=off.
+# cmd/community's graph pulls PRIVATE hanzoai/* forks (hanzoai/sqlite +
+# hanzoai/datastore-go — the sqlite + datastore drivers added by the driver
+# swap), so the module fetch DOES need git auth. A `gh_token` build secret
+# (docker.yaml passes secrets.GH_PAT) is mounted and wired via git
+# url.insteadOf before the build; GOPRIVATE + GOSUMDB=off route hanzoai/*
+# direct and skip the sumdb.
 #
 # The browser SPA is served at the edge by hanzoai/static (house-native static
 # plugin), not bundled here, so the server runs headless (O11Y_WEB_ENABLED=false).
@@ -24,7 +27,8 @@ FROM golang:1.26.4-alpine AS backend
 RUN apk add --no-cache git ca-certificates
 WORKDIR /src
 
-# hanzoai/* modules are fetched via direct git (all public); trust go.sum.
+# hanzoai/* modules fetched via direct git (some private — auth'd by the
+# gh_token secret mounted on the build RUN below); trust go.sum.
 ENV GOPRIVATE=github.com/hanzoai/* \
     GOSUMDB=off \
     CGO_ENABLED=0 \
@@ -46,6 +50,10 @@ ARG VARIANT=community
 # not include cloud.
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=secret,id=gh_token \
+    if [ -s /run/secrets/gh_token ]; then \
+      git config --global url."https://x-access-token:$(cat /run/secrets/gh_token)@github.com/".insteadOf "https://github.com/"; \
+    fi && \
     VERPKG=github.com/hanzoai/o11y/pkg/version && \
     go build -trimpath -tags timetzdata \
       -ldflags "-s -w \
