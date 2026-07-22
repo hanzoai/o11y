@@ -77,10 +77,18 @@ This replaces an unrelated upstream image that previously squatted the tags.
   no cloud sibling is checked out. (Cloud lives only in root `mount.go`, compiled by
   the `go build ./...` CI job — so `ci.yaml` still needs the sibling; the container
   does not.) A bare `go mod download` WOULD fail (cloud→../cloud); build the one pkg.
-- All external deps in its graph are PUBLIC hanzoai/* forks (otel-collector,
-  govaluate, clickhouse-go-mock, expr) → no private git auth, just
-  `GOPRIVATE=github.com/hanzoai/* GOSUMDB=off`. GHCR push uses `GH_PAT || GITHUB_TOKEN`
-  (the package is linked to hanzoai/o11y, so GITHUB_TOKEN+`packages: write` suffices).
+- Its graph pulls **PRIVATE** hanzoai/* forks — `hanzoai/sqlite` and
+  `hanzoai/datastore-go` (the sqlite + datastore drivers added by the driver
+  swap) — alongside the public ones (otel-collector, govaluate,
+  clickhouse-go-mock, expr). So the module fetch DOES need git auth: the
+  Dockerfile mounts a `gh_token` build secret (docker.yaml passes
+  `secrets.GH_PAT`) and wires `git url.insteadOf` before `go build`. Without it
+  the build 128s on `git ls-remote https://github.com/hanzoai/sqlite` ("could
+  not read Username … terminal prompts disabled"). `GOPRIVATE=github.com/hanzoai/*
+  GOSUMDB=off` still route hanzoai/* direct and skip the sumdb. GHCR push uses
+  `GH_PAT || GITHUB_TOKEN` (package linked to hanzoai/o11y, so
+  GITHUB_TOKEN+`packages: write` suffices for the push; GH_PAT is needed for the
+  cross-repo private module fetch).
 - Runs headless: `O11Y_WEB_ENABLED=false`. `routerweb` os.Stat()s its web dir at
   boot and fatals if missing; the SPA is served by hanzoai/static at the edge. The
   `frontend/` tree is NOT bundled — its `pnpm-lock.yaml` is STALE vs `package.json`
