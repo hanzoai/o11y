@@ -278,6 +278,19 @@ func (q *builderQuery[T]) narrowWindowByTraceID(ctx context.Context, fromMS, toM
 		return fromMS, toMS, true, ""
 	}
 
+	// The trace_id predicate may be a bound `$N` variable placeholder rather than an
+	// inline literal — the span views parameterize `trace_id = $N` and carry the real
+	// id in the request Variables map, so ExtractTraceIDsFromFilter (which reads the
+	// expression TEXT) hands back the literal "$N". Resolve those placeholders against
+	// the bound variables before the trace_summary lookup. When a placeholder has no
+	// bound value we cannot key the optimization on a real id, so SKIP the optimization
+	// and let the fully-substituted main query run — never short-circuit to empty on a
+	// literal "$N" that no trace can match.
+	traceIDs, resolved := q.resolveTraceIDVars(traceIDs)
+	if !resolved {
+		return fromMS, toMS, true, ""
+	}
+
 	finder := telemetrytraces.NewTraceTimeRangeFinder(q.telemetryStore)
 	traceStart, traceEnd, exists, err := finder.GetTraceTimeRangeMulti(ctx, traceIDs)
 	if err != nil {
@@ -328,6 +341,65 @@ func (q *builderQuery[T]) narrowWindowByTraceID(ctx context.Context, fromMS, toM
 		slog.Uint64("start", fromMS),
 		slog.Uint64("end", toMS))
 	return fromMS, toMS, true, ""
+}
+
+// resolveTraceIDVars replaces any `$N` / `$name` placeholder among the extracted
+// trace_ids with its bound variable value, mirroring the where-clause visitor's
+// lookup (try the raw token, then the `$`-stripped key). Inline literals (no `$`
+// prefix) pass through unchanged, preserving the fast path. It returns ok=false when
+// a placeholder has no matching variable or a non-scalar/empty value — the signal for
+// the caller to skip the trace_id time-range optimization rather than look up a
+// literal "$N" in trace_summary (which matches nothing and short-circuits to empty).
+func (q *builderQuery[T]) resolveTraceIDVars(traceIDs []string) ([]string, bool) {
+	out := make([]string, 0, len(traceIDs))
+	for _, id := range traceIDs {
+		if !strings.HasPrefix(id, "$") {
+			out = append(out, id)
+			continue
+		}
+		item, ok := q.variables[id]
+		if !ok {
+			item, ok = q.variables[strings.TrimPrefix(id, "$")]
+		}
+		if !ok {
+			return nil, false
+		}
+		vals, ok := traceIDVarStrings(item.Value)
+		if !ok {
+			return nil, false
+		}
+		out = append(out, vals...)
+	}
+	return out, len(out) > 0
+}
+
+// traceIDVarStrings coerces a bound variable value into one or more non-empty
+// trace_id strings. A single string or a homogeneous list of non-empty strings is
+// accepted; anything else (empty string, empty list, non-string element) yields
+// ok=false so the caller skips the optimization instead of keying it on garbage.
+func traceIDVarStrings(v any) ([]string, bool) {
+	switch x := v.(type) {
+	case string:
+		return []string{x}, x != ""
+	case []string:
+		for _, s := range x {
+			if s == "" {
+				return nil, false
+			}
+		}
+		return x, len(x) > 0
+	case []any:
+		out := make([]string, 0, len(x))
+		for _, e := range x {
+			s, ok := e.(string)
+			if !ok || s == "" {
+				return nil, false
+			}
+			out = append(out, s)
+		}
+		return out, len(out) > 0
+	}
+	return nil, false
 }
 
 // emptyResultFor returns an empty result payload appropriate for the given kind.
