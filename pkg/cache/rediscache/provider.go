@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/redis/go-redis/extra/redisotel/v9"
-	"github.com/redis/go-redis/v9"
+	"github.com/hanzokv/go/extra/redisotel/v9"
+	"github.com/hanzokv/go/v9"
 
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/errors"

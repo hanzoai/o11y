@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/types/cachetypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/go-redis/redismock/v9"
+	"github.com/hanzokv/mock/v9"
 	"github.com/stretchr/testify/assert"
 )
 
