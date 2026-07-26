@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hanzokv/go/extra/redisotel/v9"
-	"github.com/hanzokv/go/v9"
+	"github.com/hanzokv/go/extra/kvotel/v9"
+	kv "github.com/hanzokv/go/v9"
 
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/errors"
@@ -18,7 +18,7 @@ import (
 )
 
 type provider struct {
-	client   *redis.Client
+	client   *kv.Client
 	settings factory.ScopedProviderSettings
 }
 
@@ -28,7 +28,7 @@ func NewFactory() factory.ProviderFactory[cache.Cache, cache.Config] {
 
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config cache.Config) (cache.Cache, error) {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/cache/rediscache")
-	client := redis.NewClient(&redis.Options{
+	client := kv.NewClient(&kv.Options{
 		Addr:     strings.Join([]string{config.Redis.Host, fmt.Sprint(config.Redis.Port)}, ":"),
 		Password: config.Redis.Password,
 		DB:       config.Redis.DB,
@@ -38,11 +38,11 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 		return nil, err
 	}
 
-	if err := redisotel.InstrumentTracing(client, redisotel.WithTracerProvider(providerSettings.TracerProvider), redisotel.WithDBStatement(true)); err != nil {
+	if err := kvotel.InstrumentTracing(client, kvotel.WithTracerProvider(providerSettings.TracerProvider), kvotel.WithDBStatement(true)); err != nil {
 		return nil, err
 	}
 
-	if err := redisotel.InstrumentMetrics(client, redisotel.WithMeterProvider(providerSettings.MeterProvider)); err != nil {
+	if err := kvotel.InstrumentMetrics(client, kvotel.WithMeterProvider(providerSettings.MeterProvider)); err != nil {
 		return nil, err
 	}
 
@@ -56,7 +56,7 @@ func (c *provider) Set(ctx context.Context, orgID valuer.UUID, cacheKey string, 
 func (c *provider) Get(ctx context.Context, orgID valuer.UUID, cacheKey string, dest cachetypes.Cacheable) error {
 	err := c.client.Get(ctx, strings.Join([]string{orgID.StringValue(), cacheKey}, "::")).Scan(dest)
 	if err != nil {
-		if errors.Is(err, redis.Nil) {
+		if errors.Is(err, kv.Nil) {
 			return errors.Newf(errors.TypeNotFound, errors.CodeNotFound, "key miss")
 		}
 

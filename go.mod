@@ -30,9 +30,9 @@ require (
 	github.com/hanzoai/govaluate v0.1.0
 	github.com/hanzoai/otel-collector v1.2.0
 	github.com/hanzoai/sqlite v0.3.2
-	github.com/hanzokv/go/extra/redisotel/v9 v9.21.1
-	github.com/hanzokv/go/v9 v9.21.1
-	github.com/hanzokv/mock/v9 v9.2.1
+	github.com/hanzokv/go/extra/kvotel/v9 v9.22.0
+	github.com/hanzokv/go/v9 v9.22.0
+	github.com/hanzokv/mock/v9 v9.2.2
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12
 	github.com/knadh/koanf/parsers/json v1.0.0
 	github.com/knadh/koanf/parsers/yaml v1.1.0
@@ -239,7 +239,6 @@ require (
 	github.com/hanzoai/tasks v1.51.4 // indirect
 	github.com/hanzoai/vfs v0.6.6 // indirect
 	github.com/hanzoai/xorm v1.4.4 // indirect
-	github.com/hanzokv/go/extra/rediscmd/v9 v9.21.1 // indirect
 	github.com/hashicorp/go-metrics v0.5.4 // indirect
 	github.com/henomis/lingoose v0.1.0 // indirect
 	github.com/hhrutter/lzw v1.0.0 // indirect
@@ -438,6 +437,7 @@ require (
 	github.com/hanzo-ds/mock v0.14.4
 	github.com/hanzo-ds/sqlbuilder v1.42.2
 	github.com/hanzo-ds/sqlparser v0.4.16
+	github.com/hanzokv/go/extra/kvcmd/v9 v9.22.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-msgpack/v2 v2.1.5 // indirect

@@ -11,7 +11,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/types/cachetypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/hanzokv/mock/v9"
+	kvmock "github.com/hanzokv/mock/v9"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,7 +42,7 @@ func (cacheable *CacheableA) UnmarshalBinary(data []byte) error {
 }
 
 func TestSet(t *testing.T) {
-	db, mock := redismock.NewClientMock()
+	db, mock := kvmock.NewClientMock()
 	providerSettings := instrumentationtest.New().ToProviderSettings()
 	cache := &provider{client: db, settings: factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/cache/rediscache")}
 
