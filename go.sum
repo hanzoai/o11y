@@ -947,8 +947,12 @@ github.com/hanzoai/search-go v0.36.0 h1:bQfbAs/bc/s3qZDCtSqEAxp48koHkb0Z4ezUknt2
 github.com/hanzoai/search-go v0.36.0/go.mod h1:jdcYUdG6exMfRfJvilWhaNdAR8XWQRPvZtuRxQBzn34=
 github.com/hanzoai/sqlcipher v0.1.0 h1:V9gKG3ZltN2ZCteDrOnXWfOeEe/YDhhUm9AorQEAuBo=
 github.com/hanzoai/sqlcipher v0.1.0/go.mod h1:F0soUYM1i4sawOZUpRvVnWoUayPbeGVlGq01VXy9Aqg=
+github.com/hanzoai/sqlcipher v0.1.1 h1:GARjSiUEa1lwhd1/f87XRaujZBG5s1ZwxrZW2Es/ADI=
+github.com/hanzoai/sqlcipher v0.1.1/go.mod h1:F0soUYM1i4sawOZUpRvVnWoUayPbeGVlGq01VXy9Aqg=
 github.com/hanzoai/sqlite v0.3.2 h1:B/TRunlIDZECEypmr6rHeNyWf37YZXvPJHBDEFMKn/g=
 github.com/hanzoai/sqlite v0.3.2/go.mod h1:a3llsefKbu2Iq/0rJ1mlWCaU2t2cXh+aze85x+oW72k=
+github.com/hanzoai/sqlite v0.4.0 h1:xlF6w6xzn2VSeAVBKFrZfIq0ISqRSTHz2g3QN3eCcnE=
+github.com/hanzoai/sqlite v0.4.0/go.mod h1:sE5uvENQ+q+rI011AwFuAuJ7DwOoDnywyCQstZ0ekHQ=
 github.com/hanzoai/tasks v1.51.4 h1:qMx80ZfiJPQIDd9lpxxJhDywKYnHOmKxL2IfhZfExgk=
 github.com/hanzoai/tasks v1.51.4/go.mod h1:+Oqq+L3nY4uKeLyPanimlbcym/HoIUDaBezgIs6v4Hk=
 github.com/hanzoai/vfs v0.6.6 h1:+4qrHjDOIqgUN1wryU9b5xphDKzTVyBa4CEwbhFSlYw=
