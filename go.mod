@@ -18,7 +18,6 @@ require (
 	github.com/go-openapi/runtime v0.29.2
 	github.com/go-openapi/strfmt v0.26.1
 	github.com/go-playground/validator/v10 v10.30.2
-	github.com/go-redis/redismock/v9 v9.2.0
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/gojek/heimdall/v7 v7.0.3
 	github.com/golang-jwt/jwt/v5 v5.3.1
@@ -31,6 +30,9 @@ require (
 	github.com/hanzoai/govaluate v0.1.0
 	github.com/hanzoai/otel-collector v1.2.0
 	github.com/hanzoai/sqlite v0.3.2
+	github.com/hanzokv/go/extra/redisotel/v9 v9.21.1
+	github.com/hanzokv/go/v9 v9.21.1
+	github.com/hanzokv/mock/v9 v9.2.1
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12
 	github.com/knadh/koanf/parsers/json v1.0.0
 	github.com/knadh/koanf/parsers/yaml v1.1.0
@@ -50,8 +52,6 @@ require (
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/common v0.67.5
 	github.com/prometheus/prometheus v0.311.3
-	github.com/redis/go-redis/extra/redisotel/v9 v9.15.1
-	github.com/redis/go-redis/v9 v9.20.0
 	github.com/rs/cors v1.11.1
 	github.com/samber/lo v1.47.0
 	github.com/segmentio/analytics-go/v3 v3.2.1
@@ -240,6 +240,7 @@ require (
 	github.com/hanzoai/tasks v1.51.4 // indirect
 	github.com/hanzoai/vfs v0.6.6 // indirect
 	github.com/hanzoai/xorm v1.4.4 // indirect
+	github.com/hanzokv/go/extra/rediscmd/v9 v9.21.1 // indirect
 	github.com/hashicorp/go-metrics v0.5.4 // indirect
 	github.com/henomis/lingoose v0.1.0 // indirect
 	github.com/hhrutter/lzw v1.0.0 // indirect
@@ -306,7 +307,6 @@ require (
 	github.com/pkoukk/tiktoken-go v0.1.7 // indirect
 	github.com/prometheus/client_golang/exp v0.0.0-20260325093428-d8591d0db856 // indirect
 	github.com/puzpuzpuz/xsync/v4 v4.4.0 // indirect
-	github.com/redis/go-redis/extra/rediscmd/v9 v9.15.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
@@ -350,6 +350,7 @@ require (
 	github.com/zap-proto/go v1.3.0 // indirect
 	github.com/zap-proto/http v0.2.0 // indirect
 	github.com/zap-proto/md v0.1.0 // indirect
+	github.com/zeebo/xxh3 v1.1.0 // indirect
 	go.mongodb.org/mongo-driver v1.17.9 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
 	go.opentelemetry.io/collector/client v1.54.0 // indirect
