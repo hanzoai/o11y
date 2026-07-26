@@ -29,7 +29,7 @@ require (
 	github.com/hanzoai/cloud v1.801.63
 	github.com/hanzoai/govaluate v0.1.0
 	github.com/hanzoai/otel-collector v1.2.0
-	github.com/hanzoai/sqlite v0.3.2
+	github.com/hanzoai/sqlite v0.4.0
 	github.com/hanzokv/go/extra/kvotel/v9 v9.22.0
 	github.com/hanzokv/go/v9 v9.22.0
 	github.com/hanzokv/mock/v9 v9.2.2
@@ -235,7 +235,7 @@ require (
 	github.com/hanzoai/pdf v1.2.0 // indirect
 	github.com/hanzoai/s3-go v1.0.0 // indirect
 	github.com/hanzoai/search-go v0.36.0 // indirect
-	github.com/hanzoai/sqlcipher v0.1.0 // indirect
+	github.com/hanzoai/sqlcipher v0.1.1 // indirect
 	github.com/hanzoai/tasks v1.51.4 // indirect
 	github.com/hanzoai/vfs v0.6.6 // indirect
 	github.com/hanzoai/xorm v1.4.4 // indirect
