@@ -359,6 +359,12 @@ func (v *filterExpressionVisitor) VisitPrimary(ctx *grammar.PrimaryContext) any 
 				v.errors = append(v.errors, fmt.Sprintf("unsupported value type: %s", valCtx.GetText()))
 				return ErrorConditionLiteral
 			}
+		} else {
+			// Neither a key nor a value: searchText would stay empty and the
+			// full-text condition below would match everything. Report it
+			// instead, like the unsupported-value case above.
+			v.errors = append(v.errors, fmt.Sprintf("unsupported full text search term: %s", ctx.GetText()))
+			return ErrorConditionLiteral
 		}
 		cond, err := v.conditionBuilder.ConditionFor(context.Background(), v.startNs, v.endNs, v.fullTextColumn, qbtypes.FilterOperatorRegexp, FormatFullTextSearch(searchText), v.builder)
 		if err != nil {
