@@ -1,0 +1,12 @@
+o11y
+Copyright (c) 2026 Hanzo AI, Inc.
+
+This product includes software from SigNoz (https://github.com/SigNoz/signoz),
+licensed under the MIT Expat license:
+
+    Copyright (c) 2020-present SigNoz Inc.
+
+Only the MIT Expat-licensed portions of SigNoz are used here. SigNoz's
+source-available "ee/" and "cmd/enterprise/" code (governed by the separate,
+non-OSS SigNoz Enterprise License) is NOT included in this repository and is
+never redistributed.

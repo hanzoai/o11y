@@ -1,0 +1,75 @@
+import { useParams } from 'react-router-dom';
+import { Typography } from 'antd';
+import BrandMark from 'components/BrandMark';
+import { useGetPublicDashboardData } from 'hooks/dashboard/useGetPublicDashboardData';
+import { Frown } from 'components/ui/icons';
+
+import o11yBrandLogoUrl from '@/assets/Logos/o11y-brand-logo.svg';
+
+import PublicDashboardContainer from '../../container/PublicDashboardContainer';
+
+import './PublicDashboard.styles.scss';
+
+function PublicDashboardPage(): JSX.Element {
+	// read the dashboard id from the url
+	const { dashboardId } = useParams<{ dashboardId: string }>();
+
+	const {
+		data: publicDashboardData,
+		isLoading: isLoadingPublicDashboardData,
+		isFetching: isFetchingPublicDashboardData,
+		isError: isErrorPublicDashboardData,
+	} = useGetPublicDashboardData(dashboardId || '');
+
+	const isLoading =
+		isLoadingPublicDashboardData || isFetchingPublicDashboardData;
+
+	const isError = isErrorPublicDashboardData;
+
+	return (
+		<div className="public-dashboard-page">
+			{publicDashboardData && (
+				<PublicDashboardContainer
+					publicDashboardId={dashboardId}
+					publicDashboardData={publicDashboardData}
+				/>
+			)}
+
+			{isError && !isLoading && (
+				<div className="public-dashboard-error-container">
+					<div className="perilin-bg" />
+
+					<div className="public-dashboard-error-content-header">
+						<div className="brand">
+							<BrandMark size={32} />
+						</div>
+
+						<div className="brand-tagline">
+							<Typography.Text>
+								OpenTelemetry-Native Logs, Metrics and Traces in a single pane
+							</Typography.Text>
+						</div>
+					</div>
+
+					<div className="public-dashboard-error-content">
+						<Typography.Title
+							level={4}
+							className="public-dashboard-error-message-icon"
+						>
+							<Frown size={36} />
+						</Typography.Title>
+						<Typography.Title level={4} className="public-dashboard-error-message">
+							The public dashboard you are looking for does not exist or has been
+							unpublished.
+						</Typography.Title>
+						<Typography.Text className="public-dashboard-error-message-description">
+							Please reach out to the owner of the dashboard to get access.
+						</Typography.Text>
+					</div>
+				</div>
+			)}
+		</div>
+	);
+}
+
+export default PublicDashboardPage;
