@@ -25,7 +25,7 @@ processors:
     send_batch_size: 1000
     timeout: 10s
   o11yspanmetrics/cumulative:
-    metrics_exporter: clickhousemetricswrite
+    metrics_exporter: datastoremetricswrite
     latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 50ms, 100ms, 250ms, 500ms, 1000ms, 1400ms, 2000ms, 5s, 10s, 20s, 40s, 60s ]
     dimensions_cache_size: 10000
     dimensions:
@@ -51,10 +51,10 @@ processors:
 extensions:
   zpages: {}
 exporters:
-  clickhousetraces:
+  datastoretraces:
     datasource: tcp://localhost:9000/o11y_traces
-    migrations: exporter/clickhousetracesexporter/migrations
-  clickhousemetricswrite:
+    migrations: exporter/datastoretracesexporter/migrations
+  datastoremetricswrite:
     endpoint: tcp://localhost:9000/o11y_metrics
     resource_to_telemetry_conversion:
       enabled: true
@@ -66,11 +66,11 @@ service:
     traces:
       receivers: [jaeger, otlp]
       processors: [o11yspanmetrics/cumulative, batch]
-      exporters: [clickhousetraces]
+      exporters: [datastoretraces]
     metrics:
       receivers: [otlp, hostmetrics]
       processors: [batch]
-      exporters: [clickhousemetricswrite]
+      exporters: [datastoremetricswrite]
     metrics/spanmetrics:
       receivers: [otlp/spanmetrics]
       exporters: [prometheus]
