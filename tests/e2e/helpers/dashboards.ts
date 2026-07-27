@@ -199,7 +199,7 @@ function seederUrl(): string {
 
 /**
  * POST a batch of metrics into the seeder. The seeder writes them directly
- * into ClickHouse, bypassing the OTLP collector. Use this for tests that need
+ * into the datastore, bypassing the OTLP collector. Use this for tests that need
  * panel queries to return non-empty results.
  */
 export async function seedMetricsViaSeeder(
@@ -218,7 +218,7 @@ export async function seedMetricsViaSeeder(
 }
 
 /**
- * Truncate the metrics tables in ClickHouse via the seeder. Use in
+ * Truncate the metrics tables in the datastore via the seeder. Use in
  * `afterAll` for tests that mutate global telemetry state — the bootstrap
  * stack is shared across specs, so leftover seeded rows could affect
  * neighbouring suites.
