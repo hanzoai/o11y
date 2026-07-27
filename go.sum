@@ -614,6 +614,8 @@ github.com/hanzoai/builder v0.3.13 h1:tAOJ+0Q0xrrovk7lkvaZxuKZ4lqENIB6tE0Rr9+6Bo
 github.com/hanzoai/builder v0.3.13/go.mod h1:TWZaiP0Y9tCMwtLH2EvQqBAeT1f3aJI5Y0XPM8S0wcE=
 github.com/hanzoai/commerce v1.49.24 h1:JtS6we7E6amB7C4elqZ/OXUcXGBo0S1uzN9X8J/rDJs=
 github.com/hanzoai/commerce v1.49.24/go.mod h1:0E+PK5bnwGF5y+HD+ZzqUWSpYIFvmoCdCibBIy0uWQA=
+github.com/hanzoai/commerce v1.49.25 h1:iPD33VF//7pMscTW3u1W0sL2ssNJSOuEGq514zjgtm8=
+github.com/hanzoai/commerce v1.49.25/go.mod h1:Bf3GqSiOwReC3vzK9Auqn4W5FfLQcwuAnb67Iv0mu4M=
 github.com/hanzoai/csqlite v0.1.0 h1:suwC3dh0INlfP/U0Es6cDf6JNQ+2+GVLLATPWCUux6k=
 github.com/hanzoai/csqlite v0.1.0/go.mod h1:H31a/O6VXuklR9UBkgY++bmAK5uzVfXPqU0F6P9Wsos=
 github.com/hanzoai/dbx v1.17.2 h1:EBADhGuOMxCsc4eHj5cJmtE9c7tSKaviyl8URx31NOQ=
@@ -630,6 +632,8 @@ github.com/hanzoai/ha v0.1.1 h1:FyiD6mRAdAKbPRlzSqOWujvDG/O9OgZ3CHvqO+XRfsY=
 github.com/hanzoai/ha v0.1.1/go.mod h1:7G+gwkCWNpVsioNpKpK+x6ECoUYY2N/m/rlgPbxCqrA=
 github.com/hanzoai/iam v1.33.23 h1:vQJB7GUgatkHrfo4hkNYmUbgzt3pZ+y1vIpNZTxt7S4=
 github.com/hanzoai/iam v1.33.23/go.mod h1:DvgQCfM+NaKIhNIeA2/zufQTyggd6kLAtmmaqAOFNxM=
+github.com/hanzoai/iam v1.33.26 h1:eHLxHkF2t334stYkDT2LB24G0cIDKk1qzPMc5v7Omoo=
+github.com/hanzoai/iam v1.33.26/go.mod h1:6g87Dqj9qEt8WBjuXqGs6tqdal72W4Ghyj03bbZahx8=
 github.com/hanzoai/money v0.2.1 h1:w2Fi2aP9bBYY+Zk1jyYfCOT3QhaswGzXQUmoZIjwIHM=
 github.com/hanzoai/money v0.2.1/go.mod h1:A8BJJ7CFalMMv+gyJm0gUMGfxg3zpygXgfb2WeRzStY=
 github.com/hanzoai/orm v0.6.16 h1:w3UXH65huahNJ8RgC88ffUeicAbHoUpQW8oLuDCojK8=
@@ -838,6 +842,8 @@ github.com/luxfi/concurrent v0.1.1 h1:LkAmNXybOsAm97nFILqMDBp/YLgleuLmyGomFT7YNx
 github.com/luxfi/concurrent v0.1.1/go.mod h1:GlkfiJtPBpatNxvROf7hkPi4gsnmdHGmqhDnVWFrkZE=
 github.com/luxfi/consensus v1.36.9 h1:un4iRecrXQqePGEtVNJO4uc76n4GhxOeq+YAaoQB0TE=
 github.com/luxfi/consensus v1.36.9/go.mod h1:iwlx11D7BRdEaUqyUvueAe2Fit1K1k26avBK2eLYdnc=
+github.com/luxfi/consensus v1.36.11 h1:cc+O6TnvDNzCljR1E73SZ9I2ETQU3nE5UK8xzAoQdUE=
+github.com/luxfi/consensus v1.36.11/go.mod h1:mCtA6k31FVW/H6rsYQ7V8VvS198WsFS8oFo/z3IMI+A=
 github.com/luxfi/constants v1.6.2 h1:pXHdKIFbfE9qX4xOjq2LxYvagNhhNvspUVEbPcIEKfA=
 github.com/luxfi/constants v1.6.2/go.mod h1:r0oH8C/+r/XFYBq1AJxt6zWRKKRKgDzrEMop/CCs9rI=
 github.com/luxfi/container v0.2.1 h1:MTnfKXzS5+oxV5jKZerdOxSA6iMPaQI9/FWGufizzaw=
@@ -1275,6 +1281,8 @@ github.com/zap-proto/zap2pb v0.2.0 h1:sos6HnayhGMGLRO54px1InzimDzTZ2o5TSMEatYBjz
 github.com/zap-proto/zap2pb v0.2.0/go.mod h1:wD97Z2VTPabDq/4AMNL++PWnQ0YwEtajiuNkLGg3/18=
 github.com/zap-proto/zip v1.10.0 h1:0Swzr+SNr+4VeO8pUw+Umdkh3z/lnD0hJ4N1kObdP60=
 github.com/zap-proto/zip v1.10.0/go.mod h1:9R3FOq2ItZa7G+9QilsB/punEpVSHtdXiQji0P84LSE=
+github.com/zap-proto/zip v1.12.0 h1:6naF1jZQIno9rx7AvTdX94x6qmS0Sg8SFDJ48BiXdyE=
+github.com/zap-proto/zip v1.12.0/go.mod h1:9R3FOq2ItZa7G+9QilsB/punEpVSHtdXiQji0P84LSE=
 github.com/zeebo/xxh3 v1.1.0 h1:s7DLGDK45Dyfg7++yxI0khrfwq9661w9EN78eP/UZVs=
 github.com/zeebo/xxh3 v1.1.0/go.mod h1:IisAie1LELR4xhVinxWS5+zf1lA4p0MW4T+w+W07F5s=
 go.etcd.io/etcd/api/v3 v3.5.4/go.mod h1:5GB2vv4A4AOn3yk7MftYGHkUfGtDHnEraIjym4dYz5A=

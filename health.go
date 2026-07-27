@@ -77,6 +77,6 @@ func probe(sel func(factory.Handler) http.HandlerFunc) zip.Handler {
 		if h == nil {
 			return c.Next()
 		}
-		return zip.AdaptNetHTTPFunc(sel(h))(c)
+		return zip.AdaptNetHTTP(sel(h))(c)
 	}
 }
