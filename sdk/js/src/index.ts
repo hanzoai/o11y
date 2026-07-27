@@ -1,10 +1,12 @@
-import { connect, type Socket } from 'node:net'
 import { randomBytes } from 'node:crypto'
 
-import { encodeSpanBatch, type Span, type SpanBatch, type SpanEvent } from './wire.js'
+import { dial, type Peer } from './transport.js'
+import { encodeSpanBatch, type Span, type SpanBatch } from './wire.js'
 
 export { encodeSpanBatch, MSG_SPAN_BATCH } from './wire.js'
 export type { Span, SpanBatch, SpanEvent } from './wire.js'
+export { dial } from './transport.js'
+export type { Peer } from './transport.js'
 
 export interface O11yOptions {
   /** Service name recorded on every span. */
@@ -19,6 +21,8 @@ export interface O11yOptions {
   batchSize?: number
   /** Flush at least this often, in milliseconds. */
   flushIntervalMs?: number
+  /** Our node ID in the ZAP handshake. Defaults to the app name. */
+  nodeID?: string
 }
 
 /** A span in progress. Ending it queues it for export. */
@@ -42,10 +46,10 @@ const hex = (bytes: number): string => randomBytes(bytes).toString('hex')
  * only work at export time is JSON plus a frame.
  */
 export class O11y {
-  private readonly opts: Required<Omit<O11yOptions, 'resource' | 'version'>> &
-    Pick<O11yOptions, 'resource' | 'version'>
+  private readonly opts: O11yOptions &
+    Required<Pick<O11yOptions, 'host' | 'port' | 'batchSize' | 'flushIntervalMs'>>
   private queue: Span[] = []
-  private socket: Socket | null = null
+  private peer: Peer | null = null
   private timer: NodeJS.Timeout | null = null
   private closed = false
 
@@ -123,36 +127,19 @@ export class O11y {
     }
   }
 
-  /**
-   * TODO(transport): the collector is a ZAP node — the Go emitter reaches it
-   * with node.ConnectDirect() and sends to the resolved peer. @zap-proto/zap
-   * 1.6.0 exports no node/peer layer, so this writes a correct frame onto a
-   * bare socket and the receiver decodes nothing. Swap for a peer send once
-   * the TS runtime has one; the frame itself is already right.
-   */
   private async send(frame: Uint8Array): Promise<void> {
-    const socket = await this.connect()
-    await new Promise<void>((resolve, reject) => {
-      socket.write(frame, (err) => (err ? reject(err) : resolve()))
-    })
+    const peer = await this.peerConn()
+    await peer.send(frame)
   }
 
-  private connect(): Promise<Socket> {
-    if (this.socket && !this.socket.destroyed) return Promise.resolve(this.socket)
-    return new Promise((resolve, reject) => {
-      const socket = connect({ host: this.opts.host, port: this.opts.port })
-      socket.unref()
-      socket.once('connect', () => {
-        this.socket = socket
-        resolve(socket)
-      })
-      socket.once('error', (err) => {
-        // Drop the handle so the next flush dials again rather than writing
-        // into a socket that will never deliver.
-        if (this.socket === socket) this.socket = null
-        reject(err)
-      })
+  private async peerConn(): Promise<Peer> {
+    if (this.peer && !this.peer.closed) return this.peer
+    this.peer = await dial({
+      host: this.opts.host,
+      port: this.opts.port,
+      nodeID: this.opts.nodeID ?? this.opts.appName,
     })
+    return this.peer
   }
 
   /** Flush what is queued and stop. The instance is unusable afterwards. */
@@ -166,7 +153,7 @@ export class O11y {
     this.closed = false
     await this.flush()
     this.closed = true
-    this.socket?.end()
-    this.socket = null
+    this.peer?.close()
+    this.peer = null
   }
 }
