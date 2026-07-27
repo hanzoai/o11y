@@ -1,5 +1,6 @@
 {
-  "name": "@hanzo/o11y",
+  "name": "o11y-frontend",
+  "private": true,
   "version": "1.0.0",
   "description": "Hanzo o11y frontend — unified observability for metrics, traces, and logs.",
   "type": "module",
