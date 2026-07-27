@@ -163,6 +163,13 @@ func (m *module) RotateProjectKey(ctx context.Context, orgID, id valuer.UUID) (*
 	return m.gettable(p), nil
 }
 
+// DeleteProject removes the project, org-scoped. Once gone, ResolveIngest can no
+// longer map its id to a tenant, so its DSN fails closed exactly like an unknown
+// one — no separate revocation step. Retained events are untouched by design.
+func (m *module) DeleteProject(ctx context.Context, orgID, id valuer.UUID) error {
+	return m.projects.Delete(ctx, orgID, id)
+}
+
 // gettable derives the project's current DSN (never stored) and returns the API view.
 func (m *module) gettable(p *sentrytypes.Project) *sentrytypes.GettableProject {
 	dsn := ""

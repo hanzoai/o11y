@@ -202,6 +202,26 @@ func (h *handler) RotateProjectKey(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusOK, p)
 }
 
+func (h *handler) DeleteProject(rw http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), writeTimeout)
+	defer cancel()
+	orgID, err := orgFromContext(ctx)
+	if err != nil {
+		render.Error(rw, err)
+		return
+	}
+	id, err := idFromPath(r)
+	if err != nil {
+		render.Error(rw, err)
+		return
+	}
+	if err := h.module.DeleteProject(ctx, orgID, id); err != nil {
+		render.Error(rw, err)
+		return
+	}
+	render.Success(rw, http.StatusNoContent, nil)
+}
+
 // --- issues ---
 
 func (h *handler) ListIssues(rw http.ResponseWriter, r *http.Request) {
