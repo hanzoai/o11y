@@ -6,7 +6,6 @@ require (
 	dario.cat/mergo v1.0.2
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/antlr4-go/antlr/v4 v4.13.1
-	github.com/antonmedv/expr v1.15.3
 	github.com/bytedance/sonic v1.15.2
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/coreos/go-oidc/v3 v3.17.0
@@ -117,6 +116,7 @@ require (
 	github.com/aliyun/alibabacloud-oss-go-sdk-v2 v1.3.0 // indirect
 	github.com/aliyun/credentials-go v1.4.7 // indirect
 	github.com/anthropics/anthropic-sdk-go v1.4.0 // indirect
+	github.com/antonmedv/expr v1.15.3 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.41.5 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.8 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.32.14 // indirect
