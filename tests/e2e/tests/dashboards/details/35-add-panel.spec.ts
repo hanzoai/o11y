@@ -12,7 +12,7 @@ import {
 //   2. A panel created from the dialog actually lands on the canvas and
 //      survives a hard reload (the dashboard's persistence contract).
 //
-// Editor-internal behaviour (Query Builder vs ClickHouse tab, Panel Settings,
+// Editor-internal behaviour (Query Builder vs Datastore tab, Panel Settings,
 // y-axis units, panel-type changes, etc.) belongs in a separate panel-editor
 // spec — do NOT add those here.
 

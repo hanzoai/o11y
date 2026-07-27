@@ -9,7 +9,7 @@ import {
 // This file's scope is intentionally narrow: prove that the detail page's
 // "Edit panel" entry-point lands the user in the panel editor at
 // `/dashboard/:id/new?widgetId=…`. Editor-internal behaviour (Query Builder
-// pre-population, ClickHouse tab, Panel Settings rename, query-edit + revert,
+// pre-population, Datastore tab, Panel Settings rename, query-edit + revert,
 // y-axis units, panel-type changes, etc.) is the responsibility of a separate
 // panel-editor spec — keep this file as the dashboard-side seam only.
 
