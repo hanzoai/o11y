@@ -2,7 +2,7 @@
   "name": "o11y-frontend",
   "private": true,
   "version": "1.0.0",
-  "description": "Hanzo o11y frontend — unified observability for metrics, traces, and logs.",
+  "description": "Hanzo o11y frontend \u2014 unified observability for metrics, traces, and logs.",
   "type": "module",
   "packageManager": "pnpm@10.33.4",
   "scripts": {
@@ -109,6 +109,7 @@
     "js-base64": "^3.7.2",
     "lodash-es": "^4.17.21",
     "lucide-react": "0.498.0",
+    "monaco-editor": "0.55.1",
     "motion": "12.4.13",
     "nuqs": "2.8.8",
     "overlayscrollbars": "^2.8.1",
