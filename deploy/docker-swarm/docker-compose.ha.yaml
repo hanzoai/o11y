@@ -11,7 +11,7 @@ x-common: &common
       max-file: "3"
 x-clickhouse-defaults: &clickhouse-defaults
   !!merge <<: *common
-  image: ghcr.io/hanzoai/datastore:25.5.6
+  image: ghcr.io/hanzoai/datastore:26.6.1.1
   tty: true
   deploy:
     labels:
@@ -64,7 +64,7 @@ x-db-depend: &db-depend
 services:
   init-clickhouse:
     !!merge <<: *common
-    image: ghcr.io/hanzoai/datastore:25.5.6
+    image: ghcr.io/hanzoai/datastore:26.6.1.1
     command:
       - bash
       - -c

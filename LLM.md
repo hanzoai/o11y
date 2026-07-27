@@ -7,7 +7,7 @@
     <br>Hanzo O11y
 </h1>
 
-Hanzo's observability spine — OTLP in, Hanzo Datastore (ClickHouse OLAP) on disk,
+Hanzo's observability spine — OTLP in, Hanzo Datastore (columnar OLAP) on disk,
 serving o11y.hanzo.ai. A clean full fork of **latest O11y** (synced to upstream
 `main`), building green (`go build ./...` = 0), MIT-only (no `ee/`).
 
@@ -19,7 +19,7 @@ consumed as upstream-branded modules. Do NOT reintroduce `github.com/SigNoz/*`.
 | upstream | fork | tag pinned | fork module path |
 |---|---|---|---|
 | SigNoz/signoz-otel-collector | hanzoai/otel-collector | v0.144.7 | `github.com/hanzoai/otel-collector` (renamed) |
-| SigNoz/clickhouse-go-mock | hanzoai/clickhouse-go-mock | v0.14.1 | `github.com/hanzoai/clickhouse-go-mock` (renamed) |
+| SigNoz/clickhouse-go-mock | hanzo-ds/mock | v0.14.4 | `github.com/hanzo-ds/mock` (renamed) |
 | SigNoz/govaluate | hanzoai/govaluate | v0.1.0 | `github.com/hanzoai/govaluate` (renamed) |
 | SigNoz/expr | hanzoai/expr | v1.17.8 | `github.com/expr-lang/expr` (KEEP upstream path — consumed via `replace`) |
 | SigNoz/signoz | hanzoai/o11y | synced to upstream `main` (3e6339019) | owned base; `pkg/ cmd/` re-synced wholesale to latest, `ee/` stripped (MIT-only) |
@@ -77,10 +77,10 @@ This replaces an unrelated upstream image that previously squatted the tags.
   no cloud sibling is checked out. (Cloud lives only in root `mount.go`, compiled by
   the `go build ./...` CI job — so `ci.yaml` still needs the sibling; the container
   does not.) A bare `go mod download` WOULD fail (cloud→../cloud); build the one pkg.
-- Its graph pulls **PRIVATE** hanzoai/* forks — `hanzoai/sqlite` and
-  `hanzoai/datastore-go` (the sqlite + datastore drivers added by the driver
-  swap) — alongside the public ones (otel-collector, govaluate,
-  clickhouse-go-mock, expr). So the module fetch DOES need git auth: the
+- Its graph pulls **PRIVATE** forks — `hanzoai/sqlite` and `hanzo-ds/go` (the
+  sqlite + datastore drivers added by the driver swap) — alongside the public
+  ones (otel-collector, govaluate, hanzo-ds/mock, expr). So the module fetch
+  DOES need git auth: the
   Dockerfile mounts a `gh_token` build secret (docker.yaml passes
   `secrets.GH_PAT`) and wires `git url.insteadOf` before `go build`. Without it
   the build 128s on `git ls-remote https://github.com/hanzoai/sqlite` ("could
@@ -94,7 +94,7 @@ This replaces an unrelated upstream image that previously squatted the tags.
   `frontend/` tree is NOT bundled — its `pnpm-lock.yaml` is STALE vs `package.json`
   (mid rolldown-vite/oxlint migration), fails `--frozen-lockfile`. TODO: regen lockfile.
 - Listens on `0.0.0.0:8080` (constants.HTTPHostPort); sqlstore default = sqlite at
-  `/var/lib/o11y/o11y.db`; needs an external ClickHouse for telemetry.
+  `/var/lib/o11y/o11y.db`; needs an external Datastore for telemetry.
 
 Boot fix: `pkg/instrumentation/sdk.go` hard-pinned `semconv/v1.40.0.SchemaURL`,
 which contrib `NewSDK` merges against `resource.Default()` (schema 1.41.0, from the
@@ -155,7 +155,7 @@ sharder is `noop` (owns all org keys), so dynamically-provisioned tenants pass t
 identn middleware's `IsMyOwnedKey` check — do **not** switch to `singlesharder`
 (it owns one org key and would 403 every other tenant). Multi-tenancy: SQL-stored
 data (llmobs observations/scores/sessions, dashboards, …) is scoped by
-`claims.OrgID`; ClickHouse telemetry is isolated only insofar as the emit path tags
+`claims.OrgID`; Datastore telemetry is isolated only insofar as the emit path tags
 the same org id via resource attributes.
 
 ## No third-party trackers — analytics is Insights, support chat is Hanzo Chat
@@ -185,20 +185,20 @@ repo's own `o11y/no-raw-absolute-path` lint rule mandates over a bare `window.op
 `noopener`: `window.open`, unlike `<a target="_blank">`, does not imply it, and without
 it every opened tab can navigate us back via `window.opener` (reverse tabnabbing).
 
-## Config env naming (debranded — no O11Y/CLICKHOUSE)
+## Config env naming (Hanzo-branded operator surface)
 
-Operator-facing env vars and config keys are Hanzo-branded, never SigNoz/ClickHouse.
-Naming-only: the store is still ClickHouse wire-protocol under the hood — the
-`clickhouse-go` driver, `db.system=clickhouse` semconv, and the `clickhouse`
-telemetrystore provider registration all stay (implementation, not surface).
+Operator-facing env vars and config keys are Hanzo-branded. What stays untouched is
+the wire surface — the native protocol on 9000, the SQL dialect, and the on-disk
+table names. Those are interop identifiers other tools match on, not naming surface.
 
 - **Env prefix `O11Y_`** (was `O11Y_`): set once at `pkg/config/envprovider/provider.go`
   (`prefix`). The koanf env provider derives every structured key from it. Single `_`
   is the `::` path delimiter, double `__` is a literal `_`.
-- **Store key segment `datastore`** (was `clickhouse`): the `mapstructure` tag on
-  `telemetrystore.Config.Clickhouse` is `datastore` (the Go field/type keep the
-  `Clickhouse` name — internal). YAML key `telemetrystore.datastore`. Provider
-  selector value stays `clickhouse`.
+- **Store key segment `datastore`** (was `clickhouse`): `telemetrystore.Config.Datastore`
+  carries the `mapstructure:"datastore"` tag. YAML key `telemetrystore.datastore`.
+  Provider selector value is `datastore` (`MustNewName("datastore")` in
+  `pkg/telemetrystore/datastoretelemetrystore`); the store accessor is
+  `TelemetryStore.Datastore() datastore.Conn`.
 - **Canonical DSN key `O11Y_DATASTORE_DSN`** (flat — THE operator knob): wired as an
   override alias in `pkg/o11y/config.go` (`mergeAndEnsureBackwardCompatibility`),
   mapping into `telemetrystore.datastore.dsn`. Value → Hanzo Datastore
@@ -209,24 +209,27 @@ telemetrystore provider registration all stay (implementation, not surface).
 - **Legacy override aliases** in `pkg/o11y/config.go` (`mergeAndEnsureBackwardCompatibility`)
   debranded too: `O11Y_LOCAL_DB_PATH`, `DatastoreUrl`, `O11Y_SAAS_SEGMENT_KEY`,
   `O11Y_JWT_SECRET`; and headless web via `O11Y_WEB_ENABLED` / `O11Y_WEB_DIRECTORY`.
-- **Deliberately NOT renamed** (implementation / not app-config surface): the `clickhouse`
-  provider value + `MustNewName("clickhouse")` registration, `clickhouse-go` driver + mock,
-  SQL/table/DB names (`o11y_traces` etc.) and query-template vars
-  (`O11Y_START_TIME`/`O11Y_END_TIME`), the ClickHouse **server** container in `deploy/`
-  (service/volume names, its own `CLICKHOUSE_SKIP_USER_SETUP` env), the `O11Y_E2E_*`
-  Playwright test-harness vars (separate `tests/e2e` subsystem). The
-  `O11Y_OTEL_COLLECTOR_DATASTORE_*` keys in `deploy/` are consumed by the
-  `hanzoai/otel-collector` fork — renamed here for consistency; that fork must
-  accept the `_DATASTORE_` segment (coordinated cross-repo rename).
+- **Deliberately NOT renamed** (implementation / not app-config surface): SQL/table/DB
+  names (`o11y_traces` etc.) and query-template vars
+  (`O11Y_START_TIME`/`O11Y_END_TIME`), the datastore **server** container in `deploy/`
+  (service/volume names, and `CLICKHOUSE_SKIP_USER_SETUP` — the pinned server image's
+  own entrypoint reads that name, so renaming it here would leave the container reading
+  an unset value), the `O11Y_E2E_*` Playwright test-harness vars (separate `tests/e2e`
+  subsystem), and the `clickhouse` builtin-integration id, which identifies the
+  third-party ClickHouse deployments users point o11y at and keys the
+  `088_migrate_ii_dashboards` dashboards. The `O11Y_OTEL_COLLECTOR_DATASTORE_*` keys in
+  `deploy/` are consumed by the `hanzoai/otel-collector` fork, whose exporters are
+  `o11ydatastoremetrics`, `o11ydatastoremeter`, `datastorelogsexporter` and
+  `datastoretracesexporter`.
 
 ## Native datastore metrics driver (`pkg/datastoremetrics`) — the fork unblock
 
 - **What**: the o11y-native write path for metrics. `Writer.WriteMetrics` satisfies
   `zapmetricreceiver.Handler`, decoding a ZAP `MetricBatch` straight into the datastore
-  `time_series_v4` + `samples_v4` tables over **upstream** `clickhouse-go` v2 (via
-  `telemetrystore.TelemetryStore.ClickhouseDB()`), reusing the `telemetrymetrics`
+  `time_series_v4` + `samples_v4` tables over the `hanzo-ds/go` driver (via
+  `telemetrystore.TelemetryStore.Datastore()`), reusing the `telemetrymetrics`
   table-name constants so a series written here is immediately queryable.
-- **Why it exists**: the stock `o11yclickhousemetrics` exporter serialises OTLP
+- **Why it exists**: the stock `o11ydatastoremetrics` exporter serialises OTLP
   exponential histograms as a DDSketch into `exp_hist.sketch`, which needs the FORKED
   ch-go (`proto.DD/.Store/.IndexMapping`). That fork conflicts with the upstream ch-go
   the query plane pins — the reason metrics ingest could not move in-process. This driver

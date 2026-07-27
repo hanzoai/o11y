@@ -1,4 +1,4 @@
-# HTTP seeder for Playwright e2e tests. Wraps the direct-ClickHouse-insert
+# HTTP seeder for Playwright e2e tests. Wraps the direct-datastore-insert
 # helpers in tests/fixtures/{traces,logs,metrics}.py so a browser test can
 # seed telemetry with fine-grained control.
 #
