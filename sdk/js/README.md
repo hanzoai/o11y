@@ -30,21 +30,16 @@ the root object's first field. Verified byte-identical to the Go emitter's
 Adding a field means adding it to all three — this SDK, `luxfi/trace`, and
 `pkg/zapreceiver` — in one change.
 
-## Status: encoding done, transport blocked
+## Transport
 
-`encodeSpanBatch` is complete and correct. Delivery is not.
+The collector is a ZAP node, not a socket that takes loose frames — until the
+NodeID exchange completes it discards what arrives. `src/transport.ts` is that
+layer: length-prefixed frames over TCP (little-endian uint32), opened by the
+handshake `luxfi/zap` defines in `node_codec.go` — the ID in bytes [0,60) and its
+length at offset 60.
 
-`pkg/zapreceiver` is a ZAP **node**: the Go emitter reaches it with
-`node.ConnectDirect(endpoint)` and sends to the resolved peer ID. That node/peer
-layer lives in `luxfi/zap`. The published TypeScript runtime, `@zap-proto/zap`
-1.6.0, is **wire format only** — `Builder`, `Message`, envelopes, `Pipeliner` —
-with no node, client, connect or peer export. Writing a correct frame onto a bare
-TCP socket, which is what this SDK does today, is not the protocol: the receiver
-accepts the connection and decodes nothing.
+`@zap-proto/zap` supplies the wire format and stops there, so the node/peer layer
+lives here. If it grows one, this file is what to delete.
 
-So this package encodes correctly and its spans do not arrive. Closing it needs
-the node/peer transport in `@zap-proto/zap` (handshake, peer identity, framed
-send), at which point `O11y.send` swaps its socket write for a peer send and
-nothing else here changes.
-
-Not published until then.
+Verified end to end against a live `pkg/zapreceiver`: spans sent from Node arrive
+decoded, with trace/parent linkage, attributes, events and status intact.
