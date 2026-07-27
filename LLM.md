@@ -11,6 +11,39 @@ Hanzo's observability spine — OTLP in, Hanzo Datastore (columnar OLAP) on disk
 serving o11y.hanzo.ai. A clean full fork of **latest O11y** (synced to upstream
 `main`), building green (`go build ./...` = 0), MIT-only (no `ee/`).
 
+## How this ships
+
+One way, and it runs on our own stack:
+
+    push  ->  github.com/hanzoai/o11y         (a mirror)
+              .github/workflows/sync.yml       carries refs onward
+      ->  git.hanzo.ai/hanzoai/o11y            CANONICAL
+              .hanzo/workflows/ci.yaml         go build + go test
+              .hanzo/workflows/docker.yaml     builds ghcr.io/hanzoai/o11y
+              .hanzo/workflows/docker-site.yaml builds ghcr.io/hanzoai/o11y-site
+      ->  hanzoai/universe crs/o11y-site.yaml  names the tag that is live
+      ->  hanzoai/operator                     reconciles the App
+      ->  hanzoai/static behind hanzoai/ingress serves the SPA
+
+**git.hanzo.ai is canonical; GitHub is a mirror.** `.github/workflows/` holds
+exactly one file, `sync.yml`, and its only job is getting refs to the forge. Every
+build, check and deploy is a workflow under `.hanzo/workflows/`, which the forge
+reads. `.hanzo/workflows` uses GitHub Actions syntax, so a workflow moves between
+the two by changing directory and nothing else.
+
+No GitHub Pages and no Cloudflare Pages. `Dockerfile.site` already ends at
+`FROM ghcr.io/hanzoai/static:v0.5.1` serving `frontend/build` on :3000, so the SPA
+is an image the operator runs, like every other Hanzo surface.
+
+These three workflows were briefly deleted from `.github/workflows/` with no
+replacement anywhere, which left the promoted `o11y-site` App with **nothing that
+could build its image** — and no failing run to show it, because a workflow that
+does not exist cannot go red. They are restored here at their canonical path. That
+failure mode is the whole reason a migration is `git mv` and never a delete.
+
+Also load-bearing via the **Go module tag**: `hanzoai/cloud` `go.mod` pins
+`github.com/hanzoai/o11y`, because the query plane now lives in cloud at `/v1/o11y`.
+
 ## Dependency ownership (fork boundary)
 
 All O11y-branded platform deps are OWNED as public `hanzoai/*` forks — never
@@ -68,7 +101,7 @@ already `-skip`s it by name.
 
 ## Container image (`ghcr.io/hanzoai/o11y`)
 
-Root `Dockerfile` + `.github/workflows/docker.yaml` build a standalone community
+Root `Dockerfile` + `.hanzo/workflows/docker.yaml` build a standalone community
 server image on push to `main` and `v*` tags → `ghcr.io/hanzoai/o11y:<sha>` (+ `:main`).
 This replaces an unrelated upstream image that previously squatted the tags.
 
