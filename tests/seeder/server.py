@@ -1,6 +1,6 @@
 """HTTP seeder — single entrypoint for e2e/integration telemetry.
 
-POST /telemetry/{metrics,logs,traces} insert into ClickHouse via
+POST /telemetry/{metrics,logs,traces} insert into the datastore via
 fixtures.{metrics,logs,traces}. DELETE truncates the signal tables.
 
 Parallel-safe: every seeded row is tagged `seeder=true`. Tests share
