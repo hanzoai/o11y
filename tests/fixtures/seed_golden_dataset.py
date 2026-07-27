@@ -1,5 +1,5 @@
 """Golden dataset fixture — seeds OTel-demo-shaped metrics, traces, and
-logs into ClickHouse via the seeder on every test_setup invocation.
+logs into the datastore via the seeder on every test_setup invocation.
 
 Timestamps are rebased to `now` so panels with default time windows
 always find data. To refresh the dataset shape on disk, run
