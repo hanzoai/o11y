@@ -31,6 +31,11 @@ type Module interface {
 	GetProject(ctx context.Context, orgID, id valuer.UUID) (*sentrytypes.GettableProject, error)
 	RotateProjectKey(ctx context.Context, orgID, id valuer.UUID) (*sentrytypes.GettableProject, error)
 
+	// DeleteProject removes a project. Its DSN stops resolving immediately, so ingest
+	// for that id fails closed exactly as an unknown project does. Retained events are
+	// not touched — deleting a project must not double as a history wipe.
+	DeleteProject(ctx context.Context, orgID, id valuer.UUID) error
+
 	// ResolveIngest maps a DSN project id to its owning org, verifying the presented
 	// DSN key against the project's rotation watermark. Fail-closed: an unknown,
 	// disabled or below-watermark project/key returns ok=false.
@@ -69,6 +74,7 @@ type Handler interface {
 	ListProjects(http.ResponseWriter, *http.Request)
 	CreateProject(http.ResponseWriter, *http.Request)
 	GetProject(http.ResponseWriter, *http.Request)
+	DeleteProject(http.ResponseWriter, *http.Request)
 	RotateProjectKey(http.ResponseWriter, *http.Request)
 
 	// Issues.
