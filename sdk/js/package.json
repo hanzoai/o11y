@@ -34,6 +34,5 @@
     "directory": "sdk/js"
   },
   "license": "BSD-3-Clause",
-  "author": "Hanzo AI <dev@hanzo.ai>",
-  "private": true
+  "author": "Hanzo AI <dev@hanzo.ai>"
 }
