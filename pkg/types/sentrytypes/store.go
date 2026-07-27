@@ -18,6 +18,12 @@ type ProjectStore interface {
 	// returns the new version, org-scoped and idempotent-safe.
 	Rotate(ctx context.Context, orgID, id valuer.UUID) (int, error)
 
+	// Delete removes a project, org-scoped. Its DSN stops resolving, so ingest for
+	// that id fails closed exactly as an unknown project does. Retained events are
+	// NOT touched: they live in the columnar plane keyed by (org, project), and
+	// deleting a project must not silently destroy history.
+	Delete(ctx context.Context, orgID, id valuer.UUID) error
+
 	// Resolve maps a project id to its owning org, current key version and status —
 	// the ONLY non-org-scoped read, used by the public DSN-authenticated ingest path.
 	// Fail-closed: an unknown project returns found=false.
