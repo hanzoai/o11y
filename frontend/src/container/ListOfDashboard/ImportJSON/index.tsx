@@ -11,7 +11,21 @@ import {
 	MonitorDot,
 	MoveRight,
 } from 'components/ui/icons';
-import MEditor, { Monaco } from '@monaco-editor/react';
+import MEditor, { loader, Monaco } from '@monaco-editor/react';
+import * as monacoEditor from 'monaco-editor';
+
+// Serve monaco from OUR bundle, never a CDN.
+//
+// @monaco-editor/react defaults to fetching the monaco runtime from jsdelivr at
+// first render. Production refuses third-party CDN assets (ORB/CSP), and it fails
+// SILENTLY — the request is blocked, the editor never mounts, and the Import JSON
+// dialog just shows an empty box with no console error a user would see. Handing
+// the loader an already-imported monaco removes the network fetch entirely.
+//
+// Configured HERE rather than at the app entry on purpose: this component is the
+// only monaco consumer, so the ~5MB runtime stays in this route's chunk instead of
+// the main bundle every visitor downloads.
+loader.config({ monaco: monacoEditor });
 import { Color } from 'constants/designTokens';
 import {
 	Button,

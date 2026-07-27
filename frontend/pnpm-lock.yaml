@@ -247,6 +247,9 @@ importers:
       lucide-react:
         specifier: 0.498.0
         version: 0.498.0(react@19.2.7)
+      monaco-editor:
+        specifier: 0.55.1
+        version: 0.55.1
       motion:
         specifier: 12.4.13
         version: 12.4.13(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
