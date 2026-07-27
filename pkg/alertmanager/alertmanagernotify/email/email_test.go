@@ -11,6 +11,7 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"os"
 	"strconv"
@@ -719,7 +720,13 @@ func TestEmailRejected(t *testing.T) {
 
 	// Send the alert to mock SMTP server.
 	retry, err := e.Notify(context.Background(), firingAlert)
-	require.ErrorContains(t, err, "501 5.5.4 Rejected!")
+	// net/smtp surfaces the rejection as *textproto.Error. Assert on its fields rather
+	// than on the rendered text: Go 1.26 changed textproto.Error.Error to quote the
+	// message ("%03d %q"), so matching the formatted string is toolchain-dependent.
+	var protoErr *textproto.Error
+	require.ErrorAs(t, err, &protoErr)
+	require.Equal(t, 501, protoErr.Code)
+	require.Equal(t, "5.5.4 Rejected!", protoErr.Msg)
 	require.True(t, retry)
 	require.NoError(t, srv.Shutdown(ctx))
 
