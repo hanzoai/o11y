@@ -1,6 +1,6 @@
-# ClickHouse `signoz_*` → `o11y_*` schema cutover — lockstep deploy plan
+# Datastore `signoz_*` → `o11y_*` schema cutover — lockstep deploy plan
 
-The org-wide `signoz`→`o11y` rebrand renamed the **physical** ClickHouse
+The org-wide `signoz`→`o11y` rebrand renamed the **physical** Datastore
 databases and tables. The writer (collector), the data-preserving RENAME
 migration, and both readers (o11y querier + cloud) now all agree on `o11y_*`.
 
@@ -36,14 +36,14 @@ query-time SQL aliases (`signoz_input_idx__`, `signoz_log_id__`).
 
 | component | change | artifact |
 |---|---|---|
-| writer | schema-migrator + ClickHouse exporters emit `o11y_*` | `ghcr.io/hanzoai/otel-collector` **v0.144.8** (+ `o11y-schema-migrator`) |
+| writer | schema-migrator + datastore exporters emit `o11y_*` | `ghcr.io/hanzoai/otel-collector` **v0.144.8** (+ `o11y-schema-migrator`) |
 | migration | data-preserving `RENAME DATABASE`/`RENAME TABLE` | `deploy/datastore/migrations/0001_rename_signoz_to_o11y.sql` |
 | reader (o11y) | querier reads `o11y_*` | hanzoai/o11y#28 @ collector v0.144.8 |
-| reader (cloud) | direct ClickHouse reads `o11y_*` | hanzoai/cloud#202 @ collector v0.144.8 |
+| reader (cloud) | direct Datastore reads `o11y_*` | hanzoai/cloud#202 @ collector v0.144.8 |
 
-## Pre-flight — prove it on a FRESH/scratch ClickHouse (never prod)
+## Pre-flight — prove it on a FRESH/scratch Datastore (never prod)
 
-Run end-to-end against a throwaway ClickHouse before touching prod:
+Run end-to-end against a throwaway Datastore before touching prod:
 
 1. **Create schema fresh** with the v0.144.8 schema-migrator → it creates the
    `o11y_*` databases + tables directly (no `signoz_*` ever exist).
