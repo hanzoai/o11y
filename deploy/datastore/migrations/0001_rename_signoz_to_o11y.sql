@@ -1,20 +1,20 @@
 -- 0001_rename_signoz_to_o11y.sql
 --
--- Data-preserving ClickHouse cutover: rename the legacy `signoz_*` telemetry
+-- Data-preserving Datastore cutover: rename the legacy `signoz_*` telemetry
 -- databases and their `signoz_`-prefixed tables to the debranded `o11y_*`
 -- identifiers that the o11y querier now reads (pkg/query-service, pkg/telemetry*).
 --
 -- WHY: the o11y read plane was debranded signoz_* -> o11y_* (databases, tables,
 -- and query template identifiers). For a live deployment to keep serving its
--- existing telemetry after the upgrade, the physical ClickHouse objects must be
+-- existing telemetry after the upgrade, the physical Datastore objects must be
 -- renamed to match. This is a coordinated cutover with the otel-collector write
 -- side (see the CAVEAT below).
 --
--- DATA-PRESERVING: every statement is a metadata-only `RENAME` (ClickHouse moves
+-- DATA-PRESERVING: every statement is a metadata-only `RENAME` (Datastore moves
 -- the table/database entry — it never copies or rewrites parts). There is NO
 -- DROP, NO CREATE ... AS, NO INSERT. Live telemetry is preserved in place.
 --
--- GUARD / IDEMPOTENCY: ClickHouse `RENAME DATABASE|TABLE` has no `IF EXISTS`
+-- GUARD / IDEMPOTENCY: Datastore `RENAME DATABASE|TABLE` has no `IF EXISTS`
 -- clause, so apply this script ONCE during the cutover window, gated by the
 -- pre-check below. The check makes it safe whether or not the objects exist
 -- (fresh installs that were provisioned directly as o11y_* are skipped; a

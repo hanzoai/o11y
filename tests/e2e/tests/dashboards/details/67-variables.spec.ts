@@ -381,7 +381,7 @@ test.describe('Dashboard Detail — Variables', () => {
 		// the golden dataset which tags every resource with
 		// `k8s.namespace.name=o11y-<service>` for 8 distinct services.
 		// O11y's `o11y_metrics.distributed_metadata` table is populated
-		// naturally by the collector's o11yclickhousemetrics exporter, and
+		// naturally by the collector's o11ydatastoremetrics exporter, and
 		// `/api/v1/fields/values?signal=metrics&name=k8s.namespace.name`
 		// surfaces the values so the Dynamic variable auto-resolves.
 		await gotoVariablesDashboard(page);
