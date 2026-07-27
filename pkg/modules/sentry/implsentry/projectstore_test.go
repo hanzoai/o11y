@@ -130,3 +130,63 @@ func TestProjectStore_ResolveUnknownFailsClosed(t *testing.T) {
 	require.NoError(t, err)
 	assert.False(t, found, "an unknown project must resolve to found=false, never a tenant")
 }
+
+func TestProjectStore_Delete(t *testing.T) {
+	ctx := context.Background()
+	store := NewProjectStore(newTestSQLStore(t))
+	org := valuer.GenerateUUID()
+
+	p := newProject(org, "Gone", "gone")
+	require.NoError(t, store.Create(ctx, p))
+	require.NoError(t, store.Delete(ctx, org, p.ID))
+
+	// The row is gone from the org's reads.
+	_, err := store.Get(ctx, org, p.ID)
+	require.Error(t, err)
+	list, err := store.List(ctx, org)
+	require.NoError(t, err)
+	assert.Empty(t, list)
+
+	// Deleting again is not-found, not a silent success — the caller learns the id
+	// is already gone rather than believing it just removed something.
+	require.Error(t, store.Delete(ctx, org, p.ID))
+}
+
+func TestProjectStore_DeleteIsOrgScoped(t *testing.T) {
+	ctx := context.Background()
+	store := NewProjectStore(newTestSQLStore(t))
+	orgA, orgB := valuer.GenerateUUID(), valuer.GenerateUUID()
+
+	pa := newProject(orgA, "A app", "a-app")
+	require.NoError(t, store.Create(ctx, pa))
+
+	// orgB must not be able to delete orgA's project, and must not be able to tell
+	// "exists elsewhere" from "does not exist" — both are not-found.
+	require.Error(t, store.Delete(ctx, orgB, pa.ID))
+	require.Error(t, store.Delete(ctx, orgB, valuer.GenerateUUID()))
+
+	// orgA's project survived the cross-tenant attempt.
+	got, err := store.Get(ctx, orgA, pa.ID)
+	require.NoError(t, err)
+	assert.Equal(t, "a-app", got.Slug)
+}
+
+func TestProjectStore_DeletedProjectStopsResolving(t *testing.T) {
+	ctx := context.Background()
+	store := NewProjectStore(newTestSQLStore(t))
+	org := valuer.GenerateUUID()
+
+	p := newProject(org, "Revoked", "revoked")
+	require.NoError(t, store.Create(ctx, p))
+
+	_, _, _, found, err := store.Resolve(ctx, p.ID)
+	require.NoError(t, err)
+	require.True(t, found)
+
+	// Deleting revokes the DSN: ingest resolution fails closed with no separate
+	// revocation step, exactly as it does for an id that never existed.
+	require.NoError(t, store.Delete(ctx, org, p.ID))
+	_, _, _, found, err = store.Resolve(ctx, p.ID)
+	require.NoError(t, err)
+	assert.False(t, found)
+}

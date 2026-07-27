@@ -57,6 +57,11 @@ func (provider *provider) addSentryRoutes(router *mux.Router) error {
 			SuccessStatusCode: http.StatusOK, ErrorStatusCodes: []int{http.StatusNotFound},
 			SecuritySchemes: newSecuritySchemes(types.RoleViewer),
 		}},
+		{http.MethodDelete, "/v1/sentry/projects/{id}", provider.authzMiddleware.EditAccess(h.DeleteProject), handler.OpenAPIDef{
+			ID: "SentryDeleteProject", Tags: []string{"sentry"}, Summary: "Delete a Sentry project",
+			SuccessStatusCode: http.StatusNoContent, ErrorStatusCodes: []int{http.StatusNotFound},
+			SecuritySchemes: newSecuritySchemes(types.RoleEditor),
+		}},
 		{http.MethodPost, "/v1/sentry/projects/{id}/keys/rotate", provider.authzMiddleware.EditAccess(h.RotateProjectKey), handler.OpenAPIDef{
 			ID: "SentryRotateProjectKey", Tags: []string{"sentry"}, Summary: "Rotate a project's DSN key",
 			Response: new(sentrytypes.GettableProject), ResponseContentType: "application/json",

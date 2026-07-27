@@ -84,6 +84,28 @@ func (s *projectStore) Rotate(ctx context.Context, orgID, id valuer.UUID) (int, 
 	return p.KeyVersion + 1, nil
 }
 
+// Delete removes the project, org-scoped. Zero rows affected means it does not
+// belong to the caller's org (or never existed) — reported as not-found so a caller
+// can never probe another tenant's ids by watching for a different error.
+//
+// Retained events are deliberately left alone: they live in the columnar plane keyed
+// by (org, project), and a name/naming fix must not double as a history wipe.
+func (s *projectStore) Delete(ctx context.Context, orgID, id valuer.UUID) error {
+	res, err := s.sqlstore.BunDBCtx(ctx).
+		NewDelete().
+		Model((*sentrytypes.Project)(nil)).
+		Where("org_id = ?", orgID).
+		Where("id = ?", id).
+		Exec(ctx)
+	if err != nil {
+		return err
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return errors.Newf(errors.TypeNotFound, sentrytypes.ErrCodeSentryNotFound, "project %s not found in the org", id)
+	}
+	return nil
+}
+
 // Resolve is the ingest-time lookup: it maps a project id to its owning org, current
 // key version and status WITHOUT an org filter (ingest carries no IAM principal — the
 // DSN key is the credential, verified by the caller). Fail-closed: an unknown project
