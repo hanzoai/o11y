@@ -94,7 +94,6 @@ require (
 )
 
 require (
-	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.41.5 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.32.14 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.14 // indirect
@@ -116,7 +115,6 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
-	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2/v2 v2.2.1 // indirect
 	github.com/docker/go-connections v0.7.0 // indirect
@@ -158,48 +156,28 @@ require (
 	github.com/hanzoai/go-openai v1.41.0 // indirect
 	github.com/hanzoai/ha v0.1.1 // indirect
 	github.com/hanzoai/iam v1.33.26 // indirect
+	github.com/hanzoai/metrics v1.110.2 // indirect
 	github.com/hanzoai/money v0.2.1 // indirect
 	github.com/hanzoai/orm v0.6.16 // indirect
 	github.com/hanzoai/s3-go v1.0.0 // indirect
 	github.com/hanzoai/sqlcipher v0.1.1 // indirect
-	github.com/hanzoai/tasks v1.51.4 // indirect
+	github.com/hanzoai/tasks v1.52.3 // indirect
 	github.com/hanzoai/vfs v0.6.6 // indirect
 	github.com/hanzoai/xorm v1.4.4 // indirect
 	github.com/hashicorp/go-metrics v0.5.4 // indirect
-	github.com/holiman/uint256 v1.3.2 // indirect
 	github.com/huandu/go-clone v1.7.3 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/luxfi/accel v1.2.4 // indirect
-	github.com/luxfi/bft v0.1.5 // indirect
-	github.com/luxfi/cache v1.3.1 // indirect
-	github.com/luxfi/compress v0.1.1 // indirect
-	github.com/luxfi/concurrent v0.1.1 // indirect
-	github.com/luxfi/consensus v1.36.11 // indirect
-	github.com/luxfi/constants v1.6.2 // indirect
-	github.com/luxfi/container v0.2.1 // indirect
 	github.com/luxfi/crypto v1.20.2 // indirect
-	github.com/luxfi/database v1.21.1 // indirect
-	github.com/luxfi/geth v1.20.1 // indirect
-	github.com/luxfi/ids v1.3.2 // indirect
-	github.com/luxfi/math v1.5.1 // indirect
-	github.com/luxfi/math/big v0.1.0 // indirect
 	github.com/luxfi/mdns v0.1.1 // indirect
 	github.com/luxfi/metric v1.9.0 // indirect
-	github.com/luxfi/mock v0.1.1 // indirect
-	github.com/luxfi/p2p v1.22.1 // indirect
-	github.com/luxfi/pq v1.1.0 // indirect
-	github.com/luxfi/sampler v1.1.0 // indirect
 	github.com/luxfi/trace v1.4.0 // indirect
-	github.com/luxfi/validators v1.3.1 // indirect
-	github.com/luxfi/version v1.0.1 // indirect
-	github.com/luxfi/warp v1.24.1 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/minio/crc64nvme v1.1.1 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/mr-tron/base58 v1.3.0 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/nxadm/tail v1.4.11 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
@@ -209,7 +187,6 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/savsgio/gotils v0.0.0-20240704082632-aef3928b8a38 // indirect
-	github.com/supranational/blst v0.3.16 // indirect
 	github.com/swaggest/refl v1.4.0 // indirect
 	github.com/swaggest/usecase v1.3.1 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
@@ -330,7 +307,7 @@ require (
 	github.com/leodido/go-syslog/v4 v4.3.0 // indirect
 	github.com/leodido/ragel-machinery v0.0.0-20190525184631-5f46317e436b // indirect
 	github.com/lufia/plan9stats v0.0.0-20260216142805-b3301c5f2a88 // indirect
-	github.com/luxfi/log v1.5.0
+	github.com/luxfi/log v1.6.0
 	github.com/magefile/mage v1.17.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mdlayher/socket v0.5.1 // indirect
@@ -381,7 +358,7 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	github.com/zap-proto/zip v1.17.2
+	github.com/zap-proto/zip v1.18.1
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/collector/component v1.54.0 // indirect
 	go.opentelemetry.io/collector/component/componentstatus v0.148.0 // indirect
@@ -436,8 +413,8 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.40.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.44.0 // indirect
-	go.opentelemetry.io/otel/log v0.19.0 // indirect
-	go.opentelemetry.io/otel/sdk/log v0.19.0 // indirect
+	go.opentelemetry.io/otel/log v0.20.0 // indirect
+	go.opentelemetry.io/otel/sdk/log v0.20.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.44.0
 	go.opentelemetry.io/proto/otlp v1.10.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
