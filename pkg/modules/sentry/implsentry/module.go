@@ -2,7 +2,6 @@ package implsentry
 
 import (
 	"context"
-	"encoding/json"
 	"strings"
 	"time"
 
@@ -40,10 +39,9 @@ type module struct {
 }
 
 // NewModule composes the sentry product face over the reused engine, the projects
-// store, the columnar events plane and the reused issue lifecycle. Trace/event/issue
-// reads are all org+project scoped over the events plane (the o11y_traces span plane
-// is intentionally NOT read — it has no general org column, so it cannot be
-// tenant-scoped for this multi-tenant product; see the report).
+// store, the event.error plane and the reused issue lifecycle. Trace/event/issue reads
+// are all org+project scoped over event.error; the event.span plane is not read here
+// (see TraceDetail).
 func NewModule(projects sentrytypes.ProjectStore, events sentrytypes.EventStore, issues errortracking.Module, cfg Config) sentry.Module {
 	return &module{
 		projects: projects,
@@ -265,11 +263,14 @@ func (m *module) ListTraces(ctx context.Context, orgID, projectID valuer.UUID, p
 
 // TraceDetail returns the (org, project)-scoped error events referencing a trace —
 // the tenant-safe "errors in this trace" view. The load-bearing scope is on the READ
-// itself: the events query binds org AND project, so a caller only ever sees their own
-// project's events for a trace, never another tenant's. The o11y_traces span waterfall
-// is intentionally NOT read — that plane has no general org column (only gen_ai spans
-// carry gen_ai.hanzo.org_id), so it cannot be tenant-scoped for a multi-tenant product;
-// the full span waterfall is a follow-on gated on a general org column in o11y_traces.
+// itself: the events query binds org AND product, so a caller only ever sees their own
+// project's events for a trace, never another tenant's.
+//
+// This returns the errors on the trace, not the full span waterfall. The reason it
+// used to be impossible is gone — event.span carries org as its first column, so spans
+// ARE tenant-scopable now — but joining the waterfall in is its own cut: the two planes
+// have to agree on which identifier space org is in (event.span is keyed by org slug,
+// this face by the org UUID) before a join can be trusted.
 func (m *module) TraceDetail(ctx context.Context, orgID, projectID valuer.UUID, traceID string) (any, error) {
 	if _, err := m.projects.Get(ctx, orgID, projectID); err != nil {
 		return nil, err
@@ -301,10 +302,10 @@ func (m *module) requireProject(ctx context.Context, orgID valuer.UUID, raw stri
 	return id, nil
 }
 
-// eventFromOccurrence maps a normalized Occurrence to a columnar events-plane row for
-// (org, project). The full occurrence is retained as the sample JSON for event detail.
+// eventFromOccurrence maps a normalized Occurrence to an event.error row for (org,
+// project). Stack frames become the five parallel frames.* arrays, so the crash site
+// is queryable rather than buried in a JSON blob.
 func eventFromOccurrence(orgID, projectID valuer.UUID, occ *errortrackingtypes.Occurrence) *sentrytypes.Event {
-	sample, _ := json.Marshal(occ)
 	e := &sentrytypes.Event{
 		OrgID:       orgID.String(),
 		ProjectID:   projectID.String(),
@@ -312,10 +313,10 @@ func eventFromOccurrence(orgID, projectID valuer.UUID, occ *errortrackingtypes.O
 		Timestamp:   occ.Timestamp,
 		Level:       occ.Level,
 		Type:        occ.Type,
-		Value:       occ.Value,
 		Message:     firstNonEmpty(occ.Value, occ.Type),
 		Culprit:     occ.Culprit,
 		Fingerprint: occ.Fingerprint,
+		Handled:     handledFromTags(occ.Tags),
 		Platform:    occ.Platform,
 		Environment: occ.Environment,
 		Release:     occ.Release,
@@ -325,7 +326,7 @@ func eventFromOccurrence(orgID, projectID valuer.UUID, occ *errortrackingtypes.O
 		SpanID:      occ.SpanID,
 		ServerName:  occ.ServerName,
 		Tags:        occ.Tags,
-		Sample:      string(sample),
+		Frames:      framesFromOccurrence(occ.Frames),
 	}
 	if occ.Timestamp.IsZero() {
 		e.Timestamp = nowUTC()
@@ -336,6 +337,42 @@ func eventFromOccurrence(orgID, projectID valuer.UUID, occ *errortrackingtypes.O
 		e.UserIP = occ.User.IP
 	}
 	return e
+}
+
+// framesFromOccurrence narrows a normalized stack to the frame fields event.error
+// stores. Filename is preferred over the absolute path: it is what a stack trace reads
+// as, and it does not leak a build machine's directory layout.
+func framesFromOccurrence(in []errortrackingtypes.Frame) []sentrytypes.Frame {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]sentrytypes.Frame, len(in))
+	for i, f := range in {
+		out[i] = sentrytypes.Frame{
+			Function: f.Function,
+			File:     firstNonEmpty(f.Filename, f.AbsPath),
+			Line:     clampLine(f.Lineno),
+			Column:   clampLine(f.Colno),
+			Own:      f.InApp,
+		}
+	}
+	return out
+}
+
+// clampLine narrows a wire line/column to the stored unsigned column, mapping a
+// negative or absent value to zero ("unknown") rather than wrapping it.
+func clampLine(n int) uint32 {
+	if n <= 0 {
+		return 0
+	}
+	return uint32(n)
+}
+
+// handledFromTags reads the SDK's exception-mechanism flag, which normalization
+// carries as a tag. Absent means the report arrived through the normal capture path,
+// which is handled; only an explicit "false" marks a crash.
+func handledFromTags(tags map[string]string) bool {
+	return tags["handled"] != "false"
 }
 
 func firstNonEmpty(vals ...string) string {

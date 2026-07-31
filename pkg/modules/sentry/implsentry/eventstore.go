@@ -3,7 +3,6 @@ package implsentry
 import (
 	"context"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/hanzo-ds/go/lib/driver"
@@ -12,80 +11,38 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
-// Default database + table for the columnar events plane. The o11y convention is one
-// database per telemetry plane (o11y_traces / o11y_logs / o11y_metrics); the Sentry
-// events plane is o11y_sentry, mirroring it.
+// Sentry error events are rows of event.error — the ONE error table, sharing the
+// envelope with event.event / event.log / event.span. The database is named for what
+// it holds and the table for what it is, so a query reads FROM error.
 const (
-	defaultEventsDB    = "o11y_sentry"
-	defaultEventsTable = "o11y_sentry_events"
+	defaultEventsDB    = "event"
+	defaultEventsTable = "error"
 )
 
-// insertSQL is the fixed-order INSERT the batch sink appends to. Column order is
-// identical to selectColumns / scanEvent so a written row reads back field-for-field.
-const insertSQL = "INSERT INTO %s.%s (org_id, project_id, event_id, timestamp, received_at, level, type, value, message, culprit, fingerprint, platform, environment, release, service_name, transaction, trace_id, span_id, server_name, user_id, user_email, user_ip, tags, sample)"
+// errorKind is the envelope's kind discriminator for a captured exception. event.error
+// holds errors; kind says which sort of error a row is.
+const errorKind = "exception"
 
-// createSchemaDDL is the events-plane schema.
+// insertColumns is the fixed-order column list the batch sink appends to. Order is
+// identical to the Append call in Insert. Columns the Sentry wire has no value for
+// (session_id, distinct_id, anonymous_id, url, el) are omitted so the table's own
+// defaults apply.
+const insertColumns = "org, product, id, time, ingested_at, name, kind, level, class, " +
+	"message, site, " + groupCol + ", handled, environment, release, service, path, " +
+	"trace_id, span_id, person_id, attributes, " +
+	"frames.function, frames.file, frames.line, frames.column, frames.own"
+
+// eventStore is the datastore-backed EventStore over event.error.
 //
-// HONEST STATUS — NOT LIVE-VERIFIED. This DDL was designed against the o11y datastore
-// conventions and is exercised by the datastore-go-mock round-trip test, but it has
-// NOT been byte-verified against a live datastore in this build (no datastore was
-// reachable — localhost:9000 closed, no O11Y_DATASTORE_DSN). Two things a live run
-// must confirm before this is called done:
-//  1. the datastore accepts this exact DDL (types, INDEX/TTL syntax);
-//  2. on a MULTI-SHARD datastore this plain MergeTree must become the o11y
-//     local + Distributed(ON CLUSTER) split (the distributed_* convention) so a read
-//     on any node sees all shards. It is correct as-is only for a single-shard /
-//     replicated topology, which is why the engine + database are configurable
-//     (WithDatabase/WithEngine) — the follow-on is config, not a rewrite.
-const createSchemaDDL = `CREATE TABLE IF NOT EXISTS %s.%s (
-	org_id       String,
-	project_id   String,
-	event_id     String,
-	timestamp    DateTime64(9),
-	received_at  DateTime64(3),
-	level        LowCardinality(String),
-	type         LowCardinality(String),
-	value        String,
-	message      String,
-	culprit      String,
-	fingerprint  String,
-	platform     LowCardinality(String),
-	environment  LowCardinality(String),
-	release      String,
-	service_name LowCardinality(String),
-	transaction  String,
-	trace_id     String,
-	span_id      String,
-	server_name  String,
-	user_id      String,
-	user_email   String,
-	user_ip      String,
-	tags         Map(String, String),
-	sample       String,
-	INDEX idx_fingerprint fingerprint TYPE bloom_filter GRANULARITY 4,
-	INDEX idx_trace_id trace_id TYPE bloom_filter GRANULARITY 4
-) ENGINE = %s
-PARTITION BY toDate(timestamp)
-ORDER BY (org_id, project_id, timestamp)
-TTL toDateTime(timestamp) + INTERVAL %d DAY
-SETTINGS index_granularity = 8192`
-
-const defaultEngine = "MergeTree"
-const defaultRetentionDays = 30
-
-// eventStore is the datastore-backed EventStore. It ensures its schema lazily (once,
-// retried until it succeeds) so it works identically in the standalone runtime and the
-// cloud embed with no boot wiring, and touches the datastore only when actually used.
+// It does NOT create its schema. The event plane is applied as one schema; a reader
+// that also runs CREATE DATABASE / CREATE TABLE quietly resurrects whatever it names
+// the moment the process restarts, which is how a dropped database comes back from the
+// dead. Schema is a deploy artifact, this is a client.
 type eventStore struct {
-	store         telemetrystore.TelemetryStore
-	db            string
-	table         string
-	engine        string
-	retentionDays int
-	now           func() time.Time
-
-	ensureMu   sync.Mutex
-	ensureDone bool
+	store telemetrystore.TelemetryStore
+	db    string
+	table string
+	now   func() time.Time
 }
 
 // Option configures the event store.
@@ -93,24 +50,14 @@ type Option func(*eventStore)
 
 func WithDatabase(db string) Option { return func(s *eventStore) { s.db = db } }
 func WithTable(t string) Option     { return func(s *eventStore) { s.table = t } }
-func WithEngine(e string) Option    { return func(s *eventStore) { s.engine = e } }
-func WithRetentionDays(d int) Option {
-	return func(s *eventStore) {
-		if d > 0 {
-			s.retentionDays = d
-		}
-	}
-}
 
 // NewEventStore builds the events plane over the shared datastore connection.
 func NewEventStore(store telemetrystore.TelemetryStore, opts ...Option) sentrytypes.EventStore {
 	s := &eventStore{
-		store:         store,
-		db:            defaultEventsDB,
-		table:         defaultEventsTable,
-		engine:        defaultEngine,
-		retentionDays: defaultRetentionDays,
-		now:           func() time.Time { return time.Now().UTC() },
+		store: store,
+		db:    defaultEventsDB,
+		table: defaultEventsTable,
+		now:   func() time.Time { return time.Now().UTC() },
 	}
 	for _, o := range opts {
 		o(s)
@@ -118,35 +65,12 @@ func NewEventStore(store telemetrystore.TelemetryStore, opts ...Option) sentryty
 	return s
 }
 
-// ensureSchema creates the database + table idempotently. It caches success so the
-// DDL runs once; a failure is returned (and retried next call) so a transient datastore
-// outage does not permanently disable the plane.
-func (s *eventStore) ensureSchema(ctx context.Context) error {
-	s.ensureMu.Lock()
-	defer s.ensureMu.Unlock()
-	if s.ensureDone {
-		return nil
-	}
-	conn := s.store.Datastore()
-	if err := conn.Exec(ctx, fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", s.db)); err != nil {
-		return err
-	}
-	if err := conn.Exec(ctx, fmt.Sprintf(createSchemaDDL, s.db, s.table, s.engine, s.retentionDays)); err != nil {
-		return err
-	}
-	s.ensureDone = true
-	return nil
-}
-
 func (s *eventStore) Insert(ctx context.Context, orgID, projectID valuer.UUID, events []*sentrytypes.Event) error {
 	if len(events) == 0 {
 		return nil
 	}
-	if err := s.ensureSchema(ctx); err != nil {
-		return err
-	}
 	batch, err := s.store.Datastore().PrepareBatch(ctx,
-		fmt.Sprintf(insertSQL, s.db, s.table), driver.WithReleaseConnection())
+		fmt.Sprintf("INSERT INTO %s.%s (%s)", s.db, s.table, insertColumns), driver.WithReleaseConnection())
 	if err != nil {
 		return err
 	}
@@ -155,12 +79,12 @@ func (s *eventStore) Insert(ctx context.Context, orgID, projectID valuer.UUID, e
 	received := s.now()
 	org, proj := orgID.String(), projectID.String()
 	for _, e := range events {
+		fn, file, line, col, own := unzipFrames(e.Frames)
 		if err := batch.Append(
-			org, proj, e.EventID, e.Timestamp, received,
-			e.Level, e.Type, e.Value, e.Message, e.Culprit, e.Fingerprint,
-			e.Platform, e.Environment, e.Release, e.ServiceName, e.Transaction,
-			e.TraceID, e.SpanID, e.ServerName, e.UserID, e.UserEmail, e.UserIP,
-			mapOrEmpty(e.Tags), e.Sample,
+			org, proj, e.EventID, e.Timestamp, received, e.Type, errorKind, e.Level, e.Type,
+			e.Message, e.Culprit, e.Fingerprint, e.Handled, e.Environment, e.Release,
+			e.ServiceName, e.Transaction, e.TraceID, e.SpanID, e.UserID, attributesOf(e),
+			fn, file, line, col, own,
 		); err != nil {
 			return err
 		}
@@ -169,9 +93,6 @@ func (s *eventStore) Insert(ctx context.Context, orgID, projectID valuer.UUID, e
 }
 
 func (s *eventStore) Discover(ctx context.Context, orgID, projectID valuer.UUID, req *sentrytypes.DiscoverRequest, w sentrytypes.Window) (*sentrytypes.DiscoverResult, error) {
-	if err := s.ensureSchema(ctx); err != nil {
-		return nil, err
-	}
 	sql, args, cols, err := buildDiscover(s.db, s.table, orgID.String(), projectID.String(), req, w)
 	if err != nil {
 		return nil, err
@@ -197,9 +118,6 @@ func (s *eventStore) Discover(ctx context.Context, orgID, projectID valuer.UUID,
 }
 
 func (s *eventStore) GetEvent(ctx context.Context, orgID, projectID valuer.UUID, eventID string) (*sentrytypes.Event, error) {
-	if err := s.ensureSchema(ctx); err != nil {
-		return nil, err
-	}
 	sql, args := buildGetEvent(s.db, s.table, orgID.String(), projectID.String(), eventID)
 	events, err := s.queryEvents(ctx, sql, args)
 	if err != nil || len(events) == 0 {
@@ -209,9 +127,6 @@ func (s *eventStore) GetEvent(ctx context.Context, orgID, projectID valuer.UUID,
 }
 
 func (s *eventStore) ListForFingerprint(ctx context.Context, orgID, projectID valuer.UUID, fingerprint string, limit int) ([]*sentrytypes.Event, error) {
-	if err := s.ensureSchema(ctx); err != nil {
-		return nil, err
-	}
 	sql, args := buildListForFingerprint(s.db, s.table, orgID.String(), projectID.String(), fingerprint, limit)
 	return s.queryEvents(ctx, sql, args)
 }
@@ -220,25 +135,16 @@ func (s *eventStore) ListForTrace(ctx context.Context, orgID, projectID valuer.U
 	if traceID == "" {
 		return nil, nil
 	}
-	if err := s.ensureSchema(ctx); err != nil {
-		return nil, err
-	}
 	sql, args := buildListForTrace(s.db, s.table, orgID.String(), projectID.String(), traceID, limit)
 	return s.queryEvents(ctx, sql, args)
 }
 
 func (s *eventStore) ListLogs(ctx context.Context, orgID, projectID valuer.UUID, query string, w sentrytypes.Window, limit int) ([]*sentrytypes.Event, error) {
-	if err := s.ensureSchema(ctx); err != nil {
-		return nil, err
-	}
 	sql, args := buildListLogs(s.db, s.table, orgID.String(), projectID.String(), query, w, limit)
 	return s.queryEvents(ctx, sql, args)
 }
 
 func (s *eventStore) DistinctFingerprints(ctx context.Context, orgID, projectID valuer.UUID, w sentrytypes.Window) ([]string, error) {
-	if err := s.ensureSchema(ctx); err != nil {
-		return nil, err
-	}
 	sql, args := buildDistinctFingerprints(s.db, s.table, orgID.String(), projectID.String(), w)
 	rows, err := s.store.Datastore().Query(ctx, sql, args...)
 	if err != nil {
@@ -257,9 +163,6 @@ func (s *eventStore) DistinctFingerprints(ctx context.Context, orgID, projectID 
 }
 
 func (s *eventStore) ListTraces(ctx context.Context, orgID, projectID valuer.UUID, w sentrytypes.Window, limit int) ([]*sentrytypes.TraceSummary, error) {
-	if err := s.ensureSchema(ctx); err != nil {
-		return nil, err
-	}
 	sql, args := buildListTraces(s.db, s.table, orgID.String(), projectID.String(), w, limit)
 	rows, err := s.store.Datastore().Query(ctx, sql, args...)
 	if err != nil {
@@ -269,7 +172,7 @@ func (s *eventStore) ListTraces(ctx context.Context, orgID, projectID valuer.UUI
 	var out []*sentrytypes.TraceSummary
 	for rows.Next() {
 		t := new(sentrytypes.TraceSummary)
-		if err := rows.Scan(&t.TraceID, &t.Count, &t.FirstSeen, &t.LastSeen, &t.Sample); err != nil {
+		if err := rows.Scan(&t.TraceID, &t.Count, &t.FirstSeen, &t.LastSeen, &t.Message); err != nil {
 			return nil, err
 		}
 		out = append(out, t)
@@ -278,9 +181,6 @@ func (s *eventStore) ListTraces(ctx context.Context, orgID, projectID valuer.UUI
 }
 
 func (s *eventStore) Stats(ctx context.Context, orgID, projectID valuer.UUID, field string, w sentrytypes.Window) ([]sentrytypes.StatsPoint, error) {
-	if err := s.ensureSchema(ctx); err != nil {
-		return nil, err
-	}
 	sql, args, err := buildStats(s.db, s.table, orgID.String(), projectID.String(), field, w)
 	if err != nil {
 		return nil, err
@@ -311,21 +211,86 @@ func (s *eventStore) queryEvents(ctx context.Context, sql string, args []any) ([
 	var out []*sentrytypes.Event
 	for rows.Next() {
 		e := new(sentrytypes.Event)
-		if e.Tags == nil {
-			e.Tags = map[string]string{}
-		}
+		e.Tags = map[string]string{}
+		var fn, file []string
+		var line, col []uint32
+		var own []bool
 		if err := rows.Scan(
 			&e.OrgID, &e.ProjectID, &e.EventID, &e.Timestamp, &e.ReceivedAt,
-			&e.Level, &e.Type, &e.Value, &e.Message, &e.Culprit, &e.Fingerprint,
-			&e.Platform, &e.Environment, &e.Release, &e.ServiceName, &e.Transaction,
-			&e.TraceID, &e.SpanID, &e.ServerName, &e.UserID, &e.UserEmail, &e.UserIP,
-			&e.Tags, &e.Sample,
+			&e.Level, &e.Type, &e.Message, &e.Culprit, &e.Fingerprint, &e.Handled,
+			&e.Environment, &e.Release, &e.ServiceName, &e.Transaction,
+			&e.TraceID, &e.SpanID, &e.Platform, &e.ServerName, &e.UserID,
+			&e.UserEmail, &e.UserIP, &e.Tags,
+			&fn, &file, &line, &col, &own,
 		); err != nil {
 			return nil, err
 		}
+		e.Frames = zipFrames(fn, file, line, col, own)
 		out = append(out, e)
 	}
 	return out, rows.Err()
+}
+
+// attributesOf folds an event's tags plus the envelope-adjacent values that live in
+// the attributes map (platform, server, user contact) into the one map column. Tags
+// are copied, never mutated in place, so the caller's map is untouched.
+func attributesOf(e *sentrytypes.Event) map[string]string {
+	attrs := make(map[string]string, len(e.Tags)+4)
+	for k, v := range e.Tags {
+		attrs[k] = v
+	}
+	for k, v := range map[string]string{
+		"platform":   e.Platform,
+		"server":     e.ServerName,
+		"user_email": e.UserEmail,
+		"user_ip":    e.UserIP,
+	} {
+		if v != "" {
+			attrs[k] = v
+		}
+	}
+	return attrs
+}
+
+// unzipFrames splits []Frame into the five parallel arrays event.error stores. A nil
+// slice yields empty (not nil) arrays so a batch column is never null.
+func unzipFrames(frames []sentrytypes.Frame) (fn, file []string, line, col []uint32, own []bool) {
+	fn, file = make([]string, len(frames)), make([]string, len(frames))
+	line, col = make([]uint32, len(frames)), make([]uint32, len(frames))
+	own = make([]bool, len(frames))
+	for i, f := range frames {
+		fn[i], file[i], line[i], col[i], own[i] = f.Function, f.File, f.Line, f.Column, f.Own
+	}
+	return
+}
+
+// zipFrames rebuilds []Frame from the parallel arrays, tolerating a short array (a
+// row written before a column existed reads as a zero value, never a panic).
+func zipFrames(fn, file []string, line, col []uint32, own []bool) []sentrytypes.Frame {
+	if len(fn) == 0 {
+		return nil
+	}
+	out := make([]sentrytypes.Frame, len(fn))
+	for i := range fn {
+		out[i] = sentrytypes.Frame{
+			Function: fn[i],
+			File:     at(file, i),
+			Line:     at(line, i),
+			Column:   at(col, i),
+			Own:      at(own, i),
+		}
+	}
+	return out
+}
+
+// at reads index i of a parallel array, yielding the zero value when the array is
+// shorter than the frame count.
+func at[T any](s []T, i int) T {
+	var zero T
+	if i < len(s) {
+		return s[i]
+	}
+	return zero
 }
 
 // scanTargets allocates a typed scan destination per Discover output column and
@@ -339,6 +304,8 @@ func scanTargets(cols []discoverCol) ([]any, func() []any) {
 			dest[i] = new(time.Time)
 		case kindUint:
 			dest[i] = new(uint64)
+		case kindBool:
+			dest[i] = new(bool)
 		default:
 			dest[i] = new(string)
 		}
@@ -351,17 +318,12 @@ func scanTargets(cols []discoverCol) ([]any, func() []any) {
 				row[i] = *v
 			case *uint64:
 				row[i] = *v
+			case *bool:
+				row[i] = *v
 			case *string:
 				row[i] = *v
 			}
 		}
 		return row
 	}
-}
-
-func mapOrEmpty(m map[string]string) map[string]string {
-	if m == nil {
-		return map[string]string{}
-	}
-	return m
 }
