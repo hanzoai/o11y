@@ -1606,9 +1606,19 @@ func (aH *APIHandler) getDisks(w http.ResponseWriter, r *http.Request) {
 }
 
 func (aH *APIHandler) getVersion(w http.ResponseWriter, r *http.Request) {
+	// EE is "N" and the constant is the point: this build has NO enterprise edition.
+	// It reported "Y" while the EE features were compiled out, so the frontend took
+	// the enterprise bootstrap path and called SigNoz's Zeus licensing service, which
+	// 404s here — a flag claiming a capability the binary does not have.
+	//
+	// The field STAYS rather than being deleted, and stays a single expression, so
+	// enabling an edition later is one edit in one place. When there is something to
+	// gate, this reads Hanzo's OWN entitlement (GET /v1/entitlements on api.hanzo.ai,
+	// cloud/apps/entitlements — live and auth-gated today, 403 not 404) — never Zeus,
+	// which is SigNoz's commercial licensing service and not ours to call.
 	versionResponse := model.GetVersionResponse{
 		Version:        version.Info.Version(),
-		EE:             "Y",
+		EE:             "N",
 		SetupCompleted: aH.SetupCompleted,
 	}
 
