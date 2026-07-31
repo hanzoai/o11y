@@ -19,7 +19,7 @@ import RolesSettings from '../RolesSettings';
 jest.mock('hooks/useAuthZ/useAuthZ');
 const mockUseAuthZ = useAuthZ as jest.MockedFunction<typeof useAuthZ>;
 
-const rolesApiURL = 'http://localhost/api/v1/roles';
+const rolesApiURL = 'http://localhost/v1/o11y/roles';
 
 describe('RolesSettings', () => {
 	beforeEach(() => {

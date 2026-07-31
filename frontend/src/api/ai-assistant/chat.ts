@@ -2,9 +2,9 @@
  * AI Assistant API client.
  *
  * Flow:
- *   1. POST /api/v1/assistant/threads                                           → { threadId }
- *   2. POST /api/v1/assistant/threads/{threadId}/messages                       → { executionId }
- *   3. GET  /api/v1/assistant/executions/{executionId}/events                    → SSE stream (closes on 'done')
+ *   1. POST /v1/o11y/assistant/threads                          → { threadId }
+ *   2. POST /v1/o11y/assistant/threads/{threadId}/messages      → { executionId }
+ *   3. GET  /v1/o11y/assistant/executions/{executionId}/events  → SSE stream (closes on 'done')
  *
  * For subsequent messages in the same thread, repeat steps 2–3.
  * Approval/clarification events pause the stream; use approveExecution/clarifyExecution
@@ -283,7 +283,7 @@ export async function getThreadDetail(
 
 // ---------------------------------------------------------------------------
 // Step 1 — Create thread
-// POST /api/v1/assistant/threads → { threadId }
+// POST /v1/o11y/assistant/threads → { threadId }
 // ---------------------------------------------------------------------------
 
 export async function createThread(signal?: AbortSignal): Promise<string> {
@@ -297,7 +297,7 @@ export async function createThread(signal?: AbortSignal): Promise<string> {
 
 // ---------------------------------------------------------------------------
 // Step 2 — Send message
-// POST /api/v1/assistant/threads/{threadId}/messages → { executionId }
+// POST /v1/o11y/assistant/threads/{threadId}/messages → { executionId }
 // ---------------------------------------------------------------------------
 
 /** Fetches the thread's active executionId for reconnect on thread_busy (409). */
@@ -343,7 +343,7 @@ export async function sendMessage(
 
 // ---------------------------------------------------------------------------
 // Step 3 — Stream execution events
-// GET /api/v1/assistant/executions/{executionId}/events → SSE
+// GET /v1/o11y/assistant/executions/{executionId}/events → SSE
 // ---------------------------------------------------------------------------
 
 function parseSSELine(line: string): SSEEvent | null {

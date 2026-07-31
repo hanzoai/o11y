@@ -127,8 +127,8 @@ func NewWriter(conn datastore.Conn, opts ...Option) *Writer {
 	w := &Writer{
 		conn:         conn,
 		db:           telemetrymetrics.DBName,
-		tsTable:      telemetrymetrics.TimeseriesV4TableName,
-		samplesTable: telemetrymetrics.SamplesV4TableName,
+		tsTable:      telemetrymetrics.SeriesTableName,
+		samplesTable: telemetrymetrics.MetricTableName,
 		nowMilli:     func() int64 { return time.Now().UnixMilli() },
 	}
 	for _, o := range opts {

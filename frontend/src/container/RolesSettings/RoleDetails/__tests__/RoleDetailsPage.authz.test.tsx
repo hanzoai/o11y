@@ -30,7 +30,7 @@ const mockUseAuthZ = useAuthZ as jest.MockedFunction<typeof useAuthZ>;
 const CUSTOM_ROLE_ID = '019c24aa-3333-0001-aaaa-111111111111';
 const MANAGED_ROLE_ID = '019c24aa-2248-756f-9833-984f1ab63819';
 
-const rolesApiBase = 'http://localhost/api/v1/roles';
+const rolesApiBase = 'http://localhost/v1/o11y/roles';
 
 const emptyObjectsResponse = { status: 'success', data: [] };
 

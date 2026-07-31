@@ -23,7 +23,7 @@ import (
 
 const (
 	issuerURL    string = "https://accounts.google.com"
-	redirectPath string = "/api/v1/complete/google"
+	redirectPath string = "/v1/o11y/complete/google"
 )
 
 var scopes []string = []string{"email", "profile"}

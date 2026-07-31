@@ -36,15 +36,15 @@ func newConfig() factory.Config {
 			Default: 60 * time.Second,
 			Max:     600 * time.Second,
 			ExcludedRoutes: []string{
-				"/api/v1/logs/tail",
-				"/api/v3/logs/livetail",
-				"/api/v1/export_raw_data",
+				"/v1/o11y/logs/tail",
+				"/v1/o11y/logs/livetail",
+				"/v1/o11y/export_raw_data",
 			},
 		},
 		Logging: Logging{
 			ExcludedRoutes: []string{
-				"/api/v1/health",
-				"/api/v1/version",
+				"/v1/o11y/health",
+				"/v1/o11y/version",
 				"/",
 			},
 		},

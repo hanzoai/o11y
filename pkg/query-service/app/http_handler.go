@@ -3,7 +3,6 @@ package app
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -27,7 +26,6 @@ import (
 
 	"github.com/prometheus/prometheus/promql"
 
-	"github.com/hanzoai/o11y/pkg/http/middleware"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/licensing"
 	"github.com/hanzoai/o11y/pkg/o11y"
@@ -67,10 +65,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
-	"github.com/hanzoai/o11y/pkg/types/dashboardtypes"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
-	"github.com/hanzoai/o11y/pkg/types/licensetypes"
 	"github.com/hanzoai/o11y/pkg/types/opamptypes"
 	"github.com/hanzoai/o11y/pkg/types/pipelinetypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
@@ -368,193 +364,9 @@ func writeHttpResponse(w http.ResponseWriter, data interface{}) {
 	}
 }
 
-func (aH *APIHandler) RegisterQueryRangeV3Routes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/api/v3").Subrouter()
-	subRouter.HandleFunc("/autocomplete/aggregate_attributes", am.ViewAccess(
-		withCacheControl(AutoCompleteCacheControlAge, aH.autocompleteAggregateAttributes))).Methods(http.MethodGet)
-	subRouter.HandleFunc("/autocomplete/attribute_keys", am.ViewAccess(
-		withCacheControl(AutoCompleteCacheControlAge, aH.autoCompleteAttributeKeys))).Methods(http.MethodGet)
-	subRouter.HandleFunc("/autocomplete/attribute_values", am.ViewAccess(
-		withCacheControl(AutoCompleteCacheControlAge, aH.autoCompleteAttributeValues))).Methods(http.MethodGet)
-
-	// autocomplete with filters using new endpoints
-	// Note: eventually all autocomplete APIs should be migrated to new endpoint with appropriate filters, deprecating the older ones
-
-	subRouter.HandleFunc("/auto_complete/attribute_values", am.ViewAccess(aH.autoCompleteAttributeValuesPost)).Methods(http.MethodPost)
-
-	subRouter.HandleFunc("/query_range", am.ViewAccess(aH.QueryRangeV3)).Methods(http.MethodPost)
-	subRouter.HandleFunc("/query_range/format", am.ViewAccess(aH.QueryRangeV3Format)).Methods(http.MethodPost)
-
-	subRouter.HandleFunc("/filter_suggestions", am.ViewAccess(aH.getQueryBuilderSuggestions)).Methods(http.MethodGet)
-
-	// TODO(Raj): Remove this handler after /ws based path has been completely rolled out.
-	subRouter.HandleFunc("/query_progress", am.ViewAccess(aH.GetQueryProgressUpdates)).Methods(http.MethodGet)
-
-	// live logs
-	subRouter.HandleFunc("/logs/livetail", am.ViewAccess(aH.O11y.Handlers.QuerierHandler.QueryRawStream)).Methods(http.MethodGet)
-}
-
-func (aH *APIHandler) RegisterInfraMetricsRoutes(router *mux.Router, am *middleware.AuthZ) {
-	hostsSubRouter := router.PathPrefix("/api/v1/hosts").Subrouter()
-	hostsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getHostAttributeKeys)).Methods(http.MethodGet)
-	hostsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getHostAttributeValues)).Methods(http.MethodGet)
-	hostsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getHostList)).Methods(http.MethodPost)
-
-	processesSubRouter := router.PathPrefix("/api/v1/processes").Subrouter()
-	processesSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getProcessAttributeKeys)).Methods(http.MethodGet)
-	processesSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getProcessAttributeValues)).Methods(http.MethodGet)
-	processesSubRouter.HandleFunc("/list", am.ViewAccess(aH.getProcessList)).Methods(http.MethodPost)
-
-	podsSubRouter := router.PathPrefix("/api/v1/pods").Subrouter()
-	podsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getPodAttributeKeys)).Methods(http.MethodGet)
-	podsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getPodAttributeValues)).Methods(http.MethodGet)
-	podsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getPodList)).Methods(http.MethodPost)
-
-	pvcsSubRouter := router.PathPrefix("/api/v1/pvcs").Subrouter()
-	pvcsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getPvcAttributeKeys)).Methods(http.MethodGet)
-	pvcsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getPvcAttributeValues)).Methods(http.MethodGet)
-	pvcsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getPvcList)).Methods(http.MethodPost)
-
-	nodesSubRouter := router.PathPrefix("/api/v1/nodes").Subrouter()
-	nodesSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getNodeAttributeKeys)).Methods(http.MethodGet)
-	nodesSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getNodeAttributeValues)).Methods(http.MethodGet)
-	nodesSubRouter.HandleFunc("/list", am.ViewAccess(aH.getNodeList)).Methods(http.MethodPost)
-
-	namespacesSubRouter := router.PathPrefix("/api/v1/namespaces").Subrouter()
-	namespacesSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getNamespaceAttributeKeys)).Methods(http.MethodGet)
-	namespacesSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getNamespaceAttributeValues)).Methods(http.MethodGet)
-	namespacesSubRouter.HandleFunc("/list", am.ViewAccess(aH.getNamespaceList)).Methods(http.MethodPost)
-
-	clustersSubRouter := router.PathPrefix("/api/v1/clusters").Subrouter()
-	clustersSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getClusterAttributeKeys)).Methods(http.MethodGet)
-	clustersSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getClusterAttributeValues)).Methods(http.MethodGet)
-	clustersSubRouter.HandleFunc("/list", am.ViewAccess(aH.getClusterList)).Methods(http.MethodPost)
-
-	deploymentsSubRouter := router.PathPrefix("/api/v1/deployments").Subrouter()
-	deploymentsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getDeploymentAttributeKeys)).Methods(http.MethodGet)
-	deploymentsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getDeploymentAttributeValues)).Methods(http.MethodGet)
-	deploymentsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getDeploymentList)).Methods(http.MethodPost)
-
-	daemonsetsSubRouter := router.PathPrefix("/api/v1/daemonsets").Subrouter()
-	daemonsetsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getDaemonSetAttributeKeys)).Methods(http.MethodGet)
-	daemonsetsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getDaemonSetAttributeValues)).Methods(http.MethodGet)
-	daemonsetsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getDaemonSetList)).Methods(http.MethodPost)
-
-	statefulsetsSubRouter := router.PathPrefix("/api/v1/statefulsets").Subrouter()
-	statefulsetsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getStatefulSetAttributeKeys)).Methods(http.MethodGet)
-	statefulsetsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getStatefulSetAttributeValues)).Methods(http.MethodGet)
-	statefulsetsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getStatefulSetList)).Methods(http.MethodPost)
-
-	jobsSubRouter := router.PathPrefix("/api/v1/jobs").Subrouter()
-	jobsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getJobAttributeKeys)).Methods(http.MethodGet)
-	jobsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getJobAttributeValues)).Methods(http.MethodGet)
-	jobsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getJobList)).Methods(http.MethodPost)
-
-	infraOnboardingSubRouter := router.PathPrefix("/api/v1/infra_onboarding").Subrouter()
-	infraOnboardingSubRouter.HandleFunc("/k8s/status", am.ViewAccess(aH.getK8sInfraOnboardingStatus)).Methods(http.MethodGet)
-}
-
-func (aH *APIHandler) RegisterWebSocketPaths(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/ws").Subrouter()
-	subRouter.HandleFunc("/query_progress", am.ViewAccess(aH.GetQueryProgressUpdates)).Methods(http.MethodGet)
-}
-
-func (aH *APIHandler) RegisterQueryRangeV4Routes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/api/v4").Subrouter()
-	subRouter.HandleFunc("/query_range", am.ViewAccess(aH.QueryRangeV4)).Methods(http.MethodPost)
-	subRouter.HandleFunc("/metric/metric_metadata", am.ViewAccess(aH.getMetricMetadata)).Methods(http.MethodGet)
-}
-
 // todo(remove): Implemented at render package (github.com/hanzoai/o11y/pkg/http/render) with the new error structure
 func (aH *APIHandler) Respond(w http.ResponseWriter, data interface{}) {
 	writeHttpResponse(w, data)
-}
-
-// RegisterRoutes registers routes for this handler on the given router
-func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/api/v1/query_range", am.ViewAccess(aH.queryRangeMetrics)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/query", am.ViewAccess(aH.queryMetrics)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/rules", am.ViewAccess(aH.listRules)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/rules/{id}", am.ViewAccess(aH.getRule)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/rules", am.EditAccess(aH.createRule)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/rules/{id}", am.EditAccess(aH.editRule)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v1/rules/{id}", am.EditAccess(aH.deleteRule)).Methods(http.MethodDelete)
-	router.HandleFunc("/api/v1/rules/{id}", am.EditAccess(aH.patchRule)).Methods(http.MethodPatch)
-	router.HandleFunc("/api/v1/testRule", am.EditAccess(aH.testRule)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/rules/{id}/history/stats", am.ViewAccess(aH.getRuleStats)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/rules/{id}/history/timeline", am.ViewAccess(aH.getRuleStateHistory)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/rules/{id}/history/top_contributors", am.ViewAccess(aH.getRuleStateHistoryTopContributors)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/rules/{id}/history/overall_status", am.ViewAccess(aH.getOverallStateTransitions)).Methods(http.MethodPost)
-
-	router.HandleFunc("/api/v1/dashboards", am.ViewAccess(aH.List)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/dashboards", am.EditAccess(aH.O11y.Handlers.Dashboard.Create)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/dashboards/{id}", am.ViewAccess(aH.Get)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/dashboards/{id}", am.EditAccess(aH.O11y.Handlers.Dashboard.Update)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v1/dashboards/{id}", am.EditAccess(aH.O11y.Handlers.Dashboard.Delete)).Methods(http.MethodDelete)
-	router.HandleFunc("/api/v1/dashboards/{id}/lock", am.EditAccess(aH.O11y.Handlers.Dashboard.LockUnlock)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v2/variables/query", am.ViewAccess(aH.queryDashboardVarsV2)).Methods(http.MethodPost)
-
-	router.HandleFunc("/api/v1/explorer/views", am.ViewAccess(aH.O11y.Handlers.SavedView.List)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/explorer/views", am.EditAccess(aH.O11y.Handlers.SavedView.Create)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.ViewAccess(aH.O11y.Handlers.SavedView.Get)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Update)).Methods(http.MethodPut)
-	router.HandleFunc("/api/v1/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Delete)).Methods(http.MethodDelete)
-	router.HandleFunc("/api/v1/event", am.ViewAccess(aH.registerEvent)).Methods(http.MethodPost)
-
-	router.HandleFunc("/api/v1/services", am.ViewAccess(aH.getServices)).Methods(http.MethodPost) // Deprecated Usage, use the below endpoint /v2/services
-	router.HandleFunc("/api/v2/services", am.ViewAccess(aH.O11y.Handlers.Services.Get)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/services/list", am.ViewAccess(aH.getServicesList)).Methods(http.MethodGet)
-
-	router.HandleFunc("/api/v2/service/top_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetTopOperations)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/service/top_operations", am.ViewAccess(aH.getTopOperations)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/service/top_level_operations", am.ViewAccess(aH.getServicesTopLevelOps)).Methods(http.MethodPost)
-
-	router.HandleFunc("/api/v2/service/entry_point_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetEntryPointOperations)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/service/entry_point_operations", am.ViewAccess(aH.getEntryPointOps)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/traces/{traceId}", am.ViewAccess(aH.SearchTraces)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/usage", am.ViewAccess(aH.getUsage)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/dependency_graph", am.ViewAccess(aH.dependencyGraph)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/settings/ttl", am.AdminAccess(aH.setTTL)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/settings/ttl", am.ViewAccess(aH.getTTL)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v2/settings/ttl", am.AdminAccess(aH.setCustomRetentionTTL)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v2/settings/ttl", am.ViewAccess(aH.getCustomRetentionTTL)).Methods(http.MethodGet)
-
-	router.HandleFunc("/api/v1/settings/apdex", am.AdminAccess(aH.O11y.Handlers.Apdex.Set)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/settings/apdex", am.ViewAccess(aH.O11y.Handlers.Apdex.Get)).Methods(http.MethodGet)
-
-	router.HandleFunc("/api/v2/traces/fields", am.ViewAccess(aH.traceFields)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v2/traces/fields", am.EditAccess(aH.updateTraceField)).Methods(http.MethodPost)
-
-	router.HandleFunc("/api/v1/version", am.OpenAccess(aH.getVersion)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/features", am.ViewAccess(aH.getFeatureFlags)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/health", am.OpenAccess(aH.getHealth)).Methods(http.MethodGet)
-
-	router.HandleFunc("/api/v1/listErrors", am.ViewAccess(aH.listErrors)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/countErrors", am.ViewAccess(aH.countErrors)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v1/errorFromErrorID", am.ViewAccess(aH.getErrorFromErrorID)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/errorFromGroupID", am.ViewAccess(aH.getErrorFromGroupID)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/nextPrevErrorIDs", am.ViewAccess(aH.getNextPrevErrorIDs)).Methods(http.MethodGet)
-
-	router.HandleFunc("/api/v1/disks", am.ViewAccess(aH.getDisks)).Methods(http.MethodGet)
-
-	// Quick Filters
-	router.HandleFunc("/api/v1/orgs/me/filters", am.ViewAccess(aH.O11y.Handlers.QuickFilter.GetQuickFilters)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/orgs/me/filters/{signal}", am.ViewAccess(aH.O11y.Handlers.QuickFilter.GetSignalFilters)).Methods(http.MethodGet)
-	router.HandleFunc("/api/v1/orgs/me/filters", am.AdminAccess(aH.O11y.Handlers.QuickFilter.UpdateQuickFilters)).Methods(http.MethodPut)
-
-	router.HandleFunc("/api/v1/register", am.OpenAccess(aH.registerUser)).Methods(http.MethodPost)
-
-	router.HandleFunc("/api/v3/licenses", am.ViewAccess(func(rw http.ResponseWriter, req *http.Request) {
-		render.Success(rw, http.StatusOK, []any{})
-	})).Methods(http.MethodGet)
-	router.HandleFunc("/api/v3/licenses/active", am.ViewAccess(func(rw http.ResponseWriter, req *http.Request) {
-		aH.LicensingAPI.Activate(rw, req)
-	})).Methods(http.MethodGet)
-
-	router.HandleFunc("/api/v1/span_percentile", am.ViewAccess(aH.O11y.Handlers.SpanPercentile.GetSpanPercentileDetails)).Methods(http.MethodPost)
-
-	// Query Filter Analyzer api used to extract metric names and grouping columns from a query
-	router.HandleFunc("/api/v1/query_filter/analyze", am.ViewAccess(aH.QueryParserAPI.AnalyzeQueryFilter)).Methods(http.MethodPost)
 }
 
 func Intersection(a, b []int) (c []int) {
@@ -625,131 +437,6 @@ func (aH *APIHandler) PopulateTemporality(ctx context.Context, orgID valuer.UUID
 		}
 	}
 	return nil
-}
-
-func (aH *APIHandler) listRules(w http.ResponseWriter, r *http.Request) {
-
-	rules, err := aH.ruleManager.ListRuleStates(r.Context())
-	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, nil)
-		return
-	}
-
-	// todo(amol): need to add sorter
-
-	aH.Respond(w, rules)
-}
-
-func (aH *APIHandler) getRule(w http.ResponseWriter, r *http.Request) {
-	idStr := mux.Vars(r)["id"]
-	id, err := valuer.NewUUID(idStr)
-	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	ruleResponse, err := aH.ruleManager.GetRule(r.Context(), id)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
-			return
-		}
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, nil)
-		return
-	}
-	aH.Respond(w, ruleResponse)
-}
-
-func (aH *APIHandler) createRule(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		aH.logger.ErrorContext(r.Context(), "error reading request body for create rule", errors.Attr(err))
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	rule, err := aH.ruleManager.CreateRule(r.Context(), string(body))
-	if err != nil {
-		RespondError(w, toApiError(err), nil)
-		return
-	}
-
-	aH.Respond(w, rule)
-}
-
-func (aH *APIHandler) editRule(w http.ResponseWriter, r *http.Request) {
-	idStr := mux.Vars(r)["id"]
-	id, err := valuer.NewUUID(idStr)
-	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		aH.logger.ErrorContext(r.Context(), "error reading request body for edit rule", errors.Attr(err))
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	err = aH.ruleManager.EditRule(r.Context(), string(body), id)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
-			return
-		}
-		RespondError(w, toApiError(err), nil)
-		return
-	}
-
-	aH.Respond(w, "rule successfully edited")
-}
-
-func (aH *APIHandler) deleteRule(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars(r)["id"]
-
-	err := aH.ruleManager.DeleteRule(r.Context(), id)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
-			return
-		}
-		RespondError(w, toApiError(err), nil)
-		return
-	}
-
-	aH.Respond(w, "rule successfully deleted")
-}
-
-func (aH *APIHandler) patchRule(w http.ResponseWriter, r *http.Request) {
-	idStr := mux.Vars(r)["id"]
-	id, err := valuer.NewUUID(idStr)
-	if err != nil {
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		aH.logger.ErrorContext(r.Context(), "error reading request body for patch rule", errors.Attr(err))
-		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
-		return
-	}
-
-	gettableRule, err := aH.ruleManager.PatchRule(r.Context(), string(body), id)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			RespondError(w, &model.ApiError{Typ: model.ErrorNotFound, Err: fmt.Errorf("rule not found")}, nil)
-			return
-		}
-		RespondError(w, toApiError(err), nil)
-		return
-	}
-
-	aH.Respond(w, gettableRule)
 }
 
 func (aH *APIHandler) testRule(w http.ResponseWriter, r *http.Request) {
@@ -1067,78 +754,6 @@ func prepareQuery(r *http.Request) (string, error) {
 	return newQuery, nil
 }
 
-func (aH *APIHandler) Get(rw http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	orgID, err := valuer.NewUUID(claims.OrgID)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	id := mux.Vars(r)["id"]
-	if id == "" {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
-		return
-	}
-
-	dashboardID, err := valuer.NewUUID(id)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-	dashboard, err := aH.O11y.Modules.Dashboard.Get(ctx, orgID, dashboardID)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	gettableDashboard, err := dashboardtypes.NewGettableDashboardFromDashboard(dashboard)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	render.Success(rw, http.StatusOK, gettableDashboard)
-}
-
-func (aH *APIHandler) List(rw http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	orgID, err := valuer.NewUUID(claims.OrgID)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	dashboards, err := aH.O11y.Modules.Dashboard.List(ctx, orgID)
-	if err != nil && !errors.Ast(err, errors.TypeNotFound) {
-		render.Error(rw, err)
-		return
-	}
-
-	gettableDashboards, err := dashboardtypes.NewGettableDashboardsFromDashboards(dashboards)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-	render.Success(rw, http.StatusOK, gettableDashboards)
-}
-
 func (aH *APIHandler) queryDashboardVarsV2(w http.ResponseWriter, r *http.Request) {
 	query, err := prepareQuery(r)
 	if err != nil {
@@ -1280,39 +895,6 @@ func (aH *APIHandler) registerEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (aH *APIHandler) getTopOperations(w http.ResponseWriter, r *http.Request) {
-
-	query, err := parseGetTopOperationsRequest(r)
-	if aH.HandleError(w, err, http.StatusBadRequest) {
-		return
-	}
-
-	result, apiErr := aH.reader.GetTopOperations(r.Context(), query)
-
-	if apiErr != nil && aH.HandleError(w, apiErr.Err, http.StatusInternalServerError) {
-		return
-	}
-
-	aH.WriteJSON(w, r, result)
-
-}
-
-func (aH *APIHandler) getEntryPointOps(w http.ResponseWriter, r *http.Request) {
-	query, err := parseGetTopOperationsRequest(r)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	result, apiErr := aH.reader.GetEntryPointOperations(r.Context(), query)
-	if apiErr != nil {
-		render.Error(w, apiErr)
-		return
-	}
-
-	render.Success(w, http.StatusOK, result)
-}
-
 func (aH *APIHandler) getUsage(w http.ResponseWriter, r *http.Request) {
 
 	query, err := parseGetUsageRequest(r)
@@ -1372,20 +954,6 @@ func (aH *APIHandler) getServicesTopLevelOps(w http.ResponseWriter, r *http.Requ
 	result, apiErr := aH.reader.GetTopLevelOperations(r.Context(), start, end, services)
 	if apiErr != nil {
 		RespondError(w, apiErr, nil)
-		return
-	}
-
-	aH.WriteJSON(w, r, result)
-}
-
-func (aH *APIHandler) getServices(w http.ResponseWriter, r *http.Request) {
-	query, err := parseGetServicesRequest(r)
-	if aH.HandleError(w, err, http.StatusBadRequest) {
-		return
-	}
-
-	result, apiErr := aH.reader.GetServices(r.Context(), query)
-	if apiErr != nil && aH.HandleError(w, apiErr.Err, http.StatusInternalServerError) {
 		return
 	}
 
@@ -1508,34 +1076,6 @@ func (aH *APIHandler) getErrorFromGroupID(w http.ResponseWriter, r *http.Request
 	aH.WriteJSON(w, r, result)
 }
 
-func (aH *APIHandler) setTTL(w http.ResponseWriter, r *http.Request) {
-	ttlParams, err := parseTTLParams(r)
-	if aH.HandleError(w, err, http.StatusBadRequest) {
-		return
-	}
-
-	ctx := r.Context()
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, errors.NewInternalf(errors.CodeInternal, "failed to get org id from context"))
-		return
-	}
-
-	// Context is not used here as TTL is long duration DB operation
-	result, apiErr := aH.reader.SetTTL(context.Background(), claims.OrgID, ttlParams)
-	if apiErr != nil {
-		if apiErr.Typ == model.ErrorConflict {
-			aH.HandleError(w, apiErr.Err, http.StatusConflict)
-		} else {
-			aH.HandleError(w, apiErr.Err, http.StatusInternalServerError)
-		}
-		return
-	}
-
-	aH.WriteJSON(w, r, result)
-
-}
-
 func (aH *APIHandler) setCustomRetentionTTL(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	claims, errv2 := authtypes.ClaimsFromContext(ctx)
@@ -1577,25 +1117,6 @@ func (aH *APIHandler) getCustomRetentionTTL(w http.ResponseWriter, r *http.Reque
 	aH.WriteJSON(w, r, result)
 }
 
-func (aH *APIHandler) getTTL(w http.ResponseWriter, r *http.Request) {
-	ttlParams, err := parseGetTTL(r)
-	if aH.HandleError(w, err, http.StatusBadRequest) {
-		return
-	}
-
-	ctx := r.Context()
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-	result, apiErr := aH.reader.GetTTL(r.Context(), claims.OrgID, ttlParams)
-	if apiErr != nil && aH.HandleError(w, apiErr.Err, http.StatusInternalServerError) {
-		return
-	}
-	aH.WriteJSON(w, r, result)
-}
-
 func (aH *APIHandler) getDisks(w http.ResponseWriter, r *http.Request) {
 	result, apiErr := aH.reader.GetDisks(context.Background())
 	if apiErr != nil && aH.HandleError(w, apiErr.Err, http.StatusInternalServerError) {
@@ -1623,78 +1144,6 @@ func (aH *APIHandler) getVersion(w http.ResponseWriter, r *http.Request) {
 	}
 
 	aH.WriteJSON(w, r, versionResponse)
-}
-
-func (aH *APIHandler) getFeatureFlags(w http.ResponseWriter, r *http.Request) {
-	featureSet, err := aH.O11y.Licensing.GetFeatureFlags(r.Context(), valuer.GenerateUUID())
-	if err != nil {
-		aH.HandleError(w, err, http.StatusInternalServerError)
-		return
-	}
-
-	claims, err := authtypes.ClaimsFromContext(r.Context())
-	if err != nil {
-		aH.HandleError(w, err, http.StatusInternalServerError)
-		return
-	}
-
-	orgID := valuer.MustNewUUID(claims.OrgID)
-
-	evalCtx := featuretypes.NewFlaggerEvaluationContext(orgID)
-	useSpanMetrics := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseSpanMetrics, evalCtx)
-
-	featureSet = append(featureSet, &licensetypes.Feature{
-		Name:       valuer.NewString(flagger.FeatureUseSpanMetrics.String()),
-		Active:     useSpanMetrics,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	})
-
-	bodyJSONQuery := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseJSONBody, evalCtx)
-	featureSet = append(featureSet, &licensetypes.Feature{
-		Name:       valuer.NewString(flagger.FeatureUseJSONBody.String()),
-		Active:     bodyJSONQuery,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	})
-
-	fineGrainedAuthz := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseFineGrainedAuthz, evalCtx)
-	featureSet = append(featureSet, &licensetypes.Feature{
-		Name:       valuer.NewString(flagger.FeatureUseFineGrainedAuthz.String()),
-		Active:     fineGrainedAuthz,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	})
-
-	useDashboardV2 := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureUseDashboardV2, evalCtx)
-	featureSet = append(featureSet, &licensetypes.Feature{
-		Name:       valuer.NewString(flagger.FeatureUseDashboardV2.String()),
-		Active:     useDashboardV2,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	})
-
-	aiObservability := aH.O11y.Flagger.BooleanOrEmpty(r.Context(), flagger.FeatureEnableAIObservability, evalCtx)
-	featureSet = append(featureSet, &licensetypes.Feature{
-		Name:       valuer.NewString(flagger.FeatureEnableAIObservability.String()),
-		Active:     aiObservability,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	})
-
-	if constants.IsDotMetricsEnabled {
-		for idx, feature := range featureSet {
-			if feature.Name == licensetypes.DotMetricsEnabled {
-				featureSet[idx].Active = true
-			}
-		}
-	}
-	aH.Respond(w, featureSet)
 }
 
 // getHealth is used to check the health of the service.
@@ -1769,61 +1218,6 @@ func (aH *APIHandler) WriteJSON(w http.ResponseWriter, r *http.Request, response
 	resp, _ := marshall(response)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(resp)
-}
-
-// RegisterMessagingQueuesRoutes adds messaging-queues routes
-func (aH *APIHandler) RegisterMessagingQueuesRoutes(router *mux.Router, am *middleware.AuthZ) {
-
-	// Main messaging queues router
-	messagingQueuesRouter := router.PathPrefix("/api/v1/messaging-queues").Subrouter()
-
-	// Queue Overview route
-	messagingQueuesRouter.HandleFunc("/queue-overview", am.ViewAccess(aH.getQueueOverview)).Methods(http.MethodPost)
-
-	// -------------------------------------------------
-	// Kafka-specific routes
-	kafkaRouter := messagingQueuesRouter.PathPrefix("/kafka").Subrouter()
-
-	onboardingRouter := kafkaRouter.PathPrefix("/onboarding").Subrouter()
-
-	onboardingRouter.HandleFunc("/producers", am.ViewAccess(aH.onboardProducers)).Methods(http.MethodPost)
-	onboardingRouter.HandleFunc("/consumers", am.ViewAccess(aH.onboardConsumers)).Methods(http.MethodPost)
-	onboardingRouter.HandleFunc("/kafka", am.ViewAccess(aH.onboardKafka)).Methods(http.MethodPost)
-
-	partitionLatency := kafkaRouter.PathPrefix("/partition-latency").Subrouter()
-
-	partitionLatency.HandleFunc("/overview", am.ViewAccess(aH.getPartitionOverviewLatencyData)).Methods(http.MethodPost)
-	partitionLatency.HandleFunc("/consumer", am.ViewAccess(aH.getConsumerPartitionLatencyData)).Methods(http.MethodPost)
-
-	consumerLagRouter := kafkaRouter.PathPrefix("/consumer-lag").Subrouter()
-
-	consumerLagRouter.HandleFunc("/producer-details", am.ViewAccess(aH.getProducerData)).Methods(http.MethodPost)
-	consumerLagRouter.HandleFunc("/consumer-details", am.ViewAccess(aH.getConsumerData)).Methods(http.MethodPost)
-	consumerLagRouter.HandleFunc("/network-latency", am.ViewAccess(aH.getNetworkData)).Methods(http.MethodPost)
-
-	topicThroughput := kafkaRouter.PathPrefix("/topic-throughput").Subrouter()
-
-	topicThroughput.HandleFunc("/producer", am.ViewAccess(aH.getProducerThroughputOverview)).Methods(http.MethodPost)
-	topicThroughput.HandleFunc("/producer-details", am.ViewAccess(aH.getProducerThroughputDetails)).Methods(http.MethodPost)
-	topicThroughput.HandleFunc("/consumer", am.ViewAccess(aH.getConsumerThroughputOverview)).Methods(http.MethodPost)
-	topicThroughput.HandleFunc("/consumer-details", am.ViewAccess(aH.getConsumerThroughputDetails)).Methods(http.MethodPost)
-
-	spanEvaluation := kafkaRouter.PathPrefix("/span").Subrouter()
-
-	spanEvaluation.HandleFunc("/evaluation", am.ViewAccess(aH.getProducerConsumerEval)).Methods(http.MethodPost)
-}
-
-// RegisterThirdPartyApiRoutes adds third-party-api integration routes
-func (aH *APIHandler) RegisterThirdPartyApiRoutes(router *mux.Router, am *middleware.AuthZ) {
-
-	// Main messaging queues router
-	thirdPartyApiRouter := router.PathPrefix("/api/v1/third-party-apis").Subrouter()
-
-	// Domain Overview route
-	overviewRouter := thirdPartyApiRouter.PathPrefix("/overview").Subrouter()
-
-	overviewRouter.HandleFunc("/list", am.ViewAccess(aH.getDomainList)).Methods(http.MethodPost)
-	overviewRouter.HandleFunc("/domain", am.ViewAccess(aH.getDomainInfo)).Methods(http.MethodPost)
 }
 
 // not using md5 hashing as the plain string would work
@@ -2878,32 +2272,6 @@ func (aH *APIHandler) getProducerConsumerEval(w http.ResponseWriter, r *http.Req
 	aH.Respond(w, resp)
 }
 
-// RegisterIntegrationRoutes Registers all Integrations
-func (aH *APIHandler) RegisterIntegrationRoutes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/api/v1/integrations").Subrouter()
-
-	subRouter.HandleFunc(
-		"/install", am.ViewAccess(aH.InstallIntegration),
-	).Methods(http.MethodPost)
-
-	subRouter.HandleFunc(
-		"/uninstall", am.ViewAccess(aH.UninstallIntegration),
-	).Methods(http.MethodPost)
-
-	// Used for polling for status in v0
-	subRouter.HandleFunc(
-		"/{integrationId}/connection_status", am.ViewAccess(aH.GetIntegrationConnectionStatus),
-	).Methods(http.MethodGet)
-
-	subRouter.HandleFunc(
-		"/{integrationId}", am.ViewAccess(aH.GetIntegration),
-	).Methods(http.MethodGet)
-
-	subRouter.HandleFunc(
-		"", am.ViewAccess(aH.ListIntegrations),
-	).Methods(http.MethodGet)
-}
-
 func (aH *APIHandler) ListIntegrations(
 	w http.ResponseWriter, r *http.Request,
 ) {
@@ -3212,20 +2580,6 @@ func (aH *APIHandler) UninstallIntegration(w http.ResponseWriter, r *http.Reques
 	}
 
 	aH.Respond(w, map[string]interface{}{})
-}
-
-// logs
-func (aH *APIHandler) RegisterLogsRoutes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/api/v1/logs").Subrouter()
-	subRouter.HandleFunc("", am.ViewAccess(aH.getLogs)).Methods(http.MethodGet)
-	subRouter.HandleFunc("/fields", am.ViewAccess(aH.logFields)).Methods(http.MethodGet)
-	subRouter.HandleFunc("/fields", am.EditAccess(aH.logFieldUpdate)).Methods(http.MethodPost)
-	subRouter.HandleFunc("/aggregate", am.ViewAccess(aH.logAggregate)).Methods(http.MethodGet)
-
-	// log pipelines
-	subRouter.HandleFunc("/pipelines/preview", am.ViewAccess(aH.PreviewLogsPipelinesHandler)).Methods(http.MethodPost)
-	subRouter.HandleFunc("/pipelines/{version}", am.ViewAccess(aH.ListLogsPipelinesHandler)).Methods(http.MethodGet)
-	subRouter.HandleFunc("/pipelines", am.EditAccess(aH.CreateLogsPipeline)).Methods(http.MethodPost)
 }
 
 func (aH *APIHandler) logFields(w http.ResponseWriter, r *http.Request) {
@@ -3912,37 +3266,6 @@ func (aH *APIHandler) sendQueryResultEvents(r *http.Request, result []*v3.Result
 
 }
 
-func (aH *APIHandler) QueryRangeV3(w http.ResponseWriter, r *http.Request) {
-	claims, err := authtypes.ClaimsFromContext(r.Context())
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-	orgID, err := valuer.NewUUID(claims.OrgID)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	queryRangeParams, apiErrorObj := ParseQueryRangeParams(r)
-
-	if apiErrorObj != nil {
-		aH.logger.ErrorContext(r.Context(), "error parsing metric query range params", errors.Attr(apiErrorObj.Err))
-		RespondError(w, apiErrorObj, nil)
-		return
-	}
-
-	// add temporality for each metric
-	temporalityErr := aH.PopulateTemporality(r.Context(), orgID, queryRangeParams)
-	if temporalityErr != nil {
-		aH.logger.ErrorContext(r.Context(), "error adding temporality for metrics", errors.Attr(temporalityErr))
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: temporalityErr}, nil)
-		return
-	}
-
-	aH.queryRangeV3(r.Context(), queryRangeParams, w, r)
-}
-
 func (aH *APIHandler) GetQueryProgressUpdates(w http.ResponseWriter, r *http.Request) {
 	// Upgrade connection to websocket, sending back the requested protocol
 	// value for sec-websocket-protocol
@@ -4131,42 +3454,6 @@ func (aH *APIHandler) queryRangeV4(ctx context.Context, queryRangeParams *v3.Que
 	aH.Respond(w, resp)
 }
 
-func (aH *APIHandler) QueryRangeV4(w http.ResponseWriter, r *http.Request) {
-	claims, err := authtypes.ClaimsFromContext(r.Context())
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-	orgID, err := valuer.NewUUID(claims.OrgID)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	queryRangeParams, apiErrorObj := ParseQueryRangeParams(r)
-
-	if apiErrorObj != nil {
-		aH.logger.ErrorContext(r.Context(), "error parsing metric query range params", errors.Attr(apiErrorObj.Err))
-		RespondError(w, apiErrorObj, nil)
-		return
-	}
-	queryRangeParams.Version = "v4"
-
-	// add temporality for each metric
-	temporalityErr := aH.PopulateTemporality(r.Context(), orgID, queryRangeParams)
-	if temporalityErr != nil {
-		aH.logger.ErrorContext(r.Context(), "error adding temporality for metrics", errors.Attr(temporalityErr))
-		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: temporalityErr}, nil)
-		return
-	}
-
-	ctx := ctxtypes.NewContextWithCommentVals(r.Context(), map[string]string{
-		instrumentationtypes.CodeNamespace:    "app",
-		instrumentationtypes.CodeFunctionName: "QueryRangeV4",
-	})
-	aH.queryRangeV4(ctx, queryRangeParams, w, r)
-}
-
 func (aH *APIHandler) traceFields(w http.ResponseWriter, r *http.Request) {
 	fields, apiErr := aH.reader.GetTraceFields(r.Context())
 	if apiErr != nil {
@@ -4343,49 +3630,6 @@ func (aH *APIHandler) getDomainInfo(w http.ResponseWriter, r *http.Request) {
 
 	// Send the response
 	aH.Respond(w, finalResult)
-}
-
-// RegisterTraceFunnelsRoutes adds trace funnels routes
-func (aH *APIHandler) RegisterTraceFunnelsRoutes(router *mux.Router, am *middleware.AuthZ) {
-	// Main trace funnels router
-	traceFunnelsRouter := router.PathPrefix("/api/v1/trace-funnels").Subrouter()
-
-	// API endpoints
-	traceFunnelsRouter.HandleFunc("/new",
-		am.EditAccess(aH.O11y.Handlers.TraceFunnel.New)).
-		Methods(http.MethodPost)
-	traceFunnelsRouter.HandleFunc("/list",
-		am.ViewAccess(aH.O11y.Handlers.TraceFunnel.List)).
-		Methods(http.MethodGet)
-	traceFunnelsRouter.HandleFunc("/steps/update",
-		am.EditAccess(aH.O11y.Handlers.TraceFunnel.UpdateSteps)).
-		Methods(http.MethodPut)
-
-	traceFunnelsRouter.HandleFunc("/{funnel_id}",
-		am.ViewAccess(aH.O11y.Handlers.TraceFunnel.Get)).
-		Methods(http.MethodGet)
-	traceFunnelsRouter.HandleFunc("/{funnel_id}",
-		am.EditAccess(aH.O11y.Handlers.TraceFunnel.Delete)).
-		Methods(http.MethodDelete)
-	traceFunnelsRouter.HandleFunc("/{funnel_id}",
-		am.EditAccess(aH.O11y.Handlers.TraceFunnel.UpdateFunnel)).
-		Methods(http.MethodPut)
-
-	// Analytics endpoints
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/validate", aH.handleValidateTraces).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/overview", aH.handleFunnelAnalytics).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/steps", aH.handleStepAnalytics).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/steps/overview", aH.handleFunnelStepAnalytics).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/slow-traces", aH.handleFunnelSlowTraces).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/error-traces", aH.handleFunnelErrorTraces).Methods("POST")
-
-	// Analytics endpoints
-	traceFunnelsRouter.HandleFunc("/analytics/validate", aH.handleValidateTracesWithPayload).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/analytics/overview", aH.handleFunnelAnalyticsWithPayload).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/analytics/steps", aH.handleStepAnalyticsWithPayload).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/analytics/steps/overview", aH.handleFunnelStepAnalyticsWithPayload).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/analytics/slow-traces", aH.handleFunnelSlowTracesWithPayload).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/analytics/error-traces", aH.handleFunnelErrorTracesWithPayload).Methods("POST")
 }
 
 func (aH *APIHandler) handleValidateTraces(w http.ResponseWriter, r *http.Request) {

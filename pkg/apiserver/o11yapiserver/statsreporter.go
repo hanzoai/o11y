@@ -9,7 +9,7 @@ import (
 )
 
 func (provider *provider) addStatsReporterRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v1/stats", handler.New(
+	if err := router.Handle("/v1/o11y/stats", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.statsHandler.Get),
 		handler.OpenAPIDef{
 			ID:                  "GetStats",

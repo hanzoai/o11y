@@ -116,7 +116,7 @@ describe('DashboardWidget', () => {
 	it('shows error message when dashboard fetch fails', async () => {
 		server.use(
 			rest.get(
-				`http://localhost/api/v1/dashboards/${DASHBOARD_ID}`,
+				`http://localhost/v1/o11y/dashboards/${DASHBOARD_ID}`,
 				(_req, res, ctx) => res(ctx.status(500), ctx.json({ status: 'error' })),
 			),
 		);
@@ -131,7 +131,7 @@ describe('DashboardWidget', () => {
 	it('renders NewWidget when dashboard loads successfully', async () => {
 		server.use(
 			rest.get(
-				`http://localhost/api/v1/dashboards/${DASHBOARD_ID}`,
+				`http://localhost/v1/o11y/dashboards/${DASHBOARD_ID}`,
 				(_req, res, ctx) => res(ctx.status(200), ctx.json(mockDashboardResponse)),
 			),
 		);

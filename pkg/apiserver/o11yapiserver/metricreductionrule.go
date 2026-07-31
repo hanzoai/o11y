@@ -11,7 +11,7 @@ import (
 )
 
 func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v2/metric_reduction_rules", handler.New(
+	if err := router.Handle("/v1/o11y/metric_reduction_rules", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricReductionRuleHandler.List),
 		handler.OpenAPIDef{
 			ID:                  "ListMetricReductionRules",
@@ -29,7 +29,7 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 		return err
 	}
 
-	if err := router.Handle("/api/v2/metric_reduction_rules", handler.New(
+	if err := router.Handle("/v1/o11y/metric_reduction_rules", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.metricReductionRuleHandler.Create),
 		handler.OpenAPIDef{
 			ID:                  "CreateMetricReductionRule",
@@ -48,7 +48,7 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 		return err
 	}
 
-	if err := router.Handle("/api/v2/metric_reduction_rules/stats", handler.New(
+	if err := router.Handle("/v1/o11y/metric_reduction_rules/stats", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricReductionRuleHandler.Stats),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricReductionRuleStats",
@@ -65,7 +65,7 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 		return err
 	}
 
-	if err := router.Handle("/api/v2/metric_reduction_rules/timeseries", handler.New(
+	if err := router.Handle("/v1/o11y/metric_reduction_rules/timeseries", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricReductionRuleHandler.Timeseries),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricReductionRuleTimeseries",
@@ -82,7 +82,7 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 		return err
 	}
 
-	if err := router.Handle("/api/v2/metric_reduction_rules/preview", handler.New(
+	if err := router.Handle("/v1/o11y/metric_reduction_rules/preview", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.metricReductionRuleHandler.Preview),
 		handler.OpenAPIDef{
 			ID:                  "PreviewMetricReductionRule",
@@ -101,7 +101,7 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 		return err
 	}
 
-	if err := router.Handle("/api/v2/metric_reduction_rules/{id}", handler.New(
+	if err := router.Handle("/v1/o11y/metric_reduction_rules/{id}", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricReductionRuleHandler.GetByID),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricReductionRuleByID",
@@ -118,7 +118,7 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 		return err
 	}
 
-	if err := router.Handle("/api/v2/metric_reduction_rules/{id}", handler.New(
+	if err := router.Handle("/v1/o11y/metric_reduction_rules/{id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.metricReductionRuleHandler.UpdateByID),
 		handler.OpenAPIDef{
 			ID:                  "UpdateMetricReductionRuleByID",
@@ -137,7 +137,7 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 		return err
 	}
 
-	if err := router.Handle("/api/v2/metric_reduction_rules/{id}", handler.New(
+	if err := router.Handle("/v1/o11y/metric_reduction_rules/{id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.metricReductionRuleHandler.DeleteByID),
 		handler.OpenAPIDef{
 			ID:                "DeleteMetricReductionRuleByID",

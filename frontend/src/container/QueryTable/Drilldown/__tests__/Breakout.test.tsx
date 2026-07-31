@@ -148,7 +148,7 @@ describe('TableDrilldown Breakout Functionality', () => {
 
 		// Mock the substitute_vars API that's causing network errors
 		server.use(
-			rest.post('*/api/v5/substitute_vars', (req, res, ctx) =>
+			rest.post('*/v1/o11y/substitute_vars', (req, res, ctx) =>
 				res(ctx.status(200), ctx.json({ status: 'success', data: {} })),
 			),
 		);

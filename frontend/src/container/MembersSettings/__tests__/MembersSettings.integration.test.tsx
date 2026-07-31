@@ -12,7 +12,7 @@ jest.mock('@hanzo/ui', () => ({
 	},
 }));
 
-const USERS_ENDPOINT = '*/api/v2/users';
+const USERS_ENDPOINT = '*/v1/o11y/users';
 
 const mockUsers: TypesUserDTO[] = [
 	{

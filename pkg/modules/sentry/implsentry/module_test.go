@@ -105,7 +105,7 @@ func newModuleHarness(t *testing.T) *harness {
 	t.Helper()
 	store := newModuleSQLStore(t)
 	projects := NewProjectStore(store)
-	issues := errortracking.Module(implerrortracking.NewModule(implerrortracking.NewStore(store)))
+	issues := errortracking.Module(implerrortracking.NewModule(implerrortracking.NewStore(store), implerrortracking.NewNoopSink()))
 	events := newFakeEvents()
 	mod := NewModule(projects, events, issues, Config{IngestSecret: []byte(testSecret), Host: "api.hanzo.ai"})
 	return &harness{mod: mod, events: events, projects: projects}

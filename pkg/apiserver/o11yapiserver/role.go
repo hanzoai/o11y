@@ -11,7 +11,7 @@ import (
 )
 
 func (provider *provider) addRoleRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v1/roles", handler.New(
+	if err := router.Handle("/v1/o11y/roles", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.Create, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "CreateRole",
@@ -38,7 +38,7 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/roles", handler.New(
+	if err := router.Handle("/v1/o11y/roles", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.List, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "ListRoles",
@@ -64,7 +64,7 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/roles/{id}", handler.New(
+	if err := router.Handle("/v1/o11y/roles/{id}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.Get, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "GetRole",
@@ -91,7 +91,7 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/roles/{id}", handler.New(
+	if err := router.Handle("/v1/o11y/roles/{id}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.Update, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "UpdateRole",
@@ -118,7 +118,7 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/roles/{id}", handler.New(
+	if err := router.Handle("/v1/o11y/roles/{id}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.Delete, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "DeleteRole",

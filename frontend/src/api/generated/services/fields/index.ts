@@ -34,7 +34,7 @@ export const getFieldsKeys = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetFieldsKeys200>({
-		url: `/api/v1/fields/keys`,
+		url: `/v1/o11y/fields/keys`,
 		method: 'GET',
 		params,
 		signal,
@@ -42,7 +42,7 @@ export const getFieldsKeys = (
 };
 
 export const getGetFieldsKeysQueryKey = (params?: GetFieldsKeysParams) => {
-	return [`/api/v1/fields/keys`, ...(params ? [params] : [])] as const;
+	return [`/v1/o11y/fields/keys`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetFieldsKeysQueryOptions = <
@@ -129,7 +129,7 @@ export const getFieldsValues = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetFieldsValues200>({
-		url: `/api/v1/fields/values`,
+		url: `/v1/o11y/fields/values`,
 		method: 'GET',
 		params,
 		signal,
@@ -137,7 +137,7 @@ export const getFieldsValues = (
 };
 
 export const getGetFieldsValuesQueryKey = (params?: GetFieldsValuesParams) => {
-	return [`/api/v1/fields/values`, ...(params ? [params] : [])] as const;
+	return [`/v1/o11y/fields/values`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetFieldsValuesQueryOptions = <

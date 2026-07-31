@@ -29,7 +29,7 @@ export const authzCheck = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<AuthzCheck200>({
-		url: `/api/v1/authz/check`,
+		url: `/v1/o11y/authz/check`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: authtypesTransactionDTO,

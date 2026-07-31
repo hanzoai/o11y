@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"slices"
-	"strings"
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/queryparser"
@@ -16,7 +15,6 @@ import (
 	"github.com/rs/cors"
 	"github.com/soheilhy/cmux"
 
-	"github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	"github.com/hanzoai/o11y/pkg/licensing/nooplicensing"
 	"github.com/hanzoai/o11y/pkg/o11y"
@@ -141,8 +139,8 @@ func (s Server) HealthCheckStatus() chan healthcheck.Status {
 
 // PublicHandler returns the fully-wired public HTTP handler — every middleware
 // (IdentN identity resolution over the gateway-injected Hanzo IAM session
-// headers X-Org-Id/X-User-Id/X-User-Email, AuthZ, audit, timeout, recovery) and
-// the ExternalPath strip — WITHOUT binding a listener. It lets an embedding host
+// headers X-Org-Id/X-User-Id/X-User-Email, AuthZ, audit, timeout, recovery),
+// serving the public paths verbatim — WITHOUT binding a listener. It lets an embedding host
 // (the unified cloud binary) serve /v1/o11y/* on its own HTTP stack instead of
 // running a second Deployment; Start/initListeners stay the standalone entrypoints.
 func (s *Server) PublicHandler() http.Handler {
@@ -159,7 +157,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 		otelmux.WithTracerProvider(s.o11y.Instrumentation.TracerProvider()),
 		otelmux.WithPropagators(propagation.NewCompositeTextMapPropagator(propagation.Baggage{}, propagation.TraceContext{})),
 		otelmux.WithFilter(func(r *http.Request) bool {
-			return !slices.Contains([]string{"/api/v1/health"}, r.URL.Path)
+			return !slices.Contains([]string{"/v1/o11y/health"}, r.URL.Path)
 		}),
 	))
 	r.Use(middleware.NewIdentN(s.o11y.IdentNResolver, s.o11y.Sharder, s.o11y.Instrumentation.Logger()).Wrap)
@@ -205,46 +203,15 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 		return nil, err
 	}
 
-	// Register the version-less /api/<resource> aliases for every /api/vN route on the
-	// assembled router, so the ONE public Hanzo contract — /v1/o11y/<resource> (rewritten
-	// to /api/<resource> by mount.go rewriteExternalPath) — resolves. Done HERE, after ALL
-	// routes (api + web) are registered on r, matching what the o11yapiserver provider does.
-	// Without it the embedded runtime (cloud one-binary via community.NewServer) 404s every
-	// version-less call — the console's canonical o11y contract. Additive: adds aliases only.
-	if err = o11yapiserver.AddVersionlessAliases(r); err != nil {
-		return nil, err
-	}
-
-	routePrefix := s.config.Global.ExternalPath()
-	if routePrefix != "" {
-		prefixed := http.StripPrefix(routePrefix, handler)
-		handler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			// A path already under /api/ reaches the router directly. In the embedded
-			// one-binary runtime the host (cloud mount.go rewriteExternalPath) rewrote
-			// /v1/o11y/<res> → /api/<res> BEFORE this handler, so StripPrefix(routePrefix=
-			// /v1/o11y) would 404 it — the /v1/o11y prefix is already gone (double-strip),
-			// which broke EVERY embedded o11y data call. Standalone requests still arrive
-			// /v1/o11y-prefixed and fall through to StripPrefix. Supersedes the prior
-			// health-only special-case (health is under /api/ too).
-			if strings.HasPrefix(req.URL.Path, "/api/") {
-				r.ServeHTTP(w, req)
-				return
-			}
-
-			// Hanzo Sentry is served under the CLEAN /v1/sentry contract (no /api/,
-			// no /v1/o11y rewrite): its routes are registered on r at their literal
-			// /v1/sentry/… path. StripPrefix(routePrefix=/v1/o11y) would 404 them, so
-			// pass them straight to the router — the same escape hatch the /api/ paths
-			// use, for the same reason.
-			if strings.HasPrefix(req.URL.Path, "/v1/sentry/") {
-				r.ServeHTTP(w, req)
-				return
-			}
-
-			prefixed.ServeHTTP(w, req)
-		})
-	}
-
+	// No prefix stripping. Every route on r is registered at its full public path
+	// (/v1/o11y/…, /v1/sentry/…), so the request path that arrives is the path that
+	// matches — standalone and embedded in the cloud binary alike. The former
+	// StripPrefix(Global.ExternalPath()) wrapper predates that: it existed to graft a
+	// mount prefix onto routes registered at bare names, and once the names carried
+	// the prefix it could only subtract it back off (/v1/o11y/services → /services),
+	// which the web catch-all then answered with index.html — a blank console, not
+	// even a 404. ExternalPath survives where it belongs: building absolute URLs
+	// (cookie Path, OAuth redirect, SPA base href), never routing.
 	return &http.Server{
 		Handler: handler,
 	}, nil
