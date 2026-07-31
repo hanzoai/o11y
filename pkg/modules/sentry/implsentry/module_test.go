@@ -105,7 +105,7 @@ func newModuleHarness(t *testing.T) *harness {
 	t.Helper()
 	store := newModuleSQLStore(t)
 	projects := NewProjectStore(store)
-	issues := errortracking.Module(implerrortracking.NewModule(implerrortracking.NewStore(store), implerrortracking.NewNoopSink()))
+	issues := errortracking.Module(implerrortracking.NewModule(implerrortracking.NewStore(store)))
 	events := newFakeEvents()
 	mod := NewModule(projects, events, issues, Config{IngestSecret: []byte(testSecret), Host: "api.hanzo.ai"})
 	return &harness{mod: mod, events: events, projects: projects}
@@ -280,7 +280,7 @@ func TestListIssues_ProjectFilterViaEventsPlane(t *testing.T) {
 // injects an event carrying org A's trace_id, then reads that trace. Because the
 // load-bearing scope is on the events READ (org AND project bound), TraceDetail returns
 // ONLY org B's own project events for the trace — ZERO of org A's data — and the
-// o11y_traces span plane (which has no org column) is never read.
+// event.span plane is never read here — this returns the errors on the trace.
 func TestTraceDetail_CrossTenantTraceIsolation(t *testing.T) {
 	ctx := context.Background()
 	h := newModuleHarness(t)

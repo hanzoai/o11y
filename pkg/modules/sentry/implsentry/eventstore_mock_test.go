@@ -20,26 +20,22 @@ type anyMatcher struct{}
 
 func (anyMatcher) Match(string, string) error { return nil }
 
-// TestEventStore_EnsureSchemaAndQuery exercises the REAL datastore IO path against the
-// datastore-go-mock: ensureSchema runs the CREATE DATABASE + CREATE TABLE DDL exactly
-// once, and a read binds + decodes rows. This verifies the wiring (query executes,
-// rows scan) — it does NOT verify a live datastore accepts the DDL (see the honest
-// caveat on createSchemaDDL; no live datastore was reachable in this build).
-func TestEventStore_EnsureSchemaAndQuery(t *testing.T) {
+// A read must execute exactly one query and NOTHING else. The store used to run
+// CREATE DATABASE + CREATE TABLE before every operation, which recreated the database
+// it names on the next process start — the way a dropped database comes back from the
+// dead. Only the query below is expected here, so any DDL the store issued would be an
+// unmatched call and fail this test.
+func TestEventStore_ReadsWithoutIssuingDDL(t *testing.T) {
 	provider := telemetrystoretest.New(telemetrystore.Config{}, anyMatcher{})
 	mock := provider.Mock()
 	mock.MatchExpectationsInOrder(false)
 
-	// ensureSchema → CREATE DATABASE + CREATE TABLE (idempotent, once).
-	mock.ExpectExec("CREATE DATABASE")
-	mock.ExpectExec("CREATE TABLE")
-
 	// DistinctFingerprints → one String column. The 4 bound args are the (org,
 	// project, from, to) tenant+window scope every read carries.
-	mock.ExpectQuery("SELECT DISTINCT fingerprint").
+	mock.ExpectQuery("SELECT DISTINCT").
 		WithArgs(nil, nil, nil, nil). // nil = match-any (dsmock.matchArg); 4 = the tenant+window scope
 		WillReturnRows(dsmock.NewRows(
-			[]dsmock.ColumnType{{Name: "fingerprint", Type: "String"}},
+			[]dsmock.ColumnType{{Name: "group", Type: "String"}},
 			[][]any{{"fp-1"}, {"fp-2"}},
 		))
 
@@ -51,20 +47,71 @@ func TestEventStore_EnsureSchemaAndQuery(t *testing.T) {
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
-// TestInsertTemplateColumnCount pins the insert-sink invariant: the INSERT column list
-// and the batch.Append argument list are the SAME length (24) and in the SAME order as
-// the read projection — so a written row reads back field-for-field. A drift here is
-// exactly the class of bug the honest sink note warned about.
-func TestInsertTemplateColumnCount(t *testing.T) {
-	// Column list between the first "(" and the first ")".
-	open := strings.Index(insertSQL, "(")
-	closeP := strings.Index(insertSQL, ")")
-	require.Greater(t, closeP, open)
-	insertCols := strings.Count(insertSQL[open:closeP], ",") + 1
-	selectCols := strings.Count(selectColumns, ",") + 1
+// TestEventStoreTargetsEventError pins WHICH table the plane reads and writes. The
+// database is named for what it holds and the table for what it is.
+func TestEventStoreTargetsEventError(t *testing.T) {
+	s := NewEventStore(nil).(*eventStore)
+	assert.Equal(t, "event", s.db)
+	assert.Equal(t, "error", s.table)
+}
 
-	assert.Equal(t, 24, insertCols, "insert must write all 24 columns")
-	assert.Equal(t, 24, selectCols, "read projection must match the 24 written columns")
+// TestInsertMatchesAppend pins the insert-sink invariant: the INSERT column list and
+// the batch.Append argument list are the same length and order, and the read
+// projection scans exactly as many columns as it selects — so a written row reads back
+// field-for-field.
+func TestInsertMatchesAppend(t *testing.T) {
+	assert.Equal(t, 26, countCols(insertColumns), "insert writes 26 columns")
+	assert.Equal(t, 28, countCols(selectColumns),
+		"the read projection selects the 5 frame arrays plus the attribute-backed fields")
+}
+
+// countCols counts a comma-separated column list. Every expression in these lists is
+// a bare column or a constant map/array subscript, none of which contain a comma.
+func countCols(list string) int { return strings.Count(list, ",") + 1 }
+
+// Frames survive the round trip through the five parallel arrays event.error stores.
+func TestFramesRoundTrip(t *testing.T) {
+	in := []sentrytypes.Frame{
+		{Function: "handle", File: "app/svc.py", Line: 42, Column: 7, Own: true},
+		{Function: "connect", File: "inpage.js", Line: 1, Column: 84179, Own: false},
+	}
+	fn, file, line, col, own := unzipFrames(in)
+	assert.Equal(t, in, zipFrames(fn, file, line, col, own))
+}
+
+// A short parallel array must read as a zero value, never panic — the shape a row
+// written before a frame column existed has.
+func TestFramesTolerateShortArrays(t *testing.T) {
+	got := zipFrames([]string{"handle", "connect"}, []string{"only-one.py"}, nil, nil, nil)
+	require.Len(t, got, 2)
+	assert.Equal(t, "only-one.py", got[0].File)
+	assert.Equal(t, sentrytypes.Frame{Function: "connect"}, got[1])
+}
+
+// No frames means no frames — not one empty frame.
+func TestFramesEmpty(t *testing.T) {
+	assert.Nil(t, zipFrames(nil, nil, nil, nil, nil))
+	fn, file, line, col, own := unzipFrames(nil)
+	assert.Empty(t, fn)
+	assert.Empty(t, file)
+	assert.Empty(t, line)
+	assert.Empty(t, col)
+	assert.Empty(t, own)
+}
+
+// attributesOf folds tags plus the envelope-adjacent values into the one map column,
+// without mutating the caller's tag map.
+func TestAttributesOfDoesNotMutateTags(t *testing.T) {
+	tags := map[string]string{"release_channel": "beta"}
+	e := &sentrytypes.Event{Tags: tags, Platform: "python", ServerName: "web-1"}
+
+	attrs := attributesOf(e)
+	assert.Equal(t, "beta", attrs["release_channel"])
+	assert.Equal(t, "python", attrs["platform"])
+	assert.Equal(t, "web-1", attrs["server"])
+	assert.NotContains(t, attrs, "user_email", "an empty value is not stored")
+
+	assert.Equal(t, map[string]string{"release_channel": "beta"}, tags, "the caller's map is untouched")
 }
 
 var _ sentrytypes.EventStore = (*eventStore)(nil)
