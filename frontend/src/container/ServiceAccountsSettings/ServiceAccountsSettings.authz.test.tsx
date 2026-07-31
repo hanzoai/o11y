@@ -6,7 +6,7 @@ import { render, screen, waitFor } from 'tests/test-utils';
 import { AUTHZ_CHECK_URL, authzMockResponse } from 'tests/authz-test-utils';
 import ServiceAccountsSettings from './ServiceAccountsSettings';
 
-const SA_LIST_URL = 'http://localhost/api/v1/service_accounts';
+const SA_LIST_URL = 'http://localhost/v1/o11y/service_accounts';
 
 function renderPage(): ReturnType<typeof render> {
 	return render(

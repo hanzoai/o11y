@@ -14,7 +14,7 @@ import (
 )
 
 func (provider *provider) addDashboardRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v2/dashboards", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.ListV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.ListV2), handler.OpenAPIDef{
 		ID:                  "ListDashboardsV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "List dashboards (v2)",
@@ -32,7 +32,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/users/me/dashboards", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.ListForUserV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/users/me/dashboards", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.ListForUserV2), handler.OpenAPIDef{
 		ID:                  "ListDashboardsForUserV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "List dashboards for the current user (v2)",
@@ -50,7 +50,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboards", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.CreateV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.CreateV2), handler.OpenAPIDef{
 		ID:                  "CreateDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Create dashboard (v2)",
@@ -68,7 +68,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboards/{id}/clone", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.CloneV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}/clone", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.CloneV2), handler.OpenAPIDef{
 		ID:                  "CloneDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Clone dashboard (v2)",
@@ -85,7 +85,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboards/{id}", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.GetV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.GetV2), handler.OpenAPIDef{
 		ID:                  "GetDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Get dashboard (v2)",
@@ -102,7 +102,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboards/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.UpdateV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.UpdateV2), handler.OpenAPIDef{
 		ID:                  "UpdateDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Update dashboard (v2)",
@@ -119,7 +119,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboards/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.PatchV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.PatchV2), handler.OpenAPIDef{
 		ID:          "PatchDashboardV2",
 		Tags:        []string{"dashboard"},
 		Summary:     "Patch dashboard (v2)",
@@ -142,7 +142,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboards/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.DeleteV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.DeleteV2), handler.OpenAPIDef{
 		ID:                  "DeleteDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Delete dashboard (v2)",
@@ -159,7 +159,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboards/{id}/lock", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.LockV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}/lock", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.LockV2), handler.OpenAPIDef{
 		ID:                  "LockDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Lock dashboard (v2)",
@@ -176,7 +176,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboards/{id}/lock", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.UnlockV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}/lock", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.UnlockV2), handler.OpenAPIDef{
 		ID:                  "UnlockDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Unlock dashboard (v2)",
@@ -195,7 +195,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 
 	// ViewAccess: pinning only mutates the calling user's pin list, not the
 	// dashboard itself — anyone who can view a dashboard can bookmark it.
-	if err := router.Handle("/api/v2/users/me/dashboards/{id}/pins", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.PinV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/users/me/dashboards/{id}/pins", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.PinV2), handler.OpenAPIDef{
 		ID:                  "PinDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Pin a dashboard for the current user (v2)",
@@ -212,7 +212,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/users/me/dashboards/{id}/pins", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.UnpinV2), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/users/me/dashboards/{id}/pins", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.UnpinV2), handler.OpenAPIDef{
 		ID:                  "UnpinDashboardV2",
 		Tags:                []string{"dashboard"},
 		Summary:             "Unpin a dashboard for the current user (v2)",
@@ -229,7 +229,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboard_views", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.ListViews), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboard_views", handler.New(provider.authzMiddleware.ViewAccess(provider.dashboardHandler.ListViews), handler.OpenAPIDef{
 		ID:                  "ListDashboardViews",
 		Tags:                []string{"dashboard"},
 		Summary:             "List dashboard saved views",
@@ -246,7 +246,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboard_views", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.CreateView), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboard_views", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.CreateView), handler.OpenAPIDef{
 		ID:                  "CreateDashboardView",
 		Tags:                []string{"dashboard"},
 		Summary:             "Create dashboard saved view",
@@ -263,7 +263,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboard_views/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.UpdateView), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboard_views/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.UpdateView), handler.OpenAPIDef{
 		ID:                  "UpdateDashboardView",
 		Tags:                []string{"dashboard"},
 		Summary:             "Update dashboard saved view",
@@ -280,7 +280,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v2/dashboard_views/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.DeleteView), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboard_views/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.dashboardHandler.DeleteView), handler.OpenAPIDef{
 		ID:                  "DeleteDashboardView",
 		Tags:                []string{"dashboard"},
 		Summary:             "Delete dashboard saved view",
@@ -297,7 +297,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.CreatePublic), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.CreatePublic), handler.OpenAPIDef{
 		ID:                  "CreatePublicDashboard",
 		Tags:                []string{"dashboard"},
 		Summary:             "Create public dashboard",
@@ -314,7 +314,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.GetPublic), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.GetPublic), handler.OpenAPIDef{
 		ID:                  "GetPublicDashboard",
 		Tags:                []string{"dashboard"},
 		Summary:             "Get public dashboard",
@@ -331,7 +331,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.UpdatePublic), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.UpdatePublic), handler.OpenAPIDef{
 		ID:                  "UpdatePublicDashboard",
 		Tags:                []string{"dashboard"},
 		Summary:             "Update public dashboard",
@@ -348,7 +348,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.DeletePublic), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/dashboards/{id}/public", handler.New(provider.authzMiddleware.AdminAccess(provider.dashboardHandler.DeletePublic), handler.OpenAPIDef{
 		ID:                  "DeletePublicDashboard",
 		Tags:                []string{"dashboard"},
 		Summary:             "Delete public dashboard",
@@ -365,7 +365,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/public/dashboards/{id}", handler.New(provider.authzMiddleware.CheckWithoutClaims(
+	if err := router.Handle("/v1/o11y/public/dashboards/{id}", handler.New(provider.authzMiddleware.CheckWithoutClaims(
 		provider.dashboardHandler.GetPublicData,
 		authtypes.Relation{Verb: coretypes.VerbRead},
 		coretypes.ResourceMetaResourcePublicDashboard,
@@ -393,7 +393,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/public/dashboards/{id}/widgets/{idx}/query_range", handler.New(provider.authzMiddleware.CheckWithoutClaims(
+	if err := router.Handle("/v1/o11y/public/dashboards/{id}/widgets/{idx}/query_range", handler.New(provider.authzMiddleware.CheckWithoutClaims(
 		provider.dashboardHandler.GetPublicWidgetQueryRange,
 		authtypes.Relation{Verb: coretypes.VerbRead},
 		coretypes.ResourceMetaResourcePublicDashboard,

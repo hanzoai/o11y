@@ -86,7 +86,7 @@ jest.mock('react-use', () => ({
 	],
 }));
 
-const ROLES_ENDPOINT = '*/api/v1/roles';
+const ROLES_ENDPOINT = '*/v1/o11y/roles';
 
 const mockDeleteMutate = jest.fn();
 const mockRemoveMutateAsync = jest.fn();

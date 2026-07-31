@@ -68,7 +68,7 @@ export const getResetPasswordTokenDeprecated = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetResetPasswordTokenDeprecated200>({
-		url: `/api/v1/getResetPasswordToken/${id}`,
+		url: `/v1/o11y/getResetPasswordToken/${id}`,
 		method: 'GET',
 		signal,
 	});
@@ -77,7 +77,7 @@ export const getResetPasswordTokenDeprecated = (
 export const getGetResetPasswordTokenDeprecatedQueryKey = ({
 	id,
 }: GetResetPasswordTokenDeprecatedPathParameters) => {
-	return [`/api/v1/getResetPasswordToken/${id}`] as const;
+	return [`/v1/o11y/getResetPasswordToken/${id}`] as const;
 };
 
 export const getGetResetPasswordTokenDeprecatedQueryOptions = <
@@ -176,7 +176,7 @@ export const createInvite = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateInvite201>({
-		url: `/api/v1/invite`,
+		url: `/v1/o11y/invite`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: typesPostableInviteDTO,
@@ -259,7 +259,7 @@ export const createBulkInvite = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/invite/bulk`,
+		url: `/v1/o11y/invite/bulk`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: typesPostableBulkInviteRequestDTO,
@@ -342,7 +342,7 @@ export const resetPassword = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/resetPassword`,
+		url: `/v1/o11y/resetPassword`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: typesPostableResetPasswordDTO,
@@ -422,14 +422,14 @@ export const useResetPassword = <
  */
 export const listUsersDeprecated = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<ListUsersDeprecated200>({
-		url: `/api/v1/user`,
+		url: `/v1/o11y/user`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getListUsersDeprecatedQueryKey = () => {
-	return [`/api/v1/user`] as const;
+	return [`/v1/o11y/user`] as const;
 };
 
 export const getListUsersDeprecatedQueryOptions = <
@@ -509,7 +509,7 @@ export const deleteUser = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/user/${id}`,
+		url: `/v1/o11y/user/${id}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -588,7 +588,7 @@ export const getUserDeprecated = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetUserDeprecated200>({
-		url: `/api/v1/user/${id}`,
+		url: `/v1/o11y/user/${id}`,
 		method: 'GET',
 		signal,
 	});
@@ -597,7 +597,7 @@ export const getUserDeprecated = (
 export const getGetUserDeprecatedQueryKey = ({
 	id,
 }: GetUserDeprecatedPathParameters) => {
-	return [`/api/v1/user/${id}`] as const;
+	return [`/v1/o11y/user/${id}`] as const;
 };
 
 export const getGetUserDeprecatedQueryOptions = <
@@ -691,7 +691,7 @@ export const updateUserDeprecated = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<UpdateUserDeprecated200>({
-		url: `/api/v1/user/${id}`,
+		url: `/v1/o11y/user/${id}`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: typesDeprecatedUserDTO,
@@ -787,14 +787,14 @@ export const useUpdateUserDeprecated = <
  */
 export const getMyUserDeprecated = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetMyUserDeprecated200>({
-		url: `/api/v1/user/me`,
+		url: `/v1/o11y/user/me`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetMyUserDeprecatedQueryKey = () => {
-	return [`/api/v1/user/me`] as const;
+	return [`/v1/o11y/user/me`] as const;
 };
 
 export const getGetMyUserDeprecatedQueryOptions = <
@@ -874,7 +874,7 @@ export const forgotPassword = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/factor_password/forgot`,
+		url: `/v1/o11y/factor_password/forgot`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: typesPostableForgotPasswordDTO,
@@ -957,7 +957,7 @@ export const verifyResetPasswordToken = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/reset_password_tokens/verify`,
+		url: `/v1/o11y/reset_password_tokens/verify`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: typesPostableVerifyResetPasswordTokenDTO,
@@ -1041,7 +1041,7 @@ export const getUsersByRoleID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetUsersByRoleID200>({
-		url: `/api/v2/roles/${id}/users`,
+		url: `/v1/o11y/roles/${id}/users`,
 		method: 'GET',
 		signal,
 	});
@@ -1050,7 +1050,7 @@ export const getUsersByRoleID = (
 export const getGetUsersByRoleIDQueryKey = ({
 	id,
 }: GetUsersByRoleIDPathParameters) => {
-	return [`/api/v2/roles/${id}/users`] as const;
+	return [`/v1/o11y/roles/${id}/users`] as const;
 };
 
 export const getGetUsersByRoleIDQueryOptions = <
@@ -1139,14 +1139,14 @@ export const invalidateGetUsersByRoleID = async (
  */
 export const listUsers = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<ListUsers200>({
-		url: `/api/v2/users`,
+		url: `/v1/o11y/users`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getListUsersQueryKey = () => {
-	return [`/api/v2/users`] as const;
+	return [`/v1/o11y/users`] as const;
 };
 
 export const getListUsersQueryOptions = <
@@ -1218,14 +1218,14 @@ export const getUser = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetUser200>({
-		url: `/api/v2/users/${id}`,
+		url: `/v1/o11y/users/${id}`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetUserQueryKey = ({ id }: GetUserPathParameters) => {
-	return [`/api/v2/users/${id}`] as const;
+	return [`/v1/o11y/users/${id}`] as const;
 };
 
 export const getGetUserQueryOptions = <
@@ -1308,7 +1308,7 @@ export const updateUser = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/users/${id}`,
+		url: `/v1/o11y/users/${id}`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: typesUpdatableUserDTO,
@@ -1406,7 +1406,7 @@ export const getResetPasswordToken = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetResetPasswordToken200>({
-		url: `/api/v2/users/${id}/reset_password_tokens`,
+		url: `/v1/o11y/users/${id}/reset_password_tokens`,
 		method: 'GET',
 		signal,
 	});
@@ -1415,7 +1415,7 @@ export const getResetPasswordToken = (
 export const getGetResetPasswordTokenQueryKey = ({
 	id,
 }: GetResetPasswordTokenPathParameters) => {
-	return [`/api/v2/users/${id}/reset_password_tokens`] as const;
+	return [`/v1/o11y/users/${id}/reset_password_tokens`] as const;
 };
 
 export const getGetResetPasswordTokenQueryOptions = <
@@ -1508,7 +1508,7 @@ export const createResetPasswordToken = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateResetPasswordToken201>({
-		url: `/api/v2/users/${id}/reset_password_tokens`,
+		url: `/v1/o11y/users/${id}/reset_password_tokens`,
 		method: 'PUT',
 		signal,
 	});
@@ -1588,7 +1588,7 @@ export const getRolesByUserID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetRolesByUserID200>({
-		url: `/api/v2/users/${id}/roles`,
+		url: `/v1/o11y/users/${id}/roles`,
 		method: 'GET',
 		signal,
 	});
@@ -1597,7 +1597,7 @@ export const getRolesByUserID = (
 export const getGetRolesByUserIDQueryKey = ({
 	id,
 }: GetRolesByUserIDPathParameters) => {
-	return [`/api/v2/users/${id}/roles`] as const;
+	return [`/v1/o11y/users/${id}/roles`] as const;
 };
 
 export const getGetRolesByUserIDQueryOptions = <
@@ -1690,7 +1690,7 @@ export const setRoleByUserID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/users/${id}/roles`,
+		url: `/v1/o11y/users/${id}/roles`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: typesPostableRoleDTO,
@@ -1788,7 +1788,7 @@ export const removeUserRoleByUserIDAndRoleID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/users/${id}/roles/${roleId}`,
+		url: `/v1/o11y/users/${id}/roles/${roleId}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -1865,14 +1865,14 @@ export const useRemoveUserRoleByUserIDAndRoleID = <
  */
 export const getMyUser = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetMyUser200>({
-		url: `/api/v2/users/me`,
+		url: `/v1/o11y/users/me`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetMyUserQueryKey = () => {
-	return [`/api/v2/users/me`] as const;
+	return [`/v1/o11y/users/me`] as const;
 };
 
 export const getGetMyUserQueryOptions = <
@@ -1944,7 +1944,7 @@ export const updateMyUserV2 = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/users/me`,
+		url: `/v1/o11y/users/me`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: typesUpdatableUserDTO,
@@ -2027,7 +2027,7 @@ export const updateMyPassword = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/users/me/factor_password`,
+		url: `/v1/o11y/users/me/factor_password`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: typesChangePasswordRequestDTO,

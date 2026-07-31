@@ -39,7 +39,7 @@ export const listLLMPricingRules = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListLLMPricingRules200>({
-		url: `/api/v1/llm_pricing_rules`,
+		url: `/v1/o11y/llm_pricing_rules`,
 		method: 'GET',
 		params,
 		signal,
@@ -49,7 +49,7 @@ export const listLLMPricingRules = (
 export const getListLLMPricingRulesQueryKey = (
 	params?: ListLLMPricingRulesParams,
 ) => {
-	return [`/api/v1/llm_pricing_rules`, ...(params ? [params] : [])] as const;
+	return [`/v1/o11y/llm_pricing_rules`, ...(params ? [params] : [])] as const;
 };
 
 export const getListLLMPricingRulesQueryOptions = <
@@ -137,7 +137,7 @@ export const createOrUpdateLLMPricingRules = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/llm_pricing_rules`,
+		url: `/v1/o11y/llm_pricing_rules`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: llmpricingruletypesUpdatableLLMPricingRulesDTO,
@@ -221,7 +221,7 @@ export const deleteLLMPricingRule = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/llm_pricing_rules/${id}`,
+		url: `/v1/o11y/llm_pricing_rules/${id}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -301,7 +301,7 @@ export const getLLMPricingRule = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetLLMPricingRule200>({
-		url: `/api/v1/llm_pricing_rules/${id}`,
+		url: `/v1/o11y/llm_pricing_rules/${id}`,
 		method: 'GET',
 		signal,
 	});
@@ -310,7 +310,7 @@ export const getLLMPricingRule = (
 export const getGetLLMPricingRuleQueryKey = ({
 	id,
 }: GetLLMPricingRulePathParameters) => {
-	return [`/api/v1/llm_pricing_rules/${id}`] as const;
+	return [`/v1/o11y/llm_pricing_rules/${id}`] as const;
 };
 
 export const getGetLLMPricingRuleQueryOptions = <

@@ -116,7 +116,7 @@ describe('TopOperation API Integration', () => {
 
 		server.use(
 			rest.post(
-				'http://localhost/api/v2/service/top_operations',
+				'http://localhost/v1/o11y/service/top_operations',
 				async (req, res, ctx) => {
 					const body = await req.json();
 					apiCalls.push({ endpoint: TOP_OPERATIONS_ENDPOINT, body });
@@ -127,7 +127,7 @@ describe('TopOperation API Integration', () => {
 				},
 			),
 			rest.post(
-				'http://localhost/api/v2/service/entry_point_operations',
+				'http://localhost/v1/o11y/service/entry_point_operations',
 				async (req, res, ctx) => {
 					const body = await req.json();
 					apiCalls.push({ endpoint: ENTRY_POINT_OPERATIONS_ENDPOINT, body });

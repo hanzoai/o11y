@@ -60,7 +60,7 @@ export const agentCheckInDeprecated = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<AgentCheckInDeprecated200>({
-		url: `/api/v1/cloud-integrations/${cloudProvider}/agent-check-in`,
+		url: `/v1/o11y/cloud-integrations/${cloudProvider}/agent-check-in`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: cloudintegrationtypesPostableAgentCheckInDTO,
@@ -160,7 +160,7 @@ export const listAccounts = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListAccounts200>({
-		url: `/api/v1/cloud_integrations/${cloudProvider}/accounts`,
+		url: `/v1/o11y/cloud_integrations/${cloudProvider}/accounts`,
 		method: 'GET',
 		signal,
 	});
@@ -169,7 +169,7 @@ export const listAccounts = (
 export const getListAccountsQueryKey = ({
 	cloudProvider,
 }: ListAccountsPathParameters) => {
-	return [`/api/v1/cloud_integrations/${cloudProvider}/accounts`] as const;
+	return [`/v1/o11y/cloud_integrations/${cloudProvider}/accounts`] as const;
 };
 
 export const getListAccountsQueryOptions = <
@@ -263,7 +263,7 @@ export const createAccount = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateAccount201>({
-		url: `/api/v1/cloud_integrations/${cloudProvider}/accounts`,
+		url: `/v1/o11y/cloud_integrations/${cloudProvider}/accounts`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: cloudintegrationtypesPostableAccountDTO,
@@ -361,7 +361,7 @@ export const disconnectAccount = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/cloud_integrations/${cloudProvider}/accounts/${id}`,
+		url: `/v1/o11y/cloud_integrations/${cloudProvider}/accounts/${id}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -440,7 +440,7 @@ export const getAccount = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetAccount200>({
-		url: `/api/v1/cloud_integrations/${cloudProvider}/accounts/${id}`,
+		url: `/v1/o11y/cloud_integrations/${cloudProvider}/accounts/${id}`,
 		method: 'GET',
 		signal,
 	});
@@ -450,7 +450,7 @@ export const getGetAccountQueryKey = ({
 	cloudProvider,
 	id,
 }: GetAccountPathParameters) => {
-	return [`/api/v1/cloud_integrations/${cloudProvider}/accounts/${id}`] as const;
+	return [`/v1/o11y/cloud_integrations/${cloudProvider}/accounts/${id}`] as const;
 };
 
 export const getGetAccountQueryOptions = <
@@ -542,7 +542,7 @@ export const updateAccount = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/cloud_integrations/${cloudProvider}/accounts/${id}`,
+		url: `/v1/o11y/cloud_integrations/${cloudProvider}/accounts/${id}`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: cloudintegrationtypesUpdatableAccountDTO,
@@ -641,7 +641,7 @@ export const updateService = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/cloud_integrations/${cloudProvider}/accounts/${id}/services/${serviceId}`,
+		url: `/v1/o11y/cloud_integrations/${cloudProvider}/accounts/${id}/services/${serviceId}`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: cloudintegrationtypesUpdatableServiceDTO,
@@ -740,7 +740,7 @@ export const agentCheckIn = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<AgentCheckIn200>({
-		url: `/api/v1/cloud_integrations/${cloudProvider}/accounts/check_in`,
+		url: `/v1/o11y/cloud_integrations/${cloudProvider}/accounts/check_in`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: cloudintegrationtypesPostableAgentCheckInDTO,
@@ -838,7 +838,7 @@ export const getConnectionCredentials = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetConnectionCredentials200>({
-		url: `/api/v1/cloud_integrations/${cloudProvider}/credentials`,
+		url: `/v1/o11y/cloud_integrations/${cloudProvider}/credentials`,
 		method: 'GET',
 		signal,
 	});
@@ -847,7 +847,7 @@ export const getConnectionCredentials = (
 export const getGetConnectionCredentialsQueryKey = ({
 	cloudProvider,
 }: GetConnectionCredentialsPathParameters) => {
-	return [`/api/v1/cloud_integrations/${cloudProvider}/credentials`] as const;
+	return [`/v1/o11y/cloud_integrations/${cloudProvider}/credentials`] as const;
 };
 
 export const getGetConnectionCredentialsQueryOptions = <
@@ -946,7 +946,7 @@ export const listServicesMetadata = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListServicesMetadata200>({
-		url: `/api/v1/cloud_integrations/${cloudProvider}/services`,
+		url: `/v1/o11y/cloud_integrations/${cloudProvider}/services`,
 		method: 'GET',
 		params,
 		signal,
@@ -958,7 +958,7 @@ export const getListServicesMetadataQueryKey = (
 	params?: ListServicesMetadataParams,
 ) => {
 	return [
-		`/api/v1/cloud_integrations/${cloudProvider}/services`,
+		`/v1/o11y/cloud_integrations/${cloudProvider}/services`,
 		...(params ? [params] : []),
 	] as const;
 };
@@ -1062,7 +1062,7 @@ export const getService = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetService200>({
-		url: `/api/v1/cloud_integrations/${cloudProvider}/services/${serviceId}`,
+		url: `/v1/o11y/cloud_integrations/${cloudProvider}/services/${serviceId}`,
 		method: 'GET',
 		params,
 		signal,
@@ -1074,7 +1074,7 @@ export const getGetServiceQueryKey = (
 	params?: GetServiceParams,
 ) => {
 	return [
-		`/api/v1/cloud_integrations/${cloudProvider}/services/${serviceId}`,
+		`/v1/o11y/cloud_integrations/${cloudProvider}/services/${serviceId}`,
 		...(params ? [params] : []),
 	] as const;
 };

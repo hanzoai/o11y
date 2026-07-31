@@ -18,7 +18,7 @@ jest.mock('api/utils', () => ({
 	Logout: jest.fn().mockResolvedValue(undefined),
 }));
 
-const VERIFY_TOKEN_ENDPOINT = '*/api/v2/reset_password_tokens/verify';
+const VERIFY_TOKEN_ENDPOINT = '*/v1/o11y/reset_password_tokens/verify';
 const VERSION_ENDPOINT = '*/version';
 
 const mockHistoryPush = history.push as jest.MockedFunction<

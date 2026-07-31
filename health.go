@@ -30,7 +30,7 @@ var (
 )
 
 // SetHealth registers the runtime's service-health handler so the liveness,
-// readiness and health probes under /v1/o11y/api/v2/* dispatch on the native
+// readiness and health probes under /v1/o11y/* dispatch on the native
 // router. The embedding host calls it after constructing the runtime, passing
 // factory.NewHandler(runtime.Registry). Safe for concurrent use; pass nil to
 // unset (the probes then fall through to the delegated runtime handler).
@@ -48,13 +48,13 @@ func getHealth() factory.Handler {
 }
 
 // mountHealth registers the probe group on the native router, ahead of the
-// /v1/o11y/* delegation wildcard. The external paths mirror the internal
-// /api/v2/* routes the runtime already serves, so the public contract is
-// unchanged — only the dispatch moves off mux.
+// /v1/o11y/* delegation wildcard. The paths are the SAME literals the runtime
+// registers on mux (o11yapiserver registry.go), so native dispatch and the
+// fall-through answer the same request — one spelling per probe, not two.
 func mountHealth(app *zip.App) {
-	app.Get("/v1/o11y/api/v2/livez", livez)
-	app.Get("/v1/o11y/api/v2/healthz", probe(func(h factory.Handler) http.HandlerFunc { return h.Healthz }))
-	app.Get("/v1/o11y/api/v2/readyz", probe(func(h factory.Handler) http.HandlerFunc { return h.Readyz }))
+	app.Get("/v1/o11y/livez", livez)
+	app.Get("/v1/o11y/healthz", probe(func(h factory.Handler) http.HandlerFunc { return h.Healthz }))
+	app.Get("/v1/o11y/readyz", probe(func(h factory.Handler) http.HandlerFunc { return h.Readyz }))
 }
 
 // livez reports process liveness. factory.Handler.Livez renders an empty success

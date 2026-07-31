@@ -18,7 +18,7 @@ import {
 	mockQueryBuilderContextValue,
 } from './mock';
 
-const queryRangeURL = 'http://localhost/api/v3/query_range';
+const queryRangeURL = 'http://localhost/v1/o11y/query_range';
 const ACTIVE_LOG_ID = 'test-log-id';
 jest.mock('react-router-dom', () => ({
 	...jest.requireActual('react-router-dom'),

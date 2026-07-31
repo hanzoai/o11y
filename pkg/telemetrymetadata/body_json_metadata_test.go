@@ -26,7 +26,7 @@ func TestBuildListLogsJSONIndexesQuery(t *testing.T) {
 				"WHERE database = ? AND table = ? AND (expr ILIKE ? OR expr ILIKE ?)",
 			expectedArgs: []any{
 				telemetrylogs.DBName,
-				telemetrylogs.LogsV2LocalTableName,
+				telemetrylogs.LogLocalTableName,
 				fmt.Sprintf("%%%s%%", querybuilder.FormatValueForContains(constants.BodyV2ColumnPrefix)),
 				fmt.Sprintf("%%%s%%", querybuilder.FormatValueForContains(constants.BodyPromotedColumnPrefix)),
 			},
@@ -39,7 +39,7 @@ func TestBuildListLogsJSONIndexesQuery(t *testing.T) {
 				"WHERE database = ? AND table = ? AND (expr ILIKE ? OR expr ILIKE ?) AND (replaceAll(expr, '`', '') ILIKE ? OR replaceAll(expr, '`', '') ILIKE ?)",
 			expectedArgs: []any{
 				telemetrylogs.DBName,
-				telemetrylogs.LogsV2LocalTableName,
+				telemetrylogs.LogLocalTableName,
 				fmt.Sprintf("%%%s%%", querybuilder.FormatValueForContains(constants.BodyV2ColumnPrefix)),
 				fmt.Sprintf("%%%s%%", querybuilder.FormatValueForContains(constants.BodyPromotedColumnPrefix)),
 				fmt.Sprintf("%%%s%%", querybuilder.FormatValueForContains("foo")),

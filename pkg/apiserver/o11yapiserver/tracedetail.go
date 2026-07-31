@@ -10,7 +10,7 @@ import (
 )
 
 func (provider *provider) addTraceDetailRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v4/traces/{traceID}/waterfall", handler.New(
+	if err := router.Handle("/v1/o11y/traces/{traceID}/waterfall", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.traceDetailHandler.GetWaterfallV4),
 		handler.OpenAPIDef{
 			ID:                  "GetWaterfallV4",
@@ -29,7 +29,7 @@ func (provider *provider) addTraceDetailRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/traces/{traceID}/aggregations", handler.New(
+	if err := router.Handle("/v1/o11y/traces/{traceID}/aggregations", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.traceDetailHandler.GetTraceAggregations),
 		handler.OpenAPIDef{
 			ID:                  "GetTraceAggregations",
@@ -48,7 +48,7 @@ func (provider *provider) addTraceDetailRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v3/traces/{traceID}/flamegraph", handler.New(
+	if err := router.Handle("/v1/o11y/traces/{traceID}/flamegraph", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.traceDetailHandler.GetFlamegraph),
 		handler.OpenAPIDef{
 			ID:                  "GetFlamegraph",

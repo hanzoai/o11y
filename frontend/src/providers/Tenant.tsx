@@ -7,6 +7,8 @@ import {
 	type JSX,
 } from 'react';
 
+import { withBasePath } from 'utils/basePath';
+
 export interface TenantBranding {
 	/** Display name / wordmark text */
 	name: string;
@@ -47,7 +49,9 @@ export function TenantProvider({
 	const [tenant, setTenant] = useState<TenantBranding>(DEFAULT_TENANT);
 
 	useEffect(() => {
-		fetch('/api/v1/tenant')
+		// Raw fetch — no axios interceptor runs here, so the base path is applied
+		// explicitly. Same seam as `interceptorsRequestBasePath`.
+		fetch(withBasePath('/v1/o11y/tenant'))
 			.then((res) => {
 				if (!res.ok) throw new Error(`${res.status}`);
 				return res.json();
