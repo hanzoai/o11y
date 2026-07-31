@@ -8,41 +8,75 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 )
 
+// Metrics live in the ONE event database beside the other signals, named for what
+// they are: a row of metric is one sample, a row of series is one series. The
+// fingerprint/series model is unchanged — samples carry a UInt64 fingerprint that
+// every query INNER JOINs through the series dimension table, because rate() and
+// increase() need WINDOW PARTITION BY fingerprint over physically fingerprint-ordered
+// rows, which no time-ordered table can express.
+//
+// There are no Distributed wrappers on this deployment, so the distributed and local
+// name of a table are the same string. The pair is kept because the query builders
+// distinguish the two roles, and a sharded deployment would reintroduce the split in
+// exactly one place: here.
 const (
-	DBName                           = "o11y_metrics"
-	UpdatedMetadataTableName         = "distributed_updated_metadata"
-	UpdatedMetadataLocalTableName    = "updated_metadata"
-	SamplesV4TableName               = "distributed_samples_v4"
-	SamplesV4LocalTableName          = "samples_v4"
-	SamplesV4Agg5mTableName          = "distributed_samples_v4_agg_5m"
-	SamplesV4Agg5mLocalTableName     = "samples_v4_agg_5m"
-	SamplesV4Agg30mTableName         = "distributed_samples_v4_agg_30m"
-	SamplesV4Agg30mLocalTableName    = "samples_v4_agg_30m"
-	ExpHistogramTableName            = "distributed_exp_hist"
-	ExpHistogramLocalTableName       = "exp_hist"
-	TimeseriesV4TableName            = "distributed_time_series_v4"
-	TimeseriesV4LocalTableName       = "time_series_v4"
-	TimeseriesV46hrsTableName        = "distributed_time_series_v4_6hrs"
-	TimeseriesV46hrsLocalTableName   = "time_series_v4_6hrs"
-	TimeseriesV41dayTableName        = "distributed_time_series_v4_1day"
-	TimeseriesV41dayLocalTableName   = "time_series_v4_1day"
-	TimeseriesV41weekTableName       = "distributed_time_series_v4_1week"
-	TimeseriesV41weekLocalTableName  = "time_series_v4_1week"
-	AttributesMetadataTableName      = "distributed_metadata"
-	AttributesMetadataLocalTableName = "metadata"
+	DBName = "event"
 
-	// The buffer holds raw points for ~24h; the reduced tables hold 60s
-	// aggregates of dropped-label series.
-	SamplesV4BufferTableName          = "distributed_samples_v4_buffer"
-	SamplesV4BufferLocalTableName     = "samples_v4_buffer"
-	TimeseriesV4BufferTableName       = "distributed_time_series_v4_buffer"
-	TimeseriesV4BufferLocalTableName  = "time_series_v4_buffer"
-	SamplesV4ReducedLastTableName     = "distributed_samples_v4_reduced_last_60s"
-	SamplesV4ReducedSumTableName      = "distributed_samples_v4_reduced_sum_60s"
-	TimeseriesV4ReducedTableName      = "distributed_time_series_v4_reduced"
-	TimeseriesV4ReducedLocalTableName = "time_series_v4_reduced"
+	DescriptorTableName      = "descriptor"
+	DescriptorLocalTableName = "descriptor"
 
-	ReductionRulesTableName = "distributed_metric_reduction_rules"
+	MetricTableName      = "metric"
+	MetricLocalTableName = "metric"
+
+	Metric5mTableName      = "metric_5m"
+	Metric5mLocalTableName = "metric_5m"
+
+	Metric30mTableName      = "metric_30m"
+	Metric30mLocalTableName = "metric_30m"
+
+	SeriesTableName      = "series"
+	SeriesLocalTableName = "series"
+
+	Series6hTableName      = "series_6h"
+	Series6hLocalTableName = "series_6h"
+
+	Series1dTableName      = "series_1d"
+	Series1dLocalTableName = "series_1d"
+
+	Series1wTableName      = "series_1w"
+	Series1wLocalTableName = "series_1w"
+)
+
+// The names below are NOT part of the applied event schema — the deployed database
+// holds metric, metric_5m, metric_30m, series, series_6h, series_1d, series_1w and
+// descriptor, and nothing else. They name the tables the exponential-histogram,
+// reduced-metric and metric-metadata code paths read, so those paths are wired to
+// the event plane the day the tables are added rather than carrying a second naming
+// scheme. Until then a query through them fails on a missing table, which is the
+// honest outcome.
+const (
+	// histogram holds exponential-histogram sketch points, which do not decompose
+	// into plain samples.
+	HistogramTableName      = "histogram"
+	HistogramLocalTableName = "histogram"
+
+	// The buffers hold raw points for ~24h; the reduced tables hold 60s aggregates
+	// of dropped-label series.
+	MetricBufferTableName       = "metric_buffer"
+	MetricBufferLocalTableName  = "metric_buffer"
+	SeriesBufferTableName       = "series_buffer"
+	SeriesBufferLocalTableName  = "series_buffer"
+	MetricReducedLastTableName  = "metric_reduced_last"
+	MetricReducedSumTableName   = "metric_reduced_sum"
+	SeriesReducedTableName      = "series_reduced"
+	SeriesReducedLocalTableName = "series_reduced"
+
+	// metric_attribute is one attribute of one metric — the metadata dimension.
+	AttributeTableName      = "metric_attribute"
+	AttributeLocalTableName = "metric_attribute"
+
+	// reduction is one label-reduction rule.
+	ReductionTableName = "reduction"
 )
 
 var (
@@ -66,10 +100,10 @@ func WhichTSTableToUse(
 	tableHints *metrictypes.MetricTableHints,
 ) (uint64, uint64, string, string) {
 	// the buffer holds the recent raw window for reduced metrics and has the same
-	// shape as time_series_v4; round the start to the hour like the v4 table.
+	// shape as series; round the start to the hour like series does.
 	if useBuffer {
 		start = start - (start % (oneHourInMilliseconds))
-		return start, end, TimeseriesV4BufferTableName, TimeseriesV4BufferLocalTableName
+		return start, end, SeriesBufferTableName, SeriesBufferLocalTableName
 	}
 
 	// if we have a hint for the table, we need to use it
@@ -78,67 +112,65 @@ func WhichTSTableToUse(
 		if tableHints.TimeSeriesTableName != "" {
 			var distributedTableName string
 			switch tableHints.TimeSeriesTableName {
-			case TimeseriesV4LocalTableName:
+			case SeriesLocalTableName:
 				// adjust the start time to nearest 1 hour
 				start = start - (start % (oneHourInMilliseconds))
-				distributedTableName = TimeseriesV4TableName
-			case TimeseriesV46hrsLocalTableName:
+				distributedTableName = SeriesTableName
+			case Series6hLocalTableName:
 				// adjust the start time to nearest 6 hours
 				start = start - (start % (sixHoursInMilliseconds))
-				distributedTableName = TimeseriesV46hrsTableName
-			case TimeseriesV41dayLocalTableName:
+				distributedTableName = Series6hTableName
+			case Series1dLocalTableName:
 				// adjust the start time to nearest 1 day
 				start = start - (start % (oneDayInMilliseconds))
-				distributedTableName = TimeseriesV41dayTableName
-			case TimeseriesV41weekLocalTableName:
+				distributedTableName = Series1dTableName
+			case Series1wLocalTableName:
 				// adjust the start time to nearest 1 week
 				start = start - (start % (oneWeekInMilliseconds))
-				distributedTableName = TimeseriesV41weekTableName
+				distributedTableName = Series1wTableName
 			}
 			return start, end, distributedTableName, tableHints.TimeSeriesTableName
 		}
 	}
 
-	// If time range is less than 6 hours, we need to use the `time_series_v4` table
-	// else if time range is less than 1 day and greater than 6 hours, we need to use the `time_series_v4_6hrs` table
-	// else if time range is less than 1 week and greater than 1 day, we need to use the `time_series_v4_1day` table
-	// else we need to use the `time_series_v4_1week` table
+	// Pick the coarsest rollup the window can afford: series under 6 hours, then
+	// series_6h under a day, series_1d under a week, series_1w beyond that.
 	var distributedTableName string
 	var localTableName string
 	if end-start < sixHoursInMilliseconds {
 		// adjust the start time to nearest 1 hour
 		start = start - (start % (oneHourInMilliseconds))
-		distributedTableName = TimeseriesV4TableName
-		localTableName = TimeseriesV4LocalTableName
+		distributedTableName = SeriesTableName
+		localTableName = SeriesLocalTableName
 	} else if end-start < oneDayInMilliseconds {
 		// adjust the start time to nearest 6 hours
 		start = start - (start % (sixHoursInMilliseconds))
-		distributedTableName = TimeseriesV46hrsTableName
-		localTableName = TimeseriesV46hrsLocalTableName
+		distributedTableName = Series6hTableName
+		localTableName = Series6hLocalTableName
 	} else if end-start < oneWeekInMilliseconds {
 		// adjust the start time to nearest 1 day
 		start = start - (start % (oneDayInMilliseconds))
-		distributedTableName = TimeseriesV41dayTableName
-		localTableName = TimeseriesV41dayLocalTableName
+		distributedTableName = Series1dTableName
+		localTableName = Series1dLocalTableName
 	} else {
 		// adjust the start time to nearest 1 week
 		start = start - (start % (oneWeekInMilliseconds))
-		distributedTableName = TimeseriesV41weekTableName
-		localTableName = TimeseriesV41weekLocalTableName
+		distributedTableName = Series1wTableName
+		localTableName = Series1wLocalTableName
 	}
 
 	return start, end, distributedTableName, localTableName
 }
 
 // CountExpressionForSamplesTable returns the count expression for a given samples table name.
-// For non-aggregated tables (distributed_samples_v4, exp_hist), it returns "count(*)".
-// For aggregated tables (distributed_samples_v4_agg_5m, distributed_samples_v4_agg_30m), it returns "sum(count)".
+// For the raw tables (metric, histogram) it returns "count(*)"; for the rollups
+// (metric_5m, metric_30m), whose rows already carry a count, it returns "sum(count)".
 func CountExpressionForSamplesTable(tableName string) string {
 	// Non-aggregated tables use count(*)
-	if tableName == SamplesV4TableName ||
-		tableName == SamplesV4LocalTableName ||
-		tableName == ExpHistogramTableName ||
-		tableName == ExpHistogramLocalTableName {
+	if tableName == MetricTableName ||
+		tableName == MetricLocalTableName ||
+		tableName == HistogramTableName ||
+		tableName == HistogramLocalTableName {
 		return "count(*)"
 	}
 	// Aggregated tables use sum(count)
@@ -150,7 +182,7 @@ func CountExpressionForSamplesTable(tableName string) string {
 // note all the other columns in the aggregated samples tables are nothing but aggregations.
 // and so "last" is the value column for these tables.
 func ValueColumnForSamplesTable(tableName string) string {
-	if tableName == SamplesV4Agg5mTableName || tableName == SamplesV4Agg30mTableName {
+	if tableName == Metric5mTableName || tableName == Metric30mTableName {
 		return "last"
 	}
 	return "value"
@@ -160,9 +192,9 @@ func ValueColumnForSamplesTable(tableName string) string {
 // (in that order) appropriate for the given window, metric type, and time aggregation.
 //
 // start and end are in milliseconds. We have three tables for samples:
-//  1. distributed_samples_v4
-//  2. distributed_samples_v4_agg_5m — for queries with time range >= 1 day and < 1 week
-//  3. distributed_samples_v4_agg_30m — for queries with time range >= 1 week
+//  1. metric
+//  2. metric_5m — for queries with time range >= 1 day and < 1 week
+//  3. metric_30m — for queries with time range >= 1 week
 //
 // If the `timeAggregation` is `count_distinct` we can't use the aggregated tables
 // because they don't support it.
@@ -173,9 +205,9 @@ func WhichSamplesTableToUse(
 	useBuffer bool,
 	tableHints *metrictypes.MetricTableHints,
 ) (string, string) {
-	// the buffer holds the recent raw window for reduced metrics; same shape as samples_v4
+	// the buffer holds the recent raw window for reduced metrics; same shape as metric
 	if useBuffer {
-		return SamplesV4BufferTableName, SamplesV4BufferLocalTableName
+		return MetricBufferTableName, MetricBufferLocalTableName
 	}
 
 	// if we have a hint for the table, we need to use it
@@ -183,35 +215,35 @@ func WhichSamplesTableToUse(
 	// SamplesTableName is the distributed name; derive the local via switch.
 	if tableHints != nil && tableHints.SamplesTableName != "" {
 		switch tableHints.SamplesTableName {
-		case SamplesV4TableName, SamplesV4BufferTableName:
-			return SamplesV4TableName, SamplesV4LocalTableName
-		case SamplesV4Agg5mTableName:
-			return SamplesV4Agg5mTableName, SamplesV4Agg5mLocalTableName
-		case SamplesV4Agg30mTableName:
-			return SamplesV4Agg30mTableName, SamplesV4Agg30mLocalTableName
-		case ExpHistogramTableName:
-			return ExpHistogramTableName, ExpHistogramLocalTableName
+		case MetricTableName, MetricBufferTableName:
+			return MetricTableName, MetricLocalTableName
+		case Metric5mTableName:
+			return Metric5mTableName, Metric5mLocalTableName
+		case Metric30mTableName:
+			return Metric30mTableName, Metric30mLocalTableName
+		case HistogramTableName:
+			return HistogramTableName, HistogramLocalTableName
 		}
 		return tableHints.SamplesTableName, tableHints.SamplesTableName
 	}
 
 	// we don't have any aggregated table for sketches (yet)
 	if metricType == metrictypes.ExpHistogramType {
-		return ExpHistogramTableName, ExpHistogramLocalTableName
+		return HistogramTableName, HistogramLocalTableName
 	}
 
-	// if the time aggregation is count_distinct, we need to use the distributed_samples_v4 table
+	// if the time aggregation is count_distinct, we need to use the raw metric table
 	// because the aggregated tables don't support count_distinct
 	if timeAggregation == metrictypes.TimeAggregationCountDistinct {
-		return SamplesV4TableName, SamplesV4LocalTableName
+		return MetricTableName, MetricLocalTableName
 	}
 
 	if end-start < oneDayInMilliseconds+offsetBucket {
-		return SamplesV4TableName, SamplesV4LocalTableName
+		return MetricTableName, MetricLocalTableName
 	} else if end-start < oneWeekInMilliseconds+offsetBucket {
-		return SamplesV4Agg5mTableName, SamplesV4Agg5mLocalTableName
+		return Metric5mTableName, Metric5mLocalTableName
 	}
-	return SamplesV4Agg30mTableName, SamplesV4Agg30mLocalTableName
+	return Metric30mTableName, Metric30mLocalTableName
 }
 
 func AggregationColumnForSamplesTable(
@@ -226,7 +258,7 @@ func AggregationColumnForSamplesTable(
 		// although it doesn't make sense to use anyLast, avg, min, max, count on delta metrics,
 		// we are keeping it here to make sure that query will not be invalid
 		switch tableName {
-		case SamplesV4TableName, SamplesV4BufferTableName:
+		case MetricTableName, MetricBufferTableName:
 			switch timeAggregation {
 			case metrictypes.TimeAggregationLatest:
 				aggregationColumn = "anyLast(value)"
@@ -245,7 +277,7 @@ func AggregationColumnForSamplesTable(
 			case metrictypes.TimeAggregationRate, metrictypes.TimeAggregationIncrease: // only these two options give meaningful results
 				aggregationColumn = "sum(value)"
 			}
-		case SamplesV4Agg5mTableName, SamplesV4Agg30mTableName:
+		case Metric5mTableName, Metric30mTableName:
 			switch timeAggregation {
 			case metrictypes.TimeAggregationLatest:
 				aggregationColumn = "anyLast(last)"
@@ -268,7 +300,7 @@ func AggregationColumnForSamplesTable(
 		// for cumulative metrics, we only support `RATE`/`INCREASE`. The max value in window is
 		// used to calculate the sum which is then divided by the window size to get the rate
 		switch tableName {
-		case SamplesV4TableName, SamplesV4BufferTableName:
+		case MetricTableName, MetricBufferTableName:
 			switch timeAggregation {
 			case metrictypes.TimeAggregationLatest:
 				aggregationColumn = "anyLast(value)"
@@ -287,7 +319,7 @@ func AggregationColumnForSamplesTable(
 			case metrictypes.TimeAggregationRate, metrictypes.TimeAggregationIncrease: // only these two options give meaningful results
 				aggregationColumn = "max(value)"
 			}
-		case SamplesV4Agg5mTableName, SamplesV4Agg30mTableName:
+		case Metric5mTableName, Metric30mTableName:
 			switch timeAggregation {
 			case metrictypes.TimeAggregationLatest:
 				aggregationColumn = "anyLast(last)"
@@ -308,7 +340,7 @@ func AggregationColumnForSamplesTable(
 		}
 	case metrictypes.Unspecified:
 		switch tableName {
-		case SamplesV4TableName, SamplesV4BufferTableName:
+		case MetricTableName, MetricBufferTableName:
 			switch timeAggregation {
 			case metrictypes.TimeAggregationLatest:
 				aggregationColumn = "anyLast(value)"
@@ -327,7 +359,7 @@ func AggregationColumnForSamplesTable(
 			case metrictypes.TimeAggregationRate, metrictypes.TimeAggregationIncrease: // ideally, this should never happen
 				aggregationColumn = "sum(value)"
 			}
-		case SamplesV4Agg5mTableName, SamplesV4Agg30mTableName:
+		case Metric5mTableName, Metric30mTableName:
 			switch timeAggregation {
 			case metrictypes.TimeAggregationLatest:
 				aggregationColumn = "anyLast(last)"
@@ -361,9 +393,9 @@ func AggregationColumnForSamplesTable(
 // and histograms.
 func WhichReducedSamplesTableToUse(metricType metrictypes.Type) string {
 	if metricType == metrictypes.SumType || metricType == metrictypes.HistogramType {
-		return SamplesV4ReducedSumTableName
+		return MetricReducedSumTableName
 	}
-	return SamplesV4ReducedLastTableName
+	return MetricReducedLastTableName
 }
 
 // ReducedValueColumn returns the reduced value column (and the avg-denominator
