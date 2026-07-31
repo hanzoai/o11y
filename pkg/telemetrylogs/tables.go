@@ -18,12 +18,9 @@ const (
 	SkipIndexTableName = "system.data_skipping_indices"
 )
 
-// The names below are NOT part of the applied event schema, which holds event, error,
-// log, span and the metric tables and nothing else. They name the supporting tables
-// the log query plane reads — attribute autocomplete, resource fingerprints, JSON path
-// types — under the one naming scheme, so those paths land in the event plane the day
-// the tables are added rather than carrying a second scheme. Until then a query
-// through them fails on a missing table, which is the honest outcome.
+// The supporting tables of the logs signal — attribute and key autocomplete, resource
+// fingerprints. Their shapes are defined in schema.sql beside this file, and the first
+// four below are applied to the event database.
 //
 // The scheme: a table that SUPPORTS a signal is prefixed by that signal, which is what
 // keeps log_attribute and span_attribute apart now that both planes share one database.
@@ -33,6 +30,17 @@ const (
 	LogKeyTableName            = "log_key"
 	LogResourceKeyTableName    = "log_resource_key"
 	LogResourceTableName       = "log_resource"
-	LogPathTableName           = "log_path"
-	LogPromotedTableName       = "log_promoted"
+)
+
+// These two are declared but NOT applied, because nothing reads them: log_path was
+// distributed_json_path_types and log_promoted was distributed_json_promoted_paths,
+// and neither had a SELECT against it before the rename either. The JSON-body
+// promotion path reads telemetrymetadata.PromotedPathsTableName — a same-named
+// constant in a different package, which is why a naive grep looks like this one has
+// readers. Creating them would mean guessing a column set; a query through a missing
+// table fails loudly, while a table with the wrong columns fails silently and corrupts
+// the lens reading it. They are created the day a reader defines their shape.
+const (
+	LogPathTableName     = "log_path"
+	LogPromotedTableName = "log_promoted"
 )
