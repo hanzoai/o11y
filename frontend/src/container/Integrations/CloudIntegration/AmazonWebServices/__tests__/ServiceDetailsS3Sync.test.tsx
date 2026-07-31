@@ -62,11 +62,11 @@ describe('ServiceDetails for S3 Sync service', () => {
 		testInitialBuckets = {};
 		server.use(
 			rest.get(
-				'http://localhost/api/v1/cloud_integrations/aws/accounts',
+				'http://localhost/v1/o11y/cloud_integrations/aws/accounts',
 				(_req, res, ctx) => res(ctx.json(accountsResponse)),
 			),
 			rest.get(
-				'http://localhost/api/v1/cloud_integrations/aws/services/:serviceId',
+				'http://localhost/v1/o11y/cloud_integrations/aws/services/:serviceId',
 				(req, res, ctx) =>
 					res(
 						ctx.json(
@@ -117,7 +117,7 @@ describe('ServiceDetails for S3 Sync service', () => {
 
 	it('should send updated bucket configuration on save', async () => {
 		let capturedPayload: Record<string, unknown> | null = null;
-		const mockUpdateConfigUrl = `http://localhost/api/v1/cloud_integrations/aws/accounts/${CLOUD_ACCOUNT_ID}/services/s3sync`;
+		const mockUpdateConfigUrl = `http://localhost/v1/o11y/cloud_integrations/aws/accounts/${CLOUD_ACCOUNT_ID}/services/s3sync`;
 
 		// Override PUT handler specifically for this test to capture payload
 		server.use(

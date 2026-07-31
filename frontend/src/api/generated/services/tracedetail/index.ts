@@ -36,7 +36,7 @@ export const getTraceAggregations = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetTraceAggregations200>({
-		url: `/api/v1/traces/${traceID}/aggregations`,
+		url: `/v1/o11y/traces/${traceID}/aggregations`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: spantypesPostableTraceAggregationsDTO,
@@ -136,7 +136,7 @@ export const getWaterfall = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetWaterfall200>({
-		url: `/api/v3/traces/${traceID}/waterfall`,
+		url: `/v1/o11y/traces/${traceID}/waterfall`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: spantypesPostableWaterfallDTO,
@@ -235,7 +235,7 @@ export const getWaterfallV4 = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetWaterfallV4200>({
-		url: `/api/v4/traces/${traceID}/waterfall`,
+		url: `/v1/o11y/traces/${traceID}/waterfall`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: spantypesPostableWaterfallDTO,

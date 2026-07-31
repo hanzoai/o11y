@@ -33,14 +33,14 @@ import type { ErrorType, BodyType } from '../../../generatedAPIInstance';
  */
 export const getHosts = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetHosts200>({
-		url: `/api/v2/zeus/hosts`,
+		url: `/v1/o11y/zeus/hosts`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetHostsQueryKey = () => {
-	return [`/api/v2/zeus/hosts`] as const;
+	return [`/v1/o11y/zeus/hosts`] as const;
 };
 
 export const getGetHostsQueryOptions = <
@@ -112,7 +112,7 @@ export const putHost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/zeus/hosts`,
+		url: `/v1/o11y/zeus/hosts`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: zeustypesPostableHostDTO,
@@ -195,7 +195,7 @@ export const putProfile = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/zeus/profiles`,
+		url: `/v1/o11y/zeus/profiles`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: zeustypesPostableProfileDTO,

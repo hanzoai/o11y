@@ -170,7 +170,7 @@ describe('dashboard list page', () => {
 		};
 		(useLocation as jest.Mock).mockReturnValue(mockLocation);
 		server.use(
-			rest.get('http://localhost/api/v1/dashboards', (_, res, ctx) =>
+			rest.get('http://localhost/v1/o11y/dashboards', (_, res, ctx) =>
 				res(ctx.status(200), ctx.json(dashboardEmptyState)),
 			),
 		);

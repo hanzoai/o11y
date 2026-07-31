@@ -23,11 +23,11 @@ jest.mock('lib/history', () => ({
 }));
 
 // API Endpoints
-const ORG_PREFERENCES_ENDPOINT = '*/api/v1/org/preferences/list';
-const UPDATE_ORG_PREFERENCE_ENDPOINT = '*/api/v1/org/preferences/name/update';
-const UPDATE_PROFILE_ENDPOINT = '*/api/v2/zeus/profiles';
-const EDIT_ORG_ENDPOINT = '*/api/v2/orgs/me';
-const INVITE_USERS_ENDPOINT = '*/api/v1/invite/bulk/create';
+const ORG_PREFERENCES_ENDPOINT = '*/v1/o11y/org/preferences/list';
+const UPDATE_ORG_PREFERENCE_ENDPOINT = '*/v1/o11y/org/preferences/name/update';
+const UPDATE_PROFILE_ENDPOINT = '*/v1/o11y/zeus/profiles';
+const EDIT_ORG_ENDPOINT = '*/v1/o11y/orgs/me';
+const INVITE_USERS_ENDPOINT = '*/v1/o11y/invite/bulk/create';
 
 const mockOrgPreferences = {
 	data: {

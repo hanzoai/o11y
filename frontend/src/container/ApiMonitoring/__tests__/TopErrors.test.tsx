@@ -38,7 +38,7 @@ jest.mock('components/CeleryTask/useNavigateToExplorer', () => ({
 
 describe('TopErrors', () => {
 	const TABLE_BODY_SELECTOR = '.ant-table-tbody';
-	const V5_QUERY_RANGE_API_PATH = '*/api/v5/query_range';
+	const QUERY_RANGE_API_PATH = '*/v1/o11y/query_range';
 
 	const mockProps = {
 		domainName: 'test-domain',
@@ -73,48 +73,51 @@ describe('TopErrors', () => {
 		// Mock useNavigateToExplorer
 		(useNavigateToExplorer as jest.Mock).mockReturnValue(jest.fn());
 
-		// Mock V5 API endpoint for top errors
+		// One endpoint now serves both request shapes, so the single handler
+		// discriminates on the payload: `schemaVersion` is only sent by the
+		// scalar top-errors query, never by the endpoint-dropdown query.
 		server.use(
-			rest.post(V5_QUERY_RANGE_API_PATH, (_req, res, ctx) =>
-				res(
-					ctx.status(200),
-					ctx.json({
-						data: {
-							data: {
-								results: [
-									{
-										columns: [
-											{
-												name: SPAN_ATTRIBUTES.HTTP_URL,
-												fieldDataType: 'string',
-												fieldContext: 'attribute',
-											},
-											{
-												name: 'response_status_code',
-												fieldDataType: 'string',
-												fieldContext: 'span',
-											},
-											{
-												name: 'status_message',
-												fieldDataType: 'string',
-												fieldContext: 'span',
-											},
-											{ name: 'count()', fieldDataType: 'int64', fieldContext: '' },
-										],
-										data: [['/api/test', '500', 'Internal Server Error', 10]],
-									},
-								],
-							},
-						},
-					}),
-				),
-			),
-		);
+			rest.post(QUERY_RANGE_API_PATH, async (req, res, ctx) => {
+				const body = await req.json();
 
-		// Mock V4 API endpoint for dropdown data
-		server.use(
-			rest.post('*/api/v1/query_range', (_req, res, ctx) =>
-				res(
+				if (body?.schemaVersion) {
+					// Top errors table
+					return res(
+						ctx.status(200),
+						ctx.json({
+							data: {
+								data: {
+									results: [
+										{
+											columns: [
+												{
+													name: SPAN_ATTRIBUTES.HTTP_URL,
+													fieldDataType: 'string',
+													fieldContext: 'attribute',
+												},
+												{
+													name: 'response_status_code',
+													fieldDataType: 'string',
+													fieldContext: 'span',
+												},
+												{
+													name: 'status_message',
+													fieldDataType: 'string',
+													fieldContext: 'span',
+												},
+												{ name: 'count()', fieldDataType: 'int64', fieldContext: '' },
+											],
+											data: [['/api/test', '500', 'Internal Server Error', 10]],
+										},
+									],
+								},
+							},
+						}),
+					);
+				}
+
+				// Endpoint dropdown
+				return res(
 					ctx.status(200),
 					ctx.json({
 						payload: {
@@ -134,8 +137,8 @@ describe('TopErrors', () => {
 							},
 						},
 					}),
-				),
-			),
+				);
+			}),
 		);
 	});
 
@@ -162,7 +165,7 @@ describe('TopErrors', () => {
 	it('renders error state when API fails', async () => {
 		// Mock API to return error
 		server.use(
-			rest.post(V5_QUERY_RANGE_API_PATH, (_req, res, ctx) =>
+			rest.post(QUERY_RANGE_API_PATH, (_req, res, ctx) =>
 				res(ctx.status(500), ctx.json({ error: 'Internal Server Error' })),
 			),
 		);

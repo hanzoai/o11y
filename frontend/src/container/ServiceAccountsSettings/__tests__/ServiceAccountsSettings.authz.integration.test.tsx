@@ -8,11 +8,11 @@ import { setupAuthzAdmin } from 'tests/authz-test-utils';
 
 import ServiceAccountsSettings from '../ServiceAccountsSettings';
 
-const SA_LIST_ENDPOINT = '*/api/v1/service_accounts';
-const SA_ENDPOINT = '*/api/v1/service_accounts/:id';
-const SA_KEYS_ENDPOINT = '*/api/v1/service_accounts/:id/keys';
-const SA_ROLES_ENDPOINT = '*/api/v1/service_accounts/:id/roles';
-const ROLES_ENDPOINT = '*/api/v1/roles';
+const SA_LIST_ENDPOINT = '*/v1/o11y/service_accounts';
+const SA_ENDPOINT = '*/v1/o11y/service_accounts/:id';
+const SA_KEYS_ENDPOINT = '*/v1/o11y/service_accounts/:id/keys';
+const SA_ROLES_ENDPOINT = '*/v1/o11y/service_accounts/:id/roles';
+const ROLES_ENDPOINT = '*/v1/o11y/roles';
 
 jest.mock('components/ui/drawer', () => ({
 	...jest.requireActual('components/ui/drawer'),

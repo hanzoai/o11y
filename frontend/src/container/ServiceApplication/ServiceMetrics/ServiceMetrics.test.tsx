@@ -53,7 +53,7 @@ describe('ServicesUsingMetrics', () => {
 
 		// Mock the query range API responses
 		server.use(
-			rest.post('*/api/v1/query_range', (req, res, ctx) =>
+			rest.post('*/v1/o11y/query_range', (req, res, ctx) =>
 				res(
 					ctx.status(200),
 					ctx.json({
@@ -155,7 +155,7 @@ describe('ServicesUsingMetrics', () => {
 
 		// Mock the query range API responses
 		server.use(
-			rest.post('*/api/v1/query_range', (req, res, ctx) =>
+			rest.post('*/v1/o11y/query_range', (req, res, ctx) =>
 				res(
 					ctx.status(200),
 					ctx.json({

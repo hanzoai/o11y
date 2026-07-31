@@ -15,12 +15,12 @@ import {
 
 import ServiceAccountDrawer from '../ServiceAccountDrawer';
 
-const ROLES_ENDPOINT = '*/api/v1/roles';
-const SA_KEYS_ENDPOINT = '*/api/v1/service_accounts/:id/keys';
-const SA_ENDPOINT = '*/api/v1/service_accounts/sa-1';
-const SA_DELETE_ENDPOINT = '*/api/v1/service_accounts/sa-1';
-const SA_ROLES_ENDPOINT = '*/api/v1/service_accounts/:id/roles';
-const SA_ROLE_DELETE_ENDPOINT = '*/api/v1/service_accounts/:id/roles/:rid';
+const ROLES_ENDPOINT = '*/v1/o11y/roles';
+const SA_KEYS_ENDPOINT = '*/v1/o11y/service_accounts/:id/keys';
+const SA_ENDPOINT = '*/v1/o11y/service_accounts/sa-1';
+const SA_DELETE_ENDPOINT = '*/v1/o11y/service_accounts/sa-1';
+const SA_ROLES_ENDPOINT = '*/v1/o11y/service_accounts/:id/roles';
+const SA_ROLE_DELETE_ENDPOINT = '*/v1/o11y/service_accounts/:id/roles/:rid';
 
 const activeAccountResponse = {
 	id: 'sa-1',

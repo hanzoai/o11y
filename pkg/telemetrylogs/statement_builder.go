@@ -55,7 +55,7 @@ func NewLogQueryStatementBuilder(
 	resourceFilterResolver := telemetryresourcefilter.NewResolver[qbtypes.LogAggregation](
 		settings,
 		DBName,
-		LogsResourceV2TableName,
+		LogResourceTableName,
 		telemetrytypes.SignalLogs,
 		telemetrytypes.SourceUnspecified,
 		metadataStore,
@@ -325,7 +325,7 @@ func (b *logQueryStatementBuilder) buildListQuery(
 		}
 	}
 
-	sb.From(fmt.Sprintf("%s.%s", DBName, LogsV2TableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, LogTableName))
 	// Add filter conditions
 	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
 
@@ -431,7 +431,7 @@ func (b *logQueryStatementBuilder) buildTimeSeriesQuery(
 	}
 
 	// Add FROM clause
-	sb.From(fmt.Sprintf("%s.%s", DBName, LogsV2TableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, LogTableName))
 
 	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
 
@@ -589,7 +589,7 @@ func (b *logQueryStatementBuilder) buildScalarQuery(
 		}
 	}
 
-	sb.From(fmt.Sprintf("%s.%s", DBName, LogsV2TableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, LogTableName))
 
 	// Add filter conditions
 	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)

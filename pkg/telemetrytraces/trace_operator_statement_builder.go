@@ -39,7 +39,7 @@ func NewTraceOperatorStatementBuilder(
 	resourceFilterStmtBuilder := telemetryresourcefilter.New[qbtypes.TraceAggregation](
 		settings,
 		DBName,
-		TracesResourceV3TableName,
+		SpanResourceTableName,
 		telemetrytypes.SignalTraces,
 		telemetrytypes.SourceUnspecified,
 		metadataStore,

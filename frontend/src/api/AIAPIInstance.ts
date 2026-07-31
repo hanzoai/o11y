@@ -8,8 +8,19 @@ import {
 } from 'api';
 import { getO11yInstanceUrl } from 'utils/o11yInstanceUrl';
 
-/** Path-only base for the AI Assistant API. */
-export const AI_API_PATH = '/api/v1/assistant';
+import apiV1 from './apiV1';
+
+/**
+ * Path-only base for the AI Assistant API — the single place the assistant
+ * prefix is spelled. Built on the one `apiV1` prefix so the assistant shares
+ * the `/v1/o11y/` namespace with every other route.
+ *
+ * NOTE: this surface is client-only. No `assistant` route exists in the
+ * backend (`pkg/`); requests go to the separate AI backend named by the
+ * global config's `ai_assistant_url`. Against the O11y server itself the
+ * path 404s — see `src/api/ai-assistant/index.ts`.
+ */
+export const AI_API_PATH = `${apiV1}assistant`;
 
 /** Header that tells the AI backend which O11y instance to query against. */
 export const O11Y_URL_HEADER = 'X-O11y-URL';

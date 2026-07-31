@@ -110,8 +110,23 @@ type Event struct {
 	UserID      string            `json:"userId,omitempty"`
 	UserEmail   string            `json:"userEmail,omitempty"`
 	UserIP      string            `json:"userIp,omitempty"`
+	Handled     bool              `json:"handled"`
 	Tags        map[string]string `json:"tags,omitempty"`
-	Sample      string            `json:"-"` // full normalized Occurrence JSON, for event detail
+	Frames      []Frame           `json:"frames,omitempty"`
+}
+
+// Frame is one stack frame of the captured exception. event.error stores the stack as
+// five parallel arrays (frames.function / .file / .line / .column / .own) rather than
+// a JSON blob, so the crash site is a queryable column; Frame is the zipped view of
+// one index across those arrays.
+type Frame struct {
+	Function string `json:"function,omitempty"`
+	File     string `json:"file,omitempty"`
+	Line     uint32 `json:"line,omitempty"`
+	Column   uint32 `json:"column,omitempty"`
+	// Own marks a frame in the reporting application's own code, as opposed to a
+	// dependency or runtime frame.
+	Own bool `json:"own,omitempty"`
 }
 
 // Window is a resolved absolute time range [From, To]. Every columnar read is bounded
@@ -162,5 +177,7 @@ type TraceSummary struct {
 	Count     uint64    `json:"count"`
 	FirstSeen time.Time `json:"firstSeen"`
 	LastSeen  time.Time `json:"lastSeen"`
-	Sample    string    `json:"sample,omitempty"`
+	// Message is the latest error message seen on the trace — argMax(message, time).
+	// event.error has no `sample` column, so the representative text IS the message.
+	Message string `json:"message,omitempty"`
 }

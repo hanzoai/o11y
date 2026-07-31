@@ -17,15 +17,11 @@ import { topLevelOperationSuccessResponse } from './__mockdata__/top_level_opera
 import { traceDetailResponse } from './__mockdata__/tracedetail';
 
 export const handlers = [
-	rest.post('http://localhost/api/v3/query_range', (req, res, ctx) =>
+	rest.post('http://localhost/v1/o11y/query_range', (req, res, ctx) =>
 		res(ctx.status(200), ctx.json(queryRangeSuccessResponse)),
 	),
 
-	rest.post('http://localhost/api/v4/query_range', (req, res, ctx) =>
-		res(ctx.status(200), ctx.json(queryRangeSuccessResponse)),
-	),
-
-	rest.post('http://localhost/api/v2/services', (req, res, ctx) =>
+	rest.post('http://localhost/v1/o11y/services', (req, res, ctx) =>
 		res(
 			ctx.status(200),
 			ctx.json({ status: 'success', data: serviceSuccessResponse }),
@@ -33,16 +29,16 @@ export const handlers = [
 	),
 
 	rest.post(
-		'http://localhost/api/v1/service/top_level_operations',
+		'http://localhost/v1/o11y/service/top_level_operations',
 		(req, res, ctx) =>
 			res(ctx.status(200), ctx.json(topLevelOperationSuccessResponse)),
 	),
 
-	rest.get('http://localhost/api/v1/user', (req, res, ctx) =>
+	rest.get('http://localhost/v1/o11y/user', (req, res, ctx) =>
 		res(ctx.status(200), ctx.json({ status: '200', data: membersResponse })),
 	),
 	rest.get(
-		'http://localhost/api/v3/autocomplete/attribute_keys',
+		'http://localhost/v1/o11y/autocomplete/attribute_keys',
 		(req, res, ctx) => {
 			const metricName = req.url.searchParams.get('metricName');
 			const match = req.url.searchParams.get('match');
@@ -59,7 +55,7 @@ export const handlers = [
 	),
 
 	rest.get(
-		'http://localhost/api/v3/autocomplete/attribute_values',
+		'http://localhost/v1/o11y/autocomplete/attribute_values',
 		(req, res, ctx) => {
 			// ?metricName=observe_calls_total&tagKey=resource_o11y_collector_id
 			const metricName = req.url.searchParams.get('metricName');
@@ -137,7 +133,7 @@ export const handlers = [
 			return res(ctx.status(500));
 		},
 	),
-	rest.get('http://localhost/api/v1/loginPrecheck', (req, res, ctx) => {
+	rest.get('http://localhost/v1/o11y/loginPrecheck', (req, res, ctx) => {
 		const email = req.url.searchParams.get('email');
 		if (email === 'failEmail@o11y.hanzo.ai') {
 			return res(ctx.status(500));
@@ -158,23 +154,23 @@ export const handlers = [
 		);
 	}),
 
-	rest.get('http://localhost/api/v2/licenses', (req, res, ctx) =>
+	rest.get('http://localhost/v1/o11y/licenses', (req, res, ctx) =>
 		res(ctx.status(200), ctx.json(licensesSuccessResponse)),
 	),
 
-	rest.get('http://localhost/api/v1/billing', (req, res, ctx) =>
+	rest.get('http://localhost/v1/o11y/billing', (req, res, ctx) =>
 		res(ctx.status(200), ctx.json(billingSuccessResponse)),
 	),
 
-	rest.get('http://localhost/api/v1/dashboards', (_, res, ctx) =>
+	rest.get('http://localhost/v1/o11y/dashboards', (_, res, ctx) =>
 		res(ctx.status(200), ctx.json(dashboardSuccessResponse)),
 	),
 
-	rest.get('http://localhost/api/v1/dashboards/4', (_, res, ctx) =>
+	rest.get('http://localhost/v1/o11y/dashboards/4', (_, res, ctx) =>
 		res(ctx.status(200), ctx.json(getDashboardById)),
 	),
 
-	rest.post('http://localhost/api/v1/invite', (_, res, ctx) =>
+	rest.post('http://localhost/v1/o11y/invite', (_, res, ctx) =>
 		res(
 			ctx.status(200),
 			ctx.json({
@@ -183,7 +179,7 @@ export const handlers = [
 			}),
 		),
 	),
-	rest.put('http://localhost/api/v1/user/:id', (_, res, ctx) =>
+	rest.put('http://localhost/v1/o11y/user/:id', (_, res, ctx) =>
 		res(
 			ctx.status(200),
 			ctx.json({
@@ -192,7 +188,7 @@ export const handlers = [
 		),
 	),
 	rest.get(
-		'http://localhost/api/v3/autocomplete/aggregate_attributes',
+		'http://localhost/v1/o11y/autocomplete/aggregate_attributes',
 		(req, res, ctx) =>
 			res(
 				ctx.status(200),
@@ -203,11 +199,11 @@ export const handlers = [
 			),
 	),
 
-	rest.get('http://localhost/api/v1/explorer/views', (req, res, ctx) =>
+	rest.get('http://localhost/v1/o11y/explorer/views', (req, res, ctx) =>
 		res(ctx.status(200), ctx.json(explorerView)),
 	),
 
-	rest.post('http://localhost/api/v1/explorer/views', (req, res, ctx) =>
+	rest.post('http://localhost/v1/o11y/explorer/views', (req, res, ctx) =>
 		res(
 			ctx.status(200),
 			ctx.json({
@@ -217,7 +213,7 @@ export const handlers = [
 		),
 	),
 
-	rest.post('http://localhost/api/v1/event', (req, res, ctx) =>
+	rest.post('http://localhost/v1/o11y/event', (req, res, ctx) =>
 		res(
 			ctx.status(200),
 			ctx.json({
@@ -229,14 +225,14 @@ export const handlers = [
 	),
 
 	rest.get(
-		'http://localhost/api/v1/traces/000000000000000071dc9b0a338729b4',
+		'http://localhost/v1/o11y/traces/000000000000000071dc9b0a338729b4',
 		(req, res, ctx) => res(ctx.status(200), ctx.json(traceDetailResponse)),
 	),
 
-	rest.get('http://localhost/api/v1/channels', (_, res, ctx) =>
+	rest.get('http://localhost/v1/o11y/channels', (_, res, ctx) =>
 		res(ctx.status(200), ctx.json({ data: allAlertChannels, status: 'success' })),
 	),
-	rest.delete('http://localhost/api/v1/channels/:id', (_, res, ctx) =>
+	rest.delete('http://localhost/v1/o11y/channels/:id', (_, res, ctx) =>
 		res(
 			ctx.status(200),
 			ctx.json({

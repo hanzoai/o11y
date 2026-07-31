@@ -27,11 +27,12 @@ func TestMountWithoutHandlerReturns503(t *testing.T) {
 	}
 }
 
-// TestMountNormalizesExternalPath proves the one public contract /v1/o11y/<resource>
-// (one /v1/, no nested version, no /api/) is normalized at the mount seam onto o11y's
-// internal /api/ namespace — where a version-less alias (O11y, highest-version) or an
-// llmobs route answers.
-func TestMountNormalizesExternalPath(t *testing.T) {
+// TestMountDelegatesPathVerbatim proves the mount seam does not touch the path.
+// Routes are registered at their full public /v1/o11y/<resource> names, so the
+// runtime handler must receive exactly what the client sent — any rewrite here
+// can only move a request off its own route. A mangler is invisible to the
+// compiler, so this is the only thing that catches one coming back.
+func TestMountDelegatesPathVerbatim(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
 		t.Fatalf("Mount: %v", err)
@@ -44,34 +45,31 @@ func TestMountNormalizesExternalPath(t *testing.T) {
 	}))
 	defer o11y.SetHandler(nil)
 
-	cases := []struct {
-		name, external, internal string
-	}{
-		// Canonical version-less contract → internal /api/<resource> (no nested version).
-		{"versionless health", "/v1/o11y/health", "/api/health"},
-		{"versionless query_range", "/v1/o11y/query_range", "/api/query_range"},
-		// Hanzo llmobs resources (own their version-less names).
-		{"llmobs traces", "/v1/o11y/traces", "/api/traces"},
-		{"llmobs observations", "/v1/o11y/observations", "/api/observations"},
-		{"llmobs score by id", "/v1/o11y/score/abc123", "/api/score/abc123"},
-		// Explicit-version form still resolves to its exact version route.
-		{"explicit version", "/v1/o11y/v3/query_range", "/api/v3/query_range"},
-		// Leaked /api/ form kept working for the not-yet-migrated O11y SPA.
-		{"legacy api alias", "/v1/o11y/api/v1/health", "/api/v1/health"},
+	// Each is a real registered route literal (grep them: routes_*.go,
+	// pkg/apiserver/o11yapiserver/*.go). What arrives is what dispatches.
+	paths := []string{
+		"/v1/o11y/services",
+		"/v1/o11y/query_range",
+		"/v1/o11y/settings/ttl",
+		"/v1/o11y/global/config",
+		"/v1/o11y/users",
+		"/v1/o11y/llm/observations",
+		"/v1/o11y/llm/score/abc123",
+		"/v1/o11y/errortracking/issues",
+		"/v1/o11y/api/hanzo/envelope/", // Sentry SDK wire path, received as-is
 	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
+	for _, p := range paths {
+		t.Run(p, func(t *testing.T) {
 			sawPath = ""
-			req := httptest.NewRequest(http.MethodGet, tc.external, nil)
-			resp, err := app.Fiber().Test(req)
+			resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, p, nil))
 			if err != nil {
 				t.Fatalf("Test: %v", err)
 			}
 			if resp.StatusCode != http.StatusOK {
 				t.Fatalf("status=%d want 200", resp.StatusCode)
 			}
-			if sawPath != tc.internal {
-				t.Fatalf("external %s → internal %q, want %q", tc.external, sawPath, tc.internal)
+			if sawPath != p {
+				t.Fatalf("runtime received %q, want %q verbatim", sawPath, p)
 			}
 		})
 	}

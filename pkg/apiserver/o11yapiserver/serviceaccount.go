@@ -14,7 +14,7 @@ import (
 )
 
 func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v1/service_accounts", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.Create, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "CreateServiceAccount",
@@ -41,7 +41,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.List, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "ListServiceAccounts",
@@ -67,7 +67,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/me", handler.New(provider.authzMiddleware.OpenAccess(provider.serviceAccountHandler.GetMe), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/service_accounts/me", handler.New(provider.authzMiddleware.OpenAccess(provider.serviceAccountHandler.GetMe), handler.OpenAPIDef{
 		ID:                  "GetMyServiceAccount",
 		Tags:                []string{"serviceaccount"},
 		Summary:             "Gets my service account",
@@ -84,7 +84,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/{id}", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts/{id}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.Get, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "GetServiceAccount",
@@ -111,7 +111,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/{id}/roles", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts/{id}/roles", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.GetRoles, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "GetServiceAccountRoles",
@@ -138,7 +138,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/{id}/roles", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts/{id}/roles", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.SetRole, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "CreateServiceAccountRole",
@@ -168,7 +168,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/{id}/roles/{rid}", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts/{id}/roles/{rid}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.DeleteRole, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "DeleteServiceAccountRole",
@@ -198,7 +198,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/me", handler.New(provider.authzMiddleware.OpenAccess(provider.serviceAccountHandler.UpdateMe), handler.OpenAPIDef{
+	if err := router.Handle("/v1/o11y/service_accounts/me", handler.New(provider.authzMiddleware.OpenAccess(provider.serviceAccountHandler.UpdateMe), handler.OpenAPIDef{
 		ID:                  "UpdateMyServiceAccount",
 		Tags:                []string{"serviceaccount"},
 		Summary:             "Updates my service account",
@@ -215,7 +215,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/{id}", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts/{id}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.Update, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "UpdateServiceAccount",
@@ -242,7 +242,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/{id}", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts/{id}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.Delete, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "DeleteServiceAccount",
@@ -269,7 +269,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/{id}/keys", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts/{id}/keys", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.CreateFactorAPIKey, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "CreateServiceAccountKey",
@@ -307,7 +307,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/{id}/keys", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts/{id}/keys", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.ListFactorAPIKey, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "ListServiceAccountKeys",
@@ -333,7 +333,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/{id}/keys/{fid}", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts/{id}/keys/{fid}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.UpdateFactorAPIKey, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "UpdateServiceAccountKey",
@@ -360,7 +360,7 @@ func (provider *provider) addServiceAccountRoutes(router *mux.Router) error {
 		return err
 	}
 
-	if err := router.Handle("/api/v1/service_accounts/{id}/keys/{fid}", handler.New(
+	if err := router.Handle("/v1/o11y/service_accounts/{id}/keys/{fid}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.serviceAccountHandler.RevokeFactorAPIKey, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "RevokeServiceAccountKey",

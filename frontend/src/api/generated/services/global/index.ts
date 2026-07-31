@@ -28,14 +28,14 @@ import type { ErrorType } from '../../../generatedAPIInstance';
  */
 export const getGlobalConfig = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetGlobalConfig200>({
-		url: `/api/v1/global/config`,
+		url: `/v1/o11y/global/config`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetGlobalConfigQueryKey = () => {
-	return [`/api/v1/global/config`] as const;
+	return [`/v1/o11y/global/config`] as const;
 };
 
 export const getGetGlobalConfigQueryOptions = <

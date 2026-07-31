@@ -49,7 +49,7 @@ export const deletePublicDashboard = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<string>({
-		url: `/api/v1/dashboards/${id}/public`,
+		url: `/v1/o11y/dashboards/${id}/public`,
 		method: 'DELETE',
 		signal,
 	});
@@ -129,7 +129,7 @@ export const getPublicDashboard = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetPublicDashboard200>({
-		url: `/api/v1/dashboards/${id}/public`,
+		url: `/v1/o11y/dashboards/${id}/public`,
 		method: 'GET',
 		signal,
 	});
@@ -138,7 +138,7 @@ export const getPublicDashboard = (
 export const getGetPublicDashboardQueryKey = ({
 	id,
 }: GetPublicDashboardPathParameters) => {
-	return [`/api/v1/dashboards/${id}/public`] as const;
+	return [`/v1/o11y/dashboards/${id}/public`] as const;
 };
 
 export const getGetPublicDashboardQueryOptions = <
@@ -232,7 +232,7 @@ export const createPublicDashboard = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreatePublicDashboard201>({
-		url: `/api/v1/dashboards/${id}/public`,
+		url: `/v1/o11y/dashboards/${id}/public`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: dashboardtypesPostablePublicDashboardDTO,
@@ -332,7 +332,7 @@ export const updatePublicDashboard = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<string>({
-		url: `/api/v1/dashboards/${id}/public`,
+		url: `/v1/o11y/dashboards/${id}/public`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: dashboardtypesUpdatablePublicDashboardDTO,
@@ -431,7 +431,7 @@ export const getPublicDashboardData = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetPublicDashboardData200>({
-		url: `/api/v1/public/dashboards/${id}`,
+		url: `/v1/o11y/public/dashboards/${id}`,
 		method: 'GET',
 		signal,
 	});
@@ -440,7 +440,7 @@ export const getPublicDashboardData = (
 export const getGetPublicDashboardDataQueryKey = ({
 	id,
 }: GetPublicDashboardDataPathParameters) => {
-	return [`/api/v1/public/dashboards/${id}`] as const;
+	return [`/v1/o11y/public/dashboards/${id}`] as const;
 };
 
 export const getGetPublicDashboardDataQueryOptions = <
@@ -534,7 +534,7 @@ export const getPublicDashboardWidgetQueryRange = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetPublicDashboardWidgetQueryRange200>({
-		url: `/api/v1/public/dashboards/${id}/widgets/${idx}/query_range`,
+		url: `/v1/o11y/public/dashboards/${id}/widgets/${idx}/query_range`,
 		method: 'GET',
 		signal,
 	});
@@ -544,7 +544,7 @@ export const getGetPublicDashboardWidgetQueryRangeQueryKey = ({
 	id,
 	idx,
 }: GetPublicDashboardWidgetQueryRangePathParameters) => {
-	return [`/api/v1/public/dashboards/${id}/widgets/${idx}/query_range`] as const;
+	return [`/v1/o11y/public/dashboards/${id}/widgets/${idx}/query_range`] as const;
 };
 
 export const getGetPublicDashboardWidgetQueryRangeQueryOptions = <
@@ -642,7 +642,7 @@ export const createDashboardV2 = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateDashboardV2201>({
-		url: `/api/v2/dashboards`,
+		url: `/v1/o11y/dashboards`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: dashboardtypesPostableDashboardV2DTO,
@@ -725,7 +725,7 @@ export const getDashboardV2 = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetDashboardV2200>({
-		url: `/api/v2/dashboards/${id}`,
+		url: `/v1/o11y/dashboards/${id}`,
 		method: 'GET',
 		signal,
 	});
@@ -734,7 +734,7 @@ export const getDashboardV2 = (
 export const getGetDashboardV2QueryKey = ({
 	id,
 }: GetDashboardV2PathParameters) => {
-	return [`/api/v2/dashboards/${id}`] as const;
+	return [`/v1/o11y/dashboards/${id}`] as const;
 };
 
 export const getGetDashboardV2QueryOptions = <
