@@ -297,6 +297,12 @@ func TestMetricsRoutesAreTheSameNineteen(t *testing.T) {
 	}
 	for route := range got {
 		if !want[route] {
+			// platform.go owns the OLDER /metric/metric_metadata route (legacy
+			// path, service-scoped input) — a different op from this face's
+			// /metrics/metadata. Another slice's door is not this face growing one.
+			if route == "GET /v1/o11y/metric/metric_metadata" {
+				continue
+			}
 			t.Errorf("%s is registered and was not declared — the face grew a door", route)
 		}
 	}
