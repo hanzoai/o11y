@@ -65,6 +65,12 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// answered on the runtime, so the wire — including every CheckResources and
 	// OpenAccess gate — is unchanged; see access.go.
 	mountAccess(app)
+	// The TYPED APM ops — the service catalog, the messaging-queue views and
+	// the third-party API overview; twenty-one reads that now carry named
+	// inputs, named outputs and their prose into the document. Same
+	// construction: named In, named Out, answered on the runtime, wire
+	// unchanged; see apm.go.
+	mountAPM(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
