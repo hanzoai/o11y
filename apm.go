@@ -531,27 +531,6 @@ type O11yQueueRow struct {
 	Data map[string]json.RawMessage `json:"data"`
 }
 
-// O11yQueryRangeOut is a query-range answer — the shape every Kafka view
-// responds with.
-type O11yQueryRangeOut struct {
-	// Status is "success".
-	Status string `json:"status"`
-	// Data holds the result.
-	Data O11yQueryRange `json:"data"`
-}
-
-// O11yQueryRange is a set of named query results.
-type O11yQueryRange struct {
-	// ContextTimeout reports that the read hit its deadline.
-	ContextTimeout bool `json:"contextTimeout,omitempty"`
-	// ContextTimeoutMessage says where the deadline hit.
-	ContextTimeoutMessage string `json:"contextTimeoutMessage,omitempty"`
-	// ResultType names the overall shape, when the view sets one.
-	ResultType string `json:"resultType"`
-	// Result holds one entry per query.
-	Result []O11yQueryResult `json:"result"`
-}
-
 // O11yQueryResult is one query's result: series, rows or a table, whichever
 // the view produced.
 type O11yQueryResult struct {
@@ -651,34 +630,6 @@ type O11yDomainsData struct {
 	// type — time-series data, scalar data or raw rows — so the bytes pass
 	// through verbatim.
 	Results []json.RawMessage `json:"results"`
-}
-
-// O11yQueryStats reports what a read cost.
-type O11yQueryStats struct {
-	// RowsScanned is how many rows the store read.
-	RowsScanned uint64 `json:"rowsScanned"`
-	// BytesScanned is how many bytes the store read.
-	BytesScanned uint64 `json:"bytesScanned"`
-	// DurationMS is how long the read took, milliseconds.
-	DurationMS uint64 `json:"durationMs"`
-	// StepIntervals is the step used per query, seconds.
-	StepIntervals map[string]uint64 `json:"stepIntervals,omitempty"`
-}
-
-// O11yQueryWarning is a warning the store attached to an answer.
-type O11yQueryWarning struct {
-	// Message is the warning.
-	Message string `json:"message"`
-	// URL links the relevant documentation, when there is some.
-	URL string `json:"url,omitempty"`
-	// Warnings itemizes the finding.
-	Warnings []O11yQueryWarningNote `json:"warnings,omitempty"`
-}
-
-// O11yQueryWarningNote is one itemized warning.
-type O11yQueryWarningNote struct {
-	// Message is the item.
-	Message string `json:"message"`
 }
 
 // ── the seam ──────────────────────────────────────────────────────────────────

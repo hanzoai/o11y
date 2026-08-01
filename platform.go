@@ -63,7 +63,7 @@ func mountPlatform(app *zip.App) {
 	zip.Post(g, "/query_filter/analyze", analyzeQueryFilter)
 	zip.Get(g, "/filter_suggestions", filterSuggestions)
 	zip.Get(g, "/infra_onboarding/k8s/status", k8sOnboarding)
-	zip.Get(g, "/metric/metric_metadata", metricMetadata)
+	zip.Get(g, "/metric/metric_metadata", legacyMetricMetadata)
 
 	// routes_settings.go
 	zip.Post(g, "/settings/ttl", setRetention)
@@ -230,12 +230,18 @@ func k8sOnboarding(ctx context.Context, _ *struct{}) (*O11yOnboardingOut, error)
 	return out, relayAt(ctx, http.MethodGet, "/infra_onboarding/k8s/status", nil, nil, out)
 }
 
-// metricMetadata returns one metric's metadata — its type, unit, description,
+// legacyMetricMetadata serves the OLDER /metric/metric_metadata route. It is
+// NOT the same op as metrics.go's metricMetadata (/metrics/metadata): different
+// path, different input (this one also scopes by service). Two slices named one
+// Go function for two routes; the route is the identity, so the name follows it.
+// Renamed rather than merged — collapsing them would silently drop the service
+// scope this one accepts.
+// It returns one metric's metadata — its type, unit, description,
 // temporality, monotonicity and histogram buckets — optionally scoped to the
 // metric as one service reports it.
 //
 // Callers need the viewer role; the runtime's own gate enforces it.
-func metricMetadata(ctx context.Context, in *O11yMetricMetadataIn) (*O11yMetricMetadataOut, error) {
+func legacyMetricMetadata(ctx context.Context, in *O11yMetricMetadataIn) (*O11yMetricMetadataOut, error) {
 	out := new(O11yMetricMetadataOut)
 	return out, relayAt(ctx, http.MethodGet, "/metric/metric_metadata", query(
 		"metricName", in.MetricName,
@@ -796,24 +802,6 @@ type O11yPodOnboarding struct {
 	HasCronjobName bool `json:"hasCronjobName"`
 	// HasJobName says whether the job label is present.
 	HasJobName bool `json:"hasJobName"`
-}
-
-// O11yMetricMetadataOut is one metric's metadata.
-type O11yMetricMetadataOut struct {
-	// Delta says whether the metric is delta-temporality.
-	Delta bool `json:"delta"`
-	// Le are the histogram bucket bounds, for histograms.
-	Le []float64 `json:"le"`
-	// Description is the metric's description.
-	Description string `json:"description"`
-	// Unit is the metric's unit.
-	Unit string `json:"unit"`
-	// Type is the metric's type — gauge, sum, histogram.
-	Type string `json:"type"`
-	// IsMonotonic says whether a sum only ever increases.
-	IsMonotonic bool `json:"isMonotonic"`
-	// Temporality is cumulative or delta.
-	Temporality string `json:"temporality"`
 }
 
 // O11yRetentionSetOut acknowledges a retention change.

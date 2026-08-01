@@ -299,9 +299,18 @@ func TestInfraRoutesAreTheSameFortyFour(t *testing.T) {
 			continue
 		}
 		if strings.HasPrefix(r.Path, "/v1/o11y/") && !strings.HasSuffix(r.Path, "*") &&
-			(strings.Contains(r.Path, "attribute_") || infraList[r.Path] || strings.Contains(r.Path, "infra_monitoring")) {
-			!strings.Contains(r.Path, "auto") && // query-core's autocomplete/auto_complete carry attribute_* too — not infra doors
-			(strings.Contains(r.Path, "attribute_") || strings.HasSuffix(r.Path, "/list") || strings.Contains(r.Path, "infra_monitoring")) {
+			// query-core's autocomplete/auto_complete routes carry attribute_* in
+			// their paths too, and they are NOT infra doors — without this exclusion
+			// the census counts them and the 44-route assertion drifts.
+			!strings.Contains(r.Path, "auto") &&
+			// "/list" alone also matches /services/list (apm face) and
+			// /third-party-apis/overview/list (apm face). Each slice census counts
+			// only its OWN doors — a bare suffix was safe only while infra was the
+			// sole owner of it. The explicit infraList literal is the real anchor.
+			!strings.HasPrefix(r.Path, "/v1/o11y/services") &&
+			!strings.Contains(r.Path, "third-party-apis") &&
+			(strings.Contains(r.Path, "attribute_") || infraList[r.Path] ||
+				strings.HasSuffix(r.Path, "/list") || strings.Contains(r.Path, "infra_monitoring")) {
 			got[r.Method+" "+r.Path] = true
 		}
 	}
