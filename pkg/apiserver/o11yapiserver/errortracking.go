@@ -24,6 +24,14 @@ import (
 //
 //   - READ (Hanzo IAM authz, org-scoped): the Issues list/detail/update the console
 //     Errors tab consumes at /v1/o11y/errortracking/issues[/{id}].
+//
+// The three READ routes are ALSO typed ops at the module's mount seam
+// (sentryerrors.go, on the /v1/o11y group), which is what carries them into the
+// document, the SDK, the CLI and the agent surface. That is a second DISPATCH, never
+// a second implementation: the ops answer by handing the call to THIS router, so the
+// handlers below stay the one place the reads are performed. The two INGEST routes
+// stay ONLY here — OpenAccess, DSN-authenticated, opaque Sentry-envelope body — a
+// deliberate escape hatch out of the document.
 func (provider *provider) addErrorTrackingRoutes(router *mux.Router) error {
 	h := provider.errorTrackingHandler
 
