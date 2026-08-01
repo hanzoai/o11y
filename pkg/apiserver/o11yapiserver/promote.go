@@ -9,6 +9,14 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/promotetypes"
 )
 
+// addPromoteRoutes registers the two promotion routes on the runtime's own
+// router.
+//
+// TWO DISPATCHES, ONE IMPLEMENTATION. These registrations stay: the standalone
+// server has no native router to register an op on. The composed binary
+// reaches the SAME handlers through the typed ops in the repo root's logs.go
+// (logPromote, logPromoted), which relay here — deleting either half drops one
+// of the two deployments.
 func (provider *provider) addPromoteRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/logs/promote_paths", handler.New(provider.authzMiddleware.EditAccess(provider.promoteHandler.HandlePromoteAndIndexPaths), handler.OpenAPIDef{
 		ID:                  "HandlePromoteAndIndexPaths",

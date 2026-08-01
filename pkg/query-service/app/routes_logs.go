@@ -10,6 +10,11 @@ import (
 // mountLogs registers the logs surface: reads, the field catalog, and log
 // pipelines. 7 routes on its own /v1/o11y/logs subrouter.
 //
+// TWO DISPATCHES, ONE IMPLEMENTATION. These registrations stay: the standalone
+// server has no native router to register an op on. The composed binary
+// reaches the SAME handlers through the typed ops in the repo root's logs.go,
+// which relay here — deleting either half drops one of the two deployments.
+//
 // ORDER IS LOAD-BEARING inside the pipelines block: /pipelines/preview is
 // registered before /pipelines/{version}, so POST .../pipelines/preview reaches
 // the preview handler rather than binding version="preview". Preserved verbatim.
