@@ -55,6 +55,17 @@ func (handler *healthOpenAPIHandler) ResourceDefs() []pkghandler.ResourceDef {
 	return nil
 }
 
+// addRegistryRoutes registers the three service probes on the runtime's own
+// router.
+//
+// Unlike the other platform routes, these three are NOT re-declared as typed
+// ops at the module's mount seam: health.go's native probe group (mountHealth)
+// already registers the same literals — /v1/o11y/healthz, /readyz, /livez — on
+// the zip router ahead of the delegation wildcard, and its fall-through-when-
+// unset behavior is load-bearing (health_test.go pins it). A second
+// registration of the same paths would only shadow it. The OpenAccess gates
+// named below stay the one place access is decided; this router serves the
+// standalone process and the delegated fall-through path alike.
 func (provider *provider) addRegistryRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/healthz", newHealthOpenAPIHandler(
 		provider.authzMiddleware.OpenAccess(provider.factoryHandler.Healthz),
