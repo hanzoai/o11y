@@ -9,6 +9,11 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
+// DUAL DISPATCH. These registrations stay: the standalone server reaches them
+// directly, and the composed binary reaches the SAME handlers through the typed
+// query-engine ops in the repo root's querycore.go (querierQueryRange,
+// querierQueryRangePreview, querierReplaceVariables), which relay here. Deleting
+// either half drops one of the two deployments.
 func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/query_range", handler.New(provider.authzMiddleware.ViewAccess(provider.querierHandler.QueryRange), handler.OpenAPIDef{
 		ID:                 "QueryRangeV5",

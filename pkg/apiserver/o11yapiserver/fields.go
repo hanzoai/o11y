@@ -9,6 +9,10 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
+// DUAL DISPATCH. These registrations stay: the standalone server reaches them
+// directly, and the composed binary reaches the SAME handlers through the typed
+// field-catalog ops in the repo root's querycore.go (fieldKeys, fieldValues),
+// which relay here. Deleting either half drops one of the two deployments.
 func (provider *provider) addFieldsRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/fields/keys", handler.New(provider.authzMiddleware.ViewAccess(provider.fieldsHandler.GetFieldsKeys), handler.OpenAPIDef{
 		ID:                  "GetFieldsKeys",

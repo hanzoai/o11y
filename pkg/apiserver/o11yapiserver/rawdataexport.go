@@ -10,6 +10,12 @@ import (
 	v5 "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
+// ESCAPE HATCH. export_raw_data is deliberately NOT a typed query-core op: it
+// streams a chunked CSV/JSONL download with a Content-Disposition attachment and
+// an X-Response-Complete trailer, so it has no JSON answer to name and the relay
+// (which buffers a whole answer through an httptest recorder) would defeat the
+// stream. It stays on the /v1/o11y delegation wildcard, byte-identical; see the
+// escape-hatch record in querycore.go.
 func (provider *provider) addRawDataExportRoutes(router *mux.Router) error {
 
 	if err := router.Handle("/v1/o11y/export_raw_data", handler.New(provider.authzMiddleware.ViewAccess(provider.rawDataExportHandler.ExportRawData), handler.OpenAPIDef{
