@@ -52,8 +52,8 @@ func TestLLMObsRoutes(t *testing.T) {
 		}
 	}
 
-	// Reflect every registered route's OpenAPI definition; a bad request/response
-	// DTO would surface here exactly as it would in the spec generator.
+	// Reflect every registered route's OpenAPI definition: a request or response
+	// DTO the reflector cannot describe is a DTO no typed op can carry either.
 	collector := handler.NewOpenAPICollector(openapi3.NewReflector())
 	if err := router.Walk(collector.Walker); err != nil {
 		t.Fatalf("openapi reflection failed: %v", err)

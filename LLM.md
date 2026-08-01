@@ -16,7 +16,6 @@ serving o11y.hanzo.ai. A clean full fork of **latest O11y** (synced to upstream
 One way, and it runs on our own stack:
 
     push  ->  github.com/hanzoai/o11y         (a mirror)
-              .github/workflows/sync.yml       carries refs onward
       ->  git.hanzo.ai/hanzoai/o11y            CANONICAL
               .hanzo/workflows/ci.yaml         go build + go test
               .hanzo/workflows/docker.yaml     builds ghcr.io/hanzoai/o11y
@@ -25,11 +24,11 @@ One way, and it runs on our own stack:
       ->  hanzoai/operator                     reconciles the App
       ->  hanzoai/static behind hanzoai/ingress serves the SPA
 
-**git.hanzo.ai is canonical; GitHub is a mirror.** `.github/workflows/` holds
-exactly one file, `sync.yml`, and its only job is getting refs to the forge. Every
-build, check and deploy is a workflow under `.hanzo/workflows/`, which the forge
-reads. `.hanzo/workflows` uses GitHub Actions syntax, so a workflow moves between
-the two by changing directory and nothing else.
+**git.hanzo.ai is canonical; GitHub is a mirror.** Every build, check and deploy
+is a workflow under `.hanzo/workflows/`, which the forge reads. `.hanzo/workflows`
+uses GitHub Actions syntax, so a workflow moves between the two by changing
+directory and nothing else. There is no `.github/workflows/` — refs reach the
+forge by push, not by an Actions job.
 
 No GitHub Pages and no Cloudflare Pages. `Dockerfile.site` already ends at
 `FROM ghcr.io/hanzoai/static:v0.5.1` serving `frontend/build` on :3000, so the SPA
@@ -43,6 +42,27 @@ failure mode is the whole reason a migration is `git mv` and never a delete.
 
 Also load-bearing via the **Go module tag**: `hanzoai/cloud` `go.mod` pins
 `github.com/hanzoai/o11y`, because the query plane now lives in cloud at `/v1/o11y`.
+
+## The document — ONE emitter, and it is the typed op registry
+
+`identity.go` (45) + `infra.go` (44) + `logs.go` (9) + `telemetry.go` (5) = **103
+typed ops**, registered on the `cloud.Router` this module is handed at their full
+public `/v1/o11y/...` paths. Cloud's `describe.go` reads that registry from a real
+mount and weaves the result into the one published document. Change a struct and
+the document follows; there is nothing to keep in sync.
+
+There was a second emitter and it is **deleted**: `cmd/openapi.go` ran a swaggest
+reflector over the runtime's gorilla/mux tree and wrote a committed 629 KB
+`docs/api/openapi.yml` — 120 paths, 174 ops, spelled `/api/v1` ×59, `/api/v2` ×57,
+`/api/v3`, `/api/v4`, `/api/v5` ×2, and **zero** `/v1/o11y`. It described the
+fork's internal tree behind the delegation wildcard's `/v1/o11y/* -> /api/*`
+rewrite, so it documented a surface no customer can address, in a shape that
+breaks two house rules on its face. No CI regenerated or verified it, so it could
+only drift. Gone with it: `pkg/o11y/openapi.go` (the reflector — unreachable once
+the command went) and `registerGenerateOpenAPI` from `cmd/generate.go`.
+
+**If a route is not in the typed registry it is in no document.** That is the only
+place to fix it; do not add a second writer.
 
 ## Dependency ownership (fork boundary)
 
@@ -73,25 +93,24 @@ consistent upstream version. Keep it that way: bump by re-syncing to a newer O11
 The real server binary is `./cmd/community` (NOT `./cmd/server`, which does not
 exist). Build check: `GOPRIVATE='github.com/hanzoai/*' GOSUMDB=off go build ./cmd/community`.
 
-### go.mod is paired with the ci.yaml cloud pin — bump BOTH or CI goes red
+### The cloud pin is ONE fact, in go.mod
 
-Root `mount.go` imports `github.com/hanzoai/cloud`, and go.mod resolves it via
-`replace => ../cloud`. There is no such sibling in CI, so `ci.yaml` checks one out
-**at an exact commit** (`ref:` under "Checkout hanzoai/cloud") — deliberately, since
-cloud's `main` drifts independently. That makes go.mod and the ci.yaml ref **ONE fact
-in two places**: touch either alone and `go build ./...` dies with the misleading
-`go: updates to go.mod needed; to update it: go mod tidy`. This kept CI red for weeks.
+Root `mount.go` imports `github.com/hanzoai/cloud`, and go.mod requires it at a
+**released version**, resolved from the proxy like every other private `hanzoai/*`
+module (ci.yaml already configures git auth for exactly that). Bump it with
+`go get github.com/hanzoai/cloud@vX.Y.Z`.
 
-To re-tidy: `go mod tidy` against the sibling, then **bump the ci.yaml `ref` to the
-same cloud commit in the same PR**. Two traps:
+It used to resolve via `replace => ../cloud`, which no CI runner has, so ci.yaml
+carried a second checkout of cloud pinned to an exact commit to supply the
+sibling — the same fact written twice, and touching either alone died with the
+misleading `go: updates to go.mod needed`. Both the replace and the checkout step
+are **deleted**; the version in go.mod is now the only place cloud is named. The
+replace also hid a broken pin: the required version had drifted so far that a
+standalone `go build ./...` could not compile cloud at all, and nothing noticed
+because CI never built the required version.
 
-- Tidy resolves against **whatever `../cloud` is checked out right now** — that clone
-  is a working copy, often on someone's feature branch, and it moves under you. Derive
-  versions from the commit you are pinning (`git -C ../cloud show <sha>:go.mod`), not
-  from the branch that happens to be there. Same class of hazard as the stale luxfi
-  clones.
-- The resulting version jumps are **not upgrade decisions** — MVS forces them, because
-  cloud already requires them. Do not "fix" them back down; re-pair the two sides.
+The version jumps a bump drags in are **not upgrade decisions** — MVS forces them,
+because cloud already requires them. Do not "fix" them back down.
 
 Since a green build is NOT sufficient evidence (`hanzoai/zip` → `zap-proto/zip` can
 boot-panic while CI stays green), smoke-test the binary: it must reach
