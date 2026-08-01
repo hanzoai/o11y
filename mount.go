@@ -60,6 +60,13 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// unchanged; see identity.go. The three /complete/* sign-in callbacks
 	// stay on the wildcard below — they answer with redirects, not JSON.
 	mountIdentity(app)
+	// The TYPED LLM-observability ops — the four gen_ai span views
+	// (observations, traces, sessions, users), eval scores, human annotations
+	// and the LLM pricing rules; fourteen reads and writes that now carry named
+	// inputs, named outputs and their prose into the document. Same
+	// construction: they answer on the runtime, so the wire is unchanged; see
+	// llmobs.go.
+	mountLLMObs(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
