@@ -8,6 +8,15 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/globaltypes"
 )
 
+// addGlobalRoutes registers the one global-config route on the runtime's own
+// router.
+//
+// TWO DISPATCHES, ONE IMPLEMENTATION. This registration stays: the standalone
+// server has no native router to register an op on. The composed binary reaches
+// the SAME handler through the typed op in the repo root's platform.go
+// (globalConfig), which relays here — so the OpenAccess gate named below stays
+// the one place access is decided, and deleting either half drops one of the
+// two deployments.
 func (provider *provider) addGlobalRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/global/config", handler.New(provider.authzMiddleware.OpenAccess(provider.globalHandler.GetConfig), handler.OpenAPIDef{
 		ID:                  "GetGlobalConfig",
