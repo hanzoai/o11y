@@ -39,6 +39,11 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// Native probe group, registered ahead of the delegation wildcard so Fiber's
 	// in-order match serves it off the mux tree (see health.go).
 	mountHealth(app)
+	// The TYPED telemetry ops of the error-tracking face — the five reads that
+	// now carry a named input, a named output and their prose into the document
+	// instead of hiding behind a wildcard. They answer on the runtime, so the
+	// wire is unchanged; see telemetry.go.
+	mountTelemetry(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
