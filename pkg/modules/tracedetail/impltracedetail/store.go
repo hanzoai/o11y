@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
@@ -16,15 +17,30 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 )
 
-const colServiceName = `resource_string_service$$$$name` // $ gets escaped so $$$$ converts to $$.
+// distinctSpanSelect returns spantypes.SpanProjection with the leading column
+// carrying the `DISTINCT ON (span_id)` prefix, for the sqlbuilder Select(...)
+// call form. The projection itself lives beside the struct it fills.
+func distinctSpanSelect() []string {
+	out := make([]string, len(spantypes.SpanProjection))
+	out[0] = "DISTINCT ON (span_id) " + spantypes.SpanProjection[0]
+	copy(out[1:], spantypes.SpanProjection[1:])
+	return out
+}
 
 func buildFieldExpr(fieldKey telemetrytypes.TelemetryFieldKey) (string, error) {
-	switch fieldKey.FieldContext {
-	case telemetrytypes.FieldContextResource:
-		// String cast required — Variant/Dynamic is rejected by GROUP BY.
-		return fmt.Sprintf("resource.`%s`::String", fieldKey.Name), nil
+	if fieldKey.FieldContext != telemetrytypes.FieldContextResource {
+		return "", errors.NewInvalidInputf(errors.CodeInvalidInput, "unsupported field context: %v", fieldKey.FieldContext)
 	}
-	return "", errors.NewInvalidInputf(errors.CodeInvalidInput, "unsupported field context: %v", fieldKey.FieldContext)
+	// The envelope carries service/host/url as typed columns; every other resource
+	// label is addressed out of the attributes map. notEmpty() over either works.
+	switch fieldKey.Name {
+	case "service.name":
+		return "service", nil
+	case "host.name", "host":
+		return "host", nil
+	default:
+		return fmt.Sprintf("attributes['%s']", fieldKey.Name), nil
+	}
 }
 
 type spanCountRow struct {
@@ -70,16 +86,11 @@ func (s *traceStore) GetTraceSpans(ctx context.Context, traceID string, summary 
 	// DISTINCT ON (span_id) is Datastore-specific syntax not supported by sqlbuilder
 	query := fmt.Sprintf(`
 		SELECT DISTINCT ON (span_id)
-			timestamp, duration_nano, span_id, has_error, kind,
-			resource_string_service$$name, name,
-			attributes_string, attributes_number, attributes_bool, resources_string,
-			events, status_message, status_code_string, kind_string, parent_span_id,
-			flags, is_remote, trace_state, status_code,
-			db_name, db_operation, http_method, http_url, http_host,
-			external_http_method, external_http_url, response_status_code, links as references
+			%s
 		FROM %s.%s
 		WHERE trace_id=? AND ts_bucket_start>=? AND ts_bucket_start<=?
 		ORDER BY timestamp ASC, name ASC`,
+		strings.Join(spantypes.SpanProjection, ", "),
 		spantypes.TraceDB, spantypes.TraceTable,
 	)
 	var spanItems []spantypes.StorableSpan
@@ -99,8 +110,8 @@ func (s *traceStore) GetMinimalSpans(ctx context.Context, traceID string, start,
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select(
 		"DISTINCT ON (span_id) span_id",
-		"parent_span_id", "timestamp", "duration_nano", "has_error",
-		colServiceName,
+		"parent AS parent_span_id", "time AS timestamp", "duration AS duration_nano",
+		spantypes.ExprHasError+" AS has_error", "service",
 	)
 	sb.From(fmt.Sprintf("%s.%s", spantypes.TraceDB, spantypes.TraceTable))
 	sb.Where(
@@ -124,16 +135,7 @@ func (s *traceStore) GetTraceSpansByIDs(ctx context.Context, traceID string, sta
 		return []spantypes.StorableSpan{}, nil
 	}
 	sb := sqlbuilder.NewSelectBuilder()
-	sb.Select(
-		"DISTINCT ON (span_id) timestamp",
-		"duration_nano", "span_id", "has_error", "kind",
-		colServiceName, "name",
-		"attributes_string", "attributes_number", "attributes_bool", "resources_string",
-		"events", "status_message", "status_code_string", "kind_string", "parent_span_id",
-		"flags", "is_remote", "trace_state", "status_code",
-		"db_name", "db_operation", "http_method", "http_url", "http_host",
-		"external_http_method", "external_http_url", "response_status_code", "links as references",
-	)
+	sb.Select(distinctSpanSelect()...)
 	sb.From(fmt.Sprintf("%s.%s", spantypes.TraceDB, spantypes.TraceTable))
 	ids := make([]any, len(spanIDs))
 	for i, id := range spanIDs {
@@ -160,16 +162,16 @@ func (s *traceStore) GetFlamegraphSpans(ctx context.Context, traceID string, sta
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select(
 		"span_id",
-		"any(parent_span_id) AS parent_span_id",
-		"any(timestamp) AS timestamp",
-		"any(duration_nano) AS duration_nano",
-		"any(has_error) AS has_error",
+		"any(parent) AS parent_span_id",
+		"any(time) AS timestamp",
+		"any(duration) AS duration_nano",
+		"any("+spantypes.ExprHasError+") AS has_error",
 		"any(name) AS name",
-		"any(events) AS events",
-		"any(attributes_string) AS attributes_string",
-		"any(attributes_number) AS attributes_number",
-		"any(attributes_bool) AS attributes_bool",
-		"any(resources_string) AS resources_string",
+		"any("+spantypes.ExprEvents+") AS events",
+		"any(attributes) AS attributes_string",
+		"any(CAST(map() AS Map(String, Float64))) AS attributes_number",
+		"any(CAST(map() AS Map(String, Bool))) AS attributes_bool",
+		"any(map('service.name', toString(service), 'host', toString(host), 'url', url)) AS resources_string",
 	)
 	sb.From(fmt.Sprintf("%s.%s", spantypes.TraceDB, spantypes.TraceTable))
 	conditions := []string{
@@ -235,8 +237,8 @@ func (s *traceStore) GetSpanDurationByField(ctx context.Context, traceID string,
 	allSpansSB := sqlbuilder.NewSelectBuilder()
 	allSpansSB.Select(
 		"DISTINCT ON (span_id) "+fieldExpr+" AS field_value",
-		"toUnixTimestamp64Nano(timestamp) AS start_ns",
-		"start_ns + duration_nano AS end_ns",
+		"toUnixTimestamp64Nano(time) AS start_ns",
+		"start_ns + duration AS end_ns",
 	)
 	allSpansSB.From(fmt.Sprintf("%s.%s", spantypes.TraceDB, spantypes.TraceTable))
 	allSpansSB.Where(
@@ -245,7 +247,7 @@ func (s *traceStore) GetSpanDurationByField(ctx context.Context, traceID string,
 		allSpansSB.LE("ts_bucket_start", summary.End.Unix()),
 		"notEmpty(field_value)",
 	)
-	allSpansSB.OrderByAsc("timestamp")
+	allSpansSB.OrderByAsc("time")
 	allSpansSB.OrderByAsc("name")
 
 	// CTE 2: find max end time of all preceding spans.

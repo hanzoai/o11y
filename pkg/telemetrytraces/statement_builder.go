@@ -8,6 +8,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
@@ -16,7 +17,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 var (
@@ -396,23 +396,24 @@ func (b *traceQueryStatementBuilder) buildTraceQuery(
 
 	// Build the inner subquery for root spans
 	innerSB := sqlbuilder.NewSelectBuilder()
-	innerSB.Select("trace_id", "duration_nano", sqlbuilder.Escape("resource_string_service$$name as `service.name`"), "name")
+	innerSB.Select("trace_id", "duration AS duration_nano", "service as `service.name`", "name")
 	innerSB.From(fmt.Sprintf("%s.%s", DBName, SpanTableName))
-	innerSB.Where("parent_span_id = ''")
+	innerSB.Where("parent = ''")
 
 	// this only helps when there is a filter
 	if query.Filter != nil && query.Filter.Expression != "" {
 		innerSB.Where("trace_id GLOBAL IN __toe")
 	}
 
-	// Add time filter to inner query
+	// Add time filter to inner query. time is DateTime64(9) whose ticks ARE
+	// nanoseconds, so the ns bounds compare directly.
 	innerSB.Where(
-		innerSB.GE("timestamp", fmt.Sprintf("%d", start)),
-		innerSB.L("timestamp", fmt.Sprintf("%d", end)),
+		innerSB.GE("time", fmt.Sprintf("%d", start)),
+		innerSB.L("time", fmt.Sprintf("%d", end)),
 		innerSB.GE("ts_bucket_start", startBucket),
 		innerSB.LE("ts_bucket_start", endBucket))
 
-	// order by duration and limit 1 per trace
+	// order by duration and limit 1 per trace (duration_nano is the SELECT alias)
 	innerSB.OrderBy("duration_nano DESC")
 	innerSB.SQL("LIMIT 1 BY trace_id")
 
@@ -495,7 +496,7 @@ func (b *traceQueryStatementBuilder) buildTimeSeriesQuery(
 	}
 
 	sb.SelectMore(fmt.Sprintf(
-		"toStartOfInterval(timestamp, INTERVAL %d SECOND) AS ts",
+		"toStartOfInterval(time, INTERVAL %d SECOND) AS ts",
 		int64(query.StepInterval.Seconds()),
 	))
 
@@ -781,7 +782,7 @@ func (b *traceQueryStatementBuilder) addFilterCondition(
 	startBucket := start/querybuilder.NsToSeconds - querybuilder.BucketAdjustment
 	endBucket := end / querybuilder.NsToSeconds
 
-	sb.Where(sb.GE("timestamp", fmt.Sprintf("%d", start)), sb.L("timestamp", fmt.Sprintf("%d", end)), sb.GE("ts_bucket_start", startBucket), sb.LE("ts_bucket_start", endBucket))
+	sb.Where(sb.GE("time", fmt.Sprintf("%d", start)), sb.L("time", fmt.Sprintf("%d", end)), sb.GE("ts_bucket_start", startBucket), sb.LE("ts_bucket_start", endBucket))
 
 	return preparedWhereClause, nil
 }

@@ -62,6 +62,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/zeus"
 
 	"github.com/hanzoai/o11y/pkg/web"
+	"github.com/hanzoai/o11y/pkg/zapingest"
 )
 
 type O11y struct {
@@ -542,6 +543,7 @@ func New(
 		factory.NewNamedService(factory.MustNewName("auditor"), auditor),
 		factory.NewNamedService(factory.MustNewName("meterreporter"), meterReporter, factory.MustNewName("licensing")),
 		factory.NewNamedService(factory.MustNewName("ruler"), rulerInstance),
+		factory.NewNamedService(factory.MustNewName("zapingest"), zapingest.New(providerSettings, config.ZapIngest, telemetrystore)),
 	)
 	if err != nil {
 		return nil, err
