@@ -38,6 +38,13 @@ const uuidPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}
 // place the reads are performed. Both are needed — the ops serve the composed
 // binary, this router serves the standalone process, which has no native router to
 // register an op on — so deleting either half drops one of the two deployments.
+//
+// The OTHER ten reads/writes of this face — projects (list/create/get/delete/
+// rotate-key), issues (list/get/update/events) and one event — are ALSO typed ops
+// at that seam (sentryerrors.go), the same second DISPATCH into this router. The two
+// INGEST routes below stay ONLY here: OpenAccess, DSN-authenticated, carrying an
+// opaque Sentry-envelope body a typed relay would corrupt, so they are a deliberate
+// escape hatch, out of the document by design.
 func (provider *provider) addSentryRoutes(router *mux.Router) error {
 	h := provider.sentryHandler
 
