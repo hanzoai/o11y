@@ -440,44 +440,12 @@ type O11yRoleCreateOut struct {
 	Data O11yCreated `json:"data"`
 }
 
-// O11yCreated is a newly created record, named by its id.
-type O11yCreated struct {
-	// ID is the new record's id.
-	ID string `json:"id"`
-}
-
-// O11yRolesOut is every role in the org.
-type O11yRolesOut struct {
-	// Status is "success".
-	Status string `json:"status"`
-	// Data holds the roles.
-	Data []O11yRole `json:"data"`
-}
-
 // O11yRoleOut is one role with its grants.
 type O11yRoleOut struct {
 	// Status is "success".
 	Status string `json:"status"`
 	// Data holds the role and its transaction groups.
 	Data O11yRoleDetail `json:"data"`
-}
-
-// O11yRole is one role.
-type O11yRole struct {
-	// ID is the role id.
-	ID string `json:"id"`
-	// CreatedAt is when the role was created.
-	CreatedAt time.Time `json:"createdAt"`
-	// UpdatedAt is when it last changed.
-	UpdatedAt time.Time `json:"updatedAt"`
-	// Name is the role's name.
-	Name string `json:"name"`
-	// Description says what the role is for.
-	Description string `json:"description"`
-	// Type is custom or managed.
-	Type string `json:"type"`
-	// OrgID is the org the role belongs to.
-	OrgID string `json:"orgId"`
 }
 
 // O11yRoleDetail is one role together with the grants it carries.

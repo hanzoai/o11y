@@ -243,6 +243,12 @@ func TestAccessRoutesAreTheSameTwenty(t *testing.T) {
 	}
 	for route := range got {
 		if !want[route] {
+			// identity.go owns the role<->user join (roles/:id/users); this census
+			// counts the ACCESS face only. A door another slice converted is not
+			// this face growing one.
+			if route == "GET /v1/o11y/roles/:id/users" {
+				continue
+			}
 			t.Errorf("%s is registered and was not before — the face grew a door", route)
 		}
 	}
@@ -314,7 +320,12 @@ func TestAccessTheRestOfTheFaceStillReachesTheRuntime(t *testing.T) {
 	}
 	answers(t, http.StatusOK, `{"status":"success","data":[]}`)
 
-	for _, target := range []string{"/v1/o11y/dashboards", "/v1/o11y/alerts"} {
+	// /v1/o11y/dashboards was in this list until the DASHBOARDS slice typed it —
+	// it now dispatches off the mux tree ahead of the wildcard, which is the
+	// migration succeeding, not the access face breaking. Its own slice test
+	// proves it. /alerts remains wildcarded, so it still proves the fallthrough
+	// this test exists to guard.
+	for _, target := range []string{"/v1/o11y/alerts"} {
 		_, body := call(t, app, member(http.MethodGet, target, nil))
 		if !strings.Contains(string(body), `"door":"wildcard"`) {
 			t.Errorf("%s no longer reaches the runtime through the wildcard: %s", target, body)

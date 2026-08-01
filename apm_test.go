@@ -307,7 +307,11 @@ func TestAPMRoutesAreTheSameTwentyOne(t *testing.T) {
 		if !strings.HasPrefix(r.Path, "/v1/o11y/") || strings.HasSuffix(r.Path, "*") {
 			continue
 		}
-		if strings.Contains(r.Path, "/service") ||
+		// "/service" alone also matches /service_accounts, which is the ACCESS
+		// face (access.go), not APM's. Each slice census must count only its own
+		// doors or every slice fails the moment another one converts — the
+		// substring was safe only while APM was the sole owner of that prefix.
+		if (strings.Contains(r.Path, "/service") && !strings.Contains(r.Path, "/service_accounts")) ||
 			strings.Contains(r.Path, "/messaging-queues/") ||
 			strings.Contains(r.Path, "/third-party-apis/") {
 			got[r.Method+" "+r.Path] = true

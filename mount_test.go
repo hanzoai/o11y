@@ -49,16 +49,15 @@ func TestMountDelegatesPathVerbatim(t *testing.T) {
 	// pkg/apiserver/o11yapiserver/*.go). What arrives is what dispatches.
 	paths := []string{
 		"/v1/o11y/services",
-		"/v1/o11y/query_range",
-		// /v1/o11y/settings/ttl and /v1/o11y/global/config are now TYPED ops
-		// (platform.go): they dispatch off the mux tree ahead of the wildcard, so
-		// they no longer delegate verbatim. Query-service delegation stays covered
-		// by /services and /query_range above; apiserver delegation by the llm,
-		// errortracking and envelope samples below.
+		// REMOVED as the conversion advanced — each of these became a TYPED op and
+		// therefore dispatches off the mux tree AHEAD of the wildcard, which is the
+		// whole point of the migration: /query_range (metrics.go), /settings/ttl and
+		// /global/config (platform.go). A typed op is proved by its own slice test;
+		// asserting it still delegates verbatim would assert the migration failed.
+		// What remains here are the genuinely-wildcarded surfaces — the escape
+		// hatches — which is exactly what this test should guard.
 		"/v1/o11y/query_progress", // long-poll progress: deliberately wildcarded, a stream (querycore.go)
-		"/v1/o11y/settings/ttl",
-		"/v1/o11y/global/config",
-		"/v1/o11y/complete/google", // sign-in callback: deliberately wildcarded (identity.go)
+		"/v1/o11y/complete/google", // sign-in callback: 303 redirect, deliberately wildcarded (identity.go)
 		// the /v1/o11y/llm* surface is TYPED now (llmobs.go), so it dispatches to
 		// ops and takes precedence over this wildcard — proved in llmobs_test.go.
 		"/v1/o11y/errortracking/issues",
