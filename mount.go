@@ -44,6 +44,11 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// instead of hiding behind a wildcard. They answer on the runtime, so the
 	// wire is unchanged; see telemetry.go.
 	mountTelemetry(app)
+	// The TYPED logs ops — the record read, the field catalog and its tuning
+	// write, the aggregate read, pipelines and path promotion; live tail stays
+	// on the wildcard because it is a stream. Same construction: they answer
+	// on the runtime, so the wire is unchanged; see logs.go.
+	mountLogs(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
