@@ -5,121 +5,135 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+	"github.com/hanzoai/o11y/pkg/types/spantypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/hanzo-ds/sqlbuilder"
 	"golang.org/x/exp/maps"
 )
 
 var (
+	// indexV3Columns maps every logical span field to its physical form on the ONE
+	// event.span envelope (org,time,…,attributes Map(LowCardinality(String),String),
+	// host,service,trace_id,span_id,parent,duration,status,kind,…). The OTLP-fork
+	// column names are gone: intrinsics rename to their envelope column, everything
+	// else is an expression over the single `attributes` map or the service/host/url
+	// columns. FieldFor returns Name verbatim for scalar/low-card types and
+	// `Name['key']` for maps, so an envelope expression placed in Name IS the emitted
+	// SQL. Types stay faithful to each expression's RESULT so the exists logic in the
+	// condition builder picks the right emptiness test.
+	attributesMap = &schema.Column{Name: "attributes", Type: schema.MapColumnType{
+		KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
+		ValueType: schema.ColumnTypeString,
+	}}
+	lowCardString  = schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}
 	indexV3Columns = map[string]*schema.Column{
 		"ts_bucket_start":      {Name: "ts_bucket_start", Type: schema.ColumnTypeUInt64},
 		"resource_fingerprint": {Name: "resource_fingerprint", Type: schema.ColumnTypeString},
 
-		// intrinsic columns
-		"timestamp":          {Name: "timestamp", Type: schema.DateTime64ColumnType{Precision: 9, Timezone: "UTC"}},
-		"trace_id":           {Name: "trace_id", Type: schema.FixedStringColumnType{Length: 32}},
-		"span_id":            {Name: "span_id", Type: schema.ColumnTypeString},
-		"trace_state":        {Name: "trace_state", Type: schema.ColumnTypeString},
-		"parent_span_id":     {Name: "parent_span_id", Type: schema.ColumnTypeString},
-		"flags":              {Name: "flags", Type: schema.ColumnTypeUInt32},
-		"name":               {Name: "name", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"kind":               {Name: "kind", Type: schema.ColumnTypeInt8},
-		"kind_string":        {Name: "kind_string", Type: schema.ColumnTypeString},
-		"duration_nano":      {Name: "duration_nano", Type: schema.ColumnTypeUInt64},
-		"status_code":        {Name: "status_code", Type: schema.ColumnTypeInt16},
-		"status_message":     {Name: "status_message", Type: schema.ColumnTypeString},
-		"status_code_string": {Name: "status_code_string", Type: schema.ColumnTypeString},
+		// intrinsic columns -> envelope columns / expressions
+		"timestamp":      {Name: "time", Type: schema.DateTime64ColumnType{Precision: 9, Timezone: "UTC"}},
+		"trace_id":       {Name: "trace_id", Type: schema.FixedStringColumnType{Length: 32}},
+		"span_id":        {Name: "span_id", Type: schema.ColumnTypeString},
+		"trace_state":    {Name: "attributes['trace_state']", Type: schema.ColumnTypeString},
+		"parent_span_id": {Name: "parent", Type: schema.ColumnTypeString},
+		"flags":          {Name: spantypes.ExprFlags, Type: schema.ColumnTypeUInt32},
+		"name":           {Name: "name", Type: lowCardString},
+		// kind and status are the writer's normalised lowercase enums
+		// (datastoretraces normEnum), so the numeric views decode from those
+		// spellings and cast to the width the consumer scans into.
+		"kind":               {Name: spantypes.ExprKind, Type: schema.ColumnTypeInt8},
+		"kind_string":        {Name: "kind", Type: lowCardString},
+		"duration_nano":      {Name: "duration", Type: schema.ColumnTypeUInt64},
+		"status_code":        {Name: spantypes.ExprStatusCode, Type: schema.ColumnTypeInt16},
+		"status_message":     {Name: "attributes['status.message']", Type: schema.ColumnTypeString},
+		"status_code_string": {Name: "status", Type: lowCardString},
 
-		// attributes columns
-		"attributes_string": {Name: "attributes_string", Type: schema.MapColumnType{
+		// attributes columns: all three data-type views address the ONE envelope
+		// map; FieldFor wraps number/bool by ValueType (toFloat64OrNull / = 'true').
+		"attributes_string": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeString,
 		}},
-		"attributes_number": {Name: "attributes_number", Type: schema.MapColumnType{
+		"attributes_number": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeFloat64,
 		}},
-		"attributes_bool": {Name: "attributes_bool", Type: schema.MapColumnType{
+		"attributes_bool": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeBool,
 		}},
-		"resources_string": {Name: "resources_string", Type: schema.MapColumnType{
-			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
-			ValueType: schema.ColumnTypeString,
-		}},
-		"resource": {Name: "resource", Type: schema.JSONColumnType{}},
+		// resource labels beyond service/host live in the same envelope map.
+		"attributes": attributesMap,
 
-		"events": {Name: "events", Type: schema.ArrayColumnType{
-			ElementType: schema.ColumnTypeString,
-		}},
-		"links": {Name: "links", Type: schema.ColumnTypeString},
-		// derived columns
-		"response_status_code": {Name: "response_status_code", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"external_http_url":    {Name: "external_http_url", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"http_url":             {Name: "http_url", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"external_http_method": {Name: "external_http_method", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"http_method":          {Name: "http_method", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"http_host":            {Name: "http_host", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"db_name":              {Name: "db_name", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"db_operation":         {Name: "db_operation", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"has_error":            {Name: "has_error", Type: schema.ColumnTypeBool},
-		"is_remote":            {Name: "is_remote", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		// materialized columns
-		"resource_string_service$$name":         {Name: "resource_string_service$$name", Type: schema.ColumnTypeString},
-		"attribute_string_http$$route":          {Name: "attribute_string_http$$route", Type: schema.ColumnTypeString},
-		"attribute_string_messaging$$system":    {Name: "attribute_string_messaging$$system", Type: schema.ColumnTypeString},
-		"attribute_string_messaging$$operation": {Name: "attribute_string_messaging$$operation", Type: schema.ColumnTypeString},
-		"attribute_string_db$$system":           {Name: "attribute_string_db$$system", Type: schema.ColumnTypeString},
-		"attribute_string_rpc$$system":          {Name: "attribute_string_rpc$$system", Type: schema.ColumnTypeString},
-		"attribute_string_rpc$$service":         {Name: "attribute_string_rpc$$service", Type: schema.ColumnTypeString},
-		"attribute_string_rpc$$method":          {Name: "attribute_string_rpc$$method", Type: schema.ColumnTypeString},
-		"attribute_string_peer$$service":        {Name: "attribute_string_peer$$service", Type: schema.ColumnTypeString},
+		"events": {Name: spantypes.ExprEvents, Type: schema.ArrayColumnType{ElementType: schema.ColumnTypeString}},
+		"links":  {Name: "attributes['links']", Type: schema.ColumnTypeString},
+		// derived columns -> envelope expressions
+		"response_status_code": {Name: spantypes.ExprResponseStatusCode, Type: lowCardString},
+		"external_http_url":    {Name: "url", Type: lowCardString},
+		"http_url":             {Name: "url", Type: lowCardString},
+		"external_http_method": {Name: spantypes.ExprHTTPMethod, Type: lowCardString},
+		"http_method":          {Name: spantypes.ExprHTTPMethod, Type: lowCardString},
+		"http_host":            {Name: "host", Type: lowCardString},
+		"db_name":              {Name: "attributes['db.name']", Type: lowCardString},
+		"db_operation":         {Name: "attributes['db.operation']", Type: lowCardString},
+		"has_error":            {Name: spantypes.ExprHasError, Type: schema.ColumnTypeBool},
+		"is_remote":            {Name: "attributes['is_remote']", Type: lowCardString},
+		// materialized shortcuts -> envelope service column / attributes map
+		"resource_string_service$$name":         {Name: "service", Type: schema.ColumnTypeString},
+		"attribute_string_http$$route":          {Name: "attributes['http.route']", Type: schema.ColumnTypeString},
+		"attribute_string_messaging$$system":    {Name: "attributes['messaging.system']", Type: schema.ColumnTypeString},
+		"attribute_string_messaging$$operation": {Name: "attributes['messaging.operation']", Type: schema.ColumnTypeString},
+		"attribute_string_db$$system":           {Name: "attributes['db.system']", Type: schema.ColumnTypeString},
+		"attribute_string_rpc$$system":          {Name: "attributes['rpc.system']", Type: schema.ColumnTypeString},
+		"attribute_string_rpc$$service":         {Name: "attributes['rpc.service']", Type: schema.ColumnTypeString},
+		"attribute_string_rpc$$method":          {Name: "attributes['rpc.method']", Type: schema.ColumnTypeString},
+		"attribute_string_peer$$service":        {Name: "attributes['peer.service']", Type: schema.ColumnTypeString},
 
-		// deprecated intrinsic columns
-		"traceID":          {Name: "traceID", Type: schema.FixedStringColumnType{Length: 32}},
-		"spanID":           {Name: "spanID", Type: schema.ColumnTypeString},
-		"parentSpanID":     {Name: "parentSpanID", Type: schema.ColumnTypeString},
-		"spanKind":         {Name: "spanKind", Type: schema.ColumnTypeString},
-		"durationNano":     {Name: "durationNano", Type: schema.ColumnTypeUInt64},
-		"statusCode":       {Name: "statusCode", Type: schema.ColumnTypeInt16},
-		"statusMessage":    {Name: "statusMessage", Type: schema.ColumnTypeString},
-		"statusCodeString": {Name: "statusCodeString", Type: schema.ColumnTypeString},
+		// deprecated intrinsic columns (resolved through oldToNew to the envelope)
+		"traceID":          {Name: "trace_id", Type: schema.FixedStringColumnType{Length: 32}},
+		"spanID":           {Name: "span_id", Type: schema.ColumnTypeString},
+		"parentSpanID":     {Name: "parent", Type: schema.ColumnTypeString},
+		"spanKind":         {Name: "kind", Type: lowCardString},
+		"durationNano":     {Name: "duration", Type: schema.ColumnTypeUInt64},
+		"statusCode":       {Name: spantypes.ExprStatusCode, Type: schema.ColumnTypeInt16},
+		"statusMessage":    {Name: "attributes['status.message']", Type: schema.ColumnTypeString},
+		"statusCodeString": {Name: "status", Type: lowCardString},
 
-		// deprecated derived columns
-		"references":         {Name: "references", Type: schema.ColumnTypeString},
-		"responseStatusCode": {Name: "responseStatusCode", Type: schema.ColumnTypeString},
-		"externalHttpUrl":    {Name: "externalHttpUrl", Type: schema.ColumnTypeString},
-		"httpUrl":            {Name: "httpUrl", Type: schema.ColumnTypeString},
-		"externalHttpMethod": {Name: "externalHttpMethod", Type: schema.ColumnTypeString},
-		"httpMethod":         {Name: "httpMethod", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"httpHost":           {Name: "httpHost", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"dbName":             {Name: "dbName", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"dbOperation":        {Name: "dbOperation", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"hasError":           {Name: "hasError", Type: schema.ColumnTypeBool},
-		"isRemote":           {Name: "isRemote", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"serviceName":        {Name: "serviceName", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"httpRoute":          {Name: "httpRoute", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"msgSystem":          {Name: "msgSystem", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"msgOperation":       {Name: "msgOperation", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"dbSystem":           {Name: "dbSystem", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"rpcSystem":          {Name: "rpcSystem", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"rpcService":         {Name: "rpcService", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"rpcMethod":          {Name: "rpcMethod", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"peerService":        {Name: "peerService", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
+		// deprecated derived columns (resolved through oldToNew to the envelope)
+		"references":         {Name: "attributes['links']", Type: schema.ColumnTypeString},
+		"responseStatusCode": {Name: spantypes.ExprResponseStatusCode, Type: schema.ColumnTypeString},
+		"externalHttpUrl":    {Name: "url", Type: schema.ColumnTypeString},
+		"httpUrl":            {Name: "url", Type: schema.ColumnTypeString},
+		"externalHttpMethod": {Name: spantypes.ExprHTTPMethod, Type: schema.ColumnTypeString},
+		"httpMethod":         {Name: spantypes.ExprHTTPMethod, Type: lowCardString},
+		"httpHost":           {Name: "host", Type: lowCardString},
+		"dbName":             {Name: "attributes['db.name']", Type: lowCardString},
+		"dbOperation":        {Name: "attributes['db.operation']", Type: lowCardString},
+		"hasError":           {Name: spantypes.ExprHasError, Type: schema.ColumnTypeBool},
+		"isRemote":           {Name: "attributes['is_remote']", Type: lowCardString},
+		"serviceName":        {Name: "service", Type: lowCardString},
+		"httpRoute":          {Name: "attributes['http.route']", Type: lowCardString},
+		"msgSystem":          {Name: "attributes['messaging.system']", Type: lowCardString},
+		"msgOperation":       {Name: "attributes['messaging.operation']", Type: lowCardString},
+		"dbSystem":           {Name: "attributes['db.system']", Type: lowCardString},
+		"rpcSystem":          {Name: "attributes['rpc.system']", Type: lowCardString},
+		"rpcService":         {Name: "attributes['rpc.service']", Type: lowCardString},
+		"rpcMethod":          {Name: "attributes['rpc.method']", Type: lowCardString},
+		"peerService":        {Name: "attributes['peer.service']", Type: lowCardString},
 
-		// materialized exists columns
-		"resource_string_service$$name_exists":         {Name: "resource_string_service$$name_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_http$$route_exists":          {Name: "attribute_string_http$$route_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_messaging$$system_exists":    {Name: "attribute_string_messaging$$system_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_messaging$$operation_exists": {Name: "attribute_string_messaging$$operation_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_db$$system_exists":           {Name: "attribute_string_db$$system_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_rpc$$system_exists":          {Name: "attribute_string_rpc$$system_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_rpc$$service_exists":         {Name: "attribute_string_rpc$$service_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_rpc$$method_exists":          {Name: "attribute_string_rpc$$method_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_peer$$service_exists":        {Name: "attribute_string_peer$$service_exists", Type: schema.ColumnTypeBool},
+		// deprecated exists shortcuts -> envelope membership tests
+		"resource_string_service$$name_exists":         {Name: "service != ''", Type: schema.ColumnTypeBool},
+		"attribute_string_http$$route_exists":          {Name: "mapContains(attributes, 'http.route')", Type: schema.ColumnTypeBool},
+		"attribute_string_messaging$$system_exists":    {Name: "mapContains(attributes, 'messaging.system')", Type: schema.ColumnTypeBool},
+		"attribute_string_messaging$$operation_exists": {Name: "mapContains(attributes, 'messaging.operation')", Type: schema.ColumnTypeBool},
+		"attribute_string_db$$system_exists":           {Name: "mapContains(attributes, 'db.system')", Type: schema.ColumnTypeBool},
+		"attribute_string_rpc$$system_exists":          {Name: "mapContains(attributes, 'rpc.system')", Type: schema.ColumnTypeBool},
+		"attribute_string_rpc$$service_exists":         {Name: "mapContains(attributes, 'rpc.service')", Type: schema.ColumnTypeBool},
+		"attribute_string_rpc$$method_exists":          {Name: "mapContains(attributes, 'rpc.method')", Type: schema.ColumnTypeBool},
+		"attribute_string_peer$$service_exists":        {Name: "mapContains(attributes, 'peer.service')", Type: schema.ColumnTypeBool},
 	}
 
 	// TODO(srikanthccv): remove this mapping.
@@ -158,6 +172,22 @@ var (
 	}
 )
 
+// PromotedResourceColumn returns the envelope column a resource label is
+// promoted to. The envelope lifts service and host OUT of the attributes map
+// into typed columns of their own; every other resource label stays in the map.
+// This is the single declaration of that promotion: the field mapper resolves
+// through it, and the condition builder consults it to know that a promoted
+// column always exists and therefore needs no exists filter.
+func PromotedResourceColumn(name string) (*schema.Column, bool) {
+	switch name {
+	case "service.name":
+		return &schema.Column{Name: "service", Type: lowCardString}, true
+	case "host.name", "host":
+		return &schema.Column{Name: "host", Type: lowCardString}, true
+	}
+	return nil, false
+}
+
 type defaultFieldMapper struct {
 }
 
@@ -174,7 +204,10 @@ func (m *defaultFieldMapper) getColumn(
 ) ([]*schema.Column, error) {
 	switch key.FieldContext {
 	case telemetrytypes.FieldContextResource:
-		return []*schema.Column{indexV3Columns["resources_string"], indexV3Columns["resource"]}, nil
+		if col, ok := PromotedResourceColumn(key.Name); ok {
+			return []*schema.Column{col}, nil
+		}
+		return []*schema.Column{attributesMap}, nil
 	case telemetrytypes.FieldContextScope:
 		return []*schema.Column{}, qbtypes.ErrColumnNotFound
 	case telemetrytypes.FieldContextAttribute:
@@ -257,7 +290,10 @@ func (m *defaultFieldMapper) FieldFor(
 
 	var newColumns []*schema.Column
 	var evolutionsEntries []*telemetrytypes.EvolutionEntry
-	if len(key.Evolutions) > 0 {
+	// An evolution selects BETWEEN columns; the envelope resolves every key to
+	// exactly one column, so there is nothing to select and the evolution
+	// metadata (which names OTLP-fork columns) does not apply.
+	if len(key.Evolutions) > 0 && len(columns) > 1 {
 		// we will use the corresponding column and its evolution entry for the query
 		newColumns, evolutionsEntries, err = qbtypes.SelectEvolutionsForColumns(columns, key.Evolutions, startNs, endNs)
 		if err != nil {
@@ -310,14 +346,18 @@ func (m *defaultFieldMapper) FieldFor(
 
 			switch valueType := column.Type.(schema.MapColumnType).ValueType; valueType.GetType() {
 			case schema.ColumnTypeEnumString, schema.ColumnTypeEnumFloat64, schema.ColumnTypeEnumBool:
-				// a key could have been materialized, if so return the materialized column name
-				if key.Materialized {
-					exprs = append(exprs, telemetrytypes.FieldKeyToMaterializedColumnName(key))
-					existExpr = append(existExpr, fmt.Sprintf("%s==true", telemetrytypes.FieldKeyToMaterializedColumnNameForExists(key)))
-				} else {
-					exprs = append(exprs, fmt.Sprintf("%s['%s']", columnName, key.Name))
-					existExpr = append(existExpr, fmt.Sprintf("mapContains(%s, '%s')", columnName, key.Name))
+				// The envelope keeps ONE attributes map with String values and no
+				// materialized columns, so every key is a map access; the requested
+				// value type decides the cast (number -> toFloat64OrNull, bool -> = 'true').
+				access := fmt.Sprintf("%s['%s']", columnName, key.Name)
+				switch valueType.GetType() {
+				case schema.ColumnTypeEnumFloat64:
+					access = fmt.Sprintf("toFloat64OrNull(%s)", access)
+				case schema.ColumnTypeEnumBool:
+					access = fmt.Sprintf("%s = 'true'", access)
 				}
+				exprs = append(exprs, access)
+				existExpr = append(existExpr, fmt.Sprintf("mapContains(%s, '%s')", columnName, key.Name))
 			default:
 				return "", errors.NewInvalidInputf(errors.CodeInvalidInput, "value type %s is not supported for map column type %s", valueType, column.Type)
 			}

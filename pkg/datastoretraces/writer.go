@@ -64,10 +64,17 @@ const (
 // looks back by (statement_builder pins start-1800 against the bucket).
 const resourceBucketSeconds = 1800
 
-// spanEventsKey is where the span's events land in the envelope's attributes
-// map: event.span has no events column by design, and dropping them would be
-// silent data loss, so they travel as one JSON value under a reserved key.
-const spanEventsKey = "span.events"
+// spanEventsKey and spanStatusMessageKey are where the two span fields with no
+// envelope column of their own land in the attributes map: event.span carries
+// neither an events array nor a status message by design, and dropping them
+// would be silent data loss, so they travel under reserved keys. The trace read
+// plane resolves `events` and `status_message` to exactly these two keys
+// (spantypes.ExprEvents, indexV3Columns["status_message"]) — one name per value,
+// written and read in one place each.
+const (
+	spanEventsKey        = "span.events"
+	spanStatusMessageKey = "status.message"
+)
 
 // INSERT templates — column lists match the applied event-plane schema.
 // Omitted envelope columns (el, anonymous_id, person_id, host) take their
@@ -339,6 +346,9 @@ func buildRows(batch *zapreceiver.SpanBatch, org string, now time.Time) rows {
 			if b, err := json.Marshal(s.Events); err == nil {
 				attrs[spanEventsKey] = string(b)
 			}
+		}
+		if s.StatusMsg != "" {
+			attrs[spanStatusMessageKey] = s.StatusMsg
 		}
 
 		id := s.SpanID
