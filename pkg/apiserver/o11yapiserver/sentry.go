@@ -29,6 +29,15 @@ const uuidPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}
 //
 // These paths are literal /v1/sentry/… on the SAME router the o11y read plane uses, so
 // no /v1/o11y→/api rewrite applies (see createPublicServer's /v1/sentry passthrough).
+//
+// FIVE of the read routes — discover, logs, traces, traces/{id}, stats — are ALSO
+// declared as typed ops at the module's mount seam (telemetry.go in the repo root),
+// which is what carries them into the composed document, the SDK, the CLI and the
+// agent surface. That is a second DISPATCH, never a second implementation: the ops
+// answer by handing the call to this router, so the handlers below stay the one
+// place the reads are performed. Both are needed — the ops serve the composed
+// binary, this router serves the standalone process, which has no native router to
+// register an op on — so deleting either half drops one of the two deployments.
 func (provider *provider) addSentryRoutes(router *mux.Router) error {
 	h := provider.sentryHandler
 
