@@ -49,6 +49,11 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// named outputs and their prose into the document. They answer on the
 	// runtime, so the wire is unchanged; see infra.go.
 	mountInfra(app)
+	// The TYPED logs ops — the record read, the field catalog and its tuning
+	// write, the aggregate read, pipelines and path promotion; live tail stays
+	// on the wildcard because it is a stream. Same construction: they answer
+	// on the runtime, so the wire is unchanged; see logs.go.
+	mountLogs(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
