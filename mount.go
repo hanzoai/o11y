@@ -84,6 +84,11 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// construction: they answer on the runtime, so the wire is unchanged; see
 	// llmobs.go.
 	mountLLMObs(app)
+	// The TYPED metrics ops — the metrics-explorer reads and the metadata write,
+	// and the volume-control (metric reduction) rules; nineteen ops that now
+	// carry named inputs, named outputs and their prose into the document. They
+	// answer on the runtime, so the wire is unchanged; see metrics.go.
+	mountMetrics(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }

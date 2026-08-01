@@ -9,6 +9,16 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/metricsexplorertypes"
 )
 
+// ALL of these routes are ALSO declared as typed ops at the module's mount seam
+// (metrics.go in the repo root), which is what carries them into the composed
+// document, the SDK, the CLI and the agent surface. That is a second DISPATCH,
+// never a second implementation: the ops answer by handing the call to this
+// router, so the handlers below stay the one place the work is performed — and
+// the gates declared here (ViewAccess on the reads, EditAccess on the metadata
+// write) stay the one place access is decided. Both halves are needed — the ops
+// serve the composed binary, this router serves the standalone process, which
+// has no native router to register an op on — so deleting either drops one of
+// the two deployments.
 func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/metrics", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.ListMetrics),
