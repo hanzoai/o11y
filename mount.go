@@ -107,6 +107,17 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// and websocket) and raw-data export stay on the wildcard below — they are
 	// streams, not JSON answers.
 	mountQueryCore(app)
+	// The last three slices. They were DARK: their files landed with the rest of
+	// the conversion, but nothing here called them, so 83 typed ops existed in the
+	// source and reached no router at all. An uncalled package-level func is legal
+	// Go, so the package built and the whole suite passed while every one of those
+	// routes still fell through the wildcard below — the conversion was true of the
+	// source and false of the binary. Route-table arithmetic is what caught it:
+	// Mount registered 250 routes against 321 zip.* registrations across the slice
+	// files, and the 83 missing were exactly these three.
+	mountSentryErrors(app)
+	mountRulesAlerts(app)
+	mountIntegrations(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
