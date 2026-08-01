@@ -55,6 +55,9 @@ func TestMountDelegatesPathVerbatim(t *testing.T) {
 		// they no longer delegate verbatim. Query-service delegation stays covered
 		// by /services and /query_range above; apiserver delegation by the llm,
 		// errortracking and envelope samples below.
+		"/v1/o11y/query_progress", // long-poll progress: deliberately wildcarded, a stream (querycore.go)
+		"/v1/o11y/settings/ttl",
+		"/v1/o11y/global/config",
 		"/v1/o11y/complete/google", // sign-in callback: deliberately wildcarded (identity.go)
 		// the /v1/o11y/llm* surface is TYPED now (llmobs.go), so it dispatches to
 		// ops and takes precedence over this wildcard — proved in llmobs_test.go.
