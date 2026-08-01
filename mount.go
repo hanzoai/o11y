@@ -54,6 +54,12 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// on the wildcard because it is a stream. Same construction: they answer
 	// on the runtime, so the wire is unchanged; see logs.go.
 	mountLogs(app)
+	// The TYPED identity ops — users, invites, passwords, roles-on-users,
+	// sessions, auth domains, my-org, preferences and quick filters. Same
+	// construction: named In, named Out, answered on the runtime, wire
+	// unchanged; see identity.go. The three /complete/* sign-in callbacks
+	// stay on the wildcard below — they answer with redirects, not JSON.
+	mountIdentity(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }

@@ -52,7 +52,7 @@ func TestMountDelegatesPathVerbatim(t *testing.T) {
 		"/v1/o11y/query_range",
 		"/v1/o11y/settings/ttl",
 		"/v1/o11y/global/config",
-		"/v1/o11y/users",
+		"/v1/o11y/complete/google", // sign-in callback: deliberately wildcarded (identity.go)
 		"/v1/o11y/llm/observations",
 		"/v1/o11y/llm/score/abc123",
 		"/v1/o11y/errortracking/issues",
