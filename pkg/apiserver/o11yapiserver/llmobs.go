@@ -19,6 +19,16 @@ import (
 // the auth sessions, or the IAM user records that own those words at /v1/o11y/.
 // Flat names collided outright — GET /v1/o11y/users is IAM's, registered first,
 // so a flat llmobs twin would be dead on arrival with no error from mux.
+//
+// ALL of these routes are ALSO declared as typed ops at the module's mount seam
+// (llmobs.go in the repo root), which is what carries them into the composed
+// document, the SDK, the CLI and the agent surface. That is a second DISPATCH,
+// never a second implementation: the ops answer by handing the call to this
+// router, so the handlers below stay the one place the work is performed — and
+// the gates declared here (ViewAccess, EditAccess, AdminAccess) stay the one
+// place access is decided. Both halves are needed — the ops serve the composed
+// binary, this router serves the standalone process, which has no native router
+// to register an op on — so deleting either drops one of the two deployments.
 func (provider *provider) addLLMObsRoutes(router *mux.Router) error {
 	h := provider.llmObsHandler
 
