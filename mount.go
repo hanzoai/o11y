@@ -71,6 +71,12 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// construction: named In, named Out, answered on the runtime, wire
 	// unchanged; see apm.go.
 	mountAPM(app)
+	// The TYPED dashboard ops — v2 dashboard CRUD, cloning, locking, per-user
+	// pinning, the org-shared saved views, public-sharing config and the two
+	// anonymous public reads; twenty-two routes that now carry named inputs,
+	// named outputs and their prose into the document. Same construction: they
+	// answer on the runtime, so the wire is unchanged; see dashboards.go.
+	mountDashboards(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
