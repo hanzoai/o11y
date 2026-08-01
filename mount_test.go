@@ -53,8 +53,8 @@ func TestMountDelegatesPathVerbatim(t *testing.T) {
 		"/v1/o11y/settings/ttl",
 		"/v1/o11y/global/config",
 		"/v1/o11y/complete/google", // sign-in callback: deliberately wildcarded (identity.go)
-		"/v1/o11y/llm/observations",
-		"/v1/o11y/llm/score/abc123",
+		// the /v1/o11y/llm* surface is TYPED now (llmobs.go), so it dispatches to
+		// ops and takes precedence over this wildcard — proved in llmobs_test.go.
 		"/v1/o11y/errortracking/issues",
 		"/v1/o11y/api/hanzo/envelope/", // Sentry SDK wire path, received as-is
 	}
