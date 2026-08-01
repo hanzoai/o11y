@@ -8,6 +8,13 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 )
 
+// The authz probe is ALSO declared as a typed op at the module's mount seam
+// (access.go in the repo root), which is what carries it into the composed
+// document, the SDK, the CLI and the agent surface. That is a second DISPATCH,
+// never a second implementation: the op answers by handing the call to this
+// router, so the handler below stays the one place the check is performed.
+// Both are needed — the op serves the composed binary, this router serves the
+// standalone process, which has no native router to register an op on.
 func (provider *provider) addAuthzRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/authz/check", handler.New(provider.authzHandler.Check, handler.OpenAPIDef{
 		ID:                  "AuthzCheck",
