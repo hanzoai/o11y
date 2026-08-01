@@ -12,6 +12,13 @@ import (
 // registration order of the original single-file version is preserved.
 //
 // If any of these grows a second route, give it its own routes_<resource>.go.
+//
+// TWO DISPATCHES, ONE IMPLEMENTATION. These registrations stay: the standalone
+// server has no native router to register an op on. The composed binary reaches
+// the SAME handlers through the typed ops in the repo root's platform.go, which
+// relay here — so the gates named below (OpenAccess, ViewAccess) stay the one
+// place access is decided, and deleting either half drops one of the two
+// deployments.
 
 // mountMisc registers the root-router singletons. 11 routes:
 // query, variables, event, usage, dependency_graph, version, health, disks,

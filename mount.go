@@ -89,6 +89,16 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// carry named inputs, named outputs and their prose into the document. They
 	// answer on the runtime, so the wire is unchanged; see metrics.go.
 	mountMetrics(app)
+	// The TYPED platform ops — instant queries, dashboard variables, product
+	// events, usage, the dependency graph, version/health, disks, first-user
+	// registration, retention and apdex settings, licenses, global config,
+	// feature flags, org stats, filter suggestions, k8s onboarding, metric
+	// metadata, span percentiles and query-filter analysis. Same construction:
+	// they answer on the runtime through the shared relayAt seam, so the wire is
+	// unchanged; see platform.go. The three service probes (healthz, readyz,
+	// livez) stay on mountHealth above — its fall-through-when-unset is
+	// load-bearing.
+	mountPlatform(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
