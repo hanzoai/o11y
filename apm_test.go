@@ -311,7 +311,12 @@ func TestAPMRoutesAreTheSameTwentyOne(t *testing.T) {
 		// face (access.go), not APM's. Each slice census must count only its own
 		// doors or every slice fails the moment another one converts — the
 		// substring was safe only while APM was the sole owner of that prefix.
-		if (strings.Contains(r.Path, "/service") && !strings.Contains(r.Path, "/service_accounts")) ||
+		// cloud_integrations owns /…/services too (integrations.go). Same lesson as
+		// /service_accounts: a substring is only unambiguous while one face owns it.
+		if (strings.Contains(r.Path, "/service") &&
+			!strings.Contains(r.Path, "/service_accounts") &&
+			!strings.Contains(r.Path, "cloud_integrations") &&
+			!strings.Contains(r.Path, "cloud-integrations")) ||
 			strings.Contains(r.Path, "/messaging-queues/") ||
 			strings.Contains(r.Path, "/third-party-apis/") {
 			got[r.Method+" "+r.Path] = true
