@@ -281,13 +281,25 @@ func TestInfraRoutesAreTheSameFortyFour(t *testing.T) {
 		t.Fatalf("the census itself is wrong: %d", len(want))
 	}
 
+	// The /list heuristic must stay inside infra's OWN resources: other faces
+	// carry /list routes too (the service catalog's /services/list, the
+	// third-party overview's .../overview/list), and a bare "/list" suffix
+	// would miscount those as infra doors. Scope it to the eleven resources the
+	// want-set is built from, so any other face's /list route is ignored here.
+	infraList := map[string]bool{}
+	for _, r := range []string{
+		"hosts", "processes", "pods", "pvcs", "nodes", "namespaces",
+		"clusters", "deployments", "daemonsets", "statefulsets", "jobs",
+	} {
+		infraList["/v1/o11y/"+r+"/list"] = true
+	}
 	got := map[string]bool{}
 	for _, r := range app.Fiber().GetRoutes(true) {
 		if r.Method == http.MethodHead || r.Method == http.MethodOptions {
 			continue
 		}
 		if strings.HasPrefix(r.Path, "/v1/o11y/") && !strings.HasSuffix(r.Path, "*") &&
-			(strings.Contains(r.Path, "attribute_") || strings.HasSuffix(r.Path, "/list") || strings.Contains(r.Path, "infra_monitoring")) {
+			(strings.Contains(r.Path, "attribute_") || infraList[r.Path] || strings.Contains(r.Path, "infra_monitoring")) {
 			got[r.Method+" "+r.Path] = true
 		}
 	}
