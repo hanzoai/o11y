@@ -10,6 +10,15 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
 )
 
+// ALL FIVE role routes are ALSO declared as typed ops at the module's mount
+// seam (access.go in the repo root), which is what carries them into the
+// composed document, the SDK, the CLI and the agent surface. That is a second
+// DISPATCH, never a second implementation: the ops answer by handing the call
+// to this router, so the CheckResources gate and the handlers below stay the
+// one place role access control is performed. Both are needed — the ops serve
+// the composed binary, this router serves the standalone process, which has no
+// native router to register an op on — so deleting either half drops one of
+// the two deployments.
 func (provider *provider) addRoleRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/roles", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.Create, authtypes.O11yAdminRoleName),
