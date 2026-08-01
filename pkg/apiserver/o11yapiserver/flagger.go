@@ -9,6 +9,15 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 )
 
+// addFlaggerRoutes registers the one features route on the runtime's own
+// router.
+//
+// TWO DISPATCHES, ONE IMPLEMENTATION. This registration stays: the standalone
+// server has no native router to register an op on. The composed binary reaches
+// the SAME handler through the typed op in the repo root's platform.go
+// (features), which relays here — so the ViewAccess gate named below stays the
+// one place access is decided, and deleting either half drops one of the two
+// deployments.
 func (provider *provider) addFlaggerRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/features", handler.New(provider.authzMiddleware.ViewAccess(provider.flaggerHandler.GetFeatures), handler.OpenAPIDef{
 		ID:                  "GetFeatures",
