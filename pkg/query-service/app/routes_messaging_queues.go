@@ -11,6 +11,14 @@ import (
 // overview plus the Kafka onboarding, partition-latency, consumer-lag,
 // topic-throughput and span-evaluation groups. 14 routes on nested subrouters
 // under /v1/o11y/messaging-queues.
+//
+// TWO DISPATCHES, ONE IMPLEMENTATION. These registrations stay: the standalone
+// server has no native router to register an op on. The composed binary reaches
+// the SAME handlers through the typed ops in the repo root's apm.go (queueOverview,
+// the onboarding, partition-latency, consumer-lag, topic-throughput and span
+// ops), which relay here — deleting either half drops one of the two
+// deployments. The ViewAccess gate on each route is unchanged: it runs here,
+// one layer in.
 func (aH *APIHandler) mountMessagingQueues(router *mux.Router, am *middleware.AuthZ) {
 	// Main messaging queues router
 	messagingQueuesRouter := router.PathPrefix("/v1/o11y/messaging-queues").Subrouter()
