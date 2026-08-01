@@ -54,6 +54,11 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// on the wildcard because it is a stream. Same construction: they answer
 	// on the runtime, so the wire is unchanged; see logs.go.
 	mountLogs(app)
+	// The TYPED access-control ops — roles, service accounts, service-account
+	// keys and the authorization probe. Same construction: named In, named Out,
+	// answered on the runtime, so the wire — including every CheckResources and
+	// OpenAccess gate — is unchanged; see access.go.
+	mountAccess(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
