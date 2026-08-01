@@ -137,22 +137,22 @@ func TestTraceTimeRangeOptimization(t *testing.T) {
 func TestTraceTimeRangeFinderQuery(t *testing.T) {
 	expectedQuery := `
 		SELECT 
-			toUnixTimestamp64Nano(min(timestamp)) as start_time,
-			toUnixTimestamp64Nano(max(timestamp)) as end_time
+			toUnixTimestamp64Nano(min(time)) as start_time,
+			toUnixTimestamp64Nano(max(time)) as end_time
 		FROM o11y_traces.distributed_o11y_spans
 		WHERE traceID = ?
-		AND timestamp >= now() - INTERVAL 30 DAY
+		AND time >= now() - INTERVAL 30 DAY
 	`
 
 	expectedQuery = normalizeQuery(expectedQuery)
 
 	actualQuery := `
 		SELECT 
-			toUnixTimestamp64Nano(min(timestamp)) as start_time,
-			toUnixTimestamp64Nano(max(timestamp)) as end_time
+			toUnixTimestamp64Nano(min(time)) as start_time,
+			toUnixTimestamp64Nano(max(time)) as end_time
 		FROM o11y_traces.distributed_o11y_spans
 		WHERE traceID = ?
-		AND timestamp >= now() - INTERVAL 30 DAY
+		AND time >= now() - INTERVAL 30 DAY
 	`
 	actualQuery = normalizeQuery(actualQuery)
 

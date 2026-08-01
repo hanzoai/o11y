@@ -202,12 +202,12 @@ func TestSelectEvolutionsForColumns(t *testing.T) {
 					ReleaseTime:  time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC),
 				},
 			},
+			// An evolution referencing a column the mapper no longer exposes is
+			// inert, never an error — plain no-evolution semantics.
 			tsStart:         uint64(time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
 			tsEnd:           uint64(time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC).UnixNano()),
 			expectedColumns: []string{},
 			expectedEvols:   []string{},
-			expectedError:   true,
-			errorStr:        "column resources_string not found",
 		},
 		{
 			name: "Duplicate evolutions - should use first encountered (oldest if sorted)",

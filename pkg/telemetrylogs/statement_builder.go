@@ -290,24 +290,27 @@ func (b *logQueryStatementBuilder) buildListQuery(
 		cteArgs = append(cteArgs, args)
 	}
 
-	// Select timestamp and id by default
-	sb.Select(LogsV2TimestampColumn)
+	// Select timestamp and id by default — envelope columns aliased back to
+	// the logical names the consume layer and API shape expect.
+	sb.Select("time AS `timestamp`")
 	sb.SelectMore(LogsV2IDColumn)
 	if len(query.SelectFields) == 0 {
-		// Select all default columns
+		// Select all default columns. The envelope holds ONE attributes map of
+		// strings, so the number/bool legs are empty typed maps and scope
+		// fields read from the map — shape-stable for every consumer.
 		sb.SelectMore(LogsV2TraceIDColumn)
 		sb.SelectMore(LogsV2SpanIDColumn)
-		sb.SelectMore(LogsV2TraceFlagsColumn)
+		sb.SelectMore("toUInt32OrZero(attributes['trace_flags']) AS `trace_flags`")
 		sb.SelectMore(LogsV2SeverityTextColumn)
 		sb.SelectMore(LogsV2SeverityNumberColumn)
-		sb.SelectMore(LogsV2ScopeNameColumn)
-		sb.SelectMore(LogsV2ScopeVersionColumn)
+		sb.SelectMore("attributes['scope.name'] AS `scope_name`")
+		sb.SelectMore("attributes['scope.version'] AS `scope_version`")
 		sb.SelectMore(bodyAliasExpression(bodyJSONEnabled))
-		sb.SelectMore(LogsV2AttributesStringColumn)
-		sb.SelectMore(LogsV2AttributesNumberColumn)
-		sb.SelectMore(LogsV2AttributesBoolColumn)
-		sb.SelectMore(LogsV2ResourcesStringColumn)
-		sb.SelectMore(LogsV2ScopeStringColumn)
+		sb.SelectMore("attributes AS `attributes_string`")
+		sb.SelectMore("CAST(map(), 'Map(String, Float64)') AS `attributes_number`")
+		sb.SelectMore("CAST(map(), 'Map(String, Bool)') AS `attributes_bool`")
+		sb.SelectMore("map('service.name', toString(service)) AS `resources_string`")
+		sb.SelectMore("CAST(map(), 'Map(String, String)') AS `scope_string`")
 
 	} else {
 		// Select specified columns
@@ -395,7 +398,7 @@ func (b *logQueryStatementBuilder) buildTimeSeriesQuery(
 	}
 
 	sb.SelectMore(fmt.Sprintf(
-		"toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL %d SECOND) AS ts",
+		"toStartOfInterval(time, INTERVAL %d SECOND) AS ts",
 		int64(query.StepInterval.Seconds()),
 	))
 
@@ -698,10 +701,10 @@ func (b *logQueryStatementBuilder) addFilterCondition(
 	}
 
 	if start != 0 {
-		sb.Where(sb.GE("timestamp", fmt.Sprintf("%d", start)), sb.GE("ts_bucket_start", startBucket))
+		sb.Where(sb.GE("time", fmt.Sprintf("%d", start)), sb.GE("ts_bucket_start", startBucket))
 	}
 	if end != 0 {
-		sb.Where(sb.L("timestamp", fmt.Sprintf("%d", end)), sb.LE("ts_bucket_start", endBucket))
+		sb.Where(sb.L("time", fmt.Sprintf("%d", end)), sb.LE("ts_bucket_start", endBucket))
 	}
 
 	return preparedWhereClause, nil

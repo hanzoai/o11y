@@ -13,113 +13,138 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+// The span plane is event.span: the 15-column envelope plus the span identity
+// columns (trace_id, span_id, parent, duration, status) and ONE attributes map,
+// Map(LowCardinality(String), String). Every OTLP-fork column a query can name
+// is REWRITTEN onto that envelope here — the map key is the logical field name
+// the query language keeps, the Column.Name is the envelope SQL that satisfies
+// it. One naming scheme wins: no attributes_string/number/bool triplet, no
+// materialized attribute_string_x$$y shortcut columns, no JSON resource column
+// on the main table (resource labels live in event.span_resource, reached via
+// the __resource_filter CTE).
+const (
+	// kind and status hold the STRING enums on the live plane ('client',
+	// 'server', ... / 'ok', 'error'). Numeric kind/status_code predicates and
+	// selects go through these translations, so old queries keep working.
+	SpanKindNumberExpr       = "toInt8(multiIf(kind = 'internal', 1, kind = 'server', 2, kind = 'client', 3, kind = 'producer', 4, kind = 'consumer', 5, 0))"
+	SpanStatusCodeNumberExpr = "toInt16(multiIf(status = 'ok', 1, status = 'error', 2, 0))"
+	SpanHasErrorExpr         = "toBool(status = 'error')"
+	SpanHTTPMethodExpr       = "if(attributes['http.request.method'] != '', attributes['http.request.method'], attributes['http.method'])"
+	SpanResponseStatusExpr   = "if(attributes['http.response.status_code'] != '', attributes['http.response.status_code'], attributes['http.status_code'])"
+	SpanEventsExpr           = "arrayFilter(x -> x != '', [attributes['events']])"
+)
+
 var (
 	indexV3Columns = map[string]*schema.Column{
 		"ts_bucket_start":      {Name: "ts_bucket_start", Type: schema.ColumnTypeUInt64},
 		"resource_fingerprint": {Name: "resource_fingerprint", Type: schema.ColumnTypeString},
 
 		// intrinsic columns
-		"timestamp":          {Name: "timestamp", Type: schema.DateTime64ColumnType{Precision: 9, Timezone: "UTC"}},
-		"trace_id":           {Name: "trace_id", Type: schema.FixedStringColumnType{Length: 32}},
+		"timestamp":          {Name: "time", Type: schema.DateTime64ColumnType{Precision: 9, Timezone: "UTC"}},
+		"trace_id":           {Name: "trace_id", Type: schema.ColumnTypeString},
 		"span_id":            {Name: "span_id", Type: schema.ColumnTypeString},
-		"trace_state":        {Name: "trace_state", Type: schema.ColumnTypeString},
-		"parent_span_id":     {Name: "parent_span_id", Type: schema.ColumnTypeString},
-		"flags":              {Name: "flags", Type: schema.ColumnTypeUInt32},
-		"name":               {Name: "name", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"kind":               {Name: "kind", Type: schema.ColumnTypeInt8},
-		"kind_string":        {Name: "kind_string", Type: schema.ColumnTypeString},
-		"duration_nano":      {Name: "duration_nano", Type: schema.ColumnTypeUInt64},
-		"status_code":        {Name: "status_code", Type: schema.ColumnTypeInt16},
-		"status_message":     {Name: "status_message", Type: schema.ColumnTypeString},
-		"status_code_string": {Name: "status_code_string", Type: schema.ColumnTypeString},
+		"trace_state":        {Name: "attributes['trace_state']", Type: schema.ColumnTypeString},
+		"parent_span_id":     {Name: "parent", Type: schema.ColumnTypeString},
+		"flags":              {Name: "toUInt32OrZero(attributes['flags'])", Type: schema.ColumnTypeUInt32},
+		"name":               {Name: "name", Type: schema.ColumnTypeString},
+		"kind":               {Name: SpanKindNumberExpr, Type: schema.ColumnTypeInt8},
+		"kind_string":        {Name: "kind", Type: schema.ColumnTypeString},
+		"duration_nano":      {Name: "duration", Type: schema.ColumnTypeUInt64},
+		"status_code":        {Name: SpanStatusCodeNumberExpr, Type: schema.ColumnTypeInt16},
+		"status_message":     {Name: "attributes['status.message']", Type: schema.ColumnTypeString},
+		"status_code_string": {Name: "status", Type: schema.ColumnTypeString},
 
-		// attributes columns
-		"attributes_string": {Name: "attributes_string", Type: schema.MapColumnType{
+		// attributes columns — one physical map; the logical value type decides
+		// the wrapping (FieldFor): string -> attributes[k],
+		// number -> toFloat64OrNull(attributes[k]), bool -> attributes[k] = 'true'.
+		"attributes_string": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeString,
 		}},
-		"attributes_number": {Name: "attributes_number", Type: schema.MapColumnType{
+		"attributes_number": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeFloat64,
 		}},
-		"attributes_bool": {Name: "attributes_bool", Type: schema.MapColumnType{
+		"attributes_bool": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeBool,
 		}},
-		"resources_string": {Name: "resources_string", Type: schema.MapColumnType{
+		// resource labels other than service.name ride the same attributes map
+		"resources_string": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeString,
 		}},
-		"resource": {Name: "resource", Type: schema.JSONColumnType{}},
 
-		"events": {Name: "events", Type: schema.ArrayColumnType{
+		"events": {Name: SpanEventsExpr, Type: schema.ArrayColumnType{
 			ElementType: schema.ColumnTypeString,
 		}},
-		"links": {Name: "links", Type: schema.ColumnTypeString},
+		"links": {Name: "attributes['links']", Type: schema.ColumnTypeString},
 		// derived columns
-		"response_status_code": {Name: "response_status_code", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"external_http_url":    {Name: "external_http_url", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"http_url":             {Name: "http_url", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"external_http_method": {Name: "external_http_method", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"http_method":          {Name: "http_method", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"http_host":            {Name: "http_host", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"db_name":              {Name: "db_name", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"db_operation":         {Name: "db_operation", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"has_error":            {Name: "has_error", Type: schema.ColumnTypeBool},
-		"is_remote":            {Name: "is_remote", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		// materialized columns
-		"resource_string_service$$name":         {Name: "resource_string_service$$name", Type: schema.ColumnTypeString},
-		"attribute_string_http$$route":          {Name: "attribute_string_http$$route", Type: schema.ColumnTypeString},
-		"attribute_string_messaging$$system":    {Name: "attribute_string_messaging$$system", Type: schema.ColumnTypeString},
-		"attribute_string_messaging$$operation": {Name: "attribute_string_messaging$$operation", Type: schema.ColumnTypeString},
-		"attribute_string_db$$system":           {Name: "attribute_string_db$$system", Type: schema.ColumnTypeString},
-		"attribute_string_rpc$$system":          {Name: "attribute_string_rpc$$system", Type: schema.ColumnTypeString},
-		"attribute_string_rpc$$service":         {Name: "attribute_string_rpc$$service", Type: schema.ColumnTypeString},
-		"attribute_string_rpc$$method":          {Name: "attribute_string_rpc$$method", Type: schema.ColumnTypeString},
-		"attribute_string_peer$$service":        {Name: "attribute_string_peer$$service", Type: schema.ColumnTypeString},
+		"response_status_code": {Name: SpanResponseStatusExpr, Type: schema.ColumnTypeString},
+		"external_http_url":    {Name: "url", Type: schema.ColumnTypeString},
+		"http_url":             {Name: "url", Type: schema.ColumnTypeString},
+		"external_http_method": {Name: SpanHTTPMethodExpr, Type: schema.ColumnTypeString},
+		"http_method":          {Name: SpanHTTPMethodExpr, Type: schema.ColumnTypeString},
+		"http_host":            {Name: "host", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
+		"db_name":              {Name: "attributes['db.name']", Type: schema.ColumnTypeString},
+		"db_operation":         {Name: "attributes['db.operation']", Type: schema.ColumnTypeString},
+		"has_error":            {Name: SpanHasErrorExpr, Type: schema.ColumnTypeBool},
+		"is_remote":            {Name: "attributes['is_remote']", Type: schema.ColumnTypeString},
+		// former materialized shortcut columns -> envelope expressions
+		"resource_string_service$$name":         {Name: "service", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
+		"attribute_string_http$$route":          {Name: "attributes['http.route']", Type: schema.ColumnTypeString},
+		"attribute_string_messaging$$system":    {Name: "attributes['messaging.system']", Type: schema.ColumnTypeString},
+		"attribute_string_messaging$$operation": {Name: "attributes['messaging.operation']", Type: schema.ColumnTypeString},
+		"attribute_string_db$$system":           {Name: "attributes['db.system']", Type: schema.ColumnTypeString},
+		"attribute_string_rpc$$system":          {Name: "attributes['rpc.system']", Type: schema.ColumnTypeString},
+		"attribute_string_rpc$$service":         {Name: "attributes['rpc.service']", Type: schema.ColumnTypeString},
+		"attribute_string_rpc$$method":          {Name: "attributes['rpc.method']", Type: schema.ColumnTypeString},
+		"attribute_string_peer$$service":        {Name: "attributes['peer.service']", Type: schema.ColumnTypeString},
 
-		// deprecated intrinsic columns
-		"traceID":          {Name: "traceID", Type: schema.FixedStringColumnType{Length: 32}},
-		"spanID":           {Name: "spanID", Type: schema.ColumnTypeString},
-		"parentSpanID":     {Name: "parentSpanID", Type: schema.ColumnTypeString},
-		"spanKind":         {Name: "spanKind", Type: schema.ColumnTypeString},
-		"durationNano":     {Name: "durationNano", Type: schema.ColumnTypeUInt64},
-		"statusCode":       {Name: "statusCode", Type: schema.ColumnTypeInt16},
-		"statusMessage":    {Name: "statusMessage", Type: schema.ColumnTypeString},
-		"statusCodeString": {Name: "statusCodeString", Type: schema.ColumnTypeString},
+		// deprecated intrinsic columns — resolve through oldToNew first; these
+		// direct entries exist for lookups that bypass it and MUST target the
+		// same envelope expressions, never fork columns.
+		"traceID":          {Name: "trace_id", Type: schema.ColumnTypeString},
+		"spanID":           {Name: "span_id", Type: schema.ColumnTypeString},
+		"parentSpanID":     {Name: "parent", Type: schema.ColumnTypeString},
+		"spanKind":         {Name: "kind", Type: schema.ColumnTypeString},
+		"durationNano":     {Name: "duration", Type: schema.ColumnTypeUInt64},
+		"statusCode":       {Name: SpanStatusCodeNumberExpr, Type: schema.ColumnTypeInt16},
+		"statusMessage":    {Name: "attributes['status.message']", Type: schema.ColumnTypeString},
+		"statusCodeString": {Name: "status", Type: schema.ColumnTypeString},
 
 		// deprecated derived columns
-		"references":         {Name: "references", Type: schema.ColumnTypeString},
-		"responseStatusCode": {Name: "responseStatusCode", Type: schema.ColumnTypeString},
-		"externalHttpUrl":    {Name: "externalHttpUrl", Type: schema.ColumnTypeString},
-		"httpUrl":            {Name: "httpUrl", Type: schema.ColumnTypeString},
-		"externalHttpMethod": {Name: "externalHttpMethod", Type: schema.ColumnTypeString},
-		"httpMethod":         {Name: "httpMethod", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"httpHost":           {Name: "httpHost", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"dbName":             {Name: "dbName", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"dbOperation":        {Name: "dbOperation", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"hasError":           {Name: "hasError", Type: schema.ColumnTypeBool},
-		"isRemote":           {Name: "isRemote", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"serviceName":        {Name: "serviceName", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"httpRoute":          {Name: "httpRoute", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"msgSystem":          {Name: "msgSystem", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"msgOperation":       {Name: "msgOperation", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"dbSystem":           {Name: "dbSystem", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"rpcSystem":          {Name: "rpcSystem", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"rpcService":         {Name: "rpcService", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"rpcMethod":          {Name: "rpcMethod", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
-		"peerService":        {Name: "peerService", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
+		"references":         {Name: "attributes['links']", Type: schema.ColumnTypeString},
+		"responseStatusCode": {Name: SpanResponseStatusExpr, Type: schema.ColumnTypeString},
+		"externalHttpUrl":    {Name: "url", Type: schema.ColumnTypeString},
+		"httpUrl":            {Name: "url", Type: schema.ColumnTypeString},
+		"externalHttpMethod": {Name: SpanHTTPMethodExpr, Type: schema.ColumnTypeString},
+		"httpMethod":         {Name: SpanHTTPMethodExpr, Type: schema.ColumnTypeString},
+		"httpHost":           {Name: "host", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
+		"dbName":             {Name: "attributes['db.name']", Type: schema.ColumnTypeString},
+		"dbOperation":        {Name: "attributes['db.operation']", Type: schema.ColumnTypeString},
+		"hasError":           {Name: SpanHasErrorExpr, Type: schema.ColumnTypeBool},
+		"isRemote":           {Name: "attributes['is_remote']", Type: schema.ColumnTypeString},
+		"serviceName":        {Name: "service", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
+		"httpRoute":          {Name: "attributes['http.route']", Type: schema.ColumnTypeString},
+		"msgSystem":          {Name: "attributes['messaging.system']", Type: schema.ColumnTypeString},
+		"msgOperation":       {Name: "attributes['messaging.operation']", Type: schema.ColumnTypeString},
+		"dbSystem":           {Name: "attributes['db.system']", Type: schema.ColumnTypeString},
+		"rpcSystem":          {Name: "attributes['rpc.system']", Type: schema.ColumnTypeString},
+		"rpcService":         {Name: "attributes['rpc.service']", Type: schema.ColumnTypeString},
+		"rpcMethod":          {Name: "attributes['rpc.method']", Type: schema.ColumnTypeString},
+		"peerService":        {Name: "attributes['peer.service']", Type: schema.ColumnTypeString},
 
-		// materialized exists columns
-		"resource_string_service$$name_exists":         {Name: "resource_string_service$$name_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_http$$route_exists":          {Name: "attribute_string_http$$route_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_messaging$$system_exists":    {Name: "attribute_string_messaging$$system_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_messaging$$operation_exists": {Name: "attribute_string_messaging$$operation_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_db$$system_exists":           {Name: "attribute_string_db$$system_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_rpc$$system_exists":          {Name: "attribute_string_rpc$$system_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_rpc$$service_exists":         {Name: "attribute_string_rpc$$service_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_rpc$$method_exists":          {Name: "attribute_string_rpc$$method_exists", Type: schema.ColumnTypeBool},
-		"attribute_string_peer$$service_exists":        {Name: "attribute_string_peer$$service_exists", Type: schema.ColumnTypeBool},
+		// former materialized *_exists columns -> envelope membership checks
+		"resource_string_service$$name_exists":         {Name: "service != ''", Type: schema.ColumnTypeBool},
+		"attribute_string_http$$route_exists":          {Name: "mapContains(attributes, 'http.route')", Type: schema.ColumnTypeBool},
+		"attribute_string_messaging$$system_exists":    {Name: "mapContains(attributes, 'messaging.system')", Type: schema.ColumnTypeBool},
+		"attribute_string_messaging$$operation_exists": {Name: "mapContains(attributes, 'messaging.operation')", Type: schema.ColumnTypeBool},
+		"attribute_string_db$$system_exists":           {Name: "mapContains(attributes, 'db.system')", Type: schema.ColumnTypeBool},
+		"attribute_string_rpc$$system_exists":          {Name: "mapContains(attributes, 'rpc.system')", Type: schema.ColumnTypeBool},
+		"attribute_string_rpc$$service_exists":         {Name: "mapContains(attributes, 'rpc.service')", Type: schema.ColumnTypeBool},
+		"attribute_string_rpc$$method_exists":          {Name: "mapContains(attributes, 'rpc.method')", Type: schema.ColumnTypeBool},
+		"attribute_string_peer$$service_exists":        {Name: "mapContains(attributes, 'peer.service')", Type: schema.ColumnTypeBool},
 	}
 
 	// TODO(srikanthccv): remove this mapping.
@@ -158,6 +183,19 @@ var (
 	}
 )
 
+// SpanFieldExpression returns the envelope SQL expression that satisfies the
+// given logical span field name (e.g. "duration_nano" -> "duration",
+// "status_message" -> "attributes['status.message']"). It is the ONE lookup
+// every reader of event.span shares — the trace-detail store aliases these
+// back to the logical names its scan structs expect. Unknown names return
+// the input unchanged.
+func SpanFieldExpression(logicalName string) string {
+	if col, ok := indexV3Columns[logicalName]; ok {
+		return col.Name
+	}
+	return logicalName
+}
+
 type defaultFieldMapper struct {
 }
 
@@ -174,7 +212,14 @@ func (m *defaultFieldMapper) getColumn(
 ) ([]*schema.Column, error) {
 	switch key.FieldContext {
 	case telemetrytypes.FieldContextResource:
-		return []*schema.Column{indexV3Columns["resources_string"], indexV3Columns["resource"]}, nil
+		// service.name is the one resource label promoted to an envelope
+		// column; every other resource label rides the attributes map on the
+		// row. The full label set lives in event.span_resource (labels JSON),
+		// reached through the __resource_filter CTE, not on the main table.
+		if key.Name == "service.name" {
+			return []*schema.Column{indexV3Columns["resource_string_service$$name"]}, nil
+		}
+		return []*schema.Column{indexV3Columns["resources_string"]}, nil
 	case telemetrytypes.FieldContextScope:
 		return []*schema.Column{}, qbtypes.ErrColumnNotFound
 	case telemetrytypes.FieldContextAttribute:
@@ -308,19 +353,20 @@ func (m *defaultFieldMapper) FieldFor(
 				return "", errors.NewInvalidInputf(errors.CodeInvalidInput, "key type %s is not supported for map column type %s", keyType, column.Type)
 			}
 
+			// One physical map of strings; the LOGICAL value type decides the
+			// read expression. No materialized per-key columns exist on the
+			// envelope, so key.Materialized is deliberately ignored.
 			switch valueType := column.Type.(schema.MapColumnType).ValueType; valueType.GetType() {
-			case schema.ColumnTypeEnumString, schema.ColumnTypeEnumFloat64, schema.ColumnTypeEnumBool:
-				// a key could have been materialized, if so return the materialized column name
-				if key.Materialized {
-					exprs = append(exprs, telemetrytypes.FieldKeyToMaterializedColumnName(key))
-					existExpr = append(existExpr, fmt.Sprintf("%s==true", telemetrytypes.FieldKeyToMaterializedColumnNameForExists(key)))
-				} else {
-					exprs = append(exprs, fmt.Sprintf("%s['%s']", columnName, key.Name))
-					existExpr = append(existExpr, fmt.Sprintf("mapContains(%s, '%s')", columnName, key.Name))
-				}
+			case schema.ColumnTypeEnumString:
+				exprs = append(exprs, fmt.Sprintf("%s['%s']", columnName, key.Name))
+			case schema.ColumnTypeEnumFloat64:
+				exprs = append(exprs, fmt.Sprintf("toFloat64OrNull(%s['%s'])", columnName, key.Name))
+			case schema.ColumnTypeEnumBool:
+				exprs = append(exprs, fmt.Sprintf("toBool(%s['%s'] = 'true')", columnName, key.Name))
 			default:
 				return "", errors.NewInvalidInputf(errors.CodeInvalidInput, "value type %s is not supported for map column type %s", valueType, column.Type)
 			}
+			existExpr = append(existExpr, fmt.Sprintf("mapContains(%s, '%s')", columnName, key.Name))
 		}
 	}
 

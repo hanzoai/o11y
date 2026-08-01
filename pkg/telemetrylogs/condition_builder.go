@@ -232,7 +232,8 @@ func (c *conditionBuilder) conditionFor(
 			} else {
 				return sb.E(fieldExpression, value), nil
 			}
-		case schema.ColumnTypeEnumUInt64, schema.ColumnTypeEnumUInt32, schema.ColumnTypeEnumUInt8:
+		case schema.ColumnTypeEnumUInt64, schema.ColumnTypeEnumUInt32, schema.ColumnTypeEnumUInt8,
+			schema.ColumnTypeEnumDateTime64:
 			value = 0
 			if operator == qbtypes.FilterOperatorExists {
 				return sb.NE(fieldExpression, value), nil
@@ -247,10 +248,9 @@ func (c *conditionBuilder) conditionFor(
 
 			switch valueType := column.Type.(schema.MapColumnType).ValueType; valueType.GetType() {
 			case schema.ColumnTypeEnumString, schema.ColumnTypeEnumBool, schema.ColumnTypeEnumFloat64:
+				// no materialized per-key columns on the envelope — membership
+				// is always a map lookup
 				leftOperand := fmt.Sprintf("mapContains(%s, '%s')", column.Name, key.Name)
-				if key.Materialized {
-					leftOperand = telemetrytypes.FieldKeyToMaterializedColumnNameForExists(key)
-				}
 				if operator == qbtypes.FilterOperatorExists {
 					return sb.E(leftOperand, true), nil
 				} else {

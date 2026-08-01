@@ -396,9 +396,9 @@ func (b *traceQueryStatementBuilder) buildTraceQuery(
 
 	// Build the inner subquery for root spans
 	innerSB := sqlbuilder.NewSelectBuilder()
-	innerSB.Select("trace_id", "duration_nano", sqlbuilder.Escape("resource_string_service$$name as `service.name`"), "name")
+	innerSB.Select("trace_id", "duration AS duration_nano", "service as `service.name`", "name")
 	innerSB.From(fmt.Sprintf("%s.%s", DBName, SpanTableName))
-	innerSB.Where("parent_span_id = ''")
+	innerSB.Where("parent = ''")
 
 	// this only helps when there is a filter
 	if query.Filter != nil && query.Filter.Expression != "" {
@@ -407,8 +407,8 @@ func (b *traceQueryStatementBuilder) buildTraceQuery(
 
 	// Add time filter to inner query
 	innerSB.Where(
-		innerSB.GE("timestamp", fmt.Sprintf("%d", start)),
-		innerSB.L("timestamp", fmt.Sprintf("%d", end)),
+		innerSB.GE("time", fmt.Sprintf("%d", start)),
+		innerSB.L("time", fmt.Sprintf("%d", end)),
 		innerSB.GE("ts_bucket_start", startBucket),
 		innerSB.LE("ts_bucket_start", endBucket))
 
@@ -495,7 +495,7 @@ func (b *traceQueryStatementBuilder) buildTimeSeriesQuery(
 	}
 
 	sb.SelectMore(fmt.Sprintf(
-		"toStartOfInterval(timestamp, INTERVAL %d SECOND) AS ts",
+		"toStartOfInterval(time, INTERVAL %d SECOND) AS ts",
 		int64(query.StepInterval.Seconds()),
 	))
 
@@ -781,7 +781,7 @@ func (b *traceQueryStatementBuilder) addFilterCondition(
 	startBucket := start/querybuilder.NsToSeconds - querybuilder.BucketAdjustment
 	endBucket := end / querybuilder.NsToSeconds
 
-	sb.Where(sb.GE("timestamp", fmt.Sprintf("%d", start)), sb.L("timestamp", fmt.Sprintf("%d", end)), sb.GE("ts_bucket_start", startBucket), sb.LE("ts_bucket_start", endBucket))
+	sb.Where(sb.GE("time", fmt.Sprintf("%d", start)), sb.L("time", fmt.Sprintf("%d", end)), sb.GE("ts_bucket_start", startBucket), sb.LE("ts_bucket_start", endBucket))
 
 	return preparedWhereClause, nil
 }

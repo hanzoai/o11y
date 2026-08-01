@@ -14,13 +14,16 @@
 // luxfi/zap node multiplexes by MsgType in the envelope flags upper
 // byte, so one zap.Node instance can host BOTH handlers concurrently.
 //
+// The write side is pkg/datastoremetrics: its WriteMetrics satisfies Handler
+// and lands every batch on the event plane (event.metric + event.series),
+// never on an OTLP-fork table.
+//
 // Usage:
 //
+//	w := datastoremetrics.NewWriter(store.Datastore())
 //	rcv, err := zapmetricreceiver.New(zapmetricreceiver.Config{
-//	    Listen: ":4317",
-//	    OnBatch: func(ctx context.Context, b *MetricBatch) error {
-//	        return datastoreWriter.WriteMetrics(ctx, b)
-//	    },
+//	    Listen:  ":4317",
+//	    OnBatch: w.WriteMetrics,
 //	})
 //	if err != nil { return err }
 //	defer rcv.Stop()

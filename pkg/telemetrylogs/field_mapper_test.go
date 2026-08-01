@@ -127,12 +127,12 @@ func TestGetColumn(t *testing.T) {
 			expectedError: nil,
 		},
 		{
-			name: "Log field - timestamp",
+			name: "Log field - time",
 			key: telemetrytypes.TelemetryFieldKey{
-				Name:         "timestamp",
+				Name:         "time",
 				FieldContext: telemetrytypes.FieldContextLog,
 			},
-			expectedCol:   []*schema.Column{logsV2Columns["timestamp"]},
+			expectedCol:   []*schema.Column{logsV2Columns["time"]},
 			expectedError: nil,
 		},
 		{
@@ -196,12 +196,12 @@ func TestGetFieldKeyName(t *testing.T) {
 		addExistsFilter bool
 	}{
 		{
-			name: "Simple column type - timestamp",
+			name: "Simple column type - time",
 			key: telemetrytypes.TelemetryFieldKey{
-				Name:         "timestamp",
+				Name:         "time",
 				FieldContext: telemetrytypes.FieldContextLog,
 			},
-			expectedResult:  "timestamp",
+			expectedResult:  "time",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -212,7 +212,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeString,
 			},
-			expectedResult:  "attributes_string['user.id']",
+			expectedResult:  "attributes['user.id']",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -223,7 +223,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeNumber,
 			},
-			expectedResult:  "attributes_number['request.size']",
+			expectedResult:  "toFloat64OrNull(attributes['request.size'])",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -234,7 +234,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeBool,
 			},
-			expectedResult:  "attributes_bool['request.success']",
+			expectedResult:  "toBool(attributes['request.success'] = 'true')",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -245,7 +245,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext: telemetrytypes.FieldContextResource,
 				Evolutions:   resourceEvolution,
 			},
-			expectedResult:  "resources_string['service.name']",
+			expectedResult:  "service",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -258,7 +258,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				Materialized:  true,
 				Evolutions:    resourceEvolution,
 			},
-			expectedResult:  "`resource_string_service$$name`",
+			expectedResult:  "service",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -321,7 +321,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "resources_string['service.name']",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -339,7 +339,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "resources_string['service.name']",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -365,7 +365,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, mapContains(resources_string, 'service.name'), resources_string['service.name'], NULL)",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		// TODO(piyush): to be added once integration with JSON is done.
@@ -423,7 +423,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "resource.`service.name`::String",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -449,7 +449,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Unix(0, 0),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, mapContains(resources_string, 'service.name'), resources_string['service.name'], NULL)",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -484,7 +484,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 2, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "resource.`service.name`::String",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -510,7 +510,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "resources_string['service.name']",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 	}
@@ -573,13 +573,13 @@ func TestFieldForWithMaterialized(t *testing.T) {
 			name:           "Map column in use (pre-evolution to JSON)",
 			start:          time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			end:            time.Date(2024, 2, 2, 0, 0, 0, 0, time.UTC),
-			expectedResult: "`resource_string_service$$name`",
+			expectedResult: "service",
 		},
 		{
 			name:           "Multi evolution - both columns (JSON + materialized)",
 			start:          time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			end:            time.Date(2024, 4, 2, 0, 0, 0, 0, time.UTC),
-			expectedResult: "multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, `resource_string_service$$name_exists`==true, `resource_string_service$$name`, NULL)",
+			expectedResult: "service",
 		},
 	}
 

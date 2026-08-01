@@ -8,13 +8,16 @@
 // SpanBatch (see luxfi/trace.SpanBatch for the type definition). No
 // protobuf, no OTLP, no gRPC — the ZAP envelope is the only framing.
 //
+// The write side is pkg/datastoretraces: its WriteSpans satisfies Handler and
+// lands every batch on the event plane (event.span + the trace support
+// tables), never on an OTLP-fork table.
+//
 // Usage:
 //
+//	w := datastoretraces.NewWriter(store.Datastore())
 //	rcv, err := zapreceiver.New(zapreceiver.Config{
-//	    Listen: ":4317",
-//	    OnBatch: func(ctx context.Context, b *SpanBatch) error {
-//	        return datastoreWriter.WriteBatch(ctx, b)
-//	    },
+//	    Listen:  ":4317",
+//	    OnBatch: w.WriteSpans,
 //	})
 //	if err != nil { return err }
 //	defer rcv.Stop()

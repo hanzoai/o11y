@@ -13,6 +13,12 @@ import (
 
 // SelectEvolutionsForColumns selects the appropriate evolution entries for each column based on the time range.
 // Logic:
+//   - Ignores evolutions that reference columns absent from `columns`: such an
+//     entry describes a plane the mapper no longer exposes (e.g. the OTLP-fork
+//     resources_string/resource split superseded by the one-envelope scheme),
+//     so it cannot apply — it is inert, never an error
+//   - With no applicable evolutions, returns the columns unchanged and nil
+//     entries: plain no-evolution semantics
 //   - Finds the latest base evolution (<= tsStartTime) across ALL columns
 //   - Rejects all evolutions before this latest base evolution
 //   - For duplicate evolutions it considers the oldest one (first in ReleaseTime)
@@ -20,8 +26,19 @@ import (
 //   - Results are sorted by ReleaseTime descending (newest first)
 func SelectEvolutionsForColumns(columns []*schema.Column, evolutions []*telemetrytypes.EvolutionEntry, tsStart, tsEnd uint64) ([]*schema.Column, []*telemetrytypes.EvolutionEntry, error) {
 
-	sortedEvolutions := make([]*telemetrytypes.EvolutionEntry, len(evolutions))
-	copy(sortedEvolutions, evolutions)
+	knownColumns := make(map[string]bool, len(columns))
+	for _, column := range columns {
+		knownColumns[column.Name] = true
+	}
+	sortedEvolutions := make([]*telemetrytypes.EvolutionEntry, 0, len(evolutions))
+	for _, evolution := range evolutions {
+		if knownColumns[evolution.ColumnName] {
+			sortedEvolutions = append(sortedEvolutions, evolution)
+		}
+	}
+	if len(sortedEvolutions) == 0 {
+		return columns, nil, nil
+	}
 
 	// sort the evolutions by ReleaseTime ascending
 	sort.Slice(sortedEvolutions, func(i, j int) bool {
@@ -78,10 +95,7 @@ func SelectEvolutionsForColumns(columns []*schema.Column, evolutions []*telemetr
 			continue
 		}
 
-		if _, exists := columnLookUpMap[evolution.ColumnName]; !exists {
-			return nil, nil, errors.Newf(errors.TypeInternal, errors.CodeInternal, "evolution column %s not found in columns %v", evolution.ColumnName, columns)
-		}
-
+		// every remaining evolution references a known column by construction
 		pairs = append(pairs, colEvoPair{columnLookUpMap[evolution.ColumnName], evolution})
 	}
 

@@ -13,13 +13,16 @@
 // logs off the box had to reach for an OTLP exporter, which carries protobuf
 // and gRPC on either flavour.
 //
+// The write side is pkg/datastorelogs: its WriteLogs satisfies Handler and
+// lands every batch on the event plane (event.log + the log support tables),
+// never on an OTLP-fork table.
+//
 // Usage:
 //
+//	w := datastorelogs.NewWriter(store.Datastore())
 //	rcv, err := zaplogreceiver.New(zaplogreceiver.Config{
-//	    Listen: ":4317",
-//	    OnBatch: func(ctx context.Context, b *LogBatch) error {
-//	        return datastoreWriter.WriteLogs(ctx, b)
-//	    },
+//	    Listen:  ":4317",
+//	    OnBatch: w.WriteLogs,
 //	})
 //	if err != nil { return err }
 //	defer rcv.Stop()

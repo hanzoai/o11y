@@ -12,10 +12,12 @@ import (
 )
 
 const (
-	// Datastore database and table names for trace queries.
-	TraceDB           = "o11y_traces"
-	TraceTable        = "distributed_o11y_index_v3"
-	TraceSummaryTable = "distributed_trace_summary"
+	// Datastore database and table names for trace queries. Everything lives
+	// in the ONE event database: spans in event.span, whole-trace summaries in
+	// event.trace.
+	TraceDB           = "event"
+	TraceTable        = "span"
+	TraceSummaryTable = "trace"
 )
 
 // ErrTraceNotFound is returned when a trace ID has no matching spans in Datastore.
@@ -98,7 +100,7 @@ type StorableSpan struct {
 	SpanID             string             `ch:"span_id"`
 	HasError           bool               `ch:"has_error"`
 	Kind               int8               `ch:"kind"`
-	ServiceName        string             `ch:"resource_string_service$$name"`
+	ServiceName        string             `ch:"service"`
 	Name               string             `ch:"name"`
 	AttributesString   map[string]string  `ch:"attributes_string"`
 	AttributesNumber   map[string]float64 `ch:"attributes_number"`
@@ -131,7 +133,7 @@ type MinimalSpan struct {
 	StartTime    time.Time `ch:"timestamp"`
 	DurationNano uint64    `ch:"duration_nano"`
 	HasError     bool      `ch:"has_error"`
-	ServiceName  string    `ch:"resource_string_service$$name"`
+	ServiceName  string    `ch:"service"`
 }
 
 func (item *MinimalSpan) ToWaterfallSpan(traceID string) *WaterfallSpan {

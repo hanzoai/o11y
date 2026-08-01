@@ -29,6 +29,26 @@
 -- touching the schema. Until then a read is one range scan per org, which is
 -- cheap because org is LowCardinality.
 
+-- event.span itself is applied elsewhere and not restated here, EXCEPT for the
+-- two read-plane columns below, which this file owns because the trace query
+-- builders are their only reason to exist. Both statements are replayable
+-- (IF NOT EXISTS), like everything else in this file.
+--
+--   * resource_fingerprint — write-time hash of the span's FULL resource label
+--     set. NOT derivable from any envelope column; it is the join key the
+--     __resource_filter CTE stamps on the main table:
+--     `resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter)`
+--     where the CTE reads event.span_resource (below). Writers that don't
+--     compute it yet leave it '' — such rows simply never match a resource
+--     filter, they don't error.
+--   * ts_bucket_start — MATERIALIZED from time, so writers stay 15-col
+--     envelope-only. One bucketing scheme (1800s) shared with
+--     seen_at_ts_bucket_start on the support tables; the query builders put
+--     range predicates on it beside every time predicate.
+ALTER TABLE event.span
+    ADD COLUMN IF NOT EXISTS `resource_fingerprint` String CODEC(ZSTD(1)) AFTER `status`,
+    ADD COLUMN IF NOT EXISTS `ts_bucket_start` UInt64 MATERIALIZED intDiv(toUnixTimestamp(time), 1800) * 1800 CODEC(DoubleDelta, ZSTD(1)) AFTER `resource_fingerprint`;
+
 -- span_attribute — attribute VALUE autocomplete.
 --
 -- ENGINE ReplacingMergeTree(unix_milli): a pure dimension keyed on its own
