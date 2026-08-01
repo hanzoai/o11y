@@ -7,6 +7,12 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 )
 
+// DUAL DISPATCH. These registrations stay: the standalone server reaches them
+// directly, and the composed binary reaches the SAME handlers through the typed
+// query-core ops in the repo root's querycore.go (metricsQueryRange,
+// queryRangeFormat), which relay here. Deleting either half drops one of the two
+// deployments.
+
 // mountQueryRange registers the metrics range read. 1 route.
 func (aH *APIHandler) mountQueryRange(router *mux.Router, am *middleware.AuthZ) {
 	router.HandleFunc("/v1/o11y/query_range", am.ViewAccess(aH.queryRangeMetrics)).Methods(http.MethodGet)

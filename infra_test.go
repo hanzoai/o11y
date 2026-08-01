@@ -287,6 +287,7 @@ func TestInfraRoutesAreTheSameFortyFour(t *testing.T) {
 			continue
 		}
 		if strings.HasPrefix(r.Path, "/v1/o11y/") && !strings.HasSuffix(r.Path, "*") &&
+			!strings.Contains(r.Path, "auto") && // query-core's autocomplete/auto_complete carry attribute_* too — not infra doors
 			(strings.Contains(r.Path, "attribute_") || strings.HasSuffix(r.Path, "/list") || strings.Contains(r.Path, "infra_monitoring")) {
 			got[r.Method+" "+r.Path] = true
 		}

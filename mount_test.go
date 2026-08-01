@@ -49,7 +49,7 @@ func TestMountDelegatesPathVerbatim(t *testing.T) {
 	// pkg/apiserver/o11yapiserver/*.go). What arrives is what dispatches.
 	paths := []string{
 		"/v1/o11y/services",
-		"/v1/o11y/query_range",
+		"/v1/o11y/query_progress", // long-poll progress: deliberately wildcarded, a stream (querycore.go)
 		"/v1/o11y/settings/ttl",
 		"/v1/o11y/global/config",
 		"/v1/o11y/complete/google", // sign-in callback: deliberately wildcarded (identity.go)

@@ -60,6 +60,14 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// unchanged; see identity.go. The three /complete/* sign-in callbacks
 	// stay on the wildcard below — they answer with redirects, not JSON.
 	mountIdentity(app)
+	// The TYPED query-core ops — the v5 composite query engine (query_range, its
+	// dry-run preview, variable substitution), the legacy metrics range read and
+	// the builder-format echo, attribute autocomplete, the field catalog and the
+	// saved explorer views. Same construction: named In, named Out, answered on
+	// the runtime, wire unchanged; see querycore.go. Query progress (long-poll
+	// and websocket) and raw-data export stay on the wildcard below — they are
+	// streams, not JSON answers.
+	mountQueryCore(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
