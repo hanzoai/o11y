@@ -44,6 +44,11 @@ func Mount(app *zip.App, deps cloud.Deps) error {
 	// instead of hiding behind a wildcard. They answer on the runtime, so the
 	// wire is unchanged; see telemetry.go.
 	mountTelemetry(app)
+	// The TYPED infra ops — hosts, processes, the Kubernetes fleet and the
+	// infra_monitoring rollups; forty-four reads that now carry named inputs,
+	// named outputs and their prose into the document. They answer on the
+	// runtime, so the wire is unchanged; see infra.go.
+	mountInfra(app)
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(handlerAdapter{}))
 	return nil
 }
