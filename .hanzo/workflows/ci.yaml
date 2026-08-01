@@ -17,23 +17,13 @@ jobs:
       GOPRIVATE: github.com/hanzoai/*
       GOSUMDB: "off"
     steps:
+      # go.mod requires github.com/hanzoai/cloud at a released version and
+      # resolves it from the proxy like every other private hanzoai module — no
+      # sibling checkout, no second copy of the pin to keep in step with it.
       - name: Checkout o11y
         uses: actions/checkout@v4
         with:
           path: o11y
-
-      # go.mod pins `replace github.com/hanzoai/cloud => ../cloud` for local
-      # co-development, so CI supplies the sibling. Pin the exact commit o11y's
-      # module graph is reconciled against (readonly `go build ./...` is green
-      # against it) — cloud's `main` drifts independently and would break the
-      # readonly graph. Bump this when o11y's go.mod is re-tidied against cloud.
-      - name: Checkout hanzoai/cloud (sibling for replace => ../cloud)
-        uses: actions/checkout@v4
-        with:
-          repository: hanzoai/cloud
-          ref: ce6c4dc374160fae6873dd6ad6222bf52d803f71
-          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-          path: cloud
 
       - name: Set up Go
         uses: actions/setup-go@v5
