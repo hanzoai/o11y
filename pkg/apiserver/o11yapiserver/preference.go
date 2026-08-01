@@ -9,6 +9,11 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/preferencetypes"
 )
 
+// ALL of these routes are ALSO declared as typed ops at the module's mount seam
+// (identity.go in the repo root) — a second DISPATCH onto this router, never a
+// second implementation; the ViewAccess/AdminAccess gates below stay the one
+// place access is decided. The ops serve the composed binary, this router the
+// standalone process.
 func (provider *provider) addPreferenceRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/user/preferences", handler.New(provider.authzMiddleware.ViewAccess(provider.preferenceHandler.ListByUser), handler.OpenAPIDef{
 		ID:                  "ListUserPreferences",

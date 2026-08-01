@@ -8,6 +8,11 @@ import (
 	"github.com/hanzoai/o11y/pkg/types"
 )
 
+// BOTH routes are ALSO declared as typed ops at the module's mount seam
+// (identity.go in the repo root) — a second DISPATCH onto this router, never a
+// second implementation; the AdminAccess gate below stays the one place access
+// is decided. The ops serve the composed binary, this router the standalone
+// process.
 func (provider *provider) addOrgRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/orgs/me", handler.New(provider.authzMiddleware.AdminAccess(provider.orgHandler.Get), handler.OpenAPIDef{
 		ID:                  "GetMyOrganization",
