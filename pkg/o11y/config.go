@@ -45,6 +45,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/hanzoai/o11y/pkg/web"
+	"github.com/hanzoai/o11y/pkg/zapingest"
 )
 
 // Config defines the entire input configuration of o11y.
@@ -147,6 +148,9 @@ type Config struct {
 
 	// Authz config
 	Authz authz.Config `mapstructure:"authz"`
+
+	// ZapIngest config — where the ZAP receivers that write the event plane listen.
+	ZapIngest zapingest.Config `mapstructure:"zapingest"`
 }
 
 func NewConfig(ctx context.Context, logger *slog.Logger, resolverConfig config.ResolverConfig) (Config, error) {
@@ -183,6 +187,7 @@ func NewConfig(ctx context.Context, logger *slog.Logger, resolverConfig config.R
 		cloudintegration.NewConfigFactory(),
 		tracedetail.NewConfigFactory(),
 		authz.NewConfigFactory(),
+		zapingest.NewConfigFactory(),
 	}
 
 	conf, err := config.New(ctx, resolverConfig, configFactories)

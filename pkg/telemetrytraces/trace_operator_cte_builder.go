@@ -134,14 +134,14 @@ func (b *traceOperatorCTEBuilder) build(ctx context.Context, requestType qbtypes
 func (b *traceOperatorCTEBuilder) buildAllSpansCTE(ctx context.Context) {
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("*")
-	sb.SelectMore(sqlbuilder.Escape("resource_string_service$$name") + " AS `service.name`")
+	sb.SelectMore("service AS `service.name`")
 
 	sb.From(fmt.Sprintf("%s.%s", DBName, SpanTableName))
 	startBucket := b.start/querybuilder.NsToSeconds - querybuilder.BucketAdjustment
 	endBucket := b.end / querybuilder.NsToSeconds
 	sb.Where(
-		sb.GE("timestamp", fmt.Sprintf("%d", b.start)),
-		sb.L("timestamp", fmt.Sprintf("%d", b.end)),
+		sb.GE("time", fmt.Sprintf("%d", b.start)),
+		sb.L("time", fmt.Sprintf("%d", b.end)),
 		sb.GE("ts_bucket_start", startBucket),
 		sb.LE("ts_bucket_start", endBucket),
 	)
@@ -251,8 +251,8 @@ func (b *traceOperatorCTEBuilder) buildQueryCTE(ctx context.Context, queryName s
 	startBucket := b.start/querybuilder.NsToSeconds - querybuilder.BucketAdjustment
 	endBucket := b.end / querybuilder.NsToSeconds
 	sb.Where(
-		sb.GE("timestamp", fmt.Sprintf("%d", b.start)),
-		sb.L("timestamp", fmt.Sprintf("%d", b.end)),
+		sb.GE("time", fmt.Sprintf("%d", b.start)),
+		sb.L("time", fmt.Sprintf("%d", b.end)),
 		sb.GE("ts_bucket_start", startBucket),
 		sb.LE("ts_bucket_start", endBucket),
 	)
@@ -366,7 +366,7 @@ func (b *traceOperatorCTEBuilder) buildDirectDescendantCTE(parentCTE, childCTE s
 	sb.JoinWithOption(
 		sqlbuilder.InnerJoin,
 		fmt.Sprintf("%s AS c", childCTE),
-		"p.trace_id = c.trace_id AND p.span_id = c.parent_span_id",
+		"p.trace_id = c.trace_id AND p.span_id = c.parent",
 	)
 
 	sql, args := sb.BuildWithFlavor(datastoresql.Flavor)
@@ -374,7 +374,7 @@ func (b *traceOperatorCTEBuilder) buildDirectDescendantCTE(parentCTE, childCTE s
 }
 
 func (b *traceOperatorCTEBuilder) buildIndirectDescendantCTE(ancestorCTE, descendantCTE string) (string, []string) {
-	sql := fmt.Sprintf(`WITH RECURSIVE up AS (SELECT d.trace_id, d.span_id, d.parent_span_id, 0 AS depth FROM %s AS d UNION ALL SELECT p.trace_id, p.span_id, p.parent_span_id, up.depth + 1 FROM all_spans AS p JOIN up ON p.trace_id = up.trace_id AND p.span_id = up.parent_span_id WHERE up.depth < 100) SELECT DISTINCT a.* FROM %s AS a GLOBAL INNER JOIN (SELECT DISTINCT trace_id, span_id FROM up WHERE depth > 0 ) AS ancestors ON ancestors.trace_id = a.trace_id AND ancestors.span_id = a.span_id`, descendantCTE, ancestorCTE)
+	sql := fmt.Sprintf(`WITH RECURSIVE up AS (SELECT d.trace_id, d.span_id, d.parent, 0 AS depth FROM %s AS d UNION ALL SELECT p.trace_id, p.span_id, p.parent, up.depth + 1 FROM all_spans AS p JOIN up ON p.trace_id = up.trace_id AND p.span_id = up.parent WHERE up.depth < 100) SELECT DISTINCT a.* FROM %s AS a GLOBAL INNER JOIN (SELECT DISTINCT trace_id, span_id FROM up WHERE depth > 0 ) AS ancestors ON ancestors.trace_id = a.trace_id AND ancestors.span_id = a.span_id`, descendantCTE, ancestorCTE)
 	return sql, []string{ancestorCTE, descendantCTE, "all_spans"}
 }
 
@@ -466,13 +466,15 @@ func (b *traceOperatorCTEBuilder) buildListQuery(ctx context.Context, selectFrom
 
 	// Select core fields. These are always present so the trace operator
 	// response shape is stable regardless of user-supplied selectFields.
+	// The CTEs are SELECT * over event.span, so the columns in scope are the
+	// envelope's. Alias them back to the names the consume layer reads.
 	sb.Select(
-		"timestamp",
+		"time AS `timestamp`",
 		"trace_id",
 		"span_id",
 		"name",
-		"duration_nano",
-		"parent_span_id",
+		"duration AS `duration_nano`",
+		"parent AS `parent_span_id`",
 	)
 
 	selectedFields := map[string]bool{
@@ -624,7 +626,7 @@ func (b *traceOperatorCTEBuilder) buildTimeSeriesQuery(ctx context.Context, sele
 	sb := sqlbuilder.NewSelectBuilder()
 
 	sb.Select(fmt.Sprintf(
-		"toStartOfInterval(timestamp, INTERVAL %d SECOND) AS ts",
+		"toStartOfInterval(time, INTERVAL %d SECOND) AS ts",
 		int64(b.operator.StepInterval.Seconds()),
 	))
 
@@ -794,11 +796,11 @@ func (b *traceOperatorCTEBuilder) buildTraceQuery(ctx context.Context, selectFro
 	}
 
 	sb.Select(
-		"any(root.timestamp) as timestamp",
+		"any(root.time) as timestamp",
 		"any(root.`service.name`) as `service.name`",
 		"any(root.name) as `name`",
 		"summary.total_span_count as span_count", // Updated column name
-		"any(root.duration_nano) as `duration_nano`",
+		"any(root.duration) as `duration_nano`",
 		"root.trace_id as `trace_id`",
 	)
 
@@ -808,7 +810,7 @@ func (b *traceOperatorCTEBuilder) buildTraceQuery(ctx context.Context, selectFro
 		"trace_summary as summary",
 		"root.trace_id = summary.trace_id",
 	)
-	sb.Where("root.parent_span_id = ''")
+	sb.Where("root.parent = ''")
 
 	sb.GroupBy("root.trace_id", "summary.total_span_count")
 	if len(b.operator.GroupBy) > 0 {

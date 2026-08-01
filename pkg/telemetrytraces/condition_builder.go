@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/hanzo-ds/sqlbuilder"
 	"golang.org/x/exp/maps"
 )
 
@@ -162,7 +162,10 @@ func (c *conditionBuilder) conditionFor(
 
 		var value any
 		column := columns[0]
-		if len(key.Evolutions) > 0 {
+		// An evolution selects BETWEEN columns; the envelope resolves every key to
+		// exactly one column, so there is nothing to select and the evolution
+		// metadata (which names OTLP-fork columns) does not apply.
+		if len(key.Evolutions) > 0 && len(columns) > 1 {
 			// we will use the corresponding column and its evolution entry for the query
 			newColumns, _, err := qbtypes.SelectEvolutionsForColumns(columns, key.Evolutions, startNs, endNs)
 			if err != nil {
@@ -185,6 +188,18 @@ func (c *conditionBuilder) conditionFor(
 
 			// otherwise we have to find the correct exist operator based on the column type
 			column = newColumns[0]
+		}
+
+		// A resource label the envelope PROMOTED to a column of its own is always
+		// structurally present, so its existence IS the column being non-empty —
+		// and that needs no bound parameter, unlike a map-membership test.
+		if key.FieldContext == telemetrytypes.FieldContextResource {
+			if _, promoted := PromotedResourceColumn(key.Name); promoted {
+				if operator == qbtypes.FilterOperatorExists {
+					return fmt.Sprintf("notEmpty(%s)", fieldExpression), nil
+				}
+				return fmt.Sprintf("empty(%s)", fieldExpression), nil
+			}
 		}
 
 		switch column.Type.GetType() {
@@ -235,10 +250,9 @@ func (c *conditionBuilder) conditionFor(
 
 			switch valueType := column.Type.(schema.MapColumnType).ValueType; valueType.GetType() {
 			case schema.ColumnTypeEnumString, schema.ColumnTypeEnumBool, schema.ColumnTypeEnumFloat64:
+				// The envelope has one attributes map and no materialized columns, so
+				// membership is always a mapContains over it.
 				leftOperand := fmt.Sprintf("mapContains(%s, '%s')", column.Name, key.Name)
-				if key.Materialized {
-					leftOperand = telemetrytypes.FieldKeyToMaterializedColumnNameForExists(key)
-				}
 				if operator == qbtypes.FilterOperatorExists {
 					return sb.E(leftOperand, true), nil
 				} else {
@@ -273,13 +287,23 @@ func (c *conditionBuilder) ConditionFor(
 	}
 
 	if operator.AddDefaultExistsFilter() {
-		// skip adding exists filter for intrinsic fields
-		field, _ := c.fm.FieldFor(ctx, startNs, endNs, key)
-		if slices.Contains(maps.Keys(IntrinsicFields), field) ||
-			slices.Contains(maps.Keys(IntrinsicFieldsDeprecated), field) ||
-			slices.Contains(maps.Keys(CalculatedFields), field) ||
-			slices.Contains(maps.Keys(CalculatedFieldsDeprecated), field) {
+		// skip adding exists filter for intrinsic/calculated fields. Keyed on the
+		// logical field name, not the emitted column: envelope columns no longer
+		// coincide with the field-map keys the way the OTLP-fork column names did.
+		if slices.Contains(maps.Keys(IntrinsicFields), key.Name) ||
+			slices.Contains(maps.Keys(IntrinsicFieldsDeprecated), key.Name) ||
+			slices.Contains(maps.Keys(CalculatedFields), key.Name) ||
+			slices.Contains(maps.Keys(CalculatedFieldsDeprecated), key.Name) {
 			return condition, nil
+		}
+
+		// A resource label the envelope PROMOTED to a column of its own is always
+		// present — there is no map entry that could be missing — so an exists
+		// filter over it is a tautology, not a guard.
+		if key.FieldContext == telemetrytypes.FieldContextResource {
+			if _, promoted := PromotedResourceColumn(key.Name); promoted {
+				return condition, nil
+			}
 		}
 
 		existsCondition, err := c.conditionFor(ctx, startNs, endNs, key, qbtypes.FilterOperatorExists, nil, sb)
@@ -318,17 +342,15 @@ func (c *conditionBuilder) buildSpanScopeCondition(key *telemetrytypes.Telemetry
 	keyName := strings.ToLower(key.Name)
 	switch keyName {
 	case SpanSearchScopeRoot:
-		return "parent_span_id = ''", nil
+		return "parent = ''", nil
 	case SpanSearchScopeEntryPoint:
 		if startNs > 0 { // only add time filter if it is a valid time, else do not add
 			startS := int64(startNs / 1_000_000_000)
-			// Note: Escape $$ to $$$$ to avoid sqlbuilder interpreting materialized $ signs
-			return sqlbuilder.Escape(fmt.Sprintf("((name, resource_string_service$$name) GLOBAL IN (SELECT DISTINCT name, serviceName from %s.%s WHERE time >= toDateTime(%d))) AND parent_span_id != ''",
-				DBName, OperationTableName, startS)), nil
+			return fmt.Sprintf("((name, service) GLOBAL IN (SELECT DISTINCT name, serviceName from %s.%s WHERE time >= toDateTime(%d))) AND parent != ''",
+				DBName, OperationTableName, startS), nil
 		}
-		// Note: Escape $$ to $$$$ to avoid sqlbuilder interpreting materialized $ signs
-		return sqlbuilder.Escape(fmt.Sprintf("((name, resource_string_service$$name) GLOBAL IN (SELECT DISTINCT name, serviceName from %s.%s)) AND parent_span_id != ''",
-			DBName, OperationTableName)), nil
+		return fmt.Sprintf("((name, service) GLOBAL IN (SELECT DISTINCT name, serviceName from %s.%s)) AND parent != ''",
+			DBName, OperationTableName), nil
 	default:
 		return "", errors.NewInvalidInputf(errors.CodeInvalidInput, "invalid span search scope: %s", key.Name)
 	}

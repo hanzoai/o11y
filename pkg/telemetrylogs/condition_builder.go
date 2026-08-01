@@ -184,7 +184,10 @@ func (c *conditionBuilder) conditionFor(
 
 		var value any
 		column := columns[0]
-		if len(key.Evolutions) > 0 {
+		// An evolution selects BETWEEN columns; the envelope resolves every key to
+		// exactly one column, so there is nothing to select and the evolution
+		// metadata (which names OTLP-fork columns) does not apply.
+		if len(key.Evolutions) > 0 && len(columns) > 1 {
 			// we will use the corresponding column and its evolution entry for the query
 			newColumns, _, err := qbtypes.SelectEvolutionsForColumns(columns, key.Evolutions, startNs, endNs)
 			if err != nil {
@@ -206,6 +209,18 @@ func (c *conditionBuilder) conditionFor(
 
 			// otherwise we have to find the correct exist operator based on the column type
 			column = newColumns[0]
+		}
+
+		// A resource label the envelope PROMOTED to a column of its own is always
+		// structurally present, so its existence IS the column being non-empty —
+		// and that needs no bound parameter, unlike a map-membership test.
+		if key.FieldContext == telemetrytypes.FieldContextResource {
+			if _, promoted := PromotedResourceColumn(key.Name); promoted {
+				if operator == qbtypes.FilterOperatorExists {
+					return fmt.Sprintf("notEmpty(%s)", fieldExpression), nil
+				}
+				return fmt.Sprintf("empty(%s)", fieldExpression), nil
+			}
 		}
 
 		switch column.Type.GetType() {
@@ -247,10 +262,9 @@ func (c *conditionBuilder) conditionFor(
 
 			switch valueType := column.Type.(schema.MapColumnType).ValueType; valueType.GetType() {
 			case schema.ColumnTypeEnumString, schema.ColumnTypeEnumBool, schema.ColumnTypeEnumFloat64:
+				// The envelope has one attributes map and no materialized columns, so
+				// membership is always a mapContains over it.
 				leftOperand := fmt.Sprintf("mapContains(%s, '%s')", column.Name, key.Name)
-				if key.Materialized {
-					leftOperand = telemetrytypes.FieldKeyToMaterializedColumnNameForExists(key)
-				}
 				if operator == qbtypes.FilterOperatorExists {
 					return sb.E(leftOperand, true), nil
 				} else {
@@ -290,7 +304,15 @@ func (c *conditionBuilder) ConditionFor(
 		// immediately return
 		return condition, nil
 	case telemetrytypes.FieldContextResource, telemetrytypes.FieldContextAttribute:
-		// build exist condition for resource and attribute fields based on filter operator
+		// build exist condition for resource and attribute fields based on filter
+		// operator — except for a resource label the envelope PROMOTED to a column
+		// of its own, which is always present, so an exists filter over it is a
+		// tautology rather than a guard.
+		if key.FieldContext == telemetrytypes.FieldContextResource {
+			if _, promoted := PromotedResourceColumn(key.Name); promoted {
+				return condition, nil
+			}
+		}
 	case telemetrytypes.FieldContextBody:
 		// Querying JSON fields already account for Nullability of fields
 		// so additional exists checks are not needed

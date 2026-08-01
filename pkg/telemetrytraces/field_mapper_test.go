@@ -27,7 +27,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				Name:         "timestamp",
 				FieldContext: telemetrytypes.FieldContextSpan,
 			},
-			expectedResult: "timestamp",
+			expectedResult: "time",
 			expectedError:  nil,
 		},
 		{
@@ -37,7 +37,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeString,
 			},
-			expectedResult: "attributes_string['user.id']",
+			expectedResult: "attributes['user.id']",
 			expectedError:  nil,
 		},
 		{
@@ -47,7 +47,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeNumber,
 			},
-			expectedResult: "attributes_number['request.size']",
+			expectedResult: "toFloat64OrNull(attributes['request.size'])",
 			expectedError:  nil,
 		},
 		{
@@ -57,7 +57,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeBool,
 			},
-			expectedResult: "attributes_bool['request.success']",
+			expectedResult: "attributes['request.success'] = 'true'",
 			expectedError:  nil,
 		},
 		{
@@ -67,7 +67,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext: telemetrytypes.FieldContextResource,
 				Evolutions:   mockEvolution,
 			},
-			expectedResult: "multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, mapContains(resources_string, 'service.name'), resources_string['service.name'], NULL)",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -79,7 +79,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				Materialized:  true,
 				Evolutions:    mockEvolution,
 			},
-			expectedResult: "multiIf(resource.`deployment.environment` IS NOT NULL, resource.`deployment.environment`::String, `resource_string_deployment$$environment_exists`==true, `resource_string_deployment$$environment`, NULL)",
+			expectedResult: "attributes['deployment.environment']",
 			expectedError:  nil,
 		},
 		{
@@ -90,7 +90,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeString,
 			},
-			expectedResult: "attributes_string['attributes_string']",
+			expectedResult: "attributes['attributes_string']",
 			expectedError:  nil,
 		},
 		{
@@ -140,7 +140,7 @@ func TestFieldForResourceWithEvolution(t *testing.T) {
 			},
 			tsStart:        uint64(time.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
 			tsEnd:          uint64(time.Date(2025, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
-			expectedResult: "multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, mapContains(resources_string, 'service.name'), resources_string['service.name'], NULL)",
+			expectedResult: "service",
 		},
 		{
 			name: "Window fully after release - JSON column only",
@@ -151,7 +151,7 @@ func TestFieldForResourceWithEvolution(t *testing.T) {
 			},
 			tsStart:        uint64(time.Date(2025, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
 			tsEnd:          uint64(time.Date(2025, 7, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
-			expectedResult: "resource.`service.name`::String",
+			expectedResult: "service",
 		},
 		{
 			name: "Window fully before release - map column only",
@@ -162,7 +162,7 @@ func TestFieldForResourceWithEvolution(t *testing.T) {
 			},
 			tsStart:        uint64(time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
 			tsEnd:          uint64(time.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
-			expectedResult: "resources_string['service.name']",
+			expectedResult: "service",
 		},
 		{
 			name: "Window fully after release - materialized resource",
@@ -175,7 +175,7 @@ func TestFieldForResourceWithEvolution(t *testing.T) {
 			},
 			tsStart:        uint64(time.Date(2025, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
 			tsEnd:          uint64(time.Date(2025, 7, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
-			expectedResult: "resource.`deployment.environment`::String",
+			expectedResult: "attributes['deployment.environment']",
 		},
 		{
 			name: "Window straddles release - materialized resource",
@@ -188,7 +188,7 @@ func TestFieldForResourceWithEvolution(t *testing.T) {
 			},
 			tsStart:        uint64(time.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
 			tsEnd:          uint64(time.Date(2025, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
-			expectedResult: "multiIf(resource.`deployment.environment` IS NOT NULL, resource.`deployment.environment`::String, `resource_string_deployment$$environment_exists`==true, `resource_string_deployment$$environment`, NULL)",
+			expectedResult: "attributes['deployment.environment']",
 		},
 	}
 
