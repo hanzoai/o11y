@@ -323,14 +323,11 @@ func TestAccessTheRestOfTheFaceStillReachesTheRuntime(t *testing.T) {
 	// /v1/o11y/dashboards was in this list until the DASHBOARDS slice typed it —
 	// it now dispatches off the mux tree ahead of the wildcard, which is the
 	// migration succeeding, not the access face breaking. Its own slice test
-	// proves it. /alerts remains wildcarded, so it still proves the fallthrough
-	// this test exists to guard.
-	for _, target := range []string{"/v1/o11y/alerts"} {
-		_, body := call(t, app, member(http.MethodGet, target, nil))
-		if !strings.Contains(string(body), `"door":"wildcard"`) {
-			t.Errorf("%s no longer reaches the runtime through the wildcard: %s", target, body)
-		}
-	}
+	// proves it. /alerts left this list for the SAME reason once mountRulesAlerts
+	// was actually wired into Mount — it had only appeared wildcarded because that
+	// slice was DARK (its file landed, nothing called it). There is no
+	// still-wildcarded path left to sample from this face, so the fallthrough
+	// guard now lives where the hatches do: mount_test.go.
 	// ...and the typed access path wins over that wildcard.
 	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/roles", nil)); strings.Contains(string(body), `"door":"wildcard"`) {
 		t.Fatalf("the typed op did not take precedence: %s", body)

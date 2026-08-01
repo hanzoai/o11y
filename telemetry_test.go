@@ -332,7 +332,14 @@ func TestTelemetryRoutesAreTheSameFive(t *testing.T) {
 	}
 	got := map[string]bool{}
 	for _, r := range app.Fiber().GetRoutes(true) {
-		if strings.HasPrefix(r.Path, "/v1/sentry") && r.Method != http.MethodHead && r.Method != http.MethodOptions {
+		// /v1/sentry is shared: THIS face owns the telemetry reads (discover, logs,
+		// traces, trace/:id, stats); sentryerrors.go owns projects and issues/*.
+		// Counting the whole prefix made this census fail the moment
+		// mountSentryErrors was wired in — the doors were always defined, just dark.
+		if strings.HasPrefix(r.Path, "/v1/sentry") &&
+			!strings.Contains(r.Path, "/projects") && !strings.Contains(r.Path, "/issues") &&
+			!strings.Contains(r.Path, "/events/") &&
+			r.Method != http.MethodHead && r.Method != http.MethodOptions {
 			got[r.Method+" "+r.Path] = true
 		}
 	}
@@ -364,11 +371,13 @@ func TestTheRestOfTheFaceStillReachesTheRuntime(t *testing.T) {
 	}
 	runtime(t, map[string]any{"items": []*sentrytypes.Event{}})
 
+	// projects, issues, issues/:id/events and events/:id LEFT this list: they are
+	// typed ops in sentryerrors.go and now dispatch ahead of the wildcard. They
+	// only sampled as "wildcarded" because mountSentryErrors was never called —
+	// this list was encoding the dark-slice defect, not guarding against it.
+	// The envelope path stays: it is the Sentry SDK's own wire (that /api/-style
+	// suffix is the SDK's, received verbatim), a genuine escape hatch.
 	for _, target := range []string{
-		"/v1/sentry/projects",
-		"/v1/sentry/issues",
-		"/v1/sentry/issues/abc/events",
-		"/v1/sentry/events/e1",
 		"/v1/sentry/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/",
 	} {
 		_, body := call(t, app, member(http.MethodGet, target, nil))

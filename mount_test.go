@@ -60,7 +60,12 @@ func TestMountDelegatesPathVerbatim(t *testing.T) {
 		"/v1/o11y/complete/google", // sign-in callback: 303 redirect, deliberately wildcarded (identity.go)
 		// the /v1/o11y/llm* surface is TYPED now (llmobs.go), so it dispatches to
 		// ops and takes precedence over this wildcard — proved in llmobs_test.go.
-		"/v1/o11y/errortracking/issues",
+		// REMOVED: /v1/o11y/errortracking/issues is a TYPED op (sentryerrors.go) and
+		// dispatches ahead of the wildcard. It only ever passed here because
+		// mountSentryErrors was never called — this assertion was ENCODING the dark-
+		// slice defect rather than catching it, and flipped red the moment Mount was
+		// fixed. That is the tell: a wildcard-delegation assertion that passes for a
+		// route someone converted is proof the conversion did not reach the router.
 		"/v1/o11y/api/hanzo/envelope/", // Sentry SDK wire path, received as-is
 	}
 	for _, p := range paths {
