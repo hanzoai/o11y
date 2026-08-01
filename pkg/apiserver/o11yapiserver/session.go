@@ -8,6 +8,14 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 )
 
+// The four JSON routes here (email_password, context, rotate, delete) are ALSO
+// declared as typed ops at the module's mount seam (identity.go in the repo
+// root) — a second DISPATCH onto this router, never a second implementation;
+// the composed binary serves them as ops, this router serves the standalone
+// process. The three /complete/* callbacks are NOT typed: they answer with 303
+// redirects whatever happens, and a typed op declares a 2xx JSON contract,
+// which would be a lie about them. They reach this router through the
+// delegation wildcard in both deployments.
 func (provider *provider) addSessionRoutes(router *mux.Router) error {
 	if err := router.Handle("/v1/o11y/sessions/email_password", handler.New(provider.authzMiddleware.OpenAccess(provider.sessionHandler.CreateSessionByEmailPassword), handler.OpenAPIDef{
 		ID:                  "CreateSessionByEmailPassword",
