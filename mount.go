@@ -41,8 +41,8 @@ import (
 // with a clear error rather than pretending.
 //
 // EVERY ROUTE IS NAMED. There is no /v1/o11y/* catch-all any more. The runtime
-// registers 367 method+path pairs; 356 of them are typed ops declared in the
-// slice files below, and the remaining 11 are registered one by one in
+// registers 331 method+path pairs; 323 of them are typed ops declared in the
+// slice files below, and the remaining 8 are registered one by one in
 // mountHatches with the reason each cannot be typed written next to it. A
 // catch-all hides the difference between "converted" and "not converted" — the
 // dark-slice defect this package already shipped once was invisible precisely
@@ -74,11 +74,11 @@ func Mount(app *zip.App) error {
 	// a hatch because it is a stream. Same construction: they answer on the
 	// runtime, so the wire is unchanged; see logs.go.
 	mountLogs(app)
-	// The TYPED identity ops — users, invites, passwords, roles-on-users,
-	// sessions, auth domains, my-org, preferences and quick filters. Same
-	// construction: named In, named Out, answered on the runtime, wire
-	// unchanged; see identity.go. The three /complete/* sign-in callbacks stay
-	// hatches — they answer with redirects, not JSON.
+	// The TYPED identity ops — who the caller is, my-org, quick filters and
+	// preferences. Same construction: named In, named Out, answered on the
+	// runtime, wire unchanged; see identity.go. Invites, passwords, reset
+	// tokens, member administration, sessions, SSO domains and the /complete/*
+	// sign-in callbacks are GONE, not hatched: Hanzo IAM owns credentials.
 	mountIdentity(app)
 	// The TYPED access-control ops — roles, service accounts, service-account
 	// keys and the authorization probe. Same construction: named In, named Out,
@@ -150,12 +150,12 @@ func Mount(app *zip.App) error {
 	// The TYPED span-mapper ops — the ingest-time rules that move or copy span
 	// attributes into resource attributes; see spanmappers.go.
 	mountSpanMappers(app)
-	// And the eleven that cannot be typed, each named and justified.
+	// And the eight that cannot be typed, each named and justified.
 	mountHatches(app)
 	return nil
 }
 
-// mountHatches registers the ELEVEN routes that cannot be typed ops, one route
+// mountHatches registers the EIGHT routes that cannot be typed ops, one route
 // literal each, with the reason next to it. This list is meant to shrink and is
 // meant to be hard to grow: adding to it costs a justification in review, where
 // a catch-all cost nothing.
@@ -167,10 +167,16 @@ func Mount(app *zip.App) error {
 // than being absent from it — a generated client that trusts a false contract
 // fails at the customer, not at review.
 //
-// Two of these eleven were not reachable AT ALL from the composed binary before
+// Two of these eight were not reachable AT ALL from the composed binary before
 // this pass: /ws/query_progress and the two /v1/sentry ingest routes sit outside
 // /v1/o11y, so the old catch-all never saw them. That is the second thing a
 // wildcard hides — not just which routes are un-typed, but which are missing.
+//
+// THREE REDIRECT HATCHES LEFT THIS LIST with the identity system: the Google,
+// OIDC and SAML sign-in callbacks. They were the last routes here whose reason
+// for existing was authentication, and they are not hatched now, they are
+// deleted — the runtime behind them is gone, and a hatch onto nothing is a 503
+// that looks like a door.
 func mountHatches(app *zip.App) {
 	h := zip.AdaptNetHTTP(handlerAdapter{})
 
@@ -185,16 +191,7 @@ func mountHatches(app *zip.App) {
 	app.Get("/ws/query_progress", h)         // the same read over a websocket; the Upgrade IS the contract
 	app.Post(o11yRoot+"/export_raw_data", h) // chunked CSV/JSONL attachment, X-Response-Complete trailer
 
-	// ── 2. REDIRECTS: the answer is a Location, not a body ───────────────────
-	// The three sign-in callbacks answer 303 with a Location header and no
-	// payload. A typed op declares a 2xx JSON contract, so typing these would
-	// publish a response schema for a response that does not exist, and hide the
-	// header that is the entire point of the call.
-	app.Get(o11yRoot+"/complete/google", h) // Google OIDC callback → 303 to the console
-	app.Get(o11yRoot+"/complete/oidc", h)   // generic OIDC callback → 303
-	app.Post(o11yRoot+"/complete/saml", h)  // SAML assertion consumer → 303
-
-	// ── 3. A FOREIGN PROTOCOL WE RECEIVE ─────────────────────────────────────
+	// ── 2. A FOREIGN PROTOCOL WE RECEIVE ─────────────────────────────────────
 	// Sentry-compatible ingest. The body is an application/x-sentry-envelope
 	// frame, not JSON, and the caller is a Sentry SDK authenticating with a DSN
 	// public key rather than a Hanzo session. The /api/ segment is NOT ours to

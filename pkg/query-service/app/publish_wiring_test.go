@@ -2,9 +2,9 @@ package app
 
 // THE LINK, NOT THE FUNCTION.
 //
-// publish_test.go proves what publish DOES: mount it on a bare zip.App and 353
-// operations and 353 MCP tools appear. Every assertion it makes calls publish
-// directly — which is precisely the shape of the original defect. 353 typed ops
+// publish_test.go proves what publish DOES: mount it on a bare zip.App and 319
+// operations and 319 MCP tools appear. Every assertion it makes calls publish
+// directly — which is precisely the shape of the original defect. 319 typed ops
 // once shipped in files nothing called; the package built, the route arithmetic
 // added up, and the running server published nothing. A test that calls the
 // function itself cannot see that, because the thing that was missing was the

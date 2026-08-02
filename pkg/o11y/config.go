@@ -41,7 +41,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/statsreporter"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
-	"github.com/hanzoai/o11y/pkg/tokenizer"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/hanzoai/o11y/pkg/web"
@@ -113,9 +112,6 @@ type Config struct {
 	// Gateway config
 	Gateway gateway.Config `mapstructure:"gateway"`
 
-	// Tokenizer config
-	Tokenizer tokenizer.Config `mapstructure:"tokenizer"`
-
 	// MetricsExplorer config
 	MetricsExplorer metricsexplorer.Config `mapstructure:"metricsexplorer"`
 
@@ -175,7 +171,6 @@ func NewConfig(ctx context.Context, logger *slog.Logger, resolverConfig config.R
 		sharder.NewConfigFactory(),
 		statsreporter.NewConfigFactory(),
 		gateway.NewConfigFactory(),
-		tokenizer.NewConfigFactory(),
 		metricsexplorer.NewConfigFactory(),
 		inframonitoring.NewConfigFactory(),
 		flagger.NewConfigFactory(),
@@ -326,11 +321,6 @@ func mergeAndEnsureBackwardCompatibility(ctx context.Context, logger *slog.Logge
 		config.Flagger.Config.Boolean[flagger.FeatureUseSpanMetrics.String()] = os.Getenv("USE_SPAN_METRICS") == "true"
 	}
 
-	if os.Getenv("O11Y_JWT_SECRET") != "" {
-		logger.WarnContext(ctx, "[Deprecated] env O11Y_JWT_SECRET is deprecated and scheduled for removal. Please use O11Y_TOKENIZER_JWT_SECRET instead.")
-		config.Tokenizer.JWT.Secret = os.Getenv("O11Y_JWT_SECRET")
-	}
-
 	if os.Getenv("KAFKA_SPAN_EVAL") != "" {
 		logger.WarnContext(ctx, "[Deprecated] env KAFKA_SPAN_EVAL is deprecated and scheduled for removal. Please use O11Y_FLAGGER_CONFIG_BOOLEAN_KAFKA__SPAN__EVAL instead.")
 		if config.Flagger.Config.Boolean == nil {
@@ -354,9 +344,6 @@ func (config Config) Collect(_ context.Context, _ valuer.UUID) (map[string]any, 
 
 	// SQL Store Config Stats
 	stats["config.sqlstore.provider"] = config.SQLStore.Provider
-
-	// Tokenizer Config Stats
-	stats["config.tokenizer.provider"] = config.Tokenizer.Provider
 
 	// Cache Config Stats
 	stats["config.cache.provider"] = config.Cache.Provider

@@ -1,137 +1,78 @@
 package impluser
 
 import (
-	"context"
-	"io"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
-	"github.com/hanzoai/o11y/pkg/http/routing"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
-	root "github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
-// The per-user routes address a user by a PATH segment, and one of them,
-// /users/{id}/roles/{roleId}, carries TWO. A handler that reads the wrong name
-// still compiles and still returns 2xx, it just acts on the wrong user — so
-// each test drives DISTINCT uuids through a REAL router and asserts which value
-// landed where.
+// GetMyUser ANSWERS FROM THE CLAIMS, and this is the test that says so.
 //
-// Embedding the interface keeps the doubles to the methods these routes are
-// allowed to reach — every other call is a nil call, which states "this route
-// must not touch that".
-type recordingSetter struct {
-	root.Setter
-	userID valuer.UUID
-	roleID valuer.UUID
-}
-
-func (s *recordingSetter) UpdateUser(_ context.Context, _ valuer.UUID, userID valuer.UUID, _ *types.UpdatableUser) (*types.User, error) {
-	s.userID = userID
-	return &types.User{}, nil
-}
-
-func (s *recordingSetter) RemoveUserRole(_ context.Context, _ valuer.UUID, userID valuer.UUID, roleID valuer.UUID) error {
-	s.userID, s.roleID = userID, roleID
-	return nil
-}
-
-type recordingGetter struct {
-	root.Getter
-	userID valuer.UUID
-}
-
-func (g *recordingGetter) GetResetPasswordTokenByOrgIDAndUserID(_ context.Context, _ valuer.UUID, userID valuer.UUID) (*types.ResetPasswordToken, error) {
-	g.userID = userID
-	return &types.ResetPasswordToken{}, nil
-}
-
-// servedUser drives one request through a REAL router registered at the
-// template the service registers, so the segments under assertion are ones the
-// router matched — injecting them by hand would prove only that the injector
-// and the reader agree with each other.
-func servedUser(t *testing.T, template, method, target, body string, claims authtypes.Claims, pick func(root.Handler) http.HandlerFunc) (*recordingSetter, *recordingGetter, *httptest.ResponseRecorder) {
-	t.Helper()
-
-	setter, getter := new(recordingSetter), new(recordingGetter)
-	router := routing.Serve(method, template, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		pick(NewHandler(setter, getter))(w, r.WithContext(authtypes.NewContextWithClaims(r.Context(), claims)))
-	}))
-
-	var reader io.Reader = http.NoBody
-	if body != "" {
-		reader = strings.NewReader(body)
+// The handler used to hold a Getter and SELECT the caller's row, which made
+// o11y's own bookkeeping a precondition for rendering the console: a person the
+// edge had authenticated, whose row was missing, got "user not found" on the one
+// call the console uses to learn who it is. NewHandler now takes NOTHING — there
+// is no store to reach — so the coupling is gone at the type level and this test
+// pins the values that come out.
+//
+// The mutation that must turn this red: read any field from anywhere but the
+// claims (a row, a config, a default) and the assertions below stop matching the
+// claims they were built from.
+func TestGetMyUserIsTheClaims(t *testing.T) {
+	claims := authtypes.Claims{
+		UserID:    "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+		OrgID:     "6ba7b811-9dad-11d1-80b4-00c04fd430c8",
+		Email:     "ada@example.com",
+		Principal: authtypes.PrincipalUser,
 	}
-	req := httptest.NewRequest(method, target, reader)
 
 	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
-	return setter, getter, rec
+	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/users/me", http.NoBody)
+	NewHandler().GetMyUser(rec, req.WithContext(authtypes.NewContextWithClaims(req.Context(), claims)))
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status=%d body=%s, want 200", rec.Code, rec.Body)
+	}
+
+	var got struct {
+		Status string     `json:"status"`
+		Data   types.User `json:"data"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+		t.Fatalf("unmarshal: %v (%s)", err, rec.Body)
+	}
+
+	if got.Data.ID.StringValue() != claims.UserID {
+		t.Errorf("id=%q, want the IAM subject %q", got.Data.ID.StringValue(), claims.UserID)
+	}
+	if got.Data.OrgID.StringValue() != claims.OrgID {
+		t.Errorf("orgId=%q, want the asserted org %q", got.Data.OrgID.StringValue(), claims.OrgID)
+	}
+	if got.Data.Email.StringValue() != claims.Email {
+		t.Errorf("email=%q, want the asserted address %q", got.Data.Email.StringValue(), claims.Email)
+	}
+	if got.Data.DisplayName != claims.Email {
+		t.Errorf("displayName=%q, want the asserted address %q — the seated row carried the same value", got.Data.DisplayName, claims.Email)
+	}
+	if got.Data.IsRoot {
+		t.Error("isRoot=true — an IAM session is never the local root user")
+	}
+	if got.Data.Status != types.UserStatusActive {
+		t.Errorf("status=%q, want active", got.Data.Status)
+	}
 }
 
-func someoneElse(t *testing.T) authtypes.Claims {
-	t.Helper()
-	return authtypes.Claims{UserID: valuer.GenerateUUID().String(), OrgID: valuer.GenerateUUID().String()}
-}
+// No claims, no answer. The route is OpenAccess — "is anyone authenticated" —
+// so the refusal has to come from here, and it has to be a refusal.
+func TestGetMyUserWithoutClaimsIsUnauthenticated(t *testing.T) {
+	rec := httptest.NewRecorder()
+	NewHandler().GetMyUser(rec, httptest.NewRequest(http.MethodGet, "/v1/o11y/users/me", http.NoBody))
 
-func TestUpdateUserActsOnTheUserTheRouterMatched(t *testing.T) {
-	want := valuer.GenerateUUID()
-
-	setter, _, rec := servedUser(t, "/v1/o11y/users/{id}", http.MethodPut, "/v1/o11y/users/"+want.String(), `{"displayName":"renamed"}`, someoneElse(t), func(h root.Handler) http.HandlerFunc { return h.UpdateUser })
-
-	require.Equal(t, http.StatusNoContent, rec.Code, rec.Body.String())
-	assert.Equal(t, want, setter.userID)
-}
-
-// The self-modification guard compares the PATH segment against the caller's
-// own id, so the guard only holds while that segment is read correctly: read
-// the wrong name and it compares "" to the caller and lets the edit through.
-func TestUpdateUserRefusesTheCallerEditingSelfByPath(t *testing.T) {
-	self := valuer.GenerateUUID()
-	claims := authtypes.Claims{UserID: self.String(), OrgID: valuer.GenerateUUID().String()}
-
-	setter, _, rec := servedUser(t, "/v1/o11y/users/{id}", http.MethodPut, "/v1/o11y/users/"+self.String(), `{"displayName":"renamed"}`, claims, func(h root.Handler) http.HandlerFunc { return h.UpdateUser })
-
-	assert.Equal(t, http.StatusBadRequest, rec.Code)
-	assert.Contains(t, rec.Body.String(), "users cannot call this api on self")
-	assert.Equal(t, valuer.UUID{}, setter.userID, "a refused edit must not reach the store")
-}
-
-// {id} and {roleId} are two segments of one path: the user, and the role they
-// lose. Swapping them would revoke by the wrong identifier.
-func TestRemoveUserRoleSeparatesTheUserFromTheRole(t *testing.T) {
-	user, role := valuer.GenerateUUID(), valuer.GenerateUUID()
-
-	setter, _, rec := servedUser(t, "/v1/o11y/users/{id}/roles/{roleId}", http.MethodDelete, "/v1/o11y/users/"+user.String()+"/roles/"+role.String(), "", someoneElse(t), func(h root.Handler) http.HandlerFunc { return h.RemoveUserRoleByRoleID })
-
-	require.Equal(t, http.StatusNoContent, rec.Code, rec.Body.String())
-	assert.Equal(t, user, setter.userID)
-	assert.Equal(t, role, setter.roleID)
-}
-
-func TestGetResetPasswordTokenReadsTheUserTheRouterMatched(t *testing.T) {
-	want := valuer.GenerateUUID()
-
-	_, getter, rec := servedUser(t, "/v1/o11y/users/{id}/reset_password_tokens", http.MethodGet, "/v1/o11y/users/"+want.String()+"/reset_password_tokens", "", someoneElse(t), func(h root.Handler) http.HandlerFunc { return h.GetResetPasswordToken })
-
-	require.Equal(t, http.StatusOK, rec.Code, rec.Body.String())
-	assert.Equal(t, want, getter.userID)
-}
-
-// A segment that is not a uuid is refused before the store is reached — an
-// empty or malformed id must never arrive as a lookup for "whatever the zero
-// value matches".
-func TestGetResetPasswordTokenRefusesANonUUIDSegment(t *testing.T) {
-	_, getter, rec := servedUser(t, "/v1/o11y/users/{id}/reset_password_tokens", http.MethodGet, "/v1/o11y/users/not-a-uuid/reset_password_tokens", "", someoneElse(t), func(h root.Handler) http.HandlerFunc { return h.GetResetPasswordToken })
-
-	assert.Equal(t, http.StatusBadRequest, rec.Code)
-	assert.Contains(t, rec.Body.String(), "invalid uuid not-a-uuid")
-	assert.Equal(t, valuer.UUID{}, getter.userID, "a refused id must not reach the store")
+	if rec.Code != http.StatusUnauthorized {
+		t.Fatalf("status=%d body=%s, want 401", rec.Code, rec.Body)
+	}
 }

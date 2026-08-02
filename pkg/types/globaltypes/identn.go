@@ -1,13 +1,11 @@
 package globaltypes
 
+// IdentNConfig is the part of GET /v1/o11y/global/config the console reads to
+// decide how identity reaches it. The `tokenizer` member is gone with the
+// tokenizer: o11y minted its own access and refresh tokens, and it does not.
 type IdentNConfig struct {
-	Tokenizer     TokenizerConfig     `json:"tokenizer"`
 	APIKey        APIKeyConfig        `json:"apikey"`
 	Impersonation ImpersonationConfig `json:"impersonation"`
-}
-
-type TokenizerConfig struct {
-	Enabled bool `json:"enabled"`
 }
 
 type APIKeyConfig struct {
@@ -18,9 +16,8 @@ type ImpersonationConfig struct {
 	Enabled bool `json:"enabled"`
 }
 
-func NewIdentNConfig(tokenizer TokenizerConfig, apiKey APIKeyConfig, impersonation ImpersonationConfig) IdentNConfig {
+func NewIdentNConfig(apiKey APIKeyConfig, impersonation ImpersonationConfig) IdentNConfig {
 	return IdentNConfig{
-		Tokenizer:     tokenizer,
 		APIKey:        apiKey,
 		Impersonation: impersonation,
 	}

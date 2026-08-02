@@ -57,11 +57,18 @@ func assertRoutes(t *testing.T, want map[string]bool, prefix string) {
 	}
 }
 
-// THE WHOLE SURFACE, counted. 367 is the number of method+path pairs the o11y
+// THE WHOLE SURFACE, counted. 330 is the number of method+path pairs the o11y
 // runtime registers on its gorilla/mux tree (pkg/query-service/app/routes_*.go
-// and pkg/apiserver/o11yapiserver/*.go). Mount registers the same 367 — 353 as
+// and pkg/apiserver/o11yapiserver/*.go). Mount registers the same 330 — 319 as
 // typed ops that carry a named In, a named Out and their prose into the
-// document, 11 as named escape hatches, 3 as native service probes.
+// document, 8 as named escape hatches, 3 as native service probes.
+//
+// It was 367 (353/11/3). Thirty-seven routes left with the duplicate identity
+// system: thirty-four typed ops (invites, passwords, reset tokens, member
+// administration, roles-on-users, sessions, SSO domains, self-registration) and
+// the three redirect hatches that were the sign-in callbacks. Hanzo IAM serves
+// all of it, and a route that is merely unrouted is not deleted — these have no
+// handler, no store and no table left behind them.
 //
 // If this number moves, one of two things happened and both need a human: a
 // route was added to the runtime and not named here (it would 404 in the
@@ -72,8 +79,8 @@ func TestEveryRouteIsNamedAndCounted(t *testing.T) {
 	all := registered(t, app)
 
 	const (
-		wantTyped   = 353 // typed ops: in the OpenAPI document and the MCP tool list
-		wantHatches = 11  // mount.go mountHatches, each with its reason
+		wantTyped   = 319 // typed ops: in the OpenAPI document and the MCP tool list
+		wantHatches = 8   // mount.go mountHatches, each with its reason
 		wantProbes  = 3   // health.go livez/healthz/readyz, native with fall-through
 	)
 	if len(all) != wantTyped+wantHatches+wantProbes {
@@ -147,7 +154,7 @@ func setRuntime(t *testing.T, fn http.HandlerFunc) {
 	t.Cleanup(func() { o11y.SetHandler(nil) })
 }
 
-// THE ELEVEN. Each hatch is registered at its exact method and path, and each
+// THE EIGHT. Each hatch is registered at its exact method and path, and each
 // delegates with the path UNTOUCHED — a rewrite at this seam can only ever move
 // a request off its own route, and a mangler is invisible to the compiler, so
 // this is the only thing that catches one coming back.
@@ -157,17 +164,12 @@ func TestHatchesDelegateVerbatim(t *testing.T) {
 		{http.MethodGet, "/v1/o11y/query_progress"},
 		{http.MethodGet, "/ws/query_progress"},
 		{http.MethodPost, "/v1/o11y/export_raw_data"},
-
-		{http.MethodGet, "/v1/o11y/complete/google"},
-		{http.MethodGet, "/v1/o11y/complete/oidc"},
-		{http.MethodPost, "/v1/o11y/complete/saml"},
-
 		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
 		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
 		{http.MethodPost, "/v1/sentry/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
 		{http.MethodPost, "/v1/sentry/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
 	}
-	if len(hatches) != 11 {
+	if len(hatches) != 8 {
 		t.Fatalf("the census itself is wrong: %d", len(hatches))
 	}
 

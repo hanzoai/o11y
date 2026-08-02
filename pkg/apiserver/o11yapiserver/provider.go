@@ -13,7 +13,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/handler"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	"github.com/hanzoai/o11y/pkg/http/routing"
-	"github.com/hanzoai/o11y/pkg/modules/authdomain"
 	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking"
@@ -30,7 +29,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
 	"github.com/hanzoai/o11y/pkg/modules/sentry"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
-	"github.com/hanzoai/o11y/pkg/modules/session"
 	"github.com/hanzoai/o11y/pkg/modules/spanmapper"
 	"github.com/hanzoai/o11y/pkg/modules/tracedetail"
 	"github.com/hanzoai/o11y/pkg/modules/user"
@@ -49,8 +47,6 @@ type provider struct {
 	authzService               authz.AuthZ
 	orgHandler                 organization.Handler
 	userHandler                user.Handler
-	sessionHandler             session.Handler
-	authDomainHandler          authdomain.Handler
 	preferenceHandler          preference.Handler
 	globalHandler              global.Handler
 	promoteHandler             promote.Handler
@@ -86,8 +82,6 @@ func NewFactory(
 	authzService authz.AuthZ,
 	orgHandler organization.Handler,
 	userHandler user.Handler,
-	sessionHandler session.Handler,
-	authDomainHandler authdomain.Handler,
 	preferenceHandler preference.Handler,
 	globalHandler global.Handler,
 	promoteHandler promote.Handler,
@@ -126,8 +120,6 @@ func NewFactory(
 			authzService,
 			orgHandler,
 			userHandler,
-			sessionHandler,
-			authDomainHandler,
 			preferenceHandler,
 			globalHandler,
 			promoteHandler,
@@ -168,8 +160,6 @@ func newProvider(
 	authzService authz.AuthZ,
 	orgHandler organization.Handler,
 	userHandler user.Handler,
-	sessionHandler session.Handler,
-	authDomainHandler authdomain.Handler,
 	preferenceHandler preference.Handler,
 	globalHandler global.Handler,
 	promoteHandler promote.Handler,
@@ -206,8 +196,6 @@ func newProvider(
 		orgHandler:                 orgHandler,
 		userHandler:                userHandler,
 		authzService:               authzService,
-		sessionHandler:             sessionHandler,
-		authDomainHandler:          authDomainHandler,
 		preferenceHandler:          preferenceHandler,
 		globalHandler:              globalHandler,
 		promoteHandler:             promoteHandler,
@@ -248,8 +236,6 @@ func newProvider(
 
 func (provider *provider) AddToRouter(router routing.Router) {
 	provider.addOrgRoutes(router)
-	provider.addSessionRoutes(router)
-	provider.addAuthDomainRoutes(router)
 	provider.addPreferenceRoutes(router)
 	provider.addUserRoutes(router)
 	provider.addGlobalRoutes(router)
@@ -296,6 +282,6 @@ func newAnonymousSecuritySchemes(scopes []string) []handler.OpenAPISecuritySchem
 func newScopedSecuritySchemes(scopes []string) []handler.OpenAPISecurityScheme {
 	return []handler.OpenAPISecurityScheme{
 		{Name: authtypes.IdentNProviderAPIKey.StringValue(), Scopes: scopes},
-		{Name: authtypes.IdentNProviderTokenizer.StringValue(), Scopes: scopes},
+		{Name: authtypes.IdentNProviderIAM.StringValue(), Scopes: scopes},
 	}
 }

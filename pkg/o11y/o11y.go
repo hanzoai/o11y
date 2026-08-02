@@ -11,8 +11,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/analytics"
 	"github.com/hanzoai/o11y/pkg/apiserver"
 	"github.com/hanzoai/o11y/pkg/auditor"
-	"github.com/hanzoai/o11y/pkg/authn"
-	"github.com/hanzoai/o11y/pkg/authn/authnstore/sqlauthnstore"
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/emailing"
@@ -24,7 +22,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/instrumentation"
 	"github.com/hanzoai/o11y/pkg/licensing"
 	"github.com/hanzoai/o11y/pkg/meterreporter"
-	"github.com/hanzoai/o11y/pkg/modules/authdomain/implauthdomain"
 	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/metricreductionrule"
@@ -55,8 +52,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrytraces"
-	pkgtokenizer "github.com/hanzoai/o11y/pkg/tokenizer"
-	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/hanzoai/o11y/pkg/zeus"
@@ -83,7 +78,6 @@ type O11y struct {
 	Emailing               emailing.Emailing
 	Sharder                sharder.Sharder
 	StatsReporter          statsreporter.StatsReporter
-	Tokenizer              pkgtokenizer.Tokenizer
 	IdentNResolver         identn.IdentNResolver
 	Authz                  authz.AuthZ
 	Ruler                  ruler.Ruler
@@ -109,7 +103,6 @@ func New(
 	sqlSchemaProviderFactories func(sqlstore.SQLStore) factory.NamedMap[factory.ProviderFactory[sqlschema.SQLSchema, sqlschema.Config]],
 	sqlstoreProviderFactories factory.NamedMap[factory.ProviderFactory[sqlstore.SQLStore, sqlstore.Config]],
 	telemetrystoreProviderFactories factory.NamedMap[factory.ProviderFactory[telemetrystore.TelemetryStore, telemetrystore.Config]],
-	authNsCallback func(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error),
 	authzCallback func(context.Context, sqlstore.SQLStore, authz.Config, licensing.Licensing, []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error),
 	dashboardModuleCallback func(sqlstore.SQLStore, factory.ProviderSettings, analytics.Analytics, organization.Getter, queryparser.QueryParser, querier.Querier, licensing.Licensing, tag.Module) dashboard.Module,
 	gatewayProviderFactory func(licensing.Licensing) factory.ProviderFactory[gateway.Gateway, gateway.Config],
@@ -308,18 +301,6 @@ func New(
 	// Initialize organization getter
 	orgGetter := implorganization.NewGetter(implorganization.NewStore(sqlstore), sharder)
 
-	// Initialize tokenizer from the available tokenizer provider factories
-	tokenizer, err := factory.NewProviderFromNamedMap(
-		ctx,
-		providerSettings,
-		config.Tokenizer,
-		NewTokenizerProviderFactories(cache, sqlstore, orgGetter),
-		config.Tokenizer.Provider,
-	)
-	if err != nil {
-		return nil, err
-	}
-
 	// Initialize user store
 	userStore := impluser.NewStore(sqlstore, providerSettings)
 
@@ -353,13 +334,10 @@ func New(
 	// Initialize service account getter
 	serviceAccountGetter := implserviceaccount.NewGetter(implserviceaccount.NewStore(sqlstore))
 
-	authDomainGetter := implauthdomain.NewGetter(implauthdomain.NewStore(sqlstore))
-
 	// Build pre-delete callbacks from modules
 	onBeforeRoleDelete := []authz.OnBeforeRoleDelete{
 		userGetter.OnBeforeRoleDelete,
 		serviceAccountGetter.OnBeforeRoleDelete,
-		authDomainGetter.OnBeforeRoleDelete,
 	}
 
 	// Initialize authz
@@ -417,13 +395,6 @@ func New(
 		return nil, err
 	}
 
-	// Initialize authns
-	store := sqlauthnstore.NewStore(sqlstore)
-	authNs, err := authNsCallback(ctx, providerSettings, store, licensing)
-	if err != nil {
-		return nil, err
-	}
-
 	// Initialize telemetry metadata store
 	// TODO: consolidate other telemetrymetadata.NewTelemetryMetaStore initializations to reuse this instance instead.
 	telemetryMetadataStore := telemetrymetadata.NewTelemetryMetaStore(
@@ -474,7 +445,7 @@ func New(
 	metricReductionRuleModule := metricReductionRuleModuleCallback(sqlstore, telemetrystore, dashboard, queryParser, licensing, flagger, telemetryMetadataStore, providerSettings, config.MetricsExplorer.TelemetryStore.Threads)
 
 	// Initialize all modules
-	modules := NewModules(sqlstore, tokenizer, emailing, providerSettings, orgGetter, alertmanager, analytics, querier, telemetrystore, telemetryMetadataStore, authNs, authz, cache, queryParser, config, dashboard, userGetter, userRoleStore, serviceAccount, cloudIntegrationModule, retentionGetter, flagger, tagModule, metricReductionRuleModule)
+	modules := NewModules(sqlstore, emailing, providerSettings, orgGetter, alertmanager, analytics, querier, telemetrystore, telemetryMetadataStore, authz, cache, queryParser, config, dashboard, userGetter, userRoleStore, serviceAccount, cloudIntegrationModule, retentionGetter, flagger, tagModule, metricReductionRuleModule)
 
 	// Initialize ruler from the variant-specific provider factories
 	rulerInstance, err := factory.NewProviderFromNamedMap(ctx, providerSettings, config.Ruler, rulerProviderFactories(cache, alertmanager, sqlstore, telemetrystore, telemetryMetadataStore, prometheus, orgGetter, modules.RuleStateHistory, querier, queryParser), "o11y")
@@ -483,13 +454,13 @@ func New(
 	}
 
 	// Initialize identN resolver
-	identNFactories := NewIdentNProviderFactories(tokenizer, serviceAccount, orgGetter, modules.OrgSetter, authz, userGetter, modules.UserSetter, config.User)
+	identNFactories := NewIdentNProviderFactories(serviceAccount, orgGetter, modules.OrgSetter, authz, userGetter, modules.UserSetter, config.User)
 	identNResolver, err := identn.NewIdentNResolver(ctx, providerSettings, config.IdentN, identNFactories)
 	if err != nil {
 		return nil, err
 	}
 
-	userService := impluser.NewService(providerSettings, impluser.NewStore(sqlstore, providerSettings), modules.UserGetter, modules.UserSetter, orgGetter, authz, config.User.Root)
+	userService := impluser.NewService(providerSettings, impluser.NewStore(sqlstore, providerSettings), modules.UserSetter, orgGetter, modules.OrgSetter, authz, config.User.Root)
 
 	// Initialize the querier handler via callback (allows EE to decorate with anomaly detection)
 	querierHandler := querierHandlerCallback(providerSettings, querier, analytics)
@@ -502,9 +473,7 @@ func New(
 		modules.SavedView,
 		modules.UserSetter,
 		licensing,
-		tokenizer,
 		config,
-		modules.AuthDomain,
 		serviceAccount,
 		cloudIntegrationModule,
 		modules.LogsPipeline,
@@ -521,7 +490,7 @@ func New(
 		ctx,
 		providerSettings,
 		config.StatsReporter,
-		NewStatsReporterProviderFactories(statsAggregator, orgGetter, userGetter, tokenizer, version.Info, config.Analytics),
+		NewStatsReporterProviderFactories(statsAggregator, orgGetter, userGetter, version.Info, config.Analytics),
 		config.StatsReporter.Provider(),
 	)
 	if err != nil {
@@ -537,7 +506,6 @@ func New(
 		factory.NewNamedService(factory.MustNewName("alertmanager"), alertmanager),
 		factory.NewNamedService(factory.MustNewName("licensing"), licensing),
 		factory.NewNamedService(factory.MustNewName("statsreporter"), statsReporter),
-		factory.NewNamedService(factory.MustNewName("tokenizer"), tokenizer),
 		factory.NewNamedService(factory.MustNewName("authz"), authz),
 		factory.NewNamedService(factory.MustNewName("user"), userService, factory.MustNewName("authz")),
 		factory.NewNamedService(factory.MustNewName("auditor"), auditor),
@@ -582,7 +550,6 @@ func New(
 		Licensing:              licensing,
 		Emailing:               emailing,
 		Sharder:                sharder,
-		Tokenizer:              tokenizer,
 		IdentNResolver:         identNResolver,
 		Authz:                  authz,
 		Ruler:                  rulerInstance,

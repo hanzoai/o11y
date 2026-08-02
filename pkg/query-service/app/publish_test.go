@@ -13,7 +13,7 @@ import (
 // What publish is FOR, verified the only way this defect was ever visible: by
 // the BODY of a request to the router, not by a status code.
 //
-// The conversion shipped 353 typed operations that no binary linked. Every proof
+// The conversion shipped 319 typed operations that no binary linked. Every proof
 // it had was taken inside a test process that imported the table directly, which
 // is exactly the thing that cannot fail: an uncalled package-level func is legal
 // Go, so the package built, the route arithmetic added up, and the server the
@@ -71,20 +71,20 @@ func operations(t *testing.T, doc map[string]any) int {
 	return n
 }
 
-// THE PAYOFF, on the router the binary serves. 353 is the same count
+// THE PAYOFF, on the router the binary serves. 319 is the same count
 // routes_test.go pins on the table itself; asserting it HERE is what makes the
-// two the same 353 rather than two numbers that happen to agree.
+// two the same 319 rather than two numbers that happen to agree.
 func TestPublishServesTheDocument(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	if err := publish(app); err != nil {
 		t.Fatalf("publish: %v", err)
 	}
 
-	if got := operations(t, documentOf(t, app)); got != 353 {
-		t.Fatalf("the served document publishes %d operations, want 353", got)
+	if got := operations(t, documentOf(t, app)); got != 319 {
+		t.Fatalf("the served document publishes %d operations, want 319", got)
 	}
-	if got := len(app.MCPTools()); got != 353 {
-		t.Fatalf("the served router offers %d MCP tools, want 353", got)
+	if got := len(app.MCPTools()); got != 319 {
+		t.Fatalf("the served router offers %d MCP tools, want 319", got)
 	}
 }
 

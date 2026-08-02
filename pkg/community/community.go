@@ -17,7 +17,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/analytics"
 	"github.com/hanzoai/o11y/pkg/auditor"
-	"github.com/hanzoai/o11y/pkg/authn"
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/authz/iamauthz"
 	"github.com/hanzoai/o11y/pkg/authz/localauthz"
@@ -54,7 +53,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/sqlschema"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
-	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/zeus"
 	"github.com/hanzoai/o11y/pkg/zeus/noopzeus"
@@ -119,9 +117,6 @@ func NewO11y(ctx context.Context, config o11y.Config) (*o11y.O11y, error) {
 		SQLSchemaProviderFactories,
 		SQLStoreProviderFactories(),
 		o11y.NewTelemetryStoreProviderFactories(),
-		func(ctx context.Context, providerSettings factory.ProviderSettings, store authtypes.AuthNStore, licensing licensing.Licensing) (map[authtypes.AuthNProvider]authn.AuthN, error) {
-			return o11y.NewAuthNs(ctx, providerSettings, store, licensing, config.Global)
-		},
 		func(_ context.Context, sqlstore sqlstore.SQLStore, config authz.Config, _ licensing.Licensing, _ []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error) {
 			// Authorization is selected by the TRUST BOUNDARY, not by pluggable policy —
 			// the enforced policy is identical either way, only where the relationship

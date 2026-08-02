@@ -13,7 +13,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	"github.com/hanzoai/o11y/pkg/http/routing"
-	"github.com/hanzoai/o11y/pkg/modules/authdomain"
 	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking"
@@ -30,7 +29,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
 	"github.com/hanzoai/o11y/pkg/modules/sentry"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
-	"github.com/hanzoai/o11y/pkg/modules/session"
 	"github.com/hanzoai/o11y/pkg/modules/spanmapper"
 	"github.com/hanzoai/o11y/pkg/modules/tracedetail"
 	"github.com/hanzoai/o11y/pkg/modules/user"
@@ -44,7 +42,7 @@ import (
 // THE API SERVER'S CENSUS.
 //
 // This package registers the larger half of the service's HTTP surface, and it
-// registers it by calling 32 functions from one place. An uncalled func is legal
+// registers it by calling 30 functions from one place. An uncalled func is legal
 // Go, so a slice that stops being called compiles, passes every test it has, and
 // serves nothing — which is exactly what this repo already shipped once, with 83
 // typed ops present in the source and reaching no router at all. Only arithmetic
@@ -52,7 +50,15 @@ import (
 //
 // If this number moves, a route was added or removed and someone has to say
 // which. It is not a target to satisfy by editing the constant.
-const wantAPIServerRoutes = 233
+//
+// It was 233. Thirty-six routes left when the duplicate identity system did:
+// twenty-four user routes (invites, passwords, reset tokens, member listing and
+// editing, roles-on-users), seven session routes including the three /complete/*
+// sign-in callbacks, and five SSO auth-domain routes. addSessionRoutes and
+// addAuthDomainRoutes are not merely uncalled — the files are deleted, which is
+// the only shape of removal this census can tell apart from the defect it
+// exists to catch.
+const wantAPIServerRoutes = 197
 
 // every handler field satisfied by an embedded nil interface: the route table is
 // a fact about REGISTRATION, and registration only takes method values off these
@@ -64,8 +70,6 @@ func censusProvider() *provider {
 		authzService:               struct{ authz.AuthZ }{},
 		orgHandler:                 struct{ organization.Handler }{},
 		userHandler:                struct{ user.Handler }{},
-		sessionHandler:             struct{ session.Handler }{},
-		authDomainHandler:          struct{ authdomain.Handler }{},
 		preferenceHandler:          struct{ preference.Handler }{},
 		globalHandler:              struct{ global.Handler }{},
 		promoteHandler:             struct{ promote.Handler }{},

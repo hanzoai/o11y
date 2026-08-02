@@ -13,57 +13,27 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-// THE WIRE PROOF for the identity face — telemetry_test.go's discipline applied
-// to the forty-five typed identity ops. The reads take the bytes the RUNTIME
-// wrote (through the SAME render.Success the handlers use) and the bytes the OP
-// answered and demand they are the same bytes, for a payload built from the
-// face's OWN types with every field populated. The writes prove the body the
-// runtime receives is the caller's own, field for field. A field this port
-// failed to name, or named with a different tag, or ordered differently, shows
-// up here as a diff. The routing and document proofs pin the whole face at once.
+// THE WIRE PROOF for what is LEFT of the identity face. The reads take the bytes
+// the RUNTIME wrote (through the SAME render.Success the handlers use) and the
+// bytes the OP answered and demand they are the same bytes, for a payload built
+// from the face's OWN types with every field populated. A field this port failed
+// to name, or named with a different tag, or ordered differently, shows up here
+// as a diff.
+//
+// It also proves the DELETIONS, which is the harder half: thirty-three ops and
+// three redirect hatches are gone, and a deletion that leaves the door standing
+// is not a deletion. TestDeletedIdentityRoutesAre404 asks the router for each of
+// them by name.
 //
 // The helpers (mounted, runtime, call, member, mustJSON) are telemetry_test.go's;
 // every typed face is proved with the one harness.
 
-// identityOps is the face's routing table, spelled once: the forty-five typed
-// ops, their methods and their operation ids, as mountIdentity registers them.
-// The routing proof reads it as native Fiber routes, the document proof as
-// OpenAPI paths — one source, two projections.
+// identityOps is the face's routing table, spelled once: the twelve typed ops,
+// their methods and their operation ids, as mountIdentity registers them. The
+// routing proof reads it as native Fiber routes, the document proof as OpenAPI
+// paths — one source, two projections.
 var identityOps = []struct{ Method, Path, OpID string }{
-	{"POST", "/invite", "CreateInvite"},
-	{"POST", "/invite/bulk", "CreateBulkInvite"},
-	{"GET", "/user", "ListUsersDeprecated"},
-	{"GET", "/users", "ListUsers"},
-	{"GET", "/user/me", "GetMyUserDeprecated"},
 	{"GET", "/users/me", "GetMyUser"},
-	{"POST", "/users", "CreateUser"},
-	{"PUT", "/users/me", "UpdateMyUserV2"},
-	{"GET", "/user/:id", "GetUserDeprecated"},
-	{"GET", "/users/:id", "GetUser"},
-	{"PUT", "/user/:id", "UpdateUserDeprecated"},
-	{"PUT", "/users/:id", "UpdateUser"},
-	{"DELETE", "/user/:id", "DeleteUserDeprecated"},
-	{"DELETE", "/users/:id", "DeleteUser"},
-	{"GET", "/getResetPasswordToken/:id", "GetResetPasswordTokenDeprecated"},
-	{"GET", "/users/:id/reset_password_tokens", "GetResetPasswordToken"},
-	{"PUT", "/users/:id/reset_password_tokens", "CreateResetPasswordToken"},
-	{"POST", "/reset_password_tokens/verify", "VerifyResetPasswordToken"},
-	{"POST", "/resetPassword", "ResetPassword"},
-	{"PUT", "/users/me/factor_password", "UpdateMyPassword"},
-	{"POST", "/factor_password/forgot", "ForgotPassword"},
-	{"GET", "/users/:id/roles", "GetRolesByUserID"},
-	{"POST", "/users/:id/roles", "SetRoleByUserID"},
-	{"DELETE", "/users/:id/roles/:roleId", "RemoveUserRoleByUserIDAndRoleID"},
-	{"GET", "/roles/:id/users", "GetUsersByRoleID"},
-	{"POST", "/sessions/email_password", "CreateSessionByEmailPassword"},
-	{"GET", "/sessions/context", "GetSessionContext"},
-	{"POST", "/sessions/rotate", "RotateSession"},
-	{"DELETE", "/sessions", "DeleteSession"},
-	{"GET", "/domains", "ListAuthDomains"},
-	{"POST", "/domains", "CreateAuthDomain"},
-	{"GET", "/domains/:id", "GetAuthDomain"},
-	{"PUT", "/domains/:id", "UpdateAuthDomain"},
-	{"DELETE", "/domains/:id", "DeleteAuthDomain"},
 	{"GET", "/orgs/me", "GetMyOrganization"},
 	{"PUT", "/orgs/me", "UpdateMyOrganization"},
 	{"GET", "/orgs/me/filters", "GetQuickFilters"},
@@ -75,6 +45,59 @@ var identityOps = []struct{ Method, Path, OpID string }{
 	{"GET", "/org/preferences", "ListOrgPreferences"},
 	{"GET", "/org/preferences/:name", "GetOrgPreference"},
 	{"PUT", "/org/preferences/:name", "UpdateOrgPreference"},
+}
+
+// deletedIdentityRoutes is every method+path the identity face used to answer
+// and must not answer any more — the credential surfaces (a), the member
+// administration (c), and the three sign-in callbacks that were the last
+// authentication hatches. Spelled out rather than counted, because the failure
+// this guards against is ONE of them surviving.
+var deletedIdentityRoutes = []struct{ Method, Path string }{
+	// invites
+	{"POST", "/v1/o11y/invite"},
+	{"POST", "/v1/o11y/invite/bulk"},
+	// member administration
+	{"GET", "/v1/o11y/user"},
+	{"GET", "/v1/o11y/users"},
+	{"POST", "/v1/o11y/users"},
+	{"GET", "/v1/o11y/user/me"},
+	{"PUT", "/v1/o11y/users/me"},
+	{"GET", "/v1/o11y/user/u1"},
+	{"GET", "/v1/o11y/users/u1"},
+	{"PUT", "/v1/o11y/user/u1"},
+	{"PUT", "/v1/o11y/users/u1"},
+	{"DELETE", "/v1/o11y/user/u1"},
+	{"DELETE", "/v1/o11y/users/u1"},
+	// passwords and their reset tokens
+	{"GET", "/v1/o11y/getResetPasswordToken/u1"},
+	{"GET", "/v1/o11y/users/u1/reset_password_tokens"},
+	{"PUT", "/v1/o11y/users/u1/reset_password_tokens"},
+	{"POST", "/v1/o11y/reset_password_tokens/verify"},
+	{"POST", "/v1/o11y/resetPassword"},
+	{"PUT", "/v1/o11y/users/me/factor_password"},
+	{"POST", "/v1/o11y/factor_password/forgot"},
+	// roles on users
+	{"GET", "/v1/o11y/users/u1/roles"},
+	{"POST", "/v1/o11y/users/u1/roles"},
+	{"DELETE", "/v1/o11y/users/u1/roles/r1"},
+	{"GET", "/v1/o11y/roles/r1/users"},
+	// sessions
+	{"POST", "/v1/o11y/sessions/email_password"},
+	{"GET", "/v1/o11y/sessions/context"},
+	{"POST", "/v1/o11y/sessions/rotate"},
+	{"DELETE", "/v1/o11y/sessions"},
+	// SSO domains
+	{"GET", "/v1/o11y/domains"},
+	{"POST", "/v1/o11y/domains"},
+	{"GET", "/v1/o11y/domains/d1"},
+	{"PUT", "/v1/o11y/domains/d1"},
+	{"DELETE", "/v1/o11y/domains/d1"},
+	// the sign-in callbacks
+	{"GET", "/v1/o11y/complete/google"},
+	{"POST", "/v1/o11y/complete/saml"},
+	{"GET", "/v1/o11y/complete/oidc"},
+	// self-registration
+	{"POST", "/v1/o11y/register"},
 }
 
 // bracePath rewrites a zip route's ":seg" parameters into the OpenAPI document's
@@ -89,13 +112,10 @@ func bracePath(zipPath string) string {
 	return strings.Join(segs, "/")
 }
 
-// THE ROUTES, exactly as the mux tree declared them: forty-five typed paths on
-// the native router, and the three /complete/* sign-in callbacks NOT among them —
-// they answer with 303 redirects, so they stay on the delegation wildcard where
-// a typed 2xx-JSON contract cannot lie about them.
-func TestIdentityRoutesAreTheSameFortyFive(t *testing.T) {
-	if len(identityOps) != 45 {
-		t.Fatalf("identityOps has %d entries, want 45", len(identityOps))
+// THE ROUTES, exactly as mountIdentity declares them.
+func TestIdentityRoutesAreTheSameTwelve(t *testing.T) {
+	if len(identityOps) != 12 {
+		t.Fatalf("identityOps has %d entries, want 12", len(identityOps))
 	}
 	app := mounted(t)
 	got := map[string]bool{}
@@ -108,104 +128,37 @@ func TestIdentityRoutesAreTheSameFortyFive(t *testing.T) {
 			t.Errorf("%s is not registered as a typed op", key)
 		}
 	}
-	// The three SSO callbacks are NAMED HATCHES now (mount.go mountHatches), not
-	// typed ops and no longer a fall-through: they answer 303 with a Location and
-	// no body, so a typed op would publish a response schema for a response that
-	// does not exist. Each must be registered — a hatch that is not registered is
-	// a 404 now that the catch-all is gone.
-	for _, cb := range []string{
-		"GET /v1/o11y/complete/google",
-		"POST /v1/o11y/complete/saml",
-		"GET /v1/o11y/complete/oidc",
-	} {
-		if !got[cb] {
-			t.Errorf("%s is not registered; it is a named hatch (it answers 303)", cb)
-		}
-	}
 }
 
-// The three SSO callbacks reach the runtime through their OWN named routes now,
-// path untouched, with the 303 and its Location passed straight back — while the
-// typed identity paths next to them dispatch as ops. Both halves in one test,
-// because the interesting failure is one of them stealing the other's traffic.
+// THE DELETION, on the router the binary serves.
 //
-// This test used to install a host wildcard and assert the callbacks fell into
-// it. That assertion could not distinguish a deliberate hatch from a route
-// nobody had converted, which is how three unmounted slices shipped; it now
-// asserts the named door instead.
-func TestCompleteCallbacksAreNamedHatches(t *testing.T) {
+// A registered runtime answers 200 to EVERYTHING, so a route that still exists
+// answers 200 here and a route that is gone answers 404. That is the whole
+// discrimination, and it is why the runtime is registered rather than left nil:
+// with no runtime every path returns 503, and 503 would hide a surviving door.
+func TestDeletedIdentityRoutesAre404(t *testing.T) {
 	app := mounted(t)
-
-	var saw string
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		saw = r.URL.Path
-		w.Header().Set("Location", "https://console.hanzo.ai/")
-		w.WriteHeader(http.StatusSeeOther)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
-
-	for _, cb := range []struct{ method, target string }{
-		{http.MethodGet, "/v1/o11y/complete/google"},
-		{http.MethodPost, "/v1/o11y/complete/saml"},
-		{http.MethodGet, "/v1/o11y/complete/oidc"},
-	} {
-		saw = ""
-		resp, err := app.Fiber().Test(member(cb.method, cb.target, nil))
-		if err != nil {
-			t.Fatalf("Test: %v", err)
-		}
-		if resp.StatusCode != http.StatusSeeOther {
-			t.Errorf("%s status=%d, want 303 — the redirect is the answer", cb.target, resp.StatusCode)
-		}
-		if got := resp.Header.Get("Location"); got != "https://console.hanzo.ai/" {
-			t.Errorf("%s Location=%q — the header a typed op would have hidden", cb.target, got)
-		}
-		if saw != cb.target {
-			t.Errorf("%s reached the runtime as %q", cb.target, saw)
-		}
-	}
-
-	// ...and a typed identity op next door still dispatches as an op.
 	runtime(t, []any{})
-	if status, body := call(t, app, member(http.MethodGet, "/v1/o11y/users", nil)); status != http.StatusOK {
-		t.Fatalf("the typed users op did not answer: status=%d %s", status, body)
+
+	for _, r := range deletedIdentityRoutes {
+		// 404 (no such path) or 405 (the path survives for another method, as
+		// /users/me does for GET) both mean this method+path is not served. A
+		// 2xx, a 4xx from a handler, or the 503 of an unwired hatch would not.
+		status, body := call(t, app, member(r.Method, r.Path, strings.NewReader("{}")))
+		if status != http.StatusNotFound && status != http.StatusMethodNotAllowed {
+			t.Errorf("%s %s answers %d (%s) — it must be gone, not merely unrouted", r.Method, r.Path, status, body)
+		}
 	}
 }
 
-// A page of org members is what the runtime wrote, to the byte — each member's
-// every field populated, so a dropped or renamed field cannot hide behind a
-// zero value — and the runtime is asked at the member collection, verbatim.
-func TestUsersAnswerIsTheRuntimeAnswer(t *testing.T) {
+// The caller's own identity is what the runtime wrote, to the byte — every field
+// populated, so a dropped or renamed field cannot hide behind a zero value.
+func TestMyUserAnswerIsTheRuntimeAnswer(t *testing.T) {
 	at := time.Date(2026, 7, 31, 12, 0, 0, 123456789, time.UTC)
 	app := mounted(t)
-	wrote, asked := runtime(t, []o11y.O11yUser{
-		{ID: "u1", DisplayName: "Ada", Email: "ada@example.com", OrgID: "maxpower", IsRoot: true, Status: "active", CreatedAt: at, UpdatedAt: at.Add(time.Hour)},
-		{ID: "u2", DisplayName: "Grace", Email: "grace@example.com", OrgID: "maxpower", Status: "pending_invite", CreatedAt: at, UpdatedAt: at},
-	})
-
-	status, got := call(t, app, member(http.MethodGet, "/v1/o11y/users", nil))
-	if status != http.StatusOK {
-		t.Fatalf("status=%d body=%s, want 200", status, got)
-	}
-	if !bytes.Equal(got, *wrote) {
-		t.Fatalf("the op changed the bytes.\n runtime: %s\n op:      %s", *wrote, got)
-	}
-	if r := *asked; r.URL.Path != "/v1/o11y/users" {
-		t.Fatalf("runtime was asked %q, want /v1/o11y/users", r.URL.Path)
-	}
-}
-
-// The calling user and every role they hold is what the runtime wrote, to the
-// byte — a nested role assignment carrying its own role, so a member's whole
-// role graph is proved, not just the scalar fields.
-func TestUserWithRolesAnswerIsTheRuntimeAnswer(t *testing.T) {
-	at := time.Date(2026, 7, 31, 12, 0, 0, 123456789, time.UTC)
-	app := mounted(t)
-	role := &o11y.O11yRole{ID: "r1", CreatedAt: at, UpdatedAt: at, Name: "ADMIN", Description: "full access", Type: "managed", OrgID: "maxpower"}
-	wrote, asked := runtime(t, o11y.O11yUserWithRoles{
-		ID: "u1", DisplayName: "Ada", Email: "ada@example.com", OrgID: "maxpower", IsRoot: true, Status: "active",
-		CreatedAt: at, UpdatedAt: at,
-		UserRoles: []o11y.O11yUserRole{{ID: "ur1", UserID: "u1", RoleID: "r1", CreatedAt: at, UpdatedAt: at, Role: role}},
+	wrote, asked := runtime(t, o11y.O11yUser{
+		ID: "u1", DisplayName: "ada@example.com", Email: "ada@example.com", OrgID: "maxpower",
+		IsRoot: false, Status: "active", CreatedAt: at, UpdatedAt: at,
 	})
 
 	status, got := call(t, app, member(http.MethodGet, "/v1/o11y/users/me", nil))
@@ -220,22 +173,19 @@ func TestUserWithRolesAnswerIsTheRuntimeAnswer(t *testing.T) {
 	}
 }
 
-// The create forwards the caller's postable user through the runtime's own type,
-// field for field, and answers with the runtime's 201 — the created status the
-// mux registration always carried.
-func TestCreateUserForwardsTheBody(t *testing.T) {
+// The org update forwards the caller's body through the face's own type, field
+// for field.
+func TestUpdateMyOrgForwardsTheBody(t *testing.T) {
 	app := mounted(t)
-	_, asked := runtime(t, o11y.O11yCreated{ID: "u9"})
+	_, asked := runtime(t, struct{}{})
 
-	sent := `{"displayName":"Ada","email":"ada@example.com","frontendBaseUrl":"https://console.example.com",` +
-		`"userRoles":[{"id":"r1"},{"id":"r2"}]}`
-	status, got := call(t, app, member(http.MethodPost, "/v1/o11y/users", strings.NewReader(sent)))
-	if status != http.StatusCreated {
-		t.Fatalf("status=%d body=%s, want 201", status, got)
+	sent := `{"displayName":"Max Power","name":"maxpower","alias":"mp"}`
+	if status, got := call(t, app, member(http.MethodPut, "/v1/o11y/orgs/me", strings.NewReader(sent))); status != http.StatusNoContent {
+		t.Fatalf("status=%d body=%s, want 204", status, got)
 	}
 
 	forwarded, _ := io.ReadAll((*asked).Body)
-	var want, have o11y.O11yPostableUser
+	var want, have o11y.O11yOrganization
 	if err := json.Unmarshal([]byte(sent), &want); err != nil {
 		t.Fatalf("unmarshal sent: %v", err)
 	}
@@ -247,41 +197,14 @@ func TestCreateUserForwardsTheBody(t *testing.T) {
 	}
 }
 
-// Sign-in answers the runtime's token pair, to the byte, and the runtime receives
-// the caller's own credentials — the body a session is minted from is not
-// rewritten on the way through.
-func TestSessionTokenAnswerIsTheRuntimeAnswer(t *testing.T) {
-	app := mounted(t)
-	wrote, asked := runtime(t, o11y.O11yToken{TokenType: "bearer", AccessToken: "acc.jwt", RefreshToken: "ref.jwt", ExpiresIn: 3600})
-
-	sent := `{"email":"ada@example.com","password":"hunter2","orgId":"maxpower"}`
-	status, got := call(t, app, member(http.MethodPost, "/v1/o11y/sessions/email_password", strings.NewReader(sent)))
-	if status != http.StatusOK {
-		t.Fatalf("status=%d body=%s, want 200", status, got)
-	}
-	if !bytes.Equal(got, *wrote) {
-		t.Fatalf("the op changed the bytes.\n runtime: %s\n op:      %s", *wrote, got)
-	}
-	forwarded, _ := io.ReadAll((*asked).Body)
-	var want, have o11y.O11yEmailPasswordSessionIn
-	if err := json.Unmarshal([]byte(sent), &want); err != nil {
-		t.Fatalf("unmarshal sent: %v", err)
-	}
-	if err := json.Unmarshal(forwarded, &have); err != nil {
-		t.Fatalf("the runtime was sent something it cannot read: %v (%s)", err, forwarded)
-	}
-	if a, b := mustJSON(t, want), mustJSON(t, have); a != b {
-		t.Fatalf("the op rewrote the credentials.\n caller: %s\n runtime: %s", a, b)
-	}
-}
-
 // The caller's identity travels on as the gateway asserted it — propagated, not
-// minted, and not invented when there is none.
+// minted, and not invented when there is none. This is the ONLY way a caller is
+// identified now, which is why it is proved on the identity face itself.
 func TestIdentityPropagatesTheCaller(t *testing.T) {
 	app := mounted(t)
-	_, asked := runtime(t, []any{})
+	_, asked := runtime(t, o11y.O11yUser{ID: "u1"})
 
-	r := member(http.MethodGet, "/v1/o11y/users", nil)
+	r := member(http.MethodGet, "/v1/o11y/users/me", nil)
 	r.Header.Set(zip.HeaderUserAdmin, "true")
 	r.Header.Set(zip.HeaderProject, "proj-9")
 	if status, body := call(t, app, r); status != http.StatusOK {
@@ -308,9 +231,7 @@ func TestIdentityFailsClosedWithoutARuntime(t *testing.T) {
 	o11y.SetHandler(nil)
 
 	for _, tc := range []struct{ method, target string }{
-		{http.MethodGet, "/v1/o11y/users"},
 		{http.MethodGet, "/v1/o11y/users/me"},
-		{http.MethodGet, "/v1/o11y/domains"},
 		{http.MethodGet, "/v1/o11y/orgs/me"},
 		{http.MethodGet, "/v1/o11y/user/preferences"},
 	} {
@@ -320,11 +241,9 @@ func TestIdentityFailsClosedWithoutARuntime(t *testing.T) {
 	}
 }
 
-// THE POINT OF THE PORT: every one of the forty-five ops is in the document now,
-// each with its operation id and its prose. A route behind the wildcard had none
-// of that — no SDK method, no command, no agent tool, no reference page — which
-// is what made a tenant's own membership, sign-in and preferences unreachable
-// from anything but a hand-written call.
+// Every surviving op is in the document, with its operation id and its prose —
+// and every deleted one is NOT, because a document that still advertises a
+// password reset is a client that will call one.
 func TestIdentityReachesTheDocument(t *testing.T) {
 	app := mounted(t)
 	raw, err := json.Marshal(app.OpenAPISpec())
@@ -356,10 +275,15 @@ func TestIdentityReachesTheDocument(t *testing.T) {
 			t.Errorf("%s %s has no prose in the document: %q", op.Method, path, doc.Summary)
 		}
 	}
-	// The three redirect callbacks are deliberately absent from the document.
-	for _, p := range []string{"/v1/o11y/complete/google", "/v1/o11y/complete/saml", "/v1/o11y/complete/oidc"} {
+
+	for _, p := range []string{
+		"/v1/o11y/invite", "/v1/o11y/users", "/v1/o11y/users/{id}", "/v1/o11y/sessions",
+		"/v1/o11y/sessions/rotate", "/v1/o11y/sessions/email_password", "/v1/o11y/domains",
+		"/v1/o11y/resetPassword", "/v1/o11y/factor_password/forgot",
+		"/v1/o11y/users/me/factor_password", "/v1/o11y/complete/google",
+	} {
 		if _, there := spec.Paths[p]; there {
-			t.Errorf("%s entered the document as a typed op — it answers a 303 redirect, and the document would lie about it", p)
+			t.Errorf("%s is still in the document — a generated client would still call it", p)
 		}
 	}
 }

@@ -3,7 +3,6 @@ package o11y
 import (
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/analytics"
-	"github.com/hanzoai/o11y/pkg/authn"
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/emailing"
@@ -11,8 +10,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/modules/apdex"
 	"github.com/hanzoai/o11y/pkg/modules/apdex/implapdex"
-	"github.com/hanzoai/o11y/pkg/modules/authdomain"
-	"github.com/hanzoai/o11y/pkg/modules/authdomain/implauthdomain"
 	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking"
@@ -48,8 +45,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/modules/services"
 	"github.com/hanzoai/o11y/pkg/modules/services/implservices"
-	"github.com/hanzoai/o11y/pkg/modules/session"
-	"github.com/hanzoai/o11y/pkg/modules/session/implsession"
 	"github.com/hanzoai/o11y/pkg/modules/spanmapper"
 	"github.com/hanzoai/o11y/pkg/modules/spanmapper/implspanmapper"
 	"github.com/hanzoai/o11y/pkg/modules/spanpercentile"
@@ -66,7 +61,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/ruler/rulestore/sqlrulestore"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
-	"github.com/hanzoai/o11y/pkg/tokenizer"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/preferencetypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
@@ -85,8 +79,6 @@ type Modules struct {
 	QuickFilter         quickfilter.Module
 	TraceFunnel         tracefunnel.Module
 	RawDataExport       rawdataexport.Module
-	AuthDomain          authdomain.Module
-	Session             session.Module
 	Services            services.Module
 	SpanPercentile      spanpercentile.Module
 	MetricsExplorer     metricsexplorer.Module
@@ -115,7 +107,6 @@ type Modules struct {
 
 func NewModules(
 	sqlstore sqlstore.SQLStore,
-	tokenizer tokenizer.Tokenizer,
 	emailing emailing.Emailing,
 	providerSettings factory.ProviderSettings,
 	orgGetter organization.Getter,
@@ -124,7 +115,6 @@ func NewModules(
 	querier querier.Querier,
 	telemetryStore telemetrystore.TelemetryStore,
 	telemetryMetadataStore telemetrytypes.MetadataStore,
-	authNs map[authtypes.AuthNProvider]authn.AuthN,
 	authz authz.AuthZ,
 	cache cache.Cache,
 	queryParser queryparser.QueryParser,
@@ -141,13 +131,8 @@ func NewModules(
 ) Modules {
 	quickfilter := implquickfilter.NewModule(implquickfilter.NewStore(sqlstore))
 	orgSetter := implorganization.NewSetter(implorganization.NewStore(sqlstore), alertmanager, quickfilter)
-	// Cleanup callbacks from other modules, invoked when a user is deleted.
-	onDeleteUser := []user.OnDeleteUser{
-		dashboard.DeletePreferencesForUser,
-	}
-	userSetter := impluser.NewSetter(impluser.NewStore(sqlstore, providerSettings), tokenizer, emailing, providerSettings, orgSetter, authz, analytics, config.User, userRoleStore, userGetter, onDeleteUser)
+	userSetter := impluser.NewSetter(impluser.NewStore(sqlstore, providerSettings), providerSettings, authz, analytics, userRoleStore)
 	ruleStore := sqlrulestore.NewRuleStore(sqlstore, queryParser, providerSettings)
-	authDomainModule := implauthdomain.NewModule(implauthdomain.NewStore(sqlstore), authNs, authz)
 
 	// Error tracking (o11y_issues lifecycle) and trace detail (o11y_traces waterfall)
 	// are pulled into locals so the Sentry product face can COMPOSE them rather than
@@ -186,8 +171,6 @@ func NewModules(
 		QuickFilter:              quickfilter,
 		TraceFunnel:              impltracefunnel.NewModule(impltracefunnel.NewStore(sqlstore)),
 		RawDataExport:            implrawdataexport.NewModule(querier),
-		AuthDomain:               authDomainModule,
-		Session:                  implsession.NewModule(providerSettings, authNs, userSetter, userGetter, authDomainModule, tokenizer, orgGetter, authz),
 		SpanPercentile:           implspanpercentile.NewModule(querier, providerSettings),
 		Services:                 implservices.NewModule(querier, telemetryStore),
 		MetricsExplorer:          implmetricsexplorer.NewModule(telemetryStore, telemetryMetadataStore, cache, ruleStore, dashboard, fl, providerSettings, config.MetricsExplorer),

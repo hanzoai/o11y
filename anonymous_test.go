@@ -19,6 +19,18 @@ var fixedExemptions = []string{
 	"GET /v1/o11y/version",
 	"GET /v1/o11y/health",
 	"GET /v1/o11y/global/config",
+	"GET /v1/o11y/users/me",
+	"GET /v1/o11y/service_accounts/me",
+	"PUT /v1/o11y/service_accounts/me",
+}
+
+// noCredentialSurfaceIsExempt is the list this file used to be half made of:
+// registration, sign-in, session rotation, sign-out, three SSO callbacks and
+// three password routes. o11y authenticates nobody now, so none of them is a
+// route and none may be an exemption. Naming them keeps the deletion honest —
+// re-adding any one of them to openOps fails here even if the route never comes
+// back, because an exemption without a route is the hole that outlives the door.
+var noCredentialSurfaceIsExempt = []string{
 	"POST /v1/o11y/register",
 	"POST /v1/o11y/sessions/email_password",
 	"GET /v1/o11y/sessions/context",
@@ -30,12 +42,20 @@ var fixedExemptions = []string{
 	"POST /v1/o11y/reset_password_tokens/verify",
 	"POST /v1/o11y/resetPassword",
 	"POST /v1/o11y/factor_password/forgot",
-	"GET /v1/o11y/user/me",
-	"GET /v1/o11y/users/me",
-	"PUT /v1/o11y/users/me",
 	"PUT /v1/o11y/users/me/factor_password",
-	"GET /v1/o11y/service_accounts/me",
-	"PUT /v1/o11y/service_accounts/me",
+}
+
+func TestNoCredentialSurfaceIsExemptOrRouted(t *testing.T) {
+	have := registered(t, mounted(t))
+	for _, route := range noCredentialSurfaceIsExempt {
+		method, path, _ := strings.Cut(route, " ")
+		if o11y.Anonymous(method, path) {
+			t.Errorf("%q is exempt from authentication and must not be: o11y holds no credentials", route)
+		}
+		if have[route] {
+			t.Errorf("%q is still registered — Hanzo IAM owns credentials", route)
+		}
+	}
 }
 
 // THE DRIFT GUARD. The unified door refused every public o11y op — /version,
@@ -93,7 +113,7 @@ func TestPublicOpsAreExempt(t *testing.T) {
 		"GET /v1/o11y/healthz",
 		"GET /v1/o11y/readyz",
 		"GET /v1/o11y/global/config",
-		"POST /v1/o11y/sessions/email_password",
+		"GET /v1/o11y/users/me",
 		"GET /v1/o11y/public/dashboards/d1",
 		"GET /v1/o11y/public/dashboards/d1/widgets/0/query_range",
 		"POST /v1/o11y/api/proj/envelope/",

@@ -39,8 +39,6 @@ func (aH *APIHandler) mountMisc(router routing.Router, am *middleware.AuthZ) {
 
 	router.Get("/v1/o11y/disks", am.ViewAccess(aH.getDisks))
 
-	router.Post("/v1/o11y/register", am.OpenAccess(aH.registerUser))
-
 	router.Post("/v1/o11y/span_percentile", am.ViewAccess(aH.O11y.Handlers.SpanPercentile.GetSpanPercentileDetails))
 
 	// Query Filter Analyzer api used to extract metric names and grouping columns from a query

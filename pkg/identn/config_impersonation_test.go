@@ -11,7 +11,7 @@ package identn
 // impersonation matches unconditionally, so if it is in the list at all, a
 // request that fails to match IAM falls through to root. The ONLY thing standing
 // between that and a production host is Config.Validate refusing to boot when
-// impersonation is enabled alongside IAM, the tokenizer or API keys — a check
+// impersonation is enabled alongside IAM or API keys — a check
 // that pkg/o11y/config.go's validateConfig runs over every config at startup, so
 // a deployment that tries the combination fails to start rather than serving.
 //
@@ -32,13 +32,12 @@ func TestImpersonationCannotBootBesideARealIdentityProvider(t *testing.T) {
 		with func(*Config)
 	}{
 		{"IAM", func(c *Config) { c.IAM.Enabled = true }},
-		{"tokenizer", func(c *Config) { c.Tokenizer.Enabled = true }},
 		{"api key", func(c *Config) { c.APIKeyConfig.Enabled = true }},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			c := newConfig().(*Config)
 			c.Impersonation.Enabled = true
-			c.IAM.Enabled, c.Tokenizer.Enabled, c.APIKeyConfig.Enabled = false, false, false
+			c.IAM.Enabled, c.APIKeyConfig.Enabled = false, false
 			tc.with(c)
 
 			if err := c.Validate(); err == nil {
@@ -54,7 +53,7 @@ func TestImpersonationCannotBootBesideARealIdentityProvider(t *testing.T) {
 func TestImpersonationAloneIsValid(t *testing.T) {
 	c := newConfig().(*Config)
 	c.Impersonation.Enabled = true
-	c.IAM.Enabled, c.Tokenizer.Enabled, c.APIKeyConfig.Enabled = false, false, false
+	c.IAM.Enabled, c.APIKeyConfig.Enabled = false, false
 
 	if err := c.Validate(); err != nil {
 		t.Fatalf("impersonation alone is the local single-user mode and must validate: %v", err)

@@ -58,7 +58,6 @@ func mountPlatform(app *zip.App) {
 	zip.Get(g, "/version", version)
 	zip.Get(g, "/health", health)
 	zip.Get(g, "/disks", disks)
-	zip.Post(g, "/register", register)
 	zip.Post(g, "/span_percentile", spanPercentile)
 	zip.Post(g, "/query_filter/analyze", analyzeQueryFilter)
 	zip.Get(g, "/filter_suggestions", filterSuggestions)
@@ -174,16 +173,6 @@ func health(ctx context.Context, in *O11yHealthIn) (*O11yHealthOut, error) {
 func disks(ctx context.Context, _ *struct{}) (*O11yDiskList, error) {
 	out := new(O11yDiskList)
 	return out, relay(ctx, http.MethodGet, o11yRoot+"/disks", nil, nil, out)
-}
-
-// register creates the FIRST organization and its admin user. It is open by
-// design — there is nobody to be signed in as yet — and refuses once setup has
-// completed, after which new users arrive by invitation only.
-//
-// Open by design; the runtime's own gate is OpenAccess.
-func register(ctx context.Context, in *O11yRegisterIn) (*O11yRegisterOut, error) {
-	out := new(O11yRegisterOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/register", nil, in, out)
 }
 
 // spanPercentile places one span's duration among its peers: the p50/p90/p99
@@ -423,20 +412,6 @@ type O11yHealthIn struct {
 	Live bool `json:"live,omitempty"`
 }
 
-// O11yRegisterIn creates the first organization and its admin user.
-type O11yRegisterIn struct {
-	// Name is the admin's display name.
-	Name string `json:"name,omitempty"`
-	// Email is the admin's email. Required.
-	Email string `json:"email" validate:"required"`
-	// Password is the admin's password.
-	Password string `json:"password,omitempty"`
-	// OrgDisplayName is the organization's display name.
-	OrgDisplayName string `json:"orgDisplayName,omitempty"`
-	// OrgName is the organization's name.
-	OrgName string `json:"orgName,omitempty"`
-}
-
 // O11ySpanPercentileIn names one span and the peer group to place it in.
 type O11ySpanPercentileIn struct {
 	// SpanDuration is the span's duration in nanoseconds.
@@ -633,16 +608,6 @@ type O11yDisk struct {
 	Name string `json:"name,omitempty"`
 	// Type is the disk's type, e.g. local or s3.
 	Type string `json:"type,omitempty"`
-}
-
-// O11yRegisterOut is the created admin user.
-type O11yRegisterOut struct {
-	// Status is "success".
-	Status string `json:"status"`
-	// Data is the user. The runtime answers register with the same user shape
-	// the identity face reads, so it is the ONE O11yUser (identity.go) — a
-	// created user is a user, and the document names it once.
-	Data O11yUser `json:"data"`
 }
 
 // O11ySpanPercentileOut is a span's percentile placement.

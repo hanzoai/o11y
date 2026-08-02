@@ -62,7 +62,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/postprocess"
-	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
@@ -1156,32 +1155,6 @@ func (aH *APIHandler) getHealth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	aH.WriteJSON(w, r, map[string]string{"status": "ok"})
-}
-
-func (aH *APIHandler) registerUser(w http.ResponseWriter, r *http.Request) {
-	if aH.SetupCompleted {
-		render.Error(w, errors.NewInvalidInputf(errors.CodeInvalidInput, "self-registration is disabled"))
-		return
-	}
-
-	var req types.PostableRegisterOrgAndAdmin
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	organization := types.NewOrganization(req.OrgDisplayName, req.OrgName)
-	user, errv2 := aH.O11y.Modules.UserSetter.CreateFirstUser(r.Context(), organization, req.Name, req.Email, req.Password)
-	if errv2 != nil {
-		render.Error(w, errv2)
-		return
-	}
-
-	// since the first user is now created, we can disable self-registration as
-	// from here onwards, we expect admin (owner) to invite other users.
-	aH.SetupCompleted = true
-
-	aH.Respond(w, user)
 }
 
 func (aH *APIHandler) HandleError(w http.ResponseWriter, err error, statusCode int) bool {

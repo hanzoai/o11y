@@ -18,6 +18,7 @@ package localauthz
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/hanzoai/o11y/pkg/factory"
@@ -145,4 +146,44 @@ func TestRehydratedGrantsStayInTheirOrg(t *testing.T) {
 	if err := p.CheckWithTupleCreation(ctx, claims, otherOrg, authtypes.Relation{}, nil, nil, selectors); err == nil {
 		t.Fatal("a grant rehydrated for one org authorized the subject in another")
 	}
+}
+
+// THE LINK, not the function.
+//
+// Every test above calls p.rehydrate directly, and all four stayed GREEN when
+// the call to it was deleted from Start — which is the whole defect they were
+// written to prevent, reproduced one layer up. A rehydration nothing invokes is
+// a lockout with a passing suite, and the thing the process actually runs is
+// Start.
+//
+// So this drives START, on a provider whose only state is durable rows, and
+// asks the question a request asks. Delete `p.rehydrate(ctx)` from Start and
+// this goes red; the four above do not.
+func TestStartRehydrates(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	orgID, userID, roleID := valuer.GenerateUUID(), valuer.GenerateUUID(), valuer.GenerateUUID()
+	p := newProvider(durable(t, userID, valuer.UUID{}, orgID, roleID), factory.NewScopedProviderSettings(instrumentationtest.New().ToProviderSettings(), "test"))
+
+	started := make(chan error, 1)
+	go func() { started <- p.Start(ctx) }()
+	t.Cleanup(func() {
+		_ = p.Stop(context.Background())
+		<-started
+	})
+
+	claims := authtypes.Claims{Principal: authtypes.PrincipalUser, UserID: userID.StringValue()}
+	selectors := []coretypes.Selector{coretypes.TypeRole.MustSelector(adminRole)}
+
+	// Start blocks after rehydrating, so poll rather than sleep on a guess.
+	deadline := time.Now().Add(4 * time.Second)
+	var err error
+	for time.Now().Before(deadline) {
+		if err = p.CheckWithTupleCreation(ctx, claims, orgID, authtypes.Relation{}, nil, nil, selectors); err == nil {
+			return
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	t.Fatalf("Start did not rehydrate the durable grants: %v", err)
 }
