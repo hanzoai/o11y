@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -128,21 +128,9 @@ func (handler *handler) GetChannelByID(rw http.ResponseWriter, req *http.Request
 		return
 	}
 
-	vars := mux.Vars(req)
-	if vars == nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is required in path"))
-		return
-	}
-
-	idString, ok := vars["id"]
-	if !ok {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is required in path"))
-		return
-	}
-
-	id, err := valuer.NewUUID(idString)
+	id, err := channelIDFromPath(req)
 	if err != nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7"))
+		render.Error(rw, err)
 		return
 	}
 
@@ -165,21 +153,9 @@ func (handler *handler) UpdateChannelByID(rw http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	vars := mux.Vars(req)
-	if vars == nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is required in path"))
-		return
-	}
-
-	idString, ok := vars["id"]
-	if !ok {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is required in path"))
-		return
-	}
-
-	id, err := valuer.NewUUID(idString)
+	id, err := channelIDFromPath(req)
 	if err != nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7"))
+		render.Error(rw, err)
 		return
 	}
 
@@ -215,21 +191,9 @@ func (handler *handler) DeleteChannelByID(rw http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	vars := mux.Vars(req)
-	if vars == nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is required in path"))
-		return
-	}
-
-	idString, ok := vars["id"]
-	if !ok {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is required in path"))
-		return
-	}
-
-	id, err := valuer.NewUUID(idString)
+	id, err := channelIDFromPath(req)
 	if err != nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7"))
+		render.Error(rw, err)
 		return
 	}
 
@@ -326,8 +290,7 @@ func (handler *handler) GetRoutePolicyByID(rw http.ResponseWriter, req *http.Req
 	ctx, cancel := context.WithTimeout(req.Context(), 30*time.Second)
 	defer cancel()
 
-	vars := mux.Vars(req)
-	policyID := vars["id"]
+	policyID := coretypes.Param(req, "id")
 	if policyID == "" {
 		render.Error(rw, errors.NewInvalidInputf(errors.CodeInvalidInput, "policy ID is required"))
 		return
@@ -346,8 +309,7 @@ func (handler *handler) DeleteRoutePolicyByID(rw http.ResponseWriter, req *http.
 	ctx, cancel := context.WithTimeout(req.Context(), 30*time.Second)
 	defer cancel()
 
-	vars := mux.Vars(req)
-	policyID := vars["id"]
+	policyID := coretypes.Param(req, "id")
 	if policyID == "" {
 		render.Error(rw, errors.NewInvalidInputf(errors.CodeInvalidInput, "policy ID is required"))
 		return
@@ -366,8 +328,7 @@ func (handler *handler) UpdateRoutePolicy(rw http.ResponseWriter, req *http.Requ
 	ctx, cancel := context.WithTimeout(req.Context(), 30*time.Second)
 	defer cancel()
 
-	vars := mux.Vars(req)
-	policyID := vars["id"]
+	policyID := coretypes.Param(req, "id")
 	if policyID == "" {
 		render.Error(rw, errors.NewInvalidInputf(errors.CodeInvalidInput, "policy ID is required"))
 		return
@@ -398,4 +359,24 @@ func (handler *handler) UpdateRoutePolicy(rw http.ResponseWriter, req *http.Requ
 		return
 	}
 	render.Success(rw, http.StatusOK, result)
+}
+
+// channelIDFromPath reads the {id} PATH segment of /v1/o11y/channels/{id} and
+// validates it as a uuid-v7. Absent and malformed stay DIFFERENT refusals: a
+// request that reached the handler without the segment is a routing fault, a
+// segment that is not a uuid is the caller's. The read goes through
+// coretypes.Param — the ONE route-value reader — so this handler names the value
+// it needs and not the router that matched it.
+func channelIDFromPath(req *http.Request) (valuer.UUID, error) {
+	raw := coretypes.Param(req, "id")
+	if raw == "" {
+		return valuer.UUID{}, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is required in path")
+	}
+
+	id, err := valuer.NewUUID(raw)
+	if err != nil {
+		return valuer.UUID{}, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7")
+	}
+
+	return id, nil
 }

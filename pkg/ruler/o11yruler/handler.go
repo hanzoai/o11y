@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/ruler"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
@@ -47,9 +47,9 @@ func (handler *handler) GetRuleByID(rw http.ResponseWriter, req *http.Request) {
 	ctx, cancel := context.WithTimeout(req.Context(), 30*time.Second)
 	defer cancel()
 
-	id, err := valuer.NewUUID(mux.Vars(req)["id"])
+	id, err := idFromPath(req)
 	if err != nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7"))
+		render.Error(rw, err)
 		return
 	}
 
@@ -86,9 +86,9 @@ func (handler *handler) UpdateRuleByID(rw http.ResponseWriter, req *http.Request
 	ctx, cancel := context.WithTimeout(req.Context(), 30*time.Second)
 	defer cancel()
 
-	id, err := valuer.NewUUID(mux.Vars(req)["id"])
+	id, err := idFromPath(req)
 	if err != nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7"))
+		render.Error(rw, err)
 		return
 	}
 
@@ -112,9 +112,9 @@ func (handler *handler) DeleteRuleByID(rw http.ResponseWriter, req *http.Request
 	ctx, cancel := context.WithTimeout(req.Context(), 30*time.Second)
 	defer cancel()
 
-	id, err := valuer.NewUUID(mux.Vars(req)["id"])
+	id, err := idFromPath(req)
 	if err != nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7"))
+		render.Error(rw, err)
 		return
 	}
 
@@ -131,9 +131,9 @@ func (handler *handler) PatchRuleByID(rw http.ResponseWriter, req *http.Request)
 	ctx, cancel := context.WithTimeout(req.Context(), 30*time.Second)
 	defer cancel()
 
-	id, err := valuer.NewUUID(mux.Vars(req)["id"])
+	id, err := idFromPath(req)
 	if err != nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7"))
+		render.Error(rw, err)
 		return
 	}
 
@@ -235,9 +235,9 @@ func (handler *handler) GetDowntimeScheduleByID(rw http.ResponseWriter, req *htt
 	ctx, cancel := context.WithTimeout(req.Context(), 30*time.Second)
 	defer cancel()
 
-	id, err := valuer.NewUUID(mux.Vars(req)["id"])
+	id, err := idFromPath(req)
 	if err != nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7"))
+		render.Error(rw, err)
 		return
 	}
 
@@ -278,9 +278,9 @@ func (handler *handler) UpdateDowntimeScheduleByID(rw http.ResponseWriter, req *
 	ctx, cancel := context.WithTimeout(req.Context(), 30*time.Second)
 	defer cancel()
 
-	id, err := valuer.NewUUID(mux.Vars(req)["id"])
+	id, err := idFromPath(req)
 	if err != nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7"))
+		render.Error(rw, err)
 		return
 	}
 
@@ -308,9 +308,9 @@ func (handler *handler) DeleteDowntimeScheduleByID(rw http.ResponseWriter, req *
 	ctx, cancel := context.WithTimeout(req.Context(), 30*time.Second)
 	defer cancel()
 
-	id, err := valuer.NewUUID(mux.Vars(req)["id"])
+	id, err := idFromPath(req)
 	if err != nil {
-		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7"))
+		render.Error(rw, err)
 		return
 	}
 
@@ -321,4 +321,16 @@ func (handler *handler) DeleteDowntimeScheduleByID(rw http.ResponseWriter, req *
 	}
 
 	render.Success(rw, http.StatusNoContent, nil)
+}
+
+// idFromPath reads the {id} PATH segment — a rule's on /v1/o11y/rules/{id}, a
+// schedule's on /v1/o11y/downtime_schedules/{id} — and validates it as a
+// uuid-v7. The read goes through coretypes.Param, the ONE route-value reader, so
+// these handlers name the value they need and not the router that matched it.
+func idFromPath(req *http.Request) (valuer.UUID, error) {
+	id, err := valuer.NewUUID(coretypes.Param(req, "id"))
+	if err != nil {
+		return valuer.UUID{}, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is not a valid uuid-v7")
+	}
+	return id, nil
 }
