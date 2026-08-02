@@ -48,6 +48,7 @@ import (
 
 	"github.com/hanzo-ds/go"
 	"github.com/hanzo-ds/go/lib/driver"
+	"github.com/hanzoai/o11y/pkg/sightings"
 	"github.com/hanzoai/o11y/pkg/telemetrylogs"
 	"github.com/hanzoai/o11y/pkg/zaplogreceiver"
 )
@@ -152,6 +153,24 @@ type Writer struct {
 	db   string
 	org  string
 	now  func() time.Time
+
+	// One sighting Set per DIMENSION table. Not one per row TYPE: log_key and
+	// log_resource_key are both keyRow, and a shared Set would let a key seen
+	// in one table suppress the same key in the other.
+	//
+	// event.log itself has no Set — a log line is a fact, never a repeat.
+	seenAttrs        *sightings.Set[bucketed[attrRow]]
+	seenKeys         *sightings.Set[bucketed[keyRow]]
+	seenResourceKeys *sightings.Set[bucketed[keyRow]]
+	seenResources    *sightings.Set[resourceRow] // already carries its bucket
+}
+
+// bucketed qualifies a sighting by the time window it was seen in, so a
+// dimension row is rewritten once per bucket instead of once per batch (never
+// rewriting it would freeze the tables' recency columns).
+type bucketed[T comparable] struct {
+	bucket int64
+	row    T
 }
 
 // Option configures a Writer.
@@ -174,10 +193,14 @@ func WithNow(now func() time.Time) Option { return func(w *Writer) { w.now = now
 // record written here is immediately searchable.
 func NewWriter(conn datastore.Conn, opts ...Option) *Writer {
 	w := &Writer{
-		conn: conn,
-		db:   telemetrylogs.DBName,
-		org:  "hanzo",
-		now:  func() time.Time { return time.Now().UTC() },
+		conn:             conn,
+		db:               telemetrylogs.DBName,
+		org:              "hanzo",
+		now:              func() time.Time { return time.Now().UTC() },
+		seenAttrs:        sightings.New[bucketed[attrRow]](0),
+		seenKeys:         sightings.New[bucketed[keyRow]](0),
+		seenResourceKeys: sightings.New[bucketed[keyRow]](0),
+		seenResources:    sightings.New[resourceRow](0),
 	}
 	for _, o := range opts {
 		o(w)
@@ -203,31 +226,58 @@ func (w *Writer) WriteLogs(ctx context.Context, batch *zaplogreceiver.LogBatch) 
 		}); err != nil {
 		return fmt.Errorf("datastorelogs: write log: %w", err)
 	}
-	if err := send(ctx, w.conn, fmt.Sprintf(attributeSQLTmpl, w.db, telemetrylogs.LogAttributeTableName), r.attrs,
-		func(b driver.Batch, a attrRow) error {
-			return b.Append(a.org, a.tagKey, a.tagType, a.tagDataType, a.stringValue, a.numberValue, nowMilli)
+	// The four DIMENSION tables below are sightings, ~99.7% of which repeat
+	// batch after batch. Each suppressed set is one INSERT round-trip not taken
+	// on the receiver's connection handler, which calls this writer
+	// synchronously — so this is intake latency, not just database load.
+	bucket := bucketOf(now)
+	if err := sightings.Write(w.seenAttrs, r.attrs,
+		func(a attrRow) bucketed[attrRow] { return bucketed[attrRow]{bucket, a} },
+		func(novel []attrRow) error {
+			return send(ctx, w.conn, fmt.Sprintf(attributeSQLTmpl, w.db, telemetrylogs.LogAttributeTableName), novel,
+				func(b driver.Batch, a attrRow) error {
+					return b.Append(a.org, a.tagKey, a.tagType, a.tagDataType, a.stringValue, a.numberValue, nowMilli)
+				})
 		}); err != nil {
 		return fmt.Errorf("datastorelogs: write log_attribute: %w", err)
 	}
-	if err := send(ctx, w.conn, fmt.Sprintf(keySQLTmpl, w.db, telemetrylogs.LogKeyTableName), r.keys,
-		func(b driver.Batch, k keyRow) error {
-			return b.Append(k.org, k.name, k.datatype)
+	if err := sightings.Write(w.seenKeys, r.keys,
+		func(k keyRow) bucketed[keyRow] { return bucketed[keyRow]{bucket, k} },
+		func(novel []keyRow) error {
+			return send(ctx, w.conn, fmt.Sprintf(keySQLTmpl, w.db, telemetrylogs.LogKeyTableName), novel,
+				func(b driver.Batch, k keyRow) error {
+					return b.Append(k.org, k.name, k.datatype)
+				})
 		}); err != nil {
 		return fmt.Errorf("datastorelogs: write log_key: %w", err)
 	}
-	if err := send(ctx, w.conn, fmt.Sprintf(resourceKeySQLTmpl, w.db, telemetrylogs.LogResourceKeyTableName), r.resourceKeys,
-		func(b driver.Batch, k keyRow) error {
-			return b.Append(k.org, k.name, k.datatype)
+	if err := sightings.Write(w.seenResourceKeys, r.resourceKeys,
+		func(k keyRow) bucketed[keyRow] { return bucketed[keyRow]{bucket, k} },
+		func(novel []keyRow) error {
+			return send(ctx, w.conn, fmt.Sprintf(resourceKeySQLTmpl, w.db, telemetrylogs.LogResourceKeyTableName), novel,
+				func(b driver.Batch, k keyRow) error {
+					return b.Append(k.org, k.name, k.datatype)
+				})
 		}); err != nil {
 		return fmt.Errorf("datastorelogs: write log_resource_key: %w", err)
 	}
-	if err := send(ctx, w.conn, fmt.Sprintf(resourceSQLTmpl, w.db, telemetrylogs.LogResourceTableName), r.resources,
-		func(b driver.Batch, res resourceRow) error {
-			return b.Append(res.org, res.fingerprint, res.labels, res.bucket)
+	if err := sightings.Write(w.seenResources, r.resources,
+		func(res resourceRow) resourceRow { return res }, // bucket is already a field
+		func(novel []resourceRow) error {
+			return send(ctx, w.conn, fmt.Sprintf(resourceSQLTmpl, w.db, telemetrylogs.LogResourceTableName), novel,
+				func(b driver.Batch, res resourceRow) error {
+					return b.Append(res.org, res.fingerprint, res.labels, res.bucket)
+				})
 		}); err != nil {
 		return fmt.Errorf("datastorelogs: write log_resource: %w", err)
 	}
 	return nil
+}
+
+// bucketOf is the resource-bucket floor, the one window every sighting in this
+// package is qualified by — the same 1800s grid event.log_resource stores.
+func bucketOf(t time.Time) int64 {
+	return t.Unix() / resourceBucketSeconds * resourceBucketSeconds
 }
 
 // send is the one batch-INSERT shape: prepare, append every row, send.
