@@ -3,7 +3,6 @@ package coretypes
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/tidwall/gjson"
 )
 
@@ -60,12 +59,13 @@ func OneID(extractor ResourceIDExtractor) ResourceIDsExtractor {
 	}}
 }
 
+// PathParam lifts the route-value read into an extractor, so the authz layer
+// names a resource by its path segment through the SAME reader every handler
+// uses (see routevalue.go). Two spellings of one read would be free to disagree
+// about which router matched.
 func PathParam(name string) ResourceIDExtractor {
 	return ResourceIDExtractor{Phase: PhaseRequest, Fn: func(ec ExtractorContext) (string, error) {
-		if ec.Request == nil {
-			return "", nil
-		}
-		return mux.Vars(ec.Request)[name], nil
+		return Param(ec.Request, name), nil
 	}}
 }
 
