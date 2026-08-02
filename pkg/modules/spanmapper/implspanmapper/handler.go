@@ -10,9 +10,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/spanmapper"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/spantypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -273,11 +273,9 @@ func (h *handler) DeleteMapper(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusNoContent, nil)
 }
 
-// groupIDFromPath extracts and validates the {id} or {groupId} path variable.
+// groupIDFromPath extracts and validates the {groupId} path variable.
 func groupIDFromPath(r *http.Request) (valuer.UUID, error) {
-	vars := mux.Vars(r)
-	raw := vars["groupId"]
-	id, err := valuer.NewUUID(raw)
+	id, err := valuer.NewUUID(coretypes.Param(r, "groupId"))
 	if err != nil {
 		return valuer.UUID{}, errors.Wrapf(err, errors.TypeInvalidInput, spantypes.ErrCodeMappingInvalidInput, "group id is not a valid uuid")
 	}
@@ -286,8 +284,7 @@ func groupIDFromPath(r *http.Request) (valuer.UUID, error) {
 
 // mapperIDFromPath extracts and validates the {mapperId} path variable.
 func mapperIDFromPath(r *http.Request) (valuer.UUID, error) {
-	raw := mux.Vars(r)["mapperId"]
-	id, err := valuer.NewUUID(raw)
+	id, err := valuer.NewUUID(coretypes.Param(r, "mapperId"))
 	if err != nil {
 		return valuer.UUID{}, errors.Wrapf(err, errors.TypeInvalidInput, spantypes.ErrCodeMappingInvalidInput, "mapper id is not a valid uuid")
 	}

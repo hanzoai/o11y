@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/errortrackingtypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -28,11 +28,11 @@ func envelopeFor(project string) []byte {
 }
 
 func ingestReq(project, key string, body []byte) *http.Request {
-	req := httptest.NewRequest(http.MethodPost, "/api/"+project+"/envelope/", bytes.NewReader(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/o11y/api/"+project+"/envelope/", bytes.NewReader(body))
 	if key != "" {
 		req.Header.Set("X-Sentry-Auth", "Sentry sentry_version=7, sentry_key="+key)
 	}
-	return mux.SetURLVars(req, map[string]string{"project_id": project})
+	return coretypes.SetRoute(req, "/v1/o11y/api/{project_id}/envelope/")
 }
 
 func TestIngest_EndToEnd_ValidKeyStoresIssueUnderResolvedOrg(t *testing.T) {
@@ -106,9 +106,9 @@ func TestIngest_LegacyStoreEndpoint(t *testing.T) {
 	key := publicKeyFor(secret, "acme")
 
 	body := []byte(`{"event_id":"1","exception":{"values":[{"type":"KeyError","value":"missing"}]}}`)
-	req := httptest.NewRequest(http.MethodPost, "/api/acme/store/", bytes.NewReader(body))
+	req := httptest.NewRequest(http.MethodPost, "/v1/o11y/api/acme/store/", bytes.NewReader(body))
 	req.Header.Set("X-Sentry-Auth", "Sentry sentry_key="+key)
-	req = mux.SetURLVars(req, map[string]string{"project_id": "acme"})
+	req = coretypes.SetRoute(req, "/v1/o11y/api/{project_id}/store/")
 	w := httptest.NewRecorder()
 	h.StoreIngest(w, req)
 	require.Equal(t, http.StatusOK, w.Code)

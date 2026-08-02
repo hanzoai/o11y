@@ -55,7 +55,7 @@ func (f *TraceTimeRangeFinder) GetTraceTimeRangeMulti(ctx context.Context, trace
 			toUnixTimestamp64Nano(max(end))
 		FROM %s.%s
 		WHERE trace_id IN (%s)
-	`, DBName, TraceSummaryTableName, strings.Join(placeholders, ", "))
+	`, DBName, TraceTableName, strings.Join(placeholders, ", "))
 
 	row := f.telemetryStore.Datastore().QueryRow(ctx, query, args...)
 

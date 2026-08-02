@@ -4,10 +4,10 @@ import {
 } from 'api/generated/services/o11y.schemas';
 
 // API Endpoints
-export const AUTH_DOMAINS_LIST_ENDPOINT = '*/api/v1/domains';
-export const AUTH_DOMAINS_CREATE_ENDPOINT = '*/api/v1/domains';
-export const AUTH_DOMAINS_UPDATE_ENDPOINT = '*/api/v1/domains/:id';
-export const AUTH_DOMAINS_DELETE_ENDPOINT = '*/api/v1/domains/:id';
+export const AUTH_DOMAINS_LIST_ENDPOINT = '*/v1/o11y/domains';
+export const AUTH_DOMAINS_CREATE_ENDPOINT = '*/v1/o11y/domains';
+export const AUTH_DOMAINS_UPDATE_ENDPOINT = '*/v1/o11y/domains/:id';
+export const AUTH_DOMAINS_DELETE_ENDPOINT = '*/v1/o11y/domains/:id';
 
 // Mock Auth Domain with Google Auth
 export const mockGoogleAuthDomain: AuthtypesGettableAuthDomainDTO = {

@@ -162,7 +162,7 @@ jest.mock(
 const setupServer = (capturedPayloads: QueryRangePayloadV5[]): void => {
 	server.use(
 		rest.post(
-			`${ENVIRONMENT.baseURL}/api/v5/query_range`,
+			`${ENVIRONMENT.baseURL}/v1/o11y/query_range`,
 			async (req, res, ctx) => {
 				const payload = await req.json();
 				capturedPayloads.push(payload);
@@ -170,7 +170,7 @@ const setupServer = (capturedPayloads: QueryRangePayloadV5[]): void => {
 			},
 		),
 		// Add handler for the fields endpoint that's causing warnings
-		rest.get(`${ENVIRONMENT.baseURL}/api/v1/fields/keys`, async (req, res, ctx) =>
+		rest.get(`${ENVIRONMENT.baseURL}/v1/o11y/fields/keys`, async (req, res, ctx) =>
 			res(ctx.status(200), ctx.json([])),
 		),
 	);

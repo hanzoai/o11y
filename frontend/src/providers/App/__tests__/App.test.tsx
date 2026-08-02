@@ -12,9 +12,9 @@ import { AUTHZ_CHECK_URL, authzMockResponse } from 'tests/authz-test-utils';
 
 import { AppProvider, useAppContext } from '../App';
 
-const MY_USER_URL = 'http://localhost/api/v2/users/me';
-const MY_ORG_URL = 'http://localhost/api/v2/orgs/me';
-const GLOBAL_CONFIG_URL = 'http://localhost/api/v1/global/config';
+const MY_USER_URL = 'http://localhost/v1/o11y/users/me';
+const MY_ORG_URL = 'http://localhost/v1/o11y/orgs/me';
+const GLOBAL_CONFIG_URL = 'http://localhost/v1/o11y/global/config';
 
 jest.mock('constants/env', () => ({
 	ENVIRONMENT: { baseURL: 'http://localhost', wsURL: '' },
@@ -212,7 +212,7 @@ describe('AppProvider user and org data from v2 APIs', () => {
 		setLocalStorageApi(LOCALSTORAGE.IS_LOGGED_IN, 'true');
 	});
 
-	it('populates user fields from GET /api/v2/users/me', async () => {
+	it('populates user fields from GET /v1/o11y/users/me', async () => {
 		server.use(
 			rest.get(MY_USER_URL, (_, res, ctx) =>
 				res(

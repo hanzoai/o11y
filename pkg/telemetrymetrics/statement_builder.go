@@ -298,7 +298,7 @@ func (b *MetricQueryStatementBuilder) buildReducedTimeSeriesCTE(
 		}
 	}
 
-	sb.From(fmt.Sprintf("%s.%s", DBName, TimeseriesV4ReducedLocalTableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, SeriesReducedLocalTableName))
 	sb.Select("fingerprint")
 	for _, g := range query.GroupBy {
 		col, err := b.fm.ColumnExpressionFor(ctx, start, end, &g.TelemetryFieldKey, keys)
@@ -512,7 +512,7 @@ func (b *MetricQueryStatementBuilder) buildTimeSeriesCTE(
 
 	// the buffer holds both raw rows and the reduced catalog rows; the raw read
 	// only wants the original series
-	if tsTable == TimeseriesV4BufferLocalTableName {
+	if tsTable == SeriesBufferLocalTableName {
 		sb.Where(sb.EQ("is_reduced", false))
 	}
 

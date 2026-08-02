@@ -109,22 +109,13 @@ describe('ContextLogRenderer', () => {
 
 	beforeEach(() => {
 		server.use(
-			rest.get(`${ENVIRONMENT.baseURL}/api/v1/logs`, (req, res, ctx) =>
+			rest.get(`${ENVIRONMENT.baseURL}/v1/o11y/logs`, (req, res, ctx) =>
 				res(ctx.status(200), ctx.json({ logs: [mockLog] })),
 			),
 		);
 		server.use(
 			rest.post(
-				`${ENVIRONMENT.baseURL}/api/v3/query_range`,
-				async (req, res, ctx) => {
-					capturedQueryRangePayload = await req.json();
-					return res(ctx.status(200), ctx.json(mockQueryRangeResponse));
-				},
-			),
-		);
-		server.use(
-			rest.post(
-				`${ENVIRONMENT.baseURL}/api/v5/query_range`,
+				`${ENVIRONMENT.baseURL}/v1/o11y/query_range`,
 				async (req, res, ctx) => {
 					capturedQueryRangePayload = await req.json();
 					return res(ctx.status(200), ctx.json(mockQueryRangeResponse));
@@ -133,7 +124,7 @@ describe('ContextLogRenderer', () => {
 		);
 		// Add handler for logs API that returns the expected message
 		server.use(
-			rest.get(`${ENVIRONMENT.baseURL}/api/v1/logs`, (req, res, ctx) => {
+			rest.get(`${ENVIRONMENT.baseURL}/v1/o11y/logs`, (req, res, ctx) => {
 				const url = new URL(req.url);
 				if (url.searchParams.has('offset')) {
 					// Return logs with "Failed to authenticate" message for pagination

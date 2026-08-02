@@ -10,9 +10,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/preference"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/preferencetypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -52,8 +52,8 @@ func (handler *handler) GetByOrg(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nameString, ok := mux.Vars(r)["name"]
-	if !ok {
+	nameString := coretypes.Param(r, "name")
+	if nameString == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "name is required"))
 		return
 	}
@@ -83,8 +83,8 @@ func (handler *handler) UpdateByOrg(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nameString, ok := mux.Vars(r)["name"]
-	if !ok {
+	nameString := coretypes.Param(r, "name")
+	if nameString == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "name is required"))
 		return
 	}
@@ -140,8 +140,8 @@ func (handler *handler) GetByUser(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nameString, ok := mux.Vars(r)["name"]
-	if !ok {
+	nameString := coretypes.Param(r, "name")
+	if nameString == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "name is required"))
 		return
 	}
@@ -171,8 +171,8 @@ func (handler *handler) UpdateByUser(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nameString, ok := mux.Vars(r)["name"]
-	if !ok {
+	nameString := coretypes.Param(r, "name")
+	if nameString == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "name is required"))
 		return
 	}

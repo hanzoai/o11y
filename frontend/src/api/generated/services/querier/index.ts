@@ -30,7 +30,7 @@ export const queryRangeV5 = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<QueryRangeV5200>({
-		url: `/api/v5/query_range`,
+		url: `/v1/o11y/query_range`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: querybuildertypesv5QueryRangeRequestDTO,
@@ -113,7 +113,7 @@ export const replaceVariables = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ReplaceVariables200>({
-		url: `/api/v5/substitute_vars`,
+		url: `/v1/o11y/substitute_vars`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: querybuildertypesv5QueryRangeRequestDTO,

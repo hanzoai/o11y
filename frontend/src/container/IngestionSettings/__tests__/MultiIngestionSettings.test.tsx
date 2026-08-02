@@ -100,10 +100,10 @@ describe('MultiIngestionSettings Page', () => {
 		};
 
 		server.use(
-			rest.get('*/api/v1/global/config*', (_req, res, ctx) =>
+			rest.get('*/v1/o11y/global/config*', (_req, res, ctx) =>
 				res(ctx.status(200), ctx.json(GLOBAL_CONFIG_RESPONSE)),
 			),
-			rest.get('*/api/v2/gateway/ingestion_keys*', (_req, res, ctx) =>
+			rest.get('*/v1/o11y/gateway/ingestion_keys*', (_req, res, ctx) =>
 				res(ctx.status(200), ctx.json(response)),
 			),
 		);
@@ -181,10 +181,10 @@ describe('MultiIngestionSettings Page', () => {
 		};
 
 		server.use(
-			rest.get('*/api/v1/global/config*', (_req, res, ctx) =>
+			rest.get('*/v1/o11y/global/config*', (_req, res, ctx) =>
 				res(ctx.status(200), ctx.json(GLOBAL_CONFIG_RESPONSE)),
 			),
-			rest.get('*/api/v2/gateway/ingestion_keys*', (_req, res, ctx) =>
+			rest.get('*/v1/o11y/gateway/ingestion_keys*', (_req, res, ctx) =>
 				res(ctx.status(200), ctx.json(response)),
 			),
 		);
@@ -262,10 +262,10 @@ describe('MultiIngestionSettings Page', () => {
 		};
 
 		server.use(
-			rest.get('*/api/v1/global/config*', (_req, res, ctx) =>
+			rest.get('*/v1/o11y/global/config*', (_req, res, ctx) =>
 				res(ctx.status(200), ctx.json(GLOBAL_CONFIG_RESPONSE)),
 			),
-			rest.get('*/api/v2/gateway/ingestion_keys*', (_req, res, ctx) =>
+			rest.get('*/v1/o11y/gateway/ingestion_keys*', (_req, res, ctx) =>
 				res(ctx.status(200), ctx.json(response)),
 			),
 		);
@@ -360,17 +360,17 @@ describe('MultiIngestionSettings Page', () => {
 		const searchHandler = jest.fn();
 
 		server.use(
-			rest.get('*/api/v1/global/config*', (_req, res, ctx) =>
+			rest.get('*/v1/o11y/global/config*', (_req, res, ctx) =>
 				res(ctx.status(200), ctx.json(GLOBAL_CONFIG_RESPONSE)),
 			),
-			rest.get('*/api/v2/gateway/ingestion_keys', (req, res, ctx) => {
+			rest.get('*/v1/o11y/gateway/ingestion_keys', (req, res, ctx) => {
 				if (req.url.pathname.endsWith('/search')) {
 					return undefined;
 				}
 				getHandler();
 				return res(ctx.status(200), ctx.json(getResponse));
 			}),
-			rest.get('*/api/v2/gateway/ingestion_keys/search', (_req, res, ctx) => {
+			rest.get('*/v1/o11y/gateway/ingestion_keys/search', (_req, res, ctx) => {
 				searchHandler();
 				return res(ctx.status(200), ctx.json(searchResponse));
 			}),

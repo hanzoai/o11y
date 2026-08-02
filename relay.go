@@ -1,0 +1,199 @@
+package o11y
+
+// THE SEAM. One function, one place: every typed op in this package reaches the
+// o11y runtime through relay and through nothing else.
+//
+// It arrived here by collapse. The conversion grew face by face, and each face
+// carried its own copy of this function — relay (telemetry.go), relayAt
+// (logs.go), relayO11y (identity.go), relayAPM (apm.go), send (access.go) —
+// five bodies that differed only in which prefix constant they concatenated and
+// whether they took query parameters. Alongside them sat NINE names for one
+// value: identityPrefix, infraPrefix, integrationsPrefix, metricsRoot,
+// apmPrefix, accessPrefix, rulesAlertsPrefix and o11yRoot were all the string
+// "/v1/o11y", and prefix was "/v1/sentry". A name per place instead of a name
+// per value — so a change to the seam had five sites to find, and a change to
+// the root had eight.
+//
+// The fix is the obvious one once seen: the path a caller reaches is a VALUE,
+// so ops pass the whole public path (o11yRoot+"/logs") and relay concatenates
+// nothing. Which face an op belongs to is a fact about the file it lives in,
+// not a parameter of the transport.
+//
+// What relay is: it hands a typed op's call to the handler SetHandler
+// registered — the same value the delegation wildcard forwards to — so the
+// request runs the whole chain it always ran, in order. The auth middleware
+// resolves the same identity, the SAME ViewAccess/EditAccess/AdminAccess gate
+// the route has always had refuses the same callers, the audit record is
+// written where it always was, and the bytes it answers with are the bytes the
+// runtime wrote. There is no policy here: no tenant is resolved, no role is
+// checked, nothing is scoped. Those all happen where they already do, one layer
+// in. That is what keeps a typed op a NAMING of the wire rather than a second
+// implementation of it.
+//
+// Identity is PROPAGATED, never minted: the gateway's assertion about the
+// caller travels on as the same headers it arrived on (zip.CallerOf reads
+// exactly the set the call plane forwards). A context with no request behind it
+// — a command, an agent call — carries no assertion, so the runtime's gate
+// refuses it, which is the honest answer rather than an identity invented at
+// this hop.
+//
+// A non-2xx becomes an error carrying the runtime's own status and reason, so
+// the status a caller sees is the status the runtime chose.
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"strconv"
+	"strings"
+
+	"github.com/zap-proto/zip"
+)
+
+// The two public roots this package answers on, each spelled ONCE.
+//
+//   - o11yRoot is the observability face: metrics, traces, logs, dashboards,
+//     alerts, identity, access, infra, LLM observability — everything the
+//     console calls.
+//   - sentryRoot is the error-tracking face's own contract, kept separate
+//     because a Sentry SDK reaches it with a DSN key rather than a session.
+const (
+	o11yRoot   = "/v1/o11y"
+	sentryRoot = "/v1/sentry"
+)
+
+// relay sends one typed op's call to the runtime at the FULL public path and
+// decodes the answer into the op's Out. Pass out == nil for the operations
+// whose answer is a 204 with no body.
+func relay(ctx context.Context, method, path string, params url.Values, body, out any) error {
+	h := getHandler()
+	if h == nil {
+		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
+	}
+
+	target := path
+	if q := params.Encode(); q != "" {
+		target += "?" + q
+	}
+
+	payload := io.Reader(http.NoBody)
+	if body != nil {
+		b, err := json.Marshal(body)
+		if err != nil {
+			return zip.ErrBadRequest(err.Error())
+		}
+		payload = bytes.NewReader(b)
+	}
+	req, err := http.NewRequestWithContext(ctx, method, target, payload)
+	if err != nil {
+		return zip.ErrBadRequest(err.Error())
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	caller := zip.CallerOf(ctx)
+	for header, value := range map[string]string{
+		zip.HeaderOrg:       caller.Org,
+		zip.HeaderProject:   caller.Project,
+		zip.HeaderUser:      caller.User,
+		zip.HeaderUserName:  caller.Name,
+		zip.HeaderUserEmail: caller.Email,
+		zip.HeaderUserOwner: caller.Owner,
+		zip.HeaderRequestID: caller.RequestID,
+	} {
+		if value != "" {
+			req.Header.Set(header, value)
+		}
+	}
+	if caller.Admin {
+		req.Header.Set(zip.HeaderUserAdmin, "true")
+	}
+	if caller.OrgAdmin {
+		req.Header.Set(zip.HeaderUserOrgAdmin, "true")
+	}
+
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, req)
+
+	if rec.Code < http.StatusOK || rec.Code >= http.StatusMultipleChoices {
+		code, reason := refusal(rec.Body.Bytes())
+		return &zip.HTTPError{Status: rec.Code, Code: code, Msg: reason}
+	}
+	if out == nil {
+		return nil
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), out); err != nil {
+		return zip.ErrInternal("cannot read the runtime's answer: " + err.Error())
+	}
+	return nil
+}
+
+// query builds the parameters an op sends from name/value pairs, dropping the
+// ones the caller left unset so an absent input stays absent instead of arriving
+// as an empty string — or as a zero page cap, which these faces have always read
+// as "no cap given". It is the ONE place a typed input is rendered onto the wire.
+func query(pairs ...any) url.Values {
+	params := url.Values{}
+	for i := 0; i+1 < len(pairs); i += 2 {
+		name, _ := pairs[i].(string)
+		switch value := pairs[i+1].(type) {
+		case string:
+			if value != "" {
+				params.Set(name, value)
+			}
+		case int:
+			if value != 0 {
+				params.Set(name, strconv.Itoa(value))
+			}
+		case bool:
+			if value {
+				params.Set(name, "true")
+			}
+		}
+	}
+	return params
+}
+
+// nanos renders a nanosecond epoch for the wire, or nothing when unset — the
+// runtime reads a missing or non-positive value as "use the default window", so
+// an absent input stays absent. It feeds query, which stays the ONE place
+// inputs are rendered onto the wire.
+func nanos(v int64) string {
+	if v <= 0 {
+		return ""
+	}
+	return strconv.FormatInt(v, 10)
+}
+
+// refusal reads the runtime's refusal for its code and its reason. Both of the
+// shapes these faces answer with are handled — the runtime's own {error:{code,
+// message}} and the gate's {msg} — and anything else falls back to the body it
+// sent, so a reason is never invented and never lost.
+func refusal(body []byte) (code, reason string) {
+	var refused struct {
+		Error struct {
+			Code    string `json:"code"`
+			Message string `json:"message"`
+		} `json:"error"`
+		Msg string `json:"msg"`
+	}
+	if err := json.Unmarshal(body, &refused); err == nil {
+		if refused.Error.Message != "" {
+			return refused.Error.Code, refused.Error.Message
+		}
+		if refused.Msg != "" {
+			return "", refused.Msg
+		}
+	}
+	return "", strings.TrimSpace(string(body))
+}
+
+// op names an operation for the document. Several routes carried an explicit
+// OpenAPI operation id on the runtime's own handler definitions; those ids are
+// preserved verbatim so an operation's name survives the move into the composed
+// document.
+func op(id string) zip.OpOption { return zip.WithOperationID(id) }

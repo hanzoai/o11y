@@ -48,7 +48,7 @@ export const listSpanMapperGroups = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListSpanMapperGroups200>({
-		url: `/api/v1/span_mapper_groups`,
+		url: `/v1/o11y/span_mapper_groups`,
 		method: 'GET',
 		params,
 		signal,
@@ -58,7 +58,7 @@ export const listSpanMapperGroups = (
 export const getListSpanMapperGroupsQueryKey = (
 	params?: ListSpanMapperGroupsParams,
 ) => {
-	return [`/api/v1/span_mapper_groups`, ...(params ? [params] : [])] as const;
+	return [`/v1/o11y/span_mapper_groups`, ...(params ? [params] : [])] as const;
 };
 
 export const getListSpanMapperGroupsQueryOptions = <
@@ -146,7 +146,7 @@ export const createSpanMapperGroup = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateSpanMapperGroup201>({
-		url: `/api/v1/span_mapper_groups`,
+		url: `/v1/o11y/span_mapper_groups`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: spantypesPostableSpanMapperGroupDTO,
@@ -230,7 +230,7 @@ export const deleteSpanMapperGroup = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/span_mapper_groups/${groupId}`,
+		url: `/v1/o11y/span_mapper_groups/${groupId}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -311,7 +311,7 @@ export const updateSpanMapperGroup = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/span_mapper_groups/${groupId}`,
+		url: `/v1/o11y/span_mapper_groups/${groupId}`,
 		method: 'PATCH',
 		headers: { 'Content-Type': 'application/json' },
 		data: spantypesUpdatableSpanMapperGroupDTO,
@@ -410,7 +410,7 @@ export const listSpanMappers = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListSpanMappers200>({
-		url: `/api/v1/span_mapper_groups/${groupId}/span_mappers`,
+		url: `/v1/o11y/span_mapper_groups/${groupId}/span_mappers`,
 		method: 'GET',
 		signal,
 	});
@@ -419,7 +419,7 @@ export const listSpanMappers = (
 export const getListSpanMappersQueryKey = ({
 	groupId,
 }: ListSpanMappersPathParameters) => {
-	return [`/api/v1/span_mapper_groups/${groupId}/span_mappers`] as const;
+	return [`/v1/o11y/span_mapper_groups/${groupId}/span_mappers`] as const;
 };
 
 export const getListSpanMappersQueryOptions = <
@@ -513,7 +513,7 @@ export const createSpanMapper = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateSpanMapper201>({
-		url: `/api/v1/span_mapper_groups/${groupId}/span_mappers`,
+		url: `/v1/o11y/span_mapper_groups/${groupId}/span_mappers`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: spantypesPostableSpanMapperDTO,
@@ -611,7 +611,7 @@ export const deleteSpanMapper = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/span_mapper_groups/${groupId}/span_mappers/${mapperId}`,
+		url: `/v1/o11y/span_mapper_groups/${groupId}/span_mappers/${mapperId}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -691,7 +691,7 @@ export const updateSpanMapper = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/span_mapper_groups/${groupId}/span_mappers/${mapperId}`,
+		url: `/v1/o11y/span_mapper_groups/${groupId}/span_mappers/${mapperId}`,
 		method: 'PATCH',
 		headers: { 'Content-Type': 'application/json' },
 		data: spantypesUpdatableSpanMapperDTO,

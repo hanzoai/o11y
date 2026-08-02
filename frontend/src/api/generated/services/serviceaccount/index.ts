@@ -52,14 +52,14 @@ import type { ErrorType, BodyType } from '../../../generatedAPIInstance';
  */
 export const listServiceAccounts = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<ListServiceAccounts200>({
-		url: `/api/v1/service_accounts`,
+		url: `/v1/o11y/service_accounts`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getListServiceAccountsQueryKey = () => {
-	return [`/api/v1/service_accounts`] as const;
+	return [`/v1/o11y/service_accounts`] as const;
 };
 
 export const getListServiceAccountsQueryOptions = <
@@ -139,7 +139,7 @@ export const createServiceAccount = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateServiceAccount201>({
-		url: `/api/v1/service_accounts`,
+		url: `/v1/o11y/service_accounts`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: serviceaccounttypesPostableServiceAccountDTO,
@@ -223,7 +223,7 @@ export const deleteServiceAccount = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<string>({
-		url: `/api/v1/service_accounts/${id}`,
+		url: `/v1/o11y/service_accounts/${id}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -303,7 +303,7 @@ export const getServiceAccount = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetServiceAccount200>({
-		url: `/api/v1/service_accounts/${id}`,
+		url: `/v1/o11y/service_accounts/${id}`,
 		method: 'GET',
 		signal,
 	});
@@ -312,7 +312,7 @@ export const getServiceAccount = (
 export const getGetServiceAccountQueryKey = ({
 	id,
 }: GetServiceAccountPathParameters) => {
-	return [`/api/v1/service_accounts/${id}`] as const;
+	return [`/v1/o11y/service_accounts/${id}`] as const;
 };
 
 export const getGetServiceAccountQueryOptions = <
@@ -406,7 +406,7 @@ export const updateServiceAccount = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<string>({
-		url: `/api/v1/service_accounts/${id}`,
+		url: `/v1/o11y/service_accounts/${id}`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: serviceaccounttypesPostableServiceAccountDTO,
@@ -505,7 +505,7 @@ export const listServiceAccountKeys = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListServiceAccountKeys200>({
-		url: `/api/v1/service_accounts/${id}/keys`,
+		url: `/v1/o11y/service_accounts/${id}/keys`,
 		method: 'GET',
 		signal,
 	});
@@ -514,7 +514,7 @@ export const listServiceAccountKeys = (
 export const getListServiceAccountKeysQueryKey = ({
 	id,
 }: ListServiceAccountKeysPathParameters) => {
-	return [`/api/v1/service_accounts/${id}/keys`] as const;
+	return [`/v1/o11y/service_accounts/${id}/keys`] as const;
 };
 
 export const getListServiceAccountKeysQueryOptions = <
@@ -609,7 +609,7 @@ export const createServiceAccountKey = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateServiceAccountKey201>({
-		url: `/api/v1/service_accounts/${id}/keys`,
+		url: `/v1/o11y/service_accounts/${id}/keys`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: serviceaccounttypesPostableFactorAPIKeyDTO,
@@ -708,7 +708,7 @@ export const revokeServiceAccountKey = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<string>({
-		url: `/api/v1/service_accounts/${id}/keys/${fid}`,
+		url: `/v1/o11y/service_accounts/${id}/keys/${fid}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -789,7 +789,7 @@ export const updateServiceAccountKey = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<string>({
-		url: `/api/v1/service_accounts/${id}/keys/${fid}`,
+		url: `/v1/o11y/service_accounts/${id}/keys/${fid}`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: serviceaccounttypesUpdatableFactorAPIKeyDTO,
@@ -888,7 +888,7 @@ export const getServiceAccountRoles = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetServiceAccountRoles200>({
-		url: `/api/v1/service_accounts/${id}/roles`,
+		url: `/v1/o11y/service_accounts/${id}/roles`,
 		method: 'GET',
 		signal,
 	});
@@ -897,7 +897,7 @@ export const getServiceAccountRoles = (
 export const getGetServiceAccountRolesQueryKey = ({
 	id,
 }: GetServiceAccountRolesPathParameters) => {
-	return [`/api/v1/service_accounts/${id}/roles`] as const;
+	return [`/v1/o11y/service_accounts/${id}/roles`] as const;
 };
 
 export const getGetServiceAccountRolesQueryOptions = <
@@ -992,7 +992,7 @@ export const createServiceAccountRole = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateServiceAccountRole201>({
-		url: `/api/v1/service_accounts/${id}/roles`,
+		url: `/v1/o11y/service_accounts/${id}/roles`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: serviceaccounttypesPostableServiceAccountRoleDTO,
@@ -1091,7 +1091,7 @@ export const deleteServiceAccountRole = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<string>({
-		url: `/api/v1/service_accounts/${id}/roles/${rid}`,
+		url: `/v1/o11y/service_accounts/${id}/roles/${rid}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -1168,14 +1168,14 @@ export const useDeleteServiceAccountRole = <
  */
 export const getMyServiceAccount = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetMyServiceAccount200>({
-		url: `/api/v1/service_accounts/me`,
+		url: `/v1/o11y/service_accounts/me`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetMyServiceAccountQueryKey = () => {
-	return [`/api/v1/service_accounts/me`] as const;
+	return [`/v1/o11y/service_accounts/me`] as const;
 };
 
 export const getGetMyServiceAccountQueryOptions = <
@@ -1255,7 +1255,7 @@ export const updateMyServiceAccount = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<string>({
-		url: `/api/v1/service_accounts/me`,
+		url: `/v1/o11y/service_accounts/me`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: serviceaccounttypesPostableServiceAccountDTO,

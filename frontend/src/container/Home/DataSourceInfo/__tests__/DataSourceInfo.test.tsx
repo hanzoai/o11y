@@ -4,7 +4,7 @@ import { render, screen } from 'tests/test-utils';
 
 import DataSourceInfo from '../DataSourceInfo';
 
-const ZEUS_HOSTS_ENDPOINT = '*/api/v2/zeus/hosts';
+const ZEUS_HOSTS_ENDPOINT = '*/v1/o11y/zeus/hosts';
 
 const mockHostsResponse: GetHosts200 = {
 	status: 'success',

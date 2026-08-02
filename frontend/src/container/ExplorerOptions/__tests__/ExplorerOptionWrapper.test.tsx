@@ -45,7 +45,7 @@ const TEST_DASHBOARD_DESCRIPTION = 'Test Description';
 const TEST_TIMESTAMP = '2023-01-01T00:00:00Z';
 const TEST_DASHBOARD_TITLE_2 = 'Test Dashboard for Export';
 const NEW_DASHBOARD_ID = 'new-dashboard-id';
-const DASHBOARDS_API_ENDPOINT = '*/api/v1/dashboards';
+const DASHBOARDS_API_ENDPOINT = '*/v1/o11y/dashboards';
 
 // Use the existing mock query from the codebase
 const mockQuery: Query = {

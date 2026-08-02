@@ -38,14 +38,14 @@ import type { ErrorType, BodyType } from '../../../generatedAPIInstance';
  */
 export const getAllRoutePolicies = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetAllRoutePolicies200>({
-		url: `/api/v1/route_policies`,
+		url: `/v1/o11y/route_policies`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetAllRoutePoliciesQueryKey = () => {
-	return [`/api/v1/route_policies`] as const;
+	return [`/v1/o11y/route_policies`] as const;
 };
 
 export const getGetAllRoutePoliciesQueryOptions = <
@@ -125,7 +125,7 @@ export const createRoutePolicy = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateRoutePolicy201>({
-		url: `/api/v1/route_policies`,
+		url: `/v1/o11y/route_policies`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: alertmanagertypesPostableRoutePolicyDTO,
@@ -208,7 +208,7 @@ export const deleteRoutePolicyByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/route_policies/${id}`,
+		url: `/v1/o11y/route_policies/${id}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -288,7 +288,7 @@ export const getRoutePolicyByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetRoutePolicyByID200>({
-		url: `/api/v1/route_policies/${id}`,
+		url: `/v1/o11y/route_policies/${id}`,
 		method: 'GET',
 		signal,
 	});
@@ -297,7 +297,7 @@ export const getRoutePolicyByID = (
 export const getGetRoutePolicyByIDQueryKey = ({
 	id,
 }: GetRoutePolicyByIDPathParameters) => {
-	return [`/api/v1/route_policies/${id}`] as const;
+	return [`/v1/o11y/route_policies/${id}`] as const;
 };
 
 export const getGetRoutePolicyByIDQueryOptions = <
@@ -391,7 +391,7 @@ export const updateRoutePolicy = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<UpdateRoutePolicy200>({
-		url: `/api/v1/route_policies/${id}`,
+		url: `/v1/o11y/route_policies/${id}`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: alertmanagertypesPostableRoutePolicyDTO,

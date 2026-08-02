@@ -413,14 +413,17 @@ var (
 		{Name: SpanIsRemoteColumn, FieldContext: telemetrytypes.FieldContextSpan},
 	}
 
-	// ContextualSpanColumns lists the typed attribute and resource columns
-	// selected raw (rather than via ColumnExpressionFor) so that consume.go
-	// can merge them into unified "attributes" and "resource" maps.
+	// ContextualSpanColumns lists the attribute and resource maps selected raw
+	// (rather than via ColumnExpressionFor) so that consume.go can merge them into
+	// unified "attributes" and "resource" maps. On the envelope there is ONE
+	// attributes map (String-valued) and no typed number/bool maps, so those two
+	// project as empty typed maps; the resource map is rebuilt from the promoted
+	// service/host columns. Aliases keep the consumer's column names stable.
 	ContextualSpanColumns = []string{
-		SpanAttributesStringColumn,
-		SpanAttributesNumberColumn,
-		SpanAttributesBoolColumn,
-		SpanResourcesStringColumn,
+		"attributes AS attributes_string",
+		"CAST(map() AS Map(String, Float64)) AS attributes_number",
+		"CAST(map() AS Map(String, Bool)) AS attributes_bool",
+		"map('service.name', toString(service), 'host', toString(host)) AS resources_string",
 	}
 
 	DefaultFields = map[string]telemetrytypes.TelemetryFieldKey{

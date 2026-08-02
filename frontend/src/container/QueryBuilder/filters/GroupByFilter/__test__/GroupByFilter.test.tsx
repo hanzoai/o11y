@@ -10,7 +10,7 @@ import { DataSource } from '../../../../../types/common/queryBuilder';
 import { GroupByFilter } from '../GroupByFilter';
 
 const BASE_URL = ENVIRONMENT.baseURL;
-const attributeKeysURL = `${BASE_URL}/api/v3/autocomplete/attribute_keys`;
+const attributeKeysURL = `${BASE_URL}/v1/o11y/autocomplete/attribute_keys`;
 
 function setup(
 	overrides?: Partial<React.ComponentProps<typeof GroupByFilter>>,

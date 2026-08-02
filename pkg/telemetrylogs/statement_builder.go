@@ -8,6 +8,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
@@ -18,7 +19,6 @@ import (
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 type logQueryStatementBuilder struct {
@@ -55,7 +55,7 @@ func NewLogQueryStatementBuilder(
 	resourceFilterResolver := telemetryresourcefilter.NewResolver[qbtypes.LogAggregation](
 		settings,
 		DBName,
-		LogsResourceV2TableName,
+		LogResourceTableName,
 		telemetrytypes.SignalLogs,
 		telemetrytypes.SourceUnspecified,
 		metadataStore,
@@ -290,24 +290,28 @@ func (b *logQueryStatementBuilder) buildListQuery(
 		cteArgs = append(cteArgs, args)
 	}
 
-	// Select timestamp and id by default
-	sb.Select(LogsV2TimestampColumn)
+	// Select timestamp and id by default. The envelope carries time as DateTime64,
+	// so the historic UInt64-nanosecond `timestamp` the consumer expects is
+	// reconstructed with toUnixTimestamp64Nano; every other default column is an
+	// envelope column or an expression over the one attributes map, aliased back to
+	// the name the consumer reads.
+	sb.Select("toUnixTimestamp64Nano(time) AS timestamp")
 	sb.SelectMore(LogsV2IDColumn)
 	if len(query.SelectFields) == 0 {
 		// Select all default columns
 		sb.SelectMore(LogsV2TraceIDColumn)
 		sb.SelectMore(LogsV2SpanIDColumn)
-		sb.SelectMore(LogsV2TraceFlagsColumn)
+		sb.SelectMore("toUInt32OrZero(attributes['trace_flags']) AS trace_flags")
 		sb.SelectMore(LogsV2SeverityTextColumn)
 		sb.SelectMore(LogsV2SeverityNumberColumn)
-		sb.SelectMore(LogsV2ScopeNameColumn)
-		sb.SelectMore(LogsV2ScopeVersionColumn)
+		sb.SelectMore("attributes['scope.name'] AS scope_name")
+		sb.SelectMore("attributes['scope.version'] AS scope_version")
 		sb.SelectMore(bodyAliasExpression(bodyJSONEnabled))
-		sb.SelectMore(LogsV2AttributesStringColumn)
-		sb.SelectMore(LogsV2AttributesNumberColumn)
-		sb.SelectMore(LogsV2AttributesBoolColumn)
-		sb.SelectMore(LogsV2ResourcesStringColumn)
-		sb.SelectMore(LogsV2ScopeStringColumn)
+		sb.SelectMore("attributes AS attributes_string")
+		sb.SelectMore("CAST(map() AS Map(String, Float64)) AS attributes_number")
+		sb.SelectMore("CAST(map() AS Map(String, Bool)) AS attributes_bool")
+		sb.SelectMore("map('service.name', toString(service), 'host', toString(host)) AS resources_string")
+		sb.SelectMore("CAST(map() AS Map(String, String)) AS scope_string")
 
 	} else {
 		// Select specified columns
@@ -325,7 +329,7 @@ func (b *logQueryStatementBuilder) buildListQuery(
 		}
 	}
 
-	sb.From(fmt.Sprintf("%s.%s", DBName, LogsV2TableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, LogTableName))
 	// Add filter conditions
 	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
 
@@ -395,7 +399,7 @@ func (b *logQueryStatementBuilder) buildTimeSeriesQuery(
 	}
 
 	sb.SelectMore(fmt.Sprintf(
-		"toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL %d SECOND) AS ts",
+		"toStartOfInterval(time, INTERVAL %d SECOND) AS ts",
 		int64(query.StepInterval.Seconds()),
 	))
 
@@ -431,7 +435,7 @@ func (b *logQueryStatementBuilder) buildTimeSeriesQuery(
 	}
 
 	// Add FROM clause
-	sb.From(fmt.Sprintf("%s.%s", DBName, LogsV2TableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, LogTableName))
 
 	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
 
@@ -589,7 +593,7 @@ func (b *logQueryStatementBuilder) buildScalarQuery(
 		}
 	}
 
-	sb.From(fmt.Sprintf("%s.%s", DBName, LogsV2TableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, LogTableName))
 
 	// Add filter conditions
 	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
@@ -697,11 +701,15 @@ func (b *logQueryStatementBuilder) addFilterCondition(
 		endBucket = end / querybuilder.NsToSeconds
 	}
 
+	// The range predicate is on the bare `time` column, not on a function of it:
+	// time is DateTime64(9) and the bound is its nanosecond tick count, so the
+	// comparison is exact AND stays a sort-key/minmax prefix seek. Wrapping time
+	// in toUnixTimestamp64Nano would give the same answer and scan the table.
 	if start != 0 {
-		sb.Where(sb.GE("timestamp", fmt.Sprintf("%d", start)), sb.GE("ts_bucket_start", startBucket))
+		sb.Where(sb.GE("time", fmt.Sprintf("%d", start)), sb.GE("ts_bucket_start", startBucket))
 	}
 	if end != 0 {
-		sb.Where(sb.L("timestamp", fmt.Sprintf("%d", end)), sb.LE("ts_bucket_start", endBucket))
+		sb.Where(sb.L("time", fmt.Sprintf("%d", end)), sb.LE("ts_bucket_start", endBucket))
 	}
 
 	return preparedWhereClause, nil

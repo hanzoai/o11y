@@ -6,7 +6,7 @@ import { act, render, screen } from 'tests/test-utils';
 import WorkspaceLocked from '.';
 
 describe('WorkspaceLocked', () => {
-	const apiURL = 'http://localhost/api/v2/licenses';
+	const apiURL = 'http://localhost/v1/o11y/licenses';
 
 	it('Should render the component', async () => {
 		server.use(

@@ -5,74 +5,60 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/hanzoai/cloud"
 	"github.com/hanzoai/o11y"
 	"github.com/zap-proto/zip"
 )
 
-func TestMountWithoutHandlerReturns503(t *testing.T) {
+// Mount is total: it must not fail, and it must leave every route the runtime
+// serves reachable. The counting proof lives in routes_test.go — this file holds
+// what is true of the SEAM itself.
+
+// Mount takes the router and NOTHING else. The signature is the assertion — this
+// test only pins that the table is total on a bare app, with no host, no
+// dependency struct and no runtime behind it. A table that needed anything from
+// its host could not be mounted by o11y's own binary, and for one logger field it
+// was not.
+func TestMountTakesOnlyTheRouter(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
+	if err := o11y.Mount(app); err != nil {
+		t.Fatalf("Mount: %v", err)
+	}
+}
+
+// A NAMED route with no runtime behind it answers 503, not 404: "the runtime is
+// not up yet" is a different fact from "there is no such route", and a caller —
+// or a load balancer — needs to be able to tell them apart.
+//
+// This test used to ask for /v1/o11y/anything and expect 503, which was only
+// true because a catch-all answered every path under the prefix. That is the
+// assertion that let three unmounted slices pass CI: a wildcard makes an
+// unconverted route and a missing one indistinguishable. It now asks for routes
+// that actually exist — one hatch and one typed op.
+func TestNamedRouteWithoutRuntimeReturns503(t *testing.T) {
+	app := zip.New(zip.Config{DisableStartupMessage: true})
+	if err := o11y.Mount(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	o11y.SetHandler(nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/anything", nil)
-	resp, err := app.Fiber().Test(req)
-	if err != nil {
-		t.Fatalf("Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusServiceUnavailable {
-		t.Fatalf("status=%d want 503", resp.StatusCode)
-	}
-}
-
-// TestMountNormalizesExternalPath proves the one public contract /v1/o11y/<resource>
-// (one /v1/, no nested version, no /api/) is normalized at the mount seam onto o11y's
-// internal /api/ namespace — where a version-less alias (O11y, highest-version) or an
-// llmobs route answers.
-func TestMountNormalizesExternalPath(t *testing.T) {
-	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
-		t.Fatalf("Mount: %v", err)
-	}
-
-	var sawPath string
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sawPath = r.URL.Path
-		w.WriteHeader(http.StatusOK)
-	}))
-	defer o11y.SetHandler(nil)
-
-	cases := []struct {
-		name, external, internal string
-	}{
-		// Canonical version-less contract → internal /api/<resource> (no nested version).
-		{"versionless health", "/v1/o11y/health", "/api/health"},
-		{"versionless query_range", "/v1/o11y/query_range", "/api/query_range"},
-		// Hanzo llmobs resources (own their version-less names).
-		{"llmobs traces", "/v1/o11y/traces", "/api/traces"},
-		{"llmobs observations", "/v1/o11y/observations", "/api/observations"},
-		{"llmobs score by id", "/v1/o11y/score/abc123", "/api/score/abc123"},
-		// Explicit-version form still resolves to its exact version route.
-		{"explicit version", "/v1/o11y/v3/query_range", "/api/v3/query_range"},
-		// Leaked /api/ form kept working for the not-yet-migrated O11y SPA.
-		{"legacy api alias", "/v1/o11y/api/v1/health", "/api/v1/health"},
-	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			sawPath = ""
-			req := httptest.NewRequest(http.MethodGet, tc.external, nil)
-			resp, err := app.Fiber().Test(req)
-			if err != nil {
-				t.Fatalf("Test: %v", err)
-			}
-			if resp.StatusCode != http.StatusOK {
-				t.Fatalf("status=%d want 200", resp.StatusCode)
-			}
-			if sawPath != tc.internal {
-				t.Fatalf("external %s → internal %q, want %q", tc.external, sawPath, tc.internal)
-			}
-		})
+	for _, target := range []string{
+		"/v1/o11y/logs/livetail", // a hatch
+		"/v1/o11y/logs",          // a typed op
+	} {
+		resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, target, nil))
+		if err != nil {
+			t.Fatalf("Test: %v", err)
+		}
+		if resp.StatusCode != http.StatusServiceUnavailable {
+			t.Fatalf("%s status=%d want 503", target, resp.StatusCode)
+		}
 	}
 }
+
+// Path delegation is proved once, over the whole hatch census, in
+// routes_test.go's TestHatchesDelegateVerbatim. It is not repeated here: the
+// earlier version of this test sampled three paths by hand and drifted every
+// time one of them was converted — including once when it asserted a route
+// delegated that had in fact been typed, which ENCODED the dark-slice defect
+// instead of catching it. One census, derived from the same list mount.go
+// registers, cannot drift that way.

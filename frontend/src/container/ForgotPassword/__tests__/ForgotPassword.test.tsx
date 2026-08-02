@@ -26,7 +26,7 @@ const mockHistoryPush = history.push as jest.MockedFunction<
 	typeof history.push
 >;
 
-const FORGOT_PASSWORD_ENDPOINT = '*/api/v2/factor_password/forgot';
+const FORGOT_PASSWORD_ENDPOINT = '*/v1/o11y/factor_password/forgot';
 
 // Mock data
 const mockSingleOrg: OrgSessionContext[] = [

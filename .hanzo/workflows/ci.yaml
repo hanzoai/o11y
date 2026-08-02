@@ -17,23 +17,13 @@ jobs:
       GOPRIVATE: github.com/hanzoai/*
       GOSUMDB: "off"
     steps:
+      # This module does not require github.com/hanzoai/cloud at all — cloud
+      # requires o11y, and for one logger field the arrow used to point both ways.
+      # No sibling checkout, no pin, no cycle.
       - name: Checkout o11y
         uses: actions/checkout@v4
         with:
           path: o11y
-
-      # go.mod pins `replace github.com/hanzoai/cloud => ../cloud` for local
-      # co-development, so CI supplies the sibling. Pin the exact commit o11y's
-      # module graph is reconciled against (readonly `go build ./...` is green
-      # against it) — cloud's `main` drifts independently and would break the
-      # readonly graph. Bump this when o11y's go.mod is re-tidied against cloud.
-      - name: Checkout hanzoai/cloud (sibling for replace => ../cloud)
-        uses: actions/checkout@v4
-        with:
-          repository: hanzoai/cloud
-          ref: ce6c4dc374160fae6873dd6ad6222bf52d803f71
-          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-          path: cloud
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -41,8 +31,10 @@ jobs:
           go-version-file: o11y/go.mod
           cache-dependency-path: o11y/go.sum
 
-      # Private cross-repo modules (hanzoai/*: commerce, iam, kms, licensing, …
-      # pulled transitively via cloud) are fetched over HTTPS git with the org PAT.
+      # Private cross-repo modules (hanzoai/*: sqlite, datastore, otel-collector,
+      # …) are fetched over HTTPS git with the org PAT. The two dozen that used to
+      # come in transitively via cloud (commerce, iam, kms, licensing, …) are gone
+      # with it.
       - name: Configure git auth for private hanzoai modules
         env:
           GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}

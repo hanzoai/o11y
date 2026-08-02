@@ -85,7 +85,7 @@ jest.mock('providers/preferences/sync/usePreferenceSync', () => ({
 }));
 
 const BASE_URL = ENVIRONMENT.baseURL;
-const attributeKeysURL = `${BASE_URL}/api/v3/filter_suggestions`;
+const attributeKeysURL = `${BASE_URL}/v1/o11y/filter_suggestions`;
 
 describe('PipelinePage container test', () => {
 	beforeAll(() => {

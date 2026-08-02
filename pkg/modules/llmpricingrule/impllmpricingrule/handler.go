@@ -10,9 +10,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/llmpricingrule"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/llmpricingruletypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 const maxLimit = 100
@@ -145,10 +145,11 @@ func (h *handler) Delete(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusNoContent, nil)
 }
 
-// ruleIDFromPath extracts and validates the {id} path variable.
+// ruleIDFromPath extracts and validates the {id} path segment. The read goes
+// through coretypes.Param — the ONE route-value reader — so this handler names
+// the value it needs and not the router that matched it.
 func ruleIDFromPath(r *http.Request) (valuer.UUID, error) {
-	raw := mux.Vars(r)["id"]
-	id, err := valuer.NewUUID(raw)
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		return valuer.UUID{}, errors.Wrapf(err, errors.TypeInvalidInput, llmpricingruletypes.ErrCodePricingRuleInvalidInput, "id is not a valid uuid")
 	}

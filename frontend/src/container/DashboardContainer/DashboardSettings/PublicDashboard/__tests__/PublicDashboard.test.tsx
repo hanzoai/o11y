@@ -38,7 +38,7 @@ const DASHBOARD_VARIABLES_WARNING =
 	"Dashboard variables won't work in public dashboards";
 
 // Use wildcard pattern to match both relative and absolute URLs in MSW
-const publicDashboardURL = `*/api/v1/dashboards/${MOCK_DASHBOARD_ID}/public`;
+const publicDashboardURL = `*/v1/o11y/dashboards/${MOCK_DASHBOARD_ID}/public`;
 
 const mockDashboardData = {
 	id: MOCK_DASHBOARD_ID,
@@ -89,7 +89,7 @@ describe('PublicDashboardSetting', () => {
 		it('Unpublished dashboard should be handled correctly', async () => {
 			server.use(
 				rest.get(
-					`*/api/v1/dashboards/${MOCK_DASHBOARD_ID}/public`,
+					`*/v1/o11y/dashboards/${MOCK_DASHBOARD_ID}/public`,
 					(_req, res, ctx) =>
 						res(
 							ctx.status(StatusCodes.NOT_FOUND),
@@ -134,7 +134,7 @@ describe('PublicDashboardSetting', () => {
 		it('Published dashboard should be handled correctly', async () => {
 			server.use(
 				rest.get(
-					`*/api/v1/dashboards/${MOCK_DASHBOARD_ID}/public`,
+					`*/v1/o11y/dashboards/${MOCK_DASHBOARD_ID}/public`,
 					(_req, res, ctx) =>
 						res(ctx.status(StatusCodes.OK), ctx.json(publishedPublicDashboardMeta)),
 				),
@@ -178,7 +178,7 @@ describe('PublicDashboardSetting', () => {
 		beforeEach(() => {
 			server.use(
 				rest.get(
-					`*/api/v1/dashboards/${MOCK_DASHBOARD_ID}/public`,
+					`*/v1/o11y/dashboards/${MOCK_DASHBOARD_ID}/public`,
 					(_req, res, ctx) =>
 						res(ctx.status(StatusCodes.OK), ctx.json(publishedPublicDashboardMeta)),
 				),
@@ -295,7 +295,7 @@ describe('PublicDashboardSetting', () => {
 
 			server.use(
 				rest.get(
-					`*/api/v1/dashboards/${MOCK_DASHBOARD_ID}/public`,
+					`*/v1/o11y/dashboards/${MOCK_DASHBOARD_ID}/public`,
 					(_req, res, ctx) =>
 						res(ctx.status(StatusCodes.OK), ctx.json(publishedPublicDashboardMeta)),
 				),
@@ -338,13 +338,13 @@ describe('PublicDashboardSetting', () => {
 
 			server.use(
 				rest.get(
-					`*/api/v1/dashboards/${MOCK_DASHBOARD_ID}/public`,
+					`*/v1/o11y/dashboards/${MOCK_DASHBOARD_ID}/public`,
 					(_req, res, ctx) =>
 						res(ctx.status(StatusCodes.OK), ctx.json(publishedPublicDashboardMeta)),
 				),
 				rest.delete(publicDashboardURL, (req, res, ctx) => {
 					revokeApiCalled = true;
-					// Extract dashboard ID from URL: /api/v1/dashboards/{id}/public
+					// Extract dashboard ID from URL: /v1/o11y/dashboards/{id}/public
 					const urlMatch = req.url.pathname.match(
 						/\/api\/v1\/dashboards\/([^/]+)\/public/,
 					);
@@ -377,7 +377,7 @@ describe('PublicDashboardSetting', () => {
 		it('should disable "Publish dashboard" button for non-admin users', async () => {
 			server.use(
 				rest.get(
-					`*/api/v1/dashboards/${MOCK_DASHBOARD_ID}/public`,
+					`*/v1/o11y/dashboards/${MOCK_DASHBOARD_ID}/public`,
 					(_req, res, ctx) =>
 						res(
 							ctx.status(StatusCodes.NOT_FOUND),
@@ -400,7 +400,7 @@ describe('PublicDashboardSetting', () => {
 			beforeEach(() => {
 				server.use(
 					rest.get(
-						`*/api/v1/dashboards/${MOCK_DASHBOARD_ID}/public`,
+						`*/v1/o11y/dashboards/${MOCK_DASHBOARD_ID}/public`,
 						(_req, res, ctx) =>
 							res(ctx.status(StatusCodes.OK), ctx.json(publishedPublicDashboardMeta)),
 					),

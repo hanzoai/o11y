@@ -8,9 +8,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/metricreductionrule"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/metricreductionruletypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -22,7 +22,7 @@ func NewHandler(module metricreductionrule.Module) metricreductionrule.Handler {
 }
 
 func idFromPath(r *http.Request) (valuer.UUID, error) {
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		return valuer.UUID{}, errors.NewInvalidInputf(errors.CodeInvalidInput, "id must be a valid uuid")
 	}

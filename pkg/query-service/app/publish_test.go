@@ -1,0 +1,144 @@
+package app
+
+import (
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/zap-proto/zip"
+)
+
+// What publish is FOR, verified the only way this defect was ever visible: by
+// the BODY of a request to the router, not by a status code.
+//
+// The conversion shipped 353 typed operations that no binary linked. Every proof
+// it had was taken inside a test process that imported the table directly, which
+// is exactly the thing that cannot fail: an uncalled package-level func is legal
+// Go, so the package built, the route arithmetic added up, and the server the
+// image runs published nothing. Status codes could not see it either — /version
+// answers 200 with or without the table, because the service's own registration
+// answers it.
+//
+// So this test drives the SAME function the server calls, over the SAME router
+// type it serves, and reads the document out of it.
+
+// documentOf fetches the OpenAPI document off a router the way a caller does.
+func documentOf(t *testing.T, app *zip.App) map[string]any {
+	t.Helper()
+	resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, zip.SpecPath, nil))
+	if err != nil {
+		t.Fatalf("GET %s: %v", zip.SpecPath, err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("GET %s status=%d, want 200 — the document answers on no port", zip.SpecPath, resp.StatusCode)
+	}
+	if ct := resp.Header.Get("Content-Type"); ct != "application/json" {
+		t.Fatalf("GET %s content-type=%q, want application/json", zip.SpecPath, ct)
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("read body: %v", err)
+	}
+	doc := map[string]any{}
+	if err := json.Unmarshal(body, &doc); err != nil {
+		t.Fatalf("the document is not JSON: %v — body: %.120s", err, body)
+	}
+	return doc
+}
+
+// operations counts the method+path pairs the document publishes.
+func operations(t *testing.T, doc map[string]any) int {
+	t.Helper()
+	paths, ok := doc["paths"].(map[string]any)
+	if !ok {
+		t.Fatalf("document paths has type %T", doc["paths"])
+	}
+	n := 0
+	for path, raw := range paths {
+		item, ok := raw.(map[string]any)
+		if !ok {
+			t.Fatalf("document path %s has type %T", path, raw)
+		}
+		for method := range item {
+			switch method {
+			case "get", "post", "put", "patch", "delete":
+				n++
+			}
+		}
+	}
+	return n
+}
+
+// THE PAYOFF, on the router the binary serves. 353 is the same count
+// routes_test.go pins on the table itself; asserting it HERE is what makes the
+// two the same 353 rather than two numbers that happen to agree.
+func TestPublishServesTheDocument(t *testing.T) {
+	app := zip.New(zip.Config{DisableStartupMessage: true})
+	if err := publish(app); err != nil {
+		t.Fatalf("publish: %v", err)
+	}
+
+	if got := operations(t, documentOf(t, app)); got != 353 {
+		t.Fatalf("the served document publishes %d operations, want 353", got)
+	}
+	if got := len(app.MCPTools()); got != 353 {
+		t.Fatalf("the served router offers %d MCP tools, want 353", got)
+	}
+}
+
+// Every operation the document publishes is o11y's own surface. A host that
+// mounts this table is publishing these paths under its own name, so a path that
+// is not ours would be this service claiming someone else's door.
+func TestPublishedDocumentIsO11ysSurface(t *testing.T) {
+	app := zip.New(zip.Config{DisableStartupMessage: true})
+	if err := publish(app); err != nil {
+		t.Fatalf("publish: %v", err)
+	}
+
+	paths, ok := documentOf(t, app)["paths"].(map[string]any)
+	if !ok {
+		t.Fatal("document has no paths")
+	}
+	for path := range paths {
+		if len(path) < 4 || (path[:8] != "/v1/o11y" && path[:10] != "/v1/sentry") {
+			t.Errorf("the document publishes %s, which is not o11y's surface", path)
+		}
+	}
+}
+
+// The declaration does NOT stand in front of the implementation. publish is
+// called after the service's own registration precisely so the handler that has
+// always answered a path still answers it — a typed op in front would put every
+// answer through a buffered relay round-trip, and an unbounded stream (livetail,
+// the chunked export) does not survive being buffered.
+//
+// Registration order is invisible to the compiler and to every test that mounts
+// only one of the two, so it is pinned here: an earlier registration wins, and
+// publish's routes are the later ones.
+func TestServiceRoutesOutrankTheDeclaration(t *testing.T) {
+	app := zip.New(zip.Config{DisableStartupMessage: true})
+
+	const path = "/v1/o11y/logs"
+	served := false
+	app.Get(path, zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		served = true
+		w.WriteHeader(http.StatusOK)
+	})))
+
+	if err := publish(app); err != nil {
+		t.Fatalf("publish: %v", err)
+	}
+
+	resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, path, nil))
+	if err != nil {
+		t.Fatalf("GET %s: %v", path, err)
+	}
+	if !served {
+		t.Fatalf("the declaration answered %s; the service's own handler must", path)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("GET %s status=%d, want 200", path, resp.StatusCode)
+	}
+}

@@ -40,14 +40,14 @@ import type { ErrorType, BodyType } from '../../../generatedAPIInstance';
  */
 export const createSessionByGoogleCallback = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<unknown>({
-		url: `/api/v1/complete/google`,
+		url: `/v1/o11y/complete/google`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getCreateSessionByGoogleCallbackQueryKey = () => {
-	return [`/api/v1/complete/google`] as const;
+	return [`/v1/o11y/complete/google`] as const;
 };
 
 export const getCreateSessionByGoogleCallbackQueryOptions = <
@@ -127,14 +127,14 @@ export const invalidateCreateSessionByGoogleCallback = async (
  */
 export const createSessionByOIDCCallback = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<unknown>({
-		url: `/api/v1/complete/oidc`,
+		url: `/v1/o11y/complete/oidc`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getCreateSessionByOIDCCallbackQueryKey = () => {
-	return [`/api/v1/complete/oidc`] as const;
+	return [`/v1/o11y/complete/oidc`] as const;
 };
 
 export const getCreateSessionByOIDCCallbackQueryOptions = <
@@ -232,7 +232,7 @@ export const createSessionBySAMLCallback = (
 	}
 
 	return GeneratedAPIInstance<unknown>({
-		url: `/api/v1/complete/saml`,
+		url: `/v1/o11y/complete/saml`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		data: formUrlEncoded,
@@ -330,7 +330,7 @@ export const useCreateSessionBySAMLCallback = <
  */
 export const deleteSession = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/sessions`,
+		url: `/v1/o11y/sessions`,
 		method: 'DELETE',
 		signal,
 	});
@@ -404,14 +404,14 @@ export const useDeleteSession = <
  */
 export const getSessionContext = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetSessionContext200>({
-		url: `/api/v2/sessions/context`,
+		url: `/v1/o11y/sessions/context`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetSessionContextQueryKey = () => {
-	return [`/api/v2/sessions/context`] as const;
+	return [`/v1/o11y/sessions/context`] as const;
 };
 
 export const getGetSessionContextQueryOptions = <
@@ -491,7 +491,7 @@ export const createSessionByEmailPassword = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateSessionByEmailPassword200>({
-		url: `/api/v2/sessions/email_password`,
+		url: `/v1/o11y/sessions/email_password`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: authtypesPostableEmailPasswordSessionDTO,
@@ -575,7 +575,7 @@ export const rotateSession = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<RotateSession200>({
-		url: `/api/v2/sessions/rotate`,
+		url: `/v1/o11y/sessions/rotate`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: authtypesPostableRotateTokenDTO,

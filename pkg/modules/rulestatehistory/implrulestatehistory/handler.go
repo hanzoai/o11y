@@ -10,10 +10,10 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -35,7 +35,7 @@ func NewHandler(module rulestatehistory.Module) rulestatehistory.Handler {
 }
 
 func (h *handler) GetRuleHistoryStats(w http.ResponseWriter, r *http.Request) {
-	ruleID := mux.Vars(r)["id"]
+	ruleID := coretypes.Param(r, "id")
 	query, ok := h.parseV2BaseQueryRequest(w, r)
 	if !ok {
 		return
@@ -50,7 +50,7 @@ func (h *handler) GetRuleHistoryStats(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) GetRuleHistoryOverallStatus(w http.ResponseWriter, r *http.Request) {
-	ruleID := mux.Vars(r)["id"]
+	ruleID := coretypes.Param(r, "id")
 	query, ok := h.parseV2BaseQueryRequest(w, r)
 	if !ok {
 		return
@@ -65,7 +65,7 @@ func (h *handler) GetRuleHistoryOverallStatus(w http.ResponseWriter, r *http.Req
 }
 
 func (h *handler) GetRuleHistoryTimeline(w http.ResponseWriter, r *http.Request) {
-	ruleID := mux.Vars(r)["id"]
+	ruleID := coretypes.Param(r, "id")
 	req, ok := h.parseV2TimelineQueryRequest(w, r)
 	if !ok {
 		return
@@ -121,7 +121,7 @@ func (h *handler) GetRuleHistoryTimeline(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *handler) GetRuleHistoryContributors(w http.ResponseWriter, r *http.Request) {
-	ruleID := mux.Vars(r)["id"]
+	ruleID := coretypes.Param(r, "id")
 	query, ok := h.parseV2BaseQueryRequest(w, r)
 	if !ok {
 		return
@@ -146,7 +146,7 @@ func (h *handler) GetRuleHistoryContributors(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *handler) GetRuleHistoryFilterKeys(w http.ResponseWriter, r *http.Request) {
-	ruleID := mux.Vars(r)["id"]
+	ruleID := coretypes.Param(r, "id")
 	query, search, limit, ok := h.parseV2FilterKeysRequest(w, r)
 	if !ok {
 		return
@@ -161,7 +161,7 @@ func (h *handler) GetRuleHistoryFilterKeys(w http.ResponseWriter, r *http.Reques
 }
 
 func (h *handler) GetRuleHistoryFilterValues(w http.ResponseWriter, r *http.Request) {
-	ruleID := mux.Vars(r)["id"]
+	ruleID := coretypes.Param(r, "id")
 	query, key, search, limit, ok := h.parseV2FilterValuesRequest(w, r)
 	if !ok {
 		return

@@ -31,12 +31,12 @@ jest.mock('components/ui/sonner', () => ({
 	toast: { success: jest.fn(), error: jest.fn() },
 }));
 
-const ROLES_ENDPOINT = '*/api/v1/roles';
-const SA_KEYS_ENDPOINT = '*/api/v1/service_accounts/:id/keys';
-const SA_ENDPOINT = '*/api/v1/service_accounts/sa-1';
-const SA_DELETE_ENDPOINT = '*/api/v1/service_accounts/sa-1';
-const SA_ROLES_ENDPOINT = '*/api/v1/service_accounts/:id/roles';
-const SA_ROLE_DELETE_ENDPOINT = '*/api/v1/service_accounts/:id/roles/:rid';
+const ROLES_ENDPOINT = '*/v1/o11y/roles';
+const SA_KEYS_ENDPOINT = '*/v1/o11y/service_accounts/:id/keys';
+const SA_ENDPOINT = '*/v1/o11y/service_accounts/sa-1';
+const SA_DELETE_ENDPOINT = '*/v1/o11y/service_accounts/sa-1';
+const SA_ROLES_ENDPOINT = '*/v1/o11y/service_accounts/:id/roles';
+const SA_ROLE_DELETE_ENDPOINT = '*/v1/o11y/service_accounts/:id/roles/:rid';
 
 const activeAccountResponse = {
 	id: 'sa-1',
@@ -266,13 +266,13 @@ describe('ServiceAccountDrawer', () => {
 
 	it('deleted account shows read-only name, no Save button, no Delete button', async () => {
 		server.use(
-			rest.get('*/api/v1/service_accounts/sa-2', (_, res, ctx) =>
+			rest.get('*/v1/o11y/service_accounts/sa-2', (_, res, ctx) =>
 				res(ctx.status(200), ctx.json({ data: deletedAccountResponse })),
 			),
-			rest.get('*/api/v1/service_accounts/sa-2/keys', (_, res, ctx) =>
+			rest.get('*/v1/o11y/service_accounts/sa-2/keys', (_, res, ctx) =>
 				res(ctx.status(200), ctx.json({ data: [] })),
 			),
-			rest.get('*/api/v1/service_accounts/sa-2/roles', (_, res, ctx) =>
+			rest.get('*/v1/o11y/service_accounts/sa-2/roles', (_, res, ctx) =>
 				res(ctx.status(200), ctx.json({ data: [] })),
 			),
 		);
