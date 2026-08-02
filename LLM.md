@@ -64,6 +64,31 @@ the command went) and `registerGenerateOpenAPI` from `cmd/generate.go`.
 **If a route is not in the typed registry it is in no document.** That is the only
 place to fix it; do not add a second writer.
 
+## The console (`pkg/web`) is router-agnostic
+
+`web.Web` is `http.Handler` and nothing else. It used to also carry
+`AddToRouter(*mux.Router)` — the console's mounting rule braided into one
+router's type, and the last reason `pkg/web` imported gorilla. It bought nothing:
+every host registered the same terminal catch-all, so the rule was the HOST's.
+The host now spells its own one line — `r.PathPrefix("/").Handler(web)` on the
+net/http chain in `pkg/query-service/app/server.go`, `app.All("/*",
+zip.AdaptNetHTTP(web))` on a zip host (the `hanzoai/cloud` `webui` idiom).
+
+Serving is stdlib (`http.FileServer` + the shell rendered once at boot), NOT
+`zip.Static`: `zip.Static` serves bytes out of an `fs.FS`, and the shell is not a
+file in the tree — it is templated at startup with this deployment's base href
+and settings, so `WithIndex`/`WithFallback` would hand the browser a raw
+`index.html` with no boot data. One handler serves both host kinds identically.
+
+`noopweb` (`web.enabled=false`, the shipped headless image) answers **404** —
+the bytes gorilla's default `NotFoundHandler` wrote when the null provider
+registered no route at all — so the host mounts the console unconditionally.
+
+The console refuses `/v1` and `/ws` (`routerweb.apiPrefixes`, segment-exact).
+gorilla resumes the parent router when a subrouter's prefix matches but none of
+its routes do, so **every miss inside `/v1/o11y` used to fall through to the
+console and answer 200 `text/html`** — JSON clients got the SPA shell.
+
 ## Dependency ownership (fork boundary)
 
 All O11y-branded platform deps are OWNED as public `hanzoai/*` forks — never

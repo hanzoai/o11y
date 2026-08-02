@@ -198,10 +198,14 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*http.Server,
 
 	handler = handlers.CompressHandler(handler)
 
-	err = web.AddToRouter(r)
-	if err != nil {
-		return nil, err
-	}
+	// The console is the TERMINAL handler, registered after every API route so
+	// gorilla's first-match gives the API precedence and only paths that match
+	// nothing else reach the SPA shell. web is a plain http.Handler now —
+	// pkg/web is router-agnostic — so this line is the net/http spelling of a
+	// mount a zip host writes as app.All("/*", zip.AdaptNetHTTP(web)). It is
+	// unconditional: the null provider answers 404, so a headless deployment
+	// (web.enabled=false) serves exactly what an unregistered route served.
+	r.PathPrefix("/").Handler(web)
 
 	// No prefix stripping. Every route on r is registered at its full public path
 	// (/v1/o11y/…, /v1/sentry/…), so the request path that arrives is the path that
