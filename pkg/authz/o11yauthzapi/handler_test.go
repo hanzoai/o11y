@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -45,14 +45,14 @@ func servedRole(t *testing.T, method, target string, pick func(authz.Handler) ht
 	t.Helper()
 
 	authZ := new(recordingAuthZ)
-	router := mux.NewRouter()
-	router.HandleFunc(roleRoute, pick(NewHandler(authZ))).Methods(method)
+	router := routing.Serve(method, roleRoute, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pick(NewHandler(authZ))(w, r.WithContext(authtypes.NewContextWithClaims(r.Context(), authtypes.Claims{
+			UserID: valuer.GenerateUUID().String(),
+			OrgID:  valuer.GenerateUUID().String(),
+		})))
+	}))
 
 	req := httptest.NewRequest(method, target, http.NoBody)
-	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{
-		UserID: valuer.GenerateUUID().String(),
-		OrgID:  valuer.GenerateUUID().String(),
-	}))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)

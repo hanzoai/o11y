@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/llmobstypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
@@ -74,10 +74,9 @@ func servedScoreID(t *testing.T, target string) (valuer.UUID, error) {
 		id  valuer.UUID
 		err error
 	)
-	router := mux.NewRouter()
-	router.HandleFunc(scoreRoute, func(_ http.ResponseWriter, req *http.Request) {
+	router := routing.Serve(http.MethodGet, scoreRoute, http.HandlerFunc(func(_ http.ResponseWriter, req *http.Request) {
 		id, err = idFromPath(req)
-	}).Methods(http.MethodGet)
+	}))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, target, http.NoBody))

@@ -3,9 +3,9 @@ package app
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
 	"github.com/hanzoai/o11y/pkg/http/render"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountLicenses registers the licensing surface. 2 routes.
@@ -18,11 +18,11 @@ import (
 // (licenses, activateLicense), which relay here — so the ViewAccess gates named
 // below stay the one place access is decided, and deleting either half drops
 // one of the two deployments.
-func (aH *APIHandler) mountLicenses(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/v1/o11y/licenses", am.ViewAccess(func(rw http.ResponseWriter, req *http.Request) {
+func (aH *APIHandler) mountLicenses(router routing.Router, am *middleware.AuthZ) {
+	router.Get("/v1/o11y/licenses", am.ViewAccess(func(rw http.ResponseWriter, req *http.Request) {
 		render.Success(rw, http.StatusOK, []any{})
-	})).Methods(http.MethodGet)
-	router.HandleFunc("/v1/o11y/licenses/active", am.ViewAccess(func(rw http.ResponseWriter, req *http.Request) {
+	}))
+	router.Get("/v1/o11y/licenses/active", am.ViewAccess(func(rw http.ResponseWriter, req *http.Request) {
 		aH.LicensingAPI.Activate(rw, req)
-	})).Methods(http.MethodGet)
+	}))
 }

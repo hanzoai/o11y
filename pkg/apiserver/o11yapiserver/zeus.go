@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/zeustypes"
 )
@@ -19,8 +19,8 @@ import (
 // composed binary, this router serves the standalone process, which has no
 // native router to register an op on — so deleting either drops one of the two
 // deployments.
-func (provider *provider) addZeusRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/zeus/profiles", handler.New(provider.authzMiddleware.AdminAccess(provider.zeusHandler.PutProfile), handler.OpenAPIDef{
+func (provider *provider) addZeusRoutes(router routing.Router) {
+	router.Put("/v1/o11y/zeus/profiles", handler.New(provider.authzMiddleware.AdminAccess(provider.zeusHandler.PutProfile), handler.OpenAPIDef{
 		ID:                  "PutProfile",
 		Tags:                []string{"zeus"},
 		Summary:             "Put profile in Zeus for a deployment.",
@@ -33,11 +33,9 @@ func (provider *provider) addZeusRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound, http.StatusConflict},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
-	})).Methods(http.MethodPut).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/zeus/hosts", handler.New(provider.authzMiddleware.ViewAccess(provider.zeusHandler.GetHosts), handler.OpenAPIDef{
+	router.Get("/v1/o11y/zeus/hosts", handler.New(provider.authzMiddleware.ViewAccess(provider.zeusHandler.GetHosts), handler.OpenAPIDef{
 		ID:                  "GetHosts",
 		Tags:                []string{"zeus"},
 		Summary:             "Get host info from Zeus.",
@@ -50,11 +48,9 @@ func (provider *provider) addZeusRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-	})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/zeus/hosts", handler.New(provider.authzMiddleware.AdminAccess(provider.zeusHandler.PutHost), handler.OpenAPIDef{
+	router.Put("/v1/o11y/zeus/hosts", handler.New(provider.authzMiddleware.AdminAccess(provider.zeusHandler.PutHost), handler.OpenAPIDef{
 		ID:                  "PutHost",
 		Tags:                []string{"zeus"},
 		Summary:             "Put host in Zeus for a deployment.",
@@ -67,9 +63,5 @@ func (provider *provider) addZeusRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound, http.StatusConflict},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
-	})).Methods(http.MethodPut).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	}))
 }

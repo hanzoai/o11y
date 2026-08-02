@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -42,11 +42,11 @@ func (s *stubAlertmanager) GetRoutePolicyByID(_ context.Context, policyID string
 func serve(t *testing.T, template, target string, h http.HandlerFunc) *httptest.ResponseRecorder {
 	t.Helper()
 
-	router := mux.NewRouter()
-	router.HandleFunc(template, h).Methods(http.MethodGet)
+	router := routing.Serve(http.MethodGet, template, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		h(w, r.WithContext(authtypes.NewContextWithClaims(r.Context(), authtypes.Claims{OrgID: "org-1"})))
+	}))
 
 	req := httptest.NewRequest(http.MethodGet, target, http.NoBody)
-	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{OrgID: "org-1"}))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)

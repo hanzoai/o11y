@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // DUAL DISPATCH. These registrations stay: the standalone server reaches them
@@ -19,13 +17,13 @@ import (
 // endpoints and the newer POST /auto_complete/attribute_values, which takes
 // filters. Eventually all autocomplete APIs should migrate to the new endpoint
 // with appropriate filters, deprecating the older ones.
-func (aH *APIHandler) mountAutocomplete(subRouter *mux.Router, am *middleware.AuthZ) {
-	subRouter.HandleFunc("/autocomplete/aggregate_attributes", am.ViewAccess(
-		withCacheControl(AutoCompleteCacheControlAge, aH.autocompleteAggregateAttributes))).Methods(http.MethodGet)
-	subRouter.HandleFunc("/autocomplete/attribute_keys", am.ViewAccess(
-		withCacheControl(AutoCompleteCacheControlAge, aH.autoCompleteAttributeKeys))).Methods(http.MethodGet)
-	subRouter.HandleFunc("/autocomplete/attribute_values", am.ViewAccess(
-		withCacheControl(AutoCompleteCacheControlAge, aH.autoCompleteAttributeValues))).Methods(http.MethodGet)
+func (aH *APIHandler) mountAutocomplete(subRouter routing.Router, am *middleware.AuthZ) {
+	subRouter.Get("/autocomplete/aggregate_attributes", am.ViewAccess(
+		withCacheControl(AutoCompleteCacheControlAge, aH.autocompleteAggregateAttributes)))
+	subRouter.Get("/autocomplete/attribute_keys", am.ViewAccess(
+		withCacheControl(AutoCompleteCacheControlAge, aH.autoCompleteAttributeKeys)))
+	subRouter.Get("/autocomplete/attribute_values", am.ViewAccess(
+		withCacheControl(AutoCompleteCacheControlAge, aH.autoCompleteAttributeValues)))
 
-	subRouter.HandleFunc("/auto_complete/attribute_values", am.ViewAccess(aH.autoCompleteAttributeValuesPost)).Methods(http.MethodPost)
+	subRouter.Post("/auto_complete/attribute_values", am.ViewAccess(aH.autoCompleteAttributeValuesPost))
 }

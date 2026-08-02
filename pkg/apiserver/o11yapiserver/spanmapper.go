@@ -3,14 +3,14 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/spantypes"
 )
 
-func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/span_mapper_groups", handler.New(
+func (provider *provider) addSpanMapperRoutes(router routing.Router) {
+	router.Get("/v1/o11y/span_mapper_groups", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.spanMapperHandler.ListGroups),
 		handler.OpenAPIDef{
 			ID:                  "ListSpanMapperGroups",
@@ -27,11 +27,9 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/span_mapper_groups", handler.New(
+	router.Post("/v1/o11y/span_mapper_groups", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.CreateGroup),
 		handler.OpenAPIDef{
 			ID:                  "CreateSpanMapperGroup",
@@ -47,11 +45,9 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/span_mapper_groups/{groupId}", handler.New(
+	router.Patch("/v1/o11y/span_mapper_groups/{groupId}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.UpdateGroup),
 		handler.OpenAPIDef{
 			ID:                 "UpdateSpanMapperGroup",
@@ -65,11 +61,9 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 			Deprecated:         false,
 			SecuritySchemes:    newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPatch).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/span_mapper_groups/{groupId}", handler.New(
+	router.Delete("/v1/o11y/span_mapper_groups/{groupId}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.DeleteGroup),
 		handler.OpenAPIDef{
 			ID:                  "DeleteSpanMapperGroup",
@@ -85,11 +79,9 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/span_mapper_groups/{groupId}/span_mappers", handler.New(
+	router.Get("/v1/o11y/span_mapper_groups/{groupId}/span_mappers", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.spanMapperHandler.ListMappers),
 		handler.OpenAPIDef{
 			ID:                  "ListSpanMappers",
@@ -105,11 +97,9 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/span_mapper_groups/{groupId}/span_mappers", handler.New(
+	router.Post("/v1/o11y/span_mapper_groups/{groupId}/span_mappers", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.CreateMapper),
 		handler.OpenAPIDef{
 			ID:                  "CreateSpanMapper",
@@ -125,11 +115,9 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/span_mapper_groups/{groupId}/span_mappers/{mapperId}", handler.New(
+	router.Patch("/v1/o11y/span_mapper_groups/{groupId}/span_mappers/{mapperId}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.UpdateMapper),
 		handler.OpenAPIDef{
 			ID:                 "UpdateSpanMapper",
@@ -143,11 +131,9 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 			Deprecated:         false,
 			SecuritySchemes:    newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPatch).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/span_mapper_groups/{groupId}/span_mappers/{mapperId}", handler.New(
+	router.Delete("/v1/o11y/span_mapper_groups/{groupId}/span_mappers/{mapperId}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.spanMapperHandler.DeleteMapper),
 		handler.OpenAPIDef{
 			ID:                  "DeleteSpanMapper",
@@ -163,9 +149,5 @@ func (provider *provider) addSpanMapperRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	))
 }

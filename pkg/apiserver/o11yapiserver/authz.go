@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 )
 
@@ -15,8 +15,8 @@ import (
 // router, so the handler below stays the one place the check is performed.
 // Both are needed — the op serves the composed binary, this router serves the
 // standalone process, which has no native router to register an op on.
-func (provider *provider) addAuthzRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/authz/check", handler.New(provider.authzHandler.Check, handler.OpenAPIDef{
+func (provider *provider) addAuthzRoutes(router routing.Router) {
+	router.Post("/v1/o11y/authz/check", handler.New(provider.authzHandler.Check, handler.OpenAPIDef{
 		ID:                  "AuthzCheck",
 		Tags:                []string{"authz"},
 		Summary:             "Check permissions",
@@ -29,9 +29,5 @@ func (provider *provider) addAuthzRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{},
 		Deprecated:          false,
 		SecuritySchemes:     nil,
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	}))
 }

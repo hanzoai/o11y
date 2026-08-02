@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
@@ -14,8 +14,8 @@ import (
 // query-engine ops in the repo root's querycore.go (querierQueryRange,
 // querierQueryRangePreview, querierReplaceVariables), which relay here. Deleting
 // either half drops one of the two deployments.
-func (provider *provider) addQuerierRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/query_range", handler.New(provider.authzMiddleware.ViewAccess(provider.querierHandler.QueryRange), handler.OpenAPIDef{
+func (provider *provider) addQuerierRoutes(router routing.Router) {
+	router.Post("/v1/o11y/query_range", handler.New(provider.authzMiddleware.ViewAccess(provider.querierHandler.QueryRange), handler.OpenAPIDef{
 		ID:                 "QueryRangeV5",
 		Tags:               []string{"querier"},
 		Summary:            "Query range",
@@ -452,11 +452,9 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusOK,
 		ErrorStatusCodes:    []int{http.StatusBadRequest},
 		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/query_range/preview", handler.New(provider.authzMiddleware.ViewAccess(provider.querierHandler.QueryRangePreview), handler.OpenAPIDef{
+	router.Post("/v1/o11y/query_range/preview", handler.New(provider.authzMiddleware.ViewAccess(provider.querierHandler.QueryRangePreview), handler.OpenAPIDef{
 		ID:                  "QueryRangePreviewV5",
 		Tags:                []string{"querier"},
 		Summary:             "Query range preview",
@@ -469,11 +467,9 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusOK,
 		ErrorStatusCodes:    []int{http.StatusBadRequest},
 		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/substitute_vars", handler.New(provider.authzMiddleware.ViewAccess(provider.querierHandler.ReplaceVariables), handler.OpenAPIDef{
+	router.Post("/v1/o11y/substitute_vars", handler.New(provider.authzMiddleware.ViewAccess(provider.querierHandler.ReplaceVariables), handler.OpenAPIDef{
 		ID:                  "ReplaceVariables",
 		Tags:                []string{"querier"},
 		Summary:             "Replace variables",
@@ -485,9 +481,5 @@ func (provider *provider) addQuerierRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusOK,
 		ErrorStatusCodes:    []int{http.StatusBadRequest},
 		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	}))
 }

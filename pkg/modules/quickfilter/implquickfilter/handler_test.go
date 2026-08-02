@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -37,16 +37,16 @@ func (m *recordingModule) GetSignalFilters(_ context.Context, _ valuer.UUID, sig
 func serveSignal(t *testing.T, module quickfilter.Module, target string) *httptest.ResponseRecorder {
 	t.Helper()
 
-	router := mux.NewRouter()
-	router.HandleFunc(signalRoute, NewHandler(module).GetSignalFilters).Methods(http.MethodGet)
+	router := routing.Serve(http.MethodGet, signalRoute, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		NewHandler(module).GetSignalFilters(w, r.WithContext(authtypes.NewContextWithClaims(r.Context(), authtypes.Claims{
+			OrgID:     valuer.GenerateUUID().String(),
+			UserID:    valuer.GenerateUUID().String(),
+			Email:     "u@acme",
+			Principal: authtypes.PrincipalUser,
+		})))
+	}))
 
 	req := httptest.NewRequest(http.MethodGet, target, http.NoBody)
-	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{
-		OrgID:     valuer.GenerateUUID().String(),
-		UserID:    valuer.GenerateUUID().String(),
-		Email:     "u@acme",
-		Principal: authtypes.PrincipalUser,
-	}))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)

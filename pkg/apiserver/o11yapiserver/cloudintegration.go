@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	citypes "github.com/hanzoai/o11y/pkg/types/cloudintegrationtypes"
 )
@@ -19,8 +19,8 @@ import (
 // composed binary, this router serves the standalone process, which has no
 // native router to register an op on — so deleting either drops one of the two
 // deployments.
-func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/credentials", handler.New(
+func (provider *provider) addCloudIntegrationRoutes(router routing.Router) {
+	router.Get("/v1/o11y/cloud_integrations/{cloud_provider}/credentials", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.GetConnectionCredentials),
 		handler.OpenAPIDef{
 			ID:                  "GetConnectionCredentials",
@@ -36,11 +36,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/accounts", handler.New(
+	router.Post("/v1/o11y/cloud_integrations/{cloud_provider}/accounts", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.CreateAccount),
 		handler.OpenAPIDef{
 			ID:                  "CreateAccount",
@@ -56,11 +54,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/accounts", handler.New(
+	router.Get("/v1/o11y/cloud_integrations/{cloud_provider}/accounts", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.ListAccounts),
 		handler.OpenAPIDef{
 			ID:                  "ListAccounts",
@@ -76,11 +72,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}", handler.New(
+	router.Get("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.GetAccount),
 		handler.OpenAPIDef{
 			ID:                  "GetAccount",
@@ -96,11 +90,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}", handler.New(
+	router.Put("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.UpdateAccount),
 		handler.OpenAPIDef{
 			ID:                  "UpdateAccount",
@@ -116,11 +108,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPut).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}", handler.New(
+	router.Delete("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.DisconnectAccount),
 		handler.OpenAPIDef{
 			ID:                  "DisconnectAccount",
@@ -136,11 +126,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/services", handler.New(
+	router.Get("/v1/o11y/cloud_integrations/{cloud_provider}/services", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.ListServicesMetadata),
 		handler.OpenAPIDef{
 			ID:                  "ListServicesMetadata",
@@ -157,11 +145,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}/services", handler.New(
+	router.Get("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}/services", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.ListAccountServicesMetadata),
 		handler.OpenAPIDef{
 			ID:                  "ListAccountServicesMetadata",
@@ -177,11 +163,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/services/{service_id}", handler.New(
+	router.Get("/v1/o11y/cloud_integrations/{cloud_provider}/services/{service_id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.GetService),
 		handler.OpenAPIDef{
 			ID:                  "GetService",
@@ -198,11 +182,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}/services/{service_id}", handler.New(
+	router.Put("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}/services/{service_id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.UpdateService),
 		handler.OpenAPIDef{
 			ID:                  "UpdateService",
@@ -218,11 +200,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPut).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}/services/{service_id}", handler.New(
+	router.Get("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{id}/services/{service_id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.cloudIntegrationHandler.GetAccountService),
 		handler.OpenAPIDef{
 			ID:                  "GetAccountService",
@@ -238,13 +218,11 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
 	// Agent check-in endpoint is kept same as older one to maintain backward compatibility with already deployed agents.
 	// In the future, this endpoint will be deprecated and a new endpoint will be introduced for consistency with above endpoints.
-	if err := router.Handle("/v1/o11y/cloud-integrations/{cloud_provider}/agent-check-in", handler.New(
+	router.Post("/v1/o11y/cloud-integrations/{cloud_provider}/agent-check-in", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.cloudIntegrationHandler.AgentCheckIn),
 		handler.OpenAPIDef{
 			ID:                  "AgentCheckInDeprecated",
@@ -260,11 +238,9 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          true,                                 // this endpoint will be deprecated in future
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer), // agent role is viewer
 		},
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/check_in", handler.New(
+	router.Post("/v1/o11y/cloud_integrations/{cloud_provider}/accounts/check_in", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.cloudIntegrationHandler.AgentCheckIn),
 		handler.OpenAPIDef{
 			ID:                  "AgentCheckIn",
@@ -280,9 +256,5 @@ func (provider *provider) addCloudIntegrationRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer), // agent role is viewer
 		},
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	))
 }

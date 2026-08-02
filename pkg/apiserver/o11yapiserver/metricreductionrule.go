@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/metricreductionruletypes"
 	"github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
@@ -20,8 +20,8 @@ import (
 // ops serve the composed binary, this router serves the standalone process,
 // which has no native router to register an op on — so deleting either drops
 // one of the two deployments.
-func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/metric_reduction_rules", handler.New(
+func (provider *provider) addMetricReductionRuleRoutes(router routing.Router) {
+	router.Get("/v1/o11y/metric_reduction_rules", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricReductionRuleHandler.List),
 		handler.OpenAPIDef{
 			ID:                  "ListMetricReductionRules",
@@ -35,11 +35,9 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 			ErrorStatusCodes:    []int{http.StatusUnauthorized, http.StatusNotImplemented, http.StatusUnavailableForLegalReasons, http.StatusInternalServerError},
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/metric_reduction_rules", handler.New(
+	router.Post("/v1/o11y/metric_reduction_rules", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.metricReductionRuleHandler.Create),
 		handler.OpenAPIDef{
 			ID:                  "CreateMetricReductionRule",
@@ -54,11 +52,9 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusForbidden, http.StatusConflict, http.StatusNotImplemented, http.StatusUnavailableForLegalReasons, http.StatusInternalServerError},
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/metric_reduction_rules/stats", handler.New(
+	router.Get("/v1/o11y/metric_reduction_rules/stats", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricReductionRuleHandler.Stats),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricReductionRuleStats",
@@ -71,11 +67,9 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 			ErrorStatusCodes:    []int{http.StatusUnauthorized, http.StatusNotImplemented, http.StatusUnavailableForLegalReasons, http.StatusInternalServerError},
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/metric_reduction_rules/timeseries", handler.New(
+	router.Get("/v1/o11y/metric_reduction_rules/timeseries", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricReductionRuleHandler.Timeseries),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricReductionRuleTimeseries",
@@ -88,11 +82,9 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 			ErrorStatusCodes:    []int{http.StatusUnauthorized, http.StatusNotImplemented, http.StatusUnavailableForLegalReasons, http.StatusInternalServerError},
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/metric_reduction_rules/preview", handler.New(
+	router.Post("/v1/o11y/metric_reduction_rules/preview", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.metricReductionRuleHandler.Preview),
 		handler.OpenAPIDef{
 			ID:                  "PreviewMetricReductionRule",
@@ -107,11 +99,9 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound, http.StatusNotImplemented, http.StatusUnavailableForLegalReasons, http.StatusInternalServerError},
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/metric_reduction_rules/{id}", handler.New(
+	router.Get("/v1/o11y/metric_reduction_rules/{id}", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricReductionRuleHandler.GetByID),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricReductionRuleByID",
@@ -124,11 +114,9 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 			ErrorStatusCodes:    []int{http.StatusUnauthorized, http.StatusNotFound, http.StatusNotImplemented, http.StatusUnavailableForLegalReasons, http.StatusInternalServerError},
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/metric_reduction_rules/{id}", handler.New(
+	router.Put("/v1/o11y/metric_reduction_rules/{id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.metricReductionRuleHandler.UpdateByID),
 		handler.OpenAPIDef{
 			ID:                  "UpdateMetricReductionRuleByID",
@@ -143,11 +131,9 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound, http.StatusNotImplemented, http.StatusUnavailableForLegalReasons, http.StatusInternalServerError},
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPut).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/metric_reduction_rules/{id}", handler.New(
+	router.Delete("/v1/o11y/metric_reduction_rules/{id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.metricReductionRuleHandler.DeleteByID),
 		handler.OpenAPIDef{
 			ID:                "DeleteMetricReductionRuleByID",
@@ -158,9 +144,5 @@ func (provider *provider) addMetricReductionRuleRoutes(router *mux.Router) error
 			ErrorStatusCodes:  []int{http.StatusUnauthorized, http.StatusForbidden, http.StatusNotFound, http.StatusNotImplemented, http.StatusUnavailableForLegalReasons, http.StatusInternalServerError},
 			SecuritySchemes:   newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	))
 }

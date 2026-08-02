@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountStatefulsets registers k8s statefulset infra-metrics: attribute
@@ -16,9 +14,9 @@ import (
 // second implementation: the ops answer by handing the call back to this
 // router, so the handlers below stay the one place the reads are performed,
 // and the ViewAccess gate keeps running exactly here.
-func (aH *APIHandler) mountStatefulsets(router *mux.Router, am *middleware.AuthZ) {
-	statefulsetsSubRouter := router.PathPrefix("/v1/o11y/statefulsets").Subrouter()
-	statefulsetsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getStatefulSetAttributeKeys)).Methods(http.MethodGet)
-	statefulsetsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getStatefulSetAttributeValues)).Methods(http.MethodGet)
-	statefulsetsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getStatefulSetList)).Methods(http.MethodPost)
+func (aH *APIHandler) mountStatefulsets(router routing.Router, am *middleware.AuthZ) {
+	statefulsetsSubRouter := router.Group("/v1/o11y/statefulsets")
+	statefulsetsSubRouter.Get("/attribute_keys", am.ViewAccess(aH.getStatefulSetAttributeKeys))
+	statefulsetsSubRouter.Get("/attribute_values", am.ViewAccess(aH.getStatefulSetAttributeValues))
+	statefulsetsSubRouter.Post("/list", am.ViewAccess(aH.getStatefulSetList))
 }

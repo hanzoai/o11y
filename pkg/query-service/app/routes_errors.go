@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountErrors registers the exceptions/errors surface: list, count, and the
@@ -19,10 +17,10 @@ import (
 // and the agent surface. That is a second DISPATCH, never a second implementation:
 // each op hands its call to THIS router, so the handlers below stay the one place
 // the reads are performed — deleting either half drops one of the two deployments.
-func (aH *APIHandler) mountErrors(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/v1/o11y/listErrors", am.ViewAccess(aH.listErrors)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/countErrors", am.ViewAccess(aH.countErrors)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/errorFromErrorID", am.ViewAccess(aH.getErrorFromErrorID)).Methods(http.MethodGet)
-	router.HandleFunc("/v1/o11y/errorFromGroupID", am.ViewAccess(aH.getErrorFromGroupID)).Methods(http.MethodGet)
-	router.HandleFunc("/v1/o11y/nextPrevErrorIDs", am.ViewAccess(aH.getNextPrevErrorIDs)).Methods(http.MethodGet)
+func (aH *APIHandler) mountErrors(router routing.Router, am *middleware.AuthZ) {
+	router.Post("/v1/o11y/listErrors", am.ViewAccess(aH.listErrors))
+	router.Post("/v1/o11y/countErrors", am.ViewAccess(aH.countErrors))
+	router.Get("/v1/o11y/errorFromErrorID", am.ViewAccess(aH.getErrorFromErrorID))
+	router.Get("/v1/o11y/errorFromGroupID", am.ViewAccess(aH.getErrorFromGroupID))
+	router.Get("/v1/o11y/nextPrevErrorIDs", am.ViewAccess(aH.getNextPrevErrorIDs))
 }

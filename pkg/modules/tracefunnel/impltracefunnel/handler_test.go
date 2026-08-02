@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
@@ -116,8 +116,8 @@ func TestHandler_Get(t *testing.T) {
 
 	funnelID := valuer.GenerateUUID()
 	orgID := valuer.GenerateUUID()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/trace-funnels/"+funnelID.String(), nil)
-	req = coretypes.SetParams(req, map[string]string{"funnel_id": funnelID.String()})
+	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/trace-funnels/"+funnelID.String(), nil)
+	req = coretypes.SetRoute(req, "/v1/o11y/trace-funnels/{funnel_id}")
 	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{
 		OrgID: orgID.String(),
 	}))
@@ -157,8 +157,8 @@ func TestHandler_Delete(t *testing.T) {
 
 	funnelID := valuer.GenerateUUID()
 	orgID := valuer.GenerateUUID()
-	req := httptest.NewRequest(http.MethodDelete, "/api/v1/trace-funnels/"+funnelID.String(), nil)
-	req = coretypes.SetParams(req, map[string]string{"funnel_id": funnelID.String()})
+	req := httptest.NewRequest(http.MethodDelete, "/v1/o11y/trace-funnels/"+funnelID.String(), nil)
+	req = coretypes.SetRoute(req, "/v1/o11y/trace-funnels/{funnel_id}")
 	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{
 		OrgID: orgID.String(),
 	}))
@@ -183,11 +183,11 @@ func TestHandler_Get_ActsOnTheFunnelTheRouterMatched(t *testing.T) {
 	funnelID := valuer.GenerateUUID()
 	orgID := valuer.GenerateUUID()
 
-	router := mux.NewRouter()
-	router.HandleFunc("/v1/o11y/trace-funnels/{funnel_id}", NewHandler(mockModule).Get).Methods(http.MethodGet)
+	router := routing.Serve(http.MethodGet, "/v1/o11y/trace-funnels/{funnel_id}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		NewHandler(mockModule).Get(w, r.WithContext(authtypes.NewContextWithClaims(r.Context(), authtypes.Claims{OrgID: orgID.String()})))
+	}))
 
 	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/trace-funnels/"+funnelID.String(), nil)
-	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{OrgID: orgID.String()}))
 
 	mockModule.On("Get", mock.Anything, funnelID, orgID).Return(&traceFunnels.StorableFunnel{
 		Identifiable: types.Identifiable{ID: funnelID},

@@ -3,19 +3,20 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/errortrackingtypes"
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
 )
 
-// uuidPattern constrains the ingest {project} path var to a UUID, so the wildcard
-// ingest routes can NEVER shadow a static /v1/sentry resource word (projects, issues,
-// discover, events, logs, traces, stats). Combined with static-before-wildcard
+// The ingest {project} path var is constrained to a UUID — {project:guid} — so the
+// wildcard ingest routes can NEVER shadow a static /v1/sentry resource word (projects,
+// issues, discover, events, logs, traces, stats). Combined with static-before-wildcard
 // registration order below and the reserved-slug check at project creation, a project
-// segment and a resource route are structurally unambiguous.
-const uuidPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+// segment and a resource route are structurally unambiguous. The constraint is the
+// router's own `guid` — a UUID parse, not a hand-written character class that has to
+// be read to know what it accepts.
 
 // addSentryRoutes serves Hanzo Sentry — the Sentry-parity product face — under the
 // CLEAN /v1/sentry contract (no /api/ segment anywhere). Two families:
@@ -45,7 +46,7 @@ const uuidPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}
 // INGEST routes below stay ONLY here: OpenAccess, DSN-authenticated, carrying an
 // opaque Sentry-envelope body a typed relay would corrupt, so they are a deliberate
 // escape hatch, out of the document by design.
-func (provider *provider) addSentryRoutes(router *mux.Router) error {
+func (provider *provider) addSentryRoutes(router routing.Router) {
 	h := provider.sentryHandler
 
 	// STATIC resource routes — registered BEFORE the ingest wildcard.
@@ -143,9 +144,7 @@ func (provider *provider) addSentryRoutes(router *mux.Router) error {
 		}},
 	}
 	for _, rt := range staticRoutes {
-		if err := router.Handle(rt.path, handler.New(rt.fn, rt.def)).Methods(rt.method).GetError(); err != nil {
-			return err
-		}
+		router.Handle(rt.method, rt.path, handler.New(rt.fn, rt.def))
 	}
 
 	// INGEST wildcard routes — registered LAST, UUID-constrained project segment.
@@ -154,7 +153,7 @@ func (provider *provider) addSentryRoutes(router *mux.Router) error {
 		fn   http.HandlerFunc
 		def  handler.OpenAPIDef
 	}{
-		{"/v1/sentry/{project:" + uuidPattern + "}/envelope/", provider.authzMiddleware.OpenAccess(h.EnvelopeIngest), handler.OpenAPIDef{
+		{"/v1/sentry/{project:guid}/envelope/", provider.authzMiddleware.OpenAccess(h.EnvelopeIngest), handler.OpenAPIDef{
 			ID: "SentryIngestEnvelope", Tags: []string{"sentry"}, Summary: "Ingest a Sentry envelope",
 			Description:         "Sentry-envelope-compatible ingest. Authenticated by the DSN public key (X-Sentry-Auth or ?sentry_key), not a Hanzo session.",
 			RequestContentType:  "application/x-sentry-envelope",
@@ -162,7 +161,7 @@ func (provider *provider) addSentryRoutes(router *mux.Router) error {
 			ErrorStatusCodes: []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusServiceUnavailable},
 			SecuritySchemes:  []handler.OpenAPISecurityScheme{},
 		}},
-		{"/v1/sentry/{project:" + uuidPattern + "}/store/", provider.authzMiddleware.OpenAccess(h.StoreIngest), handler.OpenAPIDef{
+		{"/v1/sentry/{project:guid}/store/", provider.authzMiddleware.OpenAccess(h.StoreIngest), handler.OpenAPIDef{
 			ID: "SentryIngestStore", Tags: []string{"sentry"}, Summary: "Ingest a legacy Sentry store event",
 			Description:         "Legacy single-event Sentry ingest. Authenticated by the DSN public key.",
 			RequestContentType:  "application/json",
@@ -172,10 +171,6 @@ func (provider *provider) addSentryRoutes(router *mux.Router) error {
 		}},
 	}
 	for _, rt := range ingestRoutes {
-		if err := router.Handle(rt.path, handler.New(rt.fn, rt.def)).Methods(http.MethodPost).GetError(); err != nil {
-			return err
-		}
+		router.Post(rt.path, handler.New(rt.fn, rt.def))
 	}
-
-	return nil
 }

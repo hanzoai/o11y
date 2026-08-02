@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountHosts registers host infra-metrics: attribute discovery + list.
@@ -16,9 +14,9 @@ import (
 // second implementation: the ops answer by handing the call back to this
 // router, so the handlers below stay the one place the reads are performed,
 // and the ViewAccess gate keeps running exactly here.
-func (aH *APIHandler) mountHosts(router *mux.Router, am *middleware.AuthZ) {
-	hostsSubRouter := router.PathPrefix("/v1/o11y/hosts").Subrouter()
-	hostsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getHostAttributeKeys)).Methods(http.MethodGet)
-	hostsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getHostAttributeValues)).Methods(http.MethodGet)
-	hostsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getHostList)).Methods(http.MethodPost)
+func (aH *APIHandler) mountHosts(router routing.Router, am *middleware.AuthZ) {
+	hostsSubRouter := router.Group("/v1/o11y/hosts")
+	hostsSubRouter.Get("/attribute_keys", am.ViewAccess(aH.getHostAttributeKeys))
+	hostsSubRouter.Get("/attribute_values", am.ViewAccess(aH.getHostAttributeValues))
+	hostsSubRouter.Post("/list", am.ViewAccess(aH.getHostList))
 }

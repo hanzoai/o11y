@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountDeployments registers k8s deployment infra-metrics: attribute discovery
@@ -16,9 +14,9 @@ import (
 // second implementation: the ops answer by handing the call back to this
 // router, so the handlers below stay the one place the reads are performed,
 // and the ViewAccess gate keeps running exactly here.
-func (aH *APIHandler) mountDeployments(router *mux.Router, am *middleware.AuthZ) {
-	deploymentsSubRouter := router.PathPrefix("/v1/o11y/deployments").Subrouter()
-	deploymentsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getDeploymentAttributeKeys)).Methods(http.MethodGet)
-	deploymentsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getDeploymentAttributeValues)).Methods(http.MethodGet)
-	deploymentsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getDeploymentList)).Methods(http.MethodPost)
+func (aH *APIHandler) mountDeployments(router routing.Router, am *middleware.AuthZ) {
+	deploymentsSubRouter := router.Group("/v1/o11y/deployments")
+	deploymentsSubRouter.Get("/attribute_keys", am.ViewAccess(aH.getDeploymentAttributeKeys))
+	deploymentsSubRouter.Get("/attribute_values", am.ViewAccess(aH.getDeploymentAttributeValues))
+	deploymentsSubRouter.Post("/list", am.ViewAccess(aH.getDeploymentList))
 }

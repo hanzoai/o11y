@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/errortrackingtypes"
 )
@@ -32,7 +32,7 @@ import (
 // handlers below stay the one place the reads are performed. The two INGEST routes
 // stay ONLY here — OpenAccess, DSN-authenticated, opaque Sentry-envelope body — a
 // deliberate escape hatch out of the document.
-func (provider *provider) addErrorTrackingRoutes(router *mux.Router) error {
+func (provider *provider) addErrorTrackingRoutes(router routing.Router) {
 	h := provider.errorTrackingHandler
 
 	routes := []struct {
@@ -83,10 +83,6 @@ func (provider *provider) addErrorTrackingRoutes(router *mux.Router) error {
 	}
 
 	for _, rt := range routes {
-		if err := router.Handle(rt.path, handler.New(rt.fn, rt.def)).Methods(rt.method).GetError(); err != nil {
-			return err
-		}
+		router.Handle(rt.method, rt.path, handler.New(rt.fn, rt.def))
 	}
-
-	return nil
 }

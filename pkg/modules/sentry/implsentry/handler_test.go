@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -46,11 +46,11 @@ func TestGetEventReadsThePathIDAndTheQueryProject(t *testing.T) {
 	module := &stubSentry{}
 	org, project := valuer.GenerateUUID(), valuer.GenerateUUID()
 
-	router := mux.NewRouter()
-	router.HandleFunc("/v1/sentry/events/{id}", NewHandler(module, true, false).GetEvent).Methods(http.MethodGet)
+	router := routing.Serve(http.MethodGet, "/v1/sentry/events/{id}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		NewHandler(module, true, false).GetEvent(w, r.WithContext(authtypes.NewContextWithClaims(r.Context(), authtypes.Claims{OrgID: org.String()})))
+	}))
 
 	req := httptest.NewRequest(http.MethodGet, "/v1/sentry/events/ev-42?project="+project.String(), http.NoBody)
-	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{OrgID: org.String()}))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
@@ -71,8 +71,7 @@ func TestIngestVerifiesTheProjectTheRouterMatched(t *testing.T) {
 	project := valuer.GenerateUUID()
 	template := "/v1/sentry/{project:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}/envelope/"
 
-	router := mux.NewRouter()
-	router.HandleFunc(template, NewHandler(module, true, false).EnvelopeIngest).Methods(http.MethodPost)
+	router := routing.Serve(http.MethodPost, template, http.HandlerFunc(NewHandler(module, true, false).EnvelopeIngest))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, httptest.NewRequest(http.MethodPost, "/v1/sentry/"+project.String()+"/envelope/", strings.NewReader("{}")))

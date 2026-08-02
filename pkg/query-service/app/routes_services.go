@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountServices registers the APM service catalog: the /services collection and
@@ -20,12 +18,12 @@ import (
 // serviceNames, topOperations, topLevelOperations, entryPointOperations), which
 // relay here — deleting either half drops one of the two deployments. The
 // ViewAccess gate on each route is unchanged: it runs here, one layer in.
-func (aH *APIHandler) mountServices(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/v1/o11y/services", am.ViewAccess(aH.O11y.Handlers.Services.Get)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/services/list", am.ViewAccess(aH.getServicesList)).Methods(http.MethodGet)
+func (aH *APIHandler) mountServices(router routing.Router, am *middleware.AuthZ) {
+	router.Post("/v1/o11y/services", am.ViewAccess(aH.O11y.Handlers.Services.Get))
+	router.Get("/v1/o11y/services/list", am.ViewAccess(aH.getServicesList))
 
-	router.HandleFunc("/v1/o11y/service/top_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetTopOperations)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/service/top_level_operations", am.ViewAccess(aH.getServicesTopLevelOps)).Methods(http.MethodPost)
+	router.Post("/v1/o11y/service/top_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetTopOperations))
+	router.Post("/v1/o11y/service/top_level_operations", am.ViewAccess(aH.getServicesTopLevelOps))
 
-	router.HandleFunc("/v1/o11y/service/entry_point_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetEntryPointOperations)).Methods(http.MethodPost)
+	router.Post("/v1/o11y/service/entry_point_operations", am.ViewAccess(aH.O11y.Handlers.Services.GetEntryPointOperations))
 }

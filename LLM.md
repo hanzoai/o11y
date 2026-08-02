@@ -70,9 +70,9 @@ place to fix it; do not add a second writer.
 `AddToRouter(*mux.Router)` — the console's mounting rule braided into one
 router's type, and the last reason `pkg/web` imported gorilla. It bought nothing:
 every host registered the same terminal catch-all, so the rule was the HOST's.
-The host now spells its own one line — `r.PathPrefix("/").Handler(web)` on the
-net/http chain in `pkg/query-service/app/server.go`, `app.All("/*",
-zip.AdaptNetHTTP(web))` on a zip host (the `hanzoai/cloud` `webui` idiom).
+The host now spells its own one line, and both hosts spell the SAME one —
+`app.All("/*", zip.AdaptNetHTTP(web))` in `pkg/query-service/app/server.go` and
+on a zip host (the `hanzoai/cloud` `webui` idiom).
 
 Serving is stdlib (`http.FileServer` + the shell rendered once at boot), NOT
 `zip.Static`: `zip.Static` serves bytes out of an `fs.FS`, and the shell is not a
@@ -81,13 +81,58 @@ and settings, so `WithIndex`/`WithFallback` would hand the browser a raw
 `index.html` with no boot data. One handler serves both host kinds identically.
 
 `noopweb` (`web.enabled=false`, the shipped headless image) answers **404** —
-the bytes gorilla's default `NotFoundHandler` wrote when the null provider
-registered no route at all — so the host mounts the console unconditionally.
+the bytes a default `NotFoundHandler` writes when a null provider registers no
+route at all — so the host mounts the console unconditionally.
 
-The console refuses `/v1` and `/ws` (`routerweb.apiPrefixes`, segment-exact).
-gorilla resumes the parent router when a subrouter's prefix matches but none of
-its routes do, so **every miss inside `/v1/o11y` used to fall through to the
-console and answer 200 `text/html`** — JSON clients got the SPA shell.
+The console refuses `/v1` and `/ws` (`routerweb.apiPrefixes`, segment-exact),
+because a router that resumes its parent when a prefix matches but no route does
+sent **every miss inside `/v1/o11y` through to the console as 200 `text/html`** —
+JSON clients got the SPA shell.
+
+## One router: `pkg/http/routing`
+
+**There is no web framework in this service but zip.** `gorilla/mux`, `otelmux`,
+`gin`, `gorilla/handlers` and `rs/cors` are all out of `go.mod`; every route the
+runtime serves is a zip route on a zip group, matched by one router with one param
+model and one middleware chain.
+
+`routing.Router` is the ONE registration surface — `Get/Post/Put/Patch/Delete`,
+`Handle(method, path, h)`, `Group(prefix)` — and it takes an `http.Handler`, so
+the 367 handler bodies did not change shape. It exists because a registration
+carries three facts zip has no slot for, each of which the old tree RECOVERED per
+request by asking the router what it had just matched:
+
+| fact | old | now |
+|---|---|---|
+| bound path segments | `mux.Vars(req)` in 140 handler bodies | bound at the leaf, read once via `coretypes.Param` |
+| the path TEMPLATE (audit keys, span names) | `mux.CurrentRoute(req).GetPathTemplate()` | recorded at registration, read via `coretypes.RoutePath` |
+| the route's declared resources | `route.GetHandler()` + type assertion, in TWO packages | handed to `middleware.Resource.For(defs)` by the registrar |
+
+Paths are declared in the public brace spelling (`/v1/o11y/rules/{id}`) and
+respelled for the router in one function; a constrained segment
+(`/v1/sentry/{project:guid}/envelope/`) becomes fiber's own `guid` — a UUID parse,
+replacing a hand-written character class. A **duplicate registration panics at
+boot**; the tree this replaces silently let the first one win.
+
+**Count the table.** `routing.Table` is the census of what registration actually
+did: **233** routes from `pkg/apiserver/o11yapiserver` + **134** from
+`pkg/query-service/app` = **367**, the same 367 the mount publishes (353 typed ops
+= 353 OpenAPI operations = 353 MCP tools, 11 hatches, 3 probes). This repo has
+shipped the other outcome — 83 typed ops in files nothing called, building green
+and serving nothing — so the arithmetic is a test, not a comment
+(`pkg/apiserver/o11yapiserver/routes_test.go`, `pkg/http/routing/routing_test.go`).
+
+**The chain is composed at the LEAF, not registered as ambient middleware.** Two
+of its members need the route: Audit keys on the template, Resource resolves the
+route's declared resources. Ambient middleware runs before the router has matched
+anything, so both would read an empty route. Composing per leaf reproduces the
+order the old tree ran in — match, then middleware, then handler.
+
+**Serving.** The standalone server hands its listener straight to the app
+(`app.Fiber().Listener(conn)`), so streams and the `/ws/query_progress` upgrade
+run native fasthttp. `PublicHandler()` is the embedding host's door and bridges to
+`net/http`: streamed answers pump through it, a connection HIJACK does not, so a
+host that needs the websocket serves the listener rather than embedding it.
 
 ## Dependency ownership (fork boundary)
 
