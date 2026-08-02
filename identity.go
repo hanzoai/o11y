@@ -13,7 +13,7 @@ package o11y
 //
 // THE WIRE DOES NOT MOVE, the same way telemetry.go's five reads did not move
 // it: no op here re-implements anything. Each hands the call to the SAME
-// runtime handler the wildcard delegates to (see relayO11y), so identity
+// runtime handler the wildcard delegates to (see relay.go), so identity
 // resolution, the org gate, the ROLE CHECK the mux registration declared —
 // AdminAccess, ViewAccess, SelfAccess, OpenAccess — the audit record, the
 // timeout and the success envelope are all still the runtime's, executed in
@@ -34,28 +34,19 @@ package o11y
 // (identity_test.go pins both halves).
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
-	"net/http/httptest"
-	"net/url"
 	"time"
 
 	"github.com/zap-proto/zip"
 )
-
-// identityPrefix is the face's path root, spelled ONCE: the group the ops
-// register on, and the first segment of every path relayO11y is handed.
-const identityPrefix = "/v1/o11y"
 
 // mountIdentity registers the identity face's typed ops on the native router.
 // Collection routes sit beside their parameterised siblings safely: the router
 // matches the most specific pattern, so /users/me can never be swallowed by
 // /users/:id, which is the same disambiguation the runtime's own tree makes.
 func mountIdentity(app *zip.App) {
-	g := app.Group(identityPrefix)
+	g := app.Group(o11yRoot)
 
 	// users and invites (runtime gate per op: see each op's comment)
 	zip.Post(g, "/invite", createInvite, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateInvite"))
@@ -126,7 +117,7 @@ func mountIdentity(app *zip.App) {
 // runtime this op relays to.
 func createInvite(ctx context.Context, in *O11yInviteIn) (*O11yInviteOut, error) {
 	out := new(O11yInviteOut)
-	return out, relayO11y(ctx, http.MethodPost, "/invite", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/invite", nil, in, out)
 }
 
 // createBulkInvite invites several people to the caller's org in one call,
@@ -134,46 +125,46 @@ func createInvite(ctx context.Context, in *O11yInviteIn) (*O11yInviteOut, error)
 // createInvite. Admin gate.
 func createBulkInvite(ctx context.Context, in *O11yBulkInviteIn) (*O11yAck, error) {
 	out := new(O11yAck)
-	return out, relayO11y(ctx, http.MethodPost, "/invite/bulk", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/invite/bulk", nil, in, out)
 }
 
 // listUsersDeprecated lists the org's members with their single legacy role.
 // Deprecated in favor of listUsers, which answers without the role. Admin gate.
 func listUsersDeprecated(ctx context.Context, _ *struct{}) (*O11yDeprecatedUsersOut, error) {
 	out := new(O11yDeprecatedUsersOut)
-	return out, relayO11y(ctx, http.MethodGet, "/user", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/user", nil, nil, out)
 }
 
 // listUsers lists the caller's org members. Admin gate.
 func listUsers(ctx context.Context, _ *struct{}) (*O11yUsersOut, error) {
 	out := new(O11yUsersOut)
-	return out, relayO11y(ctx, http.MethodGet, "/users", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/users", nil, nil, out)
 }
 
 // getMyUserDeprecated returns the calling user with their single legacy role.
 // Deprecated in favor of getMyUser. Open to any authenticated caller.
 func getMyUserDeprecated(ctx context.Context, _ *struct{}) (*O11yDeprecatedUserOut, error) {
 	out := new(O11yDeprecatedUserOut)
-	return out, relayO11y(ctx, http.MethodGet, "/user/me", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/user/me", nil, nil, out)
 }
 
 // getMyUser returns the calling user together with every role they hold. Open
 // to any authenticated caller.
 func getMyUser(ctx context.Context, _ *struct{}) (*O11yUserWithRolesOut, error) {
 	out := new(O11yUserWithRolesOut)
-	return out, relayO11y(ctx, http.MethodGet, "/users/me", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/users/me", nil, nil, out)
 }
 
 // createUser creates a member of the caller's org in the pending-invite state
 // and mails them their invitation; the answer is the new user's id. Admin gate.
 func createUser(ctx context.Context, in *O11yPostableUser) (*O11yCreatedOut, error) {
 	out := new(O11yCreatedOut)
-	return out, relayO11y(ctx, http.MethodPost, "/users", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/users", nil, in, out)
 }
 
 // updateMyUser renames the calling user. Open to any authenticated caller.
 func updateMyUser(ctx context.Context, in *O11yUpdatableUser) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/users/me", nil, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/users/me", nil, in, nil)
 }
 
 // getUserDeprecated returns one org member with their single legacy role, by
@@ -181,14 +172,14 @@ func updateMyUser(ctx context.Context, in *O11yUpdatableUser) (*struct{}, error)
 // self-access gate).
 func getUserDeprecated(ctx context.Context, in *O11yUserRef) (*O11yDeprecatedUserOut, error) {
 	out := new(O11yDeprecatedUserOut)
-	return out, relayO11y(ctx, http.MethodGet, "/user/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/user/"+in.ID, nil, nil, out)
 }
 
 // getUser returns one org member together with every role they hold, by user
 // id. Admin gate.
 func getUser(ctx context.Context, in *O11yUserRef) (*O11yUserWithRolesOut, error) {
 	out := new(O11yUserWithRolesOut)
-	return out, relayO11y(ctx, http.MethodGet, "/users/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/users/"+in.ID, nil, nil, out)
 }
 
 // updateUserDeprecated renames one org member and may move their legacy role,
@@ -196,24 +187,24 @@ func getUser(ctx context.Context, in *O11yUserRef) (*O11yUserWithRolesOut, error
 // only themselves (the runtime's self-access gate).
 func updateUserDeprecated(ctx context.Context, in *O11yDeprecatedUserUpdate) (*O11yDeprecatedUserOut, error) {
 	out := new(O11yDeprecatedUserOut)
-	return out, relayO11y(ctx, http.MethodPut, "/user/"+in.ID, nil, in, out)
+	return out, relay(ctx, http.MethodPut, o11yRoot+"/user/"+in.ID, nil, in, out)
 }
 
 // updateUser renames one org member, by user id — someone else, never the
 // caller, who renames themselves through updateMyUser. Admin gate.
 func updateUser(ctx context.Context, in *O11yUserUpdate) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/users/"+in.ID, nil, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/users/"+in.ID, nil, in, nil)
 }
 
 // deleteUserDeprecated removes one org member, by user id. The same operation
 // as deleteUser on the legacy singular path. Admin gate.
 func deleteUserDeprecated(ctx context.Context, in *O11yUserRef) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/user/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/user/"+in.ID, nil, nil, nil)
 }
 
 // deleteUser removes one org member, by user id. Admin gate.
 func deleteUser(ctx context.Context, in *O11yUserRef) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/users/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/users/"+in.ID, nil, nil, nil)
 }
 
 // ── passwords and their reset tokens ──────────────────────────────────────────
@@ -223,46 +214,46 @@ func deleteUser(ctx context.Context, in *O11yUserRef) (*struct{}, error) {
 // which separates reading from minting. Admin gate.
 func getResetTokenDeprecated(ctx context.Context, in *O11yUserRef) (*O11yResetTokenOut, error) {
 	out := new(O11yResetTokenOut)
-	return out, relayO11y(ctx, http.MethodGet, "/getResetPasswordToken/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/getResetPasswordToken/"+in.ID, nil, nil, out)
 }
 
 // getResetToken returns the reset-password token a user already has; absent
 // one, the answer is a not-found rather than a fresh token. Admin gate.
 func getResetToken(ctx context.Context, in *O11yUserRef) (*O11yResetTokenOut, error) {
 	out := new(O11yResetTokenOut)
-	return out, relayO11y(ctx, http.MethodGet, "/users/"+in.ID+"/reset_password_tokens", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/users/"+in.ID+"/reset_password_tokens", nil, nil, out)
 }
 
 // createResetToken creates or regenerates a user's reset-password token: a
 // live token is returned as it is, an expired one is replaced. Admin gate.
 func createResetToken(ctx context.Context, in *O11yUserRef) (*O11yResetTokenOut, error) {
 	out := new(O11yResetTokenOut)
-	return out, relayO11y(ctx, http.MethodPut, "/users/"+in.ID+"/reset_password_tokens", nil, nil, out)
+	return out, relay(ctx, http.MethodPut, o11yRoot+"/users/"+in.ID+"/reset_password_tokens", nil, nil, out)
 }
 
 // verifyResetToken checks that a reset-password token exists and has not
 // expired, without consuming it. Unauthenticated: the token is the proof.
 func verifyResetToken(ctx context.Context, in *O11yResetTokenRef) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPost, "/reset_password_tokens/verify", nil, in, nil)
+	return nil, relay(ctx, http.MethodPost, o11yRoot+"/reset_password_tokens/verify", nil, in, nil)
 }
 
 // resetPassword sets a new password for whoever the reset token was minted
 // for, consuming the token. Unauthenticated: the token is the proof.
 func resetPassword(ctx context.Context, in *O11yResetPasswordIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPost, "/resetPassword", nil, in, nil)
+	return nil, relay(ctx, http.MethodPost, o11yRoot+"/resetPassword", nil, in, nil)
 }
 
 // changeMyPassword replaces the calling user's password, refusing when the old
 // one does not match. Open to any authenticated caller.
 func changeMyPassword(ctx context.Context, in *O11yChangePasswordIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/users/me/factor_password", nil, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/users/me/factor_password", nil, in, nil)
 }
 
 // forgotPassword starts the forgotten-password flow: the named user is mailed
 // a reset link. Unauthenticated by design, and deliberately quiet about
 // whether the address exists.
 func forgotPassword(ctx context.Context, in *O11yForgotPasswordIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPost, "/factor_password/forgot", nil, in, nil)
+	return nil, relay(ctx, http.MethodPost, o11yRoot+"/factor_password/forgot", nil, in, nil)
 }
 
 // ── roles on users ────────────────────────────────────────────────────────────
@@ -271,27 +262,27 @@ func forgotPassword(ctx context.Context, in *O11yForgotPasswordIn) (*struct{}, e
 // gate.
 func listUserRoles(ctx context.Context, in *O11yUserRef) (*O11yRolesOut, error) {
 	out := new(O11yRolesOut)
-	return out, relayO11y(ctx, http.MethodGet, "/users/"+in.ID+"/roles", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/users/"+in.ID+"/roles", nil, nil, out)
 }
 
 // setUserRole assigns a role, by role name, to one org member — someone else,
 // never the caller. Admin gate.
 func setUserRole(ctx context.Context, in *O11ySetRoleIn) (*O11yAck, error) {
 	out := new(O11yAck)
-	return out, relayO11y(ctx, http.MethodPost, "/users/"+in.ID+"/roles", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/users/"+in.ID+"/roles", nil, in, out)
 }
 
 // removeUserRole takes a role away from one org member, by user id and role
 // id — someone else, never the caller. Admin gate.
 func removeUserRole(ctx context.Context, in *O11yUserRoleRef) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/users/"+in.ID+"/roles/"+in.RoleID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/users/"+in.ID+"/roles/"+in.RoleID, nil, nil, nil)
 }
 
 // listRoleUsers returns every org member holding a role, by role id. Admin
 // gate.
 func listRoleUsers(ctx context.Context, in *O11yRoleUsersIn) (*O11yUsersOut, error) {
 	out := new(O11yUsersOut)
-	return out, relayO11y(ctx, http.MethodGet, "/roles/"+in.ID+"/users", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/roles/"+in.ID+"/users", nil, nil, out)
 }
 
 // ── sessions ──────────────────────────────────────────────────────────────────
@@ -301,7 +292,7 @@ func listRoleUsers(ctx context.Context, in *O11yRoleUsersIn) (*O11yUsersOut, err
 // authentication begins.
 func createEmailPasswordSession(ctx context.Context, in *O11yEmailPasswordSessionIn) (*O11yTokenOut, error) {
 	out := new(O11yTokenOut)
-	return out, relayO11y(ctx, http.MethodPost, "/sessions/email_password", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/sessions/email_password", nil, in, out)
 }
 
 // getSessionContext tells a sign-in page what an email address can do: which
@@ -309,7 +300,7 @@ func createEmailPasswordSession(ctx context.Context, in *O11yEmailPasswordSessio
 // open to it. Unauthenticated: it runs before any session exists.
 func getSessionContext(ctx context.Context, in *O11ySessionContextIn) (*O11ySessionContextOut, error) {
 	out := new(O11ySessionContextOut)
-	return out, relayO11y(ctx, http.MethodGet, "/sessions/context", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/sessions/context", query(
 		"email", in.Email,
 		"ref", in.Ref,
 	), nil, out)
@@ -319,13 +310,13 @@ func getSessionContext(ctx context.Context, in *O11ySessionContextIn) (*O11ySess
 // old pair. The access token being rotated identifies the session.
 func rotateSession(ctx context.Context, in *O11yRotateSessionIn) (*O11yTokenOut, error) {
 	out := new(O11yTokenOut)
-	return out, relayO11y(ctx, http.MethodPost, "/sessions/rotate", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/sessions/rotate", nil, in, out)
 }
 
 // deleteSession signs the calling session out, invalidating its tokens. The
 // access token on the call names the session to end.
 func deleteSession(ctx context.Context, _ *struct{}) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/sessions", nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/sessions", nil, nil, nil)
 }
 
 // ── auth domains ──────────────────────────────────────────────────────────────
@@ -334,33 +325,33 @@ func deleteSession(ctx context.Context, _ *struct{}) (*struct{}, error) {
 // configuration this org owns. Admin gate.
 func listAuthDomains(ctx context.Context, _ *struct{}) (*O11yAuthDomainsOut, error) {
 	out := new(O11yAuthDomainsOut)
-	return out, relayO11y(ctx, http.MethodGet, "/domains", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/domains", nil, nil, out)
 }
 
 // createAuthDomain claims an email domain for the org and configures how its
 // users sign in; the answer is the new domain's id. Admin gate.
 func createAuthDomain(ctx context.Context, in *O11yPostableAuthDomain) (*O11yCreatedOut, error) {
 	out := new(O11yCreatedOut)
-	return out, relayO11y(ctx, http.MethodPost, "/domains", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/domains", nil, in, out)
 }
 
 // getAuthDomain returns one auth domain with its SSO configuration, by id.
 // Admin gate.
 func getAuthDomain(ctx context.Context, in *O11yDomainRef) (*O11yAuthDomainOut, error) {
 	out := new(O11yAuthDomainOut)
-	return out, relayO11y(ctx, http.MethodGet, "/domains/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/domains/"+in.ID, nil, nil, out)
 }
 
 // updateAuthDomain replaces one auth domain's SSO configuration, by id. Admin
 // gate.
 func updateAuthDomain(ctx context.Context, in *O11yUpdatableAuthDomain) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/domains/"+in.ID, nil, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/domains/"+in.ID, nil, in, nil)
 }
 
 // deleteAuthDomain releases an email domain and discards its SSO
 // configuration, by id. Admin gate.
 func deleteAuthDomain(ctx context.Context, in *O11yDomainRef) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/domains/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/domains/"+in.ID, nil, nil, nil)
 }
 
 // ── my organization and its quick filters ─────────────────────────────────────
@@ -368,33 +359,33 @@ func deleteAuthDomain(ctx context.Context, in *O11yDomainRef) (*struct{}, error)
 // getMyOrg returns the caller's own organization. Admin gate.
 func getMyOrg(ctx context.Context, _ *struct{}) (*O11yOrganizationOut, error) {
 	out := new(O11yOrganizationOut)
-	return out, relayO11y(ctx, http.MethodGet, "/orgs/me", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/orgs/me", nil, nil, out)
 }
 
 // updateMyOrg rewrites the caller's own organization record — display name,
 // name, alias — always addressed as "me", never by id. Admin gate.
 func updateMyOrg(ctx context.Context, in *O11yOrganization) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/orgs/me", nil, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/orgs/me", nil, in, nil)
 }
 
 // getQuickFilters returns the org's quick filters for every signal — the
 // attribute shortlists its explorers offer as one-click filters. Viewer gate.
 func getQuickFilters(ctx context.Context, _ *struct{}) (*O11yQuickFiltersOut, error) {
 	out := new(O11yQuickFiltersOut)
-	return out, relayO11y(ctx, http.MethodGet, "/orgs/me/filters", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/orgs/me/filters", nil, nil, out)
 }
 
 // getSignalFilters returns the org's quick filters for one signal — traces,
 // logs, metrics, exceptions or api_monitoring. Viewer gate.
 func getSignalFilters(ctx context.Context, in *O11ySignalRef) (*O11ySignalFiltersOut, error) {
 	out := new(O11ySignalFiltersOut)
-	return out, relayO11y(ctx, http.MethodGet, "/orgs/me/filters/"+in.Signal, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/orgs/me/filters/"+in.Signal, nil, nil, out)
 }
 
 // updateQuickFilters replaces the org's quick filters for one signal with the
 // attribute list given. Admin gate.
 func updateQuickFilters(ctx context.Context, in *O11yUpdatableQuickFilters) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/orgs/me/filters", nil, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/orgs/me/filters", nil, in, nil)
 }
 
 // ── preferences ───────────────────────────────────────────────────────────────
@@ -403,38 +394,38 @@ func updateQuickFilters(ctx context.Context, in *O11yUpdatableQuickFilters) (*st
 // its current and default value. Viewer gate.
 func listUserPreferences(ctx context.Context, _ *struct{}) (*O11yPreferencesOut, error) {
 	out := new(O11yPreferencesOut)
-	return out, relayO11y(ctx, http.MethodGet, "/user/preferences", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/user/preferences", nil, nil, out)
 }
 
 // getUserPreference returns one preference of the calling user, by name.
 // Viewer gate.
 func getUserPreference(ctx context.Context, in *O11yPreferenceRef) (*O11yPreferenceOut, error) {
 	out := new(O11yPreferenceOut)
-	return out, relayO11y(ctx, http.MethodGet, "/user/preferences/"+in.Name, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/user/preferences/"+in.Name, nil, nil, out)
 }
 
 // updateUserPreference sets one preference of the calling user, by name.
 // Viewer gate.
 func updateUserPreference(ctx context.Context, in *O11yUpdatablePreference) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/user/preferences/"+in.Name, nil, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/user/preferences/"+in.Name, nil, in, nil)
 }
 
 // listOrgPreferences lists every org-scoped preference, each with its current
 // and default value. Admin gate.
 func listOrgPreferences(ctx context.Context, _ *struct{}) (*O11yPreferencesOut, error) {
 	out := new(O11yPreferencesOut)
-	return out, relayO11y(ctx, http.MethodGet, "/org/preferences", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/org/preferences", nil, nil, out)
 }
 
 // getOrgPreference returns one org-scoped preference, by name. Admin gate.
 func getOrgPreference(ctx context.Context, in *O11yPreferenceRef) (*O11yPreferenceOut, error) {
 	out := new(O11yPreferenceOut)
-	return out, relayO11y(ctx, http.MethodGet, "/org/preferences/"+in.Name, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/org/preferences/"+in.Name, nil, nil, out)
 }
 
 // updateOrgPreference sets one org-scoped preference, by name. Admin gate.
 func updateOrgPreference(ctx context.Context, in *O11yUpdatablePreference) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/org/preferences/"+in.Name, nil, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/org/preferences/"+in.Name, nil, in, nil)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────
@@ -1213,88 +1204,3 @@ type O11yPreference struct {
 }
 
 // ── the seam ──────────────────────────────────────────────────────────────────
-
-// relayO11y hands a typed op's call to the o11y runtime and decodes the answer
-// into the op's Out — telemetry.go's relay, for paths under /v1/o11y. (That
-// relay bakes in the sentry prefix; hoisting the prefix out of it is a
-// cross-face refactor for when the last face is typed, not a thing to half-do
-// from one of them.)
-//
-// It is what keeps these ops a NAMING of the wire rather than a second
-// implementation of it. The handler it calls is the one SetHandler registered —
-// the same value the delegation wildcard forwards to — so the request runs the
-// whole chain it always ran: identity resolution, the role gate the route
-// declared, the audit record, the timeout, the handler. There is no policy
-// here; those all happen where they already do, one layer in.
-//
-// Identity is PROPAGATED, never minted: the gateway's assertion about the
-// caller travels on as the same headers it arrived on. A context with no
-// request behind it — a command, an agent call — carries no assertion, so the
-// runtime's gate refuses it, which is the honest answer rather than an
-// identity invented at this hop.
-//
-// A non-2xx becomes an error carrying the runtime's own status and reason, so
-// the status a caller sees is the status the runtime chose. A nil out says the
-// op answers with no body — the runtime's 204s — and skips decoding.
-func relayO11y(ctx context.Context, method, path string, params url.Values, body, out any) error {
-	h := getHandler()
-	if h == nil {
-		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
-	}
-
-	target := identityPrefix + path
-	if q := params.Encode(); q != "" {
-		target += "?" + q
-	}
-
-	payload := io.Reader(http.NoBody)
-	if body != nil {
-		b, err := json.Marshal(body)
-		if err != nil {
-			return zip.ErrBadRequest(err.Error())
-		}
-		payload = bytes.NewReader(b)
-	}
-	req, err := http.NewRequestWithContext(ctx, method, target, payload)
-	if err != nil {
-		return zip.ErrBadRequest(err.Error())
-	}
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	caller := zip.CallerOf(ctx)
-	for header, value := range map[string]string{
-		zip.HeaderOrg:       caller.Org,
-		zip.HeaderProject:   caller.Project,
-		zip.HeaderUser:      caller.User,
-		zip.HeaderUserName:  caller.Name,
-		zip.HeaderUserEmail: caller.Email,
-		zip.HeaderUserOwner: caller.Owner,
-		zip.HeaderRequestID: caller.RequestID,
-	} {
-		if value != "" {
-			req.Header.Set(header, value)
-		}
-	}
-	if caller.Admin {
-		req.Header.Set(zip.HeaderUserAdmin, "true")
-	}
-	if caller.OrgAdmin {
-		req.Header.Set(zip.HeaderUserOrgAdmin, "true")
-	}
-
-	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, req)
-
-	if rec.Code < http.StatusOK || rec.Code >= http.StatusMultipleChoices {
-		code, reason := refusal(rec.Body.Bytes())
-		return &zip.HTTPError{Status: rec.Code, Code: code, Msg: reason}
-	}
-	if out == nil {
-		return nil
-	}
-	if err := json.Unmarshal(rec.Body.Bytes(), out); err != nil {
-		return zip.ErrInternal("cannot read the runtime's answer: " + err.Error())
-	}
-	return nil
-}

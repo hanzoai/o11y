@@ -13,7 +13,7 @@ package o11y
 //
 // THE WIRE DOES NOT MOVE, and the way it does not move is that these ops do not
 // re-implement the reads and writes. Each hands the call to the SAME runtime
-// handler the wildcard delegates to (see relayO11y), so identity resolution, the
+// handler the wildcard delegates to (see relay.go), so identity resolution, the
 // org gate, the role check (viewer on every read, editor on the score and
 // annotation writes, admin on the pricing-rule writes — the exact
 // ViewAccess/EditAccess/AdminAccess gates the runtime has always run), the
@@ -29,11 +29,11 @@ package o11y
 //
 // The three writes whose answer is only their status — the score delete, the
 // pricing-rule bulk write and the pricing-rule delete — answer the empty 204 a
-// nil Out has always meant: relayO11y leaves the Out untouched, and zip writes a
+// nil Out has always meant: relay leaves the Out untouched, and zip writes a
 // clean 204 with no body.
 //
 // The mux registrations these ops mirror STAY (pkg/apiserver/o11yapiserver):
-// they are the runtime router relayO11y forwards into, and the only router the
+// they are the runtime router relay forwards into, and the only router the
 // standalone server has. Registered ahead of the wildcard, and
 // specific-beats-wildcard is what the router does regardless of registration
 // order, so these fourteen paths dispatch here and every other path under the
@@ -95,7 +95,7 @@ func mountLLMObs(app *zip.App) {
 // the read to the caller's validated tenant.
 func llmObservations(ctx context.Context, in *O11yLLMViewQuery) (*O11yLLMObservationsOut, error) {
 	out := new(O11yLLMObservationsOut)
-	return out, relayO11y(ctx, http.MethodGet, "/llm/observations", viewParams(in), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/llm/observations", viewParams(in), nil, out)
 }
 
 // llmTraces lists LLM traces — gen_ai spans grouped by trace_id, with cost,
@@ -104,7 +104,7 @@ func llmObservations(ctx context.Context, in *O11yLLMViewQuery) (*O11yLLMObserva
 // Callers need the viewer role; the runtime's own gate enforces it.
 func llmTraces(ctx context.Context, in *O11yLLMViewQuery) (*O11yLLMTracesOut, error) {
 	out := new(O11yLLMTracesOut)
-	return out, relayO11y(ctx, http.MethodGet, "/llm/traces", viewParams(in), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/llm/traces", viewParams(in), nil, out)
 }
 
 // llmSessions lists conversations — gen_ai spans grouped by session.id, with
@@ -113,7 +113,7 @@ func llmTraces(ctx context.Context, in *O11yLLMViewQuery) (*O11yLLMTracesOut, er
 // Callers need the viewer role; the runtime's own gate enforces it.
 func llmSessions(ctx context.Context, in *O11yLLMViewQuery) (*O11yLLMSessionsOut, error) {
 	out := new(O11yLLMSessionsOut)
-	return out, relayO11y(ctx, http.MethodGet, "/llm/sessions", viewParams(in), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/llm/sessions", viewParams(in), nil, out)
 }
 
 // llmUsers lists end users — gen_ai spans grouped by user.id, with their
@@ -122,7 +122,7 @@ func llmSessions(ctx context.Context, in *O11yLLMViewQuery) (*O11yLLMSessionsOut
 // Callers need the viewer role; the runtime's own gate enforces it.
 func llmUsers(ctx context.Context, in *O11yLLMViewQuery) (*O11yLLMUsersOut, error) {
 	out := new(O11yLLMUsersOut)
-	return out, relayO11y(ctx, http.MethodGet, "/llm/users", viewParams(in), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/llm/users", viewParams(in), nil, out)
 }
 
 // llmListScores lists eval scores and human-feedback signals attached to traces
@@ -131,7 +131,7 @@ func llmUsers(ctx context.Context, in *O11yLLMViewQuery) (*O11yLLMUsersOut, erro
 // Callers need the viewer role; the runtime's own gate enforces it.
 func llmListScores(ctx context.Context, in *O11yLLMScoresQuery) (*O11yLLMScoresOut, error) {
 	out := new(O11yLLMScoresOut)
-	return out, relayO11y(ctx, http.MethodGet, "/llm/scores", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/llm/scores", query(
 		"traceId", in.TraceID,
 		"observationId", in.ObservationID,
 		"name", in.Name,
@@ -148,7 +148,7 @@ func llmListScores(ctx context.Context, in *O11yLLMScoresQuery) (*O11yLLMScoresO
 // validates the payload and stamps the score's author and org.
 func llmCreateScore(ctx context.Context, in *O11yLLMIngestScore) (*O11yLLMScoreOut, error) {
 	out := new(O11yLLMScoreOut)
-	return out, relayO11y(ctx, http.MethodPost, "/llm/scores", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/llm/scores", nil, in, out)
 }
 
 // llmGetScore returns a single score by id.
@@ -156,14 +156,14 @@ func llmCreateScore(ctx context.Context, in *O11yLLMIngestScore) (*O11yLLMScoreO
 // Callers need the viewer role; the runtime's own gate enforces it.
 func llmGetScore(ctx context.Context, in *O11yLLMScoreRef) (*O11yLLMScoreOut, error) {
 	out := new(O11yLLMScoreOut)
-	return out, relayO11y(ctx, http.MethodGet, "/llm/score/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/llm/score/"+in.ID, nil, nil, out)
 }
 
 // llmDeleteScore hard-deletes a score by id.
 //
 // Callers need the editor role; the runtime's own gate enforces it.
 func llmDeleteScore(ctx context.Context, in *O11yLLMScoreRef) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/llm/score/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/llm/score/"+in.ID, nil, nil, nil)
 }
 
 // llmListAnnotations lists human annotations on traces and observations,
@@ -172,7 +172,7 @@ func llmDeleteScore(ctx context.Context, in *O11yLLMScoreRef) (*struct{}, error)
 // Callers need the viewer role; the runtime's own gate enforces it.
 func llmListAnnotations(ctx context.Context, in *O11yLLMAnnotationsQuery) (*O11yLLMAnnotationsOut, error) {
 	out := new(O11yLLMAnnotationsOut)
-	return out, relayO11y(ctx, http.MethodGet, "/llm/annotation", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/llm/annotation", query(
 		"traceId", in.TraceID,
 		"queue", in.Queue,
 		"status", in.Status,
@@ -188,7 +188,7 @@ func llmListAnnotations(ctx context.Context, in *O11yLLMAnnotationsQuery) (*O11y
 // validates the payload and stamps the annotation's author and org.
 func llmCreateAnnotation(ctx context.Context, in *O11yLLMIngestAnnotation) (*O11yLLMAnnotationOut, error) {
 	out := new(O11yLLMAnnotationOut)
-	return out, relayO11y(ctx, http.MethodPost, "/llm/annotation", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/llm/annotation", nil, in, out)
 }
 
 // llmListPricingRules returns the LLM pricing rules for the caller's org, with
@@ -197,7 +197,7 @@ func llmCreateAnnotation(ctx context.Context, in *O11yLLMIngestAnnotation) (*O11
 // Callers need the viewer role; the runtime's own gate enforces it.
 func llmListPricingRules(ctx context.Context, in *O11yLLMPricingRulesQuery) (*O11yLLMPricingRulesOut, error) {
 	out := new(O11yLLMPricingRulesOut)
-	return out, relayO11y(ctx, http.MethodGet, "/llm_pricing_rules", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/llm_pricing_rules", query(
 		"q", in.Search,
 		"isOverride", in.IsOverride,
 		"offset", in.Offset,
@@ -212,7 +212,7 @@ func llmListPricingRules(ctx context.Context, in *O11yLLMPricingRulesQuery) (*O1
 //
 // Callers need the admin role; the runtime's own gate enforces it.
 func llmUpsertPricingRules(ctx context.Context, in *O11yLLMUpdatablePricingRules) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/llm_pricing_rules", nil, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/llm_pricing_rules", nil, in, nil)
 }
 
 // llmGetPricingRule returns a single LLM pricing rule by id.
@@ -220,7 +220,7 @@ func llmUpsertPricingRules(ctx context.Context, in *O11yLLMUpdatablePricingRules
 // Callers need the viewer role; the runtime's own gate enforces it.
 func llmGetPricingRule(ctx context.Context, in *O11yLLMPricingRuleRef) (*O11yLLMPricingRuleOut, error) {
 	out := new(O11yLLMPricingRuleOut)
-	return out, relayO11y(ctx, http.MethodGet, "/llm_pricing_rules/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/llm_pricing_rules/"+in.ID, nil, nil, out)
 }
 
 // llmDeletePricingRule hard-deletes a pricing rule by id. If the rule was
@@ -228,14 +228,14 @@ func llmGetPricingRule(ctx context.Context, in *O11yLLMPricingRuleRef) (*O11yLLM
 //
 // Callers need the admin role; the runtime's own gate enforces it.
 func llmDeletePricingRule(ctx context.Context, in *O11yLLMPricingRuleRef) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/llm_pricing_rules/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/llm_pricing_rules/"+in.ID, nil, nil, nil)
 }
 
 // viewParams renders the shared span-view filter onto the wire — the ONE place
 // the four views' query is encoded, so they cannot drift. Start and End are
 // unix-millisecond epochs; a non-positive value is left off, and the runtime
 // reads an absent window as the last 24h. The tenant is NOT among these: it is
-// the validated X-Org-Id relayO11y forwards, never a caller-supplied param.
+// the validated X-Org-Id relay forwards, never a caller-supplied param.
 func viewParams(in *O11yLLMViewQuery) url.Values {
 	params := query(
 		"traceId", in.TraceID,

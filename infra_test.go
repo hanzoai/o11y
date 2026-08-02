@@ -309,6 +309,10 @@ func TestInfraRoutesAreTheSameFortyFour(t *testing.T) {
 			// sole owner of it. The explicit infraList literal is the real anchor.
 			!strings.HasPrefix(r.Path, "/v1/o11y/services") &&
 			!strings.Contains(r.Path, "third-party-apis") &&
+			// trace-funnels owns a /list too (tracefunnels.go). Same lesson the
+			// APM census learned about /service: a suffix is only unambiguous
+			// while one face owns it.
+			!strings.HasPrefix(r.Path, "/v1/o11y/trace-funnels") &&
 			(strings.Contains(r.Path, "attribute_") || infraList[r.Path] ||
 				strings.HasSuffix(r.Path, "/list") || strings.Contains(r.Path, "infra_monitoring")) {
 			got[r.Method+" "+r.Path] = true
@@ -326,9 +330,11 @@ func TestInfraRoutesAreTheSameFortyFour(t *testing.T) {
 	}
 }
 
-// Everything else under /v1/o11y still reaches the runtime through the
-// wildcard, and the typed paths take precedence over it.
-func TestTheRestOfO11yStillReachesTheRuntime(t *testing.T) {
+// A path no slice names is NOT served — there is no wildcard behind these ops
+// any more — while a typed path reaches the runtime with the path untouched.
+// Both halves in one test: the interesting failure is a typed op that quietly
+// stops dispatching and gets answered by something else.
+func TestUnnamedPathsAreNotServedButTypedOnesReachTheRuntime(t *testing.T) {
 	app := mounted(t)
 	var askedPath string
 	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -338,10 +344,15 @@ func TestTheRestOfO11yStillReachesTheRuntime(t *testing.T) {
 	}))
 	t.Cleanup(func() { o11y.SetHandler(nil) })
 
-	// A path no slice types: still delegated, path untouched, bytes untouched.
-	_, body := call(t, app, member(http.MethodGet, "/v1/o11y/never-a-typed-op/at-all", nil))
-	if !strings.Contains(string(body), `"path":"/v1/o11y/never-a-typed-op/at-all"`) {
-		t.Fatalf("the wildcard no longer delegates: %s", body)
+	// A path no slice names: 404, and the runtime is never asked. Under the old
+	// catch-all this same request was answered, which is exactly why an unmounted
+	// slice could go unnoticed for a release.
+	askedPath = ""
+	if status, body := call(t, app, member(http.MethodGet, "/v1/o11y/never-a-typed-op/at-all", nil)); status != http.StatusNotFound {
+		t.Fatalf("status=%d want 404: %s", status, body)
+	}
+	if askedPath != "" {
+		t.Fatalf("an unnamed path still reached the runtime as %q", askedPath)
 	}
 	// A typed path: the op dispatches, and what reaches the runtime is the
 	// SAME path — the op is a naming of the route, not a move of it.

@@ -45,16 +45,12 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-// infraPrefix is the infra face's path root, spelled ONCE: the group the ops
-// register on, and the first segment infraRelay rebuilds a call onto.
-const infraPrefix = "/v1/o11y"
-
 // mountInfra registers the forty-four typed infra ops on the native router:
 // three per resource face (attribute_keys, attribute_values, list) for the
 // eleven infra resources, the ten infra_monitoring rollups, and the setup
 // checks.
 func mountInfra(app *zip.App) {
-	g := app.Group(infraPrefix)
+	g := app.Group(o11yRoot)
 
 	zip.Get(g, "/hosts/attribute_keys", hostAttributeKeys)
 	zip.Get(g, "/hosts/attribute_values", hostAttributeValues)
@@ -819,7 +815,7 @@ func infraRelay(ctx context.Context, method, path string, params url.Values, bod
 		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
 	}
 
-	target := infraPrefix + path
+	target := o11yRoot + path
 	if q := params.Encode(); q != "" {
 		target += "?" + q
 	}
