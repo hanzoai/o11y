@@ -369,14 +369,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		provider.dashboardHandler.GetPublicData,
 		authtypes.Relation{Verb: coretypes.VerbRead},
 		coretypes.ResourceMetaResourcePublicDashboard,
-		func(req *http.Request, orgs []*types.Organization) ([]coretypes.Selector, valuer.UUID, error) {
-			id, err := valuer.NewUUID(mux.Vars(req)["id"])
-			if err != nil {
-				return nil, valuer.UUID{}, err
-			}
-
-			return provider.dashboardModule.GetPublicDashboardSelectorsAndOrg(req.Context(), id, orgs)
-		}, []string{}), handler.OpenAPIDef{
+		provider.publicDashboardSelectors, []string{}), handler.OpenAPIDef{
 		ID:                  "GetPublicDashboardData",
 		Tags:                []string{"dashboard"},
 		Summary:             "Get public dashboard data",
@@ -397,14 +390,7 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 		provider.dashboardHandler.GetPublicWidgetQueryRange,
 		authtypes.Relation{Verb: coretypes.VerbRead},
 		coretypes.ResourceMetaResourcePublicDashboard,
-		func(req *http.Request, orgs []*types.Organization) ([]coretypes.Selector, valuer.UUID, error) {
-			id, err := valuer.NewUUID(mux.Vars(req)["id"])
-			if err != nil {
-				return nil, valuer.UUID{}, err
-			}
-
-			return provider.dashboardModule.GetPublicDashboardSelectorsAndOrg(req.Context(), id, orgs)
-		}, []string{}), handler.OpenAPIDef{
+		provider.publicDashboardSelectors, []string{}), handler.OpenAPIDef{
 		ID:                  "GetPublicDashboardWidgetQueryRange",
 		Tags:                []string{"dashboard"},
 		Summary:             "Get query range result",
@@ -422,4 +408,18 @@ func (provider *provider) addDashboardRoutes(router *mux.Router) error {
 	}
 
 	return nil
+}
+
+// publicDashboardSelectors names the public dashboard by the {id} PATH segment
+// and answers with the selectors and org that dashboard belongs to. Both
+// anonymous public routes ask exactly this question, so they ask it in one
+// place: two copies of a gate's subject lookup is two places for the answer to
+// drift, and this one runs before any identity exists to fall back on.
+func (provider *provider) publicDashboardSelectors(req *http.Request, orgs []*types.Organization) ([]coretypes.Selector, valuer.UUID, error) {
+	id, err := valuer.NewUUID(coretypes.Param(req, "id"))
+	if err != nil {
+		return nil, valuer.UUID{}, err
+	}
+
+	return provider.dashboardModule.GetPublicDashboardSelectorsAndOrg(req.Context(), id, orgs)
 }

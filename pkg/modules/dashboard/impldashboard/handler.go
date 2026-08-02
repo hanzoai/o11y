@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
@@ -91,7 +90,7 @@ func (handler *handler) Update(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 	if id == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
@@ -140,7 +139,7 @@ func (handler *handler) LockUnlock(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 	if id == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
@@ -200,7 +199,7 @@ func (handler *handler) Delete(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 	if id == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
@@ -229,7 +228,7 @@ func (handler *handler) CreatePublic(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -267,7 +266,7 @@ func (handler *handler) GetPublic(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -292,7 +291,7 @@ func (handler *handler) GetPublicData(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -323,14 +322,14 @@ func (handler *handler) GetPublicWidgetQueryRange(rw http.ResponseWriter, r *htt
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	widgetIndex, ok := mux.Vars(r)["idx"]
-	if !ok {
+	widgetIndex := coretypes.Param(r, "idx")
+	if widgetIndex == "" {
 		render.Error(rw, errors.New(errors.TypeInvalidInput, dashboardtypes.ErrCodePublicDashboardInvalidInput, "widget index is missing from the path"))
 		return
 	}
@@ -399,7 +398,7 @@ func (handler *handler) UpdatePublic(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -443,7 +442,7 @@ func (handler *handler) DeletePublic(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return

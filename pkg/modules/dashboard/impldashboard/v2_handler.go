@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
@@ -54,7 +53,7 @@ func (handler *handler) CloneV2(rw http.ResponseWriter, r *http.Request) {
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 	if id == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
@@ -149,7 +148,7 @@ func (handler *handler) GetV2(rw http.ResponseWriter, r *http.Request) {
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 	if id == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
@@ -189,7 +188,7 @@ func (handler *handler) lockUnlockV2(rw http.ResponseWriter, r *http.Request, lo
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 	if id == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
@@ -237,7 +236,7 @@ func (handler *handler) UpdateV2(rw http.ResponseWriter, r *http.Request) {
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 	if id == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
@@ -275,7 +274,7 @@ func (handler *handler) PatchV2(rw http.ResponseWriter, r *http.Request) {
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 	if id == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
@@ -322,7 +321,7 @@ func (handler *handler) pinUnpinV2(rw http.ResponseWriter, r *http.Request, pin 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 	userID := valuer.MustNewUUID(claims.IdentityID())
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 	if id == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
@@ -358,7 +357,7 @@ func (handler *handler) DeleteV2(rw http.ResponseWriter, r *http.Request) {
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 	if id == "" {
 		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "id is missing in the path"))
 		return
