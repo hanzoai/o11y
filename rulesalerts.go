@@ -59,16 +59,12 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-// rulesAlertsPrefix is the face's path root, spelled ONCE: the group the ops
-// register on, and the first segment rulesAlertsRelay rebuilds a call onto.
-const rulesAlertsPrefix = "/v1/o11y"
-
 // mountRulesAlerts registers the rules & alerting face's typed ops on the
 // native router. Collection routes sit beside their parameterised siblings
 // safely: the router matches the most specific pattern, so /rules/test is never
 // swallowed by /rules/:id, the same disambiguation the runtime's own tree makes.
 func mountRulesAlerts(app *zip.App) {
-	g := app.Group(rulesAlertsPrefix)
+	g := app.Group(o11yRoot)
 
 	// alert rules (runtime gate per op: see each op's comment)
 	zip.Get(g, "/rules", listRules, zip.WithOperationID("ListRules"))
@@ -765,7 +761,7 @@ func rulesAlertsRelay(ctx context.Context, method, path string, params url.Value
 		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
 	}
 
-	target := rulesAlertsPrefix + path
+	target := o11yRoot + path
 	if q := params.Encode(); q != "" {
 		target += "?" + q
 	}

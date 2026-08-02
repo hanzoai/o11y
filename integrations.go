@@ -58,17 +58,13 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-// integrationsPrefix is the face's path root, spelled ONCE: the group the ops
-// register on, and the first segment integrationsRelay rebuilds a call onto.
-const integrationsPrefix = "/v1/o11y"
-
 // mountIntegrations registers the integrations face's typed ops on the native
 // router. Static segments sit beside their parameterised siblings safely — the
 // router matches the most specific pattern, so /integrations/install can never
 // be swallowed by /integrations/:integrationId, the same disambiguation the
 // runtime's own mux tree makes.
 func mountIntegrations(app *zip.App) {
-	g := app.Group(integrationsPrefix)
+	g := app.Group(o11yRoot)
 
 	// integration catalog and install lifecycle (runtime gate: ViewAccess)
 	zip.Get(g, "/integrations", listIntegrations, zip.WithOperationID("ListIntegrations"))
@@ -616,7 +612,7 @@ func integrationsRelay(ctx context.Context, method, path string, params url.Valu
 		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
 	}
 
-	target := integrationsPrefix + path
+	target := o11yRoot + path
 	if q := params.Encode(); q != "" {
 		target += "?" + q
 	}

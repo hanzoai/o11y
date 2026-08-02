@@ -56,11 +56,11 @@ import (
 )
 
 // mountSentryErrors registers the eighteen typed ops: the sentry product face on
-// the /v1/sentry group (relay), and the error-tracking and legacy exceptions
-// faces on the /v1/o11y group (relayAt). prefix and o11yRoot are telemetry.go's
-// and logs.go's roots, spelled once each.
+// the sentryRoot group, and the error-tracking and legacy exceptions faces on
+// the o11yRoot group. Both roots and the seam they relay through are spelled
+// once each, in relay.go.
 func mountSentryErrors(app *zip.App) {
-	gsentry := app.Group(prefix)
+	gsentry := app.Group(sentryRoot)
 	zip.Get(gsentry, "/projects", sentryListProjects)
 	zip.Post(gsentry, "/projects", sentryCreateProject)
 	zip.Get(gsentry, "/projects/:id", sentryGetProject)
@@ -91,7 +91,7 @@ func mountSentryErrors(app *zip.App) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func sentryListProjects(ctx context.Context, _ *struct{}) (*O11ySentryProjectsOut, error) {
 	out := new(O11ySentryProjectsOut)
-	return out, relay(ctx, http.MethodGet, "/projects", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, sentryRoot+"/projects", nil, nil, out)
 }
 
 // sentryCreateProject creates a Sentry project under the caller's org and
@@ -101,7 +101,7 @@ func sentryListProjects(ctx context.Context, _ *struct{}) (*O11ySentryProjectsOu
 // Callers need the editor role; the runtime's own gate enforces it.
 func sentryCreateProject(ctx context.Context, in *O11ySentryPostableProject) (*O11ySentryProjectOut, error) {
 	out := new(O11ySentryProjectOut)
-	return out, relay(ctx, http.MethodPost, "/projects", nil, in, out)
+	return out, relay(ctx, http.MethodPost, sentryRoot+"/projects", nil, in, out)
 }
 
 // sentryGetProject returns one Sentry project of the caller's org, DSN included.
@@ -109,7 +109,7 @@ func sentryCreateProject(ctx context.Context, in *O11ySentryPostableProject) (*O
 // Callers need the viewer role; the runtime's own gate enforces it.
 func sentryGetProject(ctx context.Context, in *O11ySentryProjectRef) (*O11ySentryProjectOut, error) {
 	out := new(O11ySentryProjectOut)
-	return out, relay(ctx, http.MethodGet, "/projects/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, sentryRoot+"/projects/"+in.ID, nil, nil, out)
 }
 
 // sentryDeleteProject deletes one Sentry project of the caller's org. Its DSN
@@ -120,7 +120,7 @@ func sentryGetProject(ctx context.Context, in *O11ySentryProjectRef) (*O11ySentr
 func sentryDeleteProject(ctx context.Context, in *O11ySentryProjectRef) (*struct{}, error) {
 	// The runtime answers 204 with a {"status":"success"} body; it is swallowed
 	// so the op answers a clean 204 No Content, its declared contract.
-	if err := relay(ctx, http.MethodDelete, "/projects/"+in.ID, nil, nil, &struct{}{}); err != nil {
+	if err := relay(ctx, http.MethodDelete, sentryRoot+"/projects/"+in.ID, nil, nil, &struct{}{}); err != nil {
 		return nil, err
 	}
 	return nil, nil
@@ -133,7 +133,7 @@ func sentryDeleteProject(ctx context.Context, in *O11ySentryProjectRef) (*struct
 // Callers need the editor role; the runtime's own gate enforces it.
 func sentryRotateProjectKey(ctx context.Context, in *O11ySentryProjectRef) (*O11ySentryProjectOut, error) {
 	out := new(O11ySentryProjectOut)
-	return out, relay(ctx, http.MethodPost, "/projects/"+in.ID+"/keys/rotate", nil, nil, out)
+	return out, relay(ctx, http.MethodPost, sentryRoot+"/projects/"+in.ID+"/keys/rotate", nil, nil, out)
 }
 
 // ── sentry issues ───────────────────────────────────────────────────────────
@@ -145,7 +145,7 @@ func sentryRotateProjectKey(ctx context.Context, in *O11ySentryProjectRef) (*O11
 // Callers need the viewer role; the runtime's own gate enforces it.
 func sentryListIssues(ctx context.Context, in *O11ySentryIssuesIn) (*O11yErrorIssuesOut, error) {
 	out := new(O11yErrorIssuesOut)
-	return out, relay(ctx, http.MethodGet, "/issues", query(
+	return out, relay(ctx, http.MethodGet, sentryRoot+"/issues", query(
 		"status", in.Status,
 		"level", in.Level,
 		"environment", in.Environment,
@@ -165,7 +165,7 @@ func sentryListIssues(ctx context.Context, in *O11ySentryIssuesIn) (*O11yErrorIs
 // Callers need the viewer role; the runtime's own gate enforces it.
 func sentryGetIssue(ctx context.Context, in *O11ySentryIssueRef) (*O11yErrorGettableIssueOut, error) {
 	out := new(O11yErrorGettableIssueOut)
-	return out, relay(ctx, http.MethodGet, "/issues/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, sentryRoot+"/issues/"+in.ID, nil, nil, out)
 }
 
 // sentryUpdateIssue changes an issue's lifecycle — resolve, ignore, reopen or
@@ -174,7 +174,7 @@ func sentryGetIssue(ctx context.Context, in *O11ySentryIssueRef) (*O11yErrorGett
 // Callers need the editor role; the runtime's own gate enforces it.
 func sentryUpdateIssue(ctx context.Context, in *O11ySentryUpdateIssueIn) (*O11yErrorIssueOut, error) {
 	out := new(O11yErrorIssueOut)
-	return out, relay(ctx, http.MethodPut, "/issues/"+in.ID, nil, O11yIssueUpdate{Status: in.Status, Assignee: in.Assignee}, out)
+	return out, relay(ctx, http.MethodPut, sentryRoot+"/issues/"+in.ID, nil, O11yIssueUpdate{Status: in.Status, Assignee: in.Assignee}, out)
 }
 
 // sentryIssueEvents lists one issue's captured occurrences, scoped to a project
@@ -184,7 +184,7 @@ func sentryUpdateIssue(ctx context.Context, in *O11ySentryUpdateIssueIn) (*O11yE
 // Callers need the viewer role; the runtime's own gate enforces it.
 func sentryIssueEvents(ctx context.Context, in *O11ySentryIssueEventsIn) (*O11ySentryIssueEventsOut, error) {
 	out := new(O11ySentryIssueEventsOut)
-	return out, relay(ctx, http.MethodGet, "/issues/"+in.ID+"/events", query(
+	return out, relay(ctx, http.MethodGet, sentryRoot+"/issues/"+in.ID+"/events", query(
 		"project", in.Project,
 		"limit", in.Limit,
 	), nil, out)
@@ -195,7 +195,7 @@ func sentryIssueEvents(ctx context.Context, in *O11ySentryIssueEventsIn) (*O11yS
 // Callers need the viewer role; the runtime's own gate enforces it.
 func sentryGetEvent(ctx context.Context, in *O11ySentryEventRef) (*O11ySentryEventOut, error) {
 	out := new(O11ySentryEventOut)
-	return out, relay(ctx, http.MethodGet, "/events/"+in.ID, query(
+	return out, relay(ctx, http.MethodGet, sentryRoot+"/events/"+in.ID, query(
 		"project", in.Project,
 	), nil, out)
 }
@@ -208,7 +208,7 @@ func sentryGetEvent(ctx context.Context, in *O11ySentryEventRef) (*O11ySentryEve
 // Callers need the viewer role; the runtime's own gate enforces it.
 func errorListIssues(ctx context.Context, in *O11yErrorIssuesIn) (*O11yErrorIssuesOut, error) {
 	out := new(O11yErrorIssuesOut)
-	return out, relayAt(ctx, http.MethodGet, "/errortracking/issues", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/errortracking/issues", query(
 		"status", in.Status,
 		"level", in.Level,
 		"environment", in.Environment,
@@ -225,7 +225,7 @@ func errorListIssues(ctx context.Context, in *O11yErrorIssuesIn) (*O11yErrorIssu
 // Callers need the viewer role; the runtime's own gate enforces it.
 func errorGetIssue(ctx context.Context, in *O11yErrorIssueRef) (*O11yErrorGettableIssueOut, error) {
 	out := new(O11yErrorGettableIssueOut)
-	return out, relayAt(ctx, http.MethodGet, "/errortracking/issues/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/errortracking/issues/"+in.ID, nil, nil, out)
 }
 
 // errorUpdateIssue changes an issue's lifecycle — resolve, ignore, reopen or
@@ -234,7 +234,7 @@ func errorGetIssue(ctx context.Context, in *O11yErrorIssueRef) (*O11yErrorGettab
 // Callers need the editor role; the runtime's own gate enforces it.
 func errorUpdateIssue(ctx context.Context, in *O11yErrorUpdateIssueIn) (*O11yErrorIssueOut, error) {
 	out := new(O11yErrorIssueOut)
-	return out, relayAt(ctx, http.MethodPost, "/errortracking/issues/"+in.ID, nil, O11yIssueUpdate{Status: in.Status, Assignee: in.Assignee}, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/errortracking/issues/"+in.ID, nil, O11yIssueUpdate{Status: in.Status, Assignee: in.Assignee}, out)
 }
 
 // ── legacy exceptions reads ─────────────────────────────────────────────────
@@ -246,7 +246,7 @@ func errorUpdateIssue(ctx context.Context, in *O11yErrorUpdateIssueIn) (*O11yErr
 // Callers need the viewer role; the runtime's own gate enforces it.
 func errorsList(ctx context.Context, in *O11yErrorsListIn) (*O11yErrorsList, error) {
 	out := new(O11yErrorsList)
-	return out, relayAt(ctx, http.MethodPost, "/listErrors", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/listErrors", nil, in, out)
 }
 
 // errorsCount counts the grouped exceptions in the query window for the caller's
@@ -255,7 +255,7 @@ func errorsList(ctx context.Context, in *O11yErrorsListIn) (*O11yErrorsList, err
 // Callers need the viewer role; the runtime's own gate enforces it.
 func errorsCount(ctx context.Context, in *O11yErrorsCountIn) (*O11yErrorCount, error) {
 	out := new(O11yErrorCount)
-	return out, relayAt(ctx, http.MethodPost, "/countErrors", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/countErrors", nil, in, out)
 }
 
 // errorFromErrorID returns one exception instance and the span it happened on,
@@ -264,7 +264,7 @@ func errorsCount(ctx context.Context, in *O11yErrorsCountIn) (*O11yErrorCount, e
 // Callers need the viewer role; the runtime's own gate enforces it.
 func errorFromErrorID(ctx context.Context, in *O11yErrorLookupIn) (*O11yErrorWithSpan, error) {
 	out := new(O11yErrorWithSpan)
-	return out, relayAt(ctx, http.MethodGet, "/errorFromErrorID", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/errorFromErrorID", query(
 		"timestamp", in.Timestamp,
 		"groupID", in.GroupID,
 		"errorID", in.ErrorID,
@@ -277,7 +277,7 @@ func errorFromErrorID(ctx context.Context, in *O11yErrorLookupIn) (*O11yErrorWit
 // Callers need the viewer role; the runtime's own gate enforces it.
 func errorFromGroupID(ctx context.Context, in *O11yErrorLookupIn) (*O11yErrorWithSpan, error) {
 	out := new(O11yErrorWithSpan)
-	return out, relayAt(ctx, http.MethodGet, "/errorFromGroupID", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/errorFromGroupID", query(
 		"timestamp", in.Timestamp,
 		"groupID", in.GroupID,
 		"errorID", in.ErrorID,
@@ -291,7 +291,7 @@ func errorFromGroupID(ctx context.Context, in *O11yErrorLookupIn) (*O11yErrorWit
 // Callers need the viewer role; the runtime's own gate enforces it.
 func nextPrevErrorIDs(ctx context.Context, in *O11yErrorLookupIn) (*O11yNextPrevErrorIDs, error) {
 	out := new(O11yNextPrevErrorIDs)
-	return out, relayAt(ctx, http.MethodGet, "/nextPrevErrorIDs", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/nextPrevErrorIDs", query(
 		"timestamp", in.Timestamp,
 		"groupID", in.GroupID,
 		"errorID", in.ErrorID,

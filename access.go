@@ -12,7 +12,7 @@ package o11y
 //
 // THE WIRE DOES NOT MOVE, and the way it does not move is that these ops do not
 // re-implement access control. Each hands the call to the SAME runtime handler
-// the wildcard delegates to (see send), so identity resolution, the org gate,
+// the wildcard delegates to (see relay.go), so identity resolution, the org gate,
 // the CheckResources/OpenAccess gate on every route, the FGA resource checks,
 // the audit record and the success envelope are all still the runtime's,
 // executed in the order they always were. What is new here is the TYPE — the In
@@ -30,33 +30,19 @@ package o11y
 // dispatches end in the same handler.
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
-	"net/http/httptest"
 	"time"
 
 	"github.com/zap-proto/zip"
 )
-
-// accessPrefix is the face's path root, spelled ONCE: the group the ops
-// register on, and the first segment send rebuilds a call onto.
-const accessPrefix = "/v1/o11y"
-
-// op names a typed registration with the operation id the face has always
-// published — the swaggest ids (CreateRole, ListServiceAccounts, …) carry over
-// verbatim so the operation's name survives the move into the composed
-// document.
-func op(id string) zip.OpOption { return zip.WithOperationID(id) }
 
 // mountAccess registers the twenty typed access-control ops on the native
 // router. The literal /service_accounts/me routes register ahead of the
 // parameterised ones so an id can never shadow them — the same defence
 // telemetry.go gives its collection routes.
 func mountAccess(app *zip.App) {
-	g := app.Group(accessPrefix)
+	g := app.Group(o11yRoot)
 
 	zip.Post(g, "/roles", createRole, op("CreateRole"), zip.WithStatus(http.StatusCreated))
 	zip.Get(g, "/roles", listRoles, op("ListRoles"))
@@ -91,34 +77,34 @@ func mountAccess(app *zip.App) {
 // reserved managed-role prefix; the runtime refuses anything else.
 func createRole(ctx context.Context, in *O11yRoleCreateIn) (*O11yRoleCreateOut, error) {
 	out := new(O11yRoleCreateOut)
-	return out, send(ctx, http.MethodPost, "/roles", in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/roles", nil, in, out)
 }
 
 // listRoles lists every role in the caller's org — the managed ones the
 // platform seeds and the custom ones its admins created.
 func listRoles(ctx context.Context, in *O11yRolesIn) (*O11yRolesOut, error) {
 	out := new(O11yRolesOut)
-	return out, send(ctx, http.MethodGet, "/roles", nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/roles", nil, nil, out)
 }
 
 // getRole returns one role with the transaction groups it grants.
 func getRole(ctx context.Context, in *O11yRoleGetIn) (*O11yRoleOut, error) {
 	out := new(O11yRoleOut)
-	return out, send(ctx, http.MethodGet, "/roles/"+in.ID, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/roles/"+in.ID, nil, nil, out)
 }
 
 // updateRole replaces a custom role's description and transaction groups.
 // Both fields are mandatory — send an empty string or an empty array to clear
 // one — and managed roles cannot be edited.
 func updateRole(ctx context.Context, in *O11yRoleUpdateIn) (*struct{}, error) {
-	return nil, send(ctx, http.MethodPut, "/roles/"+in.ID, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/roles/"+in.ID, nil, in, nil)
 }
 
 // deleteRole deletes a custom role. A role that still has user or
 // service-account assignees, or an auth-domain mapping, is refused; managed
 // roles cannot be deleted.
 func deleteRole(ctx context.Context, in *O11yRoleDeleteIn) (*struct{}, error) {
-	return nil, send(ctx, http.MethodDelete, "/roles/"+in.ID, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/roles/"+in.ID, nil, nil, nil)
 }
 
 // ── service accounts ──────────────────────────────────────────────────────────
@@ -128,59 +114,59 @@ func deleteRole(ctx context.Context, in *O11yRoleDeleteIn) (*struct{}, error) {
 // letters, digits or hyphens — becomes the account's email local part.
 func createServiceAccount(ctx context.Context, in *O11yServiceAccountCreateIn) (*O11yServiceAccountCreateOut, error) {
 	out := new(O11yServiceAccountCreateOut)
-	return out, send(ctx, http.MethodPost, "/service_accounts", in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/service_accounts", nil, in, out)
 }
 
 // listServiceAccounts lists the caller's org's service accounts.
 func listServiceAccounts(ctx context.Context, in *O11yServiceAccountsIn) (*O11yServiceAccountsOut, error) {
 	out := new(O11yServiceAccountsOut)
-	return out, send(ctx, http.MethodGet, "/service_accounts", nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/service_accounts", nil, nil, out)
 }
 
 // getMyServiceAccount returns the calling service account itself, with the
 // roles it holds — the self-inspection read for a key-authenticated caller.
 func getMyServiceAccount(ctx context.Context, in *O11yMyServiceAccountIn) (*O11yServiceAccountOut, error) {
 	out := new(O11yServiceAccountOut)
-	return out, send(ctx, http.MethodGet, "/service_accounts/me", nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/service_accounts/me", nil, nil, out)
 }
 
 // updateMyServiceAccount renames the calling service account.
 func updateMyServiceAccount(ctx context.Context, in *O11yMyServiceAccountUpdateIn) (*struct{}, error) {
-	return nil, send(ctx, http.MethodPut, "/service_accounts/me", in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/service_accounts/me", nil, in, nil)
 }
 
 // getServiceAccount returns one service account with the roles it holds.
 func getServiceAccount(ctx context.Context, in *O11yServiceAccountGetIn) (*O11yServiceAccountOut, error) {
 	out := new(O11yServiceAccountOut)
-	return out, send(ctx, http.MethodGet, "/service_accounts/"+in.ID, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/service_accounts/"+in.ID, nil, nil, out)
 }
 
 // updateServiceAccount renames a service account.
 func updateServiceAccount(ctx context.Context, in *O11yServiceAccountUpdateIn) (*struct{}, error) {
-	return nil, send(ctx, http.MethodPut, "/service_accounts/"+in.ID, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/service_accounts/"+in.ID, nil, in, nil)
 }
 
 // deleteServiceAccount deletes a service account and revokes every key it
 // holds.
 func deleteServiceAccount(ctx context.Context, in *O11yServiceAccountDeleteIn) (*struct{}, error) {
-	return nil, send(ctx, http.MethodDelete, "/service_accounts/"+in.ID, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/service_accounts/"+in.ID, nil, nil, nil)
 }
 
 // listServiceAccountRoles lists the roles a service account holds.
 func listServiceAccountRoles(ctx context.Context, in *O11yServiceAccountRolesIn) (*O11yServiceAccountRolesOut, error) {
 	out := new(O11yServiceAccountRolesOut)
-	return out, send(ctx, http.MethodGet, "/service_accounts/"+in.ID+"/roles", nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/service_accounts/"+in.ID+"/roles", nil, nil, out)
 }
 
 // grantServiceAccountRole assigns a role, named by its id, to a service
 // account.
 func grantServiceAccountRole(ctx context.Context, in *O11yServiceAccountRoleGrantIn) (*struct{}, error) {
-	return nil, send(ctx, http.MethodPost, "/service_accounts/"+in.ServiceAccountID+"/roles", in, nil)
+	return nil, relay(ctx, http.MethodPost, o11yRoot+"/service_accounts/"+in.ServiceAccountID+"/roles", nil, in, nil)
 }
 
 // revokeServiceAccountRole removes a role from a service account.
 func revokeServiceAccountRole(ctx context.Context, in *O11yServiceAccountRoleRevokeIn) (*struct{}, error) {
-	return nil, send(ctx, http.MethodDelete, "/service_accounts/"+in.ID+"/roles/"+in.RoleID, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/service_accounts/"+in.ID+"/roles/"+in.RoleID, nil, nil, nil)
 }
 
 // ── service-account keys ──────────────────────────────────────────────────────
@@ -192,25 +178,25 @@ func revokeServiceAccountRole(ctx context.Context, in *O11yServiceAccountRoleRev
 // and a timestamp in the past is refused.
 func createServiceAccountKey(ctx context.Context, in *O11yAPIKeyCreateIn) (*O11yAPIKeyCreateOut, error) {
 	out := new(O11yAPIKeyCreateOut)
-	return out, send(ctx, http.MethodPost, "/service_accounts/"+in.ServiceAccountID+"/keys", in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/service_accounts/"+in.ServiceAccountID+"/keys", nil, in, out)
 }
 
 // listServiceAccountKeys lists a service account's API keys — metadata only,
 // never the secrets.
 func listServiceAccountKeys(ctx context.Context, in *O11yAPIKeysIn) (*O11yAPIKeysOut, error) {
 	out := new(O11yAPIKeysOut)
-	return out, send(ctx, http.MethodGet, "/service_accounts/"+in.ID+"/keys", nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/service_accounts/"+in.ID+"/keys", nil, nil, out)
 }
 
 // updateServiceAccountKey renames an API key or moves its expiry.
 func updateServiceAccountKey(ctx context.Context, in *O11yAPIKeyUpdateIn) (*struct{}, error) {
-	return nil, send(ctx, http.MethodPut, "/service_accounts/"+in.ServiceAccountID+"/keys/"+in.KeyID, in, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/service_accounts/"+in.ServiceAccountID+"/keys/"+in.KeyID, nil, in, nil)
 }
 
 // revokeServiceAccountKey revokes an API key. Revocation is immediate and
 // permanent.
 func revokeServiceAccountKey(ctx context.Context, in *O11yAPIKeyRevokeIn) (*struct{}, error) {
-	return nil, send(ctx, http.MethodDelete, "/service_accounts/"+in.ID+"/keys/"+in.KeyID, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/service_accounts/"+in.ID+"/keys/"+in.KeyID, nil, nil, nil)
 }
 
 // ── authorization probe ───────────────────────────────────────────────────────
@@ -221,7 +207,7 @@ func revokeServiceAccountKey(ctx context.Context, in *O11yAPIKeyRevokeIn) (*stru
 // to show.
 func checkAccess(ctx context.Context, in *O11yCheckIn) (*O11yCheckOut, error) {
 	out := new(O11yCheckOut)
-	return out, send(ctx, http.MethodPost, "/authz/check", in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/authz/check", nil, in, out)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────
@@ -620,71 +606,3 @@ type O11yTransactionResult struct {
 }
 
 // ── the seam ──────────────────────────────────────────────────────────────────
-
-// send hands a typed op's call to the o11y runtime and decodes the answer into
-// the op's Out — nil out for the operations that answer no content.
-//
-// It is telemetry.go's relay with this face's root: the same identity
-// propagation, the same refusal reading, the same recorder hop onto the SAME
-// handler SetHandler registered, so the request runs the whole chain it always
-// ran — authn, the CheckResources or OpenAccess gate, the FGA checks, the audit
-// record — in the order it always did. No policy lives here. (Folding send and
-// relay into one prefix-parameterised seam is a one-line change in
-// telemetry.go, which belongs to its own unit.)
-func send(ctx context.Context, method, path string, body, out any) error {
-	h := getHandler()
-	if h == nil {
-		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
-	}
-
-	payload := io.Reader(http.NoBody)
-	if body != nil {
-		b, err := json.Marshal(body)
-		if err != nil {
-			return zip.ErrBadRequest(err.Error())
-		}
-		payload = bytes.NewReader(b)
-	}
-	req, err := http.NewRequestWithContext(ctx, method, accessPrefix+path, payload)
-	if err != nil {
-		return zip.ErrBadRequest(err.Error())
-	}
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	caller := zip.CallerOf(ctx)
-	for header, value := range map[string]string{
-		zip.HeaderOrg:       caller.Org,
-		zip.HeaderProject:   caller.Project,
-		zip.HeaderUser:      caller.User,
-		zip.HeaderUserName:  caller.Name,
-		zip.HeaderUserEmail: caller.Email,
-		zip.HeaderUserOwner: caller.Owner,
-		zip.HeaderRequestID: caller.RequestID,
-	} {
-		if value != "" {
-			req.Header.Set(header, value)
-		}
-	}
-	if caller.Admin {
-		req.Header.Set(zip.HeaderUserAdmin, "true")
-	}
-	if caller.OrgAdmin {
-		req.Header.Set(zip.HeaderUserOrgAdmin, "true")
-	}
-
-	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, req)
-
-	if rec.Code < http.StatusOK || rec.Code >= http.StatusMultipleChoices {
-		code, reason := refusal(rec.Body.Bytes())
-		return &zip.HTTPError{Status: rec.Code, Code: code, Msg: reason}
-	}
-	if out == nil {
-		return nil
-	}
-	if err := json.Unmarshal(rec.Body.Bytes(), out); err != nil {
-		return zip.ErrInternal("cannot read the runtime's answer: " + err.Error())
-	}
-	return nil
-}
