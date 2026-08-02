@@ -8,9 +8,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/serviceaccounttypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -53,7 +53,7 @@ func (handler *handler) Get(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -99,7 +99,7 @@ func (handler *handler) GetRoles(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -139,7 +139,7 @@ func (handler *handler) Update(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -221,7 +221,7 @@ func (handler *handler) SetRole(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -250,13 +250,13 @@ func (handler *handler) DeleteRole(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	roleID, err := valuer.NewUUID(mux.Vars(r)["rid"])
+	roleID, err := valuer.NewUUID(coretypes.Param(r, "rid"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -279,7 +279,7 @@ func (handler *handler) Delete(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -302,7 +302,7 @@ func (handler *handler) CreateFactorAPIKey(rw http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -344,7 +344,7 @@ func (handler *handler) ListFactorAPIKey(rw http.ResponseWriter, r *http.Request
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -373,13 +373,13 @@ func (handler *handler) UpdateFactorAPIKey(rw http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	factorAPIKeyID, err := valuer.NewUUID(mux.Vars(r)["fid"])
+	factorAPIKeyID, err := valuer.NewUUID(coretypes.Param(r, "fid"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -426,13 +426,13 @@ func (handler *handler) RevokeFactorAPIKey(rw http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	factorAPIKeyID, err := valuer.NewUUID(mux.Vars(r)["fid"])
+	factorAPIKeyID, err := valuer.NewUUID(coretypes.Param(r, "fid"))
 	if err != nil {
 		render.Error(rw, err)
 		return
