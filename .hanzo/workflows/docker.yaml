@@ -20,11 +20,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        # NOTE: no hanzoai/cloud sibling is checked out. The image builds only
-        # `./cmd/community`, which does not import github.com/hanzoai/cloud, so
-        # the go.mod `replace => ../cloud` is inert. (The CI go-build job, which
-        # runs `go build ./...` and thus compiles mount.go, still needs it — see
-        # ci.yaml — but the container does not.)
+        # NOTE: nothing here needs a hanzoai/cloud sibling, and neither does the
+        # go-build job any more — the module does not name cloud at all. What the
+        # image DOES now carry is the module's own route table: ./cmd/community's
+        # graph reaches github.com/hanzoai/o11y, so the OpenAPI document and the
+        # MCP tools ship in the process instead of in a package nothing links.
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

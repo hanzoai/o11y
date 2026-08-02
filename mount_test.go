@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/hanzoai/cloud"
 	"github.com/hanzoai/o11y"
 	"github.com/zap-proto/zip"
 )
@@ -14,9 +13,14 @@ import (
 // serves reachable. The counting proof lives in routes_test.go — this file holds
 // what is true of the SEAM itself.
 
-func TestMountSucceedsWithoutDeps(t *testing.T) {
+// Mount takes the router and NOTHING else. The signature is the assertion — this
+// test only pins that the table is total on a bare app, with no host, no
+// dependency struct and no runtime behind it. A table that needed anything from
+// its host could not be mounted by o11y's own binary, and for one logger field it
+// was not.
+func TestMountTakesOnlyTheRouter(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
+	if err := o11y.Mount(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 }
@@ -32,7 +36,7 @@ func TestMountSucceedsWithoutDeps(t *testing.T) {
 // that actually exist — one hatch and one typed op.
 func TestNamedRouteWithoutRuntimeReturns503(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
+	if err := o11y.Mount(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	o11y.SetHandler(nil)

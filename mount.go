@@ -4,26 +4,41 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/hanzoai/cloud"
-	luxlog "github.com/luxfi/log"
 	"github.com/zap-proto/zip"
 )
 
 // Mount registers Hanzo o11y's HTTP surface under /v1/o11y per HIP-0106.
 //
+// A ROUTE TABLE IS A VALUE, AND IT TAKES THE ROUTER AND NOTHING ELSE. Mount used
+// to take a second argument — the embedding host's dependency struct,
+// hanzoai/cloud's Deps — and it read exactly ONE field of it, Logger, on exactly
+// one line, to announce itself. That one line braided WHAT the routes are into
+// WHICH host serves them, and the price was paid three levels up:
+//
+//   - github.com/hanzoai/o11y required github.com/hanzoai/cloud, which requires
+//     github.com/hanzoai/o11y. A module CYCLE, for a log line.
+//   - Because the cycle made `go mod download` unresolvable in an image that has
+//     no cloud checkout, the community Dockerfile had to build one package
+//     instead of the module, and that package — cmd/community — could not import
+//     these declarations without dragging the host in. So it did not import them
+//     at all, and the whole conversion (353 typed ops, 353 published operations,
+//     353 MCP tools) shipped in a package the running process never linked.
+//
+// The router already carries a logger: the host configured it with its own when
+// it built the app, so app.Logger() is the SAME value Deps.Logger was, reached
+// through the argument that was already here. Nothing was carried by the second
+// argument that the first did not already have.
+//
+// With it gone the declarations stand alone, and BOTH hosts mount this ONE
+// table: the community server's own public router (pkg/query-service/app, which
+// is also the handler the unified binary embeds) and hanzoai/cloud's outer
+// router. One declaration, two hosts, nothing to drift.
+//
 // The o11y runtime (metrics, traces, logs, dashboards, alerts) is heavy:
-// telemetry stores, rule manager, websocket attachments, opamp server.
-// The standalone cmd/server boot path constructs it all. To keep the
-// route layer composable with the unified cloud binary, Mount delegates
-// to a handler registered by the runtime via SetHandler.
-//
-// Routing model:
-//
-//   - Standalone: cmd/server/server.go constructs *Server, calls
-//     o11y.SetHandler(server.PublicHandler()), then cloud.MountAll wires it.
-//   - Cloud binary: same SetHandler call, executed from the cloud bootstrapper
-//     after o11y.New + app.NewServer.
-//   - Until a handler is registered, the routes 503 with a clear error.
+// telemetry stores, rule manager, websocket attachments, opamp server. These
+// routes do not re-implement it — each hands its call to the handler the runtime
+// registers via SetHandler (see relay), and until one is registered they 503
+// with a clear error rather than pretending.
 //
 // EVERY ROUTE IS NAMED. There is no /v1/o11y/* catch-all any more. The runtime
 // registers 367 method+path pairs; 356 of them are typed ops declared in the
@@ -38,12 +53,8 @@ import (
 // PATH UNTOUCHED. Delegation never rewrites r.URL: every route is registered at
 // its full public path, so the route literal IS the contract — one spelling,
 // nothing to translate, nothing to drift.
-func Mount(app *zip.App, deps cloud.Deps) error {
-	log := deps.Logger
-	if log == nil {
-		log = luxlog.New("module", "o11y")
-	}
-	log.Info("o11y: mounting routes", "prefix", o11yRoot)
+func Mount(app *zip.App) error {
+	app.Logger().Info("o11y: mounting routes", "prefix", o11yRoot)
 
 	// Native probe group, registered ahead of everything else so Fiber's
 	// in-order match serves it off the mux tree (see health.go).
@@ -217,9 +228,21 @@ var (
 	registered http.Handler
 )
 
-// SetHandler registers the o11y runtime's public HTTP handler. The
-// standalone server calls this after app.NewServer; the unified cloud
-// binary calls it after constructing the same runtime in-process.
+// SetHandler registers the o11y runtime's public HTTP handler — the destination
+// every op in this table relays to.
+//
+// A HOST SETS THIS WHEN THE RUNTIME IS SOMEWHERE ELSE. The unified cloud binary
+// does: it mounts this table on its own router and points it at the runtime it
+// embedded (or, failing that, at the standalone Deployment it proxies), so the
+// table names a surface that answers one hop away.
+//
+// The standalone server does NOT, and must not: there the table is mounted on
+// the very router the runtime already answers on (pkg/query-service/app, see
+// publish), so the service's own handler answers first and relay is never
+// reached. Pointing this back at that same router would make an op that ever DID
+// dispatch relay into itself. Nothing to set is the correct configuration for a
+// host that IS the runtime.
+//
 // Safe for concurrent use; pass nil to unset.
 func SetHandler(h http.Handler) {
 	hmu.Lock()
