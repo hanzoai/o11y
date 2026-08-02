@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hanzoai/cloud"
 	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/http/render"
@@ -36,7 +35,7 @@ func (f fakeHealth) Livez(w http.ResponseWriter, r *http.Request) {
 func newMounted(t *testing.T) *zip.App {
 	t.Helper()
 	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
+	if err := o11y.Mount(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	return app

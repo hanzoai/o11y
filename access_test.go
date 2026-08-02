@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hanzoai/cloud"
 	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
@@ -315,7 +314,7 @@ func TestAccessTheRestOfTheFaceStillReachesTheRuntime(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = io.WriteString(w, `{"door":"wildcard","path":"`+r.URL.Path+`"}`)
 	})))
-	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
+	if err := o11y.Mount(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	answers(t, http.StatusOK, `{"status":"success","data":[]}`)
