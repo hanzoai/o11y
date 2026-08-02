@@ -17,9 +17,9 @@ jobs:
       GOPRIVATE: github.com/hanzoai/*
       GOSUMDB: "off"
     steps:
-      # go.mod requires github.com/hanzoai/cloud at a released version and
-      # resolves it from the proxy like every other private hanzoai module — no
-      # sibling checkout, no second copy of the pin to keep in step with it.
+      # This module does not require github.com/hanzoai/cloud at all — cloud
+      # requires o11y, and for one logger field the arrow used to point both ways.
+      # No sibling checkout, no pin, no cycle.
       - name: Checkout o11y
         uses: actions/checkout@v4
         with:
@@ -31,8 +31,10 @@ jobs:
           go-version-file: o11y/go.mod
           cache-dependency-path: o11y/go.sum
 
-      # Private cross-repo modules (hanzoai/*: commerce, iam, kms, licensing, …
-      # pulled transitively via cloud) are fetched over HTTPS git with the org PAT.
+      # Private cross-repo modules (hanzoai/*: sqlite, datastore, otel-collector,
+      # …) are fetched over HTTPS git with the org PAT. The two dozen that used to
+      # come in transitively via cloud (commerce, iam, kms, licensing, …) are gone
+      # with it.
       - name: Configure git auth for private hanzoai modules
         env:
           GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}

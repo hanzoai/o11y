@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"slices"
 
+	published "github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 
@@ -252,6 +253,12 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 	s.o11y.APIServer.AddToRouter(r)
 	s.routes = r.Table()
 
+	// The module's own declaration of this surface, and its projections. After the
+	// service's own routes, before the console catch-all — see publish.
+	if err := publish(app); err != nil {
+		return nil, err
+	}
+
 	// The console is the TERMINAL route, registered after every API route so the
 	// router's in-order match gives the API precedence and only paths that match
 	// nothing else reach the SPA shell. web is a plain http.Handler — pkg/web is
@@ -272,6 +279,46 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 	// even a 404. ExternalPath survives where it belongs: building absolute URLs
 	// (cookie Path, OAuth redirect, SPA base href), never routing.
 	return app, nil
+}
+
+// publish installs THE PUBLISHED TABLE — the module's own declaration of this
+// service's surface, github.com/hanzoai/o11y — onto the router this binary
+// serves, then installs zip's projections of it.
+//
+// The registrations above publish's call site are the service's IMPLEMENTATION:
+// real handlers, one per route. The table is the DECLARATION of the same 367:
+// 353 typed ops that each carry a named input, a named output and their prose,
+// 11 named escape hatches with the reason each cannot be typed, and the 3
+// probes. It was written, tested and shipped — and no binary imported it. The
+// standalone image builds ./cmd/community, and the table lived in a package
+// braided to the embedding host's dependency struct (hanzoai/cloud's Deps, for a
+// logger), so the community graph could not reach it without dragging the host
+// in. It did not, so 353 published operations and 353 MCP tools were true of the
+// source and absent from the process. Un-braiding Mount is what let this line
+// exist; this line is what puts the conversion in the binary.
+//
+// ORDER IS THE CONTRACT, twice over:
+//
+//   - AFTER the service's own routes. Fiber matches in registration order, so
+//     every one of these paths is still answered by the handler that has always
+//     answered it — no relay hop, no buffered round-trip, and therefore livetail,
+//     the long-poll and the chunked export still stream on this listener. The
+//     table names the surface here; it does not stand in front of it.
+//   - BEFORE the console's terminal catch-all. Prepare's routes are ordinary
+//     routes; registered after /* the SPA would answer for them.
+//
+// Prepare is what turns the in-memory registry into doors: the OpenAPI document
+// at /.well-known/openapi.json, /docs, the MCP tool surface at /mcp and the
+// by-name call plane. zip defers it so a host can finish mounting first, and
+// Listen calls it — but this server serves through Fiber().Listener rather than
+// zip's own Listen, so without this call the document would exist in the process
+// and answer on no port. It is guarded to run once however it is reached.
+func publish(app *zip.App) error {
+	if err := published.Mount(app); err != nil {
+		return err
+	}
+	app.Prepare()
+	return nil
 }
 
 // initListeners initialises listeners of the server

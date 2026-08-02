@@ -163,24 +163,44 @@ consistent upstream version. Keep it that way: bump by re-syncing to a newer O11
 The real server binary is `./cmd/community` (NOT `./cmd/server`, which does not
 exist). Build check: `GOPRIVATE='github.com/hanzoai/*' GOSUMDB=off go build ./cmd/community`.
 
-### The cloud pin is ONE fact, in go.mod
+### There is no cloud pin. The dependency is GONE, and it was a cycle
 
-Root `mount.go` imports `github.com/hanzoai/cloud`, and go.mod requires it at a
-**released version**, resolved from the proxy like every other private `hanzoai/*`
-module (ci.yaml already configures git auth for exactly that). Bump it with
-`go get github.com/hanzoai/cloud@vX.Y.Z`.
+`github.com/hanzoai/o11y` does **not** require `github.com/hanzoai/cloud`. It did,
+for one field of one struct on one line: `Mount(app *zip.App, deps cloud.Deps)`
+read `deps.Logger` to announce itself. That single line made the module graph a
+**cycle** — o11y required cloud, cloud requires o11y — and the cycle is what kept
+the conversion out of the shipped binary:
 
-It used to resolve via `replace => ../cloud`, which no CI runner has, so ci.yaml
-carried a second checkout of cloud pinned to an exact commit to supply the
-sibling — the same fact written twice, and touching either alone died with the
-misleading `go: updates to go.mod needed`. Both the replace and the checkout step
-are **deleted**; the version in go.mod is now the only place cloud is named. The
-replace also hid a broken pin: the required version had drifted so far that a
-standalone `go build ./...` could not compile cloud at all, and nothing noticed
-because CI never built the required version.
+- The community image builds `./cmd/community`, and the route declarations lived
+  in a package braided to the host, so that binary could not link them without
+  dragging cloud in. It did not link them. **353 typed ops, 353 published
+  operations and 353 MCP tools were true of the source and absent from the
+  process** — invisible to CI, because the tests import the table directly.
+- A whole-module `go mod download` was unresolvable in any image without a cloud
+  checkout, so the Dockerfile had to scope itself to one package to route around
+  it, and the *reason* got written down as if it were a design decision.
 
-The version jumps a bump drags in are **not upgrade decisions** — MVS forces them,
-because cloud already requires them. Do not "fix" them back down.
+`Mount(app *zip.App) error` takes the router and nothing else. The router already
+carries the host's logger (`app.Logger()`), so the argument never carried
+information the first argument did not already have. Dropping it removed cloud and
+**~20 transitive requirements** behind it (`hanzoai/{iam,commerce,authz,tasks,vfs,orm,ha,s3-go,…}`)
+from this module's graph.
+
+Standing proof, and it must stay empty:
+
+```
+go list -deps ./cmd/community | grep hanzoai/cloud     # EMPTY
+go list -deps ./cmd/community | grep -x github.com/hanzoai/o11y   # PRESENT
+```
+
+The second line is the one that matters: it is what says the declarations are in
+the binary. `pkg/query-service/app`'s `publish()` mounts them onto the router the
+server serves — after the service's own routes (so the handler that always
+answered a path still answers it, and streams stay streams) and before the console
+catch-all — then calls `app.Prepare()`, which is what turns the registry into
+doors: `/.well-known/openapi.json`, `/docs`, `/mcp`, the by-name call plane. This
+server serves through `Fiber().Listener`, not `zip.Listen`, so without that call
+the document exists in the process and answers on no port.
 
 Since a green build is NOT sufficient evidence (`hanzoai/zip` → `zap-proto/zip` can
 boot-panic while CI stays green), smoke-test the binary: it must reach
@@ -194,11 +214,10 @@ Root `Dockerfile` + `.hanzo/workflows/docker.yaml` build a standalone community
 server image on push to `main` and `v*` tags → `ghcr.io/hanzoai/o11y:<sha>` (+ `:main`).
 This replaces an unrelated upstream image that previously squatted the tags.
 
-- Builds ONLY `./cmd/community`. It does NOT import `github.com/hanzoai/cloud`, so
-  go.mod's `replace github.com/hanzoai/cloud => ../cloud` is inert for the image and
-  no cloud sibling is checked out. (Cloud lives only in root `mount.go`, compiled by
-  the `go build ./...` CI job — so `ci.yaml` still needs the sibling; the container
-  does not.) A bare `go mod download` WOULD fail (cloud→../cloud); build the one pkg.
+- Builds `./cmd/community`, the binary the image runs. No cloud sibling, no
+  replace, no pin — the module does not name cloud at all any more (see "There is
+  no cloud pin" above). The build is scoped to the one package because that is the
+  binary, not because a whole-module resolve would fail; it no longer would.
 - Its graph pulls **PRIVATE** forks — `hanzoai/sqlite` and `hanzo-ds/go` (the
   sqlite + datastore drivers added by the driver swap) — alongside the public
   ones (otel-collector, govaluate, hanzo-ds/mock, expr). So the module fetch

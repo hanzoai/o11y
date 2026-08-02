@@ -8,7 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hanzoai/cloud"
 	"github.com/zap-proto/zip"
 )
 
@@ -19,9 +18,7 @@ import (
 // so the test observes exactly what the relay forwards; the wire, not the work,
 // is what these ops own.
 func TestRulesAlertsOpsRelayVerbatim(t *testing.T) {
-	cfg := &cloud.Config{Brand: "hanzo", Domain: "api.hanzo.ai", DataDir: t.TempDir()}
-	deps := cloud.BuildDeps(cfg)
-	app := zip.New(zip.Config{Logger: deps.Logger, DisableStartupMessage: true})
+	app := zip.New(zip.Config{DisableStartupMessage: true})
 	mountRulesAlerts(app)
 
 	var (
@@ -92,9 +89,7 @@ func TestRulesAlertsOpsRelayVerbatim(t *testing.T) {
 // id and its window query parameters through to the runtime unchanged, and that
 // a downtime-list filter is forwarded only when set.
 func TestRulesAlertsHistoryQueryForwarded(t *testing.T) {
-	cfg := &cloud.Config{Brand: "hanzo", Domain: "api.hanzo.ai", DataDir: t.TempDir()}
-	deps := cloud.BuildDeps(cfg)
-	app := zip.New(zip.Config{Logger: deps.Logger, DisableStartupMessage: true})
+	app := zip.New(zip.Config{DisableStartupMessage: true})
 	mountRulesAlerts(app)
 
 	var sawPath string
