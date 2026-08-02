@@ -61,17 +61,20 @@ func TestGetEventReadsThePathIDAndTheQueryProject(t *testing.T) {
 	assert.Equal(t, org, module.gotEventOrg)
 }
 
+// ingestRoute is the template the runtime registers, guid constraint and all.
+// It is spelled here exactly as sentry.go spells it: a stale copy is not a
+// smaller version of this test, it is a different route (see the constraint
+// test below).
+const ingestRoute = "/v1/sentry/{project:guid}/envelope/"
+
 // The ingest route is the one segment read that decides TENANCY: the project in
 // the path is what the DSN key is verified against, so reading the wrong one
-// would verify a key against the wrong project. The template is the runtime's,
-// uuid constraint and all — that constraint is the router's business, the segment
-// NAME is this read's.
+// would verify a key against the wrong project.
 func TestIngestVerifiesTheProjectTheRouterMatched(t *testing.T) {
 	module := &stubSentry{}
 	project := valuer.GenerateUUID()
-	template := "/v1/sentry/{project:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}/envelope/"
 
-	router := routing.Serve(http.MethodPost, template, http.HandlerFunc(NewHandler(module, true, false).EnvelopeIngest))
+	router := routing.Serve(http.MethodPost, ingestRoute, http.HandlerFunc(NewHandler(module, true, false).EnvelopeIngest))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, httptest.NewRequest(http.MethodPost, "/v1/sentry/"+project.String()+"/envelope/", strings.NewReader("{}")))
@@ -81,4 +84,25 @@ func TestIngestVerifiesTheProjectTheRouterMatched(t *testing.T) {
 	require.Equal(t, http.StatusUnauthorized, rec.Code, rec.Body.String())
 	assert.Contains(t, rec.Body.String(), "invalid ingest key")
 	assert.Equal(t, project, module.gotIngestProj)
+}
+
+// The constraint is the whole reason the ingest wildcard can never shadow a
+// static /v1/sentry resource word, so a non-uuid segment must not reach the
+// handler at all. This is pinned because the constraint is silently OPTIONAL:
+// the router names its constraints, an unrecognised name is DROPPED rather than
+// refused, and a dropped constraint matches everything. Spelling this route with
+// the hand-written character class the runtime used to carry produces exactly
+// that — a route that answers /v1/sentry/projects/envelope/ with 418 instead of
+// 404 — which is why the template above is the runtime's own `guid` and is
+// asserted here rather than trusted.
+func TestIngestConstraintRefusesANonUUIDProject(t *testing.T) {
+	module := &stubSentry{}
+
+	router := routing.Serve(http.MethodPost, ingestRoute, http.HandlerFunc(NewHandler(module, true, false).EnvelopeIngest))
+
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, httptest.NewRequest(http.MethodPost, "/v1/sentry/projects/envelope/", strings.NewReader("{}")))
+
+	require.Equal(t, http.StatusNotFound, rec.Code, rec.Body.String())
+	assert.Equal(t, valuer.UUID{}, module.gotIngestProj, "a segment the constraint refuses must not reach the handler")
 }
