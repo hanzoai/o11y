@@ -64,6 +64,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/postprocess"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
@@ -475,7 +476,7 @@ func (aH *APIHandler) testRule(w http.ResponseWriter, r *http.Request) {
 }
 
 func (aH *APIHandler) getRuleStats(w http.ResponseWriter, r *http.Request) {
-	ruleID := mux.Vars(r)["id"]
+	ruleID := coretypes.Param(r, "id")
 	params := model.QueryRuleStateHistory{}
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
@@ -557,7 +558,7 @@ func (aH *APIHandler) getRuleStats(w http.ResponseWriter, r *http.Request) {
 }
 
 func (aH *APIHandler) getOverallStateTransitions(w http.ResponseWriter, r *http.Request) {
-	ruleID := mux.Vars(r)["id"]
+	ruleID := coretypes.Param(r, "id")
 	params := model.QueryRuleStateHistory{}
 	err := json.NewDecoder(r.Body).Decode(&params)
 	if err != nil {
@@ -575,7 +576,7 @@ func (aH *APIHandler) getOverallStateTransitions(w http.ResponseWriter, r *http.
 }
 
 func (aH *APIHandler) getRuleStateHistory(w http.ResponseWriter, r *http.Request) {
-	idStr := mux.Vars(r)["id"]
+	idStr := coretypes.Param(r, "id")
 	id, err := valuer.NewUUID(idStr)
 	if err != nil {
 		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
@@ -662,7 +663,7 @@ func (aH *APIHandler) getRuleStateHistory(w http.ResponseWriter, r *http.Request
 }
 
 func (aH *APIHandler) getRuleStateHistoryTopContributors(w http.ResponseWriter, r *http.Request) {
-	idStr := mux.Vars(r)["id"]
+	idStr := coretypes.Param(r, "id")
 	id, err := valuer.NewUUID(idStr)
 	if err != nil {
 		RespondError(w, &model.ApiError{Typ: model.ErrorBadData, Err: err}, nil)
@@ -2298,7 +2299,7 @@ func (aH *APIHandler) ListIntegrations(
 func (aH *APIHandler) GetIntegration(
 	w http.ResponseWriter, r *http.Request,
 ) {
-	integrationId := mux.Vars(r)["integrationId"]
+	integrationId := coretypes.Param(r, "integrationId")
 	claims, errv2 := authtypes.ClaimsFromContext(r.Context())
 	if errv2 != nil {
 		render.Error(w, errv2)
@@ -2327,7 +2328,7 @@ func (aH *APIHandler) GetIntegrationConnectionStatus(w http.ResponseWriter, r *h
 		return
 	}
 
-	integrationId := mux.Vars(r)["integrationId"]
+	integrationId := coretypes.Param(r, "integrationId")
 	claims, errv2 := authtypes.ClaimsFromContext(r.Context())
 	if errv2 != nil {
 		render.Error(w, errv2)
@@ -2657,7 +2658,7 @@ func (aH *APIHandler) logAggregate(w http.ResponseWriter, r *http.Request) {
 }
 
 func parseAgentConfigVersion(r *http.Request) (int, error) {
-	versionString := mux.Vars(r)["version"]
+	versionString := coretypes.Param(r, "version")
 
 	if versionString == "latest" {
 		return -1, nil
@@ -3633,8 +3634,7 @@ func (aH *APIHandler) getDomainInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func (aH *APIHandler) handleValidateTraces(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	funnelID := vars["funnel_id"]
+	funnelID := coretypes.Param(r, "funnel_id")
 
 	claims, err := authtypes.ClaimsFromContext(r.Context())
 
@@ -3675,8 +3675,7 @@ func (aH *APIHandler) handleValidateTraces(w http.ResponseWriter, r *http.Reques
 }
 
 func (aH *APIHandler) handleFunnelAnalytics(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	funnelID := vars["funnel_id"]
+	funnelID := coretypes.Param(r, "funnel_id")
 
 	claims, err := authtypes.ClaimsFromContext(r.Context())
 
@@ -3712,8 +3711,7 @@ func (aH *APIHandler) handleFunnelAnalytics(w http.ResponseWriter, r *http.Reque
 }
 
 func (aH *APIHandler) handleFunnelStepAnalytics(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	funnelID := vars["funnel_id"]
+	funnelID := coretypes.Param(r, "funnel_id")
 
 	claims, err := authtypes.ClaimsFromContext(r.Context())
 
@@ -3749,8 +3747,7 @@ func (aH *APIHandler) handleFunnelStepAnalytics(w http.ResponseWriter, r *http.R
 }
 
 func (aH *APIHandler) handleStepAnalytics(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	funnelID := vars["funnel_id"]
+	funnelID := coretypes.Param(r, "funnel_id")
 
 	claims, err := authtypes.ClaimsFromContext(r.Context())
 
@@ -3786,8 +3783,7 @@ func (aH *APIHandler) handleStepAnalytics(w http.ResponseWriter, r *http.Request
 }
 
 func (aH *APIHandler) handleFunnelSlowTraces(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	funnelID := vars["funnel_id"]
+	funnelID := coretypes.Param(r, "funnel_id")
 
 	claims, err := authtypes.ClaimsFromContext(r.Context())
 
@@ -3823,8 +3819,7 @@ func (aH *APIHandler) handleFunnelSlowTraces(w http.ResponseWriter, r *http.Requ
 }
 
 func (aH *APIHandler) handleFunnelErrorTraces(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	funnelID := vars["funnel_id"]
+	funnelID := coretypes.Param(r, "funnel_id")
 
 	claims, err := authtypes.ClaimsFromContext(r.Context())
 

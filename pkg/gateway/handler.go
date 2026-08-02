@@ -8,9 +8,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/gatewaytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 const (
@@ -136,7 +136,7 @@ func (handler *handler) UpdateIngestionKey(rw http.ResponseWriter, r *http.Reque
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	keyID := mux.Vars(r)["keyId"]
+	keyID := coretypes.Param(r, "keyId")
 	if keyID == "" {
 		render.Error(rw, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "keyId is required"))
 		return
@@ -168,7 +168,7 @@ func (handler *handler) DeleteIngestionKey(rw http.ResponseWriter, r *http.Reque
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	keyID := mux.Vars(r)["keyId"]
+	keyID := coretypes.Param(r, "keyId")
 	if keyID == "" {
 		render.Error(rw, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "keyId is required"))
 		return
@@ -194,7 +194,7 @@ func (handler *handler) CreateIngestionKeyLimit(rw http.ResponseWriter, r *http.
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	keyID := mux.Vars(r)["keyId"]
+	keyID := coretypes.Param(r, "keyId")
 	if keyID == "" {
 		render.Error(rw, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "keyId is required"))
 		return
@@ -226,7 +226,7 @@ func (handler *handler) UpdateIngestionKeyLimit(rw http.ResponseWriter, r *http.
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	limitID := mux.Vars(r)["limitId"]
+	limitID := coretypes.Param(r, "limitId")
 	if limitID == "" {
 		render.Error(rw, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "limitId is required"))
 		return
@@ -258,7 +258,7 @@ func (handler *handler) DeleteIngestionKeyLimit(rw http.ResponseWriter, r *http.
 
 	orgID := valuer.MustNewUUID(claims.OrgID)
 
-	limitID := mux.Vars(r)["limitId"]
+	limitID := coretypes.Param(r, "limitId")
 	if limitID == "" {
 		render.Error(rw, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "limitId is required"))
 		return
