@@ -80,10 +80,29 @@ const (
 // INSERT templates — column lists match the applied event-plane schema.
 // Omitted envelope columns (el, anonymous_id, person_id, host) take their
 // defaults; host is DEFAULT domain(url), so it materializes from the url we
-// insert. ingested_at is passed explicitly: it is the Replacing version, and
-// an injected clock keeps it deterministic under test.
+// insert.
+//
+// ingested_at IS DELIBERATELY NOT BOUND. It is three things at once in this
+// table's DDL:
+//
+//	ReplacingMergeTree(ingested_at)     -- the version that decides which
+//	                                       duplicate row survives a merge
+//	PARTITION BY toDate(ingested_at)    -- which partition the row lands in
+//	TTL toDateTime(ingested_at) + 30d   -- when the row is deleted
+//
+// so a writer that binds it hands all three to whoever produced the batch. A
+// sender could keep its spans forever by dating them forward, drop them
+// immediately by dating them back, scatter one batch across partitions, or win
+// a Replacing merge against a newer row. None of that is a retention policy —
+// it is the absence of one.
+//
+// DEFAULT now64(3) is on the column, so leaving it out is not a gap: the server
+// stamps its own arrival time, which is the only clock that can be trusted to
+// mean "when we received this". cloud's planesink.go already omits it and its
+// TestRetentionIsNotARequestParameter forbids binding it; this writer was the
+// divergent one, and it is the side that owns the DDL.
 const (
-	spanSQLTmpl      = "INSERT INTO %s.%s (org, time, ingested_at, id, name, kind, product, session_id, distinct_id, url, path, attributes, service, trace_id, span_id, parent, duration, status, resource_fingerprint) VALUES"
+	spanSQLTmpl      = "INSERT INTO %s.%s (org, time, id, name, kind, product, session_id, distinct_id, url, path, attributes, service, trace_id, span_id, parent, duration, status, resource_fingerprint) VALUES"
 	attributeSQLTmpl = "INSERT INTO %s.%s (org, tag_key, tag_type, tag_data_type, string_value, number_value, unix_milli) VALUES"
 	keySQLTmpl       = "INSERT INTO %s.%s (org, tagKey, tagType, dataType, isColumn, unix_milli) VALUES"
 	resourceSQLTmpl  = "INSERT INTO %s.%s (org, seen_at_ts_bucket_start, fingerprint, labels) VALUES"
@@ -91,8 +110,8 @@ const (
 	traceSQLTmpl     = "INSERT INTO %s.%s (org, trace_id, start, end, num_spans) VALUES"
 )
 
-// spanRow maps 1:1 to the inserted event.span columns (minus write-time
-// ingested_at).
+// spanRow maps 1:1 to the inserted event.span columns. ingested_at is not among
+// them and must not be added: the server defaults it (see spanSQLTmpl).
 type spanRow struct {
 	org        string
 	time       time.Time
@@ -224,9 +243,9 @@ func WithDatabase(db string) Option { return func(w *Writer) { w.db = db } }
 // "org" attribute (default "hanzo" — the deployment's own tenant).
 func WithOrg(org string) Option { return func(w *Writer) { w.org = org } }
 
-// WithNow injects the clock (tests). It feeds ingested_at (the Replacing
-// version), the support tables' unix_milli version, and the zero-time
-// fallbacks.
+// WithNow injects the clock (tests). It feeds the support tables' unix_milli
+// version, the resource bucket, and the zero-time fallbacks — NOT event.span's
+// ingested_at, which the server defaults (see spanSQLTmpl).
 func WithNow(now func() time.Time) Option { return func(w *Writer) { w.now = now } }
 
 // NewWriter builds a Writer over an existing datastore connection. Defaults
@@ -261,7 +280,10 @@ func (w *Writer) WriteSpans(ctx context.Context, batch *zapreceiver.SpanBatch) e
 
 	if err := send(ctx, w.conn, fmt.Sprintf(spanSQLTmpl, w.db, telemetrytraces.SpanTableName), r.spans,
 		func(b driver.Batch, s spanRow) error {
-			return b.Append(s.org, s.time, now, s.id, s.name, s.kind, s.product, s.sessionID, s.distinctID,
+			// No ingested_at: the server's DEFAULT now64(3) sets it. See the
+			// template's comment — that column is the version, the partition key
+			// and the TTL anchor, and none of the three belong to the sender.
+			return b.Append(s.org, s.time, s.id, s.name, s.kind, s.product, s.sessionID, s.distinctID,
 				s.url, s.path, s.attrs, s.service, s.traceID, s.spanID, s.parent, s.duration, s.status,
 				s.resourceFingerprint)
 		}); err != nil {
