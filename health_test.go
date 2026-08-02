@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/hanzoai/cloud"
 	"github.com/hanzoai/o11y"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/http/render"
@@ -36,7 +35,7 @@ func (f fakeHealth) Livez(w http.ResponseWriter, r *http.Request) {
 func newMounted(t *testing.T) *zip.App {
 	t.Helper()
 	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
+	if err := o11y.Mount(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	return app
@@ -60,7 +59,7 @@ func TestHealthzDispatchesNatively(t *testing.T) {
 	o11y.SetHealth(fakeHealth{healthy: true})
 	defer o11y.SetHealth(nil)
 
-	resp, body := get(t, app, "/v1/o11y/api/v2/healthz")
+	resp, body := get(t, app, "/v1/o11y/healthz")
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("status=%d want 200", resp.StatusCode)
 	}
@@ -76,7 +75,7 @@ func TestHealthzUnhealthyReturns503(t *testing.T) {
 	o11y.SetHealth(fakeHealth{healthy: false})
 	defer o11y.SetHealth(nil)
 
-	resp, _ := get(t, app, "/v1/o11y/api/v2/healthz")
+	resp, _ := get(t, app, "/v1/o11y/healthz")
 	if resp.StatusCode != http.StatusServiceUnavailable {
 		t.Fatalf("status=%d want 503", resp.StatusCode)
 	}
@@ -88,7 +87,7 @@ func TestReadyzDispatchesNatively(t *testing.T) {
 	o11y.SetHealth(fakeHealth{healthy: true})
 	defer o11y.SetHealth(nil)
 
-	resp, _ := get(t, app, "/v1/o11y/api/v2/readyz")
+	resp, _ := get(t, app, "/v1/o11y/readyz")
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("status=%d want 200", resp.StatusCode)
 	}
@@ -101,7 +100,7 @@ func TestLivezRendersNatively(t *testing.T) {
 	o11y.SetHealth(fakeHealth{healthy: true})
 	defer o11y.SetHealth(nil)
 
-	resp, body := get(t, app, "/v1/o11y/api/v2/livez")
+	resp, body := get(t, app, "/v1/o11y/livez")
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("status=%d want 200", resp.StatusCode)
 	}
@@ -125,13 +124,13 @@ func TestHealthFallsThroughWhenUnset(t *testing.T) {
 	}))
 	defer o11y.SetHandler(nil)
 
-	resp, _ := get(t, app, "/v1/o11y/api/v2/livez")
+	resp, _ := get(t, app, "/v1/o11y/livez")
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("status=%d want 200", resp.StatusCode)
 	}
-	// The wildcard rewrites /v1/o11y/api/v2/livez → /api/v2/livez before delegating.
-	if reached != "/api/v2/livez" {
-		t.Fatalf("fell through to %q, want /api/v2/livez", reached)
+	// The wildcard delegates the path VERBATIM — no rewrite anywhere on the way.
+	if reached != "/v1/o11y/livez" {
+		t.Fatalf("fell through to %q, want /v1/o11y/livez", reached)
 	}
 }
 

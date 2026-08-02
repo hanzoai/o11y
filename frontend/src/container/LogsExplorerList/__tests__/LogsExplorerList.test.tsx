@@ -10,7 +10,7 @@ import { PreferenceContextProvider } from 'providers/preferences/context/Prefere
 import { QueryBuilderContext } from 'providers/QueryBuilder';
 import { render, screen } from 'tests/test-utils';
 
-const queryRangeURL = 'http://localhost/api/v3/query_range';
+const queryRangeURL = 'http://localhost/v1/o11y/query_range';
 
 const logsQueryServerRequest = ({
 	response = logsQueryRangeEmptyResponse,

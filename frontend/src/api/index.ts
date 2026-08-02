@@ -70,13 +70,13 @@ export const interceptorsRequestResponse = (
 };
 
 // Strips the leading '/' from path and joins with base — idempotent if already prefixed.
-// e.g. prependBase('/o11y/', '/api/v1/') → '/o11y/api/v1/'
+// e.g. prependBase('/o11y/', '/v1/o11y/') → '/o11y/v1/o11y/'
 function prependBase(base: string, path: string): string {
 	return path.startsWith(base) ? path : base + path.slice(1);
 }
 
 // Prepends the runtime base path to outgoing requests so API calls work under
-// a URL prefix (e.g. /o11y/api/v1/…). No-op for root deployments and dev
+// a URL prefix (e.g. /o11y/v1/o11y/…). No-op for root deployments and dev
 // (dev baseURL is a full http:// URL, not an absolute path).
 export const interceptorsRequestBasePath = (
 	value: InternalAxiosRequestConfig,
@@ -87,15 +87,15 @@ export const interceptorsRequestBasePath = (
 	}
 
 	if (value.baseURL?.startsWith('/')) {
-		// Production relative baseURL: '/api/v1/' → '/o11y/api/v1/'
+		// Production relative baseURL: '/v1/o11y/' → '/o11y/v1/o11y/'
 		value.baseURL = prependBase(basePath, value.baseURL);
 	} else if (value.baseURL?.startsWith('http')) {
-		// Dev absolute baseURL (VITE_FRONTEND_API_ENDPOINT): 'https://host/api/v1/' → 'https://host/o11y/api/v1/'
+		// Dev absolute baseURL (VITE_FRONTEND_API_ENDPOINT): 'https://host/v1/o11y/' → 'https://host/o11y/v1/o11y/'
 		const url = new URL(value.baseURL);
 		url.pathname = prependBase(basePath, url.pathname);
 		value.baseURL = url.toString();
 	} else if (!value.baseURL && value.url?.startsWith('/')) {
-		// Orval-generated client (empty baseURL, path in url): '/api/o11y/v1/rules' → '/o11y/api/o11y/v1/rules'
+		// Orval-generated client (empty baseURL, path in url): '/v1/o11y/rules' → '/o11y/v1/o11y/rules'
 		value.url = prependBase(basePath, value.url);
 	}
 
@@ -121,14 +121,14 @@ export const interceptorRejected = async (
 					response.config.url === '/sessions' && response.config.method === 'delete'
 				) &&
 				response.config.url !== '/authz/check' &&
-				response.config.url !== '/api/v2/reset_password_tokens/verify'
+				response.config.url !== '/v1/o11y/reset_password_tokens/verify'
 			) {
 				try {
 					const accessToken = getLocalStorageApi(LOCALSTORAGE.AUTH_TOKEN);
 					const refreshToken = getLocalStorageApi(LOCALSTORAGE.REFRESH_AUTH_TOKEN);
 					const response = await queryClient.fetchQuery({
 						queryFn: () => post({ refreshToken: refreshToken || '' }),
-						queryKey: ['/api/v2/sessions/rotate', accessToken, refreshToken],
+						queryKey: ['/v1/o11y/sessions/rotate', accessToken, refreshToken],
 					});
 
 					afterLogin(response.data.accessToken, response.data.refreshToken, true);

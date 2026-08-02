@@ -18,7 +18,7 @@ import { Query } from 'types/api/queryBuilder/queryBuilderData';
 
 import LogsExplorer from '../index';
 
-const queryRangeURL = 'http://localhost/api/v3/query_range';
+const queryRangeURL = 'http://localhost/v1/o11y/query_range';
 
 jest.mock('react-router-dom', () => ({
 	...jest.requireActual('react-router-dom'),

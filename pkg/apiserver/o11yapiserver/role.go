@@ -3,15 +3,24 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
 )
 
-func (provider *provider) addRoleRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v1/roles", handler.New(
+// ALL FIVE role routes are ALSO declared as typed ops at the module's mount
+// seam (access.go in the repo root), which is what carries them into the
+// composed document, the SDK, the CLI and the agent surface. That is a second
+// DISPATCH, never a second implementation: the ops answer by handing the call
+// to this router, so the CheckResources gate and the handlers below stay the
+// one place role access control is performed. Both are needed — the ops serve
+// the composed binary, this router serves the standalone process, which has no
+// native router to register an op on — so deleting either half drops one of
+// the two deployments.
+func (provider *provider) addRoleRoutes(router routing.Router) {
+	router.Post("/v1/o11y/roles", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.Create, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "CreateRole",
@@ -34,11 +43,9 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 			ID:       coretypes.ResponseJSONPath("data.id"),
 			Selector: coretypes.WildcardSelector,
 		}),
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/api/v1/roles", handler.New(
+	router.Get("/v1/o11y/roles", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.List, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "ListRoles",
@@ -60,11 +67,9 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 			Category: coretypes.ActionCategoryAccessControl,
 			Selector: coretypes.WildcardSelector,
 		}),
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/api/v1/roles/{id}", handler.New(
+	router.Get("/v1/o11y/roles/{id}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.Get, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "GetRole",
@@ -87,11 +92,9 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 			ID:       coretypes.PathParam("id"),
 			Selector: provider.roleSelector,
 		}),
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/api/v1/roles/{id}", handler.New(
+	router.Put("/v1/o11y/roles/{id}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.Update, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "UpdateRole",
@@ -114,11 +117,9 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 			ID:       coretypes.PathParam("id"),
 			Selector: provider.roleSelector,
 		}),
-	)).Methods(http.MethodPut).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/api/v1/roles/{id}", handler.New(
+	router.Delete("/v1/o11y/roles/{id}", handler.New(
 		provider.authzMiddleware.CheckResources(provider.authzHandler.Delete, authtypes.O11yAdminRoleName),
 		handler.OpenAPIDef{
 			ID:                  "DeleteRole",
@@ -141,9 +142,5 @@ func (provider *provider) addRoleRoutes(router *mux.Router) error {
 			ID:       coretypes.PathParam("id"),
 			Selector: provider.roleSelector,
 		}),
-	)).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	))
 }

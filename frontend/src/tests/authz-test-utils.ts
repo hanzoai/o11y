@@ -19,7 +19,7 @@ import {
 	LicenseStatus,
 } from 'types/api/licensesV3/getActive';
 
-export const AUTHZ_CHECK_URL = `${ENVIRONMENT.baseURL || ''}/api/v1/authz/check`;
+export const AUTHZ_CHECK_URL = `${ENVIRONMENT.baseURL || ''}/v1/o11y/authz/check`;
 
 export function authzMockResponse(
 	payload: AuthtypesTransactionDTO[],

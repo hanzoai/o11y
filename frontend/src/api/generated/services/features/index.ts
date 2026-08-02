@@ -25,14 +25,14 @@ import type { ErrorType } from '../../../generatedAPIInstance';
  */
 export const getFeatures = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetFeatures200>({
-		url: `/api/v2/features`,
+		url: `/v1/o11y/features`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetFeaturesQueryKey = () => {
-	return [`/api/v2/features`] as const;
+	return [`/v1/o11y/features`] as const;
 };
 
 export const getGetFeaturesQueryOptions = <

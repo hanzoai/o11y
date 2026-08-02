@@ -9,8 +9,8 @@ import { Token } from 'types/api/v2/sessions/email_password/post';
 
 import Login from '../index';
 
-const VERSION_ENDPOINT = '*/api/v1/version';
-const SESSIONS_CONTEXT_ENDPOINT = '*/api/v2/sessions/context';
+const VERSION_ENDPOINT = '*/v1/o11y/version';
+const SESSIONS_CONTEXT_ENDPOINT = '*/v1/o11y/sessions/context';
 const CALLBACK_AUTHN_ORG = 'callback_authn_org';
 const CALLBACK_AUTHN_URL = 'https://sso.example.com/auth';
 const PASSWORD_AUTHN_ORG = 'password_authn_org';
@@ -567,7 +567,7 @@ describe('Login Component', () => {
 				rest.get(SESSIONS_CONTEXT_ENDPOINT, (_, res, ctx) =>
 					res(ctx.status(200), ctx.json({ data: mockSingleOrgPasswordAuth })),
 				),
-				rest.post('*/api/v2/sessions/email_password', async (_, res, ctx) =>
+				rest.post('*/v1/o11y/sessions/email_password', async (_, res, ctx) =>
 					res(
 						ctx.status(200),
 						ctx.json({ status: 'success', data: mockEmailPasswordResponse }),
@@ -618,7 +618,7 @@ describe('Login Component', () => {
 				rest.get(SESSIONS_CONTEXT_ENDPOINT, (_, res, ctx) =>
 					res(ctx.status(200), ctx.json({ data: mockSingleOrgPasswordAuth })),
 				),
-				rest.post('*/api/v2/sessions/email_password', (_, res, ctx) =>
+				rest.post('*/v1/o11y/sessions/email_password', (_, res, ctx) =>
 					res(
 						ctx.status(401),
 						ctx.json({

@@ -7,10 +7,10 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -56,7 +56,7 @@ func TestExistsConditionForWithEvolutions(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorExists,
 			value:         nil,
-			expectedSQL:   "WHERE resource.`service.name`::String IS NOT NULL",
+			expectedSQL:   "WHERE notEmpty(service)",
 			expectedError: nil,
 		},
 		{
@@ -88,8 +88,8 @@ func TestExistsConditionForWithEvolutions(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorExists,
 			value:         nil,
-			expectedSQL:   "WHERE mapContains(resources_string, 'service.name') = ?",
-			expectedArgs:  []any{true},
+			expectedSQL:   "WHERE notEmpty(service)",
+			expectedArgs:  nil,
 			expectedError: nil,
 		},
 		{
@@ -121,7 +121,7 @@ func TestExistsConditionForWithEvolutions(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorExists,
 			value:         nil,
-			expectedSQL:   "WHERE multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, mapContains(resources_string, 'service.name'), resources_string['service.name'], NULL) IS NOT NULL",
+			expectedSQL:   "WHERE notEmpty(service)",
 			expectedError: nil,
 		},
 	}
@@ -183,7 +183,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorGreaterThan,
 			value:         float64(100),
-			expectedSQL:   "(toFloat64(attributes_number['request.duration']) > ? AND mapContains(attributes_number, 'request.duration') = ?)",
+			expectedSQL:   "(toFloat64(toFloat64OrNull(attributes['request.duration'])) > ? AND mapContains(attributes, 'request.duration') = ?)",
 			expectedArgs:  []any{float64(100), true},
 			expectedError: nil,
 		},
@@ -196,7 +196,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorLessThan,
 			value:         float64(1024),
-			expectedSQL:   "(toFloat64(attributes_number['request.size']) < ? AND mapContains(attributes_number, 'request.size') = ?)",
+			expectedSQL:   "(toFloat64(toFloat64OrNull(attributes['request.size'])) < ? AND mapContains(attributes, 'request.size') = ?)",
 			expectedArgs:  []any{float64(1024), true},
 			expectedError: nil,
 		},
@@ -233,7 +233,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorILike,
 			value:         "%admin%",
-			expectedSQL:   "(attributes_string['user.id'] ILIKE ? AND mapContains(attributes_string, 'user.id') = ?)",
+			expectedSQL:   "(attributes['user.id'] ILIKE ? AND mapContains(attributes, 'user.id') = ?)",
 			expectedArgs:  []any{"%admin%", true},
 			expectedError: nil,
 		},
@@ -246,7 +246,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotILike,
 			value:         "%admin%",
-			expectedSQL:   "WHERE attributes_string['user.id'] NOT ILIKE ?",
+			expectedSQL:   "WHERE attributes['user.id'] NOT ILIKE ?",
 			expectedArgs:  []any{"%admin%"},
 			expectedError: nil,
 		},
@@ -259,7 +259,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorContains,
 			value:         521509198310,
-			expectedSQL:   "attributes_string['user.id'] ILIKE ?",
+			expectedSQL:   "attributes['user.id'] ILIKE ?",
 			expectedArgs:  []any{"%521509198310%", true},
 			expectedError: nil,
 		},
@@ -284,7 +284,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorContains,
 			value:         "admin",
-			expectedSQL:   "(attributes_string['user.id'] ILIKE ? AND mapContains(attributes_string, 'user.id') = ?)",
+			expectedSQL:   "(attributes['user.id'] ILIKE ? AND mapContains(attributes, 'user.id') = ?)",
 			expectedArgs:  []any{"%admin%", true},
 			expectedError: nil,
 		},
@@ -356,7 +356,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorExists,
 			value:         nil,
-			expectedSQL:   "mapContains(attributes_string, 'user.id') = ?",
+			expectedSQL:   "mapContains(attributes, 'user.id') = ?",
 			expectedArgs:  []any{true},
 			expectedError: nil,
 		},
@@ -369,7 +369,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotExists,
 			value:         nil,
-			expectedSQL:   "mapContains(attributes_string, 'user.id') <> ?",
+			expectedSQL:   "mapContains(attributes, 'user.id') <> ?",
 			expectedArgs:  []any{true},
 			expectedError: nil,
 		},
@@ -383,8 +383,8 @@ func TestConditionFor(t *testing.T) {
 			evolutions:    mockEvolution,
 			operator:      qbtypes.FilterOperatorExists,
 			value:         nil,
-			expectedSQL:   "mapContains(resources_string, 'service.name') = ?",
-			expectedArgs:  []any{true},
+			expectedSQL:   "notEmpty(service)",
+			expectedArgs:  nil,
 			expectedError: nil,
 		},
 		{
@@ -397,8 +397,8 @@ func TestConditionFor(t *testing.T) {
 			evolutions:    mockEvolution,
 			operator:      qbtypes.FilterOperatorNotExists,
 			value:         nil,
-			expectedSQL:   "mapContains(resources_string, 'service.name') <> ?",
-			expectedArgs:  []any{true},
+			expectedSQL:   "empty(service)",
+			expectedArgs:  nil,
 			expectedError: nil,
 		},
 		{
@@ -434,7 +434,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorRegexp,
 			value:         "^https://.*\\.example\\.com.*$",
-			expectedSQL:   "(match(attributes_string['http.url'], ?) AND mapContains(attributes_string, 'http.url') = ?)",
+			expectedSQL:   "(match(attributes['http.url'], ?) AND mapContains(attributes, 'http.url') = ?)",
 			expectedArgs:  []any{"^https://.*\\.example\\.com.*$", true},
 			expectedError: nil,
 		},
@@ -447,7 +447,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotRegexp,
 			value:         "^http://localhost.*",
-			expectedSQL:   "WHERE NOT match(attributes_string['http.url'], ?)",
+			expectedSQL:   "WHERE NOT match(attributes['http.url'], ?)",
 			expectedArgs:  []any{"^http://localhost.*"},
 			expectedError: nil,
 		},
@@ -462,8 +462,8 @@ func TestConditionFor(t *testing.T) {
 			evolutions:    mockEvolution,
 			operator:      qbtypes.FilterOperatorRegexp,
 			value:         "frontend-.*",
-			expectedSQL:   "WHERE (match(`resource_string_service$$name`, ?) AND `resource_string_service$$name_exists` = ?)",
-			expectedArgs:  []any{"frontend-.*", true},
+			expectedSQL:   "WHERE match(service, ?)",
+			expectedArgs:  []any{"frontend-.*"},
 			expectedError: nil,
 		},
 		{
@@ -477,7 +477,7 @@ func TestConditionFor(t *testing.T) {
 			evolutions:    mockEvolution,
 			operator:      qbtypes.FilterOperatorNotRegexp,
 			value:         "test-.*",
-			expectedSQL:   "WHERE NOT match(`resource_string_service$$name`, ?)",
+			expectedSQL:   "WHERE NOT match(service, ?)",
 			expectedArgs:  []any{"test-.*"},
 			expectedError: nil,
 		},

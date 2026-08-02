@@ -133,7 +133,7 @@ describe('Create Alert Channel', () => {
 		});
 		it('Should check if clicking on Test button shows "An alert has been sent to this channel" success message if testing passes', async () => {
 			server.use(
-				rest.post('http://localhost/api/v1/testChannel', (req, res, ctx) =>
+				rest.post('http://localhost/v1/o11y/testChannel', (req, res, ctx) =>
 					res(
 						ctx.status(200),
 						ctx.json({

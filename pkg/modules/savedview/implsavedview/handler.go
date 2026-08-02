@@ -11,8 +11,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/savedview"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -63,7 +63,7 @@ func (handler *handler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	viewID := mux.Vars(r)["viewId"]
+	viewID := coretypes.Param(r, "viewId")
 	viewUUID, err := valuer.NewUUID(viewID)
 	if err != nil {
 		render.Error(w, errors.Wrapf(err, errors.TypeInvalidInput, errors.CodeInvalidInput, "failed to parse view id"))
@@ -89,7 +89,7 @@ func (handler *handler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	viewID := mux.Vars(r)["viewId"]
+	viewID := coretypes.Param(r, "viewId")
 	viewUUID, err := valuer.NewUUID(viewID)
 	if err != nil {
 		render.Error(w, errors.Wrapf(err, errors.TypeInvalidInput, errors.CodeInvalidInput, "failed to parse view id"))
@@ -125,7 +125,7 @@ func (handler *handler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	viewID := mux.Vars(r)["viewId"]
+	viewID := coretypes.Param(r, "viewId")
 	viewUUID, err := valuer.NewUUID(viewID)
 	if err != nil {
 		render.Error(w, errors.Wrapf(err, errors.TypeInvalidInput, errors.CodeInvalidInput, "failed to parse view id"))

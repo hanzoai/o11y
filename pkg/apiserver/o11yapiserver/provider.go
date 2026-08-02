@@ -3,7 +3,6 @@ package o11yapiserver
 import (
 	"context"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/alertmanager"
 	"github.com/hanzoai/o11y/pkg/apiserver"
 	"github.com/hanzoai/o11y/pkg/authz"
@@ -13,6 +12,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/global"
 	"github.com/hanzoai/o11y/pkg/http/handler"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/modules/authdomain"
 	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/modules/dashboard"
@@ -45,7 +45,6 @@ import (
 type provider struct {
 	config                     apiserver.Config
 	settings                   factory.ScopedProviderSettings
-	router                     *mux.Router
 	authzMiddleware            *middleware.AuthZ
 	authzService               authz.AuthZ
 	orgHandler                 organization.Handler
@@ -201,12 +200,9 @@ func newProvider(
 	sentryHandler sentry.Handler,
 ) (apiserver.APIServer, error) {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/apiserver/o11yapiserver")
-	router := mux.NewRouter().UseEncodedPath()
-
 	provider := &provider{
 		config:                     config,
 		settings:                   settings,
-		router:                     router,
 		orgHandler:                 orgHandler,
 		userHandler:                userHandler,
 		authzService:               authzService,
@@ -244,157 +240,47 @@ func newProvider(
 
 	provider.authzMiddleware = middleware.NewAuthZ(settings.Logger(), orgGetter, authzService)
 
-	if err := provider.AddToRouter(router); err != nil {
-		return nil, err
-	}
-
+	// No router of its own. The provider used to build one, register every route
+	// on it, and answer Router() with it — a second copy of the whole tree that
+	// nothing served from and nothing read. The host's router is the only one.
 	return provider, nil
 }
 
-func (provider *provider) Router() *mux.Router {
-	return provider.router
-}
-
-func (provider *provider) AddToRouter(router *mux.Router) error {
-	if err := provider.addOrgRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addSessionRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addAuthDomainRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addPreferenceRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addUserRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addGlobalRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addPromoteRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addFlaggerRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addDashboardRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addMetricsExplorerRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addMetricReductionRuleRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addInfraMonitoringRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addGatewayRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addRoleRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addAuthzRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addFieldsRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addRawDataExportRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addZeusRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addQuerierRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addServiceAccountRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addRegistryRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addCloudIntegrationRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addRuleStateHistoryRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addSpanMapperRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addAlertmanagerRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addLLMPricingRuleRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addLLMObsRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addErrorTrackingRoutes(router); err != nil {
-		return err
-	}
-
-	// Hanzo Sentry product face — clean /v1/sentry/* routes on THIS router (no
-	// /v1/o11y→/api rewrite). Registered here so its literal paths precede any wildcard.
-	if err := provider.addSentryRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addTraceDetailRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addRulerRoutes(router); err != nil {
-		return err
-	}
-
-	if err := provider.addStatsReporterRoutes(router); err != nil {
-		return err
-	}
-
-	// LAST: every /api/vN/* route is now on the router. Register version-less
-	// /api/<resource> aliases so the Hanzo public contract /v1/o11y/<resource> never
-	// carries O11y's engine version (highest version wins; llmobs names are left
-	// owned). Generated by walking the router — no hand map, survives re-syncs.
-	if err := AddVersionlessAliases(router); err != nil {
-		return err
-	}
-
-	return nil
+func (provider *provider) AddToRouter(router routing.Router) {
+	provider.addOrgRoutes(router)
+	provider.addSessionRoutes(router)
+	provider.addAuthDomainRoutes(router)
+	provider.addPreferenceRoutes(router)
+	provider.addUserRoutes(router)
+	provider.addGlobalRoutes(router)
+	provider.addPromoteRoutes(router)
+	provider.addFlaggerRoutes(router)
+	provider.addDashboardRoutes(router)
+	provider.addMetricsExplorerRoutes(router)
+	provider.addMetricReductionRuleRoutes(router)
+	provider.addInfraMonitoringRoutes(router)
+	provider.addGatewayRoutes(router)
+	provider.addRoleRoutes(router)
+	provider.addAuthzRoutes(router)
+	provider.addFieldsRoutes(router)
+	provider.addRawDataExportRoutes(router)
+	provider.addZeusRoutes(router)
+	provider.addQuerierRoutes(router)
+	provider.addServiceAccountRoutes(router)
+	provider.addRegistryRoutes(router)
+	provider.addCloudIntegrationRoutes(router)
+	provider.addRuleStateHistoryRoutes(router)
+	provider.addSpanMapperRoutes(router)
+	provider.addAlertmanagerRoutes(router)
+	provider.addLLMPricingRuleRoutes(router)
+	provider.addLLMObsRoutes(router)
+	provider.addErrorTrackingRoutes(router)
+	// Hanzo Sentry product face — clean /v1/sentry/* routes on THIS router.
+	// Registered here so its literal paths precede the ingest wildcards.
+	provider.addSentryRoutes(router)
+	provider.addTraceDetailRoutes(router)
+	provider.addRulerRoutes(router)
+	provider.addStatsReporterRoutes(router)
 }
 
 func newSecuritySchemes(role types.Role) []handler.OpenAPISecurityScheme {

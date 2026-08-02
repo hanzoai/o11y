@@ -377,7 +377,7 @@ func (m *module) buildSamplesTblFingerprintSubQuery(metricNames []string, sample
 func (m *module) buildReducedSamplesTblFingerprintSubQuery(metricNames []string, flooredStart, flooredEnd uint64) *sqlbuilder.SelectBuilder {
 	lastSB := sqlbuilder.NewSelectBuilder()
 	lastSB.Select("reduced_fingerprint")
-	lastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedLastTableName))
+	lastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricReducedLastTableName))
 	lastSB.Where(
 		lastSB.In("metric_name", sqlbuilder.List(metricNames)),
 		lastSB.GE("unix_milli", flooredStart),
@@ -386,7 +386,7 @@ func (m *module) buildReducedSamplesTblFingerprintSubQuery(metricNames []string,
 
 	sumSB := sqlbuilder.NewSelectBuilder()
 	sumSB.Select("reduced_fingerprint")
-	sumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedSumTableName))
+	sumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricReducedSumTableName))
 	sumSB.Where(
 		sumSB.In("metric_name", sqlbuilder.List(metricNames)),
 		sumSB.GE("unix_milli", flooredStart),
@@ -455,7 +455,7 @@ func (m *module) getEarliestMetricTime(ctx context.Context, metricNames []string
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("min(first_reported_unix_milli) AS min_first_reported")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(sb.In("metric_name", sqlbuilder.List(metricNames)))
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
@@ -481,7 +481,7 @@ func (m *module) getMetricsExistence(ctx context.Context, metricNames []string) 
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("metric_name", "count(*) AS cnt")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(sb.In("metric_name", sqlbuilder.List(metricNames)))
 	sb.GroupBy("metric_name")
 
@@ -526,7 +526,7 @@ func (m *module) getAttributesExistence(ctx context.Context, metricNames, attrNa
 	}
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("attr_name", "count(*) AS cnt")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(
 		sb.In("metric_name", sqlbuilder.List(metricNames)),
 		sb.In("attr_name", sqlbuilder.List(attrNames)),
@@ -646,7 +646,7 @@ func (m *module) getMetadata(
 
 		reducedSrc := sqlbuilder.NewSelectBuilder()
 		reducedSrc.Select("labels", "unix_milli")
-		reducedSrc.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
+		reducedSrc.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesReducedTableName))
 		reducedSrc.Where(
 			reducedSrc.In("metric_name", sqlbuilder.List(metricNames)),
 			reducedSrc.GE("unix_milli", tsAdjustedStartMs),

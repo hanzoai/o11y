@@ -3,14 +3,24 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/metricsexplorertypes"
 )
 
-func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v2/metrics", handler.New(
+// ALL of these routes are ALSO declared as typed ops at the module's mount seam
+// (metrics.go in the repo root), which is what carries them into the composed
+// document, the SDK, the CLI and the agent surface. That is a second DISPATCH,
+// never a second implementation: the ops answer by handing the call to this
+// router, so the handlers below stay the one place the work is performed — and
+// the gates declared here (ViewAccess on the reads, EditAccess on the metadata
+// write) stay the one place access is decided. Both halves are needed — the ops
+// serve the composed binary, this router serves the standalone process, which
+// has no native router to register an op on — so deleting either drops one of
+// the two deployments.
+func (provider *provider) addMetricsExplorerRoutes(router routing.Router) {
+	router.Get("/v1/o11y/metrics", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.ListMetrics),
 		handler.OpenAPIDef{
 			ID:                  "ListMetrics",
@@ -26,11 +36,9 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/api/v2/metrics/stats", handler.New(
+	router.Post("/v1/o11y/metrics/stats", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.GetStats),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricsStats",
@@ -45,11 +53,9 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/api/v2/metrics/treemap", handler.New(
+	router.Post("/v1/o11y/metrics/treemap", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.GetTreemap),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricsTreemap",
@@ -64,11 +70,9 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/api/v2/metrics/attributes", handler.New(
+	router.Get("/v1/o11y/metrics/attributes", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.GetMetricAttributes),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricAttributes",
@@ -84,11 +88,9 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusNotFound, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/api/v2/metrics/metadata", handler.New(
+	router.Get("/v1/o11y/metrics/metadata", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.GetMetricMetadata),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricMetadata",
@@ -104,11 +106,9 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusNotFound, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/api/v2/metrics/metadata", handler.New(
+	router.Post("/v1/o11y/metrics/metadata", handler.New(
 		provider.authzMiddleware.EditAccess(provider.metricsExplorerHandler.UpdateMetricMetadata),
 		handler.OpenAPIDef{
 			ID:                  "UpdateMetricMetadata",
@@ -123,11 +123,9 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/api/v2/metrics/highlights", handler.New(
+	router.Get("/v1/o11y/metrics/highlights", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.GetMetricHighlights),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricHighlights",
@@ -143,11 +141,9 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusNotFound, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/api/v2/metrics/alerts", handler.New(
+	router.Get("/v1/o11y/metrics/alerts", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.GetMetricAlerts),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricAlerts",
@@ -163,31 +159,11 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusNotFound, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/api/v2/metrics/dashboards", handler.New(
-		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.GetMetricDashboards),
-		handler.OpenAPIDef{
-			ID:                  "GetMetricDashboards",
-			Tags:                []string{"metrics"},
-			Summary:             "Get metric dashboards",
-			Description:         "This endpoint returns associated dashboards for a specified metric",
-			Request:             nil,
-			RequestQuery:        new(metricsexplorertypes.MetricNameQuery),
-			RequestContentType:  "",
-			Response:            new(metricsexplorertypes.MetricDashboardsResponse),
-			ResponseContentType: "application/json",
-			SuccessStatusCode:   http.StatusOK,
-			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusNotFound, http.StatusInternalServerError},
-			Deprecated:          false,
-			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
-
-	if err := router.Handle("/api/v3/metrics/dashboards", handler.New(
+	// GetMetricDashboards (formerly /api/v2/metrics/dashboards) is superseded by
+	// GetMetricDashboardsV2 below (formerly /api/v3) — highest version wins.
+	router.Get("/v1/o11y/metrics/dashboards", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.GetMetricDashboardsV2),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricDashboardsV2",
@@ -203,11 +179,9 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusNotFound, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/api/v2/metrics/inspect", handler.New(
+	router.Post("/v1/o11y/metrics/inspect", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.InspectMetrics),
 		handler.OpenAPIDef{
 			ID:                  "InspectMetrics",
@@ -222,11 +196,9 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/api/v2/metrics/onboarding", handler.New(
+	router.Get("/v1/o11y/metrics/onboarding", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.GetOnboardingStatus),
 		handler.OpenAPIDef{
 			ID:                  "GetMetricsOnboardingStatus",
@@ -241,9 +213,5 @@ func (provider *provider) addMetricsExplorerRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusUnauthorized, http.StatusInternalServerError},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+		}))
 }

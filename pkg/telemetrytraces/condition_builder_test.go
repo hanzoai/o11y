@@ -7,9 +7,9 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -35,7 +35,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotEqual,
 			value:         uint64(1617979338000000000),
-			expectedSQL:   "timestamp <> ?",
+			expectedSQL:   "time <> ?",
 			expectedArgs:  []any{uint64(1617979338000000000)},
 			expectedError: nil,
 		},
@@ -48,7 +48,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorGreaterThan,
 			value:         float64(100),
-			expectedSQL:   "(toFloat64(attributes_number['request.duration']) > ? AND mapContains(attributes_number, 'request.duration') = ?)",
+			expectedSQL:   "(toFloat64(toFloat64OrNull(attributes['request.duration'])) > ? AND mapContains(attributes, 'request.duration') = ?)",
 			expectedArgs:  []any{float64(100), true},
 			expectedError: nil,
 		},
@@ -61,7 +61,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorLessThan,
 			value:         float64(1024),
-			expectedSQL:   "(toFloat64(attributes_number['request.size']) < ? AND mapContains(attributes_number, 'request.size') = ?)",
+			expectedSQL:   "(toFloat64(toFloat64OrNull(attributes['request.size'])) < ? AND mapContains(attributes, 'request.size') = ?)",
 			expectedArgs:  []any{float64(1024), true},
 			expectedError: nil,
 		},
@@ -73,7 +73,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorGreaterThanOrEq,
 			value:         uint64(1617979338000000000),
-			expectedSQL:   "timestamp >= ?",
+			expectedSQL:   "time >= ?",
 			expectedArgs:  []any{uint64(1617979338000000000)},
 			expectedError: nil,
 		},
@@ -85,7 +85,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorLessThanOrEq,
 			value:         uint64(1617979338000000000),
-			expectedSQL:   "timestamp <= ?",
+			expectedSQL:   "time <= ?",
 			expectedArgs:  []any{uint64(1617979338000000000)},
 			expectedError: nil,
 		},
@@ -98,7 +98,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorILike,
 			value:         "%admin%",
-			expectedSQL:   "(attributes_string['user.id'] ILIKE ? AND mapContains(attributes_string, 'user.id') = ?)",
+			expectedSQL:   "(attributes['user.id'] ILIKE ? AND mapContains(attributes, 'user.id') = ?)",
 			expectedArgs:  []any{"%admin%", true},
 			expectedError: nil,
 		},
@@ -111,7 +111,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotILike,
 			value:         "%admin%",
-			expectedSQL:   "WHERE attributes_string['user.id'] NOT ILIKE ?",
+			expectedSQL:   "WHERE attributes['user.id'] NOT ILIKE ?",
 			expectedArgs:  []any{"%admin%", true},
 			expectedError: nil,
 		},
@@ -124,7 +124,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorContains,
 			value:         521509198310,
-			expectedSQL:   "attributes_string['user.id'] ILIKE ?",
+			expectedSQL:   "attributes['user.id'] ILIKE ?",
 			expectedArgs:  []any{"%521509198310%", true},
 			expectedError: nil,
 		},
@@ -137,7 +137,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorLike,
 			value:         521509198310,
-			expectedSQL:   "attributes_string['user.id'] LIKE ?",
+			expectedSQL:   "attributes['user.id'] LIKE ?",
 			expectedArgs:  []any{"521509198310", true},
 			expectedError: nil,
 		},
@@ -149,7 +149,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorBetween,
 			value:         []any{uint64(1617979338000000000), uint64(1617979348000000000)},
-			expectedSQL:   "timestamp BETWEEN ? AND ?",
+			expectedSQL:   "time BETWEEN ? AND ?",
 			expectedArgs:  []any{uint64(1617979338000000000), uint64(1617979348000000000)},
 			expectedError: nil,
 		},
@@ -183,7 +183,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotBetween,
 			value:         []any{uint64(1617979338000000000), uint64(1617979348000000000)},
-			expectedSQL:   "timestamp NOT BETWEEN ? AND ?",
+			expectedSQL:   "time NOT BETWEEN ? AND ?",
 			expectedArgs:  []any{uint64(1617979338000000000), uint64(1617979348000000000)},
 			expectedError: nil,
 		},
@@ -196,7 +196,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorExists,
 			value:         nil,
-			expectedSQL:   "mapContains(attributes_string, 'user.id') = ?",
+			expectedSQL:   "mapContains(attributes, 'user.id') = ?",
 			expectedError: nil,
 		},
 		{
@@ -208,7 +208,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotExists,
 			value:         nil,
-			expectedSQL:   "mapContains(attributes_string, 'user.id') <> ?",
+			expectedSQL:   "mapContains(attributes, 'user.id') <> ?",
 			expectedError: nil,
 		},
 		{
@@ -221,7 +221,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorExists,
 			value:         nil,
-			expectedSQL:   "WHERE multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, mapContains(resources_string, 'service.name'), resources_string['service.name'], NULL) IS NOT NULL",
+			expectedSQL:   "WHERE notEmpty(service)",
 			expectedError: nil,
 		},
 		{
@@ -234,7 +234,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotExists,
 			value:         nil,
-			expectedSQL:   "WHERE multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, mapContains(resources_string, 'service.name'), resources_string['service.name'], NULL) IS NULL",
+			expectedSQL:   "WHERE empty(service)",
 			expectedError: nil,
 		},
 		{
@@ -246,7 +246,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorContains,
 			value:         "admin",
-			expectedSQL:   "(attributes_string['user.id'] ILIKE ? AND mapContains(attributes_string, 'user.id') = ?)",
+			expectedSQL:   "(attributes['user.id'] ILIKE ? AND mapContains(attributes, 'user.id') = ?)",
 			expectedArgs:  []any{"%admin%", true},
 			expectedError: nil,
 		},
@@ -259,7 +259,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorIn,
 			value:         []any{"admin", "user"},
-			expectedSQL:   "((attributes_string['user.id'] = ? OR attributes_string['user.id'] = ?) AND mapContains(attributes_string, 'user.id') = ?)",
+			expectedSQL:   "((attributes['user.id'] = ? OR attributes['user.id'] = ?) AND mapContains(attributes, 'user.id') = ?)",
 			expectedArgs:  []any{"admin", "user", true},
 			expectedError: nil,
 		},
@@ -272,7 +272,7 @@ func TestConditionFor(t *testing.T) {
 			},
 			operator:      qbtypes.FilterOperatorNotIn,
 			value:         []any{"admin", "user"},
-			expectedSQL:   "(attributes_string['user.id'] <> ? AND attributes_string['user.id'] <> ?)",
+			expectedSQL:   "(attributes['user.id'] <> ? AND attributes['user.id'] <> ?)",
 			expectedArgs:  []any{"admin", "user", true},
 			expectedError: nil,
 		},
@@ -333,7 +333,7 @@ func TestConditionForResourceWithEvolution(t *testing.T) {
 			operator:    qbtypes.FilterOperatorExists,
 			tsStart:     uint64(time.Date(2025, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
 			tsEnd:       uint64(time.Date(2025, 7, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
-			expectedSQL: "WHERE resource.`service.name`::String IS NOT NULL",
+			expectedSQL: "WHERE notEmpty(service)",
 		},
 		{
 			name: "NotExists - window after release - JSON only",
@@ -346,7 +346,7 @@ func TestConditionForResourceWithEvolution(t *testing.T) {
 			operator:    qbtypes.FilterOperatorNotExists,
 			tsStart:     uint64(time.Date(2025, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
 			tsEnd:       uint64(time.Date(2025, 7, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
-			expectedSQL: "WHERE resource.`service.name`::String IS NULL",
+			expectedSQL: "WHERE empty(service)",
 		},
 		{
 			name: "Exists - window before release - map only",
@@ -359,7 +359,7 @@ func TestConditionForResourceWithEvolution(t *testing.T) {
 			operator:    qbtypes.FilterOperatorExists,
 			tsStart:     uint64(time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
 			tsEnd:       uint64(time.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
-			expectedSQL: "WHERE mapContains(resources_string, 'service.name') = ?",
+			expectedSQL: "WHERE notEmpty(service)",
 		},
 		{
 			name: "Exists - window straddles release - multiIf null check",
@@ -372,7 +372,7 @@ func TestConditionForResourceWithEvolution(t *testing.T) {
 			operator:    qbtypes.FilterOperatorExists,
 			tsStart:     uint64(time.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
 			tsEnd:       uint64(time.Date(2025, 6, 1, 0, 0, 0, 0, time.UTC).UnixNano()),
-			expectedSQL: "WHERE multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, mapContains(resources_string, 'service.name'), resources_string['service.name'], NULL) IS NOT NULL",
+			expectedSQL: "WHERE notEmpty(service)",
 		},
 	}
 

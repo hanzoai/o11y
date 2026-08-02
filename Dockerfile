@@ -3,10 +3,16 @@
 # Hanzo O11y — standalone community server image.
 #
 # Builds the real server binary `./cmd/community` (NOT `./cmd/server`, which does
-# not exist). `cmd/community` does not import github.com/hanzoai/cloud, so the
-# go.mod `replace github.com/hanzoai/cloud => ../cloud` is inert for this build
-# and no sibling checkout is required — cloud lives only in the root `mount.go`
-# cloud-embed adapter, which `cmd/community` never pulls in.
+# not exist).
+#
+# THIS MODULE NO LONGER DEPENDS ON github.com/hanzoai/cloud AT ALL. It used to,
+# for one field of one struct on one line of mount.go — and that made the module
+# graph a CYCLE (o11y → cloud → o11y), which is why this file used to explain
+# that a whole-module `go mod download` was unresolvable here and that the build
+# had to be scoped to a single package to route around it. It does not any more:
+# the route table takes the router it registers into and nothing else, cloud is
+# gone from go.mod with 20-odd transitive requirements behind it, and this build
+# is scoped to ./cmd/community only because that is the binary the image runs.
 #
 # cmd/community's graph pulls PRIVATE hanzoai/* forks (hanzoai/sqlite +
 # hanzoai/datastore-go — the sqlite + datastore drivers added by the driver
@@ -44,10 +50,10 @@ ARG BUILD_TIME=unknown
 ARG BRANCH=unknown
 ARG VARIANT=community
 
-# Build ONLY ./cmd/community. A bare `go mod download` would fail because
-# github.com/hanzoai/cloud is a direct require replaced to ../cloud (absent
-# here); building the single package resolves only its pruned graph, which does
-# not include cloud.
+# Build ./cmd/community — the binary this image runs. Its graph now reaches the
+# module's published route table (github.com/hanzoai/o11y, mounted by
+# pkg/query-service/app), which is the whole point: the OpenAPI document and the
+# MCP tools ship in the process rather than in a package nothing links.
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=secret,id=gh_token \

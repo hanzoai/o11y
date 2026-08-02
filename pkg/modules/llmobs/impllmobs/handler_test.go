@@ -6,7 +6,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/llmobstypes"
+	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
 // validOrgUUID is any well-formed UUID for the claims (authz consistency); the span
@@ -54,5 +58,58 @@ func TestViewRequest_FailsClosedWithoutTenant(t *testing.T) {
 	r2.Header.Set("X-Org-Id", "   ")
 	if _, _, err := viewRequest(claimsCtx(), r2); err == nil {
 		t.Fatal("viewRequest must FAIL CLOSED on a blank X-Org-Id")
+	}
+}
+
+// scoreRoute is the registered template for the two per-score routes. The id is
+// a PATH segment, so what has to hold is that the segment the ROUTER matched is
+// the score the handler acts on — hence a real router at the real template, not
+// injected vars, which would prove only that the two halves of coretypes agree.
+const scoreRoute = "/v1/o11y/llm/score/{id}"
+
+func servedScoreID(t *testing.T, target string) (valuer.UUID, error) {
+	t.Helper()
+
+	var (
+		id  valuer.UUID
+		err error
+	)
+	router := routing.Serve(http.MethodGet, scoreRoute, http.HandlerFunc(func(_ http.ResponseWriter, req *http.Request) {
+		id, err = idFromPath(req)
+	}))
+
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, target, http.NoBody))
+	if rec.Code != http.StatusOK {
+		t.Fatalf("the route did not match (%d) — the test is not exercising the read", rec.Code)
+	}
+	return id, err
+}
+
+func TestIDFromPathReadsTheMatchedSegment(t *testing.T) {
+	want := valuer.GenerateUUID()
+
+	id, err := servedScoreID(t, "/v1/o11y/llm/score/"+want.String())
+	if err != nil {
+		t.Fatalf("idFromPath: %v", err)
+	}
+	if id != want {
+		t.Fatalf("id = %s, want %s (the segment the router matched)", id, want)
+	}
+}
+
+// A segment that is not a uuid is refused with the module's own code, not
+// answered with the zero uuid — a malformed or unread id must never reach the
+// store as a lookup for whatever the zero value matches.
+func TestIDFromPathRefusesANonUUIDSegment(t *testing.T) {
+	id, err := servedScoreID(t, "/v1/o11y/llm/score/not-a-uuid")
+	if err == nil {
+		t.Fatal("a non-uuid segment must be refused")
+	}
+	if !errors.Asc(err, llmobstypes.ErrCodeLLMObsInvalidInput) {
+		t.Fatalf("want the llmobs invalid-input code, got %v", err)
+	}
+	if id != (valuer.UUID{}) {
+		t.Fatalf("id = %s, want the zero uuid on refusal", id)
 	}
 }

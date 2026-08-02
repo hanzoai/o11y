@@ -15,7 +15,6 @@ func RegisterGenerate(parentCmd *cobra.Command, logger *slog.Logger) {
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 	}
 
-	registerGenerateOpenAPI(generateCmd)
 	registerGenerateAuthz(generateCmd)
 	registerGenerateConfig(generateCmd)
 

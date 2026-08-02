@@ -3,16 +3,22 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/exporttypes"
 	v5 "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 )
 
-func (provider *provider) addRawDataExportRoutes(router *mux.Router) error {
+// ESCAPE HATCH. export_raw_data is deliberately NOT a typed query-core op: it
+// streams a chunked CSV/JSONL download with a Content-Disposition attachment and
+// an X-Response-Complete trailer, so it has no JSON answer to name and the relay
+// (which buffers a whole answer through an httptest recorder) would defeat the
+// stream. It stays on the /v1/o11y delegation wildcard, byte-identical; see the
+// escape-hatch record in querycore.go.
+func (provider *provider) addRawDataExportRoutes(router routing.Router) {
 
-	if err := router.Handle("/api/v1/export_raw_data", handler.New(provider.authzMiddleware.ViewAccess(provider.rawDataExportHandler.ExportRawData), handler.OpenAPIDef{
+	router.Post("/v1/o11y/export_raw_data", handler.New(provider.authzMiddleware.ViewAccess(provider.rawDataExportHandler.ExportRawData), handler.OpenAPIDef{
 		ID:                  "HandleExportRawDataPOST",
 		Tags:                []string{"logs", "traces"},
 		Summary:             "Export raw data",
@@ -25,9 +31,5 @@ func (provider *provider) addRawDataExportRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusOK,
 		ErrorStatusCodes:    []int{http.StatusBadRequest},
 		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	}))
 }

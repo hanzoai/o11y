@@ -8,9 +8,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/tracefunnel"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	tf "github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -128,8 +128,7 @@ func (handler *handler) UpdateFunnel(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vars := mux.Vars(r)
-	funnelID := vars["funnel_id"]
+	funnelID := coretypes.Param(r, "funnel_id")
 
 	funnel, err := handler.module.Get(r.Context(), valuer.MustNewUUID(funnelID), valuer.MustNewUUID(claims.OrgID))
 	if err != nil {
@@ -192,8 +191,7 @@ func (handler *handler) List(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *handler) Get(rw http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	funnelID := vars["funnel_id"]
+	funnelID := coretypes.Param(r, "funnel_id")
 
 	claims, err := authtypes.ClaimsFromContext(r.Context())
 
@@ -214,8 +212,7 @@ func (handler *handler) Get(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *handler) Delete(rw http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	funnelID := vars["funnel_id"]
+	funnelID := coretypes.Param(r, "funnel_id")
 
 	claims, err := authtypes.ClaimsFromContext(r.Context())
 

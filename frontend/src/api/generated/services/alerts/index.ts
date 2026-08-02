@@ -25,14 +25,14 @@ import type { ErrorType } from '../../../generatedAPIInstance';
  */
 export const getAlerts = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetAlerts200>({
-		url: `/api/v1/alerts`,
+		url: `/v1/o11y/alerts`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetAlertsQueryKey = () => {
-	return [`/api/v1/alerts`] as const;
+	return [`/v1/o11y/alerts`] as const;
 };
 
 export const getGetAlertsQueryOptions = <

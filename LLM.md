@@ -16,7 +16,6 @@ serving o11y.hanzo.ai. A clean full fork of **latest O11y** (synced to upstream
 One way, and it runs on our own stack:
 
     push  ->  github.com/hanzoai/o11y         (a mirror)
-              .github/workflows/sync.yml       carries refs onward
       ->  git.hanzo.ai/hanzoai/o11y            CANONICAL
               .hanzo/workflows/ci.yaml         go build + go test
               .hanzo/workflows/docker.yaml     builds ghcr.io/hanzoai/o11y
@@ -25,11 +24,11 @@ One way, and it runs on our own stack:
       ->  hanzoai/operator                     reconciles the App
       ->  hanzoai/static behind hanzoai/ingress serves the SPA
 
-**git.hanzo.ai is canonical; GitHub is a mirror.** `.github/workflows/` holds
-exactly one file, `sync.yml`, and its only job is getting refs to the forge. Every
-build, check and deploy is a workflow under `.hanzo/workflows/`, which the forge
-reads. `.hanzo/workflows` uses GitHub Actions syntax, so a workflow moves between
-the two by changing directory and nothing else.
+**git.hanzo.ai is canonical; GitHub is a mirror.** Every build, check and deploy
+is a workflow under `.hanzo/workflows/`, which the forge reads. `.hanzo/workflows`
+uses GitHub Actions syntax, so a workflow moves between the two by changing
+directory and nothing else. There is no `.github/workflows/` — refs reach the
+forge by push, not by an Actions job.
 
 No GitHub Pages and no Cloudflare Pages. `Dockerfile.site` already ends at
 `FROM ghcr.io/hanzoai/static:v0.5.1` serving `frontend/build` on :3000, so the SPA
@@ -43,6 +42,97 @@ failure mode is the whole reason a migration is `git mv` and never a delete.
 
 Also load-bearing via the **Go module tag**: `hanzoai/cloud` `go.mod` pins
 `github.com/hanzoai/o11y`, because the query plane now lives in cloud at `/v1/o11y`.
+
+## The document — ONE emitter, and it is the typed op registry
+
+`identity.go` (45) + `infra.go` (44) + `logs.go` (9) + `telemetry.go` (5) = **103
+typed ops**, registered on the `cloud.Router` this module is handed at their full
+public `/v1/o11y/...` paths. Cloud's `describe.go` reads that registry from a real
+mount and weaves the result into the one published document. Change a struct and
+the document follows; there is nothing to keep in sync.
+
+There was a second emitter and it is **deleted**: `cmd/openapi.go` ran a swaggest
+reflector over the runtime's gorilla/mux tree and wrote a committed 629 KB
+`docs/api/openapi.yml` — 120 paths, 174 ops, spelled `/api/v1` ×59, `/api/v2` ×57,
+`/api/v3`, `/api/v4`, `/api/v5` ×2, and **zero** `/v1/o11y`. It described the
+fork's internal tree behind the delegation wildcard's `/v1/o11y/* -> /api/*`
+rewrite, so it documented a surface no customer can address, in a shape that
+breaks two house rules on its face. No CI regenerated or verified it, so it could
+only drift. Gone with it: `pkg/o11y/openapi.go` (the reflector — unreachable once
+the command went) and `registerGenerateOpenAPI` from `cmd/generate.go`.
+
+**If a route is not in the typed registry it is in no document.** That is the only
+place to fix it; do not add a second writer.
+
+## The console (`pkg/web`) is router-agnostic
+
+`web.Web` is `http.Handler` and nothing else. It used to also carry
+`AddToRouter(*mux.Router)` — the console's mounting rule braided into one
+router's type, and the last reason `pkg/web` imported gorilla. It bought nothing:
+every host registered the same terminal catch-all, so the rule was the HOST's.
+The host now spells its own one line, and both hosts spell the SAME one —
+`app.All("/*", zip.AdaptNetHTTP(web))` in `pkg/query-service/app/server.go` and
+on a zip host (the `hanzoai/cloud` `webui` idiom).
+
+Serving is stdlib (`http.FileServer` + the shell rendered once at boot), NOT
+`zip.Static`: `zip.Static` serves bytes out of an `fs.FS`, and the shell is not a
+file in the tree — it is templated at startup with this deployment's base href
+and settings, so `WithIndex`/`WithFallback` would hand the browser a raw
+`index.html` with no boot data. One handler serves both host kinds identically.
+
+`noopweb` (`web.enabled=false`, the shipped headless image) answers **404** —
+the bytes a default `NotFoundHandler` writes when a null provider registers no
+route at all — so the host mounts the console unconditionally.
+
+The console refuses `/v1` and `/ws` (`routerweb.apiPrefixes`, segment-exact),
+because a router that resumes its parent when a prefix matches but no route does
+sent **every miss inside `/v1/o11y` through to the console as 200 `text/html`** —
+JSON clients got the SPA shell.
+
+## One router: `pkg/http/routing`
+
+**There is no web framework in this service but zip.** `gorilla/mux`, `otelmux`,
+`gin`, `gorilla/handlers` and `rs/cors` are all out of `go.mod`; every route the
+runtime serves is a zip route on a zip group, matched by one router with one param
+model and one middleware chain.
+
+`routing.Router` is the ONE registration surface — `Get/Post/Put/Patch/Delete`,
+`Handle(method, path, h)`, `Group(prefix)` — and it takes an `http.Handler`, so
+the 367 handler bodies did not change shape. It exists because a registration
+carries three facts zip has no slot for, each of which the old tree RECOVERED per
+request by asking the router what it had just matched:
+
+| fact | old | now |
+|---|---|---|
+| bound path segments | `mux.Vars(req)` in 140 handler bodies | bound at the leaf, read once via `coretypes.Param` |
+| the path TEMPLATE (audit keys, span names) | `mux.CurrentRoute(req).GetPathTemplate()` | recorded at registration, read via `coretypes.RoutePath` |
+| the route's declared resources | `route.GetHandler()` + type assertion, in TWO packages | handed to `middleware.Resource.For(defs)` by the registrar |
+
+Paths are declared in the public brace spelling (`/v1/o11y/rules/{id}`) and
+respelled for the router in one function; a constrained segment
+(`/v1/sentry/{project:guid}/envelope/`) becomes fiber's own `guid` — a UUID parse,
+replacing a hand-written character class. A **duplicate registration panics at
+boot**; the tree this replaces silently let the first one win.
+
+**Count the table.** `routing.Table` is the census of what registration actually
+did: **233** routes from `pkg/apiserver/o11yapiserver` + **134** from
+`pkg/query-service/app` = **367**, the same 367 the mount publishes (353 typed ops
+= 353 OpenAPI operations = 353 MCP tools, 11 hatches, 3 probes). This repo has
+shipped the other outcome — 83 typed ops in files nothing called, building green
+and serving nothing — so the arithmetic is a test, not a comment
+(`pkg/apiserver/o11yapiserver/routes_test.go`, `pkg/http/routing/routing_test.go`).
+
+**The chain is composed at the LEAF, not registered as ambient middleware.** Two
+of its members need the route: Audit keys on the template, Resource resolves the
+route's declared resources. Ambient middleware runs before the router has matched
+anything, so both would read an empty route. Composing per leaf reproduces the
+order the old tree ran in — match, then middleware, then handler.
+
+**Serving.** The standalone server hands its listener straight to the app
+(`app.Fiber().Listener(conn)`), so streams and the `/ws/query_progress` upgrade
+run native fasthttp. `PublicHandler()` is the embedding host's door and bridges to
+`net/http`: streamed answers pump through it, a connection HIJACK does not, so a
+host that needs the websocket serves the listener rather than embedding it.
 
 ## Dependency ownership (fork boundary)
 
@@ -73,25 +163,44 @@ consistent upstream version. Keep it that way: bump by re-syncing to a newer O11
 The real server binary is `./cmd/community` (NOT `./cmd/server`, which does not
 exist). Build check: `GOPRIVATE='github.com/hanzoai/*' GOSUMDB=off go build ./cmd/community`.
 
-### go.mod is paired with the ci.yaml cloud pin — bump BOTH or CI goes red
+### There is no cloud pin. The dependency is GONE, and it was a cycle
 
-Root `mount.go` imports `github.com/hanzoai/cloud`, and go.mod resolves it via
-`replace => ../cloud`. There is no such sibling in CI, so `ci.yaml` checks one out
-**at an exact commit** (`ref:` under "Checkout hanzoai/cloud") — deliberately, since
-cloud's `main` drifts independently. That makes go.mod and the ci.yaml ref **ONE fact
-in two places**: touch either alone and `go build ./...` dies with the misleading
-`go: updates to go.mod needed; to update it: go mod tidy`. This kept CI red for weeks.
+`github.com/hanzoai/o11y` does **not** require `github.com/hanzoai/cloud`. It did,
+for one field of one struct on one line: `Mount(app *zip.App, deps cloud.Deps)`
+read `deps.Logger` to announce itself. That single line made the module graph a
+**cycle** — o11y required cloud, cloud requires o11y — and the cycle is what kept
+the conversion out of the shipped binary:
 
-To re-tidy: `go mod tidy` against the sibling, then **bump the ci.yaml `ref` to the
-same cloud commit in the same PR**. Two traps:
+- The community image builds `./cmd/community`, and the route declarations lived
+  in a package braided to the host, so that binary could not link them without
+  dragging cloud in. It did not link them. **353 typed ops, 353 published
+  operations and 353 MCP tools were true of the source and absent from the
+  process** — invisible to CI, because the tests import the table directly.
+- A whole-module `go mod download` was unresolvable in any image without a cloud
+  checkout, so the Dockerfile had to scope itself to one package to route around
+  it, and the *reason* got written down as if it were a design decision.
 
-- Tidy resolves against **whatever `../cloud` is checked out right now** — that clone
-  is a working copy, often on someone's feature branch, and it moves under you. Derive
-  versions from the commit you are pinning (`git -C ../cloud show <sha>:go.mod`), not
-  from the branch that happens to be there. Same class of hazard as the stale luxfi
-  clones.
-- The resulting version jumps are **not upgrade decisions** — MVS forces them, because
-  cloud already requires them. Do not "fix" them back down; re-pair the two sides.
+`Mount(app *zip.App) error` takes the router and nothing else. The router already
+carries the host's logger (`app.Logger()`), so the argument never carried
+information the first argument did not already have. Dropping it removed cloud and
+**~20 transitive requirements** behind it (`hanzoai/{iam,commerce,authz,tasks,vfs,orm,ha,s3-go,…}`)
+from this module's graph.
+
+Standing proof, and it must stay empty:
+
+```
+go list -deps ./cmd/community | grep hanzoai/cloud     # EMPTY
+go list -deps ./cmd/community | grep -x github.com/hanzoai/o11y   # PRESENT
+```
+
+The second line is the one that matters: it is what says the declarations are in
+the binary. `pkg/query-service/app`'s `publish()` mounts them onto the router the
+server serves — after the service's own routes (so the handler that always
+answered a path still answers it, and streams stay streams) and before the console
+catch-all — then calls `app.Prepare()`, which is what turns the registry into
+doors: `/.well-known/openapi.json`, `/docs`, `/mcp`, the by-name call plane. This
+server serves through `Fiber().Listener`, not `zip.Listen`, so without that call
+the document exists in the process and answers on no port.
 
 Since a green build is NOT sufficient evidence (`hanzoai/zip` → `zap-proto/zip` can
 boot-panic while CI stays green), smoke-test the binary: it must reach
@@ -105,11 +214,10 @@ Root `Dockerfile` + `.hanzo/workflows/docker.yaml` build a standalone community
 server image on push to `main` and `v*` tags → `ghcr.io/hanzoai/o11y:<sha>` (+ `:main`).
 This replaces an unrelated upstream image that previously squatted the tags.
 
-- Builds ONLY `./cmd/community`. It does NOT import `github.com/hanzoai/cloud`, so
-  go.mod's `replace github.com/hanzoai/cloud => ../cloud` is inert for the image and
-  no cloud sibling is checked out. (Cloud lives only in root `mount.go`, compiled by
-  the `go build ./...` CI job — so `ci.yaml` still needs the sibling; the container
-  does not.) A bare `go mod download` WOULD fail (cloud→../cloud); build the one pkg.
+- Builds `./cmd/community`, the binary the image runs. No cloud sibling, no
+  replace, no pin — the module does not name cloud at all any more (see "There is
+  no cloud pin" above). The build is scoped to the one package because that is the
+  binary, not because a whole-module resolve would fail; it no longer would.
 - Its graph pulls **PRIVATE** forks — `hanzoai/sqlite` and `hanzo-ds/go` (the
   sqlite + datastore drivers added by the driver swap) — alongside the public
   ones (otel-collector, govaluate, hanzo-ds/mock, expr). So the module fetch

@@ -12,10 +12,12 @@ import (
 )
 
 const (
-	// Datastore database and table names for trace queries.
-	TraceDB           = "o11y_traces"
-	TraceTable        = "distributed_o11y_index_v3"
-	TraceSummaryTable = "distributed_trace_summary"
+	// Datastore database and table names for trace queries. Spans live in the ONE
+	// event database as event.span (the 15-column envelope), and a trace's rolled-up
+	// summary as event.trace — the same names the trace query plane reads elsewhere.
+	TraceDB           = "event"
+	TraceTable        = "span"
+	TraceSummaryTable = "trace"
 )
 
 // ErrTraceNotFound is returned when a trace ID has no matching spans in Datastore.
@@ -98,7 +100,7 @@ type StorableSpan struct {
 	SpanID             string             `ch:"span_id"`
 	HasError           bool               `ch:"has_error"`
 	Kind               int8               `ch:"kind"`
-	ServiceName        string             `ch:"resource_string_service$$name"`
+	ServiceName        string             `ch:"service"`
 	Name               string             `ch:"name"`
 	AttributesString   map[string]string  `ch:"attributes_string"`
 	AttributesNumber   map[string]float64 `ch:"attributes_number"`
@@ -124,6 +126,60 @@ type StorableSpan struct {
 	References         string             `ch:"references"`
 }
 
+// The envelope has no OTLP-fork derived columns. kind and status are the
+// writer's normalised lowercase enums (datastoretraces.normEnum), the span's
+// events ride as one JSON value under the reserved `span.events` attribute, and
+// every other derived field resolves out of the one attributes map. These are
+// the expressions that reconstruct each fork column from the envelope, declared
+// ONCE: SpanProjection below and the trace query builder's field map both read
+// them, so the two cannot drift.
+const (
+	ExprKind               = "toInt8(multiIf(kind = 'internal', 1, kind = 'server', 2, kind = 'client', 3, kind = 'producer', 4, kind = 'consumer', 5, 0))"
+	ExprStatusCode         = "toInt16(multiIf(status = 'error', 2, status = 'ok', 1, 0))"
+	ExprHasError           = "toBool(status = 'error')"
+	ExprEvents             = "JSONExtractArrayRaw(attributes['span.events'])"
+	ExprFlags              = "toUInt32OrZero(attributes['flags'])"
+	ExprHTTPMethod         = "if(attributes['http.request.method'] != '', attributes['http.request.method'], attributes['http.method'])"
+	ExprResponseStatusCode = "if(attributes['http.response.status_code'] != '', attributes['http.response.status_code'], attributes['http.status_code'])"
+)
+
+// SpanProjection is the event.span projection that fills StorableSpan: every
+// envelope column or expression aliased to the struct's `ch` tag, in field
+// order. One definition, shared by every full-span read. The envelope keeps a
+// single String-valued attributes map, so the number and bool attribute maps
+// project as empty typed maps; casts are type-faithful so a row scans.
+var SpanProjection = []string{
+	"time AS timestamp",
+	"duration AS duration_nano",
+	"span_id",
+	ExprHasError + " AS has_error",
+	ExprKind + " AS kind",
+	"service",
+	"name",
+	"attributes AS attributes_string",
+	"CAST(map() AS Map(String, Float64)) AS attributes_number",
+	"CAST(map() AS Map(String, Bool)) AS attributes_bool",
+	"map('service.name', toString(service), 'host', toString(host), 'url', url) AS resources_string",
+	ExprEvents + " AS events",
+	"attributes['status.message'] AS status_message",
+	"status AS status_code_string",
+	"kind AS kind_string",
+	"parent AS parent_span_id",
+	ExprFlags + " AS flags",
+	"attributes['is_remote'] AS is_remote",
+	"attributes['trace_state'] AS trace_state",
+	ExprStatusCode + " AS status_code",
+	"attributes['db.name'] AS db_name",
+	"attributes['db.operation'] AS db_operation",
+	ExprHTTPMethod + " AS http_method",
+	"url AS http_url",
+	"toString(host) AS http_host",
+	ExprHTTPMethod + " AS external_http_method",
+	"url AS external_http_url",
+	ExprResponseStatusCode + " AS response_status_code",
+	"attributes['links'] AS references",
+}
+
 // MinimalSpan with only the fields needed to build the parent-child tree.
 type MinimalSpan struct {
 	SpanID       string    `ch:"span_id"`
@@ -131,7 +187,7 @@ type MinimalSpan struct {
 	StartTime    time.Time `ch:"timestamp"`
 	DurationNano uint64    `ch:"duration_nano"`
 	HasError     bool      `ch:"has_error"`
-	ServiceName  string    `ch:"resource_string_service$$name"`
+	ServiceName  string    `ch:"service"`
 }
 
 func (item *MinimalSpan) ToWaterfallSpan(traceID string) *WaterfallSpan {
