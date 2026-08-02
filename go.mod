@@ -13,7 +13,6 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/emersion/go-smtp v0.24.0
 	github.com/evanphx/json-patch/v5 v5.9.11
-	github.com/gin-gonic/gin v1.12.0
 	github.com/go-openapi/runtime v0.29.2
 	github.com/go-openapi/strfmt v0.26.1
 	github.com/go-playground/validator/v10 v10.30.2
@@ -135,7 +134,6 @@ require (
 	github.com/go-openapi/swag/yamlutils v0.25.5 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/goccy/go-yaml v1.19.2 // indirect
 	github.com/gofiber/schema v1.7.1 // indirect
 	github.com/gofiber/utils/v2 v2.0.4 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
@@ -185,7 +183,6 @@ require (
 	github.com/swaggest/usecase v1.3.1 // indirect
 	github.com/tinylib/msgp v1.6.4 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
-	github.com/ugorji/go/codec v1.3.1 // indirect
 	github.com/uptrace/opentelemetry-go-extra/otelsql v0.3.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.72.0 // indirect
@@ -195,7 +192,6 @@ require (
 	github.com/zap-proto/http v0.3.1 // indirect
 	github.com/zap-proto/md v0.1.0 // indirect
 	github.com/zeebo/xxh3 v1.1.0 // indirect
-	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
 	go.opentelemetry.io/collector/client v1.54.0 // indirect
 	go.opentelemetry.io/collector/config/configoptional v1.50.0 // indirect
 	go.opentelemetry.io/collector/config/configretry v1.50.0 // indirect
@@ -320,7 +316,6 @@ require (
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/pdatautil v0.148.0 // indirect
 	github.com/open-telemetry/opentelemetry-collector-contrib/processor/deltatocumulativeprocessor v0.148.0 // indirect
 	github.com/paulmach/orb v0.13.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.3.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.27 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
