@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/errortrackingtypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
@@ -82,7 +82,7 @@ func (h *handler) ingest(rw http.ResponseWriter, r *http.Request, parse eventPar
 		return
 	}
 
-	project := mux.Vars(r)["project_id"]
+	project := coretypes.Param(r, "project_id")
 	orgID, ok := orgUUIDFromProject(project)
 	if !ok {
 		http.Error(rw, "missing project", http.StatusBadRequest)
@@ -235,7 +235,7 @@ func orgFromContext(ctx context.Context) (valuer.UUID, error) {
 }
 
 func idFromPath(r *http.Request) (valuer.UUID, error) {
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		return valuer.UUID{}, errors.Wrapf(err, errors.TypeInvalidInput, errortrackingtypes.ErrCodeErrorTrackingInvalidInput, "id is not a valid uuid")
 	}

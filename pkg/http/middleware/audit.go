@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 
@@ -45,8 +44,11 @@ func (middleware *Audit) Wrap(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		start := time.Now()
 		host, port, _ := net.SplitHostPort(req.Host)
-		path, err := mux.CurrentRoute(req).GetPathTemplate()
-		if err != nil {
+		// The route TEMPLATE, not the request path: an audit record keyed on
+		// /v1/o11y/rules/7 is one record shape per id. Falls back to the
+		// request path when no route matched (a 404 is still audited).
+		path := coretypes.RoutePath(req)
+		if path == "" {
 			path = req.URL.Path
 		}
 
