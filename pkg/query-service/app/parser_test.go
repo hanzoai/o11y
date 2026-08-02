@@ -9,11 +9,39 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/query-service/common"
+	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// The trace id is a PATH segment of /v1/o11y/traces/{traceId}; the span id is a
+// QUERY value on the same request. Drive a REAL router registered at the real
+// template, so the parse is exercised against what the router matched rather
+// than against an injected map — the injector agreeing with the reader would
+// prove only that the two halves of the seam agree with each other.
+func TestParseSearchTracesParamsReadsTraceIDFromThePath(t *testing.T) {
+	var (
+		params *model.SearchTracesParams
+		err    error
+	)
+
+	router := mux.NewRouter()
+	router.HandleFunc("/v1/o11y/traces/{traceId}", func(_ http.ResponseWriter, r *http.Request) {
+		params, err = ParseSearchTracesParams(r)
+	}).Methods(http.MethodGet)
+
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/v1/o11y/traces/4bf92f3577b34da6a3ce929d0e0e4736?spanId=00f067aa0ba902b7", http.NoBody))
+	require.Equal(t, http.StatusOK, rec.Code, "the route did not match — the test is not exercising the parse")
+	require.NoError(t, err)
+	require.NotNil(t, params)
+
+	assert.Equal(t, "4bf92f3577b34da6a3ce929d0e0e4736", params.TraceID)
+	assert.Equal(t, "00f067aa0ba902b7", params.SpanID)
+}
 
 func TestParseAggregateAttrReques(t *testing.T) {
 	reqCases := []struct {
