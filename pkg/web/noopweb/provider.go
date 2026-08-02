@@ -6,7 +6,6 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/web"
-	"github.com/gorilla/mux"
 )
 
 type provider struct{}
@@ -19,8 +18,12 @@ func New(ctx context.Context, settings factory.ProviderSettings, config web.Conf
 	return &provider{}, nil
 }
 
-func (provider *provider) AddToRouter(router *mux.Router) error {
-	return nil
+// ServeHTTP is the honest null: this deployment serves no console (the shipped
+// image runs headless — the SPA is served at the edge by hanzoai/static — so
+// web.enabled=false selects this provider), and a path that reached the console
+// matched no API route either. 404 is what that has always meant on the wire:
+// these are the same bytes gorilla's default NotFoundHandler wrote when the null
+// provider registered no route at all.
+func (provider *provider) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	http.NotFound(w, r)
 }
-
-func (provider *provider) ServeHTTP(w http.ResponseWriter, r *http.Request) {}
