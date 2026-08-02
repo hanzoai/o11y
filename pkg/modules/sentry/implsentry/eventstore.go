@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hanzo-ds/go/lib/driver"
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
@@ -40,6 +41,7 @@ const insertColumns = "org, product, id, time, ingested_at, name, kind, level, c
 // dead. Schema is a deploy artifact, this is a client.
 type eventStore struct {
 	store telemetrystore.TelemetryStore
+	scope Scope
 	db    string
 	table string
 	now   func() time.Time
@@ -52,9 +54,15 @@ func WithDatabase(db string) Option { return func(s *eventStore) { s.db = db } }
 func WithTable(t string) Option     { return func(s *eventStore) { s.table = t } }
 
 // NewEventStore builds the events plane over the shared datastore connection.
-func NewEventStore(store telemetrystore.TelemetryStore, opts ...Option) sentrytypes.EventStore {
+//
+// `scope` is REQUIRED, not an Option, because it is the tenant boundary: it is what
+// turns the ids this process works in into the names the plane stores (see plane.go).
+// A store that could be built without one could write a row under a spelling no
+// reader binds, which is exactly the split this seam exists to close.
+func NewEventStore(store telemetrystore.TelemetryStore, scope Scope, opts ...Option) sentrytypes.EventStore {
 	s := &eventStore{
 		store: store,
+		scope: scope,
 		db:    defaultEventsDB,
 		table: defaultEventsTable,
 		now:   func() time.Time { return time.Now().UTC() },
@@ -65,9 +73,24 @@ func NewEventStore(store telemetrystore.TelemetryStore, opts ...Option) sentryty
 	return s
 }
 
+// names is every operation's first act: the (org, product) this one is about, in the
+// plane's words. It fails CLOSED — an id with no name yields an error, never a row
+// under a placeholder — so an unnamed tenant is refused rather than commingled.
+func (s *eventStore) names(ctx context.Context, orgID, projectID valuer.UUID) (string, string, error) {
+	if s.scope == nil {
+		return "", "", errors.Newf(errors.TypeInternal, sentrytypes.ErrCodeSentryInvalidInput,
+			"event store has no scope: the plane's names cannot be resolved")
+	}
+	return s.scope(ctx, orgID, projectID)
+}
+
 func (s *eventStore) Insert(ctx context.Context, orgID, projectID valuer.UUID, events []*sentrytypes.Event) error {
 	if len(events) == 0 {
 		return nil
+	}
+	org, product, err := s.names(ctx, orgID, projectID)
+	if err != nil {
+		return err
 	}
 	batch, err := s.store.Datastore().PrepareBatch(ctx,
 		fmt.Sprintf("INSERT INTO %s.%s (%s)", s.db, s.table, insertColumns), driver.WithReleaseConnection())
@@ -77,23 +100,34 @@ func (s *eventStore) Insert(ctx context.Context, orgID, projectID valuer.UUID, e
 	defer func() { _ = batch.Abort() }()
 
 	received := s.now()
-	org, proj := orgID.String(), projectID.String()
 	for _, e := range events {
-		fn, file, line, col, own := unzipFrames(e.Frames)
-		if err := batch.Append(
-			org, proj, e.EventID, e.Timestamp, received, e.Type, errorKind, e.Level, e.Type,
-			e.Message, e.Culprit, e.Fingerprint, e.Handled, e.Environment, e.Release,
-			e.ServiceName, e.Transaction, e.TraceID, e.SpanID, e.UserID, attributesOf(e),
-			fn, file, line, col, own,
-		); err != nil {
+		if err := batch.Append(row(org, product, received, e)...); err != nil {
 			return err
 		}
 	}
 	return batch.Send()
 }
 
+// row is ONE occurrence as the plane stores it, in insertColumns order. Pure, so the
+// row a write produces can be asserted without a sink — and the two facts that make a
+// row legible, the tenant's NAME and the product's, are read off the result rather
+// than inferred from the call.
+func row(org, product string, received time.Time, e *sentrytypes.Event) []any {
+	fn, file, line, col, own := unzipFrames(e.Frames)
+	return []any{
+		org, product, e.EventID, e.Timestamp, received, e.Type, errorKind, e.Level, e.Type,
+		e.Message, e.Culprit, e.Fingerprint, e.Handled, e.Environment, e.Release,
+		e.ServiceName, e.Transaction, e.TraceID, e.SpanID, e.UserID, attributesOf(e),
+		fn, file, line, col, own,
+	}
+}
+
 func (s *eventStore) Discover(ctx context.Context, orgID, projectID valuer.UUID, req *sentrytypes.DiscoverRequest, w sentrytypes.Window) (*sentrytypes.DiscoverResult, error) {
-	sql, args, cols, err := buildDiscover(s.db, s.table, orgID.String(), projectID.String(), req, w)
+	org, product, nameErr := s.names(ctx, orgID, projectID)
+	if nameErr != nil {
+		return nil, nameErr
+	}
+	sql, args, cols, err := buildDiscover(s.db, s.table, org, product, req, w)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +152,11 @@ func (s *eventStore) Discover(ctx context.Context, orgID, projectID valuer.UUID,
 }
 
 func (s *eventStore) GetEvent(ctx context.Context, orgID, projectID valuer.UUID, eventID string) (*sentrytypes.Event, error) {
-	sql, args := buildGetEvent(s.db, s.table, orgID.String(), projectID.String(), eventID)
+	org, product, err := s.names(ctx, orgID, projectID)
+	if err != nil {
+		return nil, err
+	}
+	sql, args := buildGetEvent(s.db, s.table, org, product, eventID)
 	events, err := s.queryEvents(ctx, sql, args)
 	if err != nil || len(events) == 0 {
 		return nil, err
@@ -127,7 +165,11 @@ func (s *eventStore) GetEvent(ctx context.Context, orgID, projectID valuer.UUID,
 }
 
 func (s *eventStore) ListForFingerprint(ctx context.Context, orgID, projectID valuer.UUID, fingerprint string, limit int) ([]*sentrytypes.Event, error) {
-	sql, args := buildListForFingerprint(s.db, s.table, orgID.String(), projectID.String(), fingerprint, limit)
+	org, product, err := s.names(ctx, orgID, projectID)
+	if err != nil {
+		return nil, err
+	}
+	sql, args := buildListForFingerprint(s.db, s.table, org, product, fingerprint, limit)
 	return s.queryEvents(ctx, sql, args)
 }
 
@@ -135,17 +177,29 @@ func (s *eventStore) ListForTrace(ctx context.Context, orgID, projectID valuer.U
 	if traceID == "" {
 		return nil, nil
 	}
-	sql, args := buildListForTrace(s.db, s.table, orgID.String(), projectID.String(), traceID, limit)
+	org, product, err := s.names(ctx, orgID, projectID)
+	if err != nil {
+		return nil, err
+	}
+	sql, args := buildListForTrace(s.db, s.table, org, product, traceID, limit)
 	return s.queryEvents(ctx, sql, args)
 }
 
 func (s *eventStore) ListLogs(ctx context.Context, orgID, projectID valuer.UUID, query string, w sentrytypes.Window, limit int) ([]*sentrytypes.Event, error) {
-	sql, args := buildListLogs(s.db, s.table, orgID.String(), projectID.String(), query, w, limit)
+	org, product, err := s.names(ctx, orgID, projectID)
+	if err != nil {
+		return nil, err
+	}
+	sql, args := buildListLogs(s.db, s.table, org, product, query, w, limit)
 	return s.queryEvents(ctx, sql, args)
 }
 
 func (s *eventStore) DistinctFingerprints(ctx context.Context, orgID, projectID valuer.UUID, w sentrytypes.Window) ([]string, error) {
-	sql, args := buildDistinctFingerprints(s.db, s.table, orgID.String(), projectID.String(), w)
+	org, product, err := s.names(ctx, orgID, projectID)
+	if err != nil {
+		return nil, err
+	}
+	sql, args := buildDistinctFingerprints(s.db, s.table, org, product, w)
 	rows, err := s.store.Datastore().Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
@@ -163,7 +217,11 @@ func (s *eventStore) DistinctFingerprints(ctx context.Context, orgID, projectID 
 }
 
 func (s *eventStore) ListTraces(ctx context.Context, orgID, projectID valuer.UUID, w sentrytypes.Window, limit int) ([]*sentrytypes.TraceSummary, error) {
-	sql, args := buildListTraces(s.db, s.table, orgID.String(), projectID.String(), w, limit)
+	org, product, err := s.names(ctx, orgID, projectID)
+	if err != nil {
+		return nil, err
+	}
+	sql, args := buildListTraces(s.db, s.table, org, product, w, limit)
 	rows, err := s.store.Datastore().Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
@@ -181,7 +239,11 @@ func (s *eventStore) ListTraces(ctx context.Context, orgID, projectID valuer.UUI
 }
 
 func (s *eventStore) Stats(ctx context.Context, orgID, projectID valuer.UUID, field string, w sentrytypes.Window) ([]sentrytypes.StatsPoint, error) {
-	sql, args, err := buildStats(s.db, s.table, orgID.String(), projectID.String(), field, w)
+	org, product, nameErr := s.names(ctx, orgID, projectID)
+	if nameErr != nil {
+		return nil, nameErr
+	}
+	sql, args, err := buildStats(s.db, s.table, org, product, field, w)
 	if err != nil {
 		return nil, err
 	}
