@@ -6,12 +6,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/llmobs"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/llmobstypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
@@ -272,7 +272,7 @@ func orgFromContext(ctx context.Context) (valuer.UUID, error) {
 }
 
 func idFromPath(r *http.Request) (valuer.UUID, error) {
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		return valuer.UUID{}, errors.Wrapf(err, errors.TypeInvalidInput, llmobstypes.ErrCodeLLMObsInvalidInput, "id is not a valid uuid")
 	}
