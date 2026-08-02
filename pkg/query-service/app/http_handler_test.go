@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -28,10 +28,9 @@ func TestParseAgentConfigVersionReadsVersionFromThePath(t *testing.T) {
 			err     error
 		)
 
-		router := mux.NewRouter()
-		router.HandleFunc("/v1/o11y/logs/pipelines/{version}", func(_ http.ResponseWriter, r *http.Request) {
+		router := routing.Serve(http.MethodGet, "/v1/o11y/logs/pipelines/{version}", http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 			version, err = parseAgentConfigVersion(r)
-		}).Methods(http.MethodGet)
+		}))
 
 		rec := httptest.NewRecorder()
 		router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, target, http.NoBody))

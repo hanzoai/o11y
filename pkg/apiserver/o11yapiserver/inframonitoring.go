@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/inframonitoringtypes"
 )
@@ -19,8 +19,8 @@ import (
 // standalone process, which has no native router to register an op on — so
 // deleting either half drops one of the two deployments. The ViewAccess gate
 // keeps running exactly here, on both dispatches.
-func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/infra_monitoring/hosts", handler.New(
+func (provider *provider) addInfraMonitoringRoutes(router routing.Router) {
+	router.Post("/v1/o11y/infra_monitoring/hosts", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListHosts),
 		handler.OpenAPIDef{
 			ID:                  "ListHosts",
@@ -35,11 +35,9 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/v1/o11y/infra_monitoring/pods", handler.New(
+	router.Post("/v1/o11y/infra_monitoring/pods", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListPods),
 		handler.OpenAPIDef{
 			ID:                  "ListPods",
@@ -54,11 +52,9 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/v1/o11y/infra_monitoring/nodes", handler.New(
+	router.Post("/v1/o11y/infra_monitoring/nodes", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListNodes),
 		handler.OpenAPIDef{
 			ID:                  "ListNodes",
@@ -73,11 +69,9 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/v1/o11y/infra_monitoring/namespaces", handler.New(
+	router.Post("/v1/o11y/infra_monitoring/namespaces", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListNamespaces),
 		handler.OpenAPIDef{
 			ID:                  "ListNamespaces",
@@ -92,11 +86,9 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/v1/o11y/infra_monitoring/clusters", handler.New(
+	router.Post("/v1/o11y/infra_monitoring/clusters", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListClusters),
 		handler.OpenAPIDef{
 			ID:                  "ListClusters",
@@ -111,11 +103,9 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/v1/o11y/infra_monitoring/pvcs", handler.New(
+	router.Post("/v1/o11y/infra_monitoring/pvcs", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListVolumes),
 		handler.OpenAPIDef{
 			ID:                  "ListVolumes",
@@ -130,11 +120,9 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/v1/o11y/infra_monitoring/deployments", handler.New(
+	router.Post("/v1/o11y/infra_monitoring/deployments", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListDeployments),
 		handler.OpenAPIDef{
 			ID:                  "ListDeployments",
@@ -149,11 +137,9 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/v1/o11y/infra_monitoring/statefulsets", handler.New(
+	router.Post("/v1/o11y/infra_monitoring/statefulsets", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListStatefulSets),
 		handler.OpenAPIDef{
 			ID:                  "ListStatefulSets",
@@ -168,11 +154,9 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/v1/o11y/infra_monitoring/jobs", handler.New(
+	router.Post("/v1/o11y/infra_monitoring/jobs", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListJobs),
 		handler.OpenAPIDef{
 			ID:                  "ListJobs",
@@ -187,11 +171,9 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/v1/o11y/infra_monitoring/daemonsets", handler.New(
+	router.Post("/v1/o11y/infra_monitoring/daemonsets", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.ListDaemonSets),
 		handler.OpenAPIDef{
 			ID:                  "ListDaemonSets",
@@ -206,11 +188,9 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+		}))
 
-	if err := router.Handle("/v1/o11y/infra_monitoring/checks", handler.New(
+	router.Get("/v1/o11y/infra_monitoring/checks", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.infraMonitoringHandler.GetChecks),
 		handler.OpenAPIDef{
 			ID:                  "GetChecks",
@@ -224,9 +204,5 @@ func (provider *provider) addInfraMonitoringRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusUnauthorized},
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-		})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+		}))
 }

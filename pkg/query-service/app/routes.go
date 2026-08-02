@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // This file is the route index. Every HTTP route the query-service serves is
@@ -25,7 +25,7 @@ import (
 
 // RegisterRoutes registers routes for this handler on the given router.
 // 44 routes, all mounted on the root router with fully-qualified paths.
-func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
+func (aH *APIHandler) RegisterRoutes(router routing.Router, am *middleware.AuthZ) {
 	aH.mountQueryRange(router, am)
 	aH.mountMisc(router, am)
 	aH.mountRules(router, am)
@@ -42,8 +42,8 @@ func (aH *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
 // All five mounts share ONE /v1/o11y subrouter — the same instance the original
 // single-file version built — so the parent router sees one prefix route here,
 // exactly as before.
-func (aH *APIHandler) RegisterQueryRangeV3Routes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/v1/o11y").Subrouter()
+func (aH *APIHandler) RegisterQueryRangeV3Routes(router routing.Router, am *middleware.AuthZ) {
+	subRouter := router.Group("/v1/o11y")
 	aH.mountAutocomplete(subRouter, am)
 	aH.mountQueryRangeFormat(subRouter, am)
 	aH.mountFilterSuggestions(subRouter, am)
@@ -53,7 +53,7 @@ func (aH *APIHandler) RegisterQueryRangeV3Routes(router *mux.Router, am *middlew
 
 // RegisterInfraMetricsRoutes mounts the infra-monitoring surface. 34 routes.
 // Each resource owns its own /v1/o11y/<resource> subrouter, as before.
-func (aH *APIHandler) RegisterInfraMetricsRoutes(router *mux.Router, am *middleware.AuthZ) {
+func (aH *APIHandler) RegisterInfraMetricsRoutes(router routing.Router, am *middleware.AuthZ) {
 	aH.mountHosts(router, am)
 	aH.mountProcesses(router, am)
 	aH.mountPods(router, am)
@@ -69,40 +69,40 @@ func (aH *APIHandler) RegisterInfraMetricsRoutes(router *mux.Router, am *middlew
 }
 
 // RegisterWebSocketPaths mounts the non-/v1/o11y websocket surface. 1 route.
-func (aH *APIHandler) RegisterWebSocketPaths(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/ws").Subrouter()
+func (aH *APIHandler) RegisterWebSocketPaths(router routing.Router, am *middleware.AuthZ) {
+	subRouter := router.Group("/ws")
 	aH.mountWebSocketQueryProgress(subRouter, am)
 }
 
 // RegisterQueryRangeV4Routes mounts metric metadata. 1 route.
-func (aH *APIHandler) RegisterQueryRangeV4Routes(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/v1/o11y").Subrouter()
+func (aH *APIHandler) RegisterQueryRangeV4Routes(router routing.Router, am *middleware.AuthZ) {
+	subRouter := router.Group("/v1/o11y")
 	aH.mountMetric(subRouter, am)
 }
 
 // RegisterLogsRoutes mounts the logs surface. 7 routes.
 // (The 8th logs route, /logs/livetail, is mounted by RegisterQueryRangeV3Routes
 // on the shared /v1/o11y subrouter — see routes_logs.go.)
-func (aH *APIHandler) RegisterLogsRoutes(router *mux.Router, am *middleware.AuthZ) {
+func (aH *APIHandler) RegisterLogsRoutes(router routing.Router, am *middleware.AuthZ) {
 	aH.mountLogs(router, am)
 }
 
 // RegisterIntegrationRoutes mounts the integrations surface. 5 routes.
-func (aH *APIHandler) RegisterIntegrationRoutes(router *mux.Router, am *middleware.AuthZ) {
+func (aH *APIHandler) RegisterIntegrationRoutes(router routing.Router, am *middleware.AuthZ) {
 	aH.mountIntegrations(router, am)
 }
 
 // RegisterMessagingQueuesRoutes mounts the messaging-queues surface. 14 routes.
-func (aH *APIHandler) RegisterMessagingQueuesRoutes(router *mux.Router, am *middleware.AuthZ) {
+func (aH *APIHandler) RegisterMessagingQueuesRoutes(router routing.Router, am *middleware.AuthZ) {
 	aH.mountMessagingQueues(router, am)
 }
 
 // RegisterThirdPartyApiRoutes mounts the third-party-apis surface. 2 routes.
-func (aH *APIHandler) RegisterThirdPartyApiRoutes(router *mux.Router, am *middleware.AuthZ) {
+func (aH *APIHandler) RegisterThirdPartyApiRoutes(router routing.Router, am *middleware.AuthZ) {
 	aH.mountThirdPartyApis(router, am)
 }
 
 // RegisterTraceFunnelsRoutes mounts the trace-funnels surface. 18 routes.
-func (aH *APIHandler) RegisterTraceFunnelsRoutes(router *mux.Router, am *middleware.AuthZ) {
+func (aH *APIHandler) RegisterTraceFunnelsRoutes(router routing.Router, am *middleware.AuthZ) {
 	aH.mountTraceFunnels(router, am)
 }

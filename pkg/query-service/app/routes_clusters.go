@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountClusters registers k8s cluster infra-metrics: attribute discovery +
@@ -16,9 +14,9 @@ import (
 // second implementation: the ops answer by handing the call back to this
 // router, so the handlers below stay the one place the reads are performed,
 // and the ViewAccess gate keeps running exactly here.
-func (aH *APIHandler) mountClusters(router *mux.Router, am *middleware.AuthZ) {
-	clustersSubRouter := router.PathPrefix("/v1/o11y/clusters").Subrouter()
-	clustersSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getClusterAttributeKeys)).Methods(http.MethodGet)
-	clustersSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getClusterAttributeValues)).Methods(http.MethodGet)
-	clustersSubRouter.HandleFunc("/list", am.ViewAccess(aH.getClusterList)).Methods(http.MethodPost)
+func (aH *APIHandler) mountClusters(router routing.Router, am *middleware.AuthZ) {
+	clustersSubRouter := router.Group("/v1/o11y/clusters")
+	clustersSubRouter.Get("/attribute_keys", am.ViewAccess(aH.getClusterAttributeKeys))
+	clustersSubRouter.Get("/attribute_values", am.ViewAccess(aH.getClusterAttributeValues))
+	clustersSubRouter.Post("/list", am.ViewAccess(aH.getClusterList))
 }

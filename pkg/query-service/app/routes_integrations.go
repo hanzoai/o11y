@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountIntegrations registers the integrations catalog and install lifecycle.
@@ -23,27 +21,27 @@ import (
 // ORDER IS LOAD-BEARING: /install and /uninstall are registered before
 // /{integrationId}, and /{integrationId}/connection_status before
 // /{integrationId}. Preserved verbatim.
-func (aH *APIHandler) mountIntegrations(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/v1/o11y/integrations").Subrouter()
+func (aH *APIHandler) mountIntegrations(router routing.Router, am *middleware.AuthZ) {
+	subRouter := router.Group("/v1/o11y/integrations")
 
-	subRouter.HandleFunc(
+	subRouter.Post(
 		"/install", am.ViewAccess(aH.InstallIntegration),
-	).Methods(http.MethodPost)
+	)
 
-	subRouter.HandleFunc(
+	subRouter.Post(
 		"/uninstall", am.ViewAccess(aH.UninstallIntegration),
-	).Methods(http.MethodPost)
+	)
 
 	// Used for polling for status in v0
-	subRouter.HandleFunc(
+	subRouter.Get(
 		"/{integrationId}/connection_status", am.ViewAccess(aH.GetIntegrationConnectionStatus),
-	).Methods(http.MethodGet)
+	)
 
-	subRouter.HandleFunc(
+	subRouter.Get(
 		"/{integrationId}", am.ViewAccess(aH.GetIntegration),
-	).Methods(http.MethodGet)
+	)
 
-	subRouter.HandleFunc(
+	subRouter.Get(
 		"", am.ViewAccess(aH.ListIntegrations),
-	).Methods(http.MethodGet)
+	)
 }

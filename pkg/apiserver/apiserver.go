@@ -1,13 +1,13 @@
 package apiserver
 
 import (
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 type APIServer interface {
-	// Returns the mux router for the API server. Primarily used for collecting OpenAPI operations.
-	Router() *mux.Router
-
-	// Adds the API server routes to an existing router. This is a backwards compatible method for adding routes to the input router.
-	AddToRouter(router *mux.Router) error
+	// AddToRouter registers every route this API server serves on the host's
+	// router. There is no second router and no Router() to read one back from:
+	// the routes live where the host serves them, and the census of what was
+	// registered is the router's own Table.
+	AddToRouter(router routing.Router)
 }

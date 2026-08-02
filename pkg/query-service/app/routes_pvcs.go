@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountPvcs registers k8s persistent-volume-claim infra-metrics: attribute
@@ -16,9 +14,9 @@ import (
 // second implementation: the ops answer by handing the call back to this
 // router, so the handlers below stay the one place the reads are performed,
 // and the ViewAccess gate keeps running exactly here.
-func (aH *APIHandler) mountPvcs(router *mux.Router, am *middleware.AuthZ) {
-	pvcsSubRouter := router.PathPrefix("/v1/o11y/pvcs").Subrouter()
-	pvcsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getPvcAttributeKeys)).Methods(http.MethodGet)
-	pvcsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getPvcAttributeValues)).Methods(http.MethodGet)
-	pvcsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getPvcList)).Methods(http.MethodPost)
+func (aH *APIHandler) mountPvcs(router routing.Router, am *middleware.AuthZ) {
+	pvcsSubRouter := router.Group("/v1/o11y/pvcs")
+	pvcsSubRouter.Get("/attribute_keys", am.ViewAccess(aH.getPvcAttributeKeys))
+	pvcsSubRouter.Get("/attribute_values", am.ViewAccess(aH.getPvcAttributeValues))
+	pvcsSubRouter.Post("/list", am.ViewAccess(aH.getPvcList))
 }

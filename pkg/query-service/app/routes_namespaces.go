@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountNamespaces registers k8s namespace infra-metrics: attribute discovery +
@@ -16,9 +14,9 @@ import (
 // second implementation: the ops answer by handing the call back to this
 // router, so the handlers below stay the one place the reads are performed,
 // and the ViewAccess gate keeps running exactly here.
-func (aH *APIHandler) mountNamespaces(router *mux.Router, am *middleware.AuthZ) {
-	namespacesSubRouter := router.PathPrefix("/v1/o11y/namespaces").Subrouter()
-	namespacesSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getNamespaceAttributeKeys)).Methods(http.MethodGet)
-	namespacesSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getNamespaceAttributeValues)).Methods(http.MethodGet)
-	namespacesSubRouter.HandleFunc("/list", am.ViewAccess(aH.getNamespaceList)).Methods(http.MethodPost)
+func (aH *APIHandler) mountNamespaces(router routing.Router, am *middleware.AuthZ) {
+	namespacesSubRouter := router.Group("/v1/o11y/namespaces")
+	namespacesSubRouter.Get("/attribute_keys", am.ViewAccess(aH.getNamespaceAttributeKeys))
+	namespacesSubRouter.Get("/attribute_values", am.ViewAccess(aH.getNamespaceAttributeValues))
+	namespacesSubRouter.Post("/list", am.ViewAccess(aH.getNamespaceList))
 }

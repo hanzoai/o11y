@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
@@ -19,8 +19,8 @@ import (
 // place access is decided. Both halves are needed — the ops serve the composed
 // binary, this router serves the standalone process, which has no native router
 // to register an op on — so deleting either drops one of the two deployments.
-func (provider *provider) addRulerRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/rules", handler.New(provider.authzMiddleware.ViewAccess(provider.rulerHandler.ListRules), handler.OpenAPIDef{
+func (provider *provider) addRulerRoutes(router routing.Router) {
+	router.Get("/v1/o11y/rules", handler.New(provider.authzMiddleware.ViewAccess(provider.rulerHandler.ListRules), handler.OpenAPIDef{
 		ID:                  "ListRules",
 		Tags:                []string{"rules"},
 		Summary:             "List alert rules",
@@ -29,11 +29,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		ResponseContentType: "application/json",
 		SuccessStatusCode:   http.StatusOK,
 		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-	})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/rules/{id}", handler.New(provider.authzMiddleware.ViewAccess(provider.rulerHandler.GetRuleByID), handler.OpenAPIDef{
+	router.Get("/v1/o11y/rules/{id}", handler.New(provider.authzMiddleware.ViewAccess(provider.rulerHandler.GetRuleByID), handler.OpenAPIDef{
 		ID:                  "GetRuleByID",
 		Tags:                []string{"rules"},
 		Summary:             "Get alert rule by ID",
@@ -43,11 +41,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusOK,
 		ErrorStatusCodes:    []int{http.StatusNotFound},
 		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-	})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/rules", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.CreateRule), handler.OpenAPIDef{
+	router.Post("/v1/o11y/rules", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.CreateRule), handler.OpenAPIDef{
 		ID:                  "CreateRule",
 		Tags:                []string{"rules"},
 		Summary:             "Create alert rule",
@@ -60,11 +56,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusCreated,
 		ErrorStatusCodes:    []int{http.StatusBadRequest},
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/rules/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.UpdateRuleByID), handler.OpenAPIDef{
+	router.Put("/v1/o11y/rules/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.UpdateRuleByID), handler.OpenAPIDef{
 		ID:                 "UpdateRuleByID",
 		Tags:               []string{"rules"},
 		Summary:            "Update alert rule",
@@ -75,11 +69,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		SuccessStatusCode:  http.StatusNoContent,
 		ErrorStatusCodes:   []int{http.StatusBadRequest, http.StatusNotFound},
 		SecuritySchemes:    newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodPut).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/rules/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.DeleteRuleByID), handler.OpenAPIDef{
+	router.Delete("/v1/o11y/rules/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.DeleteRuleByID), handler.OpenAPIDef{
 		ID:                "DeleteRuleByID",
 		Tags:              []string{"rules"},
 		Summary:           "Delete alert rule",
@@ -87,11 +79,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		SuccessStatusCode: http.StatusNoContent,
 		ErrorStatusCodes:  []int{http.StatusNotFound},
 		SecuritySchemes:   newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/rules/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.PatchRuleByID), handler.OpenAPIDef{
+	router.Patch("/v1/o11y/rules/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.PatchRuleByID), handler.OpenAPIDef{
 		ID:                  "PatchRuleByID",
 		Tags:                []string{"rules"},
 		Summary:             "Patch alert rule",
@@ -104,11 +94,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusOK,
 		ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusNotFound},
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodPatch).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/rules/test", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.TestRule), handler.OpenAPIDef{
+	router.Post("/v1/o11y/rules/test", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.TestRule), handler.OpenAPIDef{
 		ID:                  "TestRule",
 		Tags:                []string{"rules"},
 		Summary:             "Test alert rule",
@@ -121,11 +109,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusOK,
 		ErrorStatusCodes:    []int{http.StatusBadRequest},
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/downtime_schedules", handler.New(provider.authzMiddleware.ViewAccess(provider.rulerHandler.ListDowntimeSchedules), handler.OpenAPIDef{
+	router.Get("/v1/o11y/downtime_schedules", handler.New(provider.authzMiddleware.ViewAccess(provider.rulerHandler.ListDowntimeSchedules), handler.OpenAPIDef{
 		ID:                  "ListDowntimeSchedules",
 		Tags:                []string{"downtimeschedules"},
 		Summary:             "List downtime schedules",
@@ -135,11 +121,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		ResponseContentType: "application/json",
 		SuccessStatusCode:   http.StatusOK,
 		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-	})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/downtime_schedules/{id}", handler.New(provider.authzMiddleware.ViewAccess(provider.rulerHandler.GetDowntimeScheduleByID), handler.OpenAPIDef{
+	router.Get("/v1/o11y/downtime_schedules/{id}", handler.New(provider.authzMiddleware.ViewAccess(provider.rulerHandler.GetDowntimeScheduleByID), handler.OpenAPIDef{
 		ID:                  "GetDowntimeScheduleByID",
 		Tags:                []string{"downtimeschedules"},
 		Summary:             "Get downtime schedule by ID",
@@ -149,11 +133,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusOK,
 		ErrorStatusCodes:    []int{http.StatusNotFound},
 		SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
-	})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/downtime_schedules", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.CreateDowntimeSchedule), handler.OpenAPIDef{
+	router.Post("/v1/o11y/downtime_schedules", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.CreateDowntimeSchedule), handler.OpenAPIDef{
 		ID:                  "CreateDowntimeSchedule",
 		Tags:                []string{"downtimeschedules"},
 		Summary:             "Create downtime schedule",
@@ -165,11 +147,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		SuccessStatusCode:   http.StatusCreated,
 		ErrorStatusCodes:    []int{http.StatusBadRequest},
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/downtime_schedules/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.UpdateDowntimeScheduleByID), handler.OpenAPIDef{
+	router.Put("/v1/o11y/downtime_schedules/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.UpdateDowntimeScheduleByID), handler.OpenAPIDef{
 		ID:                 "UpdateDowntimeScheduleByID",
 		Tags:               []string{"downtimeschedules"},
 		Summary:            "Update downtime schedule",
@@ -179,11 +159,9 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		SuccessStatusCode:  http.StatusNoContent,
 		ErrorStatusCodes:   []int{http.StatusBadRequest, http.StatusNotFound},
 		SecuritySchemes:    newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodPut).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/downtime_schedules/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.DeleteDowntimeScheduleByID), handler.OpenAPIDef{
+	router.Delete("/v1/o11y/downtime_schedules/{id}", handler.New(provider.authzMiddleware.EditAccess(provider.rulerHandler.DeleteDowntimeScheduleByID), handler.OpenAPIDef{
 		ID:                "DeleteDowntimeScheduleByID",
 		Tags:              []string{"downtimeschedules"},
 		Summary:           "Delete downtime schedule",
@@ -191,9 +169,5 @@ func (provider *provider) addRulerRoutes(router *mux.Router) error {
 		SuccessStatusCode: http.StatusNoContent,
 		ErrorStatusCodes:  []int{http.StatusNotFound},
 		SecuritySchemes:   newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	}))
 }

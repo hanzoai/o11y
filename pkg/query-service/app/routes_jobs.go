@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountJobs registers k8s job infra-metrics: attribute discovery + list.
@@ -16,9 +14,9 @@ import (
 // second implementation: the ops answer by handing the call back to this
 // router, so the handlers below stay the one place the reads are performed,
 // and the ViewAccess gate keeps running exactly here.
-func (aH *APIHandler) mountJobs(router *mux.Router, am *middleware.AuthZ) {
-	jobsSubRouter := router.PathPrefix("/v1/o11y/jobs").Subrouter()
-	jobsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getJobAttributeKeys)).Methods(http.MethodGet)
-	jobsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getJobAttributeValues)).Methods(http.MethodGet)
-	jobsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getJobList)).Methods(http.MethodPost)
+func (aH *APIHandler) mountJobs(router routing.Router, am *middleware.AuthZ) {
+	jobsSubRouter := router.Group("/v1/o11y/jobs")
+	jobsSubRouter.Get("/attribute_keys", am.ViewAccess(aH.getJobAttributeKeys))
+	jobsSubRouter.Get("/attribute_values", am.ViewAccess(aH.getJobAttributeValues))
+	jobsSubRouter.Post("/list", am.ViewAccess(aH.getJobList))
 }

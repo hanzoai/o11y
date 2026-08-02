@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 )
 
@@ -17,8 +17,8 @@ import (
 // (orgStats), which relays here — so the ViewAccess gate named below stays the
 // one place access is decided, and deleting either half drops one of the two
 // deployments.
-func (provider *provider) addStatsReporterRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/stats", handler.New(
+func (provider *provider) addStatsReporterRoutes(router routing.Router) {
+	router.Get("/v1/o11y/stats", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.statsHandler.Get),
 		handler.OpenAPIDef{
 			ID:                  "GetStats",
@@ -34,9 +34,5 @@ func (provider *provider) addStatsReporterRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	))
 }

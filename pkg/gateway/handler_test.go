@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/gatewaytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
@@ -58,11 +58,11 @@ func serve(t *testing.T, template, method, target, body string, pick func(Handle
 	t.Helper()
 
 	rec := &recorder{}
-	router := mux.NewRouter()
-	router.HandleFunc(template, pick(NewHandler(rec))).Methods(method)
+	router := routing.Serve(method, template, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pick(NewHandler(rec))(w, r.WithContext(authtypes.NewContextWithClaims(r.Context(), authtypes.Claims{OrgID: orgID})))
+	}))
 
 	req := httptest.NewRequest(method, target, strings.NewReader(body))
-	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{OrgID: orgID}))
 
 	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)

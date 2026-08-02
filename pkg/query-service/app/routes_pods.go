@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountPods registers k8s pod infra-metrics: attribute discovery + list.
@@ -16,9 +14,9 @@ import (
 // second implementation: the ops answer by handing the call back to this
 // router, so the handlers below stay the one place the reads are performed,
 // and the ViewAccess gate keeps running exactly here.
-func (aH *APIHandler) mountPods(router *mux.Router, am *middleware.AuthZ) {
-	podsSubRouter := router.PathPrefix("/v1/o11y/pods").Subrouter()
-	podsSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getPodAttributeKeys)).Methods(http.MethodGet)
-	podsSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getPodAttributeValues)).Methods(http.MethodGet)
-	podsSubRouter.HandleFunc("/list", am.ViewAccess(aH.getPodList)).Methods(http.MethodPost)
+func (aH *APIHandler) mountPods(router routing.Router, am *middleware.AuthZ) {
+	podsSubRouter := router.Group("/v1/o11y/pods")
+	podsSubRouter.Get("/attribute_keys", am.ViewAccess(aH.getPodAttributeKeys))
+	podsSubRouter.Get("/attribute_values", am.ViewAccess(aH.getPodAttributeValues))
+	podsSubRouter.Post("/list", am.ViewAccess(aH.getPodList))
 }
