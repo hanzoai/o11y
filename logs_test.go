@@ -463,6 +463,11 @@ func TestLogsRoutesAreTheSameNine(t *testing.T) {
 		"POST /v1/o11y/logs/pipelines":         true,
 		"POST /v1/o11y/logs/promote_paths":     true,
 		"GET /v1/o11y/logs/promote_paths":      true,
+
+		// The tenth door: a NAMED hatch, not a typed op and not a fall-through.
+		// It is in this census precisely because it is registered — a hatch that
+		// stops being registered is a 404 now, and this is what catches that.
+		"GET /v1/o11y/logs/livetail": true,
 	}
 	got := map[string]bool{}
 	for _, r := range app.Fiber().GetRoutes(true) {
@@ -482,12 +487,12 @@ func TestLogsRoutesAreTheSameNine(t *testing.T) {
 	}
 }
 
-// Live tail is the tenth route and the one honest escape hatch: a stream that
-// never completes cannot be a buffered typed op. It still reaches the runtime
-// through the delegation wildcard, bytes untouched — a typed relay would have
-// choked on a non-JSON stream frame, so verbatim arrival IS the proof of the
-// door it went through.
-func TestLivetailStaysOnTheWildcard(t *testing.T) {
+// Live tail is the tenth route and one of the eleven honest escape hatches: a
+// stream that never completes cannot be a buffered typed op. It reaches the
+// runtime through its OWN named route now, bytes untouched — a typed relay would
+// have choked on a non-JSON stream frame, so verbatim arrival IS the proof of
+// the door it went through.
+func TestLivetailIsANamedHatch(t *testing.T) {
 	app := mounted(t)
 	frame := "event: log\ndata: {\"body\":\"boom\"}\n\n"
 	var askedPath string
