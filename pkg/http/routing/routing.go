@@ -82,12 +82,26 @@ func (t *Table) Routes() []Route {
 // Router registers routes on a zip router. Copying one is free and copies share
 // the Table: a Group is a Router with a longer prefix, not a separate tree.
 type Router struct {
-	zip   zip.Router
-	chain Chain
-	table *Table
+	zip zip.Router
+	// prefix is the composed group prefix in the DECLARED (brace) spelling.
+	//
+	// It is kept here because zip no longer has it to give. It used to be read
+	// back off the router — zip's OpScope().Prefix reported the underlying
+	// fiber.Group's composed prefix — and that reading is gone by design: a zip
+	// group is now an app included by reference, and the same definition may be
+	// included at more than one prefix, so a group has no single prefix until
+	// the walk resolves one per INCLUSION at build time. A registrar that puts
+	// concrete routes on one router does know its own, so it states it.
+	prefix string
+	chain  Chain
+	table  *Table
 }
 
 // New starts a route tree on r, serving every handler through chain.
+//
+// r is the root: every call site hands it an unprefixed group, and the paths
+// registered through it are full public paths. Group is what lengthens the
+// prefix from there.
 func New(r zip.Router, chain Chain) Router {
 	return Router{zip: r, chain: chain, table: &Table{}}
 }
@@ -100,6 +114,7 @@ func (r Router) Table() *Table { return r.table }
 // path segment sequence, exactly as the tree it replaces used it.
 func (r Router) Group(prefix string) Router {
 	r.zip = r.zip.Group(colonize(prefix))
+	r.prefix = join(r.prefix, prefix)
 	return r
 }
 
@@ -111,7 +126,7 @@ func (r Router) Group(prefix string) Router {
 // not a condition a running server can encounter, and the router that used to
 // hold these silently let the first one win.
 func (r Router) Handle(method, path string, h http.Handler) Router {
-	full := template(join(r.prefix(), path))
+	full := template(join(r.prefix, path))
 	for _, existing := range r.table.routes {
 		if existing.Method == method && existing.Path == full {
 			panic("routing: " + method + " " + full + " is registered twice")
@@ -161,10 +176,6 @@ func (r Router) Patch(path string, h http.Handler) Router {
 func (r Router) Delete(path string, h http.Handler) Router {
 	return r.Handle(http.MethodDelete, path, h)
 }
-
-// prefix reads the composed prefix off the zip router rather than keeping a
-// second copy of it, so a recorded path cannot drift from where the route landed.
-func (r Router) prefix() string { return r.zip.OpScope().Prefix }
 
 // Serve is a one-route tree, as a net/http handler.
 //
@@ -293,11 +304,11 @@ func respell(path string, say func(name, constraint string) string) string {
 	return strings.Join(segments, "/")
 }
 
-// join composes a group's prefix with a leaf path the way the router does. The
-// prefix arrives already respelled (it came off the router), so it is put back
-// into the declared spelling to keep one spelling in the source.
+// join composes a group's prefix with a leaf path the way the router does. Both
+// arrive in the declared spelling — the prefix is the one this Router composed,
+// not one read back off the router — so there is nothing to respell here.
 func join(prefix, path string) string {
-	prefix = strings.TrimRight(brace(prefix), "/")
+	prefix = strings.TrimRight(prefix, "/")
 	if prefix == "" {
 		return path
 	}
@@ -308,23 +319,4 @@ func join(prefix, path string) string {
 		path = "/" + path
 	}
 	return prefix + path
-}
-
-// brace is colonize read backwards, for the one value that arrives respelled.
-func brace(path string) string {
-	if !strings.Contains(path, ":") {
-		return path
-	}
-	segments := strings.Split(path, "/")
-	for i, segment := range segments {
-		if strings.HasPrefix(segment, ":") {
-			name, constraint, found := strings.Cut(strings.TrimSuffix(segment[1:], ">"), "<")
-			if found {
-				segments[i] = "{" + name + ":" + constraint + "}"
-				continue
-			}
-			segments[i] = "{" + name + "}"
-		}
-	}
-	return strings.Join(segments, "/")
 }
