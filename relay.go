@@ -92,6 +92,30 @@ func relay(ctx context.Context, method, path string, params url.Values, body, ou
 	if err != nil {
 		return zip.ErrBadRequest(err.Error())
 	}
+	// A handler is a SERVER seam, so the request handed to it has to be
+	// server-SHAPED. http.NewRequest builds a CLIENT request and deliberately
+	// leaves RequestURI empty — net/http fills the request-target from URL at
+	// write time, and documents that a client must not set it. Nothing writes
+	// this request to a wire: it goes straight into an http.Handler, and a
+	// handler is entitled to read the field the server would have populated.
+	//
+	// It is not cosmetic. When the host embeds the runtime IN-PROCESS, that
+	// handler is adaptor.FiberApp, which copies r.RequestURI into the fasthttp
+	// request verbatim — so an empty one erased the path, fasthttp normalized it
+	// to "/", no API route matched, and the request fell through to the console
+	// web provider, which answers http.NotFound. That is why the unified door
+	// answered every relayed op
+	//   404 {"status":404,"error":"404 page not found"}
+	// — /version, /health, /global/config, /users/me, all 353 typed ops — while
+	// the standalone runtime served the identical paths 200. The three native
+	// probes (livez/healthz/readyz) kept working precisely because mountHealth
+	// dispatches them itself and never comes through here, which is what made the
+	// break look like an auth problem instead of a lost path.
+	//
+	// The out-of-process host was immune (its handler is a reverse proxy, which
+	// re-derives the target from URL), so this only ever bit the embed — the
+	// configuration cloud runs in production.
+	req.RequestURI = target
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}
