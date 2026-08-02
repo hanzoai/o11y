@@ -463,18 +463,27 @@ GROUP BY org, service, name;
 -- On this deployment it was NOT vacuous: event.error held 88 rows whose `org` was a
 -- uuid and 13 whose `product` was, written by the Sentry ingest path.
 --
--- REPAIRING THEM IS A SEPARATE, DEPLOYMENT-SPECIFIC STEP, and it belongs to the
--- operator because the uuid -> slug map is this deployment's. It is DERIVED, never
--- guessed: o11y mints an org's uuid from its slug
--- (uuid5(NameSpaceURL, 'hanzo:o11y:org:' || slug), pkg/identn/iamidentn), and a
--- project's slug is `o11y_sentry_projects.slug`. So for each value the statement below
--- names, read its slug out of the record that owns it and confirm the derivation
--- reproduces the uuid before writing anything:
+-- REPAIRING THEM IS A SEPARATE STEP AND IT BELONGS TO THE OPERATOR, because a mutation
+-- on a source table is not this file's call. But the map is DERIVED, never guessed, so
+-- it is written out here rather than left as an exercise.
 --
---     ALTER TABLE event.error UPDATE org = 'hanzo'
---      WHERE org = 'cd35a51b-f7e7-5412-b67f-58b8703e5219';
+-- An ORG's uuid is `uuid5(NameSpaceURL, 'hanzo:o11y:org:' || slug)`
+-- (`toUUID` in pkg/identn/iamidentn/provider.go). That is invertible by re-deriving from
+-- a candidate slug, and both values on this deployment reproduce exactly:
 --
--- A mutation on a source table is the operator's call, not this file's.
+--     cd35a51b-f7e7-5412-b67f-58b8703e5219  =  uuid5(url, 'hanzo:o11y:org:hanzo')  -> hanzo
+--     dfb7a19b-108f-5150-8131-7d207488bf48  =  uuid5(url, 'hanzo:o11y:org:admin')  -> admin
+--
+--     ALTER TABLE event.error UPDATE org = 'hanzo' WHERE org = 'cd35a51b-f7e7-5412-b67f-58b8703e5219';
+--     ALTER TABLE event.error UPDATE org = 'admin' WHERE org = 'dfb7a19b-108f-5150-8131-7d207488bf48';
+--
+-- A PRODUCT's uuid is not derived and cannot be inverted: 019f9b1e-5785-7359-… is a
+-- UUIDv7 (the version nibble is 7), a MINTED Sentry project id, so its slug is a lookup
+-- rather than a computation — read `slug` from the `o11y_sentry_projects` row with that
+-- id, in the relational store, and update `product` to it.
+--
+-- Re-derive before writing. The mapping above is this deployment's, and the statement
+-- below is what says whether it is still complete.
 
 SELECT throwIf(count() > 0,
     'A SOURCE TABLE STILL SPELLS A TENANT AS A UUID. event.fact refuses it, so the backfill would abort partway. Repair the source first — see the note above this statement.') AS ok
