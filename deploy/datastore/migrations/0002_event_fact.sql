@@ -21,6 +21,18 @@
 --   4. Idempotency isolation: Replacing collapses only WITHIN a partition, so an `id`
 --      collision between an `act` and a `log` cannot silently delete a row.
 --
+-- WHY THE TIME GRAIN IS A MONTH AND NOT A DAY. Point 4 cuts both ways: Replacing
+-- collapses only within a partition, so THE PARTITION GRAIN IS THE REDELIVERY WINDOW.
+-- The four tables this replaces all partition by month. A redelivered fact is a second
+-- INSERT and takes a fresh `ingested_at`, so a delivery at 23:59:59.900 and its retry
+-- 200ms later land in ONE monthly partition and collapse — but in TWO daily ones, where
+-- they are two rows in two partitions and `OPTIMIZE ... FINAL` cannot merge across a
+-- partition boundary. The duplicate is permanent. A daily grain would narrow the
+-- redelivery window 30x against the tables this replaces, which is a regression the new
+-- table has no reason to carry, and it buys nothing the month does not already give:
+-- `ttl_only_drop_parts` drops PARTS, not partitions, and parts cluster by ingest time —
+-- which is exactly how the 30-day TTL on the live `event.log` already expires.
+--
 -- WHY IT PARTITIONS ON THE INGEST CLOCK. `time` is the caller's and may be backdated;
 -- retention is measured from `ingested_at`, which is a column DEFAULT nothing on the
 -- wire can reach. Partitioning on the event clock would land a backdated fact in an
@@ -30,16 +42,56 @@
 -- idempotency: the sink commits before it acks, so a redelivered fact must collapse
 -- rather than duplicate. Drop `id` from the key and every bus retry doubles a row.
 --
--- ADDITIVE. Every statement here CREATEs. Nothing is dropped, renamed or rewritten;
--- the four occurrence tables keep serving until their readers move (0004). Safe to run
--- on a live deployment, in the middle of the day, with ingest up.
+-- ONE RENAME, THEN ADDITIVE. `event.trace` and `event.operation` already exist under
+-- the names step 4 wants, holding a shape nothing has ever fed. Step 1 measures that
+-- and moves them to `attic` — an entry move, not a copy. Everything after step 1
+-- CREATEs. Safe to run on a live deployment, with ingest up: nothing writes the two
+-- tables being moved, and the four occurrence tables keep serving until their readers
+-- move (0004).
+--
+-- THE RENAME IS FIRST BECAUSE `CREATE TABLE IF NOT EXISTS` AGAINST AN OCCUPIED NAME IS
+-- A SILENT NO-OP. Put the CREATEs first and they quietly do nothing, the rollup view
+-- then dies on the OLD table's columns (`Code: 8 THERE_IS_NO_COLUMN: 'spans'`), and the
+-- run aborts with the fact table built and the backfill entirely unrun. Ordering is the
+-- whole fix, and `IF NOT EXISTS` is dropped from those two CREATEs so that a rename
+-- that did not happen fails loudly instead of silently.
 --
 -- CLUSTERED DEPLOYMENTS: append `ON CLUSTER '<cluster>'` to every statement, and split
 -- each table into a local MergeTree plus a Distributed wrapper. This deployment is
 -- single-shard, so the local table IS the table.
 
 -- =====================================================================
--- 1) event.fact — the one occurrence table.
+-- 1) THE CUTOVER — metadata-only, reversible, and it goes FIRST.
+-- =====================================================================
+--
+-- Measured on the live warehouse: `event.trace` holds ONE row against 9,130 distinct
+-- trace ids in `event.span`, and `event.operation` holds two against 68 distinct
+-- (service, name) pairs. Nothing ever fed them. Any design that leans on them as a
+-- fallback is leaning on nothing, so step 4 rebuilds them as rollups of the fact table.
+--
+-- The gate below does not restate those numbers, it RE-DERIVES them: each rollup is
+-- refused if it holds as much as a tenth of the population it would hold were it alive.
+-- A constant would rot; a ratio against the source cannot.
+--
+-- `attic` is where a superseded object waits out its own TTL. It is a DATABASE, not a
+-- suffix: nothing in this namespace is ever named `_old`, `_v2` or `_new`. Both tables
+-- carry a 30-day TTL, so they read out and leave without anyone deciding to delete them.
+
+CREATE DATABASE IF NOT EXISTS attic;
+
+SELECT throwIf(
+    (SELECT count() FROM event.trace) * 10 > (SELECT uniqExact(trace_id) FROM event.span),
+    'REFUSING: event.trace is not dead — it holds a tenth or more of the traces in event.span. Read it before moving it aside.');
+
+SELECT throwIf(
+    (SELECT count() FROM event.operation) * 10 > (SELECT uniqExact((service, name)) FROM event.span),
+    'REFUSING: event.operation is not dead — it holds a tenth or more of the (service, name) pairs in event.span. Read it before moving it aside.');
+
+RENAME TABLE event.trace     TO attic.trace,
+             event.operation TO attic.operation;
+
+-- =====================================================================
+-- 2) event.fact — the one occurrence table.
 -- =====================================================================
 --
 -- THE COLUMN-GROWTH RULE, which is what keeps 39 columns from becoming 200: a column
@@ -48,10 +100,9 @@
 -- the same query time and no join — so the escape hatch is cheap enough that nothing
 -- has to become a column to be storable.
 --
--- SPARSITY IS NOT A COST. Measured on the live `event.log` (798,375 rows): an
--- unpopulated envelope column costs 515 bytes for the whole table. Six of them is
--- ~3 KiB against 48 MiB — 0.006%. The "sparse columns are wasteful" instinct is a
--- row-store instinct.
+-- SPARSITY IS NOT A COST. Measured on the live `event.log`: an unpopulated envelope
+-- column costs 515 bytes for the whole table. Six of them is ~3 KiB against 48 MiB —
+-- 0.006%. The "sparse columns are wasteful" instinct is a row-store instinct.
 
 CREATE TABLE IF NOT EXISTS event.fact
 (
@@ -184,10 +235,38 @@ CREATE TABLE IF NOT EXISTS event.fact
     INDEX by_file     `frames.file` TYPE bloom_filter GRANULARITY 4,
     INDEX by_testid   el.testid     TYPE bloom_filter GRANULARITY 4,
     INDEX by_duration duration      TYPE minmax GRANULARITY 1,
-    INDEX by_severity severity      TYPE minmax GRANULARITY 1
+    INDEX by_severity severity      TYPE minmax GRANULARITY 1,
+
+    -- ── the tenant contract, ENFORCED ────────────────────────────────────────
+    --
+    -- `org` is the IAM organization slug and `product` is a surface. Neither is ever a
+    -- UUID. That was written as a comment and asserted by a SELECT nobody had to read,
+    -- and both were true of the code and false of the data: the Sentry writer emitted
+    -- `orgID.String()`, so ONE tenant sat on the plane under TWO spellings — 86 rows
+    -- as cd35a51b-f7e7-5412-b67f-58b8703e5219 and 2 as `hanzo`, which is that uuid's
+    -- own preimage (uuid5 of "hanzo:o11y:org:hanzo"). A reader binding either spelling
+    -- saw a fraction of its own errors.
+    --
+    -- A CONSTRAINT is the difference between a rule and a hope. It is evaluated on
+    -- INSERT, so a writer that regresses is REFUSED at the door rather than discovered
+    -- later by a migration, and the contract lives in ONE place — here — instead of in
+    -- prose plus a check somebody has to remember to run.
+    --
+    -- The predicate is the uuid GRAMMAR, spelled out, and not `toUUIDOrNull(x) IS
+    -- NULL` — which reads better and is WRONG: that parser accepts any 36 characters
+    -- hyphenated in the right four places, so the slug
+    -- `maxpower-team-alpha-beta-gamma-delta` parses as a uuid and a legitimate tenant
+    -- would have its telemetry refused. A constraint that can reject a real tenant is
+    -- worse than the defect it guards. Verified against the live engine (26.2.3): that
+    -- slug is admitted by the regex below and rejected by toUUIDOrNull.
+    --
+    -- Both columns are LowCardinality, so the match runs over the dictionary rather
+    -- than once per row.
+    CONSTRAINT tenant_is_a_slug   CHECK NOT match(org,     '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'),
+    CONSTRAINT product_is_a_slug  CHECK NOT match(product, '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')
 )
 ENGINE = ReplacingMergeTree(ingested_at)
-PARTITION BY (signal, toDate(ingested_at))
+PARTITION BY (signal, toYYYYMM(ingested_at))
 PRIMARY KEY (org, time)
 ORDER BY (org, time, id)
 -- The four retentions the plane already had, preserved. The signal set is CLOSED and
@@ -200,14 +279,14 @@ TTL toDateTime(ingested_at) + INTERVAL 30 DAY DELETE WHERE signal IN ('log', 'sp
 SETTINGS index_granularity = 8192,
          ttl_only_drop_parts = 1,
          -- Armed, unspent. A projection is a permanent second copy, so none is
-         -- declared at 825k rows; but the engine default for a Replacing table is
+         -- declared at this size; but the engine default for a Replacing table is
          -- `throw`, so without this setting the ALTER that adds the first projection
          -- FAILS. Declaring it now is what makes the remedy a one-line ALTER on the
          -- day a p95 justifies it, rather than a table rebuild.
          deduplicate_merge_projection_mode = 'rebuild';
 
 -- =====================================================================
--- 2) event.session — one row per session, DERIVED, never trusted.
+-- 3) event.session — one row per session, DERIVED, never trusted.
 -- =====================================================================
 --
 -- The counters are computed from other signals rather than read from SDK-supplied
@@ -273,19 +352,15 @@ GROUP BY org, session_id;
 --       FROM event.session WHERE org = ? GROUP BY org, session_id
 
 -- =====================================================================
--- 3) event.trace / event.operation — REBUILT, because they are dead.
+-- 4) event.trace / event.operation — REBUILT on the names step 1 freed.
 -- =====================================================================
 --
--- Measured on the live warehouse: `event.trace` holds ONE row against 8,820 distinct
--- trace ids in `event.span`, and `event.operation` holds two. Nothing ever fed them.
--- Any design that leans on them as a fallback is leaning on nothing, so they are
--- rebuilt here as views over the fact table.
---
--- The two tables ALREADY EXIST with the right shape and the wrong (empty) contents, so
--- the operator moves them aside first — see step 6. These CREATEs assume that has
--- happened; run them after it.
+-- No `IF NOT EXISTS` here, deliberately: these two names were occupied a moment ago and
+-- step 1 is the only thing that freed them. Without the rename these CREATEs must FAIL,
+-- because the alternative — succeeding silently against the old shape — is the defect
+-- that made this file unrunnable.
 
-CREATE TABLE IF NOT EXISTS event.trace
+CREATE TABLE event.trace
 (
     `org`       LowCardinality(String),
     `trace_id`  String CODEC(ZSTD(1)),
@@ -332,7 +407,7 @@ GROUP BY org, trace_id;
 --            argMinIfMerge(name)      AS name
 --       FROM event.trace WHERE org = ? GROUP BY org, trace_id
 
-CREATE TABLE IF NOT EXISTS event.operation
+CREATE TABLE event.operation
 (
     `org`     LowCardinality(String),
     `service` LowCardinality(String),
@@ -352,15 +427,65 @@ WHERE signal = 'span' AND service != ''
 GROUP BY org, service, name;
 
 -- =====================================================================
--- 4) BACKFILL — four statements, 825,095 rows, seconds.
+-- 5) BACKFILL — one statement per signal.
 -- =====================================================================
 --
 -- This is a RE-DERIVE, not a data migration. Idempotent: the target is a Replacing
--- table keyed (org, time, id) within a single-signal partition, so re-running merges
--- rather than duplicating. Safe to run twice, safe to run while ingest is live.
+-- table keyed (org, time, id) within a single-signal MONTHLY partition, and each
+-- statement carries the source's own `ingested_at` forward rather than taking the
+-- column DEFAULT — so a second run lands every row in the partition it is already in
+-- and merges rather than duplicating. Safe to run twice, safe to run while ingest is
+-- live.
+--
+-- THE THREE ROLLUPS FILL THEMSELVES. session_roll, trace_roll and operation_roll exist
+-- before this step and fire on these INSERTs, so event.session, event.trace and
+-- event.operation are populated by the same four statements. There is no separate
+-- rollup backfill to write, and therefore no second spelling of the rollup's SELECT to
+-- keep in sync with the view's.
+--
+-- NO ROW COUNT IS WRITTEN HERE. The plane is live and growing — the `log` signal alone
+-- passed two million while this file was being corrected, against the 825,095 an
+-- earlier draft asserted for all four — so a total in a comment is a total that is
+-- wrong by the time it is read. Step 6 is the authority: it counts both sides at the
+-- moment of the run and refuses to pass unless they agree.
 --
 -- Run these AFTER the writers have been repointed (0004 in the runbook), so nothing
--- lands in the old tables behind the backfill.
+-- lands in the old tables behind the backfill. Step 6 catches the mistake if they have
+-- not been: a source that is still growing will not match.
+--
+-- THE PRECONDITION, FIRST, BECAUSE THE BACKFILL CANNOT SURVIVE A BAD SPELLING. The
+-- tenant constraint on event.fact refuses a uuid, so a source table that still holds
+-- one aborts its INSERT — partway through, after the earlier statements have already
+-- landed. The statement below asks the same question of the SOURCES before anything is
+-- written, so the answer is a refusal to start with the offending value named, rather
+-- than a half-done backfill with a constraint violation to interpret.
+--
+-- On this deployment it was NOT vacuous: event.error held 88 rows whose `org` was a
+-- uuid and 13 whose `product` was, written by the Sentry ingest path.
+--
+-- REPAIRING THEM IS A SEPARATE, DEPLOYMENT-SPECIFIC STEP, and it belongs to the
+-- operator because the uuid -> slug map is this deployment's. It is DERIVED, never
+-- guessed: o11y mints an org's uuid from its slug
+-- (uuid5(NameSpaceURL, 'hanzo:o11y:org:' || slug), pkg/identn/iamidentn), and a
+-- project's slug is `o11y_sentry_projects.slug`. So for each value the statement below
+-- names, read its slug out of the record that owns it and confirm the derivation
+-- reproduces the uuid before writing anything:
+--
+--     ALTER TABLE event.error UPDATE org = 'hanzo'
+--      WHERE org = 'cd35a51b-f7e7-5412-b67f-58b8703e5219';
+--
+-- A mutation on a source table is the operator's call, not this file's.
+
+SELECT throwIf(count() > 0,
+    'A SOURCE TABLE STILL SPELLS A TENANT AS A UUID. event.fact refuses it, so the backfill would abort partway. Repair the source first — see the note above this statement.') AS ok
+FROM (
+    SELECT org, product FROM event.event
+    UNION ALL SELECT org, product FROM event.error
+    UNION ALL SELECT org, product FROM event.log
+    UNION ALL SELECT org, product FROM event.span
+)
+WHERE match(org,     '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')
+   OR match(product, '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
 
 INSERT INTO event.fact
     (org, signal, time, ingested_at, id, name, kind, product,
@@ -410,46 +535,40 @@ SELECT org, 'span', time, ingested_at, id, name, kind, product,
 FROM event.span;
 
 -- =====================================================================
--- 5) VERIFY — assert the re-derive, per signal.
--- =====================================================================
--- Each pair must match. Run BEFORE step 6 and before anything is retired.
-
-SELECT 'act'   AS signal, (SELECT count() FROM event.event) AS was, countIf(signal = 'act')   AS now FROM event.fact
-UNION ALL
-SELECT 'error',           (SELECT count() FROM event.error),         countIf(signal = 'error')  FROM event.fact
-UNION ALL
-SELECT 'log',             (SELECT count() FROM event.log),           countIf(signal = 'log')    FROM event.fact
-UNION ALL
-SELECT 'span',            (SELECT count() FROM event.span),          countIf(signal = 'span')   FROM event.fact;
-
--- The tenant contract, asserted against the data rather than against the code.
--- Both must return zero rows. A UUID in either column means a writer is still
--- spelling a tenant as a key instead of a slug.
-SELECT DISTINCT org     FROM event.fact WHERE match(org,     '^[0-9a-f]{8}-[0-9a-f]{4}-');
-SELECT DISTINCT product FROM event.fact WHERE match(product, '^[0-9a-f]{8}-[0-9a-f]{4}-');
-
--- =====================================================================
--- 6) THE ROLLUP CUTOVER — operator-run, metadata-only, reversible.
+-- 6) VERIFY — assert the re-derive, per signal.
 -- =====================================================================
 --
--- `event.trace` and `event.operation` already exist under the names step 3 wants.
--- They are moved aside rather than dropped, so the step is a RENAME (an entry move —
--- Datastore never copies or rewrites parts) and is undone by renaming back.
+-- IT COUNTS IDS, NOT ROWS, for the same reason the rollups do: both sides are Replacing
+-- tables, so `count()` reads whatever has not merged yet and would report a difference
+-- that is only a pending merge. `uniqExact(id)` is the collapsed count by definition and
+-- needs no FINAL.
 --
--- GATE: both are dead. Confirm before running:
---     SELECT count() FROM event.trace;      -- expect 1
---     SELECT count() FROM event.operation;  -- expect 2
+-- The assertion rides in the projection rather than in a second statement, so the pair
+-- of counts is spelled once. On a good run it prints the proof, one row per signal, with
+-- `ok = 0`. On a bad one it aborts and the same query without its last column names the
+-- signal that differs.
 --
--- `attic` is where a superseded object waits out its own TTL. It is a DATABASE, not a
--- suffix: nothing in this namespace is ever named `_old`, `_v2` or `_new`.
+-- `event.fact AS f` IS LOAD-BEARING. Written unqualified, `'act' AS signal` shadows the
+-- `signal` COLUMN, so `signal = 'act'` is a comparison of the label against itself —
+-- constantly true — and the branch counts every id in the table rather than the act
+-- ones. Measured on the copy: 23,260 reported against 200 actually present. The table
+-- alias is what keeps the label and the column apart.
 
-CREATE DATABASE IF NOT EXISTS attic;
+SELECT signal, was, now, throwIf(was != now, 'BACKFILL INCOMPLETE: a signal in event.fact does not match its source table. Re-run step 5 for that signal.') AS ok
+FROM (
+    SELECT 'act'   AS signal, (SELECT uniqExact(id) FROM event.event) AS was, uniqExactIf(f.id, f.signal = 'act')   AS now FROM event.fact AS f
+    UNION ALL
+    SELECT 'error',           (SELECT uniqExact(id) FROM event.error),        uniqExactIf(f.id, f.signal = 'error') FROM event.fact AS f
+    UNION ALL
+    SELECT 'log',             (SELECT uniqExact(id) FROM event.log),          uniqExactIf(f.id, f.signal = 'log')   FROM event.fact AS f
+    UNION ALL
+    SELECT 'span',            (SELECT uniqExact(id) FROM event.span),         uniqExactIf(f.id, f.signal = 'span')  FROM event.fact AS f
+)
+ORDER BY signal;
 
--- RENAME TABLE event.trace     TO attic.trace;
--- RENAME TABLE event.operation TO attic.operation;
---   ...then run step 3, then:
--- INSERT INTO event.trace SELECT org, trace_id, start, end,
---        countIf(signal='span'), countIf(signal='error'), max(duration),
---        anyIf(service, parent=''), anyIf(name, parent='')
---   FROM event.fact WHERE trace_id != '' AND signal IN ('span','error')
---   GROUP BY org, trace_id;   -- backfill what the MV will only see going forward
+-- THERE IS NO TENANT ASSERTION HERE, and that is the point. It used to be two bare
+-- SELECTs at the end of this file — a check that ran once, printed a table, and was
+-- believed by whoever happened to read it. The contract is now a CONSTRAINT on
+-- event.fact (step 1), so it is evaluated on EVERY insert forever, and the
+-- precondition above asks the same question of the sources before the backfill starts.
+-- A rule that holds is worth more than a rule that was checked.
