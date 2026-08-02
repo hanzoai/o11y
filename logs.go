@@ -13,7 +13,7 @@ package o11y
 //
 // THE WIRE DOES NOT MOVE, and the way it does not move is that these ops do not
 // re-implement the reads and writes. Each hands the call to the SAME runtime
-// handler the wildcard delegates to (see relayAt), so identity resolution, the
+// handler the wildcard delegates to (see relay.go), so identity resolution, the
 // org gate, the role check (viewer on the reads, editor on the writes — the
 // exact ViewAccess/EditAccess gates the runtime has always run), the audit
 // record and the success envelope are all still the runtime's, executed in the
@@ -33,22 +33,13 @@ package o11y
 // reaches the runtime untouched (logs_test.go pins both halves).
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"io"
 	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"strconv"
 	"time"
 
 	"github.com/zap-proto/zip"
 )
-
-// o11yRoot is the o11y face's path root, spelled ONCE: the group the logs ops
-// register on, and the first segment relayAt rebuilds a call onto.
-const o11yRoot = "/v1/o11y"
 
 // mountLogs registers the nine typed logs ops on the native router. The
 // pipelines routes keep the mux tree's discipline — preview registers before
@@ -75,7 +66,7 @@ func mountLogs(app *zip.App) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func logRecords(ctx context.Context, in *O11yLogRecordsIn) (*O11yLogRecordsOut, error) {
 	out := new(O11yLogRecordsOut)
-	return out, relayAt(ctx, http.MethodGet, "/logs", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/logs", query(
 		"limit", in.Limit,
 		"timestampStart", nanos(in.TimestampStart),
 		"timestampEnd", nanos(in.TimestampEnd),
@@ -86,18 +77,18 @@ func logRecords(ctx context.Context, in *O11yLogRecordsIn) (*O11yLogRecordsOut, 
 // indexed columns, and the interesting ones seen in the data that could be.
 //
 // Callers need the viewer role; the runtime's own gate enforces it.
-func logFields(ctx context.Context, _ *struct{}) (*O11yLogFieldsOut, error) {
-	out := new(O11yLogFieldsOut)
-	return out, relayAt(ctx, http.MethodGet, "/logs/fields", nil, nil, out)
+func logFields(ctx context.Context, _ *struct{}) (*O11yFieldCatalogOut, error) {
+	out := new(O11yFieldCatalogOut)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/logs/fields", nil, nil, out)
 }
 
 // logFieldUpdate changes how one log field is stored — selects or deselects it
 // as a materialized column and tunes its index — and echoes the setting back.
 //
 // Callers need the editor role; the runtime's own gate enforces it.
-func logFieldUpdate(ctx context.Context, in *O11yLogFieldSetting) (*O11yLogFieldSetting, error) {
-	out := new(O11yLogFieldSetting)
-	return out, relayAt(ctx, http.MethodPost, "/logs/fields", nil, in, out)
+func logFieldUpdate(ctx context.Context, in *O11yFieldSetting) (*O11yFieldSetting, error) {
+	out := new(O11yFieldSetting)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/logs/fields", nil, in, out)
 }
 
 // logAggregate returns the logs aggregate buckets for the query window. The
@@ -106,7 +97,7 @@ func logFieldUpdate(ctx context.Context, in *O11yLogFieldSetting) (*O11yLogField
 // Callers need the viewer role; the runtime's own gate enforces it.
 func logAggregate(ctx context.Context, _ *struct{}) (*O11yLogAggregateOut, error) {
 	out := new(O11yLogAggregateOut)
-	return out, relayAt(ctx, http.MethodGet, "/logs/aggregate", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/logs/aggregate", nil, nil, out)
 }
 
 // logPipelinePreview runs the given log parsing pipelines over the given
@@ -116,7 +107,7 @@ func logAggregate(ctx context.Context, _ *struct{}) (*O11yLogAggregateOut, error
 // Callers need the viewer role; the runtime's own gate enforces it.
 func logPipelinePreview(ctx context.Context, in *O11yLogPipelinePreviewIn) (*O11yLogPipelinePreviewOut, error) {
 	out := new(O11yLogPipelinePreviewOut)
-	return out, relayAt(ctx, http.MethodPost, "/logs/pipelines/preview", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/logs/pipelines/preview", nil, in, out)
 }
 
 // logPipelines returns the caller's org's log parsing pipelines at one config
@@ -128,7 +119,7 @@ func logPipelines(ctx context.Context, in *O11yLogPipelinesIn) (*O11yLogPipeline
 	out := new(O11yLogPipelinesOut)
 	// The version goes on VERBATIM, as the segment the router matched, so the
 	// runtime reads exactly the version the caller named.
-	return out, relayAt(ctx, http.MethodGet, "/logs/pipelines/"+in.Version, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/logs/pipelines/"+in.Version, nil, nil, out)
 }
 
 // logPipelineCreate saves the given log parsing pipelines as the new config
@@ -139,7 +130,7 @@ func logPipelines(ctx context.Context, in *O11yLogPipelinesIn) (*O11yLogPipeline
 // Callers need the editor role; the runtime's own gate enforces it.
 func logPipelineCreate(ctx context.Context, in *O11yLogPipelineCreateIn) (*O11yLogPipelinesOut, error) {
 	out := new(O11yLogPipelinesOut)
-	return out, relayAt(ctx, http.MethodPost, "/logs/pipelines", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/logs/pipelines", nil, in, out)
 }
 
 // logPromote promotes and indexes log body paths: each named path is lifted
@@ -149,7 +140,7 @@ func logPipelineCreate(ctx context.Context, in *O11yLogPipelineCreateIn) (*O11yL
 // Callers need the editor role; the runtime's own gate enforces it.
 func logPromote(ctx context.Context, in *O11yLogPromoteIn) (*O11yLogPromoteOut, error) {
 	out := new(O11yLogPromoteOut)
-	return out, relayAt(ctx, http.MethodPost, "/logs/promote_paths", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/logs/promote_paths", nil, in, out)
 }
 
 // logPromoted lists the log body paths already promoted or indexed, with the
@@ -158,7 +149,7 @@ func logPromote(ctx context.Context, in *O11yLogPromoteIn) (*O11yLogPromoteOut, 
 // Callers need the viewer role; the runtime's own gate enforces it.
 func logPromoted(ctx context.Context, _ *struct{}) (*O11yLogPromotedOut, error) {
 	out := new(O11yLogPromotedOut)
-	return out, relayAt(ctx, http.MethodGet, "/logs/promote_paths", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/logs/promote_paths", nil, nil, out)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────
@@ -177,10 +168,13 @@ type O11yLogRecordsIn struct {
 	TimestampEnd int64 `json:"timestampEnd,omitempty"`
 }
 
-// O11yLogFieldSetting is one log field's storage setting — the request a caller
-// sends to change it, and the echo they get back. One name because it is one
-// shape: the write is acknowledged with the setting it wrote.
-type O11yLogFieldSetting struct {
+// O11yFieldSetting is one telemetry field's storage setting — the request a
+// caller sends to change it, and the echo they get back. One name because it is
+// one shape: the write is acknowledged with the setting it wrote. The logs face
+// and the traces face tune the SAME catalog through it (see traces.go); the
+// runtime has always used one type for both, so naming it per-signal here would
+// have invented two names for one value.
+type O11yFieldSetting struct {
 	// Name is the field to tune. Required.
 	Name string `json:"name" validate:"required"`
 	// DataType is the field's data type, e.g. string, int64, float64, bool.
@@ -266,16 +260,17 @@ type O11yLogRecordsOut struct {
 // the data.
 type O11yLogRow map[string]json.RawMessage
 
-// O11yLogFieldsOut is the log field catalog.
-type O11yLogFieldsOut struct {
+// O11yFieldCatalogOut is a signal's field catalog — logs (here) and traces
+// (traces.go) both answer with it, because on the runtime they are one type.
+type O11yFieldCatalogOut struct {
 	// Selected are the fields materialized as their own columns.
-	Selected []O11yLogField `json:"selected"`
+	Selected []O11yTelemetryField `json:"selected"`
 	// Interesting are fields seen in the data that could be selected.
-	Interesting []O11yLogField `json:"interesting"`
+	Interesting []O11yTelemetryField `json:"interesting"`
 }
 
-// O11yLogField is one field of the log field catalog.
-type O11yLogField struct {
+// O11yTelemetryField is one field of a signal's field catalog.
+type O11yTelemetryField struct {
 	// Name is the field's name.
 	Name string `json:"name"`
 	// DataType is the field's data type, e.g. string, int64, float64, bool.
@@ -608,99 +603,3 @@ type O11yLogPromotedOut struct {
 }
 
 // ── the seam ──────────────────────────────────────────────────────────────────
-
-// relayAt hands a typed op's call to the o11y runtime at o11yRoot+path and
-// decodes the answer into the op's Out. It is telemetry.go's relay with the
-// face root as the parameterised first segment instead of a burned-in
-// /v1/sentry — the sentry ops fold onto this seam whenever a pass may touch
-// both files at once; the two are kept twins until then.
-//
-// It is what keeps these nine ops a NAMING of the wire rather than a second
-// implementation of it. The handler it calls is the one SetHandler registered —
-// the same value the delegation wildcard forwards to — so the request runs the
-// whole chain it always ran, in order: the auth middleware resolves the same
-// identity, the SAME ViewAccess/EditAccess gate each route has always had
-// refuses the same callers, and the bytes it answers with are the bytes the
-// runtime wrote. There is no policy here: no tenant is resolved, no role is
-// checked, nothing is scoped. Those all happen where they already do, one
-// layer in.
-//
-// Identity is PROPAGATED, never minted: the gateway's assertion about the
-// caller travels on as the same headers it arrived on (zip.CallerOf reads
-// exactly the set the call plane forwards). A context with no request behind
-// it — a command, an agent call — carries no assertion, so the runtime's gate
-// refuses it, which is the honest answer rather than an identity invented at
-// this hop.
-//
-// A non-2xx becomes an error carrying the runtime's own status and reason, so
-// the status a caller sees is the status the runtime chose.
-func relayAt(ctx context.Context, method, path string, params url.Values, body, out any) error {
-	h := getHandler()
-	if h == nil {
-		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
-	}
-
-	target := o11yRoot + path
-	if q := params.Encode(); q != "" {
-		target += "?" + q
-	}
-
-	payload := io.Reader(http.NoBody)
-	if body != nil {
-		b, err := json.Marshal(body)
-		if err != nil {
-			return zip.ErrBadRequest(err.Error())
-		}
-		payload = bytes.NewReader(b)
-	}
-	req, err := http.NewRequestWithContext(ctx, method, target, payload)
-	if err != nil {
-		return zip.ErrBadRequest(err.Error())
-	}
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	caller := zip.CallerOf(ctx)
-	for header, value := range map[string]string{
-		zip.HeaderOrg:       caller.Org,
-		zip.HeaderProject:   caller.Project,
-		zip.HeaderUser:      caller.User,
-		zip.HeaderUserName:  caller.Name,
-		zip.HeaderUserEmail: caller.Email,
-		zip.HeaderUserOwner: caller.Owner,
-		zip.HeaderRequestID: caller.RequestID,
-	} {
-		if value != "" {
-			req.Header.Set(header, value)
-		}
-	}
-	if caller.Admin {
-		req.Header.Set(zip.HeaderUserAdmin, "true")
-	}
-	if caller.OrgAdmin {
-		req.Header.Set(zip.HeaderUserOrgAdmin, "true")
-	}
-
-	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, req)
-
-	if rec.Code < http.StatusOK || rec.Code >= http.StatusMultipleChoices {
-		code, reason := refusal(rec.Body.Bytes())
-		return &zip.HTTPError{Status: rec.Code, Code: code, Msg: reason}
-	}
-	if err := json.Unmarshal(rec.Body.Bytes(), out); err != nil {
-		return zip.ErrInternal("cannot read the runtime's answer: " + err.Error())
-	}
-	return nil
-}
-
-// nanos renders a nanosecond epoch for the wire, or nothing when unset — the
-// runtime reads a missing or non-positive value as "use the default window",
-// so an absent input stays absent. It feeds query, which stays the ONE place
-// inputs are rendered onto the wire.
-func nanos(v int64) string {
-	if v <= 0 {
-		return ""
-	}
-	return strconv.FormatInt(v, 10)
-}

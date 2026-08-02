@@ -98,7 +98,7 @@ func mountQueryCore(app *zip.App) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func querierQueryRange(ctx context.Context, in *qbtypes.QueryRangeRequest) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relayAt(ctx, http.MethodPost, "/query_range", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/query_range", nil, in, out)
 }
 
 // querierQueryRangePreview validates a composite query and renders the Datastore
@@ -111,8 +111,7 @@ func querierQueryRangePreview(ctx context.Context, in *O11yQueryRangePreviewIn) 
 	out := new(O11yQueryRangePreviewOut)
 	// verbose rides the query string, the request rides the body — the same
 	// split the runtime reads.
-	return out, relayAt(ctx, http.MethodPost, "/query_range/preview",
-		query("verbose", in.Verbose), &in.QueryRangeRequest, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/query_range/preview", query("verbose", in.Verbose), &in.QueryRangeRequest, out)
 }
 
 // querierReplaceVariables substitutes a query's variables and returns the
@@ -122,7 +121,7 @@ func querierQueryRangePreview(ctx context.Context, in *O11yQueryRangePreviewIn) 
 // Callers need the viewer role; the runtime's own gate enforces it.
 func querierReplaceVariables(ctx context.Context, in *qbtypes.QueryRangeRequest) (*O11ySubstituteVarsOut, error) {
 	out := new(O11ySubstituteVarsOut)
-	return out, relayAt(ctx, http.MethodPost, "/substitute_vars", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/substitute_vars", nil, in, out)
 }
 
 // metricsQueryRange runs a Prometheus-style range query over metrics — the
@@ -132,7 +131,7 @@ func querierReplaceVariables(ctx context.Context, in *qbtypes.QueryRangeRequest)
 // Callers need the viewer role; the runtime's own gate enforces it.
 func metricsQueryRange(ctx context.Context, in *O11yMetricsQueryRangeIn) (*O11yMetricsQueryRangeOut, error) {
 	out := new(O11yMetricsQueryRangeOut)
-	return out, relayAt(ctx, http.MethodGet, "/query_range", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/query_range", query(
 		"start", in.Start,
 		"end", in.End,
 		"step", in.Step,
@@ -149,7 +148,7 @@ func metricsQueryRange(ctx context.Context, in *O11yMetricsQueryRangeIn) (*O11yM
 // Callers need the viewer role; the runtime's own gate enforces it.
 func queryRangeFormat(ctx context.Context, in *v3.QueryRangeParamsV3) (*O11yQueryRangeFormatOut, error) {
 	out := new(O11yQueryRangeFormatOut)
-	return out, relayAt(ctx, http.MethodPost, "/query_range/format", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/query_range/format", nil, in, out)
 }
 
 // ── attribute autocomplete ─────────────────────────────────────────────────────
@@ -161,7 +160,7 @@ func queryRangeFormat(ctx context.Context, in *v3.QueryRangeParamsV3) (*O11yQuer
 // Callers need the viewer role; the runtime's own gate enforces it.
 func autocompleteAggregate(ctx context.Context, in *O11yAggregateAttributesIn) (*O11yAggregateAttributesOut, error) {
 	out := new(O11yAggregateAttributesOut)
-	return out, relayAt(ctx, http.MethodGet, "/autocomplete/aggregate_attributes", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/autocomplete/aggregate_attributes", query(
 		"aggregateOperator", in.AggregateOperator,
 		"dataSource", in.DataSource,
 		"searchText", in.SearchText,
@@ -175,7 +174,7 @@ func autocompleteAggregate(ctx context.Context, in *O11yAggregateAttributesIn) (
 // Callers need the viewer role; the runtime's own gate enforces it.
 func autocompleteKeys(ctx context.Context, in *O11yAttributeKeysIn) (*O11yAttributeKeysOut, error) {
 	out := new(O11yAttributeKeysOut)
-	return out, relayAt(ctx, http.MethodGet, "/autocomplete/attribute_keys", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/autocomplete/attribute_keys", query(
 		"dataSource", in.DataSource,
 		"aggregateOperator", in.AggregateOperator,
 		"aggregateAttribute", in.AggregateAttribute,
@@ -191,7 +190,7 @@ func autocompleteKeys(ctx context.Context, in *O11yAttributeKeysIn) (*O11yAttrib
 // Callers need the viewer role; the runtime's own gate enforces it.
 func autocompleteValues(ctx context.Context, in *O11yAttributeValuesIn) (*O11yAttributeValuesOut, error) {
 	out := new(O11yAttributeValuesOut)
-	return out, relayAt(ctx, http.MethodGet, "/autocomplete/attribute_values", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/autocomplete/attribute_values", query(
 		"dataSource", in.DataSource,
 		"aggregateOperator", in.AggregateOperator,
 		"aggregateAttribute", in.AggregateAttribute,
@@ -210,7 +209,7 @@ func autocompleteValues(ctx context.Context, in *O11yAttributeValuesIn) (*O11yAt
 // Callers need the viewer role; the runtime's own gate enforces it.
 func autocompleteValuesPost(ctx context.Context, in *v3.FilterAttributeValueRequest) (*O11yAttributeValuesOut, error) {
 	out := new(O11yAttributeValuesOut)
-	return out, relayAt(ctx, http.MethodPost, "/auto_complete/attribute_values", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/auto_complete/attribute_values", nil, in, out)
 }
 
 // ── the field catalog ──────────────────────────────────────────────────────────
@@ -221,7 +220,7 @@ func autocompleteValuesPost(ctx context.Context, in *v3.FilterAttributeValueRequ
 // Callers need the viewer role; the runtime's own gate enforces it.
 func fieldKeys(ctx context.Context, in *O11yFieldKeysIn) (*O11yFieldKeysOut, error) {
 	out := new(O11yFieldKeysOut)
-	return out, relayAt(ctx, http.MethodGet, "/fields/keys", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/fields/keys", query(
 		"signal", in.Signal,
 		"source", in.Source,
 		"limit", in.Limit,
@@ -241,7 +240,7 @@ func fieldKeys(ctx context.Context, in *O11yFieldKeysIn) (*O11yFieldKeysOut, err
 // Callers need the viewer role; the runtime's own gate enforces it.
 func fieldValues(ctx context.Context, in *O11yFieldValuesIn) (*O11yFieldValuesOut, error) {
 	out := new(O11yFieldValuesOut)
-	return out, relayAt(ctx, http.MethodGet, "/fields/values", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/fields/values", query(
 		"signal", in.Signal,
 		"source", in.Source,
 		"limit", in.Limit,
@@ -265,7 +264,7 @@ func fieldValues(ctx context.Context, in *O11yFieldValuesIn) (*O11yFieldValuesOu
 // Callers need the viewer role; the runtime's own gate enforces it.
 func savedViewList(ctx context.Context, in *O11ySavedViewListIn) (*O11ySavedViewListOut, error) {
 	out := new(O11ySavedViewListOut)
-	return out, relayAt(ctx, http.MethodGet, "/explorer/views", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/explorer/views", query(
 		"sourcePage", in.SourcePage,
 		"name", in.Name,
 		"category", in.Category,
@@ -278,7 +277,7 @@ func savedViewList(ctx context.Context, in *O11ySavedViewListIn) (*O11ySavedView
 // Callers need the editor role; the runtime's own gate enforces it.
 func savedViewCreate(ctx context.Context, in *v3.SavedView) (*O11ySavedViewCreateOut, error) {
 	out := new(O11ySavedViewCreateOut)
-	return out, relayAt(ctx, http.MethodPost, "/explorer/views", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/explorer/views", nil, in, out)
 }
 
 // savedViewGet returns one saved explorer view by id.
@@ -286,7 +285,7 @@ func savedViewCreate(ctx context.Context, in *v3.SavedView) (*O11ySavedViewCreat
 // Callers need the viewer role; the runtime's own gate enforces it.
 func savedViewGet(ctx context.Context, in *O11ySavedViewRef) (*O11ySavedViewOut, error) {
 	out := new(O11ySavedViewOut)
-	return out, relayAt(ctx, http.MethodGet, "/explorer/views/"+in.ViewID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/explorer/views/"+in.ViewID, nil, nil, out)
 }
 
 // savedViewUpdate replaces one saved explorer view by id with the given view and
@@ -297,7 +296,7 @@ func savedViewUpdate(ctx context.Context, in *O11ySavedViewUpdateIn) (*O11ySaved
 	out := new(O11ySavedViewOut)
 	// The view id addresses the target from the URL; the body carries the new
 	// view, relayed without the id so the URL stays the one authority.
-	return out, relayAt(ctx, http.MethodPut, "/explorer/views/"+in.ViewID, nil, &in.SavedView, out)
+	return out, relay(ctx, http.MethodPut, o11yRoot+"/explorer/views/"+in.ViewID, nil, &in.SavedView, out)
 }
 
 // savedViewDelete deletes one saved explorer view by id.
@@ -305,7 +304,7 @@ func savedViewUpdate(ctx context.Context, in *O11ySavedViewUpdateIn) (*O11ySaved
 // Callers need the editor role; the runtime's own gate enforces it.
 func savedViewDelete(ctx context.Context, in *O11ySavedViewRef) (*O11ySavedViewDeleteOut, error) {
 	out := new(O11ySavedViewDeleteOut)
-	return out, relayAt(ctx, http.MethodDelete, "/explorer/views/"+in.ViewID, nil, nil, out)
+	return out, relay(ctx, http.MethodDelete, o11yRoot+"/explorer/views/"+in.ViewID, nil, nil, out)
 }
 
 // ── inputs ──────────────────────────────────────────────────────────────────────

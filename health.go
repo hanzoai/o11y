@@ -57,12 +57,25 @@ func mountHealth(app *zip.App) {
 	app.Get("/v1/o11y/readyz", probe(func(h factory.Handler) http.HandlerFunc { return h.Readyz }))
 }
 
+// delegate is the probe group's fall-through: the registered runtime handler,
+// named directly.
+//
+// It used to be c.Next(), which worked only because a /v1/o11y/* catch-all was
+// registered after the probes and caught whatever they declined. Every route is
+// named now and the catch-all is gone, so c.Next() would fall through to a 404
+// — the probes would start FAILING the moment the deployment had not called
+// SetHealth yet, which is exactly when a liveness probe matters most. Naming the
+// destination is both the fix and the honest statement of what "fall through"
+// always meant here.
+var delegate = zip.AdaptNetHTTP(handlerAdapter{})
+
 // livez reports process liveness. factory.Handler.Livez renders an empty success
 // envelope with 200 unconditionally, so it is rendered natively here through the
-// shared render types rather than bridged. Falls through when no handler is set.
+// shared render types rather than bridged. Falls through to the runtime when no
+// handler is set.
 func livez(c *zip.Ctx) error {
 	if getHealth() == nil {
-		return c.Next()
+		return delegate(c)
 	}
 	return c.JSON(http.StatusOK, render.SuccessResponse{Status: render.StatusSuccess.String()})
 }
@@ -70,12 +83,12 @@ func livez(c *zip.Ctx) error {
 // probe dispatches a stateful health check (healthz, readyz) through the runtime
 // handler selected by sel. The check reads the service registry, so its body
 // stays in factory.Handler (one home) and is reached over the net/http bridge;
-// the routing is native. Falls through when no handler is set.
+// the routing is native. Falls through to the runtime when no handler is set.
 func probe(sel func(factory.Handler) http.HandlerFunc) zip.Handler {
 	return func(c *zip.Ctx) error {
 		h := getHealth()
 		if h == nil {
-			return c.Next()
+			return delegate(c)
 		}
 		return zip.AdaptNetHTTP(sel(h))(c)
 	}
