@@ -36,15 +36,11 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-// metricsRoot is the face's path root, spelled ONCE: the group the ops
-// register on, and the first segment metricsRelay rebuilds a call onto.
-const metricsRoot = "/v1/o11y"
-
 // mountMetrics registers the nineteen typed metrics ops on the native router.
 // Collection routes register before the parameterised ones so an id can never
 // shadow a collection.
 func mountMetrics(app *zip.App) {
-	g := app.Group(metricsRoot)
+	g := app.Group(o11yRoot)
 
 	zip.Get(g, "/metrics", listMetrics, zip.WithOperationID("ListMetrics"))
 	zip.Post(g, "/metrics/stats", metricStats, zip.WithOperationID("GetMetricsStats"))
@@ -938,7 +934,7 @@ func metricsRelay(ctx context.Context, method, path string, params url.Values, b
 		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
 	}
 
-	target := metricsRoot + path
+	target := o11yRoot + path
 	if q := params.Encode(); q != "" {
 		target += "?" + q
 	}

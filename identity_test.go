@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hanzoai/cloud"
 	"github.com/hanzoai/o11y"
 	"github.com/zap-proto/zip"
 )
@@ -109,47 +108,67 @@ func TestIdentityRoutesAreTheSameFortyFive(t *testing.T) {
 			t.Errorf("%s is not registered as a typed op", key)
 		}
 	}
+	// The three SSO callbacks are NAMED HATCHES now (mount.go mountHatches), not
+	// typed ops and no longer a fall-through: they answer 303 with a Location and
+	// no body, so a typed op would publish a response schema for a response that
+	// does not exist. Each must be registered — a hatch that is not registered is
+	// a 404 now that the catch-all is gone.
 	for _, cb := range []string{
 		"GET /v1/o11y/complete/google",
 		"POST /v1/o11y/complete/saml",
 		"GET /v1/o11y/complete/oidc",
 	} {
-		if got[cb] {
-			t.Errorf("%s is registered natively; it must stay on the wildcard (it answers 303)", cb)
+		if !got[cb] {
+			t.Errorf("%s is not registered; it is a named hatch (it answers 303)", cb)
 		}
 	}
 }
 
-// The three SSO callbacks still reach the runtime through the host's wildcard,
-// and the typed identity paths take precedence over that same wildcard however
-// the host ordered its mounts — the escape hatch is honest and the ops win.
-func TestCompleteCallbacksStayOnTheWildcard(t *testing.T) {
-	app := zip.New(zip.Config{DisableStartupMessage: true})
-	// The host registers its /v1/o11y wildcard BEFORE the module mounts, which is
-	// the order the composed binary uses.
-	app.All("/v1/o11y/*", zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = io.WriteString(w, `{"door":"wildcard","path":"`+r.URL.Path+`"}`)
-	})))
-	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
-		t.Fatalf("Mount: %v", err)
-	}
-	runtime(t, []any{})
+// The three SSO callbacks reach the runtime through their OWN named routes now,
+// path untouched, with the 303 and its Location passed straight back — while the
+// typed identity paths next to them dispatch as ops. Both halves in one test,
+// because the interesting failure is one of them stealing the other's traffic.
+//
+// This test used to install a host wildcard and assert the callbacks fell into
+// it. That assertion could not distinguish a deliberate hatch from a route
+// nobody had converted, which is how three unmounted slices shipped; it now
+// asserts the named door instead.
+func TestCompleteCallbacksAreNamedHatches(t *testing.T) {
+	app := mounted(t)
 
-	for method, target := range map[string]string{
-		http.MethodGet:  "/v1/o11y/complete/google",
-		http.MethodPost: "/v1/o11y/complete/saml",
+	var saw string
+	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		saw = r.URL.Path
+		w.Header().Set("Location", "https://console.hanzo.ai/")
+		w.WriteHeader(http.StatusSeeOther)
+	}))
+	t.Cleanup(func() { o11y.SetHandler(nil) })
+
+	for _, cb := range []struct{ method, target string }{
+		{http.MethodGet, "/v1/o11y/complete/google"},
+		{http.MethodPost, "/v1/o11y/complete/saml"},
+		{http.MethodGet, "/v1/o11y/complete/oidc"},
 	} {
-		if _, body := call(t, app, member(method, target, nil)); !strings.Contains(string(body), `"door":"wildcard"`) {
-			t.Errorf("%s no longer reaches the runtime through the wildcard: %s", target, body)
+		saw = ""
+		resp, err := app.Fiber().Test(member(cb.method, cb.target, nil))
+		if err != nil {
+			t.Fatalf("Test: %v", err)
+		}
+		if resp.StatusCode != http.StatusSeeOther {
+			t.Errorf("%s status=%d, want 303 — the redirect is the answer", cb.target, resp.StatusCode)
+		}
+		if got := resp.Header.Get("Location"); got != "https://console.hanzo.ai/" {
+			t.Errorf("%s Location=%q — the header a typed op would have hidden", cb.target, got)
+		}
+		if saw != cb.target {
+			t.Errorf("%s reached the runtime as %q", cb.target, saw)
 		}
 	}
-	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/complete/oidc", nil)); !strings.Contains(string(body), `"door":"wildcard"`) {
-		t.Errorf("/v1/o11y/complete/oidc no longer reaches the wildcard: %s", body)
-	}
-	// ...and the typed op wins over that wildcard.
-	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/users", nil)); strings.Contains(string(body), `"door":"wildcard"`) {
-		t.Fatalf("the typed users op did not take precedence: %s", body)
+
+	// ...and a typed identity op next door still dispatches as an op.
+	runtime(t, []any{})
+	if status, body := call(t, app, member(http.MethodGet, "/v1/o11y/users", nil)); status != http.StatusOK {
+		t.Fatalf("the typed users op did not answer: status=%d %s", status, body)
 	}
 }
 

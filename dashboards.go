@@ -13,7 +13,7 @@ package o11y
 //
 // THE WIRE DOES NOT MOVE, and the way it does not move is that these ops do not
 // re-implement the reads and writes. Each hands the call to the SAME runtime
-// handler the wildcard delegates to (relayO11y — the seam identity.go relays
+// handler the wildcard delegates to (relay.go — the one seam every face relays
 // on, the o11y face root), so identity resolution, the org gate, the exact role
 // check each route has always run (ViewAccess on the reads and pins, EditAccess
 // on the dashboard and view writes, AdminAccess on the public-sharing config,
@@ -103,7 +103,7 @@ func mountDashboards(app *zip.App) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func dashboardListV2(ctx context.Context, in *O11yDashboardListParams) (*O11yDashboardListOut, error) {
 	out := new(O11yDashboardListOut)
-	return out, relayO11y(ctx, http.MethodGet, "/dashboards", listParams(in), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/dashboards", listParams(in), nil, out)
 }
 
 // dashboardListForUserV2 is dashboardListV2 personalized for the calling user:
@@ -114,7 +114,7 @@ func dashboardListV2(ctx context.Context, in *O11yDashboardListParams) (*O11yDas
 // Callers need the viewer role; the runtime's own gate enforces it.
 func dashboardListForUserV2(ctx context.Context, in *O11yDashboardListParams) (*O11yDashboardListForUserOut, error) {
 	out := new(O11yDashboardListForUserOut)
-	return out, relayO11y(ctx, http.MethodGet, "/users/me/dashboards", listParams(in), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/users/me/dashboards", listParams(in), nil, out)
 }
 
 // dashboardCreateV2 creates a dashboard in the v2 format that follows the Perses
@@ -123,7 +123,7 @@ func dashboardListForUserV2(ctx context.Context, in *O11yDashboardListParams) (*
 // Callers need the editor role; the runtime's own gate enforces it.
 func dashboardCreateV2(ctx context.Context, in *O11yDashboardPostable) (*O11yDashboardOut, error) {
 	out := new(O11yDashboardOut)
-	return out, relayO11y(ctx, http.MethodPost, "/dashboards", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/dashboards", nil, in, out)
 }
 
 // dashboardCloneV2 clones an existing v2-shape dashboard. User and integration
@@ -135,7 +135,7 @@ func dashboardCreateV2(ctx context.Context, in *O11yDashboardPostable) (*O11yDas
 // Callers need the editor role; the runtime's own gate enforces it.
 func dashboardCloneV2(ctx context.Context, in *O11yDashboardIDIn) (*O11yDashboardOut, error) {
 	out := new(O11yDashboardOut)
-	return out, relayO11y(ctx, http.MethodPost, "/dashboards/"+in.ID+"/clone", nil, nil, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/dashboards/"+in.ID+"/clone", nil, nil, out)
 }
 
 // dashboardGetV2 returns a v2-shape dashboard.
@@ -143,7 +143,7 @@ func dashboardCloneV2(ctx context.Context, in *O11yDashboardIDIn) (*O11yDashboar
 // Callers need the viewer role; the runtime's own gate enforces it.
 func dashboardGetV2(ctx context.Context, in *O11yDashboardIDIn) (*O11yDashboardOut, error) {
 	out := new(O11yDashboardOut)
-	return out, relayO11y(ctx, http.MethodGet, "/dashboards/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/dashboards/"+in.ID, nil, nil, out)
 }
 
 // dashboardUpdateV2 updates a v2-shape dashboard's metadata, spec and tag set.
@@ -152,7 +152,7 @@ func dashboardGetV2(ctx context.Context, in *O11yDashboardIDIn) (*O11yDashboardO
 // Callers need the editor role; the runtime's own gate enforces it.
 func dashboardUpdateV2(ctx context.Context, in *O11yDashboardUpdateIn) (*O11yDashboardOut, error) {
 	out := new(O11yDashboardOut)
-	return out, relayO11y(ctx, http.MethodPut, "/dashboards/"+in.ID, nil, in.O11yDashboardUpdatable, out)
+	return out, relay(ctx, http.MethodPut, o11yRoot+"/dashboards/"+in.ID, nil, in.O11yDashboardUpdatable, out)
 }
 
 // dashboardPatchV2 applies an RFC 6902 JSON Patch to a v2-shape dashboard. The
@@ -167,7 +167,7 @@ func dashboardPatchV2(ctx context.Context, in *O11yDashboardPatchIn) (*O11yDashb
 	out := new(O11yDashboardOut)
 	// The body goes on as the bare ops array the runtime's patch decoder reads;
 	// the id rode in on the path, not the body.
-	return out, relayO11y(ctx, http.MethodPatch, "/dashboards/"+in.ID, nil, in.Ops, out)
+	return out, relay(ctx, http.MethodPatch, o11yRoot+"/dashboards/"+in.ID, nil, in.Ops, out)
 }
 
 // dashboardDeleteV2 deletes a v2-shape dashboard along with its tag relations.
@@ -175,7 +175,7 @@ func dashboardPatchV2(ctx context.Context, in *O11yDashboardPatchIn) (*O11yDashb
 //
 // Callers need the editor role; the runtime's own gate enforces it.
 func dashboardDeleteV2(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/dashboards/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/dashboards/"+in.ID, nil, nil, nil)
 }
 
 // dashboardLockV2 locks a v2-shape dashboard. Only the dashboard's creator or an
@@ -183,7 +183,7 @@ func dashboardDeleteV2(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, e
 //
 // Callers need the editor role; the runtime's own gate enforces it.
 func dashboardLockV2(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/dashboards/"+in.ID+"/lock", nil, nil, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/dashboards/"+in.ID+"/lock", nil, nil, nil)
 }
 
 // dashboardUnlockV2 unlocks a v2-shape dashboard. Only the dashboard's creator or
@@ -191,7 +191,7 @@ func dashboardLockV2(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, err
 //
 // Callers need the editor role; the runtime's own gate enforces it.
 func dashboardUnlockV2(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/dashboards/"+in.ID+"/lock", nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/dashboards/"+in.ID+"/lock", nil, nil, nil)
 }
 
 // dashboardPinV2 pins a dashboard for the calling user. A user can pin at most ten
@@ -201,7 +201,7 @@ func dashboardUnlockV2(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, e
 //
 // Callers need the viewer role; the runtime's own gate enforces it.
 func dashboardPinV2(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/users/me/dashboards/"+in.ID+"/pins", nil, nil, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/users/me/dashboards/"+in.ID+"/pins", nil, nil, nil)
 }
 
 // dashboardUnpinV2 removes the caller's pin for a dashboard. Idempotent —
@@ -209,7 +209,7 @@ func dashboardPinV2(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, erro
 //
 // Callers need the viewer role; the runtime's own gate enforces it.
 func dashboardUnpinV2(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/users/me/dashboards/"+in.ID+"/pins", nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/users/me/dashboards/"+in.ID+"/pins", nil, nil, nil)
 }
 
 // dashboardListViews returns every saved view in the calling user's org. Saved
@@ -218,7 +218,7 @@ func dashboardUnpinV2(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, er
 // Callers need the viewer role; the runtime's own gate enforces it.
 func dashboardListViews(ctx context.Context, _ *struct{}) (*O11yDashboardViewListOut, error) {
 	out := new(O11yDashboardViewListOut)
-	return out, relayO11y(ctx, http.MethodGet, "/dashboard_views", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/dashboard_views", nil, nil, out)
 }
 
 // dashboardCreateView persists the calling user's dashboard-listing state (query,
@@ -227,7 +227,7 @@ func dashboardListViews(ctx context.Context, _ *struct{}) (*O11yDashboardViewLis
 // Callers need the editor role; the runtime's own gate enforces it.
 func dashboardCreateView(ctx context.Context, in *O11yDashboardViewPostable) (*O11yDashboardViewOut, error) {
 	out := new(O11yDashboardViewOut)
-	return out, relayO11y(ctx, http.MethodPost, "/dashboard_views", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/dashboard_views", nil, in, out)
 }
 
 // dashboardUpdateView replaces a saved view's name and data. Saved views are shared
@@ -236,7 +236,7 @@ func dashboardCreateView(ctx context.Context, in *O11yDashboardViewPostable) (*O
 // Callers need the editor role; the runtime's own gate enforces it.
 func dashboardUpdateView(ctx context.Context, in *O11yDashboardViewUpdateIn) (*O11yDashboardViewOut, error) {
 	out := new(O11yDashboardViewOut)
-	return out, relayO11y(ctx, http.MethodPut, "/dashboard_views/"+in.ID, nil, in.O11yDashboardViewPostable, out)
+	return out, relay(ctx, http.MethodPut, o11yRoot+"/dashboard_views/"+in.ID, nil, in.O11yDashboardViewPostable, out)
 }
 
 // dashboardDeleteView removes a saved view. Saved views are shared org-wide.
@@ -244,7 +244,7 @@ func dashboardUpdateView(ctx context.Context, in *O11yDashboardViewUpdateIn) (*O
 //
 // Callers need the editor role; the runtime's own gate enforces it.
 func dashboardDeleteView(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/dashboard_views/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/dashboard_views/"+in.ID, nil, nil, nil)
 }
 
 // dashboardCreatePublic creates the public-sharing config for a dashboard and
@@ -253,7 +253,7 @@ func dashboardDeleteView(ctx context.Context, in *O11yDashboardIDIn) (*struct{},
 // Callers need the admin role; the runtime's own gate enforces it.
 func dashboardCreatePublic(ctx context.Context, in *O11yPublicDashboardWriteIn) (*O11yIdentifiableOut, error) {
 	out := new(O11yIdentifiableOut)
-	return out, relayO11y(ctx, http.MethodPost, "/dashboards/"+in.ID+"/public", nil, in.O11yPublicDashboardWrite, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/dashboards/"+in.ID+"/public", nil, in.O11yPublicDashboardWrite, out)
 }
 
 // dashboardGetPublic returns the public-sharing config for a dashboard.
@@ -261,14 +261,14 @@ func dashboardCreatePublic(ctx context.Context, in *O11yPublicDashboardWriteIn) 
 // Callers need the admin role; the runtime's own gate enforces it.
 func dashboardGetPublic(ctx context.Context, in *O11yDashboardIDIn) (*O11yPublicDashboardOut, error) {
 	out := new(O11yPublicDashboardOut)
-	return out, relayO11y(ctx, http.MethodGet, "/dashboards/"+in.ID+"/public", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/dashboards/"+in.ID+"/public", nil, nil, out)
 }
 
 // dashboardUpdatePublic updates the public-sharing config for a dashboard.
 //
 // Callers need the admin role; the runtime's own gate enforces it.
 func dashboardUpdatePublic(ctx context.Context, in *O11yPublicDashboardWriteIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodPut, "/dashboards/"+in.ID+"/public", nil, in.O11yPublicDashboardWrite, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/dashboards/"+in.ID+"/public", nil, in.O11yPublicDashboardWrite, nil)
 }
 
 // dashboardDeletePublic deletes the public-sharing config and disables public
@@ -276,7 +276,7 @@ func dashboardUpdatePublic(ctx context.Context, in *O11yPublicDashboardWriteIn) 
 //
 // Callers need the admin role; the runtime's own gate enforces it.
 func dashboardDeletePublic(ctx context.Context, in *O11yDashboardIDIn) (*struct{}, error) {
-	return nil, relayO11y(ctx, http.MethodDelete, "/dashboards/"+in.ID+"/public", nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/dashboards/"+in.ID+"/public", nil, nil, nil)
 }
 
 // dashboardGetPublicData returns the sanitized dashboard data for public access —
@@ -286,7 +286,7 @@ func dashboardDeletePublic(ctx context.Context, in *O11yDashboardIDIn) (*struct{
 // enforces it.
 func dashboardGetPublicData(ctx context.Context, in *O11yDashboardIDIn) (*O11yPublicDashboardDataOut, error) {
 	out := new(O11yPublicDashboardDataOut)
-	return out, relayO11y(ctx, http.MethodGet, "/public/dashboards/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/public/dashboards/"+in.ID, nil, nil, out)
 }
 
 // dashboardGetPublicWidgetQueryRange returns the query-range result for one widget
@@ -298,9 +298,7 @@ func dashboardGetPublicData(ctx context.Context, in *O11yDashboardIDIn) (*O11yPu
 // enforces it.
 func dashboardGetPublicWidgetQueryRange(ctx context.Context, in *O11yWidgetQueryRangeIn) (*O11yWidgetQueryRangeOut, error) {
 	out := new(O11yWidgetQueryRangeOut)
-	return out, relayO11y(ctx, http.MethodGet,
-		"/public/dashboards/"+in.ID+"/widgets/"+in.Idx+"/query_range",
-		query("startTime", in.StartTime, "endTime", in.EndTime), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/public/dashboards/"+in.ID+"/widgets/"+in.Idx+"/query_range", query("startTime", in.StartTime, "endTime", in.EndTime), nil, out)
 }
 
 // ── the list query ──────────────────────────────────────────────────────────────

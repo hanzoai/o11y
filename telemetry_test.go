@@ -329,6 +329,15 @@ func TestTelemetryRoutesAreTheSameFive(t *testing.T) {
 		"GET /v1/sentry/traces":     true,
 		"GET /v1/sentry/traces/:id": true,
 		"GET /v1/sentry/stats":      true,
+
+		// The two ingest doors are NAMED hatches (mount.go mountHatches), and they
+		// land in this census because it counts what is registered. They were not
+		// here before for a reason worth recording: the composed binary only ever
+		// wildcarded /v1/o11y/*, so these two /v1/sentry paths reached NOTHING —
+		// a Sentry SDK pointed at the clean root got a 404. Naming every route is
+		// what surfaced it.
+		"POST /v1/sentry/:project/envelope/": true,
+		"POST /v1/sentry/:project/store/":    true,
 	}
 	got := map[string]bool{}
 	for _, r := range app.Fiber().GetRoutes(true) {
@@ -355,40 +364,38 @@ func TestTelemetryRoutesAreTheSameFive(t *testing.T) {
 	}
 }
 
-// The REST of the product face is untouched: projects, issues, events and the
-// two ingest doors still reach the runtime through the host's wildcard, and the
-// five typed paths take precedence over it however the host ordered its mounts.
-func TestTheRestOfTheFaceStillReachesTheRuntime(t *testing.T) {
-	app := zip.New(zip.Config{DisableStartupMessage: true})
-	// The host registers its /v1/sentry wildcard BEFORE the module mounts, which
-	// is the order the composed binary uses.
-	app.All("/v1/sentry/*", zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = io.WriteString(w, `{"door":"wildcard","path":"`+r.URL.Path+`"}`)
-	})))
-	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
-		t.Fatalf("Mount: %v", err)
-	}
-	runtime(t, map[string]any{"items": []*sentrytypes.Event{}})
+// The ingest door reaches the runtime through its OWN named route, path
+// untouched, while the typed reads next to it dispatch as ops.
+//
+// This test used to install a host wildcard and assert the ingest paths fell
+// into it. That framing hid a live defect: the composed binary's only wildcard
+// was /v1/o11y/*, so nothing in the real deployment ever answered
+// /v1/sentry/<project>/envelope/ — the test passed because the test itself had
+// registered the door. Naming every route removed both the wildcard and the
+// illusion.
+func TestTheIngestDoorIsANamedHatch(t *testing.T) {
+	app := mounted(t)
 
-	// projects, issues, issues/:id/events and events/:id LEFT this list: they are
-	// typed ops in sentryerrors.go and now dispatch ahead of the wildcard. They
-	// only sampled as "wildcarded" because mountSentryErrors was never called —
-	// this list was encoding the dark-slice defect, not guarding against it.
-	// The envelope path stays: it is the Sentry SDK's own wire (that /api/-style
-	// suffix is the SDK's, received verbatim), a genuine escape hatch.
-	for _, target := range []string{
-		"/v1/sentry/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/",
-	} {
-		_, body := call(t, app, member(http.MethodGet, target, nil))
-		if !strings.Contains(string(body), `"door":"wildcard"`) {
-			t.Errorf("%s no longer reaches the runtime through the wildcard: %s", target, body)
-		}
+	var saw string
+	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		saw = r.URL.Path
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = io.WriteString(w, `{"id":"e1"}`)
+	}))
+	t.Cleanup(func() { o11y.SetHandler(nil) })
+
+	const target = "/v1/sentry/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"
+	if status, body := call(t, app, member(http.MethodPost, target, strings.NewReader("{}"))); status != http.StatusOK {
+		t.Fatalf("status=%d body=%s", status, body)
 	}
-	// ...and the typed paths win over that wildcard.
-	_, body := call(t, app, member(http.MethodGet, "/v1/sentry/logs?project=p1", nil))
-	if strings.Contains(string(body), `"door":"wildcard"`) {
-		t.Fatalf("the typed op did not take precedence: %s", body)
+	if saw != target {
+		t.Fatalf("runtime received %q, want %q verbatim", saw, target)
+	}
+
+	// ...and the typed reads next to it still dispatch as ops.
+	runtime(t, map[string]any{"items": []*sentrytypes.Event{}})
+	if status, body := call(t, app, member(http.MethodGet, "/v1/sentry/logs?project=p1", nil)); status != http.StatusOK {
+		t.Fatalf("the typed op did not answer: status=%d %s", status, body)
 	}
 }
 

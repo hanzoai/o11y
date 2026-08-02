@@ -10,77 +10,51 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-func TestMountWithoutHandlerReturns503(t *testing.T) {
+// Mount is total: it must not fail, and it must leave every route the runtime
+// serves reachable. The counting proof lives in routes_test.go — this file holds
+// what is true of the SEAM itself.
+
+func TestMountSucceedsWithoutDeps(t *testing.T) {
+	app := zip.New(zip.Config{DisableStartupMessage: true})
+	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
+		t.Fatalf("Mount: %v", err)
+	}
+}
+
+// A NAMED route with no runtime behind it answers 503, not 404: "the runtime is
+// not up yet" is a different fact from "there is no such route", and a caller —
+// or a load balancer — needs to be able to tell them apart.
+//
+// This test used to ask for /v1/o11y/anything and expect 503, which was only
+// true because a catch-all answered every path under the prefix. That is the
+// assertion that let three unmounted slices pass CI: a wildcard makes an
+// unconverted route and a missing one indistinguishable. It now asks for routes
+// that actually exist — one hatch and one typed op.
+func TestNamedRouteWithoutRuntimeReturns503(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	o11y.SetHandler(nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/anything", nil)
-	resp, err := app.Fiber().Test(req)
-	if err != nil {
-		t.Fatalf("Test: %v", err)
-	}
-	if resp.StatusCode != http.StatusServiceUnavailable {
-		t.Fatalf("status=%d want 503", resp.StatusCode)
-	}
-}
-
-// TestMountDelegatesPathVerbatim proves the mount seam does not touch the path.
-// Routes are registered at their full public /v1/o11y/<resource> names, so the
-// runtime handler must receive exactly what the client sent — any rewrite here
-// can only move a request off its own route. A mangler is invisible to the
-// compiler, so this is the only thing that catches one coming back.
-func TestMountDelegatesPathVerbatim(t *testing.T) {
-	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app, cloud.Deps{}); err != nil {
-		t.Fatalf("Mount: %v", err)
-	}
-
-	var sawPath string
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sawPath = r.URL.Path
-		w.WriteHeader(http.StatusOK)
-	}))
-	defer o11y.SetHandler(nil)
-
-	// Each is a real registered route literal (grep them: routes_*.go,
-	// pkg/apiserver/o11yapiserver/*.go). What arrives is what dispatches.
-	paths := []string{
-		"/v1/o11y/services",
-		// REMOVED as the conversion advanced — each of these became a TYPED op and
-		// therefore dispatches off the mux tree AHEAD of the wildcard, which is the
-		// whole point of the migration: /query_range (metrics.go), /settings/ttl and
-		// /global/config (platform.go). A typed op is proved by its own slice test;
-		// asserting it still delegates verbatim would assert the migration failed.
-		// What remains here are the genuinely-wildcarded surfaces — the escape
-		// hatches — which is exactly what this test should guard.
-		"/v1/o11y/query_progress", // long-poll progress: deliberately wildcarded, a stream (querycore.go)
-		"/v1/o11y/complete/google", // sign-in callback: 303 redirect, deliberately wildcarded (identity.go)
-		// the /v1/o11y/llm* surface is TYPED now (llmobs.go), so it dispatches to
-		// ops and takes precedence over this wildcard — proved in llmobs_test.go.
-		// REMOVED: /v1/o11y/errortracking/issues is a TYPED op (sentryerrors.go) and
-		// dispatches ahead of the wildcard. It only ever passed here because
-		// mountSentryErrors was never called — this assertion was ENCODING the dark-
-		// slice defect rather than catching it, and flipped red the moment Mount was
-		// fixed. That is the tell: a wildcard-delegation assertion that passes for a
-		// route someone converted is proof the conversion did not reach the router.
-		"/v1/o11y/api/hanzo/envelope/", // Sentry SDK wire path, received as-is
-	}
-	for _, p := range paths {
-		t.Run(p, func(t *testing.T) {
-			sawPath = ""
-			resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, p, nil))
-			if err != nil {
-				t.Fatalf("Test: %v", err)
-			}
-			if resp.StatusCode != http.StatusOK {
-				t.Fatalf("status=%d want 200", resp.StatusCode)
-			}
-			if sawPath != p {
-				t.Fatalf("runtime received %q, want %q verbatim", sawPath, p)
-			}
-		})
+	for _, target := range []string{
+		"/v1/o11y/logs/livetail", // a hatch
+		"/v1/o11y/logs",          // a typed op
+	} {
+		resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, target, nil))
+		if err != nil {
+			t.Fatalf("Test: %v", err)
+		}
+		if resp.StatusCode != http.StatusServiceUnavailable {
+			t.Fatalf("%s status=%d want 503", target, resp.StatusCode)
+		}
 	}
 }
+
+// Path delegation is proved once, over the whole hatch census, in
+// routes_test.go's TestHatchesDelegateVerbatim. It is not repeated here: the
+// earlier version of this test sampled three paths by hand and drifted every
+// time one of them was converted — including once when it asserted a route
+// delegated that had in fact been typed, which ENCODED the dark-slice defect
+// instead of catching it. One census, derived from the same list mount.go
+// registers, cannot drift that way.
