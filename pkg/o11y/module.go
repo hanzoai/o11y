@@ -158,9 +158,13 @@ func NewModules(
 		implerrortracking.WithRetention(errorTrackingRetention()),
 	)
 	traceDetailModule := impltracedetail.NewModule(impltracedetail.NewTraceStore(telemetryStore), providerSettings, config.TraceDetail)
+	// The event plane stores NAMES — an org slug and a product — so the store is handed
+	// the resolver that turns this process's uuids into them, from the org row and the
+	// project row that own them. See implsentry/plane.go.
+	sentryProjects := implsentry.NewProjectStore(sqlstore)
 	sentryModule := implsentry.NewModule(
-		implsentry.NewProjectStore(sqlstore),
-		implsentry.NewEventStore(telemetryStore),
+		sentryProjects,
+		implsentry.NewEventStore(telemetryStore, implsentry.NewScope(orgGetter, sentryProjects)),
 		errorTrackingModule,
 		implsentry.Config{
 			IngestSecret: errorTrackingIngestSecret(),

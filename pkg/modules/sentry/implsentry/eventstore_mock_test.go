@@ -39,7 +39,7 @@ func TestEventStore_ReadsWithoutIssuingDDL(t *testing.T) {
 			[][]any{{"fp-1"}, {"fp-2"}},
 		))
 
-	store := NewEventStore(telemetrystore.TelemetryStore(provider))
+	store := NewEventStore(telemetrystore.TelemetryStore(provider), namedScope("acme", "docs"))
 	fps, err := store.DistinctFingerprints(context.Background(), valuer.GenerateUUID(), valuer.GenerateUUID(), testWindow())
 	require.NoError(t, err)
 	assert.Equal(t, []string{"fp-1", "fp-2"}, fps)
@@ -50,7 +50,7 @@ func TestEventStore_ReadsWithoutIssuingDDL(t *testing.T) {
 // TestEventStoreTargetsEventError pins WHICH table the plane reads and writes. The
 // database is named for what it holds and the table for what it is.
 func TestEventStoreTargetsEventError(t *testing.T) {
-	s := NewEventStore(nil).(*eventStore)
+	s := NewEventStore(nil, namedScope("acme", "docs")).(*eventStore)
 	assert.Equal(t, "event", s.db)
 	assert.Equal(t, "error", s.table)
 }
