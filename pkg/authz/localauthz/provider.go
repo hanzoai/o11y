@@ -18,15 +18,23 @@
 // one-binary does not carry.
 //
 // So localauthz keeps the EXACT policy iamauthz enforces — a subject is
-// authorized iff it holds one of the required roles in its org — but stores the
-// relationship tuples in-process rather than in Hanzo IAM. The founding grants
-// come from the same iamidentn provision path (o11y-admin per (user, org) on
-// first sight), so the in-process tuple set is populated before the per-route
-// AuthZ check runs on that same request, and re-populated on the first request
-// after a restart (both the identn `provisioned` cache and this tuple set are
-// per-process and reset together). Role *metadata* (names, descriptions, org
-// scoping) stays in the local SQL role store — not an authorization concern —
-// exactly as in iamauthz.
+// authorized iff it holds one of the required roles in its org — but CACHES the
+// relationship tuples in-process rather than storing them in Hanzo IAM.
+//
+// Cache is the load-bearing word. The durable record of a grant is the
+// user_role / service_account_role row that user.Setter writes in the same
+// operation as the Grant, and Start rehydrates the whole tuple set from those
+// rows before serving. That ordering is what the provider rests on: this doc
+// used to claim the set was "re-populated on the first request after a restart"
+// because both this map and identn's `provisioned` cache are per-process and
+// reset together — but identn's ensureUser returns early when the durable user
+// row already exists, so the founding grant did NOT run again and every
+// previously-seated principal came back with no tuple at all. Deriving the set
+// from the rows instead makes the rows the single source of truth, which is also
+// what lets a second replica answer the same way as the first.
+//
+// Role *metadata* (names, descriptions, org scoping) stays in the local SQL role
+// store — not an authorization concern — exactly as in iamauthz.
 package localauthz
 
 import (
@@ -42,6 +50,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/hanzoai/o11y/pkg/types/serviceaccounttypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -93,7 +102,9 @@ func (s *tupleStore) all() []*authtypes.TupleKey {
 }
 
 type provider struct {
+	settings factory.ScopedProviderSettings
 	tuples   *tupleStore
+	sql      sqlstore.SQLStore
 	store    authtypes.RoleStore
 	registry *authtypes.Registry
 	healthy  chan struct{}
@@ -104,17 +115,19 @@ type provider struct {
 // in the given SQL store; tuples live in-process.
 func NewProviderFactory(store sqlstore.SQLStore) factory.ProviderFactory[authz.AuthZ, authz.Config] {
 	return factory.NewProviderFactory(factory.MustNewName("local"), func(ctx context.Context, ps factory.ProviderSettings, config authz.Config) (authz.AuthZ, error) {
-		return newProvider(store), nil
+		return newProvider(store, factory.NewScopedProviderSettings(ps, "github.com/hanzoai/o11y/pkg/authz/localauthz")), nil
 	})
 }
 
-func newProvider(store sqlstore.SQLStore) authz.AuthZ {
+func newProvider(store sqlstore.SQLStore, settings factory.ScopedProviderSettings) authz.AuthZ {
 	// Ready as soon as constructed — there is no external dependency to reach.
 	healthy := make(chan struct{})
 	close(healthy)
 
 	return &provider{
+		settings: settings,
 		tuples:   newTupleStore(),
+		sql:      store,
 		store:    sqlauthzstore.NewSqlAuthzStore(store),
 		registry: authtypes.NewRegistry(),
 		healthy:  healthy,
@@ -126,15 +139,100 @@ func newProvider(store sqlstore.SQLStore) authz.AuthZ {
 // factory.ServiceWithHealthy
 // =============================================================================
 
-// Start blocks until shutdown — the service supervisor (factory.Registry.Wait)
-// treats ANY Start return as a service exit and tears the process down, so a
-// no-loop provider must block until Stop/context cancellation (mirroring
-// iamauthz and the other no-loop providers).
+// Start REHYDRATES the tuple set from durable state, then blocks until shutdown
+// — the service supervisor (factory.Registry.Wait) treats ANY Start return as a
+// service exit and tears the process down, so a no-loop provider must block
+// until Stop/context cancellation (mirroring iamauthz and the other no-loop
+// providers).
+//
+// The rehydration is not an optimisation, it is the correctness of the whole
+// provider. A tuple is written as a SIDE EFFECT of granting a role — user.Setter
+// calls authz.Grant and writes the durable user_role row in the same operation —
+// and only the row survives a restart. The founding grant rides the first sight
+// of a user, and iamidentn.ensureUser returns early when the row already exists,
+// so a restart used to leave every previously-provisioned principal with a
+// durable role and NO tuple: ViewAccess, EditAccess and AdminAccess all refuse,
+// and o11y is unreachable for everyone until each user is re-provisioned by hand.
+// This package's own doc claimed the set was "re-populated on the first request
+// after a restart"; nothing did that.
+//
+// Deriving it here makes the durable rows the single source of truth and the map
+// a cache of them, which is also what makes a second replica safe: each process
+// loads the same rows rather than accumulating its own private half of the
+// answer. Reading exactly what is stored is what keeps this a rehydration and
+// not a re-grant — a principal whose role was revoked comes back without it,
+// where re-issuing the founding admin grant would silently restore it.
 func (p *provider) Start(ctx context.Context) error {
+	// A failure here is reported, not fatal. Returning from Start tears the whole
+	// PROCESS down, and in the embed that process also serves iam, commerce, ai
+	// and the gateway — losing all of them because o11y could not read one table
+	// is out of proportion to the fault. Carrying on leaves the tuple set as
+	// whatever loaded, which denies rather than grants: fail-closed for o11y
+	// alone, loud in the log, and every other app keeps serving.
+	if err := p.rehydrate(ctx); err != nil {
+		p.settings.Logger().ErrorContext(ctx, "cannot rehydrate authorization grants from durable rows; "+
+			"o11y will refuse access until they load", "error", err)
+	}
 	select {
 	case <-ctx.Done():
 	case <-p.stopC:
 	}
+	return nil
+}
+
+// rehydrate rebuilds the tuple set from the durable role assignments — the
+// user_role and service_account_role tables, each joined to the role it names so
+// the org and the role NAME come from the same row that granted it.
+//
+// Both principal kinds are covered because both are checked: checkAnyAuthorized
+// builds its subject from PrincipalUser or PrincipalServiceAccount, so restoring
+// only users would leave every service account locked out of the surface it is
+// the whole point of — the machine callers that cannot notice and re-provision.
+func (p *provider) rehydrate(ctx context.Context) error {
+	var userRoles []*authtypes.UserRole
+	if err := p.sql.
+		BunDBCtx(ctx).
+		NewSelect().
+		Model(&userRoles).
+		Relation("Role").
+		Scan(ctx); err != nil {
+		return errors.WithAdditionalf(err, "cannot rehydrate user role grants")
+	}
+	for _, ur := range userRoles {
+		if ur.Role == nil {
+			continue
+		}
+		subject, err := authtypes.NewSubject(coretypes.NewResourceUser(), ur.UserID.StringValue(), ur.Role.OrgID, nil)
+		if err != nil {
+			return err
+		}
+		if err := p.Grant(ctx, ur.Role.OrgID, []string{ur.Role.Name}, subject); err != nil {
+			return err
+		}
+	}
+
+	var serviceAccountRoles []*serviceaccounttypes.ServiceAccountRole
+	if err := p.sql.
+		BunDBCtx(ctx).
+		NewSelect().
+		Model(&serviceAccountRoles).
+		Relation("Role").
+		Scan(ctx); err != nil {
+		return errors.WithAdditionalf(err, "cannot rehydrate service account role grants")
+	}
+	for _, sar := range serviceAccountRoles {
+		if sar.Role == nil {
+			continue
+		}
+		subject, err := authtypes.NewSubject(coretypes.NewResourceServiceAccount(), sar.ServiceAccountID.StringValue(), sar.Role.OrgID, nil)
+		if err != nil {
+			return err
+		}
+		if err := p.Grant(ctx, sar.Role.OrgID, []string{sar.Role.Name}, subject); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 func (p *provider) Stop(_ context.Context) error { close(p.stopC); return nil }
