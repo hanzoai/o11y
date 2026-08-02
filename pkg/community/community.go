@@ -123,15 +123,29 @@ func NewO11y(ctx context.Context, config o11y.Config) (*o11y.O11y, error) {
 			return o11y.NewAuthNs(ctx, providerSettings, store, licensing, config.Global)
 		},
 		func(_ context.Context, sqlstore sqlstore.SQLStore, config authz.Config, _ licensing.Licensing, _ []authz.OnBeforeRoleDelete) (factory.ProviderFactory[authz.AuthZ, authz.Config], error) {
-			// Authorization is selected by the trust boundary, not pluggable policy —
-			// the enforced policy is identical, only where the relationship tuples live
-			// differs:
-			//   - "iam" (default, STANDALONE o11y): every decision is delegated to Hanzo
-			//     IAM's Casbin enforce endpoint. o11y is its own trust domain.
-			//   - "local" (EMBEDDED one-binary, O11Y_AUTHZ_PROVIDER=local): the edge
-			//     gateway already validated the Hanzo IAM session and injected trusted
-			//     identity headers, and the sharder gates cross-org — so authorization is
-			//     a local decision, no round-trip back out to IAM. See pkg/authz/localauthz.
+			// Authorization is selected by the TRUST BOUNDARY, not by pluggable policy —
+			// the enforced policy is identical either way, only where the relationship
+			// tuples live differs:
+			//   - "local" (O11Y_AUTHZ_PROVIDER=local): an edge gateway has ALREADY
+			//     validated the Hanzo IAM session and injected the trusted identity
+			//     headers, and the sharder gates cross-org — so authorizing that user
+			//     for their own org is a local decision, and a round-trip back out to
+			//     IAM is redundant with the edge trust already spent. See
+			//     pkg/authz/localauthz.
+			//   - "iam" (default): every decision AND every tuple WRITE is delegated to
+			//     Hanzo IAM's Casbin enforcer.
+			//
+			// The boundary is a property of the DEPLOYMENT, not of standalone-vs-embed.
+			// This comment used to say "iam" was what standalone means and "local" what
+			// the embed means, which stopped being true the moment a standalone host was
+			// put behind the same gateway hop: o11y.hanzo.ai is fronted by admin-guard's
+			// verify-authn, so its boundary is the embed's boundary and it runs "local".
+			//
+			// A WARNING the default cannot express: "iam" requires IAM to serve
+			// add-policy / remove-policy / get-policies / batch-enforce, and IAM v1.34 —
+			// the clean-room zip v2 — does not. Selecting it today makes the founding
+			// grant fail with authz_unavailable on every sign-in. Either front the host
+			// with the gateway and choose "local", or restore those routes first.
 			if config.Provider == "local" {
 				return localauthz.NewProviderFactory(sqlstore), nil
 			}
