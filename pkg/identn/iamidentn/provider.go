@@ -34,9 +34,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/identn"
+	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -61,12 +61,23 @@ type OrgCreator interface {
 	Create(context.Context, *types.Organization, func(context.Context, valuer.UUID) error) error
 }
 
-// Authorizer bootstraps an org's managed roles and grants a subject a role.
-// Satisfied by authz.AuthZ (Hanzo IAM). Every runtime access check still flows
-// through the same authz service's batch-enforce.
+// Authorizer bootstraps an org's managed roles. Satisfied by authz.AuthZ (Hanzo
+// IAM). Every runtime access check still flows through the same authz service's
+// batch-enforce; the founding role grant rides UserCreator, which performs it and
+// the local user_role rows in one call.
 type Authorizer interface {
 	CreateManagedRoles(context.Context, valuer.UUID, []*authtypes.Role) error
-	Grant(context.Context, valuer.UUID, []string, string) error
+}
+
+// UserResolver reads an o11y user row by (org, id); satisfied by user.Getter.
+type UserResolver interface {
+	GetUserByOrgIDAndID(context.Context, valuer.UUID, valuer.UUID) (*types.User, error)
+}
+
+// UserCreator writes an o11y user row and grants it roles — the Hanzo IAM grant
+// AND the local user_role entries, in that one call. Satisfied by user.Setter.
+type UserCreator interface {
+	CreateUser(context.Context, *types.User, ...user.CreateUserOption) error
 }
 
 type provider struct {
@@ -74,6 +85,8 @@ type provider struct {
 	resolver   OrgResolver
 	creator    OrgCreator
 	authorizer Authorizer
+	users      UserResolver
+	userMaker  UserCreator
 
 	// provisioned records "<userID>@<orgID>" pairs already resolved this run, so
 	// the org lookup + grant happen once, not on every request. Both underlying
@@ -81,18 +94,20 @@ type provider struct {
 	provisioned sync.Map
 }
 
-func NewFactory(resolver OrgResolver, creator OrgCreator, authorizer Authorizer) factory.ProviderFactory[identn.IdentN, identn.Config] {
+func NewFactory(resolver OrgResolver, creator OrgCreator, authorizer Authorizer, users UserResolver, userMaker UserCreator) factory.ProviderFactory[identn.IdentN, identn.Config] {
 	return factory.NewProviderFactory(factory.MustNewName(authtypes.IdentNProviderIAM.StringValue()), func(ctx context.Context, providerSettings factory.ProviderSettings, config identn.Config) (identn.IdentN, error) {
-		return New(providerSettings, resolver, creator, authorizer)
+		return New(providerSettings, resolver, creator, authorizer, users, userMaker)
 	})
 }
 
-func New(providerSettings factory.ProviderSettings, resolver OrgResolver, creator OrgCreator, authorizer Authorizer) (identn.IdentN, error) {
+func New(providerSettings factory.ProviderSettings, resolver OrgResolver, creator OrgCreator, authorizer Authorizer, users UserResolver, userMaker UserCreator) (identn.IdentN, error) {
 	return &provider{
 		settings:   factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/identn/iamidentn"),
 		resolver:   resolver,
 		creator:    creator,
 		authorizer: authorizer,
+		users:      users,
+		userMaker:  userMaker,
 	}, nil
 }
 
@@ -125,16 +140,29 @@ func (p *provider) GetIdentity(req *http.Request) (*authtypes.Identity, error) {
 		email = valuer.Email{}
 	}
 
-	if err := p.provision(ctx, orgID, orgSlug, userID); err != nil {
+	if err := p.provision(ctx, orgID, orgSlug, userID, email); err != nil {
 		return nil, err
 	}
 
 	return authtypes.NewPrincipalUserIdentity(userID, orgID, email, authtypes.IdentNProviderIAM), nil
 }
 
-// provision resolves-or-creates the tenant org and grants the user its admin
-// role, once per (user, org). Idempotent and safe under concurrency.
-func (p *provider) provision(ctx context.Context, orgID valuer.UUID, orgSlug string, userID valuer.UUID) error {
+// provision resolves-or-creates the tenant org AND the person's o11y user row,
+// once per (user, org). Idempotent and safe under concurrency.
+//
+// Both halves, or neither is any use. The org alone was what this did, and it
+// left the tenant without members: o11y stores per-user rows — a dashboard's
+// author, a saved view, a preference — keyed by user id, and GET /users/me reads
+// one by (org, user). A session with no row answered "user not found" on the
+// very call the console uses as its identity provider, so a person the gateway
+// had authenticated could not open a single view. Provisioning the org and not
+// the user is not a smaller grant; it is a tenant nobody can enter.
+//
+// This is NOT o11y owning identity. The row is a PROJECTION of the IAM identity
+// keyed by IAM's own subject: no password, no invite, no SSO domain, nothing
+// authenticates against it. It exists so the foreign keys have something to
+// point at.
+func (p *provider) provision(ctx context.Context, orgID valuer.UUID, orgSlug string, userID valuer.UUID, email valuer.Email) error {
 	key := userID.String() + "@" + orgID.String()
 	if _, ok := p.provisioned.Load(key); ok {
 		return nil
@@ -144,12 +172,49 @@ func (p *provider) provision(ctx context.Context, orgID valuer.UUID, orgSlug str
 		return err
 	}
 
-	subject := authtypes.MustNewSubject(coretypes.NewResourceUser(), userID.String(), orgID, nil)
-	if err := p.authorizer.Grant(ctx, orgID, []string{authtypes.O11yAdminRoleName}, subject); err != nil {
+	if err := p.ensureUser(ctx, orgID, userID, email); err != nil {
 		return err
 	}
 
 	p.provisioned.Store(key, struct{}{})
+	return nil
+}
+
+// ensureUser creates the person's o11y row on first sight, with the org's admin
+// role. CreateUser performs the Hanzo IAM grant and the local user_role entries
+// in one call, so the founding grant is stated once rather than here and there.
+//
+// The email is load-bearing HERE and only here: a user row must have one, and
+// o11y must not invent an address for a person. A session that asserts an org and
+// a subject but no address cannot be seated, and says so rather than seating a
+// half-built identity that fails later, further away.
+//
+// A lost create race resolves to success — the row the winner wrote is the same
+// row, because both derive its id from the same IAM subject.
+func (p *provider) ensureUser(ctx context.Context, orgID, userID valuer.UUID, email valuer.Email) error {
+	if _, err := p.users.GetUserByOrgIDAndID(ctx, orgID, userID); err == nil {
+		return nil
+	} else if !errors.Ast(err, errors.TypeNotFound) {
+		return err
+	}
+
+	if email.IsZero() {
+		return errors.New(errors.TypeUnauthenticated, errors.CodeUnauthenticated, "the Hanzo IAM session carries no "+headerEmail+"; a user cannot be seated without one")
+	}
+
+	u, err := types.NewUserWithID(userID, email.String(), email, orgID, types.UserStatusActive)
+	if err != nil {
+		return err
+	}
+
+	if err := p.userMaker.CreateUser(ctx, u, user.WithRoleNames([]string{authtypes.O11yAdminRoleName})); err != nil {
+		if errors.Ast(err, errors.TypeAlreadyExists) {
+			return nil
+		}
+		return err
+	}
+
+	p.settings.Logger().InfoContext(ctx, "seated Hanzo IAM user in o11y org", "org_id", orgID.String(), "user_id", userID.String())
 	return nil
 }
 
