@@ -47,6 +47,7 @@ import { Organization } from 'types/api/user/getOrganization';
 import { UserResponse } from 'types/api/user/getUser';
 import { ROLES, USER_ROLES } from 'types/roles';
 import { toISOString } from 'utils/app';
+import { withBasePath } from 'utils/basePath';
 import { setO11yInstanceUrl } from 'utils/o11yInstanceUrl';
 
 import { IAppContext, IUser } from './types';
@@ -124,12 +125,53 @@ export function AppProvider({ children }: PropsWithChildren): JSX.Element {
 			setLocalStorageApi(LOCALSTORAGE.IS_LOGGED_IN, 'true');
 			setNoAuthMode(true);
 			setIsLoggedIn(true);
-		} else {
-			setNoAuthMode(false);
+			setIsPreflightLoading(false);
+			return;
 		}
 
-		setIsPreflightLoading(false);
-	}, [globalConfigData, isFetchingGlobalConfig]);
+		setNoAuthMode(false);
+
+		if (isLoggedIn) {
+			setIsPreflightLoading(false);
+			return;
+		}
+
+		// ASK THE SERVER whether this browser has a session, instead of asking
+		// localStorage whether it once had one.
+		//
+		// When identity is terminated at the edge — a hanzoai/gateway hop validates
+		// the Hanzo IAM session and injects the identity headers — the browser holds
+		// a session COOKIE and never receives a token to write here. localStorage is
+		// then empty for a fully authenticated person, and the app bounced them to
+		// its own /login: a login page in front of a session that already exists.
+		// Only the server knows, because only the server sees the headers.
+		//
+		// A raw fetch, deliberately: this runs BEFORE the identity the axios
+		// interceptors assume, so a 401 here must be an ANSWER ("no session"), not a
+		// trigger for the rotate-then-logout chain. Same seam, and same reason, as
+		// TenantProvider's raw fetch.
+		let cancelled = false;
+		fetch(withBasePath('/v1/o11y/users/me'), { credentials: 'include' })
+			.then((res) => {
+				if (cancelled || !res.ok) {
+					return;
+				}
+				setLocalStorageApi(LOCALSTORAGE.IS_LOGGED_IN, 'true');
+				setIsLoggedIn(true);
+			})
+			.catch(() => {
+				// No session, or no answer. Either way: the normal login flow.
+			})
+			.finally(() => {
+				if (!cancelled) {
+					setIsPreflightLoading(false);
+				}
+			});
+		// eslint-disable-next-line consistent-return
+		return (): void => {
+			cancelled = true;
+		};
+	}, [globalConfigData, isFetchingGlobalConfig, isLoggedIn]);
 
 	// fetcher for current user
 	// user will only be fetched if the user id and token is present

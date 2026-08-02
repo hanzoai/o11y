@@ -335,9 +335,9 @@ func NewTokenizerProviderFactories(cache cache.Cache, sqlstore sqlstore.SQLStore
 	)
 }
 
-func NewIdentNProviderFactories(tokenizer tokenizer.Tokenizer, serviceAccount serviceaccount.Module, orgGetter organization.Getter, orgSetter organization.Setter, authz authz.AuthZ, userGetter user.Getter, userConfig user.Config) factory.NamedMap[factory.ProviderFactory[identn.IdentN, identn.Config]] {
+func NewIdentNProviderFactories(tokenizer tokenizer.Tokenizer, serviceAccount serviceaccount.Module, orgGetter organization.Getter, orgSetter organization.Setter, authz authz.AuthZ, userGetter user.Getter, userSetter user.Setter, userConfig user.Config) factory.NamedMap[factory.ProviderFactory[identn.IdentN, identn.Config]] {
 	return factory.MustNewNamedMap(
-		iamidentn.NewFactory(orgGetter, orgSetter, authz),
+		iamidentn.NewFactory(orgGetter, orgSetter, authz, userGetter, userSetter),
 		impersonationidentn.NewFactory(orgGetter, userGetter, userConfig),
 		tokenizeridentn.NewFactory(tokenizer),
 		apikeyidentn.NewFactory(serviceAccount),

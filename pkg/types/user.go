@@ -80,9 +80,31 @@ func NewUser(displayName string, email valuer.Email, orgID valuer.UUID, status v
 		return nil, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "invalid status: %s, allowed status are: %v", status, ValidUserStatus)
 	}
 
+	return NewUserWithID(valuer.GenerateUUID(), displayName, email, orgID, status)
+}
+
+// NewUserWithID builds a user whose id is GIVEN rather than generated — the twin
+// of NewOrganizationWithID, and for the same reason. When identity is asserted by
+// Hanzo IAM the person already HAS an id (the IAM subject); a row minted with a
+// fresh one is a second identity for the same human, and every later lookup keyed
+// on the asserted subject misses it. Same validation, one constructor's worth of
+// rules, the id being the only thing the caller supplies.
+func NewUserWithID(id valuer.UUID, displayName string, email valuer.Email, orgID valuer.UUID, status valuer.String) (*User, error) {
+	if email.IsZero() {
+		return nil, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "email is required")
+	}
+
+	if orgID.IsZero() {
+		return nil, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "orgID is required")
+	}
+
+	if !slices.Contains(ValidUserStatus, status) {
+		return nil, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "invalid status: %s, allowed status are: %v", status, ValidUserStatus)
+	}
+
 	return &User{
 		Identifiable: Identifiable{
-			ID: valuer.GenerateUUID(),
+			ID: id,
 		},
 		DisplayName: displayName,
 		Email:       email,

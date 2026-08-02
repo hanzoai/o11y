@@ -12,9 +12,9 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -57,17 +57,10 @@ func (f *fakeOrgStore) Create(ctx context.Context, org *types.Organization, crea
 	return createManagedRoles(ctx, org.ID)
 }
 
-// fakeAuthorizer records managed-role bootstraps and grants.
+// fakeAuthorizer records managed-role bootstraps.
 type fakeAuthorizer struct {
 	mu           sync.Mutex
 	managedRoles int
-	grants       []grantCall
-}
-
-type grantCall struct {
-	orgID   valuer.UUID
-	names   []string
-	subject string
 }
 
 func (f *fakeAuthorizer) CreateManagedRoles(_ context.Context, _ valuer.UUID, _ []*authtypes.Role) error {
@@ -77,16 +70,52 @@ func (f *fakeAuthorizer) CreateManagedRoles(_ context.Context, _ valuer.UUID, _ 
 	return nil
 }
 
-func (f *fakeAuthorizer) Grant(_ context.Context, orgID valuer.UUID, names []string, subject string) error {
+// fakeUserStore is an in-memory UserResolver + UserCreator. CreateUser stands in
+// for the real setter, which performs the Hanzo IAM grant AND the local user_role
+// rows in the one call — so what this records IS the founding grant.
+type fakeUserStore struct {
+	mu    sync.Mutex
+	users map[string]*types.User // by "<orgID>/<userID>", the key GET /users/me reads
+	seats []seatCall
+}
+
+type seatCall struct {
+	orgID  valuer.UUID
+	userID valuer.UUID
+	email  string
+	roles  []string
+}
+
+func newFakeUserStore() *fakeUserStore {
+	return &fakeUserStore{users: map[string]*types.User{}}
+}
+
+func userKey(orgID, userID valuer.UUID) string { return orgID.String() + "/" + userID.String() }
+
+func (f *fakeUserStore) GetUserByOrgIDAndID(_ context.Context, orgID, userID valuer.UUID) (*types.User, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	f.grants = append(f.grants, grantCall{orgID: orgID, names: names, subject: subject})
+	if u, ok := f.users[userKey(orgID, userID)]; ok {
+		return u, nil
+	}
+	return nil, errors.NewNotFoundf(types.ErrCodeUserNotFound, "user not found")
+}
+
+func (f *fakeUserStore) CreateUser(_ context.Context, u *types.User, opts ...user.CreateUserOption) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	k := userKey(u.OrgID, u.ID)
+	if _, ok := f.users[k]; ok {
+		return errors.Newf(errors.TypeAlreadyExists, errors.CodeAlreadyExists, "already exists")
+	}
+	f.users[k] = u
+	f.seats = append(f.seats, seatCall{orgID: u.OrgID, userID: u.ID, email: u.Email.String(), roles: user.NewCreateUserOptions(opts...).RoleNames})
 	return nil
 }
 
-func newProvider(t *testing.T, store *fakeOrgStore, authorizer *fakeAuthorizer) *provider {
+func newProvider(t *testing.T, store *fakeOrgStore, authorizer *fakeAuthorizer, users *fakeUserStore) *provider {
 	t.Helper()
-	p, err := New(instrumentationtest.New().ToProviderSettings(), store, store, authorizer)
+	p, err := New(instrumentationtest.New().ToProviderSettings(), store, store, authorizer, users, users)
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}
@@ -113,7 +142,8 @@ func requestWithSession(org, user, email string) *http.Request {
 func TestGetIdentity_AutoProvisionsAndAuthorizes(t *testing.T) {
 	store := newFakeOrgStore()
 	authorizer := &fakeAuthorizer{}
-	p := newProvider(t, store, authorizer)
+	users := newFakeUserStore()
+	p := newProvider(t, store, authorizer, users)
 
 	const userUUID = "3f2504e0-4f89-41d3-9a0c-0305e82c3301"
 	identity, err := p.GetIdentity(requestWithSession("hanzo", userUUID, "z@hanzo.ai"))
@@ -149,18 +179,25 @@ func TestGetIdentity_AutoProvisionsAndAuthorizes(t *testing.T) {
 		t.Fatalf("managed role bootstraps = %d, want 1", authorizer.managedRoles)
 	}
 
-	// User granted admin, scoped to the resolved org.
-	if len(authorizer.grants) != 1 {
-		t.Fatalf("grants = %d, want 1", len(authorizer.grants))
+	// User SEATED in the org with the admin role — the row GET /users/me reads.
+	if len(users.seats) != 1 {
+		t.Fatalf("seats = %d, want 1", len(users.seats))
 	}
-	g := authorizer.grants[0]
-	if g.orgID != wantOrg || len(g.names) != 1 || g.names[0] != authtypes.O11yAdminRoleName {
-		t.Fatalf("grant = %+v, want admin on org %s", g, wantOrg)
+	seat := users.seats[0]
+	if seat.orgID != wantOrg || len(seat.roles) != 1 || seat.roles[0] != authtypes.O11yAdminRoleName {
+		t.Fatalf("seat = %+v, want admin on org %s", seat, wantOrg)
 	}
-	// The grant subject must equal what the authz middleware checks against.
-	wantSubject := authtypes.MustNewSubject(coretypes.NewResourceUser(), identity.UserID.String(), wantOrg, nil)
-	if g.subject != wantSubject {
-		t.Fatalf("grant subject = %s, want %s", g.subject, wantSubject)
+	// The row's id IS the asserted IAM subject, or GET /users/me — which looks it
+	// up by exactly (orgID, claims.UserID) — answers user_not_found to a person the
+	// gateway authenticated, and the console has no identity to render.
+	if seat.userID != identity.UserID {
+		t.Fatalf("seated user id = %s, want the asserted subject %s", seat.userID, identity.UserID)
+	}
+	if _, err := users.GetUserByOrgIDAndID(context.Background(), wantOrg, identity.UserID); err != nil {
+		t.Fatalf("GET /users/me would fail for the session just provisioned: %v", err)
+	}
+	if seat.email != "z@hanzo.ai" {
+		t.Fatalf("seated email = %s, want z@hanzo.ai", seat.email)
 	}
 }
 
@@ -168,7 +205,8 @@ func TestGetIdentity_AutoProvisionsAndAuthorizes(t *testing.T) {
 func TestGetIdentity_Idempotent(t *testing.T) {
 	store := newFakeOrgStore()
 	authorizer := &fakeAuthorizer{}
-	p := newProvider(t, store, authorizer)
+	users := newFakeUserStore()
+	p := newProvider(t, store, authorizer, users)
 
 	req := requestWithSession("hanzo", "3f2504e0-4f89-41d3-9a0c-0305e82c3301", "z@hanzo.ai")
 	for i := 0; i < 5; i++ {
@@ -180,8 +218,8 @@ func TestGetIdentity_Idempotent(t *testing.T) {
 	if len(store.creates) != 1 {
 		t.Fatalf("org creates = %d, want 1 (cached)", len(store.creates))
 	}
-	if len(authorizer.grants) != 1 {
-		t.Fatalf("grants = %d, want 1 (cached)", len(authorizer.grants))
+	if len(users.seats) != 1 {
+		t.Fatalf("seats = %d, want 1 (cached)", len(users.seats))
 	}
 }
 
@@ -189,7 +227,8 @@ func TestGetIdentity_Idempotent(t *testing.T) {
 func TestGetIdentity_ExistingOrgSecondUser(t *testing.T) {
 	store := newFakeOrgStore()
 	authorizer := &fakeAuthorizer{}
-	p := newProvider(t, store, authorizer)
+	users := newFakeUserStore()
+	p := newProvider(t, store, authorizer, users)
 
 	if _, err := p.GetIdentity(requestWithSession("hanzo", "3f2504e0-4f89-41d3-9a0c-0305e82c3301", "a@hanzo.ai")); err != nil {
 		t.Fatalf("first user: %v", err)
@@ -201,8 +240,8 @@ func TestGetIdentity_ExistingOrgSecondUser(t *testing.T) {
 	if len(store.creates) != 1 {
 		t.Fatalf("org creates = %d, want 1 (org reused)", len(store.creates))
 	}
-	if len(authorizer.grants) != 2 {
-		t.Fatalf("grants = %d, want 2 (one per user)", len(authorizer.grants))
+	if len(users.seats) != 2 {
+		t.Fatalf("seats = %d, want 2 (one per user)", len(users.seats))
 	}
 }
 
@@ -210,7 +249,8 @@ func TestGetIdentity_ExistingOrgSecondUser(t *testing.T) {
 func TestGetIdentity_MultiTenantIsolation(t *testing.T) {
 	store := newFakeOrgStore()
 	authorizer := &fakeAuthorizer{}
-	p := newProvider(t, store, authorizer)
+	users := newFakeUserStore()
+	p := newProvider(t, store, authorizer, users)
 
 	a, err := p.GetIdentity(requestWithSession("hanzo", "3f2504e0-4f89-41d3-9a0c-0305e82c3301", "z@hanzo.ai"))
 	if err != nil {
@@ -233,7 +273,8 @@ func TestGetIdentity_MultiTenantIsolation(t *testing.T) {
 func TestGetIdentity_MissingHeaders(t *testing.T) {
 	store := newFakeOrgStore()
 	authorizer := &fakeAuthorizer{}
-	p := newProvider(t, store, authorizer)
+	users := newFakeUserStore()
+	p := newProvider(t, store, authorizer, users)
 
 	if _, err := p.GetIdentity(requestWithSession("", "user", "z@hanzo.ai")); err == nil {
 		t.Fatal("expected error when X-Org-Id is absent")
@@ -241,17 +282,62 @@ func TestGetIdentity_MissingHeaders(t *testing.T) {
 	if _, err := p.GetIdentity(requestWithSession("hanzo", "", "z@hanzo.ai")); err == nil {
 		t.Fatal("expected error when X-User-Id is absent")
 	}
-	if len(store.creates) != 0 || len(authorizer.grants) != 0 {
-		t.Fatalf("no provisioning expected without a session: creates=%d grants=%d", len(store.creates), len(authorizer.grants))
+	if len(store.creates) != 0 || len(users.seats) != 0 {
+		t.Fatalf("no provisioning expected without a session: creates=%d seats=%d", len(store.creates), len(users.seats))
 	}
 }
 
 func TestTest_SignalIsOrgHeader(t *testing.T) {
-	p := newProvider(t, newFakeOrgStore(), &fakeAuthorizer{})
+	p := newProvider(t, newFakeOrgStore(), &fakeAuthorizer{}, newFakeUserStore())
 	if !p.Test(requestWithSession("hanzo", "user", "")) {
 		t.Fatal("Test should match when X-Org-Id is present")
 	}
 	if p.Test(requestWithSession("", "user", "")) {
 		t.Fatal("Test should not match without X-Org-Id")
+	}
+}
+
+// A session that asserts an org and a subject but no address cannot be seated —
+// a user row must carry an email, and o11y must not invent an address for a
+// person. It refuses at the seam that knows, rather than seating a half-built
+// identity that fails later and further away.
+func TestGetIdentity_RefusesToSeatWithoutEmail(t *testing.T) {
+	store := newFakeOrgStore()
+	authorizer := &fakeAuthorizer{}
+	users := newFakeUserStore()
+	p := newProvider(t, store, authorizer, users)
+
+	if _, err := p.GetIdentity(requestWithSession("hanzo", "3f2504e0-4f89-41d3-9a0c-0305e82c3301", "")); err == nil {
+		t.Fatal("expected a refusal when the session carries no X-User-Email")
+	}
+	if len(users.seats) != 0 {
+		t.Fatalf("seats = %d, want 0 — nothing half-built", len(users.seats))
+	}
+}
+
+// A person already seated is not re-seated, and their existing row is used as
+// is: re-provisioning must never overwrite a row the tenant has been using.
+func TestGetIdentity_ExistingSeatReused(t *testing.T) {
+	store := newFakeOrgStore()
+	authorizer := &fakeAuthorizer{}
+	users := newFakeUserStore()
+	p := newProvider(t, store, authorizer, users)
+
+	const userUUID = "3f2504e0-4f89-41d3-9a0c-0305e82c3301"
+	orgID, userID := toUUID("org", "hanzo"), valuer.MustNewUUID(userUUID)
+	seeded, err := types.NewUserWithID(userID, "Seeded Human", valuer.MustNewEmail("z@hanzo.ai"), orgID, types.UserStatusActive)
+	if err != nil {
+		t.Fatalf("NewUserWithID: %v", err)
+	}
+	users.users[userKey(orgID, userID)] = seeded
+
+	if _, err := p.GetIdentity(requestWithSession("hanzo", userUUID, "z@hanzo.ai")); err != nil {
+		t.Fatalf("GetIdentity: %v", err)
+	}
+	if len(users.seats) != 0 {
+		t.Fatalf("seats = %d, want 0 — an existing row is reused, never rewritten", len(users.seats))
+	}
+	if got := users.users[userKey(orgID, userID)].DisplayName; got != "Seeded Human" {
+		t.Fatalf("display name = %q, want the untouched %q", got, "Seeded Human")
 	}
 }
