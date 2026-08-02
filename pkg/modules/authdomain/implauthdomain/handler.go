@@ -10,8 +10,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/authdomain"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -63,7 +63,7 @@ func (handler *handler) Delete(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	domainId, err := valuer.NewUUID(mux.Vars(req)["id"])
+	domainId, err := valuer.NewUUID(coretypes.Param(req, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -87,7 +87,7 @@ func (handler *handler) Get(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	domainID, err := valuer.NewUUID(mux.Vars(req)["id"])
+	domainID, err := valuer.NewUUID(coretypes.Param(req, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -136,7 +136,7 @@ func (handler *handler) Update(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	domainID, err := valuer.NewUUID(mux.Vars(r)["id"])
+	domainID, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
