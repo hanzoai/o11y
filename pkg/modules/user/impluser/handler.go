@@ -12,8 +12,8 @@ import (
 	root "github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -123,7 +123,7 @@ func (handler *handler) GetUserDeprecated(w http.ResponseWriter, r *http.Request
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
@@ -144,7 +144,7 @@ func (handler *handler) GetUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	userID := mux.Vars(r)["id"]
+	userID := coretypes.Param(r, "id")
 
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
@@ -288,7 +288,7 @@ func (handler *handler) UpdateUserDeprecated(w http.ResponseWriter, r *http.Requ
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
@@ -315,7 +315,7 @@ func (handler *handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	userID := mux.Vars(r)["id"]
+	userID := coretypes.Param(r, "id")
 
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
@@ -347,7 +347,7 @@ func (handler *handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
@@ -367,7 +367,7 @@ func (handler *handler) GetResetPasswordTokenDeprecated(w http.ResponseWriter, r
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	id := mux.Vars(r)["id"]
+	id := coretypes.Param(r, "id")
 
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
@@ -394,7 +394,7 @@ func (handler *handler) GetResetPasswordToken(w http.ResponseWriter, r *http.Req
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	userID, err := valuer.NewUUID(mux.Vars(r)["id"])
+	userID, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(w, err)
 		return
@@ -419,7 +419,7 @@ func (handler *handler) CreateResetPasswordToken(w http.ResponseWriter, r *http.
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	userID, err := valuer.NewUUID(mux.Vars(r)["id"])
+	userID, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(w, err)
 		return
@@ -532,7 +532,7 @@ func (handler *handler) GetRolesByUserID(w http.ResponseWriter, r *http.Request)
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	userID := mux.Vars(r)["id"]
+	userID := coretypes.Param(r, "id")
 
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
@@ -564,7 +564,7 @@ func (handler *handler) SetRoleByUserID(w http.ResponseWriter, r *http.Request) 
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	userID := mux.Vars(r)["id"]
+	userID := coretypes.Param(r, "id")
 
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
@@ -600,8 +600,8 @@ func (handler *handler) RemoveUserRoleByRoleID(w http.ResponseWriter, r *http.Re
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	userID := mux.Vars(r)["id"]
-	roleID := mux.Vars(r)["roleId"]
+	userID := coretypes.Param(r, "id")
+	roleID := coretypes.Param(r, "roleId")
 
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
@@ -626,7 +626,7 @@ func (handler *handler) GetUsersByRoleID(w http.ResponseWriter, r *http.Request)
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
 
-	roleID := mux.Vars(r)["id"]
+	roleID := coretypes.Param(r, "id")
 
 	claims, err := authtypes.ClaimsFromContext(ctx)
 	if err != nil {
