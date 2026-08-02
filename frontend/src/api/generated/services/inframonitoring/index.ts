@@ -47,7 +47,7 @@ export const listClusters = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListClusters200>({
-		url: `/api/v2/infra_monitoring/clusters`,
+		url: `/v1/o11y/infra_monitoring/clusters`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: inframonitoringtypesPostableClustersDTO,
@@ -130,7 +130,7 @@ export const listDaemonSets = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListDaemonSets200>({
-		url: `/api/v2/infra_monitoring/daemonsets`,
+		url: `/v1/o11y/infra_monitoring/daemonsets`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: inframonitoringtypesPostableDaemonSetsDTO,
@@ -213,7 +213,7 @@ export const listDeployments = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListDeployments200>({
-		url: `/api/v2/infra_monitoring/deployments`,
+		url: `/v1/o11y/infra_monitoring/deployments`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: inframonitoringtypesPostableDeploymentsDTO,
@@ -296,7 +296,7 @@ export const listHosts = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListHosts200>({
-		url: `/api/v2/infra_monitoring/hosts`,
+		url: `/v1/o11y/infra_monitoring/hosts`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: inframonitoringtypesPostableHostsDTO,
@@ -379,7 +379,7 @@ export const listJobs = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListJobs200>({
-		url: `/api/v2/infra_monitoring/jobs`,
+		url: `/v1/o11y/infra_monitoring/jobs`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: inframonitoringtypesPostableJobsDTO,
@@ -462,7 +462,7 @@ export const listNamespaces = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListNamespaces200>({
-		url: `/api/v2/infra_monitoring/namespaces`,
+		url: `/v1/o11y/infra_monitoring/namespaces`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: inframonitoringtypesPostableNamespacesDTO,
@@ -545,7 +545,7 @@ export const listNodes = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListNodes200>({
-		url: `/api/v2/infra_monitoring/nodes`,
+		url: `/v1/o11y/infra_monitoring/nodes`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: inframonitoringtypesPostableNodesDTO,
@@ -628,7 +628,7 @@ export const listPods = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListPods200>({
-		url: `/api/v2/infra_monitoring/pods`,
+		url: `/v1/o11y/infra_monitoring/pods`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: inframonitoringtypesPostablePodsDTO,
@@ -711,7 +711,7 @@ export const listVolumes = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListVolumes200>({
-		url: `/api/v2/infra_monitoring/pvcs`,
+		url: `/v1/o11y/infra_monitoring/pvcs`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: inframonitoringtypesPostableVolumesDTO,
@@ -794,7 +794,7 @@ export const listStatefulSets = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListStatefulSets200>({
-		url: `/api/v2/infra_monitoring/statefulsets`,
+		url: `/v1/o11y/infra_monitoring/statefulsets`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: inframonitoringtypesPostableStatefulSetsDTO,

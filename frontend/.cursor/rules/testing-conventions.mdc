@@ -31,10 +31,14 @@ Global MSW server runs automatically. Override per-test:
 
 ```ts
 server.use(
-  rest.get('*/api/v1/foo', (_req, res, ctx) =>
+  rest.get('*/v1/o11y/foo', (_req, res, ctx) =>
     res(ctx.status(200), ctx.json({ ok: true })))
 );
 ```
+
+Every route lives under `/v1/o11y/` — one prefix, no version segment below it,
+no `/api/` segment (the host already says `api`). A mock spelled any other way
+silently stops intercepting and the test passes for the wrong reason.
 
 Keep large response fixtures in `mocks-server/__mockdata_`.
 

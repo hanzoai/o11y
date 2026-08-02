@@ -36,11 +36,11 @@ const mockUseApiMonitoringParams = jest.mocked(useApiMonitoringParams);
 
 const BASE_URL = ENVIRONMENT.baseURL;
 const SIGNAL = SignalType.LOGS;
-const quickFiltersListURL = `${BASE_URL}/api/v1/orgs/me/filters/${SIGNAL}`;
-const saveQuickFiltersURL = `${BASE_URL}/api/v1/orgs/me/filters`;
-const quickFiltersSuggestionsURL = `${BASE_URL}/api/v3/filter_suggestions`;
-const quickFiltersAttributeValuesURL = `${BASE_URL}/api/v3/autocomplete/attribute_values`;
-const fieldsValuesURL = `${BASE_URL}/api/v1/fields/values`;
+const quickFiltersListURL = `${BASE_URL}/v1/o11y/orgs/me/filters/${SIGNAL}`;
+const saveQuickFiltersURL = `${BASE_URL}/v1/o11y/orgs/me/filters`;
+const quickFiltersSuggestionsURL = `${BASE_URL}/v1/o11y/filter_suggestions`;
+const quickFiltersAttributeValuesURL = `${BASE_URL}/v1/o11y/autocomplete/attribute_values`;
+const fieldsValuesURL = `${BASE_URL}/v1/o11y/fields/values`;
 
 const FILTER_OS_DESCRIPTION = 'os.description';
 const FILTER_K8S_DEPLOYMENT_NAME = 'k8s.deployment.name';

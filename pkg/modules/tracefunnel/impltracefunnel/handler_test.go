@@ -7,13 +7,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	traceFunnels "github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 type MockModule struct {
@@ -114,8 +116,8 @@ func TestHandler_Get(t *testing.T) {
 
 	funnelID := valuer.GenerateUUID()
 	orgID := valuer.GenerateUUID()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/trace-funnels/"+funnelID.String(), nil)
-	req = mux.SetURLVars(req, map[string]string{"funnel_id": funnelID.String()})
+	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/trace-funnels/"+funnelID.String(), nil)
+	req = coretypes.SetRoute(req, "/v1/o11y/trace-funnels/{funnel_id}")
 	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{
 		OrgID: orgID.String(),
 	}))
@@ -155,8 +157,8 @@ func TestHandler_Delete(t *testing.T) {
 
 	funnelID := valuer.GenerateUUID()
 	orgID := valuer.GenerateUUID()
-	req := httptest.NewRequest(http.MethodDelete, "/api/v1/trace-funnels/"+funnelID.String(), nil)
-	req = mux.SetURLVars(req, map[string]string{"funnel_id": funnelID.String()})
+	req := httptest.NewRequest(http.MethodDelete, "/v1/o11y/trace-funnels/"+funnelID.String(), nil)
+	req = coretypes.SetRoute(req, "/v1/o11y/trace-funnels/{funnel_id}")
 	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), authtypes.Claims{
 		OrgID: orgID.String(),
 	}))
@@ -168,6 +170,36 @@ func TestHandler_Delete(t *testing.T) {
 	handler.Delete(rr, req)
 
 	assert.Equal(t, http.StatusOK, rr.Code)
+
+	mockModule.AssertExpectations(t)
+}
+
+// The two tests above INJECT the funnel id; this one lets a REAL router match it
+// on the REAL template. Both halves are needed: injection alone would prove only
+// that the writer and the reader of coretypes agree with each other, never that
+// the handler acts on what the router actually put there.
+func TestHandler_Get_ActsOnTheFunnelTheRouterMatched(t *testing.T) {
+	mockModule := new(MockModule)
+	funnelID := valuer.GenerateUUID()
+	orgID := valuer.GenerateUUID()
+
+	router := routing.Serve(http.MethodGet, "/v1/o11y/trace-funnels/{funnel_id}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		NewHandler(mockModule).Get(w, r.WithContext(authtypes.NewContextWithClaims(r.Context(), authtypes.Claims{OrgID: orgID.String()})))
+	}))
+
+	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/trace-funnels/"+funnelID.String(), nil)
+
+	mockModule.On("Get", mock.Anything, funnelID, orgID).Return(&traceFunnels.StorableFunnel{
+		Identifiable: types.Identifiable{ID: funnelID},
+		Name:         "test-funnel",
+		OrgID:        orgID,
+	}, nil)
+
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	require.Equal(t, http.StatusOK, rr.Code, rr.Body.String())
+	assert.Contains(t, rr.Body.String(), "test-funnel")
 
 	mockModule.AssertExpectations(t)
 }

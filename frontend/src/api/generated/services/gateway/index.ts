@@ -47,7 +47,7 @@ export const getIngestionKeys = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetIngestionKeys200>({
-		url: `/api/v2/gateway/ingestion_keys`,
+		url: `/v1/o11y/gateway/ingestion_keys`,
 		method: 'GET',
 		params,
 		signal,
@@ -58,7 +58,7 @@ export const getGetIngestionKeysQueryKey = (
 	params?: GetIngestionKeysParams,
 ) => {
 	return [
-		`/api/v2/gateway/ingestion_keys`,
+		`/v1/o11y/gateway/ingestion_keys`,
 		...(params ? [params] : []),
 	] as const;
 };
@@ -147,7 +147,7 @@ export const createIngestionKey = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateIngestionKey201>({
-		url: `/api/v2/gateway/ingestion_keys`,
+		url: `/v1/o11y/gateway/ingestion_keys`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: gatewaytypesPostableIngestionKeyDTO,
@@ -230,7 +230,7 @@ export const deleteIngestionKey = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/gateway/ingestion_keys/${keyId}`,
+		url: `/v1/o11y/gateway/ingestion_keys/${keyId}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -310,7 +310,7 @@ export const updateIngestionKey = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/gateway/ingestion_keys/${keyId}`,
+		url: `/v1/o11y/gateway/ingestion_keys/${keyId}`,
 		method: 'PATCH',
 		headers: { 'Content-Type': 'application/json' },
 		data: gatewaytypesPostableIngestionKeyDTO,
@@ -409,7 +409,7 @@ export const createIngestionKeyLimit = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateIngestionKeyLimit201>({
-		url: `/api/v2/gateway/ingestion_keys/${keyId}/limits`,
+		url: `/v1/o11y/gateway/ingestion_keys/${keyId}/limits`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: gatewaytypesPostableIngestionKeyLimitDTO,
@@ -508,7 +508,7 @@ export const deleteIngestionKeyLimit = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/gateway/ingestion_keys/limits/${limitId}`,
+		url: `/v1/o11y/gateway/ingestion_keys/limits/${limitId}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -589,7 +589,7 @@ export const updateIngestionKeyLimit = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/gateway/ingestion_keys/limits/${limitId}`,
+		url: `/v1/o11y/gateway/ingestion_keys/limits/${limitId}`,
 		method: 'PATCH',
 		headers: { 'Content-Type': 'application/json' },
 		data: gatewaytypesUpdatableIngestionKeyLimitDTO,
@@ -688,7 +688,7 @@ export const searchIngestionKeys = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<SearchIngestionKeys200>({
-		url: `/api/v2/gateway/ingestion_keys/search`,
+		url: `/v1/o11y/gateway/ingestion_keys/search`,
 		method: 'GET',
 		params,
 		signal,
@@ -699,7 +699,7 @@ export const getSearchIngestionKeysQueryKey = (
 	params?: SearchIngestionKeysParams,
 ) => {
 	return [
-		`/api/v2/gateway/ingestion_keys/search`,
+		`/v1/o11y/gateway/ingestion_keys/search`,
 		...(params ? [params] : []),
 	] as const;
 };

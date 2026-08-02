@@ -76,8 +76,8 @@ function Exceptions({
 }
 
 const BASE_URL = ENVIRONMENT.baseURL;
-const listErrorsURL = `${BASE_URL}/api/v1/listErrors`;
-const countErrorsURL = `${BASE_URL}/api/v1/countErrors`;
+const listErrorsURL = `${BASE_URL}/v1/o11y/listErrors`;
+const countErrorsURL = `${BASE_URL}/v1/o11y/countErrors`;
 
 const postListErrorsSpy = jest.fn();
 

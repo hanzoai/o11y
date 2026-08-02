@@ -28,7 +28,8 @@ func TestGetColumn(t *testing.T) {
 				Name:         "service.name",
 				FieldContext: telemetrytypes.FieldContextResource,
 			},
-			expectedCol:   []*schema.Column{logsV2Columns["resources_string"], logsV2Columns["resource"]},
+			// service.name is PROMOTED out of the map onto its own envelope column
+			expectedCol:   []*schema.Column{mustPromotedResourceColumn("service.name")},
 			expectedError: nil,
 		},
 		{
@@ -201,7 +202,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				Name:         "timestamp",
 				FieldContext: telemetrytypes.FieldContextLog,
 			},
-			expectedResult:  "timestamp",
+			expectedResult:  "toUnixTimestamp64Nano(time)",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -212,7 +213,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeString,
 			},
-			expectedResult:  "attributes_string['user.id']",
+			expectedResult:  "attributes['user.id']",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -223,7 +224,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeNumber,
 			},
-			expectedResult:  "attributes_number['request.size']",
+			expectedResult:  "toFloat64OrNull(attributes['request.size'])",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -234,7 +235,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext:  telemetrytypes.FieldContextAttribute,
 				FieldDataType: telemetrytypes.FieldDataTypeBool,
 			},
-			expectedResult:  "attributes_bool['request.success']",
+			expectedResult:  "attributes['request.success'] = 'true'",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -245,7 +246,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				FieldContext: telemetrytypes.FieldContextResource,
 				Evolutions:   resourceEvolution,
 			},
-			expectedResult:  "resources_string['service.name']",
+			expectedResult:  "service",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -258,7 +259,7 @@ func TestGetFieldKeyName(t *testing.T) {
 				Materialized:  true,
 				Evolutions:    resourceEvolution,
 			},
-			expectedResult:  "`resource_string_service$$name`",
+			expectedResult:  "service",
 			expectedError:   nil,
 			addExistsFilter: false,
 		},
@@ -321,7 +322,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "resources_string['service.name']",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -339,7 +340,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "resources_string['service.name']",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -365,7 +366,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, mapContains(resources_string, 'service.name'), resources_string['service.name'], NULL)",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		// TODO(piyush): to be added once integration with JSON is done.
@@ -423,7 +424,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "resource.`service.name`::String",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -449,7 +450,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Unix(0, 0),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, mapContains(resources_string, 'service.name'), resources_string['service.name'], NULL)",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -484,7 +485,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 2, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "resource.`service.name`::String",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 		{
@@ -510,7 +511,7 @@ func TestFieldForWithEvolutions(t *testing.T) {
 			key:            key,
 			tsStartTime:    time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			tsEndTime:      time.Date(2024, 2, 15, 0, 0, 0, 0, time.UTC),
-			expectedResult: "resources_string['service.name']",
+			expectedResult: "service",
 			expectedError:  nil,
 		},
 	}
@@ -573,13 +574,13 @@ func TestFieldForWithMaterialized(t *testing.T) {
 			name:           "Map column in use (pre-evolution to JSON)",
 			start:          time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			end:            time.Date(2024, 2, 2, 0, 0, 0, 0, time.UTC),
-			expectedResult: "`resource_string_service$$name`",
+			expectedResult: "service",
 		},
 		{
 			name:           "Multi evolution - both columns (JSON + materialized)",
 			start:          time.Date(2024, 2, 1, 0, 0, 0, 0, time.UTC),
 			end:            time.Date(2024, 4, 2, 0, 0, 0, 0, time.UTC),
-			expectedResult: "multiIf(resource.`service.name` IS NOT NULL, resource.`service.name`::String, `resource_string_service$$name_exists`==true, `resource_string_service$$name`, NULL)",
+			expectedResult: "service",
 		},
 	}
 
@@ -595,4 +596,14 @@ func TestFieldForWithMaterialized(t *testing.T) {
 			assert.Equal(t, tc.expectedResult, result)
 		})
 	}
+}
+
+// mustPromotedResourceColumn is the test's read of the one promotion
+// declaration, so the expectation cannot drift from the mapper.
+func mustPromotedResourceColumn(name string) *schema.Column {
+	col, ok := PromotedResourceColumn(name)
+	if !ok {
+		panic("not a promoted resource label: " + name)
+	}
+	return col
 }

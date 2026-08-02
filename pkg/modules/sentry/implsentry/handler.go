@@ -7,13 +7,13 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking/implerrortracking"
 	"github.com/hanzoai/o11y/pkg/modules/sentry"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/errortrackingtypes"
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
@@ -67,7 +67,7 @@ func (h *handler) ingest(rw http.ResponseWriter, r *http.Request, parse eventPar
 		return
 	}
 
-	projectID, err := valuer.NewUUID(mux.Vars(r)["project"])
+	projectID, err := valuer.NewUUID(coretypes.Param(r, "project"))
 	if err != nil {
 		http.Error(rw, "invalid project", http.StatusBadRequest)
 		return
@@ -363,7 +363,7 @@ func (h *handler) GetEvent(rw http.ResponseWriter, r *http.Request) {
 		render.Error(rw, err)
 		return
 	}
-	event, err := h.module.GetEvent(ctx, orgID, projectID, mux.Vars(r)["id"])
+	event, err := h.module.GetEvent(ctx, orgID, projectID, coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -430,7 +430,7 @@ func (h *handler) GetTrace(rw http.ResponseWriter, r *http.Request) {
 		render.Error(rw, err)
 		return
 	}
-	detail, err := h.module.TraceDetail(ctx, orgID, projectID, mux.Vars(r)["id"])
+	detail, err := h.module.TraceDetail(ctx, orgID, projectID, coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -476,7 +476,7 @@ func orgFromContext(ctx context.Context) (valuer.UUID, error) {
 }
 
 func idFromPath(r *http.Request) (valuer.UUID, error) {
-	id, err := valuer.NewUUID(mux.Vars(r)["id"])
+	id, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		return valuer.UUID{}, errors.Newf(errors.TypeInvalidInput, sentrytypes.ErrCodeSentryInvalidInput, "id is not a valid uuid")
 	}

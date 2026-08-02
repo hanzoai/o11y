@@ -39,7 +39,7 @@ func (m *module) FetchTopLevelOperations(ctx context.Context, start time.Time, s
 	ctx = m.withServicesContext(ctx, "FetchTopLevelOperations")
 
 	db := m.TelemetryStore.Datastore()
-	query := fmt.Sprintf("SELECT name, serviceName, max(time) as ts FROM %s.%s WHERE time >= @start", telemetrytraces.DBName, telemetrytraces.TopLevelOperationsTableName)
+	query := fmt.Sprintf("SELECT name, serviceName, max(time) as ts FROM %s.%s WHERE time >= @start", telemetrytraces.DBName, telemetrytraces.OperationTableName)
 	args := []any{datastore.Named("start", start)}
 	if len(services) > 0 {
 		query += " AND serviceName IN @services"

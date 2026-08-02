@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
@@ -13,7 +14,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
 	"github.com/hanzoai/otel-collector/utils"
-	"github.com/hanzo-ds/sqlbuilder"
 
 	"golang.org/x/exp/maps"
 )
@@ -23,12 +23,16 @@ var (
 		"ts_bucket_start":      {Name: "ts_bucket_start", Type: schema.ColumnTypeUInt64},
 		"resource_fingerprint": {Name: "resource_fingerprint", Type: schema.ColumnTypeString},
 
-		"timestamp":          {Name: "timestamp", Type: schema.ColumnTypeUInt64},
-		"observed_timestamp": {Name: "observed_timestamp", Type: schema.ColumnTypeUInt64},
+		// Envelope renames: the log row's time columns are DateTime64; wrapping them
+		// in toUnixTimestamp64Nano keeps the historic nanosecond-integer semantics
+		// callers compare against. trace_flags is not an envelope column — it rides
+		// in the attributes map like every other OTLP extra.
+		"timestamp":          {Name: "toUnixTimestamp64Nano(time)", Type: schema.ColumnTypeUInt64},
+		"observed_timestamp": {Name: "toUnixTimestamp64Nano(ingested_at)", Type: schema.ColumnTypeUInt64},
 		"id":                 {Name: "id", Type: schema.ColumnTypeString},
 		"trace_id":           {Name: "trace_id", Type: schema.ColumnTypeString},
 		"span_id":            {Name: "span_id", Type: schema.ColumnTypeString},
-		"trace_flags":        {Name: "trace_flags", Type: schema.ColumnTypeUInt32},
+		"trace_flags":        {Name: "toUInt32OrZero(attributes['trace_flags'])", Type: schema.ColumnTypeUInt32},
 		"severity_text":      {Name: "severity_text", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}},
 		"severity_number":    {Name: "severity_number", Type: schema.ColumnTypeUInt8},
 		"body":               {Name: "body", Type: schema.ColumnTypeString},
@@ -38,26 +42,29 @@ var (
 			MaxDynamicPaths: utils.ToPointer(uint(0)),
 		}},
 		LogsV2BodyPromotedColumn: {Name: LogsV2BodyPromotedColumn, Type: schema.JSONColumnType{}},
-		"attributes_string": {Name: "attributes_string", Type: schema.MapColumnType{
+		// attributes columns: all three data-type views address the ONE envelope
+		// map; FieldFor wraps number/bool by ValueType (toFloat64OrNull / = 'true').
+		"attributes_string": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeString,
 		}},
-		"attributes_number": {Name: "attributes_number", Type: schema.MapColumnType{
+		"attributes_number": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeFloat64,
 		}},
-		"attributes_bool": {Name: "attributes_bool", Type: schema.MapColumnType{
+		"attributes_bool": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeBool,
 		}},
-		"resources_string": {Name: "resources_string", Type: schema.MapColumnType{
+		// resource labels beyond service/host, and scope attributes, live in the
+		// same envelope map.
+		"attributes": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeString,
 		}},
-		"resource":      {Name: "resource", Type: schema.JSONColumnType{}},
-		"scope_name":    {Name: "scope_name", Type: schema.ColumnTypeString},
-		"scope_version": {Name: "scope_version", Type: schema.ColumnTypeString},
-		"scope_string": {Name: "scope_string", Type: schema.MapColumnType{
+		"scope_name":    {Name: "attributes['scope.name']", Type: schema.ColumnTypeString},
+		"scope_version": {Name: "attributes['scope.version']", Type: schema.ColumnTypeString},
+		"scope_string": {Name: "attributes", Type: schema.MapColumnType{
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeString,
 		}},
@@ -72,11 +79,29 @@ func NewFieldMapper(fl flagger.Flagger) qbtypes.FieldMapper {
 	return &fieldMapper{fl: fl}
 }
 
+// PromotedResourceColumn returns the envelope column a resource label is
+// promoted to. The envelope lifts service and host OUT of the attributes map
+// into typed columns of their own; every other resource label stays in the map.
+// This is the single declaration of that promotion: the field mapper resolves
+// through it, and the condition builder consults it to know that a promoted
+// column always exists and therefore needs no exists filter.
+func PromotedResourceColumn(name string) (*schema.Column, bool) {
+	switch name {
+	case "service.name":
+		return &schema.Column{Name: "service", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}}, true
+	case "host.name", "host":
+		return &schema.Column{Name: "host", Type: schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString}}, true
+	}
+	return nil, false
+}
+
 func (m *fieldMapper) getColumn(ctx context.Context, key *telemetrytypes.TelemetryFieldKey) ([]*schema.Column, error) {
 	switch key.FieldContext {
 	case telemetrytypes.FieldContextResource:
-		columns := []*schema.Column{logsV2Columns["resources_string"], logsV2Columns["resource"]}
-		return columns, nil
+		if col, ok := PromotedResourceColumn(key.Name); ok {
+			return []*schema.Column{col}, nil
+		}
+		return []*schema.Column{logsV2Columns["attributes"]}, nil
 	case telemetrytypes.FieldContextScope:
 		switch key.Name {
 		case "name", "scope.name", "scope_name":
@@ -141,7 +166,10 @@ func (m *fieldMapper) FieldFor(ctx context.Context, tsStart, tsEnd uint64, key *
 
 	var newColumns []*schema.Column
 	var evolutionsEntries []*telemetrytypes.EvolutionEntry
-	if len(key.Evolutions) > 0 {
+	// An evolution selects BETWEEN columns; the envelope resolves every key to
+	// exactly one column, so there is nothing to select and the evolution
+	// metadata (which names OTLP-fork columns) does not apply.
+	if len(key.Evolutions) > 0 && len(columns) > 1 {
 		// we will use the corresponding column and its evolution entry for the query
 		newColumns, evolutionsEntries, err = qbtypes.SelectEvolutionsForColumns(columns, key.Evolutions, tsStart, tsEnd)
 		if err != nil {
@@ -204,14 +232,18 @@ func (m *fieldMapper) FieldFor(ctx context.Context, tsStart, tsEnd uint64, key *
 
 			switch valueType := column.Type.(schema.MapColumnType).ValueType; valueType.GetType() {
 			case schema.ColumnTypeEnumString, schema.ColumnTypeEnumBool, schema.ColumnTypeEnumFloat64:
-				// a key could have been materialized, if so return the materialized column name
-				if key.Materialized {
-					exprs = append(exprs, telemetrytypes.FieldKeyToMaterializedColumnName(key))
-					existExpr = append(existExpr, fmt.Sprintf("%s==true", telemetrytypes.FieldKeyToMaterializedColumnNameForExists(key)))
-				} else {
-					exprs = append(exprs, fmt.Sprintf("%s['%s']", columnName, key.Name))
-					existExpr = append(existExpr, fmt.Sprintf("mapContains(%s, '%s')", columnName, key.Name))
+				// The envelope keeps ONE attributes map with String values and no
+				// materialized columns, so every key is a map access; the requested
+				// value type decides the cast (number -> toFloat64OrNull, bool -> = 'true').
+				access := fmt.Sprintf("%s['%s']", columnName, key.Name)
+				switch valueType.GetType() {
+				case schema.ColumnTypeEnumFloat64:
+					access = fmt.Sprintf("toFloat64OrNull(%s)", access)
+				case schema.ColumnTypeEnumBool:
+					access = fmt.Sprintf("%s = 'true'", access)
 				}
+				exprs = append(exprs, access)
+				existExpr = append(existExpr, fmt.Sprintf("mapContains(%s, '%s')", columnName, key.Name))
 			default:
 				return "", errors.NewInvalidInputf(errors.CodeInvalidInput, "exists operator is not supported for map column type %s", valueType)
 			}

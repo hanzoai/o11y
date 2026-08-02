@@ -20,21 +20,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        # NOTE: no hanzoai/cloud sibling is checked out. The image builds only
-        # `./cmd/community`, which does not import github.com/hanzoai/cloud, so
-        # the go.mod `replace => ../cloud` is inert. (The CI go-build job, which
-        # runs `go build ./...` and thus compiles mount.go, still needs it — see
-        # ci.yaml — but the container does not.)
+        # NOTE: nothing here needs a hanzoai/cloud sibling, and neither does the
+        # go-build job any more — the module does not name cloud at all. What the
+        # image DOES now carry is the module's own route table: ./cmd/community's
+        # graph reaches github.com/hanzoai/o11y, so the OpenAPI document and the
+        # MCP tools ship in the process instead of in a package nothing links.
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # ghcr.io wants a GitHub credential, and this job runs on a hanzo
+      # self-hosted pool -- so `secrets.GITHUB_TOKEN` is git.hanzo.ai's token,
+      # which ghcr.io has never seen (`denied: denied`). orgs/hanzoai provisions
+      # GHCR_USER + GHCR_TOKEN; naming them directly rather than through a `||`
+      # chain, because a missing org secret is "" and the fallback then swaps
+      # credentials without saying so.
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.GHCR_USER }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Docker metadata (tags + labels)
         id: meta
@@ -73,5 +79,12 @@ jobs:
             BUILD_TIME=${{ steps.date.outputs.value }}
             BRANCH=${{ github.ref_name }}
             VARIANT=community
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # Registry cache, not type=gha. The gha backend needs an Actions runtime
+          # token, and git.hanzo.ai does not issue one that buildx can parse:
+          #   Cannot parse GitHub Actions Runtime Token: missing part #2
+          #   failed to configure gha cache exporter: token is malformed
+          # That fails the BUILD, so a cache meant to save time was costing the
+          # whole job. ignore-error keeps the first build (no cache image yet)
+          # from failing on a 404, which is how luxfi/dex was breaking.
+          cache-from: type=registry,ref=ghcr.io/hanzoai/o11y:buildcache,ignore-error=true
+          cache-to: type=registry,ref=ghcr.io/hanzoai/o11y:buildcache,mode=max,ignore-error=true

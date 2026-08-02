@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"net/http"
 	"reflect"
 
-	"github.com/gorilla/mux"
 	"github.com/swaggest/jsonschema-go"
 	openapigo "github.com/swaggest/openapi-go"
 	"github.com/swaggest/rest/openapi"
@@ -53,35 +53,21 @@ func NewOpenAPICollector(reflector openapigo.Reflector) *OpenAPICollector {
 	}
 }
 
-func (c *OpenAPICollector) Walker(route *mux.Route, _ *mux.Router, _ []*mux.Route) error {
-	httpHandler := route.GetHandler()
-
-	if httpHandler == nil {
+// Collect adds one registered route to the document. A route whose handler
+// declares nothing contributes nothing — a plain http.HandlerFunc has no
+// operation to describe, and that is not an error.
+//
+// It takes the registration's three values rather than a route object to walk,
+// because a walk is a router's API and the document is not the router's
+// business: the caller holds the table its own registrar recorded and hands over
+// exactly what an operation is made of.
+func (c *OpenAPICollector) Collect(method, path string, h http.Handler) error {
+	declared, ok := h.(Handler)
+	if !ok || path == "" || method == "" {
 		return nil
 	}
 
-	path, err := route.GetPathTemplate()
-	if err != nil && path == "" {
-		// If there is no path, skip the route
-		return nil
-	}
-
-	methods, err := route.GetMethods()
-	if err != nil {
-		// If there is no methods, skip the route
-		return nil
-	}
-
-	if handler, ok := httpHandler.(Handler); ok {
-		for _, method := range methods {
-			if err := c.collector.CollectOperation(method, path, c.collect(method, path, handler.ServeOpenAPI)); err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	return nil
+	return c.collector.CollectOperation(method, path, c.collect(method, path, declared.ServeOpenAPI))
 }
 
 func (c *OpenAPICollector) collect(method string, path string, serveOpenAPIFunc ServeOpenAPIFunc) func(oc openapigo.OperationContext) error {

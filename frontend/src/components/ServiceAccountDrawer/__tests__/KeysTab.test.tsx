@@ -22,7 +22,7 @@ jest.mock('components/ui/sonner', () => ({
 
 const mockToast = jest.mocked(toast);
 
-const SA_KEY_ENDPOINT = '*/api/v1/service_accounts/sa-1/keys/:fid';
+const SA_KEY_ENDPOINT = '*/v1/o11y/service_accounts/sa-1/keys/:fid';
 
 const keys: ServiceaccounttypesGettableFactorAPIKeyDTO[] = [
 	{

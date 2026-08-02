@@ -113,7 +113,7 @@ describe('Dashboard landing page actions header tests', () => {
 		};
 		(useLocation as jest.Mock).mockReturnValue(mockLocation);
 		server.use(
-			rest.get('http://localhost/api/v1/dashboards/4', (_, res, ctx) =>
+			rest.get('http://localhost/v1/o11y/dashboards/4', (_, res, ctx) =>
 				res(ctx.status(200), ctx.json(getNonIntegrationDashboardById)),
 			),
 		);

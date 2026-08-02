@@ -17,6 +17,7 @@ import (
 
 	o11yerrors "github.com/hanzoai/o11y/pkg/errors"
 
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/thirdpartyapitypes"
 
 	"log/slog"
@@ -26,7 +27,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/kafka"
 	queues2 "github.com/hanzoai/o11y/pkg/query-service/app/integrations/messagingQueues/queues"
 
-	"github.com/gorilla/mux"
 	promModel "github.com/prometheus/common/model"
 	"go.uber.org/multierr"
 
@@ -236,9 +236,8 @@ func parseGetServicesRequest(r *http.Request) (*model.GetServicesParams, error) 
 }
 
 func ParseSearchTracesParams(r *http.Request) (*model.SearchTracesParams, error) {
-	vars := mux.Vars(r)
 	params := &model.SearchTracesParams{}
-	params.TraceID = vars["traceId"]
+	params.TraceID = coretypes.Param(r, "traceId")
 	params.SpanID = r.URL.Query().Get("spanId")
 
 	levelUpStr := r.URL.Query().Get("levelUp")

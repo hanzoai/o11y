@@ -3,14 +3,23 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/llmpricingruletypes"
 )
 
-func (provider *provider) addLLMPricingRuleRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v1/llm_pricing_rules", handler.New(
+// The four pricing-rule routes are ALSO declared as typed ops at the module's
+// mount seam (llmobs.go in the repo root), which is what carries them into the
+// composed document, the SDK, the CLI and the agent surface. That is a second
+// DISPATCH, never a second implementation: the ops answer by handing the call to
+// this router, so the handlers below stay the one place the work is performed —
+// and the gates declared here (ViewAccess, AdminAccess) stay the one place
+// access is decided. Both halves are needed — the ops serve the composed binary,
+// this router serves the standalone process, which has no native router to
+// register an op on — so deleting either drops one of the two deployments.
+func (provider *provider) addLLMPricingRuleRoutes(router routing.Router) {
+	router.Get("/v1/o11y/llm_pricing_rules", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.llmPricingRuleHandler.List),
 		handler.OpenAPIDef{
 			ID:                  "ListLLMPricingRules",
@@ -27,11 +36,9 @@ func (provider *provider) addLLMPricingRuleRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/api/v1/llm_pricing_rules", handler.New(
+	router.Put("/v1/o11y/llm_pricing_rules", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.llmPricingRuleHandler.CreateOrUpdate),
 		handler.OpenAPIDef{
 			ID:                 "CreateOrUpdateLLMPricingRules",
@@ -45,11 +52,9 @@ func (provider *provider) addLLMPricingRuleRoutes(router *mux.Router) error {
 			Deprecated:         false,
 			SecuritySchemes:    newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodPut).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/api/v1/llm_pricing_rules/{id}", handler.New(
+	router.Get("/v1/o11y/llm_pricing_rules/{id}", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.llmPricingRuleHandler.Get),
 		handler.OpenAPIDef{
 			ID:                  "GetLLMPricingRule",
@@ -65,11 +70,9 @@ func (provider *provider) addLLMPricingRuleRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/api/v1/llm_pricing_rules/{id}", handler.New(
+	router.Delete("/v1/o11y/llm_pricing_rules/{id}", handler.New(
 		provider.authzMiddleware.AdminAccess(provider.llmPricingRuleHandler.Delete),
 		handler.OpenAPIDef{
 			ID:                  "DeleteLLMPricingRule",
@@ -85,9 +88,5 @@ func (provider *provider) addLLMPricingRuleRoutes(router *mux.Router) error {
 			Deprecated:          false,
 			SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
 		},
-	)).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	))
 }

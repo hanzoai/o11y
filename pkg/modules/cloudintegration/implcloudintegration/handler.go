@@ -10,8 +10,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/cloudintegration"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/cloudintegrationtypes"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -34,7 +34,7 @@ func (handler *handler) GetConnectionCredentials(rw http.ResponseWriter, r *http
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -59,7 +59,7 @@ func (handler *handler) CreateAccount(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -104,13 +104,13 @@ func (handler *handler) GetAccount(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	accountID, err := valuer.NewUUID(mux.Vars(r)["id"])
+	accountID, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -135,7 +135,7 @@ func (handler *handler) ListAccounts(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -160,13 +160,13 @@ func (handler *handler) UpdateAccount(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	cloudIntegrationID, err := valuer.NewUUID(mux.Vars(r)["id"])
+	cloudIntegrationID, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -214,13 +214,13 @@ func (handler *handler) DisconnectAccount(rw http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	cloudIntegrationID, err := valuer.NewUUID(mux.Vars(r)["id"])
+	cloudIntegrationID, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -245,7 +245,7 @@ func (handler *handler) ListServicesMetadata(rw http.ResponseWriter, r *http.Req
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -286,13 +286,13 @@ func (handler *handler) ListAccountServicesMetadata(rw http.ResponseWriter, r *h
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	accountID, err := valuer.NewUUID(mux.Vars(r)["id"])
+	accountID, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -324,13 +324,13 @@ func (handler *handler) GetService(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	serviceID, err := cloudintegrationtypes.NewServiceID(provider, mux.Vars(r)["service_id"])
+	serviceID, err := cloudintegrationtypes.NewServiceID(provider, coretypes.Param(r, "service_id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -370,19 +370,19 @@ func (handler *handler) GetAccountService(rw http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	serviceID, err := cloudintegrationtypes.NewServiceID(provider, mux.Vars(r)["service_id"])
+	serviceID, err := cloudintegrationtypes.NewServiceID(provider, coretypes.Param(r, "service_id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	cloudIntegrationID, err := valuer.NewUUID(mux.Vars(r)["id"])
+	cloudIntegrationID, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -415,13 +415,13 @@ func (handler *handler) UpdateService(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return
 	}
 
-	serviceID, err := cloudintegrationtypes.NewServiceID(provider, mux.Vars(r)["service_id"])
+	serviceID, err := cloudintegrationtypes.NewServiceID(provider, coretypes.Param(r, "service_id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -433,7 +433,7 @@ func (handler *handler) UpdateService(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cloudIntegrationID, err := valuer.NewUUID(mux.Vars(r)["id"])
+	cloudIntegrationID, err := valuer.NewUUID(coretypes.Param(r, "id"))
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -492,7 +492,7 @@ func (handler *handler) AgentCheckIn(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	provider, err := cloudintegrationtypes.NewCloudProvider(mux.Vars(r)["cloud_provider"])
+	provider, err := cloudintegrationtypes.NewCloudProvider(coretypes.Param(r, "cloud_provider"))
 	if err != nil {
 		render.Error(rw, err)
 		return

@@ -142,7 +142,7 @@ func buildListLogsJSONIndexesQuery(cluster string, filters ...string) (string, [
 	).From(fmt.Sprintf("clusterAllReplicas('%s', %s)", cluster, SkipIndexTableName))
 
 	sb.Where(sb.Equal("database", telemetrylogs.DBName))
-	sb.Where(sb.Equal("table", telemetrylogs.LogsV2LocalTableName))
+	sb.Where(sb.Equal("table", telemetrylogs.LogLocalTableName))
 	sb.Where(sb.Or(
 		sb.ILike("expr", fmt.Sprintf("%%%s%%", querybuilder.FormatValueForContains(constants.BodyV2ColumnPrefix))),
 		sb.ILike("expr", fmt.Sprintf("%%%s%%", querybuilder.FormatValueForContains(constants.BodyPromotedColumnPrefix))),
@@ -235,7 +235,7 @@ func (t *telemetryMetaStore) ListJSONValues(ctx context.Context, path string, li
 		path = telemetrylogs.BodyV2ColumnPrefix + path
 	}
 
-	from := fmt.Sprintf("%s.%s", telemetrylogs.DBName, telemetrylogs.LogsV2TableName)
+	from := fmt.Sprintf("%s.%s", telemetrylogs.DBName, telemetrylogs.LogTableName)
 	colExpr := func(typ telemetrytypes.JSONDataType) string {
 		return fmt.Sprintf("dynamicElement(%s, '%s')", path, typ.StringValue())
 	}

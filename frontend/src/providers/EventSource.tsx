@@ -85,7 +85,7 @@ export function EventSourceProvider({
 
 			const response = await queryClient.fetchQuery({
 				queryFn: () => post({ refreshToken: refreshToken || '' }),
-				queryKey: ['/api/v2/sessions/rotate', accessToken, refreshToken],
+				queryKey: ['/v1/o11y/sessions/rotate', accessToken, refreshToken],
 			});
 			afterLogin(response.data.accessToken, response.data.refreshToken, true);
 

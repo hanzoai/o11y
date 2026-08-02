@@ -3,7 +3,7 @@ import { server } from 'mocks-server/server';
 import { rest, RestRequest } from 'msw';
 import { MetricRangePayloadV5 } from 'types/api/v5/queryRange';
 
-const QUERY_RANGE_URL = `${ENVIRONMENT.baseURL}/api/v5/query_range`;
+const QUERY_RANGE_URL = `${ENVIRONMENT.baseURL}/v1/o11y/query_range`;
 
 export type MockLogsOptions = {
 	offset?: number;

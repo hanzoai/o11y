@@ -18,7 +18,7 @@ jest.mock('components/ui/sonner', () => ({
 	},
 }));
 
-const ORG_ME_ENDPOINT = '*/api/v2/orgs/me';
+const ORG_ME_ENDPOINT = '*/v1/o11y/orgs/me';
 
 const defaultProps = { index: 0, id: 'does-not-matter-id' };
 

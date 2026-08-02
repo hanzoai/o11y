@@ -55,7 +55,7 @@ export const listMetrics = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListMetrics200>({
-		url: `/api/v2/metrics`,
+		url: `/v1/o11y/metrics`,
 		method: 'GET',
 		params,
 		signal,
@@ -63,7 +63,7 @@ export const listMetrics = (
 };
 
 export const getListMetricsQueryKey = (params?: ListMetricsParams) => {
-	return [`/api/v2/metrics`, ...(params ? [params] : [])] as const;
+	return [`/v1/o11y/metrics`, ...(params ? [params] : [])] as const;
 };
 
 export const getListMetricsQueryOptions = <
@@ -150,7 +150,7 @@ export const getMetricAlerts = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetMetricAlerts200>({
-		url: `/api/v2/metrics/${metricName}/alerts`,
+		url: `/v1/o11y/metrics/${metricName}/alerts`,
 		method: 'GET',
 		signal,
 	});
@@ -159,7 +159,7 @@ export const getMetricAlerts = (
 export const getGetMetricAlertsQueryKey = ({
 	metricName,
 }: GetMetricAlertsPathParameters) => {
-	return [`/api/v2/metrics/${metricName}/alerts`] as const;
+	return [`/v1/o11y/metrics/${metricName}/alerts`] as const;
 };
 
 export const getGetMetricAlertsQueryOptions = <
@@ -253,7 +253,7 @@ export const getMetricAttributes = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetMetricAttributes200>({
-		url: `/api/v2/metrics/${metricName}/attributes`,
+		url: `/v1/o11y/metrics/${metricName}/attributes`,
 		method: 'GET',
 		params,
 		signal,
@@ -265,7 +265,7 @@ export const getGetMetricAttributesQueryKey = (
 	params?: GetMetricAttributesParams,
 ) => {
 	return [
-		`/api/v2/metrics/${metricName}/attributes`,
+		`/v1/o11y/metrics/${metricName}/attributes`,
 		...(params ? [params] : []),
 	] as const;
 };
@@ -368,7 +368,7 @@ export const getMetricDashboards = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetMetricDashboards200>({
-		url: `/api/v2/metrics/${metricName}/dashboards`,
+		url: `/v1/o11y/metrics/${metricName}/dashboards`,
 		method: 'GET',
 		signal,
 	});
@@ -377,7 +377,7 @@ export const getMetricDashboards = (
 export const getGetMetricDashboardsQueryKey = ({
 	metricName,
 }: GetMetricDashboardsPathParameters) => {
-	return [`/api/v2/metrics/${metricName}/dashboards`] as const;
+	return [`/v1/o11y/metrics/${metricName}/dashboards`] as const;
 };
 
 export const getGetMetricDashboardsQueryOptions = <
@@ -473,7 +473,7 @@ export const getMetricHighlights = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetMetricHighlights200>({
-		url: `/api/v2/metrics/${metricName}/highlights`,
+		url: `/v1/o11y/metrics/${metricName}/highlights`,
 		method: 'GET',
 		signal,
 	});
@@ -482,7 +482,7 @@ export const getMetricHighlights = (
 export const getGetMetricHighlightsQueryKey = ({
 	metricName,
 }: GetMetricHighlightsPathParameters) => {
-	return [`/api/v2/metrics/${metricName}/highlights`] as const;
+	return [`/v1/o11y/metrics/${metricName}/highlights`] as const;
 };
 
 export const getGetMetricHighlightsQueryOptions = <
@@ -578,7 +578,7 @@ export const getMetricMetadata = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetMetricMetadata200>({
-		url: `/api/v2/metrics/${metricName}/metadata`,
+		url: `/v1/o11y/metrics/${metricName}/metadata`,
 		method: 'GET',
 		signal,
 	});
@@ -587,7 +587,7 @@ export const getMetricMetadata = (
 export const getGetMetricMetadataQueryKey = ({
 	metricName,
 }: GetMetricMetadataPathParameters) => {
-	return [`/api/v2/metrics/${metricName}/metadata`] as const;
+	return [`/v1/o11y/metrics/${metricName}/metadata`] as const;
 };
 
 export const getGetMetricMetadataQueryOptions = <
@@ -681,7 +681,7 @@ export const updateMetricMetadata = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<string>({
-		url: `/api/v2/metrics/${metricName}/metadata`,
+		url: `/v1/o11y/metrics/${metricName}/metadata`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: metricsexplorertypesUpdateMetricMetadataRequestDTO,
@@ -780,7 +780,7 @@ export const inspectMetrics = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<InspectMetrics200>({
-		url: `/api/v2/metrics/inspect`,
+		url: `/v1/o11y/metrics/inspect`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: metricsexplorertypesInspectMetricsRequestDTO,
@@ -860,14 +860,14 @@ export const useInspectMetrics = <
  */
 export const getMetricsOnboardingStatus = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<GetMetricsOnboardingStatus200>({
-		url: `/api/v2/metrics/onboarding`,
+		url: `/v1/o11y/metrics/onboarding`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetMetricsOnboardingStatusQueryKey = () => {
-	return [`/api/v2/metrics/onboarding`] as const;
+	return [`/v1/o11y/metrics/onboarding`] as const;
 };
 
 export const getGetMetricsOnboardingStatusQueryOptions = <
@@ -949,7 +949,7 @@ export const getMetricsStats = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetMetricsStats200>({
-		url: `/api/v2/metrics/stats`,
+		url: `/v1/o11y/metrics/stats`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: metricsexplorertypesStatsRequestDTO,
@@ -1032,7 +1032,7 @@ export const getMetricsTreemap = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetMetricsTreemap200>({
-		url: `/api/v2/metrics/treemap`,
+		url: `/v1/o11y/metrics/treemap`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: metricsexplorertypesTreemapRequestDTO,

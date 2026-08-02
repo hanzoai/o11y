@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/authz"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/render"
@@ -174,7 +173,7 @@ func (middleware *AuthZ) SelfAccess(next http.HandlerFunc) http.HandlerFunc {
 		)
 
 		if err != nil {
-			id := mux.Vars(req)["id"]
+			id := coretypes.Param(req, "id")
 			if err := claims.IsSelfAccess(id); err != nil {
 				middleware.logger.WarnContext(req.Context(), authzDeniedMessage, slog.Any("claims", claims))
 				render.Error(rw, err)

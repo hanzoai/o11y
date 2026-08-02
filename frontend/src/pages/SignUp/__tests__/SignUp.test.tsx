@@ -29,8 +29,8 @@ jest.mock('lib/history', () => ({
 	},
 }));
 
-const REGISTER_ENDPOINT = '*/api/v1/register';
-const EMAIL_PASSWORD_ENDPOINT = '*/api/v2/sessions/email_password';
+const REGISTER_ENDPOINT = '*/v1/o11y/register';
+const EMAIL_PASSWORD_ENDPOINT = '*/v1/o11y/sessions/email_password';
 
 const mockSignupResponse: SignupResponse = {
 	orgId: 'test-org-id',

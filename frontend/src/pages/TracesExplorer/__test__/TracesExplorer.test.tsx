@@ -507,7 +507,7 @@ jest.mock('hooks/useHandleExplorerTabChange', () => ({
 let capturedPayload: QueryRangePayloadV5;
 
 describe('TracesExplorer -', () => {
-	const quickFiltersListURL = `${BASE_URL}/api/v1/orgs/me/filters/traces`;
+	const quickFiltersListURL = `${BASE_URL}/v1/o11y/orgs/me/filters/traces`;
 
 	const setupServer = (): void => {
 		server.use(
@@ -516,7 +516,7 @@ describe('TracesExplorer -', () => {
 			),
 		);
 		server.use(
-			rest.post(`${BASE_URL}/api/v5/query_range`, (req, res, ctx) =>
+			rest.post(`${BASE_URL}/v1/o11y/query_range`, (req, res, ctx) =>
 				res(ctx.status(200), ctx.json(queryRangeForTableView)),
 			),
 		);
@@ -537,7 +537,7 @@ describe('TracesExplorer -', () => {
 
 	it.skip('trace explorer - list view', async () => {
 		server.use(
-			rest.post(`${BASE_URL}/api/v5/query_range`, (req, res, ctx) =>
+			rest.post(`${BASE_URL}/v1/o11y/query_range`, (req, res, ctx) =>
 				res(ctx.status(200), ctx.json(queryRangeForListView)),
 			),
 		);
@@ -558,7 +558,7 @@ describe('TracesExplorer -', () => {
 
 	it('should not add id to orderBy when dataSource is traces', async () => {
 		server.use(
-			rest.post(`${BASE_URL}/api/v5/query_range`, async (req, res, ctx) => {
+			rest.post(`${BASE_URL}/v1/o11y/query_range`, async (req, res, ctx) => {
 				const payload = await req.json();
 				capturedPayload = payload;
 				return res(ctx.status(200), ctx.json(queryRangeForTableView));
@@ -580,7 +580,7 @@ describe('TracesExplorer -', () => {
 
 	it.skip('trace explorer - table view', async () => {
 		server.use(
-			rest.post(`${BASE_URL}/api/v5/query_range`, (req, res, ctx) =>
+			rest.post(`${BASE_URL}/v1/o11y/query_range`, (req, res, ctx) =>
 				res(ctx.status(200), ctx.json(queryRangeForTableViewV5)),
 			),
 		);
@@ -598,7 +598,7 @@ describe('TracesExplorer -', () => {
 
 	it.skip('trace explorer - trace view', async () => {
 		server.use(
-			rest.post(`${BASE_URL}/api/v5/query_range`, (req, res, ctx) =>
+			rest.post(`${BASE_URL}/v1/o11y/query_range`, (req, res, ctx) =>
 				res(ctx.status(200), ctx.json(queryRangeForTraceView)),
 			),
 		);
@@ -647,7 +647,7 @@ describe('TracesExplorer -', () => {
 			},
 		];
 		server.use(
-			rest.post(`${BASE_URL}/api/v5/query_range`, async (req, res, ctx) => {
+			rest.post(`${BASE_URL}/v1/o11y/query_range`, async (req, res, ctx) => {
 				const payload = await req.json();
 				capturedPayload = payload;
 				return res(ctx.status(200), ctx.json(queryRangeForTraceView));

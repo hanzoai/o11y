@@ -3,14 +3,19 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 )
 
-func (provider *provider) addAuthDomainRoutes(router *mux.Router) error {
-	if err := router.Handle("/api/v1/domains", handler.New(provider.authzMiddleware.AdminAccess(provider.authDomainHandler.List), handler.OpenAPIDef{
+// ALL of these routes are ALSO declared as typed ops at the module's mount seam
+// (identity.go in the repo root) — a second DISPATCH onto this router, never a
+// second implementation; the AdminAccess gate below stays the one place access
+// is decided. The ops serve the composed binary, this router the standalone
+// process.
+func (provider *provider) addAuthDomainRoutes(router routing.Router) {
+	router.Get("/v1/o11y/domains", handler.New(provider.authzMiddleware.AdminAccess(provider.authDomainHandler.List), handler.OpenAPIDef{
 		ID:                  "ListAuthDomains",
 		Tags:                []string{"authdomains"},
 		Summary:             "List all auth domains",
@@ -23,11 +28,9 @@ func (provider *provider) addAuthDomainRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
-	})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/api/v1/domains", handler.New(provider.authzMiddleware.AdminAccess(provider.authDomainHandler.Create), handler.OpenAPIDef{
+	router.Post("/v1/o11y/domains", handler.New(provider.authzMiddleware.AdminAccess(provider.authDomainHandler.Create), handler.OpenAPIDef{
 		ID:                  "CreateAuthDomain",
 		Tags:                []string{"authdomains"},
 		Summary:             "Create auth domain",
@@ -40,11 +43,9 @@ func (provider *provider) addAuthDomainRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusConflict},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/api/v1/domains/{id}", handler.New(provider.authzMiddleware.AdminAccess(provider.authDomainHandler.Get), handler.OpenAPIDef{
+	router.Get("/v1/o11y/domains/{id}", handler.New(provider.authzMiddleware.AdminAccess(provider.authDomainHandler.Get), handler.OpenAPIDef{
 		ID:                  "GetAuthDomain",
 		Tags:                []string{"authdomains"},
 		Summary:             "Get auth domain by ID",
@@ -57,11 +58,9 @@ func (provider *provider) addAuthDomainRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{http.StatusNotFound},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
-	})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/api/v1/domains/{id}", handler.New(provider.authzMiddleware.AdminAccess(provider.authDomainHandler.Update), handler.OpenAPIDef{
+	router.Put("/v1/o11y/domains/{id}", handler.New(provider.authzMiddleware.AdminAccess(provider.authDomainHandler.Update), handler.OpenAPIDef{
 		ID:                  "UpdateAuthDomain",
 		Tags:                []string{"authdomains"},
 		Summary:             "Update auth domain",
@@ -74,11 +73,9 @@ func (provider *provider) addAuthDomainRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusConflict},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
-	})).Methods(http.MethodPut).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/api/v1/domains/{id}", handler.New(provider.authzMiddleware.AdminAccess(provider.authDomainHandler.Delete), handler.OpenAPIDef{
+	router.Delete("/v1/o11y/domains/{id}", handler.New(provider.authzMiddleware.AdminAccess(provider.authDomainHandler.Delete), handler.OpenAPIDef{
 		ID:                  "DeleteAuthDomain",
 		Tags:                []string{"authdomains"},
 		Summary:             "Delete auth domain",
@@ -91,9 +88,5 @@ func (provider *provider) addAuthDomainRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{http.StatusBadRequest},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleAdmin),
-	})).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	}))
 }

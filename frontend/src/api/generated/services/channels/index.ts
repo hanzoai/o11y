@@ -38,14 +38,14 @@ import type { ErrorType, BodyType } from '../../../generatedAPIInstance';
  */
 export const listChannels = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<ListChannels200>({
-		url: `/api/v1/channels`,
+		url: `/v1/o11y/channels`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getListChannelsQueryKey = () => {
-	return [`/api/v1/channels`] as const;
+	return [`/v1/o11y/channels`] as const;
 };
 
 export const getListChannelsQueryOptions = <
@@ -125,7 +125,7 @@ export const createChannel = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateChannel201>({
-		url: `/api/v1/channels`,
+		url: `/v1/o11y/channels`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: alertmanagertypesPostableChannelDTO,
@@ -208,7 +208,7 @@ export const deleteChannelByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/channels/${id}`,
+		url: `/v1/o11y/channels/${id}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -287,7 +287,7 @@ export const getChannelByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetChannelByID200>({
-		url: `/api/v1/channels/${id}`,
+		url: `/v1/o11y/channels/${id}`,
 		method: 'GET',
 		signal,
 	});
@@ -296,7 +296,7 @@ export const getChannelByID = (
 export const getGetChannelByIDQueryKey = ({
 	id,
 }: GetChannelByIDPathParameters) => {
-	return [`/api/v1/channels/${id}`] as const;
+	return [`/v1/o11y/channels/${id}`] as const;
 };
 
 export const getGetChannelByIDQueryOptions = <
@@ -389,7 +389,7 @@ export const updateChannelByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/channels/${id}`,
+		url: `/v1/o11y/channels/${id}`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: configReceiverDTO,
@@ -487,7 +487,7 @@ export const testChannel = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/channels/test`,
+		url: `/v1/o11y/channels/test`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: configReceiverDTO,
@@ -560,7 +560,7 @@ export const useTestChannel = <
 	return useMutation(getTestChannelMutationOptions(options));
 };
 /**
- * Deprecated: use /api/v1/channels/test instead
+ * Deprecated: use /v1/o11y/channels/test instead
  * @deprecated
  * @summary Test notification channel (deprecated)
  */
@@ -569,7 +569,7 @@ export const testChannelDeprecated = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/testChannel`,
+		url: `/v1/o11y/testChannel`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: configReceiverDTO,

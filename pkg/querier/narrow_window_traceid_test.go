@@ -38,7 +38,7 @@ func newTraceStore(t *testing.T) *telemetrystoretest.Provider {
 // "trace shows, no observations" bug. The llmobs span views parameterize the
 // trace_id predicate as `trace_id = $2` and carry the real id in the request
 // Variables map; narrowWindowByTraceID reads the filter TEXT, so before the fix it
-// looked up the literal "$2" in distributed_trace_summary, found nothing, and — for
+// looked up the literal "$2" in the trace summary table, found nothing, and — for
 // SignalTraces — short-circuited the whole span query to empty (overlap=false).
 func TestNarrowWindowParameterizedTraceID(t *testing.T) {
 	// The trace's nanosecond bounds; narrowWindowByTraceID pads by 1s and clamps the
@@ -59,7 +59,7 @@ func TestNarrowWindowParameterizedTraceID(t *testing.T) {
 	// short-circuited. (Both org=$1 and trace_id=$2 are bound, as in production.)
 	t.Run("bound placeholder runs the lookup and narrows the window", func(t *testing.T) {
 		store := newTraceStore(t)
-		store.Mock().ExpectQueryRow(`distributed_trace_summary`).
+		store.Mock().ExpectQueryRow(`event\.trace`).
 			WillReturnRow(dsmock.NewRow(summaryCols, []any{uint64(1), startNano, endNano}))
 
 		q := &builderQuery[qbtypes.TraceAggregation]{
@@ -95,7 +95,7 @@ func TestNarrowWindowParameterizedTraceID(t *testing.T) {
 		// Only the pre-fix path reaches this; it simulates "$2" not existing in
 		// trace_summary. We deliberately do NOT assert ExpectationsWereMet, since the
 		// fixed path skips the query.
-		store.Mock().ExpectQueryRow(`distributed_trace_summary`).
+		store.Mock().ExpectQueryRow(`event\.trace`).
 			WillReturnRow(dsmock.NewRow(summaryCols, []any{uint64(0), int64(0), int64(0)}))
 
 		q := &builderQuery[qbtypes.TraceAggregation]{

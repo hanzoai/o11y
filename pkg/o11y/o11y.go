@@ -62,6 +62,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/zeus"
 
 	"github.com/hanzoai/o11y/pkg/web"
+	"github.com/hanzoai/o11y/pkg/zapingest"
 )
 
 type O11y struct {
@@ -429,18 +430,18 @@ func New(
 		providerSettings,
 		telemetrystore,
 		telemetrytraces.DBName,
-		telemetrytraces.TagAttributesV2TableName,
-		telemetrytraces.SpanAttributesKeysTblName,
-		telemetrytraces.SpanIndexV3TableName,
+		telemetrytraces.SpanAttributeTableName,
+		telemetrytraces.SpanKeyTableName,
+		telemetrytraces.SpanTableName,
 		telemetrymetrics.DBName,
-		telemetrymetrics.AttributesMetadataTableName,
+		telemetrymetrics.AttributeTableName,
 		telemetrymeter.DBName,
 		telemetrymeter.SamplesAgg1dTableName,
 		telemetrylogs.DBName,
-		telemetrylogs.LogsV2TableName,
-		telemetrylogs.TagAttributesV2TableName,
-		telemetrylogs.LogAttributeKeysTblName,
-		telemetrylogs.LogResourceKeysTblName,
+		telemetrylogs.LogTableName,
+		telemetrylogs.LogAttributeTableName,
+		telemetrylogs.LogKeyTableName,
+		telemetrylogs.LogResourceKeyTableName,
 		telemetryaudit.DBName,
 		telemetryaudit.AuditLogsTableName,
 		telemetryaudit.TagAttributesTableName,
@@ -542,6 +543,7 @@ func New(
 		factory.NewNamedService(factory.MustNewName("auditor"), auditor),
 		factory.NewNamedService(factory.MustNewName("meterreporter"), meterReporter, factory.MustNewName("licensing")),
 		factory.NewNamedService(factory.MustNewName("ruler"), rulerInstance),
+		factory.NewNamedService(factory.MustNewName("zapingest"), zapingest.New(providerSettings, config.ZapIngest, telemetrystore)),
 	)
 	if err != nil {
 		return nil, err

@@ -41,7 +41,7 @@ export const listDowntimeSchedules = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ListDowntimeSchedules200>({
-		url: `/api/v1/downtime_schedules`,
+		url: `/v1/o11y/downtime_schedules`,
 		method: 'GET',
 		params,
 		signal,
@@ -51,7 +51,7 @@ export const listDowntimeSchedules = (
 export const getListDowntimeSchedulesQueryKey = (
 	params?: ListDowntimeSchedulesParams,
 ) => {
-	return [`/api/v1/downtime_schedules`, ...(params ? [params] : [])] as const;
+	return [`/v1/o11y/downtime_schedules`, ...(params ? [params] : [])] as const;
 };
 
 export const getListDowntimeSchedulesQueryOptions = <
@@ -139,7 +139,7 @@ export const createDowntimeSchedule = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateDowntimeSchedule201>({
-		url: `/api/v1/downtime_schedules`,
+		url: `/v1/o11y/downtime_schedules`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: alertmanagertypesPostablePlannedMaintenanceDTO,
@@ -223,7 +223,7 @@ export const deleteDowntimeScheduleByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/downtime_schedules/${id}`,
+		url: `/v1/o11y/downtime_schedules/${id}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -303,7 +303,7 @@ export const getDowntimeScheduleByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetDowntimeScheduleByID200>({
-		url: `/api/v1/downtime_schedules/${id}`,
+		url: `/v1/o11y/downtime_schedules/${id}`,
 		method: 'GET',
 		signal,
 	});
@@ -312,7 +312,7 @@ export const getDowntimeScheduleByID = (
 export const getGetDowntimeScheduleByIDQueryKey = ({
 	id,
 }: GetDowntimeScheduleByIDPathParameters) => {
-	return [`/api/v1/downtime_schedules/${id}`] as const;
+	return [`/v1/o11y/downtime_schedules/${id}`] as const;
 };
 
 export const getGetDowntimeScheduleByIDQueryOptions = <
@@ -407,7 +407,7 @@ export const updateDowntimeScheduleByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/downtime_schedules/${id}`,
+		url: `/v1/o11y/downtime_schedules/${id}`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: alertmanagertypesPostablePlannedMaintenanceDTO,

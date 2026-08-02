@@ -37,7 +37,7 @@ jest.mock('providers/ErrorModalProvider', () => ({
 	})),
 }));
 
-const SERVICE_ACCOUNTS_ENDPOINT = '*/api/v1/service_accounts';
+const SERVICE_ACCOUNTS_ENDPOINT = '*/v1/o11y/service_accounts';
 
 function renderModal(): ReturnType<typeof render> {
 	return render(

@@ -58,14 +58,14 @@ import type { ErrorType, BodyType } from '../../../generatedAPIInstance';
  */
 export const listRules = (signal?: AbortSignal) => {
 	return GeneratedAPIInstance<ListRules200>({
-		url: `/api/v2/rules`,
+		url: `/v1/o11y/rules`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getListRulesQueryKey = () => {
-	return [`/api/v2/rules`] as const;
+	return [`/v1/o11y/rules`] as const;
 };
 
 export const getListRulesQueryOptions = <
@@ -137,7 +137,7 @@ export const createRule = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateRule201>({
-		url: `/api/v2/rules`,
+		url: `/v1/o11y/rules`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: ruletypesPostableRuleDTO,
@@ -220,7 +220,7 @@ export const deleteRuleByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/rules/${id}`,
+		url: `/v1/o11y/rules/${id}`,
 		method: 'DELETE',
 		signal,
 	});
@@ -299,14 +299,14 @@ export const getRuleByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetRuleByID200>({
-		url: `/api/v2/rules/${id}`,
+		url: `/v1/o11y/rules/${id}`,
 		method: 'GET',
 		signal,
 	});
 };
 
 export const getGetRuleByIDQueryKey = ({ id }: GetRuleByIDPathParameters) => {
-	return [`/api/v2/rules/${id}`] as const;
+	return [`/v1/o11y/rules/${id}`] as const;
 };
 
 export const getGetRuleByIDQueryOptions = <
@@ -399,7 +399,7 @@ export const patchRuleByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<PatchRuleByID200>({
-		url: `/api/v2/rules/${id}`,
+		url: `/v1/o11y/rules/${id}`,
 		method: 'PATCH',
 		headers: { 'Content-Type': 'application/json' },
 		data: ruletypesPostableRuleDTO,
@@ -498,7 +498,7 @@ export const updateRuleByID = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v2/rules/${id}`,
+		url: `/v1/o11y/rules/${id}`,
 		method: 'PUT',
 		headers: { 'Content-Type': 'application/json' },
 		data: ruletypesPostableRuleDTO,
@@ -597,7 +597,7 @@ export const getRuleHistoryFilterKeys = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetRuleHistoryFilterKeys200>({
-		url: `/api/v2/rules/${id}/history/filter_keys`,
+		url: `/v1/o11y/rules/${id}/history/filter_keys`,
 		method: 'GET',
 		params,
 		signal,
@@ -609,7 +609,7 @@ export const getGetRuleHistoryFilterKeysQueryKey = (
 	params?: GetRuleHistoryFilterKeysParams,
 ) => {
 	return [
-		`/api/v2/rules/${id}/history/filter_keys`,
+		`/v1/o11y/rules/${id}/history/filter_keys`,
 		...(params ? [params] : []),
 	] as const;
 };
@@ -713,7 +713,7 @@ export const getRuleHistoryFilterValues = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetRuleHistoryFilterValues200>({
-		url: `/api/v2/rules/${id}/history/filter_values`,
+		url: `/v1/o11y/rules/${id}/history/filter_values`,
 		method: 'GET',
 		params,
 		signal,
@@ -725,7 +725,7 @@ export const getGetRuleHistoryFilterValuesQueryKey = (
 	params?: GetRuleHistoryFilterValuesParams,
 ) => {
 	return [
-		`/api/v2/rules/${id}/history/filter_values`,
+		`/v1/o11y/rules/${id}/history/filter_values`,
 		...(params ? [params] : []),
 	] as const;
 };
@@ -830,7 +830,7 @@ export const getRuleHistoryOverallStatus = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetRuleHistoryOverallStatus200>({
-		url: `/api/v2/rules/${id}/history/overall_status`,
+		url: `/v1/o11y/rules/${id}/history/overall_status`,
 		method: 'GET',
 		params,
 		signal,
@@ -842,7 +842,7 @@ export const getGetRuleHistoryOverallStatusQueryKey = (
 	params?: GetRuleHistoryOverallStatusParams,
 ) => {
 	return [
-		`/api/v2/rules/${id}/history/overall_status`,
+		`/v1/o11y/rules/${id}/history/overall_status`,
 		...(params ? [params] : []),
 	] as const;
 };
@@ -947,7 +947,7 @@ export const getRuleHistoryStats = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetRuleHistoryStats200>({
-		url: `/api/v2/rules/${id}/history/stats`,
+		url: `/v1/o11y/rules/${id}/history/stats`,
 		method: 'GET',
 		params,
 		signal,
@@ -959,7 +959,7 @@ export const getGetRuleHistoryStatsQueryKey = (
 	params?: GetRuleHistoryStatsParams,
 ) => {
 	return [
-		`/api/v2/rules/${id}/history/stats`,
+		`/v1/o11y/rules/${id}/history/stats`,
 		...(params ? [params] : []),
 	] as const;
 };
@@ -1062,7 +1062,7 @@ export const getRuleHistoryTimeline = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetRuleHistoryTimeline200>({
-		url: `/api/v2/rules/${id}/history/timeline`,
+		url: `/v1/o11y/rules/${id}/history/timeline`,
 		method: 'GET',
 		params,
 		signal,
@@ -1074,7 +1074,7 @@ export const getGetRuleHistoryTimelineQueryKey = (
 	params?: GetRuleHistoryTimelineParams,
 ) => {
 	return [
-		`/api/v2/rules/${id}/history/timeline`,
+		`/v1/o11y/rules/${id}/history/timeline`,
 		...(params ? [params] : []),
 	] as const;
 };
@@ -1178,7 +1178,7 @@ export const getRuleHistoryTopContributors = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<GetRuleHistoryTopContributors200>({
-		url: `/api/v2/rules/${id}/history/top_contributors`,
+		url: `/v1/o11y/rules/${id}/history/top_contributors`,
 		method: 'GET',
 		params,
 		signal,
@@ -1190,7 +1190,7 @@ export const getGetRuleHistoryTopContributorsQueryKey = (
 	params?: GetRuleHistoryTopContributorsParams,
 ) => {
 	return [
-		`/api/v2/rules/${id}/history/top_contributors`,
+		`/v1/o11y/rules/${id}/history/top_contributors`,
 		...(params ? [params] : []),
 	] as const;
 };
@@ -1294,7 +1294,7 @@ export const testRule = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<TestRule200>({
-		url: `/api/v2/rules/test`,
+		url: `/v1/o11y/rules/test`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		data: ruletypesPostableRuleDTO,

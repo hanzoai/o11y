@@ -4,6 +4,12 @@
  * * regenerate with 'yarn generate:api'
  * O11y AI Assistant API
  * OpenAPI spec version: 0.1.0
+ *
+ * HAND EDIT: every `url` is built from `AI_API_PATH` instead of a hard-coded
+ * prefix, so the assistant path is spelled in exactly one place. `orval.config.ts`
+ * has no target for this spec, so nothing here regenerates today — if that ever
+ * changes, re-apply the substitution rather than letting `/api/v1/assistant`
+ * literals back in.
  */
 import { useMutation, useQuery } from 'react-query';
 import type {
@@ -72,6 +78,7 @@ import {
 	getGeneratedAPIQueryKeyHeaders,
 } from '../generatedAPIInstance';
 import type { ErrorType, BodyType } from '../generatedAPIInstance';
+import { AI_API_PATH } from '../AIAPIInstance';
 
 /**
  * @summary Health
@@ -252,7 +259,7 @@ export const createThreadApiV1AssistantThreadsPost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateThreadResponseDTO>({
-		url: `/api/v1/assistant/threads`,
+		url: `${AI_API_PATH}/threads`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: createThreadApiV1AssistantThreadsPostBody,
@@ -355,7 +362,7 @@ export const listThreadsApiV1AssistantThreadsGet = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ThreadListResponseDTO>({
-		url: `/api/v1/assistant/threads`,
+		url: `${AI_API_PATH}/threads`,
 		method: 'GET',
 		headers,
 		params,
@@ -368,7 +375,7 @@ export const getListThreadsApiV1AssistantThreadsGetQueryKey = (
 	headers?: ListThreadsApiV1AssistantThreadsGetHeaders,
 ) => {
 	return [
-		`/api/v1/assistant/threads`,
+		`${AI_API_PATH}/threads`,
 		...(params ? [params] : []),
 		...getGeneratedAPIQueryKeyHeaders(headers),
 	] as const;
@@ -473,7 +480,7 @@ export const getThreadApiV1AssistantThreadsThreadIdGet = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ThreadDetailResponseDTO>({
-		url: `/api/v1/assistant/threads/${threadId}`,
+		url: `${AI_API_PATH}/threads/${threadId}`,
 		method: 'GET',
 		headers,
 		signal,
@@ -485,7 +492,7 @@ export const getGetThreadApiV1AssistantThreadsThreadIdGetQueryKey = (
 	headers?: GetThreadApiV1AssistantThreadsThreadIdGetHeaders,
 ) => {
 	return [
-		`/api/v1/assistant/threads/${threadId}`,
+		`${AI_API_PATH}/threads/${threadId}`,
 		...getGeneratedAPIQueryKeyHeaders(headers),
 	] as const;
 };
@@ -598,7 +605,7 @@ export const updateThreadApiV1AssistantThreadsThreadIdPatch = (
 	headers?: UpdateThreadApiV1AssistantThreadsThreadIdPatchHeaders,
 ) => {
 	return GeneratedAPIInstance<ThreadSummaryDTO>({
-		url: `/api/v1/assistant/threads/${threadId}`,
+		url: `${AI_API_PATH}/threads/${threadId}`,
 		method: 'PATCH',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: updateThreadRequestDTO,
@@ -713,7 +720,7 @@ export const createMessageApiV1AssistantThreadsThreadIdMessagesPost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CreateMessageResponseDTO>({
-		url: `/api/v1/assistant/threads/${threadId}/messages`,
+		url: `${AI_API_PATH}/threads/${threadId}/messages`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: createMessageRequestDTO,
@@ -844,7 +851,7 @@ export const regenerateMessageApiV1AssistantMessagesMessageIdRegeneratePost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<RegenerateResponseDTO>({
-		url: `/api/v1/assistant/messages/${messageId}/regenerate`,
+		url: `${AI_API_PATH}/messages/${messageId}/regenerate`,
 		method: 'POST',
 		headers,
 		signal,
@@ -978,7 +985,7 @@ export const approveApiV1AssistantApprovePost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ApproveResponseDTO>({
-		url: `/api/v1/assistant/approve`,
+		url: `${AI_API_PATH}/approve`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: approveRequestDTO,
@@ -1081,7 +1088,7 @@ export const rejectApiV1AssistantRejectPost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<void>({
-		url: `/api/v1/assistant/reject`,
+		url: `${AI_API_PATH}/reject`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: rejectRequestDTO,
@@ -1184,7 +1191,7 @@ export const clarifyApiV1AssistantClarifyPost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ClarifyResponseDTO>({
-		url: `/api/v1/assistant/clarify`,
+		url: `${AI_API_PATH}/clarify`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: clarifyRequestDTO,
@@ -1287,7 +1294,7 @@ export const cancelApiV1AssistantCancelPost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<CancelResponseDTO>({
-		url: `/api/v1/assistant/cancel`,
+		url: `${AI_API_PATH}/cancel`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: cancelRequestDTO,
@@ -1390,7 +1397,7 @@ export const undoApiV1AssistantUndoPost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ActionResultResponseDTO>({
-		url: `/api/v1/assistant/undo`,
+		url: `${AI_API_PATH}/undo`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: undoRequestDTO,
@@ -1491,7 +1498,7 @@ export const revertApiV1AssistantRevertPost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ActionResultResponseDTO>({
-		url: `/api/v1/assistant/revert`,
+		url: `${AI_API_PATH}/revert`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: revertRequestDTO,
@@ -1594,7 +1601,7 @@ export const restoreApiV1AssistantRestorePost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<ActionResultResponseDTO>({
-		url: `/api/v1/assistant/restore`,
+		url: `${AI_API_PATH}/restore`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: restoreRequestDTO,
@@ -1699,7 +1706,7 @@ export const submitFeedbackApiV1AssistantMessagesMessageIdFeedbackPost = (
 	signal?: AbortSignal,
 ) => {
 	return GeneratedAPIInstance<FeedbackResponseDTO>({
-		url: `/api/v1/assistant/messages/${messageId}/feedback`,
+		url: `${AI_API_PATH}/messages/${messageId}/feedback`,
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json', ...headers },
 		data: feedbackRequestDTO,
