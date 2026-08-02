@@ -78,8 +78,9 @@ func (enum String) MarshalText() (text []byte, err error) {
 	return []byte(enum.StringValue()), nil
 }
 
-// Implement Gin's BindUnmarshaler interface
-// See https://github.com/hanzoai/o11y/pull/10219 description for additional details.
+// UnmarshalParam takes the raw param verbatim: a String enum is normalized by
+// NewString, not rejected, so an unknown value fails validation rather than
+// binding. See https://github.com/hanzoai/o11y/pull/10219 for the background.
 func (enum *String) UnmarshalParam(param string) error {
 	*enum = NewString(param)
 	return nil
