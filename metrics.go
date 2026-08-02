@@ -24,13 +24,8 @@ package o11y
 // untouched (metrics_test.go pins both halves).
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
-	"net/http/httptest"
-	"net/url"
 	"time"
 
 	"github.com/zap-proto/zip"
@@ -70,7 +65,7 @@ func mountMetrics(app *zip.App) {
 // its description, type, unit, temporality and monotonicity.
 func listMetrics(ctx context.Context, in *O11yMetricListIn) (*O11yMetricListOut, error) {
 	out := new(O11yMetricListOut)
-	return out, metricsRelay(ctx, http.MethodGet, "/metrics", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics", query(
 		"start", int(in.Start),
 		"end", int(in.End),
 		"limit", in.Limit,
@@ -83,21 +78,21 @@ func listMetrics(ctx context.Context, in *O11yMetricListIn) (*O11yMetricListOut,
 // time range — the volume view of the metrics explorer, pageable and sortable.
 func metricStats(ctx context.Context, in *O11yMetricStatsIn) (*O11yMetricStatsOut, error) {
 	out := new(O11yMetricStatsOut)
-	return out, metricsRelay(ctx, http.MethodPost, "/metrics/stats", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/metrics/stats", nil, in, out)
 }
 
 // metricTreemap returns the proportional distribution of metrics by sample
 // count or time-series count, as the entries of a treemap.
 func metricTreemap(ctx context.Context, in *O11yMetricTreemapIn) (*O11yMetricTreemapOut, error) {
 	out := new(O11yMetricTreemapOut)
-	return out, metricsRelay(ctx, http.MethodPost, "/metrics/treemap", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/metrics/treemap", nil, in, out)
 }
 
 // metricAttributes returns one metric's attribute keys, each with its unique
 // values and their count.
 func metricAttributes(ctx context.Context, in *O11yMetricAttributesIn) (*O11yMetricAttributesOut, error) {
 	out := new(O11yMetricAttributesOut)
-	return out, metricsRelay(ctx, http.MethodGet, "/metrics/attributes", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/attributes", query(
 		"metricName", in.MetricName,
 		"start", int(in.Start),
 		"end", int(in.End),
@@ -108,7 +103,7 @@ func metricAttributes(ctx context.Context, in *O11yMetricAttributesIn) (*O11yMet
 // temporality and monotonicity.
 func metricMetadata(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricMetadataOut, error) {
 	out := new(O11yMetricMetadataOut)
-	return out, metricsRelay(ctx, http.MethodGet, "/metrics/metadata", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/metadata", query(
 		"metricName", in.MetricName,
 	), nil, out)
 }
@@ -117,14 +112,14 @@ func metricMetadata(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricMetad
 // temporality, monotonicity — and answers with the bare success envelope.
 func saveMetricMetadata(ctx context.Context, in *O11yMetricMetadataSaveIn) (*O11yMetricAckOut, error) {
 	out := new(O11yMetricAckOut)
-	return out, metricsRelay(ctx, http.MethodPost, "/metrics/metadata", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/metrics/metadata", nil, in, out)
 }
 
 // metricHighlights returns one metric's headline numbers: data points, total
 // and active time series, and when it was last received.
 func metricHighlights(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricHighlightsOut, error) {
 	out := new(O11yMetricHighlightsOut)
-	return out, metricsRelay(ctx, http.MethodGet, "/metrics/highlights", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/highlights", query(
 		"metricName", in.MetricName,
 	), nil, out)
 }
@@ -132,7 +127,7 @@ func metricHighlights(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricHig
 // metricAlerts lists the alert rules that reference a metric.
 func metricAlerts(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricAlertsOut, error) {
 	out := new(O11yMetricAlertsOut)
-	return out, metricsRelay(ctx, http.MethodGet, "/metrics/alerts", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/alerts", query(
 		"metricName", in.MetricName,
 	), nil, out)
 }
@@ -140,7 +135,7 @@ func metricAlerts(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricAlertsO
 // metricDashboards lists the dashboard panels that reference a metric.
 func metricDashboards(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricDashboardsOut, error) {
 	out := new(O11yMetricDashboardsOut)
-	return out, metricsRelay(ctx, http.MethodGet, "/metrics/dashboards", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/dashboards", query(
 		"metricName", in.MetricName,
 	), nil, out)
 }
@@ -149,14 +144,14 @@ func metricDashboards(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricDas
 // thirty minutes — each series with its labels and timestamp/value pairs.
 func inspectMetric(ctx context.Context, in *O11yMetricInspectIn) (*O11yMetricInspectOut, error) {
 	out := new(O11yMetricInspectOut)
-	return out, metricsRelay(ctx, http.MethodPost, "/metrics/inspect", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/metrics/inspect", nil, in, out)
 }
 
 // metricsOnboarding reports whether any non-O11y metrics have been ingested —
 // the lightweight check onboarding polls.
 func metricsOnboarding(ctx context.Context, _ *struct{}) (*O11yMetricOnboardingOut, error) {
 	out := new(O11yMetricOnboardingOut)
-	return out, metricsRelay(ctx, http.MethodGet, "/metrics/onboarding", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/onboarding", nil, nil, out)
 }
 
 // ── the metric reduction rule operations ──────────────────────────────────────
@@ -165,7 +160,7 @@ func metricsOnboarding(ctx context.Context, _ *struct{}) (*O11yMetricOnboardingO
 // rules, pageable and sortable by name, volume or recency.
 func listReductionRules(ctx context.Context, in *O11yReductionRuleListIn) (*O11yReductionRuleListOut, error) {
 	out := new(O11yReductionRuleListOut)
-	return out, metricsRelay(ctx, http.MethodGet, "/metric_reduction_rules", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metric_reduction_rules", query(
 		"orderBy", in.OrderBy,
 		"order", in.Order,
 		"search", in.Search,
@@ -179,14 +174,14 @@ func listReductionRules(ctx context.Context, in *O11yReductionRuleListIn) (*O11y
 // it with its id; a metric that already has a rule is refused.
 func createReductionRule(ctx context.Context, in *O11yReductionRuleCreateIn) (*O11yReductionRuleOut, error) {
 	out := new(O11yReductionRuleOut)
-	return out, metricsRelay(ctx, http.MethodPost, "/metric_reduction_rules", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/metric_reduction_rules", nil, in, out)
 }
 
 // reductionRuleStats returns total ingested vs retained series and samples and
 // the estimated monthly savings across all volume-control rules.
 func reductionRuleStats(ctx context.Context, _ *struct{}) (*O11yReductionStatsOut, error) {
 	out := new(O11yReductionStatsOut)
-	return out, metricsRelay(ctx, http.MethodGet, "/metric_reduction_rules/stats", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metric_reduction_rules/stats", nil, nil, out)
 }
 
 // reductionRuleTimeseries returns ingested vs retained series over time across
@@ -194,14 +189,14 @@ func reductionRuleStats(ctx context.Context, _ *struct{}) (*O11yReductionStatsOu
 // response shape.
 func reductionRuleTimeseries(ctx context.Context, _ *struct{}) (*O11yReductionSeriesOut, error) {
 	out := new(O11yReductionSeriesOut)
-	return out, metricsRelay(ctx, http.MethodGet, "/metric_reduction_rules/timeseries", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metric_reduction_rules/timeseries", nil, nil, out)
 }
 
 // previewReductionRule estimates the series reduction and the dashboards and
 // alerts a candidate volume-control rule would touch, without persisting it.
 func previewReductionRule(ctx context.Context, in *O11yReductionRulePreviewIn) (*O11yReductionRulePreviewOut, error) {
 	out := new(O11yReductionRulePreviewOut)
-	return out, metricsRelay(ctx, http.MethodPost, "/metric_reduction_rules/preview", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/metric_reduction_rules/preview", nil, in, out)
 }
 
 // reductionRule returns one volume-control rule by its id.
@@ -209,7 +204,7 @@ func reductionRule(ctx context.Context, in *O11yReductionRuleRef) (*O11yReductio
 	out := new(O11yReductionRuleOut)
 	// The id goes on VERBATIM, as the segment the router matched — re-encoding
 	// it here would hand the runtime a different id than the caller named.
-	return out, metricsRelay(ctx, http.MethodGet, "/metric_reduction_rules/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/metric_reduction_rules/"+in.ID, nil, nil, out)
 }
 
 // saveReductionRule updates the match type and labels of a volume-control rule
@@ -219,12 +214,12 @@ func saveReductionRule(ctx context.Context, in *O11yReductionRuleSaveIn) (*O11yR
 	// The whole In rides as the body, id included. The runtime's decoder is
 	// tolerant and binds only matchType and labels; the PATH is the addressing
 	// authority at both hops, exactly as it was on the mux tree.
-	return out, metricsRelay(ctx, http.MethodPut, "/metric_reduction_rules/"+in.ID, nil, in, out)
+	return out, relay(ctx, http.MethodPut, o11yRoot+"/metric_reduction_rules/"+in.ID, nil, in, out)
 }
 
 // deleteReductionRule deletes a volume-control rule by its id.
 func deleteReductionRule(ctx context.Context, in *O11yReductionRuleRef) (*struct{}, error) {
-	return nil, metricsRelay(ctx, http.MethodDelete, "/metric_reduction_rules/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/metric_reduction_rules/"+in.ID, nil, nil, nil)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────
@@ -906,87 +901,3 @@ type O11yAffectedWidget struct {
 }
 
 // ── the seam ──────────────────────────────────────────────────────────────────
-
-// metricsRelay hands a typed op's call to the o11y runtime and decodes the
-// answer into the op's Out — the same seam relay (telemetry.go) is for the
-// error-tracking face, rebuilt on this face's own root.
-//
-// It is what keeps these nineteen ops a NAMING of the wire rather than a
-// second implementation of it. The handler it calls is the one SetHandler
-// registered — the same value the delegation wildcard forwards to — so the
-// request runs the whole chain it always ran: identity resolution, the org
-// gate, the ROLE CHECK each mux registration declared (ViewAccess, EditAccess
-// or AdminAccess, unchanged per route), the handler, the envelope. There is
-// no policy here.
-//
-// Identity is PROPAGATED, never minted: the gateway's assertion travels on as
-// the same headers it arrived on. A context with no request behind it carries
-// none, so the runtime's gate refuses it — the honest answer rather than an
-// identity invented at this hop.
-//
-// A nil out skips the decode: a DELETE answers 204 and its body, if any, is
-// not part of the contract. A non-2xx becomes an error carrying the runtime's
-// own status and reason, so the status a caller sees is the status the
-// runtime chose.
-func metricsRelay(ctx context.Context, method, path string, params url.Values, body, out any) error {
-	h := getHandler()
-	if h == nil {
-		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
-	}
-
-	target := o11yRoot + path
-	if q := params.Encode(); q != "" {
-		target += "?" + q
-	}
-
-	payload := io.Reader(http.NoBody)
-	if body != nil {
-		b, err := json.Marshal(body)
-		if err != nil {
-			return zip.ErrBadRequest(err.Error())
-		}
-		payload = bytes.NewReader(b)
-	}
-	req, err := http.NewRequestWithContext(ctx, method, target, payload)
-	if err != nil {
-		return zip.ErrBadRequest(err.Error())
-	}
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	caller := zip.CallerOf(ctx)
-	for header, value := range map[string]string{
-		zip.HeaderOrg:       caller.Org,
-		zip.HeaderProject:   caller.Project,
-		zip.HeaderUser:      caller.User,
-		zip.HeaderUserName:  caller.Name,
-		zip.HeaderUserEmail: caller.Email,
-		zip.HeaderUserOwner: caller.Owner,
-		zip.HeaderRequestID: caller.RequestID,
-	} {
-		if value != "" {
-			req.Header.Set(header, value)
-		}
-	}
-	if caller.Admin {
-		req.Header.Set(zip.HeaderUserAdmin, "true")
-	}
-	if caller.OrgAdmin {
-		req.Header.Set(zip.HeaderUserOrgAdmin, "true")
-	}
-
-	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, req)
-
-	if rec.Code < http.StatusOK || rec.Code >= http.StatusMultipleChoices {
-		code, reason := refusal(rec.Body.Bytes())
-		return &zip.HTTPError{Status: rec.Code, Code: code, Msg: reason}
-	}
-	if out == nil {
-		return nil
-	}
-	if err := json.Unmarshal(rec.Body.Bytes(), out); err != nil {
-		return zip.ErrInternal("cannot read the runtime's answer: " + err.Error())
-	}
-	return nil
-}

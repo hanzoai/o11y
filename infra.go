@@ -31,13 +31,8 @@ package o11y
 // the wire rather than in a type.
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
-	"net/http/httptest"
-	"net/url"
 
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
@@ -132,7 +127,7 @@ func hostAttributeValues(ctx context.Context, in *O11yInfraAttributeValuesIn) (*
 // reported.
 func hostList(ctx context.Context, in *model.HostListRequest) (*O11yHostListOut, error) {
 	out := new(O11yHostListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/hosts/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/hosts/list", nil, in, out)
 }
 
 // ── processes ─────────────────────────────────────────────────────────────────
@@ -154,7 +149,7 @@ func processAttributeValues(ctx context.Context, in *O11yInfraAttributeValuesIn)
 // paginated.
 func processList(ctx context.Context, in *model.ProcessListRequest) (*O11yProcessListOut, error) {
 	out := new(O11yProcessListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/processes/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/processes/list", nil, in, out)
 }
 
 // ── pods ──────────────────────────────────────────────────────────────────────
@@ -176,7 +171,7 @@ func podAttributeValues(ctx context.Context, in *O11yInfraAttributeValuesIn) (*O
 // attributes; filterable, groupable and paginated.
 func podList(ctx context.Context, in *model.PodListRequest) (*O11yPodListOut, error) {
 	out := new(O11yPodListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/pods/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/pods/list", nil, in, out)
 }
 
 // ── pvcs ──────────────────────────────────────────────────────────────────────
@@ -198,7 +193,7 @@ func pvcAttributeValues(ctx context.Context, in *O11yInfraAttributeValuesIn) (*O
 // filterable, groupable and paginated.
 func pvcList(ctx context.Context, in *model.VolumeListRequest) (*O11yPvcListOut, error) {
 	out := new(O11yPvcListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/pvcs/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/pvcs/list", nil, in, out)
 }
 
 // ── nodes ─────────────────────────────────────────────────────────────────────
@@ -220,7 +215,7 @@ func nodeAttributeValues(ctx context.Context, in *O11yInfraAttributeValuesIn) (*
 // attributes; filterable, groupable and paginated.
 func nodeList(ctx context.Context, in *model.NodeListRequest) (*O11yNodeListOut, error) {
 	out := new(O11yNodeListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/nodes/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/nodes/list", nil, in, out)
 }
 
 // ── namespaces ────────────────────────────────────────────────────────────────
@@ -242,7 +237,7 @@ func namespaceAttributeValues(ctx context.Context, in *O11yInfraAttributeValuesI
 // filterable, groupable and paginated.
 func namespaceList(ctx context.Context, in *model.NamespaceListRequest) (*O11yNamespaceListOut, error) {
 	out := new(O11yNamespaceListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/namespaces/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/namespaces/list", nil, in, out)
 }
 
 // ── clusters ──────────────────────────────────────────────────────────────────
@@ -264,7 +259,7 @@ func clusterAttributeValues(ctx context.Context, in *O11yInfraAttributeValuesIn)
 // filterable, groupable and paginated.
 func clusterList(ctx context.Context, in *model.ClusterListRequest) (*O11yClusterListOut, error) {
 	out := new(O11yClusterListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/clusters/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/clusters/list", nil, in, out)
 }
 
 // ── deployments ───────────────────────────────────────────────────────────────
@@ -287,7 +282,7 @@ func deploymentAttributeValues(ctx context.Context, in *O11yInfraAttributeValues
 // paginated.
 func deploymentList(ctx context.Context, in *model.DeploymentListRequest) (*O11yDeploymentListOut, error) {
 	out := new(O11yDeploymentListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/deployments/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/deployments/list", nil, in, out)
 }
 
 // ── daemonsets ────────────────────────────────────────────────────────────────
@@ -310,7 +305,7 @@ func daemonSetAttributeValues(ctx context.Context, in *O11yInfraAttributeValuesI
 // paginated.
 func daemonSetList(ctx context.Context, in *model.DaemonSetListRequest) (*O11yDaemonSetListOut, error) {
 	out := new(O11yDaemonSetListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/daemonsets/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/daemonsets/list", nil, in, out)
 }
 
 // ── statefulsets ──────────────────────────────────────────────────────────────
@@ -333,7 +328,7 @@ func statefulSetAttributeValues(ctx context.Context, in *O11yInfraAttributeValue
 // paginated.
 func statefulSetList(ctx context.Context, in *model.StatefulSetListRequest) (*O11yStatefulSetListOut, error) {
 	out := new(O11yStatefulSetListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/statefulsets/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/statefulsets/list", nil, in, out)
 }
 
 // ── jobs ──────────────────────────────────────────────────────────────────────
@@ -356,7 +351,7 @@ func jobAttributeValues(ctx context.Context, in *O11yInfraAttributeValuesIn) (*O
 // groupable and paginated.
 func jobList(ctx context.Context, in *model.JobListRequest) (*O11yJobListOut, error) {
 	out := new(O11yJobListOut)
-	return out, infraRelay(ctx, http.MethodPost, "/jobs/list", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/jobs/list", nil, in, out)
 }
 
 // ── infra_monitoring rollups ──────────────────────────────────────────────────
@@ -370,7 +365,7 @@ func jobList(ctx context.Context, in *model.JobListRequest) (*O11yJobListOut, er
 // five metrics, paginated by offset and limit.
 func infraHosts(ctx context.Context, in *inframonitoringtypes.PostableHosts) (*O11yInfraHostsOut, error) {
 	out := new(O11yInfraHostsOut)
-	return out, infraRelay(ctx, http.MethodPost, "/infra_monitoring/hosts", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/infra_monitoring/hosts", nil, in, out)
 }
 
 // infraPods lists Kubernetes pods with CPU and memory usage against request
@@ -382,7 +377,7 @@ func infraHosts(ctx context.Context, in *inframonitoringtypes.PostableHosts) (*O
 // six pod metrics, paginated by offset and limit.
 func infraPods(ctx context.Context, in *inframonitoringtypes.PostablePods) (*O11yInfraPodsOut, error) {
 	out := new(O11yInfraPodsOut)
-	return out, infraRelay(ctx, http.MethodPost, "/infra_monitoring/pods", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/infra_monitoring/pods", nil, in, out)
 }
 
 // infraNodes lists Kubernetes nodes with CPU and memory usage against
@@ -394,7 +389,7 @@ func infraPods(ctx context.Context, in *inframonitoringtypes.PostablePods) (*O11
 // paginated by offset and limit.
 func infraNodes(ctx context.Context, in *inframonitoringtypes.PostableNodes) (*O11yInfraNodesOut, error) {
 	out := new(O11yInfraNodesOut)
-	return out, infraRelay(ctx, http.MethodPost, "/infra_monitoring/nodes", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/infra_monitoring/nodes", nil, in, out)
 }
 
 // infraNamespaces lists Kubernetes namespaces with the CPU and memory their
@@ -405,7 +400,7 @@ func infraNodes(ctx context.Context, in *inframonitoringtypes.PostableNodes) (*O
 // by offset and limit.
 func infraNamespaces(ctx context.Context, in *inframonitoringtypes.PostableNamespaces) (*O11yInfraNamespacesOut, error) {
 	out := new(O11yInfraNamespacesOut)
-	return out, infraRelay(ctx, http.MethodPost, "/infra_monitoring/namespaces", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/infra_monitoring/namespaces", nil, in, out)
 }
 
 // infraClusters lists Kubernetes clusters with CPU and memory usage against
@@ -416,7 +411,7 @@ func infraNamespaces(ctx context.Context, in *inframonitoringtypes.PostableNames
 // by usage or allocatable, paginated by offset and limit.
 func infraClusters(ctx context.Context, in *inframonitoringtypes.PostableClusters) (*O11yInfraClustersOut, error) {
 	out := new(O11yInfraClustersOut)
-	return out, infraRelay(ctx, http.MethodPost, "/infra_monitoring/clusters", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/infra_monitoring/clusters", nil, in, out)
 }
 
 // infraVolumes lists Kubernetes persistent volume claims with available,
@@ -428,7 +423,7 @@ func infraClusters(ctx context.Context, in *inframonitoringtypes.PostableCluster
 // limit.
 func infraVolumes(ctx context.Context, in *inframonitoringtypes.PostableVolumes) (*O11yInfraVolumesOut, error) {
 	out := new(O11yInfraVolumesOut)
-	return out, infraRelay(ctx, http.MethodPost, "/infra_monitoring/pvcs", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/infra_monitoring/pvcs", nil, in, out)
 }
 
 // infraDeployments lists Kubernetes deployments with the CPU and memory their
@@ -440,7 +435,7 @@ func infraVolumes(ctx context.Context, in *inframonitoringtypes.PostableVolumes)
 // offset and limit.
 func infraDeployments(ctx context.Context, in *inframonitoringtypes.PostableDeployments) (*O11yInfraDeploymentsOut, error) {
 	out := new(O11yInfraDeploymentsOut)
-	return out, infraRelay(ctx, http.MethodPost, "/infra_monitoring/deployments", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/infra_monitoring/deployments", nil, in, out)
 }
 
 // infraStatefulSets lists Kubernetes statefulsets with the CPU and memory
@@ -452,7 +447,7 @@ func infraDeployments(ctx context.Context, in *inframonitoringtypes.PostableDepl
 // offset and limit.
 func infraStatefulSets(ctx context.Context, in *inframonitoringtypes.PostableStatefulSets) (*O11yInfraStatefulSetsOut, error) {
 	out := new(O11yInfraStatefulSetsOut)
-	return out, infraRelay(ctx, http.MethodPost, "/infra_monitoring/statefulsets", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/infra_monitoring/statefulsets", nil, in, out)
 }
 
 // infraJobs lists Kubernetes jobs with the CPU and memory their pods used
@@ -465,7 +460,7 @@ func infraStatefulSets(ctx context.Context, in *inframonitoringtypes.PostableSta
 // job counters, paginated by offset and limit.
 func infraJobs(ctx context.Context, in *inframonitoringtypes.PostableJobs) (*O11yInfraJobsOut, error) {
 	out := new(O11yInfraJobsOut)
-	return out, infraRelay(ctx, http.MethodPost, "/infra_monitoring/jobs", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/infra_monitoring/jobs", nil, in, out)
 }
 
 // infraDaemonSets lists Kubernetes daemonsets with the CPU and memory their
@@ -477,7 +472,7 @@ func infraJobs(ctx context.Context, in *inframonitoringtypes.PostableJobs) (*O11
 // the node counts, paginated by offset and limit.
 func infraDaemonSets(ctx context.Context, in *inframonitoringtypes.PostableDaemonSets) (*O11yInfraDaemonSetsOut, error) {
 	out := new(O11yInfraDaemonSetsOut)
-	return out, infraRelay(ctx, http.MethodPost, "/infra_monitoring/daemonsets", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/infra_monitoring/daemonsets", nil, in, out)
 }
 
 // infraChecks reports whether the metrics and attributes an infra-monitoring
@@ -487,7 +482,7 @@ func infraDaemonSets(ctx context.Context, in *inframonitoringtypes.PostableDaemo
 // missing.
 func infraChecks(ctx context.Context, in *O11yInfraChecksIn) (*O11yInfraChecksOut, error) {
 	out := new(O11yInfraChecksOut)
-	return out, infraRelay(ctx, http.MethodGet, "/infra_monitoring/checks", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/infra_monitoring/checks", query(
 		"type", in.Type,
 	), nil, out)
 }
@@ -499,7 +494,7 @@ func infraChecks(ctx context.Context, in *O11yInfraChecksIn) (*O11yInfraChecksOu
 // parameters for every resource face, so one function renders them.
 func infraAttributeKeys(ctx context.Context, resource string, in *O11yInfraAttributeKeysIn) (*O11yInfraAttributeKeysOut, error) {
 	out := new(O11yInfraAttributeKeysOut)
-	return out, infraRelay(ctx, http.MethodGet, "/"+resource+"/attribute_keys", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/"+resource+"/attribute_keys", query(
 		"dataSource", in.DataSource,
 		"aggregateOperator", in.AggregateOperator,
 		"aggregateAttribute", in.AggregateAttribute,
@@ -513,7 +508,7 @@ func infraAttributeKeys(ctx context.Context, resource string, in *O11yInfraAttri
 // */attribute_values ops, for the same reason.
 func infraAttributeValues(ctx context.Context, resource string, in *O11yInfraAttributeValuesIn) (*O11yInfraAttributeValuesOut, error) {
 	out := new(O11yInfraAttributeValuesOut)
-	return out, infraRelay(ctx, http.MethodGet, "/"+resource+"/attribute_values", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/"+resource+"/attribute_values", query(
 		"dataSource", in.DataSource,
 		"aggregateOperator", in.AggregateOperator,
 		"aggregateAttribute", in.AggregateAttribute,
@@ -788,83 +783,3 @@ type O11yInfraChecksOut struct {
 }
 
 // ── the seam ──────────────────────────────────────────────────────────────────
-
-// infraRelay hands a typed op's call to the o11y runtime and decodes the
-// answer into the op's Out. It is telemetry.go's relay aimed at the /v1/o11y
-// face instead of /v1/sentry — the same seam, the same guarantees: the handler
-// it calls is the one SetHandler registered, the same value the delegation
-// wildcard forwards to, so the request runs the whole chain it always ran —
-// the mux route, the ViewAccess gate, the handler — in order. There is no
-// policy here: no tenant is resolved, no role is checked, nothing is scoped.
-// Those all happen where they already do, one layer in.
-//
-// Identity is PROPAGATED, never minted: the gateway's assertion about the
-// caller travels on as the same headers it arrived on. A context with no
-// request behind it — a command, an agent call — carries no assertion, so the
-// runtime's gate refuses it, which is the honest answer rather than an
-// identity invented at this hop.
-//
-// A non-2xx becomes an error carrying the runtime's own status and reason,
-// read by the same refusal reader relay uses. The body of this function is
-// relay's with only the prefix changed; the two faces keep separate seams
-// because each op file states its own face's root, and folding them is a
-// one-move refactor the day a third face appears.
-func infraRelay(ctx context.Context, method, path string, params url.Values, body, out any) error {
-	h := getHandler()
-	if h == nil {
-		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
-	}
-
-	target := o11yRoot + path
-	if q := params.Encode(); q != "" {
-		target += "?" + q
-	}
-
-	payload := io.Reader(http.NoBody)
-	if body != nil {
-		b, err := json.Marshal(body)
-		if err != nil {
-			return zip.ErrBadRequest(err.Error())
-		}
-		payload = bytes.NewReader(b)
-	}
-	req, err := http.NewRequestWithContext(ctx, method, target, payload)
-	if err != nil {
-		return zip.ErrBadRequest(err.Error())
-	}
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	caller := zip.CallerOf(ctx)
-	for header, value := range map[string]string{
-		zip.HeaderOrg:       caller.Org,
-		zip.HeaderProject:   caller.Project,
-		zip.HeaderUser:      caller.User,
-		zip.HeaderUserName:  caller.Name,
-		zip.HeaderUserEmail: caller.Email,
-		zip.HeaderUserOwner: caller.Owner,
-		zip.HeaderRequestID: caller.RequestID,
-	} {
-		if value != "" {
-			req.Header.Set(header, value)
-		}
-	}
-	if caller.Admin {
-		req.Header.Set(zip.HeaderUserAdmin, "true")
-	}
-	if caller.OrgAdmin {
-		req.Header.Set(zip.HeaderUserOrgAdmin, "true")
-	}
-
-	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, req)
-
-	if rec.Code < http.StatusOK || rec.Code >= http.StatusMultipleChoices {
-		code, reason := refusal(rec.Body.Bytes())
-		return &zip.HTTPError{Status: rec.Code, Code: code, Msg: reason}
-	}
-	if err := json.Unmarshal(rec.Body.Bytes(), out); err != nil {
-		return zip.ErrInternal("cannot read the runtime's answer: " + err.Error())
-	}
-	return nil
-}
