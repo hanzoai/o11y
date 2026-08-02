@@ -26,29 +26,18 @@ package o11y
 //go:generate go run github.com/zap-proto/zip/cmd/zipdoc
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
-	"net/http/httptest"
-	"net/url"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/zap-proto/zip"
 )
 
-// prefix is the product face's path root, spelled ONCE: the group the ops
-// register on, and the first segment relay rebuilds a call onto.
-const prefix = "/v1/sentry"
-
 // mountTelemetry registers the five typed telemetry ops on the native router.
 // Collection routes register before the parameterised one so an id can never
 // shadow a collection.
 func mountTelemetry(app *zip.App) {
-	g := app.Group(prefix)
+	g := app.Group(sentryRoot)
 	zip.Post(g, "/discover", discover)
 	zip.Get(g, "/logs", logs)
 	zip.Get(g, "/traces", traces)
@@ -67,14 +56,14 @@ func mountTelemetry(app *zip.App) {
 // rather than as data.
 func discover(ctx context.Context, in *O11yDiscoverIn) (*O11yDiscoverOut, error) {
 	out := new(O11yDiscoverOut)
-	return out, relay(ctx, http.MethodPost, "/discover", nil, in, out)
+	return out, relay(ctx, http.MethodPost, sentryRoot+"/discover", nil, in, out)
 }
 
 // logs lists a project's captured error events, newest first, optionally
 // narrowed to those whose message or exception text contains a search string.
 func logs(ctx context.Context, in *O11yLogsIn) (*O11yLogsOut, error) {
 	out := new(O11yLogsOut)
-	return out, relay(ctx, http.MethodGet, "/logs", query(
+	return out, relay(ctx, http.MethodGet, sentryRoot+"/logs", query(
 		"project", in.Project,
 		"query", in.Query,
 		"period", in.Period,
@@ -87,7 +76,7 @@ func logs(ctx context.Context, in *O11yLogsIn) (*O11yLogsOut, error) {
 // message seen — the entry point for "which requests are failing".
 func traces(ctx context.Context, in *O11yTracesIn) (*O11yTracesOut, error) {
 	out := new(O11yTracesOut)
-	return out, relay(ctx, http.MethodGet, "/traces", query(
+	return out, relay(ctx, http.MethodGet, sentryRoot+"/traces", query(
 		"project", in.Project,
 		"period", in.Period,
 		"limit", in.Limit,
@@ -103,7 +92,7 @@ func trace(ctx context.Context, in *O11yTraceIn) (*O11yTraceOut, error) {
 	// runtime a different id than the caller named — for the one id spelling
 	// that matters, an escaped slash, that is the difference between the answer
 	// the face has always given and a new one.
-	return out, relay(ctx, http.MethodGet, "/traces/"+in.ID, query(
+	return out, relay(ctx, http.MethodGet, sentryRoot+"/traces/"+in.ID, query(
 		"project", in.Project,
 	), nil, out)
 }
@@ -112,7 +101,7 @@ func trace(ctx context.Context, in *O11yTraceIn) (*O11yTraceOut, error) {
 // the requested period, counting the events in it.
 func stats(ctx context.Context, in *O11yStatsIn) (*O11yStatsOut, error) {
 	out := new(O11yStatsOut)
-	return out, relay(ctx, http.MethodGet, "/stats", query(
+	return out, relay(ctx, http.MethodGet, sentryRoot+"/stats", query(
 		"project", in.Project,
 		"field", in.Field,
 		"period", in.Period,
@@ -371,127 +360,3 @@ type O11yFrame struct {
 }
 
 // ── the seam ──────────────────────────────────────────────────────────────────
-
-// relay hands a typed op's call to the o11y runtime and decodes the answer into
-// the op's Out.
-//
-// It is what keeps these five ops a NAMING of the wire rather than a second
-// implementation of it. The handler it calls is the one SetHandler registered —
-// the same value the delegation wildcard forwards to — so the request runs the
-// whole chain it always ran, in order, and the bytes it answers with are the
-// bytes the runtime wrote. There is no policy here: no tenant is resolved, no
-// role is checked, nothing is scoped. Those all happen where they already do,
-// one layer in.
-//
-// Identity is PROPAGATED, never minted: the gateway's assertion about the caller
-// travels on as the same headers it arrived on (zip.CallerOf reads exactly the
-// set the call plane forwards). A context with no request behind it — a command,
-// an agent call — carries no assertion, so the runtime's gate refuses it, which
-// is the honest answer rather than an identity invented at this hop.
-//
-// A non-2xx becomes an error carrying the runtime's own status and reason, so
-// the status a caller sees is the status the runtime chose.
-func relay(ctx context.Context, method, path string, params url.Values, body, out any) error {
-	h := getHandler()
-	if h == nil {
-		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
-	}
-
-	target := prefix + path
-	if q := params.Encode(); q != "" {
-		target += "?" + q
-	}
-
-	payload := io.Reader(http.NoBody)
-	if body != nil {
-		b, err := json.Marshal(body)
-		if err != nil {
-			return zip.ErrBadRequest(err.Error())
-		}
-		payload = bytes.NewReader(b)
-	}
-	req, err := http.NewRequestWithContext(ctx, method, target, payload)
-	if err != nil {
-		return zip.ErrBadRequest(err.Error())
-	}
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	caller := zip.CallerOf(ctx)
-	for header, value := range map[string]string{
-		zip.HeaderOrg:       caller.Org,
-		zip.HeaderProject:   caller.Project,
-		zip.HeaderUser:      caller.User,
-		zip.HeaderUserName:  caller.Name,
-		zip.HeaderUserEmail: caller.Email,
-		zip.HeaderUserOwner: caller.Owner,
-		zip.HeaderRequestID: caller.RequestID,
-	} {
-		if value != "" {
-			req.Header.Set(header, value)
-		}
-	}
-	if caller.Admin {
-		req.Header.Set(zip.HeaderUserAdmin, "true")
-	}
-	if caller.OrgAdmin {
-		req.Header.Set(zip.HeaderUserOrgAdmin, "true")
-	}
-
-	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, req)
-
-	if rec.Code < http.StatusOK || rec.Code >= http.StatusMultipleChoices {
-		code, reason := refusal(rec.Body.Bytes())
-		return &zip.HTTPError{Status: rec.Code, Code: code, Msg: reason}
-	}
-	if err := json.Unmarshal(rec.Body.Bytes(), out); err != nil {
-		return zip.ErrInternal("cannot read the runtime's answer: " + err.Error())
-	}
-	return nil
-}
-
-// query builds the parameters an op sends from name/value pairs, dropping the
-// ones the caller left unset so an absent input stays absent instead of arriving
-// as an empty string — or as a zero page cap, which this face has always read as
-// "no cap given". It is the ONE place a typed input is rendered onto the wire.
-func query(pairs ...any) url.Values {
-	params := url.Values{}
-	for i := 0; i+1 < len(pairs); i += 2 {
-		name, _ := pairs[i].(string)
-		switch value := pairs[i+1].(type) {
-		case string:
-			if value != "" {
-				params.Set(name, value)
-			}
-		case int:
-			if value != 0 {
-				params.Set(name, strconv.Itoa(value))
-			}
-		}
-	}
-	return params
-}
-
-// refusal reads the runtime's refusal for its code and its reason. Both of the
-// shapes this face answers with are handled — the runtime's own {error:{code,
-// message}} and the gate's {msg} — and anything else falls back to the body it
-// sent, so a reason is never invented and never lost.
-func refusal(body []byte) (code, reason string) {
-	var refused struct {
-		Error struct {
-			Code    string `json:"code"`
-			Message string `json:"message"`
-		} `json:"error"`
-		Msg string `json:"msg"`
-	}
-	if err := json.Unmarshal(body, &refused); err == nil {
-		if refused.Error.Message != "" {
-			return refused.Error.Code, refused.Error.Message
-		}
-		if refused.Msg != "" {
-			return "", refused.Msg
-		}
-	}
-	return "", strings.TrimSpace(string(body))
-}
