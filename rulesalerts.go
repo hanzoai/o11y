@@ -42,12 +42,8 @@ package o11y
 // and every other path under the prefix still reaches the runtime untouched.
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"strconv"
 
@@ -122,29 +118,29 @@ func mountRulesAlerts(app *zip.App) {
 // listRules lists all alert rules with their current evaluation state. Viewer gate.
 func listRules(ctx context.Context, _ *struct{}) (*O11yRulesOut, error) {
 	out := new(O11yRulesOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/rules", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/rules", nil, nil, out)
 }
 
 // getRuleByID returns one alert rule with its evaluation state, by id. Viewer gate.
 func getRuleByID(ctx context.Context, in *O11yRuleRef) (*O11yRuleOut, error) {
 	out := new(O11yRuleOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/rules/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/rules/"+in.ID, nil, nil, out)
 }
 
 // createRule creates a new alert rule and answers with the stored rule. Editor gate.
 func createRule(ctx context.Context, in *ruletypes.PostableRule) (*O11yRuleOut, error) {
 	out := new(O11yRuleOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPost, "/rules", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/rules", nil, in, out)
 }
 
 // updateRuleByID replaces an alert rule's definition, by id. Editor gate.
 func updateRuleByID(ctx context.Context, in *O11yRuleUpdateIn) (*struct{}, error) {
-	return nil, rulesAlertsRelay(ctx, http.MethodPut, "/rules/"+in.ID, nil, &in.PostableRule, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/rules/"+in.ID, nil, &in.PostableRule, nil)
 }
 
 // deleteRuleByID removes an alert rule, by id. Editor gate.
 func deleteRuleByID(ctx context.Context, in *O11yRuleRef) (*struct{}, error) {
-	return nil, rulesAlertsRelay(ctx, http.MethodDelete, "/rules/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/rules/"+in.ID, nil, nil, nil)
 }
 
 // patchRuleByID applies a partial update to an alert rule, by id, answering
@@ -152,14 +148,14 @@ func deleteRuleByID(ctx context.Context, in *O11yRuleRef) (*struct{}, error) {
 // Editor gate.
 func patchRuleByID(ctx context.Context, in *O11yRuleUpdateIn) (*O11yRuleOut, error) {
 	out := new(O11yRuleOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPatch, "/rules/"+in.ID, nil, &in.PostableRule, out)
+	return out, relay(ctx, http.MethodPatch, o11yRoot+"/rules/"+in.ID, nil, &in.PostableRule, out)
 }
 
 // testRule fires a test notification for a rule definition without saving it,
 // answering with how many series would alert. Editor gate.
 func testRule(ctx context.Context, in *ruletypes.PostableRule) (*O11yTestRuleOut, error) {
 	out := new(O11yTestRuleOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPost, "/rules/test", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/rules/test", nil, in, out)
 }
 
 // ── planned maintenance / downtime schedules ────────────────────────────────
@@ -168,7 +164,7 @@ func testRule(ctx context.Context, in *ruletypes.PostableRule) (*O11yTestRuleOut
 // narrowed to the active ones or the recurring ones. Viewer gate.
 func listDowntimeSchedules(ctx context.Context, in *O11yListDowntimeSchedulesIn) (*O11yDowntimeSchedulesOut, error) {
 	out := new(O11yDowntimeSchedulesOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/downtime_schedules", query(
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/downtime_schedules", query(
 		"active", in.Active,
 		"recurring", in.Recurring,
 	), nil, out)
@@ -177,24 +173,24 @@ func listDowntimeSchedules(ctx context.Context, in *O11yListDowntimeSchedulesIn)
 // getDowntimeScheduleByID returns one planned maintenance window, by id. Viewer gate.
 func getDowntimeScheduleByID(ctx context.Context, in *O11yDowntimeRef) (*O11yDowntimeScheduleOut, error) {
 	out := new(O11yDowntimeScheduleOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/downtime_schedules/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/downtime_schedules/"+in.ID, nil, nil, out)
 }
 
 // createDowntimeSchedule creates a planned maintenance window, answering with
 // the stored schedule. Editor gate.
 func createDowntimeSchedule(ctx context.Context, in *alertmanagertypes.PostablePlannedMaintenance) (*O11yDowntimeScheduleOut, error) {
 	out := new(O11yDowntimeScheduleOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPost, "/downtime_schedules", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/downtime_schedules", nil, in, out)
 }
 
 // updateDowntimeScheduleByID replaces a planned maintenance window, by id. Editor gate.
 func updateDowntimeScheduleByID(ctx context.Context, in *O11yDowntimeUpdateIn) (*struct{}, error) {
-	return nil, rulesAlertsRelay(ctx, http.MethodPut, "/downtime_schedules/"+in.ID, nil, &in.PostablePlannedMaintenance, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/downtime_schedules/"+in.ID, nil, &in.PostablePlannedMaintenance, nil)
 }
 
 // deleteDowntimeScheduleByID removes a planned maintenance window, by id. Editor gate.
 func deleteDowntimeScheduleByID(ctx context.Context, in *O11yDowntimeRef) (*struct{}, error) {
-	return nil, rulesAlertsRelay(ctx, http.MethodDelete, "/downtime_schedules/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/downtime_schedules/"+in.ID, nil, nil, nil)
 }
 
 // ── rule state history — v2 (GET, query parameters) ─────────────────────────
@@ -203,7 +199,7 @@ func deleteDowntimeScheduleByID(ctx context.Context, in *O11yDowntimeRef) (*stru
 // the selected time range, current window against the prior one. Viewer gate.
 func getRuleHistoryStats(ctx context.Context, in *O11yRuleHistoryBaseIn) (*O11yRuleHistoryStatsOut, error) {
 	out := new(O11yRuleHistoryStatsOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/rules/"+in.ID+"/history/stats", ruleHistoryBaseParams(in), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/rules/"+in.ID+"/history/stats", ruleHistoryBaseParams(in), nil, out)
 }
 
 // getRuleHistoryTimeline returns paginated timeline entries for a rule's state
@@ -226,21 +222,21 @@ func getRuleHistoryTimeline(ctx context.Context, in *O11yRuleHistoryTimelineIn) 
 	if in.Cursor != "" {
 		params.Set("cursor", in.Cursor)
 	}
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/rules/"+in.ID+"/history/timeline", params, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/rules/"+in.ID+"/history/timeline", params, nil, out)
 }
 
 // getRuleHistoryTopContributors returns the label combinations that contributed
 // most to a rule firing over the selected range. Viewer gate.
 func getRuleHistoryTopContributors(ctx context.Context, in *O11yRuleHistoryBaseIn) (*O11yRuleHistoryContributorsOut, error) {
 	out := new(O11yRuleHistoryContributorsOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/rules/"+in.ID+"/history/top_contributors", ruleHistoryBaseParams(in), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/rules/"+in.ID+"/history/top_contributors", ruleHistoryBaseParams(in), nil, out)
 }
 
 // getRuleHistoryFilterKeys returns the distinct label keys present in a rule's
 // history entries over the selected range, for building history filters. Viewer gate.
 func getRuleHistoryFilterKeys(ctx context.Context, in *O11yRuleHistoryFilterKeysIn) (*O11yRuleHistoryFilterKeysOut, error) {
 	out := new(O11yRuleHistoryFilterKeysOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/rules/"+in.ID+"/history/filter_keys", filterKeysParams(in), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/rules/"+in.ID+"/history/filter_keys", filterKeysParams(in), nil, out)
 }
 
 // getRuleHistoryFilterValues returns the distinct values a given label key has
@@ -252,14 +248,14 @@ func getRuleHistoryFilterValues(ctx context.Context, in *O11yRuleHistoryFilterVa
 	if in.ExistingQuery != "" {
 		params.Set("existingQuery", in.ExistingQuery)
 	}
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/rules/"+in.ID+"/history/filter_values", params, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/rules/"+in.ID+"/history/filter_values", params, nil, out)
 }
 
 // getRuleHistoryOverallStatus returns the overall firing/inactive intervals for
 // a rule over the selected range. Viewer gate.
 func getRuleHistoryOverallStatus(ctx context.Context, in *O11yRuleHistoryBaseIn) (*O11yRuleHistoryOverallStatusOut, error) {
 	out := new(O11yRuleHistoryOverallStatusOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/rules/"+in.ID+"/history/overall_status", ruleHistoryBaseParams(in), nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/rules/"+in.ID+"/history/overall_status", ruleHistoryBaseParams(in), nil, out)
 }
 
 // ── rule state history — v1 (POST, JSON body) + legacy test-fire ────────────
@@ -269,35 +265,35 @@ func getRuleHistoryOverallStatus(ctx context.Context, in *O11yRuleHistoryBaseIn)
 // path; prefer /rules/test. Editor gate.
 func testRuleNotification(ctx context.Context, in *ruletypes.PostableRule) (*O11yTestNotificationOut, error) {
 	out := new(O11yTestNotificationOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPost, "/testRule", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/testRule", nil, in, out)
 }
 
 // getRuleStats returns trigger and resolution statistics for a rule, current
 // window against the prior one, for the posted query range. Viewer gate.
 func getRuleStats(ctx context.Context, in *O11yRuleHistoryQueryIn) (*O11yRuleStatsOut, error) {
 	out := new(O11yRuleStatsOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPost, "/rules/"+in.ID+"/history/stats", nil, &in.QueryRuleStateHistory, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/rules/"+in.ID+"/history/stats", nil, &in.QueryRuleStateHistory, out)
 }
 
 // getRuleStateHistory returns a rule's state-transition timeline for the posted
 // query range, each entry carrying its related-logs or related-traces link. Viewer gate.
 func getRuleStateHistory(ctx context.Context, in *O11yRuleHistoryQueryIn) (*O11yRuleStateTimelineOut, error) {
 	out := new(O11yRuleStateTimelineOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPost, "/rules/"+in.ID+"/history/timeline", nil, &in.QueryRuleStateHistory, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/rules/"+in.ID+"/history/timeline", nil, &in.QueryRuleStateHistory, out)
 }
 
 // getRuleStateHistoryTopContributors returns the label combinations that
 // contributed most to a rule firing, for the posted query range. Viewer gate.
 func getRuleStateHistoryTopContributors(ctx context.Context, in *O11yRuleHistoryQueryIn) (*O11yRuleStateContributorsOut, error) {
 	out := new(O11yRuleStateContributorsOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPost, "/rules/"+in.ID+"/history/top_contributors", nil, &in.QueryRuleStateHistory, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/rules/"+in.ID+"/history/top_contributors", nil, &in.QueryRuleStateHistory, out)
 }
 
 // getOverallStateTransitions returns the overall firing/inactive windows for a
 // rule, for the posted query range. Viewer gate.
 func getOverallStateTransitions(ctx context.Context, in *O11yRuleHistoryQueryIn) (*O11yOverallStateTransitionsOut, error) {
 	out := new(O11yOverallStateTransitionsOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPost, "/rules/"+in.ID+"/history/overall_status", nil, &in.QueryRuleStateHistory, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/rules/"+in.ID+"/history/overall_status", nil, &in.QueryRuleStateHistory, out)
 }
 
 // ── notification channels ───────────────────────────────────────────────────
@@ -305,41 +301,41 @@ func getOverallStateTransitions(ctx context.Context, in *O11yRuleHistoryQueryIn)
 // listChannels lists the org's notification channels. Viewer gate.
 func listChannels(ctx context.Context, _ *struct{}) (*O11yChannelsOut, error) {
 	out := new(O11yChannelsOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/channels", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/channels", nil, nil, out)
 }
 
 // getChannelByID returns one notification channel, by id. Viewer gate.
 func getChannelByID(ctx context.Context, in *O11yChannelRef) (*O11yChannelOut, error) {
 	out := new(O11yChannelOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/channels/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/channels/"+in.ID, nil, nil, out)
 }
 
 // createChannel creates a notification channel, answering with the stored
 // channel. Admin gate.
 func createChannel(ctx context.Context, in *alertmanagertypes.PostableChannel) (*O11yChannelOut, error) {
 	out := new(O11yChannelOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPost, "/channels", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/channels", nil, in, out)
 }
 
 // updateChannelByID replaces a notification channel's receiver, by id. Admin gate.
 func updateChannelByID(ctx context.Context, in *O11yChannelUpdateIn) (*struct{}, error) {
-	return nil, rulesAlertsRelay(ctx, http.MethodPut, "/channels/"+in.ID, nil, &in.Receiver, nil)
+	return nil, relay(ctx, http.MethodPut, o11yRoot+"/channels/"+in.ID, nil, &in.Receiver, nil)
 }
 
 // deleteChannelByID removes a notification channel, by id. Admin gate.
 func deleteChannelByID(ctx context.Context, in *O11yChannelRef) (*struct{}, error) {
-	return nil, rulesAlertsRelay(ctx, http.MethodDelete, "/channels/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/channels/"+in.ID, nil, nil, nil)
 }
 
 // testChannel sends a test notification to the posted receiver. Editor gate.
 func testChannel(ctx context.Context, in *alertmanagertypes.Receiver) (*struct{}, error) {
-	return nil, rulesAlertsRelay(ctx, http.MethodPost, "/channels/test", nil, in, nil)
+	return nil, relay(ctx, http.MethodPost, o11yRoot+"/channels/test", nil, in, nil)
 }
 
 // testChannelDeprecated sends a test notification to the posted receiver. The
 // legacy path; prefer /channels/test. Editor gate.
 func testChannelDeprecated(ctx context.Context, in *alertmanagertypes.Receiver) (*struct{}, error) {
-	return nil, rulesAlertsRelay(ctx, http.MethodPost, "/testChannel", nil, in, nil)
+	return nil, relay(ctx, http.MethodPost, o11yRoot+"/testChannel", nil, in, nil)
 }
 
 // ── route policies ──────────────────────────────────────────────────────────
@@ -347,31 +343,31 @@ func testChannelDeprecated(ctx context.Context, in *alertmanagertypes.Receiver) 
 // getAllRoutePolicies lists the org's route policies. Viewer gate.
 func getAllRoutePolicies(ctx context.Context, _ *struct{}) (*O11yRoutePoliciesOut, error) {
 	out := new(O11yRoutePoliciesOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/route_policies", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/route_policies", nil, nil, out)
 }
 
 // getRoutePolicyByID returns one route policy, by id. Viewer gate.
 func getRoutePolicyByID(ctx context.Context, in *O11yRoutePolicyRef) (*O11yRoutePolicyOut, error) {
 	out := new(O11yRoutePolicyOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/route_policies/"+in.ID, nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/route_policies/"+in.ID, nil, nil, out)
 }
 
 // createRoutePolicy creates a route policy, answering with the stored policy. Admin gate.
 func createRoutePolicy(ctx context.Context, in *alertmanagertypes.PostableRoutePolicy) (*O11yRoutePolicyOut, error) {
 	out := new(O11yRoutePolicyOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPost, "/route_policies", nil, in, out)
+	return out, relay(ctx, http.MethodPost, o11yRoot+"/route_policies", nil, in, out)
 }
 
 // updateRoutePolicy replaces a route policy, by id, answering with the stored
 // policy. Admin gate.
 func updateRoutePolicy(ctx context.Context, in *O11yRoutePolicyUpdateIn) (*O11yRoutePolicyOut, error) {
 	out := new(O11yRoutePolicyOut)
-	return out, rulesAlertsRelay(ctx, http.MethodPut, "/route_policies/"+in.ID, nil, &in.PostableRoutePolicy, out)
+	return out, relay(ctx, http.MethodPut, o11yRoot+"/route_policies/"+in.ID, nil, &in.PostableRoutePolicy, out)
 }
 
 // deleteRoutePolicyByID removes a route policy, by id. Admin gate.
 func deleteRoutePolicyByID(ctx context.Context, in *O11yRoutePolicyRef) (*struct{}, error) {
-	return nil, rulesAlertsRelay(ctx, http.MethodDelete, "/route_policies/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/route_policies/"+in.ID, nil, nil, nil)
 }
 
 // ── alerts ──────────────────────────────────────────────────────────────────
@@ -379,7 +375,7 @@ func deleteRoutePolicyByID(ctx context.Context, in *O11yRoutePolicyRef) (*struct
 // getAlerts returns the org's current alerts. Viewer gate.
 func getAlerts(ctx context.Context, _ *struct{}) (*O11yAlertsOut, error) {
 	out := new(O11yAlertsOut)
-	return out, rulesAlertsRelay(ctx, http.MethodGet, "/alerts", nil, nil, out)
+	return out, relay(ctx, http.MethodGet, o11yRoot+"/alerts", nil, nil, out)
 }
 
 // ── query-parameter builders ────────────────────────────────────────────────
@@ -735,85 +731,4 @@ type O11yAlertsOut struct {
 	Status string `json:"status"`
 	// Data holds the alerts.
 	Data alertmanagertypes.DeprecatedGettableAlerts `json:"data,omitempty"`
-}
-
-// rulesAlertsRelay hands a typed call to the runtime handler the wildcard
-// forwards to, so the request runs the whole chain it always ran — the mux
-// route, the ViewAccess / EditAccess / AdminAccess gate, the handler — in
-// order. There is no policy here: no tenant is resolved, no role is checked,
-// nothing is scoped. Those all happen where they already do, one layer in.
-//
-// Identity is PROPAGATED, never minted: the gateway's assertion about the
-// caller travels on as the same headers it arrived on. A context with no
-// request behind it — a command, an agent call — carries no assertion, so the
-// runtime's gate refuses it, the honest answer rather than an identity invented
-// at this hop.
-//
-// A non-2xx becomes an error carrying the runtime's own status and reason, read
-// by the same refusal reader the other faces use. out may be nil for the
-// no-content writes, in which case a 2xx is success and the body is ignored.
-// The body is telemetry.go's relay with only the prefix changed; the faces keep
-// separate seams because each op file states its own face's root, and folding
-// them is a one-move refactor.
-func rulesAlertsRelay(ctx context.Context, method, path string, params url.Values, body, out any) error {
-	h := getHandler()
-	if h == nil {
-		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
-	}
-
-	target := o11yRoot + path
-	if q := params.Encode(); q != "" {
-		target += "?" + q
-	}
-
-	payload := io.Reader(http.NoBody)
-	if body != nil {
-		b, err := json.Marshal(body)
-		if err != nil {
-			return zip.ErrBadRequest(err.Error())
-		}
-		payload = bytes.NewReader(b)
-	}
-	req, err := http.NewRequestWithContext(ctx, method, target, payload)
-	if err != nil {
-		return zip.ErrBadRequest(err.Error())
-	}
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	caller := zip.CallerOf(ctx)
-	for header, value := range map[string]string{
-		zip.HeaderOrg:       caller.Org,
-		zip.HeaderProject:   caller.Project,
-		zip.HeaderUser:      caller.User,
-		zip.HeaderUserName:  caller.Name,
-		zip.HeaderUserEmail: caller.Email,
-		zip.HeaderUserOwner: caller.Owner,
-		zip.HeaderRequestID: caller.RequestID,
-	} {
-		if value != "" {
-			req.Header.Set(header, value)
-		}
-	}
-	if caller.Admin {
-		req.Header.Set(zip.HeaderUserAdmin, "true")
-	}
-	if caller.OrgAdmin {
-		req.Header.Set(zip.HeaderUserOrgAdmin, "true")
-	}
-
-	rec := httptest.NewRecorder()
-	h.ServeHTTP(rec, req)
-
-	if rec.Code < http.StatusOK || rec.Code >= http.StatusMultipleChoices {
-		code, reason := refusal(rec.Body.Bytes())
-		return &zip.HTTPError{Status: rec.Code, Code: code, Msg: reason}
-	}
-	if out == nil {
-		return nil
-	}
-	if err := json.Unmarshal(rec.Body.Bytes(), out); err != nil {
-		return zip.ErrInternal("cannot read the runtime's answer: " + err.Error())
-	}
-	return nil
 }

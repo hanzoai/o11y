@@ -158,7 +158,16 @@ func (m *PlannedMaintenance) ShouldSkip(ruleID string, now time.Time, lset model
 }
 
 // IsActive reports whether [now] falls inside the maintenance window's schedule.
+//
+// Schedule is a pointer and this is called from MarshalJSON, which has a value
+// receiver and runs on whatever a decoder produced — including the zero value an
+// answer with no "data" key decodes to. A window with no schedule is not active;
+// saying so is the difference between a field the caller sees as expired and a
+// nil dereference inside encoding/json that takes the process down.
 func (m *PlannedMaintenance) IsActive(now time.Time) bool {
+	if m.Schedule == nil {
+		return false
+	}
 	// Check if maintenance window has not started yet
 	if now.Before(m.Schedule.StartTime) {
 		return false
@@ -279,6 +288,9 @@ func (m *PlannedMaintenance) checkMonthly(currentTime time.Time, loc *time.Locat
 }
 
 func (m *PlannedMaintenance) IsUpcoming() bool {
+	if m.Schedule == nil {
+		return false
+	}
 	now := time.Now()
 
 	if m.IsRecurring() {
@@ -292,7 +304,7 @@ func (m *PlannedMaintenance) IsUpcoming() bool {
 }
 
 func (m *PlannedMaintenance) IsRecurring() bool {
-	return m.Schedule.Recurrence != nil
+	return m.Schedule != nil && m.Schedule.Recurrence != nil
 }
 
 func (m *PlannedMaintenance) Validate() error {
@@ -337,7 +349,7 @@ func (m PlannedMaintenance) MarshalJSON() ([]byte, error) {
 	}
 
 	kind := MaintenanceKindFixed
-	if m.Schedule.Recurrence != nil {
+	if m.IsRecurring() {
 		kind = MaintenanceKindRecurring
 	}
 
