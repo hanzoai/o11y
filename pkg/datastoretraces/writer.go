@@ -44,6 +44,7 @@ import (
 
 	"github.com/hanzo-ds/go"
 	"github.com/hanzo-ds/go/lib/driver"
+	"github.com/hanzoai/o11y/pkg/sightings"
 	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 	"github.com/hanzoai/o11y/pkg/zapreceiver"
 )
@@ -182,6 +183,35 @@ type Writer struct {
 	db   string
 	org  string
 	now  func() time.Time
+
+	// One sighting Set per DIMENSION table, suppressing the repeats that make
+	// up almost all dimension traffic. See pkg/sightings.
+	//
+	// event.span and event.trace have NO Set, for different reasons: a span is
+	// a fact, and a trace row is a PARTIAL contribution folded by an
+	// AggregatingMergeTree — suppressing a repeat there would silently drop
+	// spans from the trace's own span count.
+	seenAttrs      *sightings.Set[bucketed[attrRow]]
+	seenKeys       *sightings.Set[bucketed[keyRow]]
+	seenResources  *sightings.Set[resourceRow] // already carries its bucket
+	seenOperations *sightings.Set[bucketed[operationIdentity]]
+}
+
+// bucketed qualifies a sighting by the window it was seen in, so a dimension
+// row refreshes once per bucket instead of once per batch.
+type bucketed[T comparable] struct {
+	bucket int64
+	row    T
+}
+
+// operationIdentity is an operationRow WITHOUT its time: the row's time is the
+// latest span start in the batch, so it differs every batch and the identity
+// that should be deduplicated is the (service, name) pair alone. Bucketing it
+// keeps event.operation's time column fresh to one window.
+type operationIdentity struct {
+	org     string
+	service string
+	name    string
 }
 
 // Option configures a Writer.
@@ -204,10 +234,14 @@ func WithNow(now func() time.Time) Option { return func(w *Writer) { w.now = now
 // written here is immediately searchable.
 func NewWriter(conn datastore.Conn, opts ...Option) *Writer {
 	w := &Writer{
-		conn: conn,
-		db:   telemetrytraces.DBName,
-		org:  "hanzo",
-		now:  func() time.Time { return time.Now().UTC() },
+		conn:           conn,
+		db:             telemetrytraces.DBName,
+		org:            "hanzo",
+		now:            func() time.Time { return time.Now().UTC() },
+		seenAttrs:      sightings.New[bucketed[attrRow]](0),
+		seenKeys:       sightings.New[bucketed[keyRow]](0),
+		seenResources:  sightings.New[resourceRow](0),
+		seenOperations: sightings.New[bucketed[operationIdentity]](0),
 	}
 	for _, o := range opts {
 		o(w)
@@ -233,27 +267,49 @@ func (w *Writer) WriteSpans(ctx context.Context, batch *zapreceiver.SpanBatch) e
 		}); err != nil {
 		return fmt.Errorf("datastoretraces: write span: %w", err)
 	}
-	if err := send(ctx, w.conn, fmt.Sprintf(attributeSQLTmpl, w.db, telemetrytraces.SpanAttributeTableName), r.attrs,
-		func(b driver.Batch, a attrRow) error {
-			return b.Append(a.org, a.tagKey, a.tagType, a.tagDataType, a.stringValue, a.numberValue, nowMilli)
+	// The four DIMENSION tables below are sightings that repeat batch after
+	// batch. Each suppressed set is one INSERT round-trip not taken on the
+	// receiver's connection handler, which calls this writer synchronously.
+	bucket := bucketOf(now)
+	if err := sightings.Write(w.seenAttrs, r.attrs,
+		func(a attrRow) bucketed[attrRow] { return bucketed[attrRow]{bucket, a} },
+		func(novel []attrRow) error {
+			return send(ctx, w.conn, fmt.Sprintf(attributeSQLTmpl, w.db, telemetrytraces.SpanAttributeTableName), novel,
+				func(b driver.Batch, a attrRow) error {
+					return b.Append(a.org, a.tagKey, a.tagType, a.tagDataType, a.stringValue, a.numberValue, nowMilli)
+				})
 		}); err != nil {
 		return fmt.Errorf("datastoretraces: write span_attribute: %w", err)
 	}
-	if err := send(ctx, w.conn, fmt.Sprintf(keySQLTmpl, w.db, telemetrytraces.SpanKeyTableName), r.keys,
-		func(b driver.Batch, k keyRow) error {
-			return b.Append(k.org, k.tagKey, k.tagType, k.dataType, false, nowMilli)
+	if err := sightings.Write(w.seenKeys, r.keys,
+		func(k keyRow) bucketed[keyRow] { return bucketed[keyRow]{bucket, k} },
+		func(novel []keyRow) error {
+			return send(ctx, w.conn, fmt.Sprintf(keySQLTmpl, w.db, telemetrytraces.SpanKeyTableName), novel,
+				func(b driver.Batch, k keyRow) error {
+					return b.Append(k.org, k.tagKey, k.tagType, k.dataType, false, nowMilli)
+				})
 		}); err != nil {
 		return fmt.Errorf("datastoretraces: write span_key: %w", err)
 	}
-	if err := send(ctx, w.conn, fmt.Sprintf(resourceSQLTmpl, w.db, telemetrytraces.SpanResourceTableName), r.resources,
-		func(b driver.Batch, res resourceRow) error {
-			return b.Append(res.org, res.bucket, res.fingerprint, res.labels)
+	if err := sightings.Write(w.seenResources, r.resources,
+		func(res resourceRow) resourceRow { return res }, // bucket is already a field
+		func(novel []resourceRow) error {
+			return send(ctx, w.conn, fmt.Sprintf(resourceSQLTmpl, w.db, telemetrytraces.SpanResourceTableName), novel,
+				func(b driver.Batch, res resourceRow) error {
+					return b.Append(res.org, res.bucket, res.fingerprint, res.labels)
+				})
 		}); err != nil {
 		return fmt.Errorf("datastoretraces: write span_resource: %w", err)
 	}
-	if err := send(ctx, w.conn, fmt.Sprintf(operationSQLTmpl, w.db, telemetrytraces.OperationTableName), r.operations,
-		func(b driver.Batch, o operationRow) error {
-			return b.Append(o.org, o.service, o.name, o.time)
+	if err := sightings.Write(w.seenOperations, r.operations,
+		func(o operationRow) bucketed[operationIdentity] {
+			return bucketed[operationIdentity]{bucket, operationIdentity{o.org, o.service, o.name}}
+		},
+		func(novel []operationRow) error {
+			return send(ctx, w.conn, fmt.Sprintf(operationSQLTmpl, w.db, telemetrytraces.OperationTableName), novel,
+				func(b driver.Batch, o operationRow) error {
+					return b.Append(o.org, o.service, o.name, o.time)
+				})
 		}); err != nil {
 		return fmt.Errorf("datastoretraces: write operation: %w", err)
 	}
@@ -264,6 +320,12 @@ func (w *Writer) WriteSpans(ctx context.Context, batch *zapreceiver.SpanBatch) e
 		return fmt.Errorf("datastoretraces: write trace: %w", err)
 	}
 	return nil
+}
+
+// bucketOf is the resource-bucket floor, the one window every sighting in this
+// package is qualified by — the same 1800s grid event.span_resource stores.
+func bucketOf(t time.Time) int64 {
+	return t.Unix() / resourceBucketSeconds * resourceBucketSeconds
 }
 
 // send is the one batch-INSERT shape: prepare, append every row, send.
