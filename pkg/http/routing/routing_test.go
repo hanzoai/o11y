@@ -181,3 +181,18 @@ func TestChainWrapsEachLeafWithItsOwnDefs(t *testing.T) {
 func nothing() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) { w.WriteHeader(http.StatusNoContent) })
 }
+
+// A constraint the router does not know is DROPPED by it, and a dropped
+// constraint matches everything — so the wildcard it was guarding starts
+// swallowing the static words it sits behind. The router is silent about this;
+// the registrar is not.
+func TestUnknownConstraintPanics(t *testing.T) {
+	defer func() {
+		if recover() == nil {
+			t.Fatal("a constraint the router would drop was accepted")
+		}
+	}()
+	app := zip.New(zip.Config{DisableStartupMessage: true})
+	routing.New(app.Group(""), nil).
+		Post("/v1/sentry/{project:[0-9a-fA-F]{8}}/envelope/", nothing())
+}

@@ -37,6 +37,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/http/handler"
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
+	"github.com/zap-proto/fiber/v3"
 	"github.com/zap-proto/fiber/v3/middleware/adaptor"
 	"github.com/zap-proto/zip"
 )
@@ -225,13 +226,39 @@ func resourceDefs(h http.Handler) []handler.ResourceDef {
 //	params     →    project          what the request is bound with
 
 // colonize respells a declared path for the router.
+//
+// A constraint the router does not know is a PANIC here, because the router's
+// own answer to one is to DROP it: an unrecognised name parses to "no
+// constraint", and a dropped constraint matches everything. That is the failure
+// mode this service can least afford to have be silent — the two Sentry ingest
+// routes are wildcards that sit after the static /v1/sentry words, and they are
+// safe there only because the constraint refuses anything that is not a UUID.
+// Spell it with a pattern the router does not recognise and the wildcard
+// silently swallows every /v1/sentry/<word>/envelope/ instead.
 func colonize(path string) string {
 	return respell(path, func(name, constraint string) string {
 		if constraint == "" {
 			return ":" + name
 		}
+		if !known[constraint] {
+			panic("routing: " + path + " constrains " + name + " with " + constraint +
+				", which the router does not know and would silently drop")
+		}
 		return ":" + name + "<" + constraint + ">"
 	})
+}
+
+// known is the router's OWN set of constraint names, read off its exported
+// constants rather than copied as strings — a second list would drift from the
+// thing it is guarding. Constraints that take data (min(3), regex(...)) are not
+// here: nothing declares one, and the day something does, this list is where the
+// spelling gets thought about instead of being discovered in production.
+var known = map[string]bool{
+	fiber.ConstraintInt:   true,
+	fiber.ConstraintBool:  true,
+	fiber.ConstraintFloat: true,
+	fiber.ConstraintAlpha: true,
+	fiber.ConstraintGUID:  true,
 }
 
 // template is the declared path with its constraints dropped: the PUBLIC
