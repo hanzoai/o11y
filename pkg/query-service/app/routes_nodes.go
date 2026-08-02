@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountNodes registers k8s node infra-metrics: attribute discovery + list.
@@ -16,9 +14,9 @@ import (
 // second implementation: the ops answer by handing the call back to this
 // router, so the handlers below stay the one place the reads are performed,
 // and the ViewAccess gate keeps running exactly here.
-func (aH *APIHandler) mountNodes(router *mux.Router, am *middleware.AuthZ) {
-	nodesSubRouter := router.PathPrefix("/v1/o11y/nodes").Subrouter()
-	nodesSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getNodeAttributeKeys)).Methods(http.MethodGet)
-	nodesSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getNodeAttributeValues)).Methods(http.MethodGet)
-	nodesSubRouter.HandleFunc("/list", am.ViewAccess(aH.getNodeList)).Methods(http.MethodPost)
+func (aH *APIHandler) mountNodes(router routing.Router, am *middleware.AuthZ) {
+	nodesSubRouter := router.Group("/v1/o11y/nodes")
+	nodesSubRouter.Get("/attribute_keys", am.ViewAccess(aH.getNodeAttributeKeys))
+	nodesSubRouter.Get("/attribute_values", am.ViewAccess(aH.getNodeAttributeValues))
+	nodesSubRouter.Post("/list", am.ViewAccess(aH.getNodeList))
 }

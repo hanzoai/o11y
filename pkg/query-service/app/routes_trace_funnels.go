@@ -3,8 +3,8 @@ package app
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountTraceFunnels registers funnel CRUD plus the two analytics families
@@ -14,44 +14,38 @@ import (
 // ORDER IS LOAD-BEARING: the literal children /new, /list and /steps/update are
 // registered before /{funnel_id}, so GET /list is the list handler and not a
 // funnel lookup with funnel_id="list". Preserved verbatim.
-func (aH *APIHandler) mountTraceFunnels(router *mux.Router, am *middleware.AuthZ) {
+func (aH *APIHandler) mountTraceFunnels(router routing.Router, am *middleware.AuthZ) {
 	// Main trace funnels router
-	traceFunnelsRouter := router.PathPrefix("/v1/o11y/trace-funnels").Subrouter()
+	traceFunnelsRouter := router.Group("/v1/o11y/trace-funnels")
 
 	// API endpoints
-	traceFunnelsRouter.HandleFunc("/new",
-		am.EditAccess(aH.O11y.Handlers.TraceFunnel.New)).
-		Methods(http.MethodPost)
-	traceFunnelsRouter.HandleFunc("/list",
-		am.ViewAccess(aH.O11y.Handlers.TraceFunnel.List)).
-		Methods(http.MethodGet)
-	traceFunnelsRouter.HandleFunc("/steps/update",
-		am.EditAccess(aH.O11y.Handlers.TraceFunnel.UpdateSteps)).
-		Methods(http.MethodPut)
+	traceFunnelsRouter.Post("/new",
+		am.EditAccess(aH.O11y.Handlers.TraceFunnel.New))
+	traceFunnelsRouter.Get("/list",
+		am.ViewAccess(aH.O11y.Handlers.TraceFunnel.List))
+	traceFunnelsRouter.Put("/steps/update",
+		am.EditAccess(aH.O11y.Handlers.TraceFunnel.UpdateSteps))
 
-	traceFunnelsRouter.HandleFunc("/{funnel_id}",
-		am.ViewAccess(aH.O11y.Handlers.TraceFunnel.Get)).
-		Methods(http.MethodGet)
-	traceFunnelsRouter.HandleFunc("/{funnel_id}",
-		am.EditAccess(aH.O11y.Handlers.TraceFunnel.Delete)).
-		Methods(http.MethodDelete)
-	traceFunnelsRouter.HandleFunc("/{funnel_id}",
-		am.EditAccess(aH.O11y.Handlers.TraceFunnel.UpdateFunnel)).
-		Methods(http.MethodPut)
+	traceFunnelsRouter.Get("/{funnel_id}",
+		am.ViewAccess(aH.O11y.Handlers.TraceFunnel.Get))
+	traceFunnelsRouter.Delete("/{funnel_id}",
+		am.EditAccess(aH.O11y.Handlers.TraceFunnel.Delete))
+	traceFunnelsRouter.Put("/{funnel_id}",
+		am.EditAccess(aH.O11y.Handlers.TraceFunnel.UpdateFunnel))
 
 	// Analytics endpoints
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/validate", aH.handleValidateTraces).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/overview", aH.handleFunnelAnalytics).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/steps", aH.handleStepAnalytics).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/steps/overview", aH.handleFunnelStepAnalytics).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/slow-traces", aH.handleFunnelSlowTraces).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/{funnel_id}/analytics/error-traces", aH.handleFunnelErrorTraces).Methods("POST")
+	traceFunnelsRouter.Post("/{funnel_id}/analytics/validate", http.HandlerFunc(aH.handleValidateTraces))
+	traceFunnelsRouter.Post("/{funnel_id}/analytics/overview", http.HandlerFunc(aH.handleFunnelAnalytics))
+	traceFunnelsRouter.Post("/{funnel_id}/analytics/steps", http.HandlerFunc(aH.handleStepAnalytics))
+	traceFunnelsRouter.Post("/{funnel_id}/analytics/steps/overview", http.HandlerFunc(aH.handleFunnelStepAnalytics))
+	traceFunnelsRouter.Post("/{funnel_id}/analytics/slow-traces", http.HandlerFunc(aH.handleFunnelSlowTraces))
+	traceFunnelsRouter.Post("/{funnel_id}/analytics/error-traces", http.HandlerFunc(aH.handleFunnelErrorTraces))
 
 	// Analytics endpoints
-	traceFunnelsRouter.HandleFunc("/analytics/validate", aH.handleValidateTracesWithPayload).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/analytics/overview", aH.handleFunnelAnalyticsWithPayload).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/analytics/steps", aH.handleStepAnalyticsWithPayload).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/analytics/steps/overview", aH.handleFunnelStepAnalyticsWithPayload).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/analytics/slow-traces", aH.handleFunnelSlowTracesWithPayload).Methods("POST")
-	traceFunnelsRouter.HandleFunc("/analytics/error-traces", aH.handleFunnelErrorTracesWithPayload).Methods("POST")
+	traceFunnelsRouter.Post("/analytics/validate", http.HandlerFunc(aH.handleValidateTracesWithPayload))
+	traceFunnelsRouter.Post("/analytics/overview", http.HandlerFunc(aH.handleFunnelAnalyticsWithPayload))
+	traceFunnelsRouter.Post("/analytics/steps", http.HandlerFunc(aH.handleStepAnalyticsWithPayload))
+	traceFunnelsRouter.Post("/analytics/steps/overview", http.HandlerFunc(aH.handleFunnelStepAnalyticsWithPayload))
+	traceFunnelsRouter.Post("/analytics/slow-traces", http.HandlerFunc(aH.handleFunnelSlowTracesWithPayload))
+	traceFunnelsRouter.Post("/analytics/error-traces", http.HandlerFunc(aH.handleFunnelErrorTracesWithPayload))
 }

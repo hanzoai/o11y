@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -26,10 +26,9 @@ func servedID(t *testing.T, template, target string) (valuer.UUID, error) {
 		id  valuer.UUID
 		err error
 	)
-	router := mux.NewRouter()
-	router.HandleFunc(template, func(_ http.ResponseWriter, req *http.Request) {
+	router := routing.Serve(http.MethodGet, template, http.HandlerFunc(func(_ http.ResponseWriter, req *http.Request) {
 		id, err = idFromPath(req)
-	}).Methods(http.MethodGet)
+	}))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, target, http.NoBody))

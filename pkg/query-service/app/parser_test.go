@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/query-service/common"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
@@ -28,10 +28,9 @@ func TestParseSearchTracesParamsReadsTraceIDFromThePath(t *testing.T) {
 		err    error
 	)
 
-	router := mux.NewRouter()
-	router.HandleFunc("/v1/o11y/traces/{traceId}", func(_ http.ResponseWriter, r *http.Request) {
+	router := routing.Serve(http.MethodGet, "/v1/o11y/traces/{traceId}", http.HandlerFunc(func(_ http.ResponseWriter, r *http.Request) {
 		params, err = ParseSearchTracesParams(r)
-	}).Methods(http.MethodGet)
+	}))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/v1/o11y/traces/4bf92f3577b34da6a3ce929d0e0e4736?spanId=00f067aa0ba902b7", http.NoBody))

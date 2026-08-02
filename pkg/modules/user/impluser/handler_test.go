@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -61,15 +61,15 @@ func servedUser(t *testing.T, template, method, target, body string, claims auth
 	t.Helper()
 
 	setter, getter := new(recordingSetter), new(recordingGetter)
-	router := mux.NewRouter()
-	router.HandleFunc(template, pick(NewHandler(setter, getter))).Methods(method)
+	router := routing.Serve(method, template, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pick(NewHandler(setter, getter))(w, r.WithContext(authtypes.NewContextWithClaims(r.Context(), claims)))
+	}))
 
 	var reader io.Reader = http.NoBody
 	if body != "" {
 		reader = strings.NewReader(body)
 	}
 	req := httptest.NewRequest(method, target, reader)
-	req = req.WithContext(authtypes.NewContextWithClaims(req.Context(), claims))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)

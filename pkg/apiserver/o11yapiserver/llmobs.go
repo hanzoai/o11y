@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/llmobstypes"
 )
@@ -29,7 +29,7 @@ import (
 // place access is decided. Both halves are needed — the ops serve the composed
 // binary, this router serves the standalone process, which has no native router
 // to register an op on — so deleting either drops one of the two deployments.
-func (provider *provider) addLLMObsRoutes(router *mux.Router) error {
+func (provider *provider) addLLMObsRoutes(router routing.Router) {
 	h := provider.llmObsHandler
 
 	routes := []struct {
@@ -118,10 +118,6 @@ func (provider *provider) addLLMObsRoutes(router *mux.Router) error {
 	}
 
 	for _, rt := range routes {
-		if err := router.Handle(rt.path, handler.New(rt.fn, rt.def)).Methods(rt.method).GetError(); err != nil {
-			return err
-		}
+		router.Handle(rt.method, rt.path, handler.New(rt.fn, rt.def))
 	}
-
-	return nil
 }

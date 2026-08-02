@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -33,8 +33,7 @@ func (s *stubModule) GetHistoryStats(_ context.Context, ruleID string, _ rulesta
 // asked about the rule the router matched.
 func TestGetRuleHistoryStatsActsOnTheRuleTheRouterMatched(t *testing.T) {
 	module := &stubModule{}
-	router := mux.NewRouter()
-	router.HandleFunc("/v1/o11y/rules/{id}/history/stats", NewHandler(module).GetRuleHistoryStats).Methods(http.MethodGet)
+	router := routing.Serve(http.MethodGet, "/v1/o11y/rules/{id}/history/stats", http.HandlerFunc(NewHandler(module).GetRuleHistoryStats))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/v1/o11y/rules/rule-7/history/stats?start=1&end=2", http.NoBody))
@@ -47,8 +46,7 @@ func TestGetRuleHistoryStatsActsOnTheRuleTheRouterMatched(t *testing.T) {
 // it, or a caller could name one rule in the path and read another's history.
 func TestGetRuleHistoryStatsIgnoresAnIDQueryValue(t *testing.T) {
 	module := &stubModule{}
-	router := mux.NewRouter()
-	router.HandleFunc("/v1/o11y/rules/{id}/history/stats", NewHandler(module).GetRuleHistoryStats).Methods(http.MethodGet)
+	router := routing.Serve(http.MethodGet, "/v1/o11y/rules/{id}/history/stats", http.HandlerFunc(NewHandler(module).GetRuleHistoryStats))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/v1/o11y/rules/rule-7/history/stats?start=1&end=2&id=rule-9", http.NoBody))

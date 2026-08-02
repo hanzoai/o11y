@@ -3,8 +3,8 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/gatewaytypes"
 )
@@ -18,8 +18,8 @@ import (
 // is decided. Both halves are needed — the ops serve the composed binary, this
 // router serves the standalone process, which has no native router to register
 // an op on — so deleting either drops one of the two deployments.
-func (provider *provider) addGatewayRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/gateway/ingestion_keys", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.GetIngestionKeys), handler.OpenAPIDef{
+func (provider *provider) addGatewayRoutes(router routing.Router) {
+	router.Get("/v1/o11y/gateway/ingestion_keys", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.GetIngestionKeys), handler.OpenAPIDef{
 		ID:                  "GetIngestionKeys",
 		Tags:                []string{"gateway"},
 		Summary:             "Get ingestion keys for workspace",
@@ -33,11 +33,9 @@ func (provider *provider) addGatewayRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/gateway/ingestion_keys/search", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.SearchIngestionKeys), handler.OpenAPIDef{
+	router.Get("/v1/o11y/gateway/ingestion_keys/search", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.SearchIngestionKeys), handler.OpenAPIDef{
 		ID:                  "SearchIngestionKeys",
 		Tags:                []string{"gateway"},
 		Summary:             "Search ingestion keys for workspace",
@@ -51,11 +49,9 @@ func (provider *provider) addGatewayRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodGet).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/gateway/ingestion_keys", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.CreateIngestionKey), handler.OpenAPIDef{
+	router.Post("/v1/o11y/gateway/ingestion_keys", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.CreateIngestionKey), handler.OpenAPIDef{
 		ID:                  "CreateIngestionKey",
 		Tags:                []string{"gateway"},
 		Summary:             "Create ingestion key for workspace",
@@ -68,11 +64,9 @@ func (provider *provider) addGatewayRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/gateway/ingestion_keys/{keyId}", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.UpdateIngestionKey), handler.OpenAPIDef{
+	router.Patch("/v1/o11y/gateway/ingestion_keys/{keyId}", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.UpdateIngestionKey), handler.OpenAPIDef{
 		ID:                  "UpdateIngestionKey",
 		Tags:                []string{"gateway"},
 		Summary:             "Update ingestion key for workspace",
@@ -85,11 +79,9 @@ func (provider *provider) addGatewayRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodPatch).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/gateway/ingestion_keys/{keyId}", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.DeleteIngestionKey), handler.OpenAPIDef{
+	router.Delete("/v1/o11y/gateway/ingestion_keys/{keyId}", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.DeleteIngestionKey), handler.OpenAPIDef{
 		ID:                  "DeleteIngestionKey",
 		Tags:                []string{"gateway"},
 		Summary:             "Delete ingestion key for workspace",
@@ -102,11 +94,9 @@ func (provider *provider) addGatewayRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/gateway/ingestion_keys/{keyId}/limits", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.CreateIngestionKeyLimit), handler.OpenAPIDef{
+	router.Post("/v1/o11y/gateway/ingestion_keys/{keyId}/limits", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.CreateIngestionKeyLimit), handler.OpenAPIDef{
 		ID:                  "CreateIngestionKeyLimit",
 		Tags:                []string{"gateway"},
 		Summary:             "Create limit for the ingestion key",
@@ -119,11 +109,9 @@ func (provider *provider) addGatewayRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/gateway/ingestion_keys/limits/{limitId}", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.UpdateIngestionKeyLimit), handler.OpenAPIDef{
+	router.Patch("/v1/o11y/gateway/ingestion_keys/limits/{limitId}", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.UpdateIngestionKeyLimit), handler.OpenAPIDef{
 		ID:                  "UpdateIngestionKeyLimit",
 		Tags:                []string{"gateway"},
 		Summary:             "Update limit for the ingestion key",
@@ -136,11 +124,9 @@ func (provider *provider) addGatewayRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodPatch).GetError(); err != nil {
-		return err
-	}
+	}))
 
-	if err := router.Handle("/v1/o11y/gateway/ingestion_keys/limits/{limitId}", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.DeleteIngestionKeyLimit), handler.OpenAPIDef{
+	router.Delete("/v1/o11y/gateway/ingestion_keys/limits/{limitId}", handler.New(provider.authzMiddleware.EditAccess(provider.gatewayHandler.DeleteIngestionKeyLimit), handler.OpenAPIDef{
 		ID:                  "DeleteIngestionKeyLimit",
 		Tags:                []string{"gateway"},
 		Summary:             "Delete limit for the ingestion key",
@@ -153,9 +139,5 @@ func (provider *provider) addGatewayRoutes(router *mux.Router) error {
 		ErrorStatusCodes:    []int{},
 		Deprecated:          false,
 		SecuritySchemes:     newSecuritySchemes(types.RoleEditor),
-	})).Methods(http.MethodDelete).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	}))
 }

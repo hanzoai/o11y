@@ -33,9 +33,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/retentiontypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 
-	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	jsoniter "github.com/json-iterator/go"
+
 	// The "sqlite" database/sql driver is registered exactly once by the sqlstore
 	// provider (pkg/sqlstore/sqlitesqlstore, which this package transitively
 	// imports and which must import modernc for the *sqlite.Error type). A second
@@ -88,11 +88,6 @@ const (
 	statusSuccess status = "success"
 	statusError   status = "error"
 )
-
-// NewRouter creates and configures a Gorilla Router.
-func NewRouter() *mux.Router {
-	return mux.NewRouter().UseEncodedPath()
-}
 
 // APIHandler implements the query service public API
 type APIHandler struct {

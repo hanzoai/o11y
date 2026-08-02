@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountThirdPartyApis registers the third-party (external domain) API overview.
@@ -16,12 +14,12 @@ import (
 // domainInfo), which relay here — deleting either half drops one of the two
 // deployments. The ViewAccess gate on each route is unchanged: it runs here,
 // one layer in.
-func (aH *APIHandler) mountThirdPartyApis(router *mux.Router, am *middleware.AuthZ) {
-	thirdPartyApiRouter := router.PathPrefix("/v1/o11y/third-party-apis").Subrouter()
+func (aH *APIHandler) mountThirdPartyApis(router routing.Router, am *middleware.AuthZ) {
+	thirdPartyApiRouter := router.Group("/v1/o11y/third-party-apis")
 
 	// Domain Overview route
-	overviewRouter := thirdPartyApiRouter.PathPrefix("/overview").Subrouter()
+	overviewRouter := thirdPartyApiRouter.Group("/overview")
 
-	overviewRouter.HandleFunc("/list", am.ViewAccess(aH.getDomainList)).Methods(http.MethodPost)
-	overviewRouter.HandleFunc("/domain", am.ViewAccess(aH.getDomainInfo)).Methods(http.MethodPost)
+	overviewRouter.Post("/list", am.ViewAccess(aH.getDomainList))
+	overviewRouter.Post("/domain", am.ViewAccess(aH.getDomainInfo))
 }

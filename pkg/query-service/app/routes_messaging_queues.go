@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountMessagingQueues registers the messaging-queues surface: the queue
@@ -19,42 +17,42 @@ import (
 // ops), which relay here — deleting either half drops one of the two
 // deployments. The ViewAccess gate on each route is unchanged: it runs here,
 // one layer in.
-func (aH *APIHandler) mountMessagingQueues(router *mux.Router, am *middleware.AuthZ) {
+func (aH *APIHandler) mountMessagingQueues(router routing.Router, am *middleware.AuthZ) {
 	// Main messaging queues router
-	messagingQueuesRouter := router.PathPrefix("/v1/o11y/messaging-queues").Subrouter()
+	messagingQueuesRouter := router.Group("/v1/o11y/messaging-queues")
 
 	// Queue Overview route
-	messagingQueuesRouter.HandleFunc("/queue-overview", am.ViewAccess(aH.getQueueOverview)).Methods(http.MethodPost)
+	messagingQueuesRouter.Post("/queue-overview", am.ViewAccess(aH.getQueueOverview))
 
 	// -------------------------------------------------
 	// Kafka-specific routes
-	kafkaRouter := messagingQueuesRouter.PathPrefix("/kafka").Subrouter()
+	kafkaRouter := messagingQueuesRouter.Group("/kafka")
 
-	onboardingRouter := kafkaRouter.PathPrefix("/onboarding").Subrouter()
+	onboardingRouter := kafkaRouter.Group("/onboarding")
 
-	onboardingRouter.HandleFunc("/producers", am.ViewAccess(aH.onboardProducers)).Methods(http.MethodPost)
-	onboardingRouter.HandleFunc("/consumers", am.ViewAccess(aH.onboardConsumers)).Methods(http.MethodPost)
-	onboardingRouter.HandleFunc("/kafka", am.ViewAccess(aH.onboardKafka)).Methods(http.MethodPost)
+	onboardingRouter.Post("/producers", am.ViewAccess(aH.onboardProducers))
+	onboardingRouter.Post("/consumers", am.ViewAccess(aH.onboardConsumers))
+	onboardingRouter.Post("/kafka", am.ViewAccess(aH.onboardKafka))
 
-	partitionLatency := kafkaRouter.PathPrefix("/partition-latency").Subrouter()
+	partitionLatency := kafkaRouter.Group("/partition-latency")
 
-	partitionLatency.HandleFunc("/overview", am.ViewAccess(aH.getPartitionOverviewLatencyData)).Methods(http.MethodPost)
-	partitionLatency.HandleFunc("/consumer", am.ViewAccess(aH.getConsumerPartitionLatencyData)).Methods(http.MethodPost)
+	partitionLatency.Post("/overview", am.ViewAccess(aH.getPartitionOverviewLatencyData))
+	partitionLatency.Post("/consumer", am.ViewAccess(aH.getConsumerPartitionLatencyData))
 
-	consumerLagRouter := kafkaRouter.PathPrefix("/consumer-lag").Subrouter()
+	consumerLagRouter := kafkaRouter.Group("/consumer-lag")
 
-	consumerLagRouter.HandleFunc("/producer-details", am.ViewAccess(aH.getProducerData)).Methods(http.MethodPost)
-	consumerLagRouter.HandleFunc("/consumer-details", am.ViewAccess(aH.getConsumerData)).Methods(http.MethodPost)
-	consumerLagRouter.HandleFunc("/network-latency", am.ViewAccess(aH.getNetworkData)).Methods(http.MethodPost)
+	consumerLagRouter.Post("/producer-details", am.ViewAccess(aH.getProducerData))
+	consumerLagRouter.Post("/consumer-details", am.ViewAccess(aH.getConsumerData))
+	consumerLagRouter.Post("/network-latency", am.ViewAccess(aH.getNetworkData))
 
-	topicThroughput := kafkaRouter.PathPrefix("/topic-throughput").Subrouter()
+	topicThroughput := kafkaRouter.Group("/topic-throughput")
 
-	topicThroughput.HandleFunc("/producer", am.ViewAccess(aH.getProducerThroughputOverview)).Methods(http.MethodPost)
-	topicThroughput.HandleFunc("/producer-details", am.ViewAccess(aH.getProducerThroughputDetails)).Methods(http.MethodPost)
-	topicThroughput.HandleFunc("/consumer", am.ViewAccess(aH.getConsumerThroughputOverview)).Methods(http.MethodPost)
-	topicThroughput.HandleFunc("/consumer-details", am.ViewAccess(aH.getConsumerThroughputDetails)).Methods(http.MethodPost)
+	topicThroughput.Post("/producer", am.ViewAccess(aH.getProducerThroughputOverview))
+	topicThroughput.Post("/producer-details", am.ViewAccess(aH.getProducerThroughputDetails))
+	topicThroughput.Post("/consumer", am.ViewAccess(aH.getConsumerThroughputOverview))
+	topicThroughput.Post("/consumer-details", am.ViewAccess(aH.getConsumerThroughputDetails))
 
-	spanEvaluation := kafkaRouter.PathPrefix("/span").Subrouter()
+	spanEvaluation := kafkaRouter.Group("/span")
 
-	spanEvaluation.HandleFunc("/evaluation", am.ViewAccess(aH.getProducerConsumerEval)).Methods(http.MethodPost)
+	spanEvaluation.Post("/evaluation", am.ViewAccess(aH.getProducerConsumerEval))
 }

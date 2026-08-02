@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountSettings registers tenant settings: retention TTL and apdex. 4 routes.
@@ -16,10 +14,10 @@ import (
 // (setRetention, retention, setApdex, apdex), which relay here — so the gates
 // named below stay the one place access is decided, and deleting either half
 // drops one of the two deployments.
-func (aH *APIHandler) mountSettings(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/v1/o11y/settings/ttl", am.AdminAccess(aH.setCustomRetentionTTL)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/settings/ttl", am.ViewAccess(aH.getCustomRetentionTTL)).Methods(http.MethodGet)
+func (aH *APIHandler) mountSettings(router routing.Router, am *middleware.AuthZ) {
+	router.Post("/v1/o11y/settings/ttl", am.AdminAccess(aH.setCustomRetentionTTL))
+	router.Get("/v1/o11y/settings/ttl", am.ViewAccess(aH.getCustomRetentionTTL))
 
-	router.HandleFunc("/v1/o11y/settings/apdex", am.AdminAccess(aH.O11y.Handlers.Apdex.Set)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/settings/apdex", am.ViewAccess(aH.O11y.Handlers.Apdex.Get)).Methods(http.MethodGet)
+	router.Post("/v1/o11y/settings/apdex", am.AdminAccess(aH.O11y.Handlers.Apdex.Set))
+	router.Get("/v1/o11y/settings/apdex", am.ViewAccess(aH.O11y.Handlers.Apdex.Get))
 }

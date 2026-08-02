@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountRules registers alert-rule evaluation and rule state history. 5 routes.
@@ -23,10 +21,10 @@ import (
 // Both halves are needed — the ops serve the composed binary, this router
 // serves the standalone process, which has no native router to register an op
 // on — so deleting either drops one of the two deployments.
-func (aH *APIHandler) mountRules(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/v1/o11y/testRule", am.EditAccess(aH.testRule)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/rules/{id}/history/stats", am.ViewAccess(aH.getRuleStats)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/rules/{id}/history/timeline", am.ViewAccess(aH.getRuleStateHistory)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/rules/{id}/history/top_contributors", am.ViewAccess(aH.getRuleStateHistoryTopContributors)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/rules/{id}/history/overall_status", am.ViewAccess(aH.getOverallStateTransitions)).Methods(http.MethodPost)
+func (aH *APIHandler) mountRules(router routing.Router, am *middleware.AuthZ) {
+	router.Post("/v1/o11y/testRule", am.EditAccess(aH.testRule))
+	router.Post("/v1/o11y/rules/{id}/history/stats", am.ViewAccess(aH.getRuleStats))
+	router.Post("/v1/o11y/rules/{id}/history/timeline", am.ViewAccess(aH.getRuleStateHistory))
+	router.Post("/v1/o11y/rules/{id}/history/top_contributors", am.ViewAccess(aH.getRuleStateHistoryTopContributors))
+	router.Post("/v1/o11y/rules/{id}/history/overall_status", am.ViewAccess(aH.getOverallStateTransitions))
 }

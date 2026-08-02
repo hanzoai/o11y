@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // DUAL DISPATCH. These registrations stay: the standalone server reaches them
@@ -14,10 +12,10 @@ import (
 
 // mountExplorer registers saved explorer views (list/create/get/update/delete).
 // 5 routes.
-func (aH *APIHandler) mountExplorer(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/v1/o11y/explorer/views", am.ViewAccess(aH.O11y.Handlers.SavedView.List)).Methods(http.MethodGet)
-	router.HandleFunc("/v1/o11y/explorer/views", am.EditAccess(aH.O11y.Handlers.SavedView.Create)).Methods(http.MethodPost)
-	router.HandleFunc("/v1/o11y/explorer/views/{viewId}", am.ViewAccess(aH.O11y.Handlers.SavedView.Get)).Methods(http.MethodGet)
-	router.HandleFunc("/v1/o11y/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Update)).Methods(http.MethodPut)
-	router.HandleFunc("/v1/o11y/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Delete)).Methods(http.MethodDelete)
+func (aH *APIHandler) mountExplorer(router routing.Router, am *middleware.AuthZ) {
+	router.Get("/v1/o11y/explorer/views", am.ViewAccess(aH.O11y.Handlers.SavedView.List))
+	router.Post("/v1/o11y/explorer/views", am.EditAccess(aH.O11y.Handlers.SavedView.Create))
+	router.Get("/v1/o11y/explorer/views/{viewId}", am.ViewAccess(aH.O11y.Handlers.SavedView.Get))
+	router.Put("/v1/o11y/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Update))
+	router.Delete("/v1/o11y/explorer/views/{viewId}", am.EditAccess(aH.O11y.Handlers.SavedView.Delete))
 }

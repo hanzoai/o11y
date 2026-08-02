@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountProcesses registers process infra-metrics: attribute discovery + list.
@@ -16,9 +14,9 @@ import (
 // second implementation: the ops answer by handing the call back to this
 // router, so the handlers below stay the one place the reads are performed,
 // and the ViewAccess gate keeps running exactly here.
-func (aH *APIHandler) mountProcesses(router *mux.Router, am *middleware.AuthZ) {
-	processesSubRouter := router.PathPrefix("/v1/o11y/processes").Subrouter()
-	processesSubRouter.HandleFunc("/attribute_keys", am.ViewAccess(aH.getProcessAttributeKeys)).Methods(http.MethodGet)
-	processesSubRouter.HandleFunc("/attribute_values", am.ViewAccess(aH.getProcessAttributeValues)).Methods(http.MethodGet)
-	processesSubRouter.HandleFunc("/list", am.ViewAccess(aH.getProcessList)).Methods(http.MethodPost)
+func (aH *APIHandler) mountProcesses(router routing.Router, am *middleware.AuthZ) {
+	processesSubRouter := router.Group("/v1/o11y/processes")
+	processesSubRouter.Get("/attribute_keys", am.ViewAccess(aH.getProcessAttributeKeys))
+	processesSubRouter.Get("/attribute_values", am.ViewAccess(aH.getProcessAttributeValues))
+	processesSubRouter.Post("/list", am.ViewAccess(aH.getProcessList))
 }

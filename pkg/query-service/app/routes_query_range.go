@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // DUAL DISPATCH. These registrations stay: the standalone server reaches them
@@ -14,12 +12,12 @@ import (
 // deployments.
 
 // mountQueryRange registers the metrics range read. 1 route.
-func (aH *APIHandler) mountQueryRange(router *mux.Router, am *middleware.AuthZ) {
-	router.HandleFunc("/v1/o11y/query_range", am.ViewAccess(aH.queryRangeMetrics)).Methods(http.MethodGet)
+func (aH *APIHandler) mountQueryRange(router routing.Router, am *middleware.AuthZ) {
+	router.Get("/v1/o11y/query_range", am.ViewAccess(aH.queryRangeMetrics))
 }
 
 // mountQueryRangeFormat registers the query-builder format op on the shared
 // /v1/o11y subrouter owned by RegisterQueryRangeV3Routes. 1 route.
-func (aH *APIHandler) mountQueryRangeFormat(subRouter *mux.Router, am *middleware.AuthZ) {
-	subRouter.HandleFunc("/query_range/format", am.ViewAccess(aH.QueryRangeV3Format)).Methods(http.MethodPost)
+func (aH *APIHandler) mountQueryRangeFormat(subRouter routing.Router, am *middleware.AuthZ) {
+	subRouter.Post("/query_range/format", am.ViewAccess(aH.QueryRangeV3Format))
 }

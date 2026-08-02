@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // Query progress streaming. 2 routes, one handler, two mount points — the
@@ -21,12 +19,12 @@ import (
 // subrouter owned by RegisterQueryRangeV3Routes. 1 route.
 //
 // TODO(Raj): Remove this handler after /ws based path has been completely rolled out.
-func (aH *APIHandler) mountQueryProgress(subRouter *mux.Router, am *middleware.AuthZ) {
-	subRouter.HandleFunc("/query_progress", am.ViewAccess(aH.GetQueryProgressUpdates)).Methods(http.MethodGet)
+func (aH *APIHandler) mountQueryProgress(subRouter routing.Router, am *middleware.AuthZ) {
+	subRouter.Get("/query_progress", am.ViewAccess(aH.GetQueryProgressUpdates))
 }
 
 // mountWebSocketQueryProgress registers the websocket path on the /ws
 // subrouter owned by RegisterWebSocketPaths. 1 route.
-func (aH *APIHandler) mountWebSocketQueryProgress(subRouter *mux.Router, am *middleware.AuthZ) {
-	subRouter.HandleFunc("/query_progress", am.ViewAccess(aH.GetQueryProgressUpdates)).Methods(http.MethodGet)
+func (aH *APIHandler) mountWebSocketQueryProgress(subRouter routing.Router, am *middleware.AuthZ) {
+	subRouter.Get("/query_progress", am.ViewAccess(aH.GetQueryProgressUpdates))
 }

@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gorilla/mux"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -42,10 +42,9 @@ func servePublicDashboard(t *testing.T, template, target string) *recordingDashb
 	prov := &provider{dashboardModule: module}
 
 	var err error
-	router := mux.NewRouter()
-	router.HandleFunc(template, func(_ http.ResponseWriter, req *http.Request) {
+	router := routing.Serve(http.MethodGet, template, http.HandlerFunc(func(_ http.ResponseWriter, req *http.Request) {
 		_, _, err = prov.publicDashboardSelectors(req, nil)
-	}).Methods(http.MethodGet)
+	}))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, target, http.NoBody))
@@ -81,10 +80,9 @@ func TestPublicDashboardSelectorsRefuseANonUUIDSegment(t *testing.T) {
 	prov := &provider{dashboardModule: module}
 
 	var err error
-	router := mux.NewRouter()
-	router.HandleFunc("/v1/o11y/public/dashboards/{id}", func(_ http.ResponseWriter, req *http.Request) {
+	router := routing.Serve(http.MethodGet, "/v1/o11y/public/dashboards/{id}", http.HandlerFunc(func(_ http.ResponseWriter, req *http.Request) {
 		_, _, err = prov.publicDashboardSelectors(req, nil)
-	}).Methods(http.MethodGet)
+	}))
 	router.ServeHTTP(httptest.NewRecorder(), httptest.NewRequest(http.MethodGet, "/v1/o11y/public/dashboards/not-a-uuid", http.NoBody))
 
 	require.Error(t, err)

@@ -1,10 +1,8 @@
 package app
 
 import (
-	"net/http"
-
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/middleware"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
 // mountLogs registers the logs surface: reads, the field catalog, and log
@@ -18,17 +16,17 @@ import (
 // ORDER IS LOAD-BEARING inside the pipelines block: /pipelines/preview is
 // registered before /pipelines/{version}, so POST .../pipelines/preview reaches
 // the preview handler rather than binding version="preview". Preserved verbatim.
-func (aH *APIHandler) mountLogs(router *mux.Router, am *middleware.AuthZ) {
-	subRouter := router.PathPrefix("/v1/o11y/logs").Subrouter()
-	subRouter.HandleFunc("", am.ViewAccess(aH.getLogs)).Methods(http.MethodGet)
-	subRouter.HandleFunc("/fields", am.ViewAccess(aH.logFields)).Methods(http.MethodGet)
-	subRouter.HandleFunc("/fields", am.EditAccess(aH.logFieldUpdate)).Methods(http.MethodPost)
-	subRouter.HandleFunc("/aggregate", am.ViewAccess(aH.logAggregate)).Methods(http.MethodGet)
+func (aH *APIHandler) mountLogs(router routing.Router, am *middleware.AuthZ) {
+	subRouter := router.Group("/v1/o11y/logs")
+	subRouter.Get("", am.ViewAccess(aH.getLogs))
+	subRouter.Get("/fields", am.ViewAccess(aH.logFields))
+	subRouter.Post("/fields", am.EditAccess(aH.logFieldUpdate))
+	subRouter.Get("/aggregate", am.ViewAccess(aH.logAggregate))
 
 	// log pipelines
-	subRouter.HandleFunc("/pipelines/preview", am.ViewAccess(aH.PreviewLogsPipelinesHandler)).Methods(http.MethodPost)
-	subRouter.HandleFunc("/pipelines/{version}", am.ViewAccess(aH.ListLogsPipelinesHandler)).Methods(http.MethodGet)
-	subRouter.HandleFunc("/pipelines", am.EditAccess(aH.CreateLogsPipeline)).Methods(http.MethodPost)
+	subRouter.Post("/pipelines/preview", am.ViewAccess(aH.PreviewLogsPipelinesHandler))
+	subRouter.Get("/pipelines/{version}", am.ViewAccess(aH.ListLogsPipelinesHandler))
+	subRouter.Post("/pipelines", am.EditAccess(aH.CreateLogsPipeline))
 }
 
 // mountLogsLivetail registers live logs on the shared /v1/o11y subrouter owned
@@ -39,6 +37,6 @@ func (aH *APIHandler) mountLogs(router *mux.Router, am *middleware.AuthZ) {
 // /v1/o11y prefix route and this registration wins. Moving it under mountLogs
 // would change nothing for callers but would change which prefix route matches
 // — left exactly where it was.
-func (aH *APIHandler) mountLogsLivetail(subRouter *mux.Router, am *middleware.AuthZ) {
-	subRouter.HandleFunc("/logs/livetail", am.ViewAccess(aH.O11y.Handlers.QuerierHandler.QueryRawStream)).Methods(http.MethodGet)
+func (aH *APIHandler) mountLogsLivetail(subRouter routing.Router, am *middleware.AuthZ) {
+	subRouter.Get("/logs/livetail", am.ViewAccess(aH.O11y.Handlers.QuerierHandler.QueryRawStream))
 }

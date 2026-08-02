@@ -3,14 +3,14 @@ package o11yapiserver
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/hanzoai/o11y/pkg/http/handler"
+	"github.com/hanzoai/o11y/pkg/http/routing"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/spantypes"
 )
 
-func (provider *provider) addTraceDetailRoutes(router *mux.Router) error {
-	if err := router.Handle("/v1/o11y/traces/{traceID}/waterfall", handler.New(
+func (provider *provider) addTraceDetailRoutes(router routing.Router) {
+	router.Post("/v1/o11y/traces/{traceID}/waterfall", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.traceDetailHandler.GetWaterfallV4),
 		handler.OpenAPIDef{
 			ID:                  "GetWaterfallV4",
@@ -25,11 +25,9 @@ func (provider *provider) addTraceDetailRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusNotFound},
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/traces/{traceID}/aggregations", handler.New(
+	router.Post("/v1/o11y/traces/{traceID}/aggregations", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.traceDetailHandler.GetTraceAggregations),
 		handler.OpenAPIDef{
 			ID:                  "GetTraceAggregations",
@@ -44,11 +42,9 @@ func (provider *provider) addTraceDetailRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusNotFound},
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
+	))
 
-	if err := router.Handle("/v1/o11y/traces/{traceID}/flamegraph", handler.New(
+	router.Post("/v1/o11y/traces/{traceID}/flamegraph", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.traceDetailHandler.GetFlamegraph),
 		handler.OpenAPIDef{
 			ID:                  "GetFlamegraph",
@@ -63,9 +59,5 @@ func (provider *provider) addTraceDetailRoutes(router *mux.Router) error {
 			ErrorStatusCodes:    []int{http.StatusBadRequest, http.StatusNotFound},
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		},
-	)).Methods(http.MethodPost).GetError(); err != nil {
-		return err
-	}
-
-	return nil
+	))
 }
