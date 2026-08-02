@@ -6,8 +6,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	"github.com/hanzoai/o11y/pkg/modules/tracedetail"
+	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/types/spantypes"
-	"github.com/gorilla/mux"
 )
 
 type handler struct {
@@ -30,7 +30,7 @@ func (h *handler) GetWaterfallV4(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.module.GetWaterfallV4(r.Context(), mux.Vars(r)["traceID"], req.SelectedSpanID, req.UncollapsedSpans)
+	result, err := h.module.GetWaterfallV4(r.Context(), coretypes.Param(r, "traceID"), req.SelectedSpanID, req.UncollapsedSpans)
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -51,7 +51,7 @@ func (h *handler) GetTraceAggregations(rw http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	result, err := h.module.GetTraceAggregations(r.Context(), mux.Vars(r)["traceID"], req)
+	result, err := h.module.GetTraceAggregations(r.Context(), coretypes.Param(r, "traceID"), req)
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -67,7 +67,7 @@ func (h *handler) GetFlamegraph(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.module.GetFlamegraph(r.Context(), mux.Vars(r)["traceID"], req.SelectedSpanID, req.SelectFields)
+	result, err := h.module.GetFlamegraph(r.Context(), coretypes.Param(r, "traceID"), req.SelectedSpanID, req.SelectFields)
 	if err != nil {
 		render.Error(rw, err)
 		return
