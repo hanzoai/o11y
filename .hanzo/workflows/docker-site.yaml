@@ -68,5 +68,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # Registry cache, not type=gha. The gha backend needs an Actions runtime
+          # token, and git.hanzo.ai does not issue one that buildx can parse:
+          #   Cannot parse GitHub Actions Runtime Token: missing part #2
+          #   failed to configure gha cache exporter: token is malformed
+          # That fails the BUILD, so a cache meant to save time was costing the
+          # whole job. ignore-error keeps the first build (no cache image yet)
+          # from failing on a 404, which is how luxfi/dex was breaking.
+          cache-from: type=registry,ref=ghcr.io/hanzoai/o11y-site:buildcache,ignore-error=true
+          cache-to: type=registry,ref=ghcr.io/hanzoai/o11y-site:buildcache,mode=max,ignore-error=true
