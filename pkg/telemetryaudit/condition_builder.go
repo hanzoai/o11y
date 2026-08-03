@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 type conditionBuilder struct {
@@ -152,7 +152,7 @@ func (c *conditionBuilder) conditionFor(
 
 			switch valueType := column.Type.(schema.MapColumnType).ValueType; valueType.GetType() {
 			case schema.ColumnTypeEnumString, schema.ColumnTypeEnumBool, schema.ColumnTypeEnumFloat64:
-				leftOperand := fmt.Sprintf("mapContains(%s, '%s')", column.Name, key.Name)
+				leftOperand := fmt.Sprintf("mapContains(%s, '%s')", column.Name, querybuilder.EscapeLiteral(key.Name))
 				if key.Materialized {
 					leftOperand = telemetrytypes.FieldKeyToMaterializedColumnNameForExists(key)
 				}
