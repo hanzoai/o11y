@@ -9,6 +9,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 )
 
 const NANOSECOND = 1000000000
@@ -73,7 +74,7 @@ func getColumnName(key v3.AttributeKey, replaceAlias bool) string {
 	if !key.IsColumn {
 		keyType := getDatastoreTracesColumnType(key.Type)
 		keyDType := getDatastoreTracesColumnDataType(key.DataType)
-		return fmt.Sprintf("%s_%s['%s']", keyType, keyDType, key.Key)
+		return fmt.Sprintf("%s_%s['%s']", keyType, keyDType, querybuilder.EscapeLiteral(key.Key))
 	}
 
 	return "`" + utils.GetDatastoreColumnNameV2(string(key.Type), string(key.DataType), key.Key) + "`"
@@ -84,7 +85,7 @@ func getSelectLabels(groupBy []v3.AttributeKey) string {
 	var labels []string
 	for _, tag := range groupBy {
 		name := getColumnName(tag, true)
-		labels = append(labels, fmt.Sprintf(" %s as `%s`", name, tag.Key))
+		labels = append(labels, fmt.Sprintf(" %s as %s", name, querybuilder.QuoteIdent(tag.Key)))
 	}
 	return strings.Join(labels, ",")
 }
@@ -148,7 +149,7 @@ func BuildTracesFilterQuery(fs *v3.FilterSet, skipAllowed bool) (string, error) 
 						cType := getDatastoreTracesColumnType(item.Key.Type)
 						cDataType := getDatastoreTracesColumnDataType(item.Key.DataType)
 						col := fmt.Sprintf("%s_%s", cType, cDataType)
-						conditions = append(conditions, fmt.Sprintf(operator, col, item.Key.Key))
+						conditions = append(conditions, fmt.Sprintf(operator, col, querybuilder.EscapeLiteral(item.Key.Key)))
 					}
 
 				default:
@@ -196,15 +197,15 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 
 	for _, item := range items {
 		if item.ColumnName == constants.O11yOrderByValue {
-			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order.Keyword()))
 		} else if _, ok := tagLookup[item.ColumnName]; ok {
-			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("%s %s", querybuilder.QuoteIdent(item.ColumnName), item.Order.Keyword()))
 		} else if panelType == v3.PanelTypeList {
 			attr := v3.AttributeKey{Key: item.ColumnName, DataType: item.DataType, Type: item.Type, IsColumn: item.IsColumn}
 			// we want to keep the original name as it will be already corrected by the select query
 			// so we are setting replaceAlias = false
 			name := getColumnName(attr, false)
-			orderBy = append(orderBy, fmt.Sprintf("%s %s", name, item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("%s %s", name, item.Order.Keyword()))
 		}
 	}
 
@@ -443,7 +444,7 @@ func buildTracesQuery(start, end, step int64, mq *v3.BuilderQuery, panelType v3.
 			} else {
 				cType := getDatastoreTracesColumnType(mq.AggregateAttribute.Type)
 				cDataType := getDatastoreTracesColumnDataType(mq.AggregateAttribute.DataType)
-				filterSubQuery = fmt.Sprintf("%s AND mapContains(%s_%s, '%s')", filterSubQuery, cType, cDataType, mq.AggregateAttribute.Key)
+				filterSubQuery = fmt.Sprintf("%s AND mapContains(%s_%s, '%s')", filterSubQuery, cType, cDataType, querybuilder.EscapeLiteral(mq.AggregateAttribute.Key))
 			}
 		}
 		op := "toFloat64(count())"

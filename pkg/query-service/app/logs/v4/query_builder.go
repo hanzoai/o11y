@@ -9,6 +9,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 )
 
 var logOperators = map[v3.FilterOperator]string{
@@ -70,7 +71,7 @@ func getDatastoreKey(key v3.AttributeKey) string {
 	if !key.IsColumn {
 		columnType := logsV3.GetDatastoreLogsColumnType(key.Type)
 		columnDataType := getDatastoreLogsColumnDataType(key.DataType)
-		return fmt.Sprintf("%s_%s['%s']", columnType, columnDataType, key.Key)
+		return fmt.Sprintf("%s_%s['%s']", columnType, columnDataType, querybuilder.EscapeLiteral(key.Key))
 	}
 
 	// materialized column created from query
@@ -85,7 +86,7 @@ func getSelectLabels(aggregatorOperator v3.AggregateOperator, groupBy []v3.Attri
 	} else {
 		for _, tag := range groupBy {
 			columnName := getDatastoreKey(tag)
-			selectLabels += fmt.Sprintf(" %s as `%s`,", columnName, tag.Key)
+			selectLabels += fmt.Sprintf(" %s as %s,", columnName, querybuilder.QuoteIdent(tag.Key))
 		}
 	}
 	return selectLabels
@@ -121,7 +122,7 @@ func getExistsNexistsFilter(op v3.FilterOperator, item v3.FilterItem) string {
 	// filter for non materialized attributes
 	columnType := logsV3.GetDatastoreLogsColumnType(item.Key.Type)
 	columnDataType := getDatastoreLogsColumnDataType(item.Key.DataType)
-	return fmt.Sprintf(logOperators[op], columnType, columnDataType, item.Key.Key)
+	return fmt.Sprintf(logOperators[op], columnType, columnDataType, querybuilder.EscapeLiteral(item.Key.Key))
 }
 
 func buildAttributeFilter(item v3.FilterItem) (string, error) {
@@ -240,7 +241,7 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 		if !attr.IsColumn {
 			columnType := logsV3.GetDatastoreLogsColumnType(attr.Type)
 			columnDataType := getDatastoreLogsColumnDataType(attr.DataType)
-			conditions = append(conditions, fmt.Sprintf("mapContains(%s_%s, '%s')", columnType, columnDataType, attr.Key))
+			conditions = append(conditions, fmt.Sprintf("mapContains(%s_%s, '%s')", columnType, columnDataType, querybuilder.EscapeLiteral(attr.Key)))
 		} else if attr.Type != v3.AttributeKeyTypeUnspecified {
 			// for materialzied columns and not the top level static fields
 			name := utils.GetDatastoreColumnNameV2(string(attr.Type), string(attr.DataType), attr.Key)
@@ -266,13 +267,13 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 
 	for _, item := range items {
 		if item.ColumnName == constants.O11yOrderByValue {
-			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order.Keyword()))
 		} else if _, ok := tagLookup[item.ColumnName]; ok {
-			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("%s %s", querybuilder.QuoteIdent(item.ColumnName), item.Order.Keyword()))
 		} else if panelType == v3.PanelTypeList {
 			attr := v3.AttributeKey{Key: item.ColumnName, DataType: item.DataType, Type: item.Type, IsColumn: item.IsColumn}
 			name := getDatastoreKey(attr)
-			orderBy = append(orderBy, fmt.Sprintf("%s %s", name, item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("%s %s", name, item.Order.Keyword()))
 		}
 	}
 	return orderBy

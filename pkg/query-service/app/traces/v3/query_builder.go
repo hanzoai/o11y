@@ -8,6 +8,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 )
 
 var AggregateOperatorToPercentile = map[v3.AggregateOperator]float64{
@@ -58,7 +59,7 @@ func getColumnName(key v3.AttributeKey) string {
 		return key.Key
 	}
 	filterType, filterDataType := getDatastoreTracesColumnDataTypeAndType(key)
-	return fmt.Sprintf("%s%s['%s']", filterDataType, filterType, key.Key)
+	return fmt.Sprintf("%s%s['%s']", filterDataType, filterType, querybuilder.EscapeLiteral(key.Key))
 }
 
 func getDatastoreTracesColumnDataTypeAndType(key v3.AttributeKey) (v3.AttributeKeyType, string) {
@@ -103,7 +104,7 @@ func getSelectLabels(aggregatorOperator v3.AggregateOperator, groupBy []v3.Attri
 	} else {
 		for _, tag := range groupBy {
 			filterName := getColumnName(tag)
-			selectLabels += fmt.Sprintf(" %s as `%s`,", filterName, tag.Key)
+			selectLabels += fmt.Sprintf(" %s as %s,", filterName, querybuilder.QuoteIdent(tag.Key))
 		}
 	}
 	return selectLabels
@@ -115,7 +116,7 @@ func GetSelectKeys(aggregatorOperator v3.AggregateOperator, groupBy []v3.Attribu
 		return ""
 	} else {
 		for _, tag := range groupBy {
-			selectLabels = append(selectLabels, fmt.Sprintf("`%s`", tag.Key))
+			selectLabels = append(selectLabels, querybuilder.QuoteIdent(tag.Key))
 		}
 	}
 	return strings.Join(selectLabels, ",")
@@ -125,7 +126,7 @@ func getSelectColumns(sc []v3.AttributeKey) string {
 	var columns []string
 	for _, tag := range sc {
 		columnName := getColumnName(tag)
-		columns = append(columns, fmt.Sprintf("%s as `%s` ", columnName, tag.Key))
+		columns = append(columns, fmt.Sprintf("%s as %s ", columnName, querybuilder.QuoteIdent(tag.Key)))
 	}
 	return strings.Join(columns, ",")
 }
@@ -180,7 +181,7 @@ func buildTracesFilterQuery(fs *v3.FilterSet) (string, error) {
 						conditions = append(conditions, subQuery)
 					} else {
 						columnType, columnDataType := getDatastoreTracesColumnDataTypeAndType(item.Key)
-						conditions = append(conditions, fmt.Sprintf(operator, columnDataType, columnType, item.Key.Key))
+						conditions = append(conditions, fmt.Sprintf(operator, columnDataType, columnType, querybuilder.EscapeLiteral(item.Key.Key)))
 					}
 
 				default:
@@ -263,7 +264,7 @@ func groupBy(panelType v3.PanelType, graphLimitQtype string, tags ...string) str
 func GroupByAttributeKeyTags(panelType v3.PanelType, graphLimitQtype string, tags ...v3.AttributeKey) string {
 	groupTags := []string{}
 	for _, tag := range tags {
-		groupTags = append(groupTags, fmt.Sprintf("`%s`", tag.Key))
+		groupTags = append(groupTags, querybuilder.QuoteIdent(tag.Key))
 	}
 	return groupBy(panelType, graphLimitQtype, groupTags...)
 }
@@ -276,16 +277,16 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 
 	for _, item := range items {
 		if item.ColumnName == constants.O11yOrderByValue {
-			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order.Keyword()))
 		} else if _, ok := tagLookup[item.ColumnName]; ok {
-			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("%s %s", querybuilder.QuoteIdent(item.ColumnName), item.Order.Keyword()))
 		} else if panelType == v3.PanelTypeList {
 			attr := v3.AttributeKey{Key: item.ColumnName, DataType: item.DataType, Type: item.Type, IsColumn: item.IsColumn}
 			name := getColumnName(attr)
 			if item.IsColumn {
-				orderBy = append(orderBy, fmt.Sprintf("`%s` %s", name, item.Order))
+				orderBy = append(orderBy, fmt.Sprintf("%s %s", querybuilder.QuoteIdent(name), item.Order.Keyword()))
 			} else {
-				orderBy = append(orderBy, fmt.Sprintf("%s %s", name, item.Order))
+				orderBy = append(orderBy, fmt.Sprintf("%s %s", name, item.Order.Keyword()))
 			}
 		}
 	}
