@@ -25,11 +25,18 @@ import "strings"
 
 // QuoteIdent renders a name as a backtick-quoted datastore identifier.
 //
-// The escape is the datastore's own: inside a backtick-quoted identifier, a
-// backslash escapes the next character, so a backslash must be doubled BEFORE a
-// backtick is escaped — otherwise a trailing backslash in the name would eat the
-// closing backtick and leave the identifier open. Order matters and is the
-// reason this is one function rather than two Replace calls at 40 call sites.
+// The escape is the datastore's own, and the authority for it is the driver:
+// hanzo-ds/go lib/column/column.go carries the same pair as colEscape /
+// colUnEscape. Inside a backtick-quoted identifier a backslash escapes the next
+// character, so BOTH the backtick and the backslash have to be escaped — the
+// backslash because a name ending in one would otherwise consume the closing
+// backtick this function adds and leave the identifier open.
+//
+// It is a single-pass Replacer on purpose. The two patterns do not overlap, so
+// one pass is order-independent and each input byte is rewritten exactly once.
+// Two sequential ReplaceAll calls would NOT be safe — escaping the backtick
+// first and the backslash second would then double the backslashes the first
+// call had just introduced — so do not unroll this into ReplaceAll.
 //
 // A name with none of those characters — every real attribute key, which is a
 // dotted identifier — renders byte for byte as before.
@@ -42,7 +49,8 @@ func QuoteIdent(name string) string {
 // It does not add the quotes, because every call site already writes them as
 // part of a larger expression.
 //
-// Same ordering rule as QuoteIdent: backslash first, then the quote.
+// Same construction as QuoteIdent, and single-pass for the same reason: the
+// quote and the backslash do not overlap, so each byte is rewritten once.
 func EscapeLiteral(s string) string {
 	return literalEscaper.Replace(s)
 }
