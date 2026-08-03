@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/metrics"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 )
 
 // ValidateAndCastValue validates and casts the value of a key to the corresponding data type of the key
@@ -245,16 +247,30 @@ func DatastoreFormattedMetricNames(v interface{}) string {
 	return DatastoreFormattedValue(v)
 }
 
+// plainTag is a tag name that needs no quoting at all: the datastore reads it as
+// a bare identifier and it carries nothing that could end one.
+var plainTag = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
+
+// AddBackTickToFormatTag renders a tag name for an identifier position — the
+// SELECT alias, the GROUP BY term and the ORDER BY term of the metrics builders,
+// which all call it so the three agree.
+//
+// It used to DECLINE TO QUOTE in two cases, and a tag name is caller text:
+//
+//   - a name with no "." and no "-" was returned BARE, so "a,(select 1)" was
+//     concatenated into the identifier position verbatim;
+//   - a name already wrapped in backticks was returned AS IS, so a caller could
+//     hand it its own quoting and close it wherever it liked.
+//
+// Neither branch escaped a backtick either. Now the bare return is guarded by
+// what it was assuming — that the name IS a plain identifier — and everything
+// else is quoted AND escaped. A real tag takes the same path it always did, so
+// the SQL for one is unchanged.
 func AddBackTickToFormatTag(str string) string {
-	if strings.Contains(str, ".") || strings.Contains(str, "-") {
-		if strings.HasPrefix(str, "`") && strings.HasSuffix(str, "`") {
-			return str
-		} else {
-			return "`" + str + "`"
-		}
-	} else {
+	if plainTag.MatchString(str) {
 		return str
 	}
+	return querybuilder.QuoteIdent(str)
 }
 
 func AddBackTickToFormatTags(inputs ...string) []string {

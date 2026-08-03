@@ -185,10 +185,10 @@ func (r ReduceToOperator) Validate() error {
 type QueryType string
 
 const (
-	QueryTypeUnknown       QueryType = "unknown"
-	QueryTypeBuilder       QueryType = "builder"
+	QueryTypeUnknown      QueryType = "unknown"
+	QueryTypeBuilder      QueryType = "builder"
 	QueryTypeDatastoreSQL QueryType = "datastore_sql"
-	QueryTypePromQL        QueryType = "promql"
+	QueryTypePromQL       QueryType = "promql"
 )
 
 func (q QueryType) Validate() error {
@@ -513,9 +513,9 @@ func (c *DatastoreQuery) Validate() error {
 }
 
 type CompositeQuery struct {
-	BuilderQueries    map[string]*BuilderQuery    `json:"builderQueries,omitempty"`
+	BuilderQueries   map[string]*BuilderQuery   `json:"builderQueries,omitempty"`
 	DatastoreQueries map[string]*DatastoreQuery `json:"chQueries,omitempty"`
-	PromQueries       map[string]*PromQuery       `json:"promQueries,omitempty"`
+	PromQueries      map[string]*PromQuery      `json:"promQueries,omitempty"`
 
 	Queries []qbtypes.QueryEnvelope `json:"queries,omitempty"`
 
@@ -554,13 +554,13 @@ func (c *CompositeQuery) Clone() *CompositeQuery {
 		}
 	}
 	return &CompositeQuery{
-		BuilderQueries:    builderQueries,
+		BuilderQueries:   builderQueries,
 		DatastoreQueries: datastoreQueries,
-		PromQueries:       promQueries,
-		PanelType:         c.PanelType,
-		QueryType:         c.QueryType,
-		Unit:              c.Unit,
-		FillGaps:          c.FillGaps,
+		PromQueries:      promQueries,
+		PanelType:        c.PanelType,
+		QueryType:        c.QueryType,
+		Unit:             c.Unit,
+		FillGaps:         c.FillGaps,
 	}
 
 }
@@ -1265,6 +1265,24 @@ type OrderBy struct {
 	DataType   AttributeKeyDataType `json:"-"`
 	Type       AttributeKeyType     `json:"-"`
 	IsColumn   bool                 `json:"-"`
+}
+
+// Keyword renders the direction for SQL. Direction is a bare string off the
+// request body, and every builder interpolated it straight into ORDER BY next to
+// the column — so "asc,(select count() from system.tables)" was a whole extra
+// ordering term, needing no quote and no backtick to get there. Only the two
+// values the type names are legal; anything else renders as nothing, which is
+// what an absent direction already rendered as.
+func (d Direction) Keyword() string {
+	// Folded, because callers send both cases; the ORIGINAL is returned so the
+	// SQL reads as the caller wrote it. That is safe precisely because the match
+	// succeeded: a string whose lowercase is "asc" or "desc" is those three or
+	// four letters and nothing else.
+	switch strings.ToLower(string(d)) {
+	case string(DirectionAsc), string(DirectionDesc):
+		return string(d)
+	}
+	return ""
 }
 
 func (o OrderBy) CacheKey() string {

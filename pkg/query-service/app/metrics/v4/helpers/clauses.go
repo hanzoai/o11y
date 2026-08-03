@@ -47,7 +47,7 @@ func OrderByAttributeKeyTags(items []v3.OrderBy, tags []v3.AttributeKey) string 
 			if item.ColumnName == tag.Key {
 				found = true
 				item.ColumnName = utils.AddBackTickToFormatTag(item.ColumnName)
-				orderBy = append(orderBy, fmt.Sprintf("%s %s", item.ColumnName, item.Order))
+				orderBy = append(orderBy, fmt.Sprintf("%s %s", item.ColumnName, item.Order.Keyword()))
 				break
 			}
 		}
