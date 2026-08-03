@@ -653,7 +653,7 @@ func (b *traceOperatorCTEBuilder) buildTimeSeriesQuery(ctx context.Context, sele
 				err,
 			)
 		}
-		colExpr := fmt.Sprintf("toString(%s) AS `%s`", expr, gb.Name)
+		colExpr := fmt.Sprintf("toString(%s) AS %s", expr, querybuilder.QuoteIdent(gb.Name))
 		allGroupByArgs = append(allGroupByArgs, args...)
 		sb.SelectMore(colExpr)
 	}
@@ -689,7 +689,7 @@ func (b *traceOperatorCTEBuilder) buildTimeSeriesQuery(ctx context.Context, sele
 	if len(b.operator.GroupBy) > 0 {
 		groupByKeys := make([]string, len(b.operator.GroupBy))
 		for i, gb := range b.operator.GroupBy {
-			groupByKeys[i] = fmt.Sprintf("`%s`", gb.Name)
+			groupByKeys[i] = querybuilder.QuoteIdent(gb.Name)
 		}
 		sb.GroupBy(groupByKeys...)
 	}
@@ -700,7 +700,7 @@ func (b *traceOperatorCTEBuilder) buildTimeSeriesQuery(ctx context.Context, sele
 		if ok {
 			sb.OrderBy(fmt.Sprintf("__result_%d %s", idx, orderBy.Direction.StringValue()))
 		} else {
-			sb.OrderBy(fmt.Sprintf("`%s` %s", orderBy.Key.Name, orderBy.Direction.StringValue()))
+			sb.OrderBy(fmt.Sprintf("%s %s", querybuilder.QuoteIdent(orderBy.Key.Name), orderBy.Direction.StringValue()))
 		}
 	}
 	sb.OrderBy("ts desc")
@@ -763,7 +763,7 @@ func (b *traceOperatorCTEBuilder) buildTraceQuery(ctx context.Context, selectFro
 				err,
 			)
 		}
-		colExpr := fmt.Sprintf("toString(%s) AS `%s`", expr, gb.Name)
+		colExpr := fmt.Sprintf("toString(%s) AS %s", expr, querybuilder.QuoteIdent(gb.Name))
 		allGroupByArgs = append(allGroupByArgs, args...)
 		sb.SelectMore(colExpr)
 	}
@@ -816,7 +816,7 @@ func (b *traceOperatorCTEBuilder) buildTraceQuery(ctx context.Context, selectFro
 	if len(b.operator.GroupBy) > 0 {
 		groupByKeys := make([]string, len(b.operator.GroupBy))
 		for i, gb := range b.operator.GroupBy {
-			groupByKeys[i] = fmt.Sprintf("`%s`", gb.Name)
+			groupByKeys[i] = querybuilder.QuoteIdent(gb.Name)
 		}
 		sb.GroupBy(groupByKeys...)
 	}
@@ -903,7 +903,7 @@ func (b *traceOperatorCTEBuilder) buildScalarQuery(ctx context.Context, selectFr
 				err,
 			)
 		}
-		colExpr := fmt.Sprintf("toString(%s) AS `%s`", expr, gb.Name)
+		colExpr := fmt.Sprintf("toString(%s) AS %s", expr, querybuilder.QuoteIdent(gb.Name))
 		allGroupByArgs = append(allGroupByArgs, args...)
 		sb.SelectMore(colExpr)
 	}
@@ -938,7 +938,7 @@ func (b *traceOperatorCTEBuilder) buildScalarQuery(ctx context.Context, selectFr
 	if len(b.operator.GroupBy) > 0 {
 		groupByKeys := make([]string, len(b.operator.GroupBy))
 		for i, gb := range b.operator.GroupBy {
-			groupByKeys[i] = fmt.Sprintf("`%s`", gb.Name)
+			groupByKeys[i] = querybuilder.QuoteIdent(gb.Name)
 		}
 		sb.GroupBy(groupByKeys...)
 	}
@@ -949,7 +949,7 @@ func (b *traceOperatorCTEBuilder) buildScalarQuery(ctx context.Context, selectFr
 		if ok {
 			sb.OrderBy(fmt.Sprintf("__result_%d %s", idx, orderBy.Direction.StringValue()))
 		} else {
-			sb.OrderBy(fmt.Sprintf("`%s` %s", orderBy.Key.Name, orderBy.Direction.StringValue()))
+			sb.OrderBy(fmt.Sprintf("%s %s", querybuilder.QuoteIdent(orderBy.Key.Name), orderBy.Direction.StringValue()))
 		}
 	}
 
