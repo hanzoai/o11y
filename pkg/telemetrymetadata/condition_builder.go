@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 type conditionBuilder struct {
@@ -124,7 +124,7 @@ func (c *conditionBuilder) ConditionFor(
 			KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 			ValueType: schema.ColumnTypeString,
 		}:
-			leftOperand := fmt.Sprintf("mapContains(%s, '%s')", columns[0].Name, key.Name)
+			leftOperand := fmt.Sprintf("mapContains(%s, '%s')", columns[0].Name, querybuilder.EscapeLiteral(key.Name))
 			if operator == qbtypes.FilterOperatorExists {
 				cond = sb.E(leftOperand, true)
 			} else {

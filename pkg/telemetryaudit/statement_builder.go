@@ -8,6 +8,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
@@ -15,7 +16,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetryresourcefilter"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 type auditQueryStatementBuilder struct {
@@ -327,10 +327,10 @@ func (b *auditQueryStatementBuilder) buildTimeSeriesQuery(
 			return nil, err
 		}
 
-		colExpr := fmt.Sprintf("toString(%s) AS `%s`", expr, gb.Name)
+		colExpr := fmt.Sprintf("toString(%s) AS %s", expr, querybuilder.QuoteIdent(gb.Name))
 		allGroupByArgs = append(allGroupByArgs, args...)
 		sb.SelectMore(colExpr)
-		fieldNames = append(fieldNames, fmt.Sprintf("`%s`", gb.Name))
+		fieldNames = append(fieldNames, querybuilder.QuoteIdent(gb.Name))
 	}
 
 	allAggChArgs := make([]any, 0)
@@ -381,7 +381,7 @@ func (b *auditQueryStatementBuilder) buildTimeSeriesQuery(
 			for _, orderBy := range query.Order {
 				_, ok := aggOrderBy(orderBy, query)
 				if !ok {
-					sb.OrderBy(fmt.Sprintf("`%s` %s", orderBy.Key.Name, orderBy.Direction.StringValue()))
+					sb.OrderBy(fmt.Sprintf("%s %s", querybuilder.QuoteIdent(orderBy.Key.Name), orderBy.Direction.StringValue()))
 				}
 			}
 			sb.OrderBy("ts desc")
@@ -408,7 +408,7 @@ func (b *auditQueryStatementBuilder) buildTimeSeriesQuery(
 			for _, orderBy := range query.Order {
 				_, ok := aggOrderBy(orderBy, query)
 				if !ok {
-					sb.OrderBy(fmt.Sprintf("`%s` %s", orderBy.Key.Name, orderBy.Direction.StringValue()))
+					sb.OrderBy(fmt.Sprintf("%s %s", querybuilder.QuoteIdent(orderBy.Key.Name), orderBy.Direction.StringValue()))
 				}
 			}
 			sb.OrderBy("ts desc")
@@ -462,7 +462,7 @@ func (b *auditQueryStatementBuilder) buildScalarQuery(
 			return nil, err
 		}
 
-		colExpr := fmt.Sprintf("toString(%s) AS `%s`", expr, gb.Name)
+		colExpr := fmt.Sprintf("toString(%s) AS %s", expr, querybuilder.QuoteIdent(gb.Name))
 		allGroupByArgs = append(allGroupByArgs, args...)
 		sb.SelectMore(colExpr)
 	}
@@ -504,7 +504,7 @@ func (b *auditQueryStatementBuilder) buildScalarQuery(
 		if ok {
 			sb.OrderBy(fmt.Sprintf("__result_%d %s", idx, orderBy.Direction.StringValue()))
 		} else {
-			sb.OrderBy(fmt.Sprintf("`%s` %s", orderBy.Key.Name, orderBy.Direction.StringValue()))
+			sb.OrderBy(fmt.Sprintf("%s %s", querybuilder.QuoteIdent(orderBy.Key.Name), orderBy.Direction.StringValue()))
 		}
 	}
 

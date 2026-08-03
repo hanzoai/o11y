@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/hanzo-ds/sqlbuilder"
 	"golang.org/x/exp/maps"
 )
 
@@ -62,7 +63,7 @@ func (m *fieldMapper) FieldFor(ctx context.Context, startNs, endNs uint64, key *
 		KeyType:   schema.LowCardinalityColumnType{ElementType: schema.ColumnTypeString},
 		ValueType: schema.ColumnTypeString,
 	}:
-		return fmt.Sprintf("%s['%s']", columns[0].Name, key.Name), nil
+		return fmt.Sprintf("%s['%s']", columns[0].Name, querybuilder.EscapeLiteral(key.Name)), nil
 	}
 	return columns[0].Name, nil
 }
@@ -108,5 +109,5 @@ func (m *fieldMapper) ColumnExpressionFor(
 		}
 	}
 
-	return fmt.Sprintf("%s AS `%s`", sqlbuilder.Escape(fieldExpression), field.Name), nil
+	return fmt.Sprintf("%s AS %s", sqlbuilder.Escape(fieldExpression), querybuilder.QuoteIdent(field.Name)), nil
 }

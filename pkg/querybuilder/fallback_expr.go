@@ -12,10 +12,10 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzo-ds/sqlbuilder"
 	"golang.org/x/exp/maps"
 )
 
@@ -126,7 +126,7 @@ func CollisionHandledFinalExpr(
 func GroupByKeys(keys []qbtypes.GroupByKey) []string {
 	k := []string{}
 	for _, key := range keys {
-		k = append(k, "`"+key.Name+"`")
+		k = append(k, QuoteIdent(key.Name))
 	}
 	return k
 }
