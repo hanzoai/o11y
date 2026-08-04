@@ -13,8 +13,6 @@ import cx from 'classnames';
 import { FeatureKeys } from 'constants/features';
 import ROUTES from 'constants/routes';
 import FullScreenHeader from 'container/FullScreenHeader/FullScreenHeader';
-import InviteUserModal from 'container/OrganizationSettings/InviteUserModal/InviteUserModal';
-import { InviteMemberFormValues } from 'container/OrganizationSettings/utils';
 import { useSafeNavigate } from 'hooks/useSafeNavigate';
 import history from 'lib/history';
 import { useAppContext } from 'providers/App/App';
@@ -301,19 +299,6 @@ export default function Onboarding(): JSX.Element {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [location.pathname]);
 
-	const [form] = Form.useForm<InviteMemberFormValues>();
-	const [isInviteTeamMemberModalOpen, setIsInviteTeamMemberModalOpen] =
-		useState<boolean>(false);
-
-	const toggleModal = useCallback(
-		(value: boolean): void => {
-			setIsInviteTeamMemberModalOpen(value);
-			if (!value) {
-				form.resetFields();
-			}
-		},
-		[form],
-	);
 
 	return (
 		<div className="container">
@@ -366,27 +351,6 @@ export default function Onboarding(): JSX.Element {
 							{t('get_started')}
 						</Button>
 					</div>
-					<div className="invite-member-wrapper">
-						<Typography.Text className="helper-text">
-							{t('invite_user_helper_text')}
-						</Typography.Text>
-						<div className="invite-member">
-							<Typography.Text>{t('invite_user')}</Typography.Text>
-							<Button
-								onClick={(): void => {
-									logEvent('Onboarding V2: Invite Member', {
-										module: selectedModule?.id,
-										page: 'homepage',
-									});
-									setIsInviteTeamMemberModalOpen(true);
-								}}
-								icon={<UserPlus size={16} />}
-								type="primary"
-							>
-								{t('invite')}
-							</Button>
-						</div>
-					</div>
 				</div>
 			)}
 
@@ -406,16 +370,9 @@ export default function Onboarding(): JSX.Element {
 						}}
 						selectedModule={selectedModule}
 						selectedModuleSteps={selectedModuleSteps}
-						setIsInviteTeamMemberModalOpen={setIsInviteTeamMemberModalOpen}
 					/>
 				</div>
 			)}
-			<InviteUserModal
-				form={form}
-				isInviteTeamMemberModalOpen={isInviteTeamMemberModalOpen}
-				toggleModal={toggleModal}
-				onClose={(): void => {}}
-			/>
 		</div>
 	);
 }

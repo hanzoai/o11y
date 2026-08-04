@@ -1,8 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { QueryClient } from 'react-query';
 import getLocalStorageApi from 'api/browser/localstorage/get';
-import post from 'api/v2/sessions/rotate/post';
-import afterLogin from 'AppRoutes/utils';
 import axios, {
 	AxiosError,
 	AxiosResponse,
@@ -16,7 +14,6 @@ import { eventEmitter } from 'utils/getEventEmitter';
 import { getIsNoAuthMode } from 'utils/noAuthMode';
 
 import apiV1, { apiAlertManager, apiV2, apiV3, apiV4, apiV5 } from './apiV1';
-import { Logout } from './utils';
 
 const RESPONSE_TIMEOUT_THRESHOLD = 5000; // 5 seconds
 const queryClient = new QueryClient({
@@ -102,70 +99,24 @@ export const interceptorsRequestBasePath = (
 	return value;
 };
 
+// A 401 IS AN ANSWER, not an errand.
+//
+// This used to be forty lines: on any 401 it exchanged a refresh token for a
+// fresh pair through /sessions/rotate, replayed the request, and signed the user
+// out when either step failed. Every part of that is gone with the tokens — o11y
+// mints no session, so there is no pair to rotate — and what is left is the
+// behaviour the app ALREADY had whenever no-auth mode was on: reject, and let
+// the caller render the error.
+//
+// The distinction that makes this correct: identity now lives in a cookie the
+// EDGE issued. A 401 from o11y is either an authorization answer (you are signed
+// in and may not do this), which no retry can change, or a session the edge has
+// stopped vouching for — and only a full navigation back through the guard can
+// fix that, which an XHR cannot perform. Logging out on a 401 would take a
+// perfectly good session away for the first reason.
 export const interceptorRejected = async (
 	value: AxiosResponse<any>,
-): Promise<AxiosResponse<any>> => {
-	try {
-		if (axios.isAxiosError(value) && value.response) {
-			const { response } = value;
-
-			const isNoAuthMode = getIsNoAuthMode();
-
-			if (
-				!isNoAuthMode &&
-				response.status === 401 &&
-				// if the session rotate call or the create session errors out with 401 or the delete sessions call returns 401 then we do not retry!
-				response.config.url !== '/sessions/rotate' &&
-				response.config.url !== '/sessions/email_password' &&
-				!(
-					response.config.url === '/sessions' && response.config.method === 'delete'
-				) &&
-				response.config.url !== '/authz/check' &&
-				response.config.url !== '/v1/o11y/reset_password_tokens/verify'
-			) {
-				try {
-					const accessToken = getLocalStorageApi(LOCALSTORAGE.AUTH_TOKEN);
-					const refreshToken = getLocalStorageApi(LOCALSTORAGE.REFRESH_AUTH_TOKEN);
-					const response = await queryClient.fetchQuery({
-						queryFn: () => post({ refreshToken: refreshToken || '' }),
-						queryKey: ['/v1/o11y/sessions/rotate', accessToken, refreshToken],
-					});
-
-					afterLogin(response.data.accessToken, response.data.refreshToken, true);
-
-					try {
-						const reResponse = await axios({
-							...value.config,
-							headers: {
-								...value.config.headers,
-								Authorization: `Bearer ${response.data.accessToken}`,
-							},
-						});
-
-						return await Promise.resolve(reResponse);
-					} catch (error) {
-						if ((error as AxiosError)?.response?.status === 401) {
-							void Logout();
-						}
-					}
-				} catch (error) {
-					void Logout();
-				}
-			}
-
-			if (
-				!isNoAuthMode &&
-				response.status === 401 &&
-				response.config.url === '/sessions/rotate'
-			) {
-				void Logout();
-			}
-		}
-		return await Promise.reject(value);
-	} catch (error) {
-		return await Promise.reject(error);
-	}
-};
+): Promise<AxiosResponse<any>> => Promise.reject(value);
 
 const interceptorRejectedBase = async (
 	value: AxiosResponse<any>,

@@ -747,9 +747,6 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 		registerShortcut(GlobalShortcuts.NavigateToSettingsRoles, () =>
 			onClickHandler(ROUTES.ROLES_SETTINGS, null),
 		);
-		registerShortcut(GlobalShortcuts.NavigateToSettingsMembers, () =>
-			onClickHandler(ROUTES.MEMBERS_SETTINGS, null),
-		);
 		registerShortcut(GlobalShortcuts.NavigateToLogsPipelines, () =>
 			onClickHandler(ROUTES.LOGS_PIPELINES, null),
 		);
@@ -775,7 +772,6 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 			deregisterShortcut(GlobalShortcuts.NavigateToSettingsNotificationChannels);
 			deregisterShortcut(GlobalShortcuts.NavigateToSettingsServiceAccounts);
 			deregisterShortcut(GlobalShortcuts.NavigateToSettingsRoles);
-			deregisterShortcut(GlobalShortcuts.NavigateToSettingsMembers);
 			deregisterShortcut(GlobalShortcuts.NavigateToLogsPipelines);
 			deregisterShortcut(GlobalShortcuts.NavigateToLogsViews);
 			deregisterShortcut(GlobalShortcuts.NavigateToTracesViews);
