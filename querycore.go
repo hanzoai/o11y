@@ -6,11 +6,11 @@ package o11y
 // for filter building, the field catalog, and the saved explorer views — as
 // TYPED ops.
 //
-// These were sixteen of the routes that reached traffic only through the
+// These were fifteen of the routes that reached traffic only through the
 // delegation wildcard, and a route behind a wildcard is in no document: no SDK
 // method, no CLI command, no agent tool, no reference page. A customer could not
 // run a query, complete a filter or open a saved view from anything but a
-// hand-written HTTP call. Typing them is what puts the sixteen operations in the
+// hand-written HTTP call. Typing them is what puts the fifteen operations in the
 // document and therefore in every projection built from it.
 //
 // THE WIRE DOES NOT MOVE, and the way it does not move is that these ops do not
@@ -38,7 +38,7 @@ package o11y
 // Those three are the slice's escape hatches; this comment is their record.
 //
 // Registered ahead of the wildcard, and specific-beats-wildcard is what the
-// router does regardless of registration order, so these sixteen paths dispatch
+// router does regardless of registration order, so these fifteen paths dispatch
 // here and every other path under the prefix — the three streams included —
 // still reaches the runtime untouched.
 
@@ -54,7 +54,7 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-// mountQueryCore registers the sixteen typed query-core ops on the native
+// mountQueryCore registers the fifteen typed query-core ops on the native
 // router, all on the shared /v1/o11y group (o11yRoot, spelled once in logs.go).
 // The saved-view collection routes register before the parameterised ones so a
 // view id can never shadow the collection, exactly as the mux tree ordered them.
@@ -62,7 +62,24 @@ func mountQueryCore(app *zip.App) {
 	g := under{app, o11yRoot}
 
 	// the v5 composite query engine
-	zip.Post(g, "/query_range", querierQueryRange)
+	//
+	// POST /v1/o11y/query_range is NOT declared here — see the same note in
+	// logs.go. The composing host declares its own handler at that address, and
+	// it is the console's canonical composite-query entry point: it resolves the
+	// caller's org and pins the query to it before it reaches the engine.
+	// querierQueryRange below hands the call to the runtime with no org on it. A
+	// document holds ONE operation per method+path, so the table does not also
+	// claim an address the host owns and answers better.
+	//
+	// The host's handler is the one that has always answered here — it registers
+	// first, and the router this table used to compose under resolved a repeated
+	// address to the first declaration, so querierQueryRange never served a
+	// request. The composition now refuses the second declaration rather than
+	// silently shadowing it. querierQueryRange and its In/Out stay; only the
+	// claim is gone.
+	//
+	// Note the METHOD is what collides, not the path: the host declares only POST
+	// here, so the legacy GET /query_range below is untouched and still ours.
 	zip.Post(g, "/query_range/preview", querierQueryRangePreview)
 	zip.Post(g, "/substitute_vars", querierReplaceVariables)
 

@@ -86,48 +86,12 @@ func rendered(t *testing.T, status int, v any) []byte {
 	return rec.Body.Bytes()
 }
 
-// A window of records is what the runtime wrote, to the byte — each record an
-// open object, so the proof carries values of every JSON type. The inputs go
-// on as the caller's own numbers, and an unset input stays ABSENT rather than
-// arriving as zero.
-func TestLogRecordsAnswerIsTheRuntimeAnswer(t *testing.T) {
-	app := mounted(t)
-	wrote := bare(t, map[string]any{"results": []map[string]any{{
-		"timestamp":         int64(1753900000000000000),
-		"body":              "GET /v1/thing 200",
-		"severity_text":     "INFO",
-		"severity_number":   9,
-		"attributes_string": map[string]string{"http.method": "GET"},
-		"attributes_int":    map[string]int64{"http.status": 200},
-		"handled":           true,
-		"nested":            map[string]any{"deep": []any{1, "two", nil}},
-	}}})
-	asked := logsRuntime(t, http.StatusOK, wrote)
-
-	status, got := call(t, app, member(http.MethodGet,
-		"/v1/o11y/logs?limit=50&timestampStart=1753899000000000000&timestampEnd=1753900000000000000", nil))
-	if status != http.StatusOK {
-		t.Fatalf("status=%d body=%s, want 200", status, got)
-	}
-	if !bytes.Equal(got, wrote) {
-		t.Fatalf("the op changed the bytes.\n runtime: %s\n op:      %s", wrote, got)
-	}
-	if r := *asked; r.URL.Path != "/v1/o11y/logs" ||
-		r.URL.Query().Get("limit") != "50" ||
-		r.URL.Query().Get("timestampStart") != "1753899000000000000" ||
-		r.URL.Query().Get("timestampEnd") != "1753900000000000000" {
-		t.Fatalf("runtime was asked %s?%s, want the caller's own inputs", r.URL.Path, r.URL.RawQuery)
-	}
-
-	// No inputs, no parameters: the runtime reads its own defaults, exactly as
-	// it always has, rather than a zero the caller never sent.
-	if status, _ := call(t, app, member(http.MethodGet, "/v1/o11y/logs", nil)); status != http.StatusOK {
-		t.Fatalf("status=%d, want 200", status)
-	}
-	if q := (*asked).URL.RawQuery; q != "" {
-		t.Fatalf("an absent input reached the runtime as %q, want none", q)
-	}
-}
+// The record read used to be proved here, driving GET /v1/o11y/logs through the
+// app. That address is no longer this table's to claim — the composing host owns
+// it with a tenant-scoped handler (see the note in logs.go) — so there is no
+// route to drive and the proof has nowhere to stand. What replaced it is
+// TestHostOwnedAddressesAreNotClaimed in mount_test.go, which pins the ABSENCE:
+// the one fact about this address that is still ours to keep true.
 
 // The field catalog is what the runtime wrote, to the byte, through the
 // runtime's own catalog type.
@@ -449,12 +413,13 @@ func TestLogPromotedAnswerIsTheRuntimeAnswer(t *testing.T) {
 	}
 }
 
-// THE ROUTES, exactly as they were: nine typed paths under /v1/o11y/logs, and
-// not a tenth — livetail is deliberately NOT among them.
-func TestLogsRoutesAreTheSameNine(t *testing.T) {
+// THE ROUTES: eight typed paths under /v1/o11y/logs, and not a tenth — livetail
+// is deliberately NOT among them, and neither is GET /v1/o11y/logs itself, which
+// the composing host owns (see the note in logs.go). Eight, because that ninth
+// claim is what the host answers.
+func TestLogsRoutesAreTheSameEight(t *testing.T) {
 	app := mounted(t)
 	want := map[string]bool{
-		"GET /v1/o11y/logs":                    true,
 		"GET /v1/o11y/logs/fields":             true,
 		"POST /v1/o11y/logs/fields":            true,
 		"GET /v1/o11y/logs/aggregate":          true,
@@ -519,9 +484,12 @@ func TestLivetailIsANamedHatch(t *testing.T) {
 // relayAt propagates, never mints.
 func TestLogsIdentityIsPropagated(t *testing.T) {
 	app := mounted(t)
-	asked := logsRuntime(t, http.StatusOK, bare(t, map[string]any{"results": []any{}}))
+	asked := logsRuntime(t, http.StatusOK, bare(t, model.GetFieldsResponse{}))
 
-	r := member(http.MethodGet, "/v1/o11y/logs", nil)
+	// Asked of the field catalog rather than the record read: propagation is a
+	// property of the shared relay seam, not of any one op, and /logs is no
+	// longer this table's address to drive (see the note in logs.go).
+	r := member(http.MethodGet, "/v1/o11y/logs/fields", nil)
 	r.Header.Set(zip.HeaderUserAdmin, "true")
 	r.Header.Set(zip.HeaderProject, "proj-9")
 	if status, body := call(t, app, r); status != http.StatusOK {
@@ -573,7 +541,8 @@ func TestLogsFailClosedWithoutARuntime(t *testing.T) {
 	o11y.SetHandler(nil)
 
 	for _, target := range []string{
-		"/v1/o11y/logs",
+		// /v1/o11y/logs is absent from this list because it is absent from the
+		// table: the composing host owns that address and answers it (logs.go).
 		"/v1/o11y/logs/fields",
 		"/v1/o11y/logs/pipelines/latest",
 		"/v1/o11y/logs/promote_paths",
@@ -606,7 +575,8 @@ func TestLogsReachTheDocument(t *testing.T) {
 	}
 
 	for path, methods := range map[string][]string{
-		"/v1/o11y/logs":                     {"get"},
+		// /v1/o11y/logs is not here: the host owns that address, so the host's op
+		// is the one the document carries for it (logs.go).
 		"/v1/o11y/logs/fields":              {"get", "post"},
 		"/v1/o11y/logs/aggregate":           {"get"},
 		"/v1/o11y/logs/pipelines/preview":   {"post"},

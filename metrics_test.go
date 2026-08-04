@@ -44,23 +44,28 @@ func norm(t *testing.T, b []byte) string {
 
 // ── the request the runtime is handed ──────────────────────────────────────────
 
-// A read carries the caller's query onto the runtime verbatim.
-func TestListMetricsForwardsTheQuery(t *testing.T) {
+// A read carries the caller's query onto the runtime verbatim. Asked of the
+// attributes read rather than the explorer list: GET /v1/o11y/metrics is no
+// longer this table's address to drive — the composing host owns it with a
+// tenant-scoped handler (see the note in metrics.go) — and verbatim forwarding
+// is a property of the shared relay seam, so any op on it proves the same thing.
+func TestMetricsForwardTheQuery(t *testing.T) {
 	app := mounted(t)
-	_, asked := runtime(t, map[string]any{"metrics": []any{}})
+	_, asked := runtime(t, map[string]any{"attributeKeys": []any{}})
 
 	status, body := call(t, app, member(http.MethodGet,
-		"/v1/o11y/metrics?start=1700000000000&end=1700003600000&limit=200&searchText=http&source=otel", nil))
+		"/v1/o11y/metrics/attributes?metricName=http.server.duration&start=1700000000000&end=1700003600000", nil))
 	if status != http.StatusOK {
 		t.Fatalf("status=%d body=%s, want 200", status, body)
 	}
 	r := *asked
-	if r.URL.Path != "/v1/o11y/metrics" {
-		t.Fatalf("runtime asked %q, want /v1/o11y/metrics", r.URL.Path)
+	if r.URL.Path != "/v1/o11y/metrics/attributes" {
+		t.Fatalf("runtime asked %q, want /v1/o11y/metrics/attributes", r.URL.Path)
 	}
 	for k, want := range map[string]string{
-		"start": "1700000000000", "end": "1700003600000",
-		"limit": "200", "searchText": "http", "source": "otel",
+		"metricName": "http.server.duration",
+		"start":      "1700000000000",
+		"end":        "1700003600000",
 	} {
 		if got := r.URL.Query().Get(k); got != want {
 			t.Errorf("runtime asked %s=%q, want %q", k, got, want)
@@ -182,7 +187,10 @@ func TestMetricsIdentityIsPropagated(t *testing.T) {
 	app := mounted(t)
 	_, asked := runtime(t, map[string]any{"metrics": []any{}})
 
-	r := member(http.MethodGet, "/v1/o11y/metrics?start=1&end=2", nil)
+	// Asked of the reduction-rule list rather than the explorer list: propagation
+	// is a property of the shared relay seam, not of any one op, and /metrics is
+	// no longer this table's address to drive (see the note in metrics.go).
+	r := member(http.MethodGet, "/v1/o11y/metric_reduction_rules", nil)
 	r.Header.Set(zip.HeaderUserAdmin, "true")
 	r.Header.Set(zip.HeaderProject, "proj-9")
 	if status, body := call(t, app, r); status != http.StatusOK {
@@ -233,7 +241,10 @@ func TestMetricsFailClosedWithoutARuntime(t *testing.T) {
 	for _, tc := range []struct {
 		method, target, body string
 	}{
-		{http.MethodGet, "/v1/o11y/metrics?start=1&end=2", ""},
+		// GET /v1/o11y/metrics is absent from this list because it is absent from
+		// the table: the composing host owns that address and answers it
+		// (metrics.go).
+		{http.MethodGet, "/v1/o11y/metrics/onboarding", ""},
 		// A well-formed body: the point under test is the nil-runtime guard, which
 		// sits AFTER the typed op's own required-field validation — so the body has
 		// to satisfy that validation to reach the guard and prove it answers 503.
@@ -254,12 +265,13 @@ func TestMetricsFailClosedWithoutARuntime(t *testing.T) {
 
 // ── the routes, and the wildcard behind them ────────────────────────────────────
 
-// THE ROUTES, exactly the nineteen. The router's own spelling of a path
+// THE ROUTES, exactly the eighteen. The router's own spelling of a path
 // parameter (:id) differs from the mux tree's ({id}); the wire path does not.
-func TestMetricsRoutesAreTheSameNineteen(t *testing.T) {
+// Eighteen, not nineteen: GET /v1/o11y/metrics is the composing host's address
+// and the host's own tenant-scoped op answers it (see the note in metrics.go).
+func TestMetricsRoutesAreTheSameEighteen(t *testing.T) {
 	app := mounted(t)
 	want := map[string]bool{
-		"GET /v1/o11y/metrics":                           true,
 		"POST /v1/o11y/metrics/stats":                    true,
 		"POST /v1/o11y/metrics/treemap":                  true,
 		"GET /v1/o11y/metrics/attributes":                true,
@@ -328,8 +340,16 @@ func TestMetricsRestStillReachesTheWildcard(t *testing.T) {
 		t.Errorf("an untyped metrics path no longer reaches the runtime: %s", body)
 	}
 	// ...and a typed path wins over the wildcard.
-	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/metrics?start=1&end=2", nil)); strings.Contains(string(body), `"door":"wildcard"`) {
+	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/metrics/onboarding", nil)); strings.Contains(string(body), `"door":"wildcard"`) {
 		t.Fatalf("the typed op did not take precedence: %s", body)
+	}
+	// GET /v1/o11y/metrics is the OTHER way round, and deliberately so: this
+	// table does not claim that address, so a host that has a wildcard sees the
+	// wildcard answer it — and a host that owns it with its own handler (which is
+	// why the claim is gone; see metrics.go) sees that handler answer it. Either
+	// way the address belongs to the host, which is the whole point.
+	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/metrics?start=1&end=2", nil)); !strings.Contains(string(body), `"door":"wildcard"`) {
+		t.Fatalf("the table still claims an address the host owns: %s", body)
 	}
 }
 
@@ -355,7 +375,8 @@ func TestMetricsReachTheDocument(t *testing.T) {
 	// path+method → the operation id the mux registration declared and this port
 	// carries forward.
 	for _, tc := range []struct{ method, path, id string }{
-		{"get", "/v1/o11y/metrics", "ListMetrics"},
+		// GET /v1/o11y/metrics is not here: the host owns that address, so the
+		// host's op is the one the document carries for it (metrics.go).
 		{"post", "/v1/o11y/metrics/stats", "GetMetricsStats"},
 		{"post", "/v1/o11y/metrics/treemap", "GetMetricsTreemap"},
 		{"get", "/v1/o11y/metrics/attributes", "GetMetricAttributes"},

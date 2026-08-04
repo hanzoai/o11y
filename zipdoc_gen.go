@@ -1224,15 +1224,6 @@ func init() {
 			"O11yLLMRulePricing.output":       "Output is the cost per unit of output tokens.",
 		},
 	})
-	zip.Describe("GET /v1/o11y/logs", zip.Doc{
-		Description: "Returns the most recent log records in the query window, newest\nfirst — each record an open object carrying its nanosecond timestamp and\nwhatever fields the record was ingested with.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
-		Fields: map[string]string{
-			"O11yLogRecordsIn.limit":          "Limit caps how many records come back. Zero means the default of 100.",
-			"O11yLogRecordsIn.timestampEnd":   "TimestampEnd is the end of the window as a nanosecond epoch. Zero means\nnow.",
-			"O11yLogRecordsIn.timestampStart": "TimestampStart is the start of the window as a nanosecond epoch. Zero\nmeans fifteen minutes before the end.",
-			"O11yLogRecordsOut.results":       "Results are the records, newest first.",
-		},
-	})
 	zip.Describe("GET /v1/o11y/logs/aggregate", zip.Doc{
 		Description: "Returns the logs aggregate buckets for the query window. The\nruntime currently answers the empty set; the shape is the contract.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
@@ -1478,25 +1469,6 @@ func init() {
 			"O11yReductionSeriesOut.status":          "Status is \"success\".",
 			"O11yReductionSeriesResult.aggregations": "Aggregations are the query's aggregation buckets.",
 			"O11yReductionSeriesResult.queryName":    "QueryName names the query the result answers.",
-		},
-	})
-	zip.Describe("GET /v1/o11y/metrics", zip.Doc{
-		Description: "Lists the distinct metric names seen in a time range, each with\nits description, type, unit, temporality and monotonicity.",
-		Fields: map[string]string{
-			"O11yMetricList.metrics":        "Metrics are the metrics, with their metadata.",
-			"O11yMetricListIn.end":          "End is the end of the window as a Unix timestamp in milliseconds.",
-			"O11yMetricListIn.limit":        "Limit caps how many metrics come back; unset means 100, at most 5000.",
-			"O11yMetricListIn.searchText":   "SearchText narrows the page to metric names containing it.",
-			"O11yMetricListIn.source":       "Source narrows the page by ingestion source.",
-			"O11yMetricListIn.start":        "Start is the start of the window as a Unix timestamp in milliseconds.",
-			"O11yMetricListOut.data":        "Data holds the metrics.",
-			"O11yMetricListOut.status":      "Status is \"success\".",
-			"O11yMetricSummary.description": "Description describes the metric.",
-			"O11yMetricSummary.isMonotonic": "IsMonotonic marks a sum that only ever increases.",
-			"O11yMetricSummary.metricName":  "MetricName is the metric's name.",
-			"O11yMetricSummary.temporality": "Temporality is delta or cumulative.",
-			"O11yMetricSummary.type":        "Type is the metric type, e.g. gauge, sum, histogram.",
-			"O11yMetricSummary.unit":        "Unit is the metric's unit.",
 		},
 	})
 	zip.Describe("GET /v1/o11y/metrics/alerts", zip.Doc{
@@ -4164,23 +4136,6 @@ func init() {
 			"O11yColumnInfo.columnName":           "Name is the column's name.",
 			"O11yQueryFilterAnalysis.groups":      "Groups are the columns the query groups by.",
 			"O11yQueryFilterAnalysis.metricNames": "MetricNames are the metrics the query reads.",
-		},
-	})
-	zip.Describe("POST /v1/o11y/query_range", zip.Doc{
-		Description: "Executes a composite query over a time range: builder\nqueries over traces, logs and metrics, formulas, trace operators, PromQL and\nDatastore SQL, answering time series, scalars or raw records as the request\ntype asks.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
-		Fields: map[string]string{
-			"CompositeQuery.queries":           "Queries is the queries to use for the request.",
-			"O11yQueryRangeOut.data":           "Data is the query result — the result type, the result set, execution stats\nand any warning — as the engine rendered it.",
-			"O11yQueryRangeOut.status":         "Status is \"success\".",
-			"QueryEnvelope.spec":               "Spec is the deferred decoding of the query if any.",
-			"QueryEnvelope.type":               "Type is the type of the query.",
-			"QueryRangeRequest.compositeQuery": "CompositeQuery is the composite query to use for the request.",
-			"QueryRangeRequest.end":            "End is the end time of the query in epoch milliseconds.",
-			"QueryRangeRequest.noCache":        "NoCache is a flag to disable caching for the request.",
-			"QueryRangeRequest.requestType":    "RequestType is the type of the request.",
-			"QueryRangeRequest.schemaVersion":  "SchemaVersion is the version of the schema to use for the request payload.",
-			"QueryRangeRequest.start":          "Start is the start time of the query in epoch milliseconds.",
-			"QueryRangeRequest.variables":      "Variables is the variables to use for the request.",
 		},
 	})
 	zip.Describe("POST /v1/o11y/query_range/format", zip.Doc{

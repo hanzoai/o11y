@@ -4,11 +4,11 @@ package o11y
 // tuning write, the aggregate read, log parsing pipelines (preview, list,
 // apply) and body-path promotion — as TYPED ops.
 //
-// These were nine of the routes that reached traffic only through the
+// These were eight of the routes that reached traffic only through the
 // delegation wildcard, and a route behind a wildcard is in no document: no SDK
 // method, no CLI command, no agent tool, no reference page. A customer could
 // not reach their own logs from anything but a hand-written HTTP call. Typing
-// them is what puts the nine operations in the document and therefore in every
+// them is what puts the eight operations in the document and therefore in every
 // projection built from it.
 //
 // THE WIRE DOES NOT MOVE, and the way it does not move is that these ops do not
@@ -20,7 +20,7 @@ package o11y
 // order they always were. What is new here is the TYPE — the In the caller may
 // send and the Out they get back — and the prose that goes with it.
 //
-// The TENTH route of this face, GET /v1/o11y/logs/livetail, is deliberately NOT
+// The NINTH route of this face, GET /v1/o11y/logs/livetail, is deliberately NOT
 // typed: it is a live stream that never completes, and the relay buffers a
 // whole answer before decoding it, so a typed livetail would hang forever on
 // the first tail. It stays on the delegation wildcard, byte-identical to what
@@ -28,7 +28,7 @@ package o11y
 // record.
 //
 // Registered ahead of the wildcard, and specific-beats-wildcard is what the
-// router does regardless of registration order, so these nine paths dispatch
+// router does regardless of registration order, so these eight paths dispatch
 // here and every other path under the prefix — livetail included — still
 // reaches the runtime untouched (logs_test.go pins both halves).
 
@@ -41,12 +41,30 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-// mountLogs registers the nine typed logs ops on the native router. The
+// mountLogs registers the eight typed logs ops on the native router. The
 // pipelines routes keep the mux tree's discipline — preview registers before
 // the parameterised version read so a version can never shadow it.
 func mountLogs(app *zip.App) {
 	g := under{app, o11yRoot}
-	zip.Get(g, "/logs", logRecords)
+	// GET /v1/o11y/logs is NOT declared here, and the reason is ownership, not
+	// oversight. The composing host — hanzoai/cloud, which mounts this table
+	// inside its own app — declares its own typed op at that exact address, and
+	// that op is TENANT-SCOPED: it resolves the caller's org and pins the read to
+	// it. logRecords below cannot do that; it hands the call to the runtime with
+	// no org on it. A document holds ONE operation per method+path, so the two
+	// cannot both claim the address — and the one that must win is the one that
+	// keeps a customer from reading another customer's logs.
+	//
+	// The host's op has always been the one that ANSWERS this address in
+	// production: it registers first, and the router the table used to compose
+	// under resolved a repeated address to the first declaration, so logRecords
+	// has never served a request. What changed is only that the composition now
+	// REFUSES the second declaration instead of quietly dropping it, which is the
+	// better failure — a silent shadow is a route you think you own and do not.
+	//
+	// logRecords and its In/Out stay: they are the typed shape of this read, they
+	// cost nothing unregistered, and they are what a host WITHOUT its own
+	// tenant-scoped handler would mount. Only the claim on the address is gone.
 	zip.Get(g, "/logs/fields", logFields)
 	zip.Post(g, "/logs/fields", logFieldUpdate)
 	zip.Get(g, "/logs/aggregate", logAggregate)
@@ -57,7 +75,7 @@ func mountLogs(app *zip.App) {
 	zip.Get(g, "/logs/promote_paths", logPromoted)
 }
 
-// ── the nine operations ───────────────────────────────────────────────────────
+// ── the operations ───────────────────────────────────────────────────────────
 
 // logRecords returns the most recent log records in the query window, newest
 // first — each record an open object carrying its nanosecond timestamp and

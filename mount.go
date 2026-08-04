@@ -41,9 +41,21 @@ import (
 // with a clear error rather than pretending.
 //
 // EVERY ROUTE IS NAMED. There is no /v1/o11y/* catch-all any more. The runtime
-// registers 367 method+path pairs; 356 of them are typed ops declared in the
-// slice files below, and the remaining 11 are registered one by one in
-// mountHatches with the reason each cannot be typed written next to it. A
+// registers 367 method+path pairs; this table names 364 of them — 353 as typed
+// ops declared in the slice files below (350 product ops plus the 3 probes), and
+// 11 registered one by one in mountHatches with the reason each cannot be typed
+// written next to it.
+//
+// The three it does NOT name are the composing HOST's: GET /v1/o11y/logs, GET
+// /v1/o11y/metrics and POST /v1/o11y/query_range. The host declares a
+// tenant-scoped handler at each — org-pinned, which the relay ops here are not —
+// and a document holds one operation per method+path, so this table yields the
+// claim rather than shadow a handler that isolates tenants. The runtime still
+// SERVES all 367; three of them are described and answered by the host. The
+// reason is written out at each removal site (logs.go, metrics.go,
+// querycore.go), and the absence is pinned by mount_test.go's
+// TestHostOwnedAddressesAreNotClaimed — re-adding one does not shadow a route,
+// it refuses the composed program at Listen. A
 // catch-all hides the difference between "converted" and "not converted" — the
 // dark-slice defect this package already shipped once was invisible precisely
 // because a wildcard answered for the routes nobody had wired up. A named route

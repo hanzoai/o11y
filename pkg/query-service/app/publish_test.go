@@ -109,20 +109,29 @@ func mcpTools(t *testing.T, app *zip.App) int {
 	return len(out.Result.Tools)
 }
 
-// THE PAYOFF, on the router the binary serves. 353 is the same count
+// THE PAYOFF, on the router the binary serves. 350 is the same count
 // routes_test.go pins on the table itself; asserting it HERE is what makes the
-// two the same 353 rather than two numbers that happen to agree.
+// two the same 350 rather than two numbers that happen to agree.
+//
+// It was 353. Three addresses — GET /v1/o11y/logs, GET /v1/o11y/metrics and
+// POST /v1/o11y/query_range — are the composing HOST's to declare, because the
+// host answers them with a tenant-scoped handler and the table's relay ops did
+// not carry an org at all. A document holds one operation per method+path, so
+// the table yields the claim; the reason is written out at each removal site.
+// The service still SERVES all three — the implementation is registered at
+// publish's call site, on the listener, and is untouched by this. What moved is
+// only which of the two apps DESCRIBES them.
 func TestPublishServesTheDocument(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	if err := publish(app); err != nil {
 		t.Fatalf("publish: %v", err)
 	}
 
-	if got := operations(t, documentOf(t, app)); got != 353 {
-		t.Fatalf("the served document publishes %d operations, want 353", got)
+	if got := operations(t, documentOf(t, app)); got != 350 {
+		t.Fatalf("the served document publishes %d operations, want 350", got)
 	}
-	if got := mcpTools(t, app); got != 353 {
-		t.Fatalf("the served router offers %d MCP tools, want 353", got)
+	if got := mcpTools(t, app); got != 350 {
+		t.Fatalf("the served router offers %d MCP tools, want 350", got)
 	}
 }
 

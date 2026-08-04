@@ -3,7 +3,7 @@ package o11y
 // The METRICS face — the metrics-explorer reads and the volume-control
 // (metric reduction) rules — as TYPED ops.
 //
-// These nineteen routes reached traffic only through the delegation wildcard,
+// These eighteen routes reached traffic only through the delegation wildcard,
 // and a route behind a wildcard is in no document: no SDK method, no CLI
 // command, no agent tool, no reference page. Typing them is what puts the
 // metrics surface in the document and therefore in every projection built
@@ -19,7 +19,7 @@ package o11y
 // they always were. What is new is the TYPE and the prose that goes with it.
 //
 // Registered ahead of the wildcard; specific-beats-wildcard is what the
-// router does regardless of registration order, so these nineteen paths
+// router does regardless of registration order, so these eighteen paths
 // dispatch here and every other path under the prefix reaches the runtime
 // untouched (metrics_test.go pins both halves).
 
@@ -31,13 +31,23 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-// mountMetrics registers the nineteen typed metrics ops on the native router.
+// mountMetrics registers the eighteen typed metrics ops on the native router.
 // Collection routes register before the parameterised ones so an id can never
 // shadow a collection.
 func mountMetrics(app *zip.App) {
 	g := under{app, o11yRoot}
 
-	zip.Get(g, "/metrics", listMetrics, zip.WithOperationID("ListMetrics"))
+	// GET /v1/o11y/metrics is NOT declared here — see the same note in logs.go.
+	// The composing host declares its own TENANT-SCOPED typed op at that address,
+	// pinned to the caller's org; listMetrics below hands the call to the runtime
+	// with no org on it. A document holds ONE operation per method+path, so the
+	// table does not also claim an address the host owns and answers better.
+	//
+	// The host's op is the one that has always answered here — it registers
+	// first, and the router this table used to compose under resolved a repeated
+	// address to the first declaration, so listMetrics never served a request.
+	// The composition now refuses the second declaration rather than silently
+	// shadowing it. listMetrics and its In/Out stay; only the claim is gone.
 	zip.Post(g, "/metrics/stats", metricStats, zip.WithOperationID("GetMetricsStats"))
 	zip.Post(g, "/metrics/treemap", metricTreemap, zip.WithOperationID("GetMetricsTreemap"))
 	zip.Get(g, "/metrics/attributes", metricAttributes, zip.WithOperationID("GetMetricAttributes"))
