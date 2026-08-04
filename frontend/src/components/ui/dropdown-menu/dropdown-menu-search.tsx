@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Input, type InputProps } from '../input';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 export type DropdownMenuSearchProps = Omit<
 	InputProps,

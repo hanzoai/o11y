@@ -20,7 +20,7 @@ import {
 	type ReactNode,
 	useRef,
 } from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 const itemBaseClass =
 	'relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-[13px] leading-5 outline-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-[var(--accent)] data-[selected=true]:text-[var(--accent-foreground)]';

@@ -3,4 +3,17 @@ trustPolicy: no-downgrade
 minimumReleaseAge: 2880 # 2d
 minimumReleaseAgeStrict: true
 minimumReleaseAgeExclude:
+  # The cooling-off period guards against a third party's registry account being
+  # compromised. It does not apply to the packages this org publishes itself, and
+  # holding them back for two days would pin every app to a stale design system.
+  - '@hanzo/*'
+  - '@hanzogui/*'
 blockExoticSubdeps: true
+trustPolicyExclude:
+  # Same reasoning as the exclude above. 8.x of the design system is published by
+  # hand rather than by CI, so it carries no provenance attestation where 5.x did,
+  # and no-downgrade reads that as a takeover. The real fix belongs upstream —
+  # publish @hanzo/ui and @hanzo/gui from CI with provenance — after which these
+  # two entries should come back out.
+  - '@hanzo/*'
+  - '@hanzogui/*'

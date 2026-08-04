@@ -19,7 +19,7 @@ import type {
 	PanelImperativeHandle,
 	PanelSize,
 } from 'react-resizable-panels';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 export type {
 	GroupImperativeHandle,

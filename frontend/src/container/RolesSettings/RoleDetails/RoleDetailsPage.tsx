@@ -1,10 +1,9 @@
 import { useMemo, useState, type JSX } from 'react';
 import { useQueryClient } from 'react-query';
 import { Redirect, useHistory, useLocation } from 'react-router-dom';
-import { Button } from '@hanzo/ui';
+import { Button, toast } from '@hanzo/ui';
 import { Table2, Trash2, Users } from 'lucide-react';
-import { toast } from '@hanzo/ui';
-import { ToggleGroup, ToggleGroupItem } from '@hanzo/ui';
+import { ToggleGroup, ToggleGroupItem } from 'components/ui/toggle-group';
 import { Skeleton } from 'antd';
 import {
 	getGetObjectsQueryKey,

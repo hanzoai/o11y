@@ -3,7 +3,7 @@ import { useQueryClient } from 'react-query';
 import { generatePath, useHistory } from 'react-router-dom';
 import { Button } from '@hanzo/ui';
 import { X } from 'lucide-react';
-import { Input, inputVariants } from 'components/ui/input';
+import { Input } from 'components/ui/input';
 import { toast } from '@hanzo/ui';
 import { Form, Modal } from 'antd';
 import {

@@ -7,9 +7,8 @@ import {
 	X,
 	type LucideProps,
 } from 'lucide-react';
-import { cva } from 'class-variance-authority';
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 interface CalloutProps extends React.ComponentProps<'div'> {
 	message?: React.ReactNode;
@@ -37,21 +36,6 @@ const defaultIcons = {
 	error: <CircleX />,
 };
 
-const calloutVariants = cva(
-	'relative w-full rounded-lg border flex gap-[10px]',
-	{
-		variants: {
-			size: {
-				small: 'p-3 pb-[14px] text-sm',
-				medium: 'p-4 text-base',
-			},
-		},
-		defaultVariants: {
-			size: 'small',
-		},
-	},
-);
-
 function Callout({
 	className,
 	message,
@@ -71,45 +55,35 @@ function Callout({
 		<div
 			data-slot="callout"
 			data-color={color ?? typeToColorMap[type]}
+			data-size={size}
 			role="alert"
-			className={cn(calloutVariants({ size }), className)}
+			className={cn('hz-callout', className)}
 			{...props}
 		>
 			{IconComponent ? (
 				React.isValidElement<LucideProps>(IconComponent) ? (
 					React.cloneElement(IconComponent, {
 						'aria-hidden': true,
-						className: cn('mt-1', IconComponent.props.className),
+						className: cn('hz-callout__icon', IconComponent.props.className),
 						color: 'var(--callout-icon-color)',
 						size: size === 'medium' ? 16 : 12,
 					})
 				) : (
-					<span className="mt-1" style={{ color: 'var(--callout-icon-color)' }}>
-						{IconComponent}
-					</span>
+					<span className="hz-callout__icon">{IconComponent}</span>
 				)
 			) : (
-				<div className={cn(size === 'medium' ? 'w-4' : 'w-3')} />
+				<div className="hz-callout__icon-placeholder" />
 			)}
-			<div className="grid gap-0.5 flex-1">
+			<div className="hz-callout__body">
 				{message && (
-					<div
-						data-slot="callout-title"
-						className={cn(
-							'line-clamp-1 min-h-4 font-medium tracking-tight text-[var(--callout-title-color)]',
-							size === 'medium' && 'text-base',
-						)}
-					>
+					<div data-slot="callout-title" className="hz-callout__title">
 						{message}
 					</div>
 				)}
 				{description && (
 					<div
 						data-slot="callout-description"
-						className={cn(
-							'grid justify-items-start gap-1 [&_p]:leading-relaxed text-[var(--callout-description-color)] font-normal leading-5',
-							size === 'medium' ? 'text-base' : 'text-sm',
-						)}
+						className="hz-callout__description"
 					>
 						{description}
 					</div>
@@ -120,12 +94,9 @@ function Callout({
 					type="button"
 					aria-label="Close"
 					onClick={onClose}
-					className="self-start p-1 rounded-sm  transition-colors cursor-pointer"
+					className="hz-callout__dismiss"
 				>
-					<X
-						size={size === 'medium' ? 16 : 14}
-						className="text-[var(--callout-description-color)] hover:text-[var(--callout-title-color)] transition-colors duration-100 ease-out"
-					/>
+					<X size={size === 'medium' ? 16 : 14} />
 				</button>
 			)}
 		</div>

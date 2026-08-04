@@ -1,0 +1,22 @@
+/* react-day-picker draws from its own custom properties; point them at the app's
+   tokens so the picker follows the active theme instead of shipping its default
+   light palette into a dark surface. */
+.periscope-calendar {
+	--rdp-accent-color: var(--primary);
+	--rdp-accent-background-color: var(--primary-background);
+	--rdp-today-color: var(--primary);
+	--rdp-range_middle-background-color: var(--l2-background);
+	--rdp-range_middle-color: var(--l1-foreground);
+	--rdp-day-height: 32px;
+	--rdp-day-width: 32px;
+	--rdp-day_button-height: 28px;
+	--rdp-day_button-width: 28px;
+	--rdp-day_button-border-radius: 4px;
+	--rdp-font-family: inherit;
+
+	color: var(--l1-foreground);
+}
+
+.periscope-calendar .rdp-disabled {
+	opacity: 0.35;
+}
