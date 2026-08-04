@@ -41,31 +41,31 @@ import (
 // parameterised /:funnel_id ones so a funnel id can never shadow them — the same
 // discipline the mux tree keeps by registering the literals first.
 func mountTraceFunnels(app *zip.App) {
-	g := app.Group(o11yRoot + "/trace-funnels")
+	g := under{app, o11yRoot + "/trace-funnels"}
 
-	zip.Post(g, "/new", funnelCreate, op("CreateTraceFunnel"))
-	zip.Get(g, "/list", funnelList, op("ListTraceFunnels"))
-	zip.Put(g, "/steps/update", funnelStepsUpdate, op("UpdateTraceFunnelSteps"))
+	opPost(g, "/new", funnelCreate, op("CreateTraceFunnel"))
+	opGet(g, "/list", funnelList, op("ListTraceFunnels"))
+	opPut(g, "/steps/update", funnelStepsUpdate, op("UpdateTraceFunnelSteps"))
 
 	// The ad-hoc family: the funnel travels in the body, nothing is stored.
-	zip.Post(g, "/analytics/validate", draftFunnelValidate, op("ValidateDraftFunnelTraces"))
-	zip.Post(g, "/analytics/overview", draftFunnelOverview, op("GetDraftFunnelOverview"))
-	zip.Post(g, "/analytics/steps", draftFunnelSteps, op("GetDraftFunnelStepMetrics"))
-	zip.Post(g, "/analytics/steps/overview", draftFunnelStepOverview, op("GetDraftFunnelStepOverview"))
-	zip.Post(g, "/analytics/slow-traces", draftFunnelSlowTraces, op("GetDraftFunnelSlowTraces"))
-	zip.Post(g, "/analytics/error-traces", draftFunnelErrorTraces, op("GetDraftFunnelErrorTraces"))
+	opPost(g, "/analytics/validate", draftFunnelValidate, op("ValidateDraftFunnelTraces"))
+	opPost(g, "/analytics/overview", draftFunnelOverview, op("GetDraftFunnelOverview"))
+	opPost(g, "/analytics/steps", draftFunnelSteps, op("GetDraftFunnelStepMetrics"))
+	opPost(g, "/analytics/steps/overview", draftFunnelStepOverview, op("GetDraftFunnelStepOverview"))
+	opPost(g, "/analytics/slow-traces", draftFunnelSlowTraces, op("GetDraftFunnelSlowTraces"))
+	opPost(g, "/analytics/error-traces", draftFunnelErrorTraces, op("GetDraftFunnelErrorTraces"))
 
-	zip.Get(g, "/:funnel_id", funnelGet, op("GetTraceFunnel"))
-	zip.Put(g, "/:funnel_id", funnelUpdate, op("UpdateTraceFunnel"))
-	zip.Delete(g, "/:funnel_id", funnelDelete, op("DeleteTraceFunnel"))
+	opGet(g, "/:funnel_id", funnelGet, op("GetTraceFunnel"))
+	opPut(g, "/:funnel_id", funnelUpdate, op("UpdateTraceFunnel"))
+	opDelete(g, "/:funnel_id", funnelDelete, op("DeleteTraceFunnel"))
 
 	// The saved family: the funnel is named by the path, the body is the window.
-	zip.Post(g, "/:funnel_id/analytics/validate", funnelValidate, op("ValidateTraceFunnelTraces"))
-	zip.Post(g, "/:funnel_id/analytics/overview", funnelOverview, op("GetTraceFunnelOverview"))
-	zip.Post(g, "/:funnel_id/analytics/steps", funnelSteps, op("GetTraceFunnelStepMetrics"))
-	zip.Post(g, "/:funnel_id/analytics/steps/overview", funnelStepOverview, op("GetTraceFunnelStepOverview"))
-	zip.Post(g, "/:funnel_id/analytics/slow-traces", funnelSlowTraces, op("GetTraceFunnelSlowTraces"))
-	zip.Post(g, "/:funnel_id/analytics/error-traces", funnelErrorTraces, op("GetTraceFunnelErrorTraces"))
+	opPost(g, "/:funnel_id/analytics/validate", funnelValidate, op("ValidateTraceFunnelTraces"))
+	opPost(g, "/:funnel_id/analytics/overview", funnelOverview, op("GetTraceFunnelOverview"))
+	opPost(g, "/:funnel_id/analytics/steps", funnelSteps, op("GetTraceFunnelStepMetrics"))
+	opPost(g, "/:funnel_id/analytics/steps/overview", funnelStepOverview, op("GetTraceFunnelStepOverview"))
+	opPost(g, "/:funnel_id/analytics/slow-traces", funnelSlowTraces, op("GetTraceFunnelSlowTraces"))
+	opPost(g, "/:funnel_id/analytics/error-traces", funnelErrorTraces, op("GetTraceFunnelErrorTraces"))
 }
 
 // ── the funnel itself ─────────────────────────────────────────────────────────

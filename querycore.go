@@ -59,33 +59,33 @@ import (
 // The saved-view collection routes register before the parameterised ones so a
 // view id can never shadow the collection, exactly as the mux tree ordered them.
 func mountQueryCore(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	// the v5 composite query engine
-	zip.Post(g, "/query_range", querierQueryRange)
-	zip.Post(g, "/query_range/preview", querierQueryRangePreview)
-	zip.Post(g, "/substitute_vars", querierReplaceVariables)
+	opPost(g, "/query_range", querierQueryRange)
+	opPost(g, "/query_range/preview", querierQueryRangePreview)
+	opPost(g, "/substitute_vars", querierReplaceVariables)
 
 	// the legacy metrics range read and the builder-format echo
-	zip.Get(g, "/query_range", metricsQueryRange)
-	zip.Post(g, "/query_range/format", queryRangeFormat)
+	opGet(g, "/query_range", metricsQueryRange)
+	opPost(g, "/query_range/format", queryRangeFormat)
 
 	// attribute autocomplete for filter building
-	zip.Get(g, "/autocomplete/aggregate_attributes", autocompleteAggregate)
-	zip.Get(g, "/autocomplete/attribute_keys", autocompleteKeys)
-	zip.Get(g, "/autocomplete/attribute_values", autocompleteValues)
-	zip.Post(g, "/auto_complete/attribute_values", autocompleteValuesPost)
+	opGet(g, "/autocomplete/aggregate_attributes", autocompleteAggregate)
+	opGet(g, "/autocomplete/attribute_keys", autocompleteKeys)
+	opGet(g, "/autocomplete/attribute_values", autocompleteValues)
+	opPost(g, "/auto_complete/attribute_values", autocompleteValuesPost)
 
 	// the field catalog
-	zip.Get(g, "/fields/keys", fieldKeys)
-	zip.Get(g, "/fields/values", fieldValues)
+	opGet(g, "/fields/keys", fieldKeys)
+	opGet(g, "/fields/values", fieldValues)
 
 	// saved explorer views
-	zip.Get(g, "/explorer/views", savedViewList)
-	zip.Post(g, "/explorer/views", savedViewCreate)
-	zip.Get(g, "/explorer/views/:viewId", savedViewGet)
-	zip.Put(g, "/explorer/views/:viewId", savedViewUpdate)
-	zip.Delete(g, "/explorer/views/:viewId", savedViewDelete)
+	opGet(g, "/explorer/views", savedViewList)
+	opPost(g, "/explorer/views", savedViewCreate)
+	opGet(g, "/explorer/views/:viewId", savedViewGet)
+	opPut(g, "/explorer/views/:viewId", savedViewUpdate)
+	opDelete(g, "/explorer/views/:viewId", savedViewDelete)
 }
 
 // ── the composite query engine ─────────────────────────────────────────────────

@@ -19,6 +19,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types"
@@ -4669,37 +4670,37 @@ func (r *DatastoreReader) ReadRuleStateHistoryByRuleID(
 			fmtVal := utils.DatastoreFormattedValue(toFormat)
 			switch op {
 			case v3.FilterOperatorEqual:
-				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') = %s", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') = %s", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorNotEqual:
-				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') != %s", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') != %s", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorIn:
-				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') IN %s", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') IN %s", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorNotIn:
-				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') NOT IN %s", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') NOT IN %s", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorLike:
-				conditions = append(conditions, fmt.Sprintf("like(JSONExtractString(labels, '%s'), %s)", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("like(JSONExtractString(labels, '%s'), %s)", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorNotLike:
-				conditions = append(conditions, fmt.Sprintf("notLike(JSONExtractString(labels, '%s'), %s)", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("notLike(JSONExtractString(labels, '%s'), %s)", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorRegex:
-				conditions = append(conditions, fmt.Sprintf("match(JSONExtractString(labels, '%s'), %s)", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("match(JSONExtractString(labels, '%s'), %s)", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorNotRegex:
-				conditions = append(conditions, fmt.Sprintf("not match(JSONExtractString(labels, '%s'), %s)", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("not match(JSONExtractString(labels, '%s'), %s)", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorGreaterThan:
-				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') > %s", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') > %s", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorGreaterThanOrEq:
-				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') >= %s", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') >= %s", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorLessThan:
-				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') < %s", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') < %s", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorLessThanOrEq:
-				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') <= %s", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("JSONExtractString(labels, '%s') <= %s", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorContains:
-				conditions = append(conditions, fmt.Sprintf("like(JSONExtractString(labels, '%s'), %s)", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("like(JSONExtractString(labels, '%s'), %s)", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorNotContains:
-				conditions = append(conditions, fmt.Sprintf("notLike(JSONExtractString(labels, '%s'), %s)", item.Key.Key, fmtVal))
+				conditions = append(conditions, fmt.Sprintf("notLike(JSONExtractString(labels, '%s'), %s)", querybuilder.EscapeLiteral(item.Key.Key), fmtVal))
 			case v3.FilterOperatorExists:
-				conditions = append(conditions, fmt.Sprintf("has(JSONExtractKeys(labels), '%s')", item.Key.Key))
+				conditions = append(conditions, fmt.Sprintf("has(JSONExtractKeys(labels), '%s')", querybuilder.EscapeLiteral(item.Key.Key)))
 			case v3.FilterOperatorNotExists:
-				conditions = append(conditions, fmt.Sprintf("not has(JSONExtractKeys(labels), '%s')", item.Key.Key))
+				conditions = append(conditions, fmt.Sprintf("not has(JSONExtractKeys(labels), '%s')", querybuilder.EscapeLiteral(item.Key.Key)))
 			default:
 				return nil, fmt.Errorf("unsupported filter operator")
 			}

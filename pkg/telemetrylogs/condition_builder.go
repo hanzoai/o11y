@@ -264,7 +264,7 @@ func (c *conditionBuilder) conditionFor(
 			case schema.ColumnTypeEnumString, schema.ColumnTypeEnumBool, schema.ColumnTypeEnumFloat64:
 				// The envelope has one attributes map and no materialized columns, so
 				// membership is always a mapContains over it.
-				leftOperand := fmt.Sprintf("mapContains(%s, '%s')", column.Name, key.Name)
+				leftOperand := fmt.Sprintf("mapContains(%s, '%s')", column.Name, querybuilder.EscapeLiteral(key.Name))
 				if operator == qbtypes.FilterOperatorExists {
 					return sb.E(leftOperand, true), nil
 				} else {

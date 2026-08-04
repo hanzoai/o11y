@@ -7,6 +7,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 )
 
 var AggregateOperatorToPercentile = map[v3.AggregateOperator]float64{
@@ -89,7 +90,7 @@ func getDatastoreColumnName(key v3.AttributeKey) string {
 	if !key.IsColumn {
 		columnType := GetDatastoreLogsColumnType(key.Type)
 		columnDataType := getDatastoreLogsColumnDataType(key.DataType)
-		datastoreColumn = fmt.Sprintf("%s_%s_value[indexOf(%s_%s_key, '%s')]", columnType, columnDataType, columnType, columnDataType, key.Key)
+		datastoreColumn = fmt.Sprintf("%s_%s_value[indexOf(%s_%s_key, '%s')]", columnType, columnDataType, columnType, columnDataType, querybuilder.EscapeLiteral(key.Key))
 		return datastoreColumn
 	}
 
@@ -112,7 +113,7 @@ func getSelectLabels(aggregatorOperator v3.AggregateOperator, groupBy []v3.Attri
 	} else {
 		for _, tag := range groupBy {
 			columnName := getDatastoreColumnName(tag)
-			selectLabels += fmt.Sprintf(" %s as `%s`,", columnName, tag.Key)
+			selectLabels += fmt.Sprintf(" %s as %s,", columnName, querybuilder.QuoteIdent(tag.Key))
 		}
 	}
 	return selectLabels
@@ -160,7 +161,7 @@ func GetExistsNexistsFilter(op v3.FilterOperator, item v3.FilterItem) string {
 	}
 	columnType := GetDatastoreLogsColumnType(item.Key.Type)
 	columnDataType := getDatastoreLogsColumnDataType(item.Key.DataType)
-	return fmt.Sprintf(logOperators[op], columnType, columnDataType, item.Key.Key)
+	return fmt.Sprintf(logOperators[op], columnType, columnDataType, querybuilder.EscapeLiteral(item.Key.Key))
 }
 
 func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey, aggregateAttribute v3.AttributeKey) (string, error) {
@@ -230,7 +231,7 @@ func buildLogsTimeSeriesFilterQuery(fs *v3.FilterSet, groupBy []v3.AttributeKey,
 		if !attr.IsColumn {
 			columnType := GetDatastoreLogsColumnType(attr.Type)
 			columnDataType := getDatastoreLogsColumnDataType(attr.DataType)
-			conditions = append(conditions, fmt.Sprintf("has(%s_%s_key, '%s')", columnType, columnDataType, attr.Key))
+			conditions = append(conditions, fmt.Sprintf("has(%s_%s_key, '%s')", columnType, columnDataType, querybuilder.EscapeLiteral(attr.Key)))
 		} else if attr.Type != v3.AttributeKeyTypeUnspecified {
 			// for materialzied columns
 			conditions = append(conditions, fmt.Sprintf("%s_exists`=true", strings.TrimSuffix(getDatastoreColumnName(attr), "`")))
@@ -408,13 +409,13 @@ func orderBy(panelType v3.PanelType, items []v3.OrderBy, tagLookup map[string]st
 
 	for _, item := range items {
 		if item.ColumnName == constants.O11yOrderByValue {
-			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("value %s", item.Order.Keyword()))
 		} else if _, ok := tagLookup[item.ColumnName]; ok {
-			orderBy = append(orderBy, fmt.Sprintf("`%s` %s", item.ColumnName, item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("%s %s", querybuilder.QuoteIdent(item.ColumnName), item.Order.Keyword()))
 		} else if panelType == v3.PanelTypeList {
 			attr := v3.AttributeKey{Key: item.ColumnName, DataType: item.DataType, Type: item.Type, IsColumn: item.IsColumn}
 			name := getDatastoreColumnName(attr)
-			orderBy = append(orderBy, fmt.Sprintf("%s %s", name, item.Order))
+			orderBy = append(orderBy, fmt.Sprintf("%s %s", name, item.Order.Keyword()))
 		}
 	}
 	return orderBy

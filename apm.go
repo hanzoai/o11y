@@ -41,36 +41,36 @@ import (
 // service catalog first, then the messaging-queue groups in the order the mux
 // tree declares them, then the third-party API overview.
 func mountAPM(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	// The service catalog: /services collection, /service/* breakdowns.
-	zip.Post(g, "/services", services)
-	zip.Get(g, "/services/list", serviceNames)
-	zip.Post(g, "/service/top_operations", topOperations)
-	zip.Post(g, "/service/top_level_operations", topLevelOperations)
-	zip.Post(g, "/service/entry_point_operations", entryPointOperations)
+	opPost(g, "/services", services)
+	opGet(g, "/services/list", serviceNames)
+	opPost(g, "/service/top_operations", topOperations)
+	opPost(g, "/service/top_level_operations", topLevelOperations)
+	opPost(g, "/service/entry_point_operations", entryPointOperations)
 
 	// The messaging-queue surface: the queue overview, then the Kafka
 	// onboarding, partition-latency, consumer-lag, topic-throughput and
 	// span-evaluation groups.
-	zip.Post(g, "/messaging-queues/queue-overview", queueOverview)
-	zip.Post(g, "/messaging-queues/kafka/onboarding/producers", producersOnboarding)
-	zip.Post(g, "/messaging-queues/kafka/onboarding/consumers", consumersOnboarding)
-	zip.Post(g, "/messaging-queues/kafka/onboarding/kafka", kafkaOnboarding)
-	zip.Post(g, "/messaging-queues/kafka/partition-latency/overview", partitionLatency)
-	zip.Post(g, "/messaging-queues/kafka/partition-latency/consumer", consumerPartitionLatency)
-	zip.Post(g, "/messaging-queues/kafka/consumer-lag/producer-details", producerLagDetails)
-	zip.Post(g, "/messaging-queues/kafka/consumer-lag/consumer-details", consumerLagDetails)
-	zip.Post(g, "/messaging-queues/kafka/consumer-lag/network-latency", consumerLagNetwork)
-	zip.Post(g, "/messaging-queues/kafka/topic-throughput/producer", producerThroughput)
-	zip.Post(g, "/messaging-queues/kafka/topic-throughput/producer-details", producerThroughputDetails)
-	zip.Post(g, "/messaging-queues/kafka/topic-throughput/consumer", consumerThroughput)
-	zip.Post(g, "/messaging-queues/kafka/topic-throughput/consumer-details", consumerThroughputDetails)
-	zip.Post(g, "/messaging-queues/kafka/span/evaluation", spanEvaluation)
+	opPost(g, "/messaging-queues/queue-overview", queueOverview)
+	opPost(g, "/messaging-queues/kafka/onboarding/producers", producersOnboarding)
+	opPost(g, "/messaging-queues/kafka/onboarding/consumers", consumersOnboarding)
+	opPost(g, "/messaging-queues/kafka/onboarding/kafka", kafkaOnboarding)
+	opPost(g, "/messaging-queues/kafka/partition-latency/overview", partitionLatency)
+	opPost(g, "/messaging-queues/kafka/partition-latency/consumer", consumerPartitionLatency)
+	opPost(g, "/messaging-queues/kafka/consumer-lag/producer-details", producerLagDetails)
+	opPost(g, "/messaging-queues/kafka/consumer-lag/consumer-details", consumerLagDetails)
+	opPost(g, "/messaging-queues/kafka/consumer-lag/network-latency", consumerLagNetwork)
+	opPost(g, "/messaging-queues/kafka/topic-throughput/producer", producerThroughput)
+	opPost(g, "/messaging-queues/kafka/topic-throughput/producer-details", producerThroughputDetails)
+	opPost(g, "/messaging-queues/kafka/topic-throughput/consumer", consumerThroughput)
+	opPost(g, "/messaging-queues/kafka/topic-throughput/consumer-details", consumerThroughputDetails)
+	opPost(g, "/messaging-queues/kafka/span/evaluation", spanEvaluation)
 
 	// The third-party API overview: external domains and one domain's detail.
-	zip.Post(g, "/third-party-apis/overview/list", domainList)
-	zip.Post(g, "/third-party-apis/overview/domain", domainInfo)
+	opPost(g, "/third-party-apis/overview/list", domainList)
+	opPost(g, "/third-party-apis/overview/domain", domainInfo)
 }
 
 // ── the service catalog ───────────────────────────────────────────────────────
