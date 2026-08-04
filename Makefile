@@ -44,9 +44,37 @@ $(TARGET_DIR):
 ##############################################################
 # common commands
 ##############################################################
+# The first rule in this file is $(TARGET_DIR) — a mkdir — so a bare `make`
+# used to build nothing and leave an empty ./target behind. Nothing calls it
+# that way (there is no .github/workflows here, and .hanzo/workflows runs go
+# directly), so the default is the help this file already had.
+.DEFAULT_GOAL := help
+
 .PHONY: help
 help: ## Displays help.
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n\nTargets:\n"} /^[a-z0-9A-Z_-]+:.*?##/ { printf "  \033[36m%-40s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+
+# The four names every Hanzo repo answers to, mapped onto what this one already
+# does — aliases, not second implementations.
+#
+# build is the SERVER binary for this host, because that is what the shipped
+# image runs: the root Dockerfile builds ./cmd/community and runs it headless
+# (O11Y_WEB_ENABLED=false). The SPA is a separate image (Dockerfile.site) that
+# builds frontend/ from source in node:22, so js-build is not folded in here —
+# it is not part of this artifact, and it needs a newer node than the backend.
+.PHONY: build
+build: go-build-community-$(ARCH) ## Builds the shipped server binary for this host's arch.
+
+.PHONY: test
+test: go-test ## Runs the go tests.
+
+.PHONY: lint
+lint: ## Runs golangci-lint over the go tree (.golangci.yml).
+	@golangci-lint run
+
+.PHONY: clean
+clean: ## Removes generated build output (./target, frontend/build). Never node_modules.
+	@rm -rf $(TARGET_DIR) $(JS_BUILD_CONTEXT)/build
 
 ##############################################################
 # devenv commands
