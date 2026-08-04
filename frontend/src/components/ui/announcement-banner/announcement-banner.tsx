@@ -11,7 +11,7 @@ import {
 	forwardRef,
 	type ReactNode,
 } from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 export type AnnouncementBannerType = 'warning' | 'info' | 'error' | 'success';
 

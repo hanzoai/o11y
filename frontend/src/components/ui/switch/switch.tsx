@@ -1,7 +1,7 @@
 import './index.css';
 import * as SwitchPrimitive from '@radix-ui/react-switch';
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 type SwitchColor =
 	| 'robin'

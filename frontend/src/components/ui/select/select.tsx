@@ -2,7 +2,7 @@ import './index.css';
 import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown, LoaderCircle, X } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 /* -------------------------------------------------------------------------- */
 /* Context                                                                    */

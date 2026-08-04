@@ -1,7 +1,7 @@
 import './index.css';
 import * as React from 'react';
 import { ChevronLeft, ChevronRight, Minus } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 /* -------------------------------------------------------------------------- */
 /* Page-number sequence helper                                                */

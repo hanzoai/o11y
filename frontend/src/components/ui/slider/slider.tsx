@@ -1,7 +1,7 @@
 import './index.css';
 import * as SliderPrimitive from '@radix-ui/react-slider';
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 import { SliderThumb } from './slider-thumb';
 import { toArray } from './slider-utils';
 

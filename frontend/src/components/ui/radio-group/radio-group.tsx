@@ -1,7 +1,7 @@
 import './index.css';
 import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 export type RadioColorProps =
 	| 'robin'

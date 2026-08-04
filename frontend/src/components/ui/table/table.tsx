@@ -1,7 +1,7 @@
 import './index.css';
 import type * as React from 'react';
 
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 type TableProps = React.ComponentProps<'table'> & {
 	fixedHeight?: string | number;

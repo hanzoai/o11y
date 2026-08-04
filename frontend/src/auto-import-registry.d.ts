@@ -10,5 +10,6 @@
 // PR for reference: https://github.com/hanzoai/o11y/pull/9694
 // -------------------------------------------------------------------------
 
+import '@hanzo/gui';
 import '@hanzo/insights';
 import '@hanzo/ui';

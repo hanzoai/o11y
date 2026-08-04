@@ -2,7 +2,7 @@ import './index.css';
 import * as React from 'react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { Lock } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 export type TabVariants = 'primary' | 'secondary';
 
