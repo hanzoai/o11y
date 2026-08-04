@@ -67,23 +67,11 @@ function DrawerContent({
 }
 
 function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
-	return (
-		<div
-			data-slot="drawer-header"
-			className={cn(className)}
-			{...props}
-		/>
-	);
+	return <div data-slot="drawer-header" className={cn(className)} {...props} />;
 }
 
 function DrawerFooter({ className, ...props }: React.ComponentProps<'div'>) {
-	return (
-		<div
-			data-slot="drawer-footer"
-			className={cn(className)}
-			{...props}
-		/>
-	);
+	return <div data-slot="drawer-footer" className={cn(className)} {...props} />;
 }
 
 function DrawerTitle({

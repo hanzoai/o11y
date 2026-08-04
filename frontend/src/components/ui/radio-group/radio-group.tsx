@@ -251,11 +251,7 @@ const RadioGroupItem = React.forwardRef<HTMLButtonElement, RadioGroupItemProps>(
 				tabIndex={checked ? 0 : -1}
 				onClick={(): void => group?.select(value)}
 				onKeyDown={(event): void =>
-					rovingKeyDown(
-						event,
-						(el) => el.click(),
-						group?.dir ?? 'ltr',
-					)
+					rovingKeyDown(event, (el) => el.click(), group?.dir ?? 'ltr')
 				}
 				{...rest}
 			>
@@ -263,7 +259,9 @@ const RadioGroupItem = React.forwardRef<HTMLButtonElement, RadioGroupItemProps>(
 			</button>
 		);
 
-		if (!children) return item;
+		if (!children) {
+			return item;
+		}
 
 		return (
 			<div

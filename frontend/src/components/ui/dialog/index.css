@@ -169,7 +169,9 @@
 	background: transparent;
 	color: var(--dialog-close-icon);
 	opacity: 0.7;
-	transition: opacity 150ms ease, background-color 150ms ease;
+	transition:
+		opacity 150ms ease,
+		background-color 150ms ease;
 }
 
 [data-slot='dialog-close-corner']:hover {

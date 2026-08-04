@@ -69,7 +69,12 @@ const clamp = (value: number, min: number, max: number): number =>
 	Math.min(Math.max(value, min), max);
 
 /** Snap to the step grid measured from `min`, then keep the result in range. */
-const snap = (value: number, min: number, max: number, step: number): number => {
+const snap = (
+	value: number,
+	min: number,
+	max: number,
+	step: number,
+): number => {
 	const snapped = min + Math.round((value - min) / step) * step;
 	// Steps rarely divide the range evenly, so round away the float dust the
 	// division leaves rather than surfacing 33.800000000000004 to a formatter.
@@ -141,7 +146,9 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 		const valueAt = React.useCallback(
 			(clientX: number): number => {
 				const rect = trackRef.current?.getBoundingClientRect();
-				if (!rect || rect.width === 0) return min;
+				if (!rect || rect.width === 0) {
+					return min;
+				}
 				const ratio = clamp((clientX - rect.left) / rect.width, 0, 1);
 				return snap(min + ratio * (max - min), min, max, step);
 			},
@@ -152,10 +159,11 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 		const moveThumb = React.useCallback(
 			(index: number, next: number, commit: boolean): void => {
 				const lower = index > 0 ? localValues[index - 1] : min;
-				const upper =
-					index < localValues.length - 1 ? localValues[index + 1] : max;
+				const upper = index < localValues.length - 1 ? localValues[index + 1] : max;
 				const bounded = clamp(next, lower, upper);
-				if (bounded === localValues[index] && !commit) return;
+				if (bounded === localValues[index] && !commit) {
+					return;
+				}
 				const updated = [...localValues];
 				updated[index] = bounded;
 				emit(updated, commit);
@@ -181,20 +189,26 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 
 		const startDrag = React.useCallback(
 			(event: React.PointerEvent<HTMLSpanElement>, index?: number): void => {
-				if (disabled) return;
+				if (disabled) {
+					return;
+				}
 				const value = valueAt(event.clientX);
 				const target = index ?? nearestThumb(value);
 				setActiveIndex(target);
 				// The pointer belongs to the slider until it is released, so a drag that
 				// leaves the element still moves the thumb it grabbed.
 				event.currentTarget.setPointerCapture?.(event.pointerId);
-				if (index === undefined) moveThumb(target, value, false);
+				if (index === undefined) {
+					moveThumb(target, value, false);
+				}
 			},
 			[disabled, valueAt, nearestThumb, moveThumb],
 		);
 
 		React.useEffect(() => {
-			if (activeIndex === null) return undefined;
+			if (activeIndex === null) {
+				return undefined;
+			}
 			const onMove = (event: PointerEvent): void =>
 				moveThumb(activeIndex, valueAt(event.clientX), false);
 			const onUp = (event: PointerEvent): void => {

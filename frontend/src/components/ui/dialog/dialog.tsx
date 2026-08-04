@@ -89,23 +89,11 @@ function DialogContent({
 }
 
 function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
-	return (
-		<div
-			data-slot="dialog-header"
-			className={cn(className)}
-			{...props}
-		/>
-	);
+	return <div data-slot="dialog-header" className={cn(className)} {...props} />;
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
-	return (
-		<div
-			data-slot="dialog-footer"
-			className={cn(className)}
-			{...props}
-		/>
-	);
+	return <div data-slot="dialog-footer" className={cn(className)} {...props} />;
 }
 
 function DialogTitle({

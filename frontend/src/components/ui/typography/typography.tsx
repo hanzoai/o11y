@@ -131,8 +131,12 @@ function defaultElement(
 	level: TypographyLevel | undefined,
 	href: string | undefined,
 ): TypographyElement {
-	if (href) return 'a';
-	if (variant === 'title') return `h${level ?? 1}` as TypographyElement;
+	if (href) {
+		return 'a';
+	}
+	if (variant === 'title') {
+		return `h${level ?? 1}` as TypographyElement;
+	}
 	return 'p';
 }
 
@@ -228,7 +232,9 @@ const TypographyBase = forwardRef<HTMLElement, TypographyProps>(
 			</Element>
 		);
 
-		if (!copyable) return content;
+		if (!copyable) {
+			return content;
+		}
 		return (
 			<span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
 				{content}

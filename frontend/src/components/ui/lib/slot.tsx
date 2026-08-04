@@ -25,15 +25,21 @@ import {
 
 type AnyProps = Record<string, unknown>;
 
-const isHandler = (key: string, value: unknown): value is (...a: never[]) => void =>
+const isHandler = (
+	key: string,
+	value: unknown,
+): value is (...a: never[]) => void =>
 	/^on[A-Z]/.test(key) && typeof value === 'function';
 
 const composeRefs =
 	<T,>(...refs: (Ref<T> | undefined)[]) =>
 	(node: T | null): void => {
 		refs.forEach((ref) => {
-			if (typeof ref === 'function') ref(node);
-			else if (ref) (ref as { current: T | null }).current = node;
+			if (typeof ref === 'function') {
+				ref(node);
+			} else if (ref) {
+				(ref as { current: T | null }).current = node;
+			}
 		});
 	};
 
@@ -71,14 +77,14 @@ export interface SlotProps extends HTMLAttributes<HTMLElement> {
 export const Slot = forwardRef<HTMLElement, SlotProps>(
 	({ children, ...slotProps }, ref) => {
 		const child = Children.only(children);
-		if (!isValidElement(child)) return null;
+		if (!isValidElement(child)) {
+			return null;
+		}
 
-		const element = child as ReactElement<AnyProps> & { ref?: Ref<HTMLElement> };
-		// React 19 exposes ref as a regular prop; older element records carry it
-		// alongside props, so read both and let composeRefs ignore the undefined.
-		const childRef = (element.props.ref ?? element.ref) as
-			| Ref<HTMLElement>
-			| undefined;
+		const element = child as ReactElement<AnyProps>;
+		// React 19 carries ref as a regular prop. Reading element.ref instead would
+		// log a removal warning on every render — and find nothing.
+		const childRef = element.props.ref as Ref<HTMLElement> | undefined;
 
 		return cloneElement(element, {
 			...merge(slotProps as AnyProps, element.props),

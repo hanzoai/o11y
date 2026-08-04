@@ -59,14 +59,18 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>((props, ref) => {
 	} = props;
 
 	const [hidden, setHidden] = useState(false);
-	if (hidden) return null;
+	if (hidden) {
+		return null;
+	}
 
 	const Comp: React.ElementType = asChild ? Slot : 'span';
 	const truncate = textEllipsis !== false;
 
 	const handleClose = (event: MouseEvent<HTMLButtonElement>): void => {
 		onClose?.(event);
-		if (!event.defaultPrevented) setHidden(true);
+		if (!event.defaultPrevented) {
+			setHidden(true);
+		}
 	};
 
 	return (

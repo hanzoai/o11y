@@ -8,7 +8,9 @@
 	background: transparent;
 	color: var(--l1-foreground);
 	font-size: 0.875rem;
-	transition: border-color 150ms ease, box-shadow 150ms ease;
+	transition:
+		border-color 150ms ease,
+		box-shadow 150ms ease;
 }
 
 .hz-input::placeholder {

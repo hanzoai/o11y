@@ -199,9 +199,7 @@ export function renderComboboxMultiPills(
 		.join(', ');
 
 	return (
-		<span
-			data-slot="combobox-pills"
-		>
+		<span data-slot="combobox-pills">
 			{displayed.map((v) => (
 				<ComboboxPill key={v} value={v} onRemove={p.onRemove}>
 					{p.resolveLabel(v)}
@@ -210,11 +208,7 @@ export function renderComboboxMultiPills(
 			{overflowCount > 0 && (
 				<TooltipPrimitive.Root>
 					<TooltipPrimitive.Trigger asChild>
-						<span
-							data-slot="combobox-pill-overflow"
-						>
-							+{overflowCount}
-						</span>
+						<span data-slot="combobox-pill-overflow">+{overflowCount}</span>
 					</TooltipPrimitive.Trigger>
 					<TooltipPrimitive.Portal>
 						<TooltipPrimitive.Content

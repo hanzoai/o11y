@@ -4,8 +4,10 @@ import { Button } from '@hanzo/ui';
 import { cn } from '@hanzo/ui/core';
 import { InputComponent, type InputTheme } from './input';
 
-export interface InputPasswordProps
-	extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+export interface InputPasswordProps extends Omit<
+	React.InputHTMLAttributes<HTMLInputElement>,
+	'type'
+> {
 	theme?: InputTheme;
 }
 
