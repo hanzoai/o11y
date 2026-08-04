@@ -1,7 +1,8 @@
 import './index.css';
 import * as React from 'react';
-import { Slot } from '@radix-ui/react-slot';
 import { cn } from '@hanzo/ui/core';
+
+import { Slot } from '../lib/slot';
 
 export type KbdSize = 'sm' | 'default' | 'lg';
 
