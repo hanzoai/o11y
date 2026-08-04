@@ -218,7 +218,6 @@
     "sharp": "0.34.5",
     "stylelint": "17.7.0",
     "svgo": "4.0.1",
-    "ts-jest": "29.4.9",
     "typescript": "7.0.2",
     "typescript-plugin-css-modules": "5.2.0",
     "use-sync-external-store": "1.6.0",
