@@ -224,7 +224,9 @@ const RadioGroupItem = React.forwardRef<HTMLButtonElement, RadioGroupItemProps>(
 		const group = React.useContext(RadioGroupContext);
 		const fallbackId = React.useId();
 		const radioId = props.id || fallbackId;
-		const { value, disabled, required, ...rest } = props;
+		// `required` is the GROUP's fact (see the root's aria-required), so it is
+		// destructured off here only to keep it off the DOM node.
+		const { value, disabled, required: _required, ...rest } = props;
 		const checked = group?.value === value;
 		const isDisabled = disabled || group?.disabled;
 
@@ -234,7 +236,9 @@ const RadioGroupItem = React.forwardRef<HTMLButtonElement, RadioGroupItemProps>(
 				type="button"
 				role="radio"
 				aria-checked={checked}
-				aria-required={required ?? group?.required ?? undefined}
+				// aria-required belongs on the radiogroup, not on a radio — the
+				// requirement is "pick one of these", not "pick this one". The root
+				// carries it.
 				data-slot="radio-group-item"
 				data-state={checked ? 'checked' : 'unchecked'}
 				data-roving-item=""
