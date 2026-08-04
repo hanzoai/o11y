@@ -1,96 +1,165 @@
-[data-slot='callout'] {
+.hz-callout {
 	--callout-icon-color: currentColor;
 	--callout-title-color: var(--text-card-foreground);
 	--callout-description-color: var(--text-muted-foreground);
-	border-color: var(--callout-border-color, transparent);
-}
 
-[data-slot='callout'] {
+	position: relative;
+	display: flex;
+	gap: 10px;
+	width: 100%;
+	padding: 12px 12px 14px;
+	border: 1px solid var(--callout-border-color, transparent);
+	border-radius: 8px;
+	font-size: 0.875rem;
 	background: color-mix(in srgb, var(--callout-background) 20%, transparent);
 }
 
-.dark [data-slot='callout'] {
+.hz-callout[data-size='medium'] {
+	padding: 16px;
+	font-size: 1rem;
+}
+
+.hz-callout__icon,
+.hz-callout__icon-placeholder {
+	margin-top: 4px;
+	flex: none;
+	color: var(--callout-icon-color);
+}
+
+.hz-callout__icon-placeholder {
+	width: 12px;
+}
+
+.hz-callout[data-size='medium'] .hz-callout__icon-placeholder {
+	width: 16px;
+}
+
+.hz-callout__body {
+	display: grid;
+	gap: 2px;
+	flex: 1;
+}
+
+.hz-callout__title {
+	min-height: 16px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	color: var(--callout-title-color);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.hz-callout__description {
+	display: grid;
+	justify-items: start;
+	gap: 4px;
+	font-weight: 400;
+	line-height: 1.25rem;
+	color: var(--callout-description-color);
+}
+
+.hz-callout__description p {
+	line-height: 1.625;
+}
+
+.hz-callout__dismiss {
+	align-self: flex-start;
+	padding: 4px;
+	border: none;
+	border-radius: 2px;
+	background: none;
+	cursor: pointer;
+	color: var(--callout-description-color);
+	transition: color 100ms ease-out;
+}
+
+.hz-callout__dismiss:hover {
+	color: var(--callout-title-color);
+}
+
+.dark .hz-callout {
 	background: color-mix(in srgb, var(--callout-background) 10%, transparent);
 }
 
-[data-color='robin'] {
+.hz-callout[data-color='robin'] {
 	--callout-background: var(--bg-robin-500);
 	--callout-icon-color: var(--bg-robin-500);
 	--callout-title-color: var(--bg-robin-500);
 	--callout-description-color: var(--bg-robin-600);
 }
 
-.dark [data-color='robin'] {
+.dark .hz-callout[data-color='robin'] {
 	--callout-background: var(--bg-robin-300);
 	--callout-icon-color: var(--bg-robin-300);
 	--callout-title-color: var(--bg-robin-100);
 	--callout-description-color: var(--bg-robin-300);
 }
 
-[data-color='cherry'] {
+.hz-callout[data-color='cherry'] {
 	--callout-background: var(--bg-cherry-500);
 	--callout-icon-color: var(--bg-cherry-500);
 	--callout-title-color: var(--bg-cherry-500);
 	--callout-description-color: var(--bg-cherry-500);
 }
 
-.dark [data-color='cherry'] {
+.dark .hz-callout[data-color='cherry'] {
 	--callout-background: var(--bg-cherry-300);
 	--callout-icon-color: var(--bg-cherry-300);
 	--callout-title-color: var(--bg-cherry-100);
 	--callout-description-color: var(--bg-cherry-300);
 }
 
-[data-color='amber'] {
+.hz-callout[data-color='amber'] {
 	--callout-background: var(--bg-amber-500);
 	--callout-title-color: var(--bg-amber-500);
 	--callout-icon-color: var(--bg-amber-600);
 	--callout-description-color: var(--bg-amber-600);
 }
 
-.dark [data-color='amber'] {
+.dark .hz-callout[data-color='amber'] {
 	--callout-background: var(--bg-amber-300);
 	--callout-icon-color: var(--bg-amber-300);
 	--callout-title-color: var(--bg-amber-100);
 	--callout-description-color: var(--bg-amber-300);
 }
 
-[data-color='sienna'] {
+.hz-callout[data-color='sienna'] {
 	--callout-background: var(--bg-sienna-500);
 	--callout-icon-color: var(--bg-sienna-600);
 	--callout-title-color: var(--bg-sienna-600);
 	--callout-description-color: var(--bg-sienna-600);
 }
 
-.dark [data-color='sienna'] {
+.dark .hz-callout[data-color='sienna'] {
 	--callout-background: var(--bg-sienna-500);
 	--callout-icon-color: var(--bg-sienna-300);
 	--callout-title-color: var(--bg-sienna-100);
 	--callout-description-color: var(--bg-sienna-300);
 }
 
-[data-color='forest'] {
+.hz-callout[data-color='forest'] {
 	--callout-background: var(--bg-forest-600);
 	--callout-icon-color: var(--bg-forest-600);
 	--callout-title-color: var(--bg-forest-600);
 	--callout-description-color: var(--bg-forest-600);
 }
 
-.dark [data-color='forest'] {
+.dark .hz-callout[data-color='forest'] {
 	--callout-background: var(--bg-forest-500);
 	--callout-icon-color: var(--bg-forest-300);
 	--callout-title-color: var(--bg-forest-100);
 	--callout-description-color: var(--bg-forest-300);
 }
 
-[data-color='aqua'] {
+.hz-callout[data-color='aqua'] {
 	--callout-background: var(--bg-aqua-500);
 	--callout-icon-color: var(--bg-aqua-300);
 	--callout-title-color: var(--bg-aqua-300);
 	--callout-description-color: var(--bg-aqua-300);
 }
 
-.dark [data-color='aqua'] {
+.dark .hz-callout[data-color='aqua'] {
 	--callout-background: var(--bg-aqua-500);
 	--callout-icon-color: var(--bg-aqua-300);
 	--callout-title-color: var(--bg-aqua-100);

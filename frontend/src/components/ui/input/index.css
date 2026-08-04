@@ -1,0 +1,67 @@
+.hz-input {
+	display: flex;
+	width: 100%;
+	height: 36px;
+	padding: 4px 12px;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: transparent;
+	color: var(--l1-foreground);
+	font-size: 0.875rem;
+	transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.hz-input::placeholder {
+	color: var(--muted-foreground);
+}
+
+.hz-input:focus-visible {
+	outline: none;
+	border-color: var(--primary);
+	box-shadow: 0 0 0 1px var(--primary);
+}
+
+.hz-input:disabled {
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+
+.hz-input::file-selector-button {
+	border: 0;
+	background: transparent;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: inherit;
+}
+
+.hz-input[data-input-theme='dark'] {
+	background: var(--l2-background);
+}
+
+/* Password field: the reveal toggle sits inside the field's trailing edge. */
+.hz-input-password {
+	position: relative;
+	width: 100%;
+}
+
+.hz-input-password .hz-input {
+	padding-right: 40px;
+}
+
+.hz-input-password__toggle {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 1;
+	width: auto;
+	height: 100%;
+	padding: 0 12px;
+	border-radius: 0;
+	box-shadow: none;
+	color: var(--muted-foreground);
+	transition: opacity 150ms ease;
+}
+
+.hz-input-password__toggle:hover {
+	opacity: 0.7;
+}

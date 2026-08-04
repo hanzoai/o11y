@@ -1,6 +1,7 @@
 import { useEffect, useState, type JSX } from 'react';
-import { Button, Label, RadioGroup, RadioGroupItem } from '@hanzo/ui';
+import { Button, Label } from '@hanzo/ui';
 import { Input } from 'components/ui/input';
+import { RadioGroup, RadioGroupItem } from 'components/ui/radio-group';
 import { Typography } from 'antd';
 import logEvent from 'api/common/logEvent';
 import { ArrowRight } from 'components/ui/icons';

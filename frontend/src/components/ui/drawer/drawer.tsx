@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import type * as React from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
 
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 function Drawer({
 	...props

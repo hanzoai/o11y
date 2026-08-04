@@ -1,7 +1,7 @@
 import './index.css';
 import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 export const ToggleColorValue = {
 	Primary: 'primary',

@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
-import { Button, Label, RadioGroup, RadioGroupItem } from '@hanzo/ui';
+import { Button, Label } from '@hanzo/ui';
 import { ChevronDown, ChevronRight, X } from 'lucide-react';
 import { Select, Skeleton } from 'antd';
-import { RadioGroupLabel } from 'components/ui/radio-group';
+import {
+	RadioGroup,
+	RadioGroupItem,
+	RadioGroupLabel,
+} from 'components/ui/radio-group';
 
 import {
 	buildConfig,

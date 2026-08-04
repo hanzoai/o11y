@@ -4,7 +4,7 @@ import { forwardRef, useState } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { X } from 'lucide-react';
 
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 export type BadgeVariant = 'default' | 'outline';
 export type BadgeColor =

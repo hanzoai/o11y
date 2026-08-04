@@ -1,7 +1,7 @@
 import './index.css';
 import * as ProgressPrimitive from '@radix-ui/react-progress';
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@hanzo/ui/core';
 
 export interface ProgressProps extends React.ComponentPropsWithoutRef<
 	typeof ProgressPrimitive.Root
