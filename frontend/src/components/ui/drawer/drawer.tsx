@@ -36,10 +36,7 @@ function DrawerOverlay({
 	return (
 		<DrawerPrimitive.Overlay
 			data-slot="drawer-overlay"
-			className={cn(
-				'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50',
-				className,
-			)}
+			className={cn(className)}
 			{...props}
 		/>
 	);
@@ -59,19 +56,10 @@ function DrawerContent({
 			{showOverlay && <DrawerOverlay />}
 			<DrawerPrimitive.Content
 				data-slot="drawer-content"
-				className={cn(
-					'group/drawer-content bg-card fixed z-50 flex h-fit flex-col shadow-lg',
-					'data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b',
-					'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[80vh] data-[vaul-drawer-direction=bottom]:rounded-t-lg data-[vaul-drawer-direction=bottom]:border-t',
-					'data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:border-l',
-					'data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:left-0 data-[vaul-drawer-direction=left]:border-r',
-					'border border-[var(--drawer-border)]',
-					type === 'drawer' ? 'rounded-md m-4' : 'rounded-none',
-					className,
-				)}
+				data-type={type ?? 'panel'}
+				className={cn(className)}
 				{...props}
 			>
-				{/* <div className="bg-muted mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full group-data-[vaul-drawer-direction=bottom]/drawer-content:block" /> */}
 				{children}
 			</DrawerPrimitive.Content>
 		</DrawerPortal>
@@ -82,7 +70,7 @@ function DrawerHeader({ className, ...props }: React.ComponentProps<'div'>) {
 	return (
 		<div
 			data-slot="drawer-header"
-			className={cn('flex flex-col gap-1.5 p-4', className)}
+			className={cn(className)}
 			{...props}
 		/>
 	);
@@ -92,7 +80,7 @@ function DrawerFooter({ className, ...props }: React.ComponentProps<'div'>) {
 	return (
 		<div
 			data-slot="drawer-footer"
-			className={cn('mt-auto flex flex-col gap-2 p-4', className)}
+			className={cn(className)}
 			{...props}
 		/>
 	);
@@ -105,7 +93,7 @@ function DrawerTitle({
 	return (
 		<DrawerPrimitive.Title
 			data-slot="drawer-title"
-			className={cn('text-foreground font-semibold', className)}
+			className={cn(className)}
 			{...props}
 		/>
 	);
@@ -118,7 +106,7 @@ function DrawerDescription({
 	return (
 		<DrawerPrimitive.Description
 			data-slot="drawer-description"
-			className={cn('text-muted-foreground text-sm', className)}
+			className={cn(className)}
 			{...props}
 		/>
 	);
@@ -163,11 +151,9 @@ interface DrawerWrapperProps {
 function CloseButton({ type }: { type?: 'panel' | 'drawer' }) {
 	return (
 		<DrawerClose asChild>
-			<button
-				className={`rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none ${type === 'panel' ? 'mr-2' : ''}`}
-			>
-				<X className="h-4 w-4" />
-				<span className="sr-only">Close</span>
+			<button type="button" data-slot="drawer-close-button" data-type={type}>
+				<X size={16} />
+				<span data-slot="drawer-close-label">Close</span>
 			</button>
 		</DrawerClose>
 	);
@@ -207,19 +193,17 @@ function DrawerWrapper({
 			{trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
 			<DrawerContent className={className} showOverlay={showOverlay} type={type}>
 				<div
-					className="w-full max-w-3xl"
+					data-slot="drawer-panel"
 					style={{
 						width: panelWidth,
 						height: type === 'panel' || width ? '100vh' : 'auto',
 					}}
 				>
 					{resolvedHeader && (
-						<div className="flex h-12 items-center justify-between border-b border-[var(--drawer-border)] px-4">
+						<div data-slot="drawer-titlebar">
 							{type === 'panel' && showCloseButton && <CloseButton type={type} />}
-							<div className="flex items-center gap-2 flex-1">
-								<DrawerTitle className="font-sans text-sm font-normal">
-									{resolvedHeader.title}
-								</DrawerTitle>
+							<div data-slot="drawer-titlebar-body">
+								<DrawerTitle>{resolvedHeader.title}</DrawerTitle>
 							</div>
 							{type === 'drawer' && showCloseButton && <CloseButton type={type} />}
 						</div>

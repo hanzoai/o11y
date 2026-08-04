@@ -58,3 +58,70 @@
 	--banner-accent: var(--bg-forest-300);
 	--banner-accent-fg: #0b0b0b;
 }
+
+/* Layout. Every element the component renders already declares a data-slot, so
+   the shape lives here and the component states only what each part IS. */
+[data-slot='announcement-banner'] {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.5rem 1rem;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.25rem;
+	letter-spacing: -0.065px;
+}
+
+[data-slot='announcement-banner-body'] {
+	display: flex;
+	min-width: 0;
+	flex: 1 1 0%;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+[data-slot='announcement-banner-icon'] {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+}
+
+[data-slot='announcement-banner-message'] {
+	min-width: 0;
+	flex: 1 1 0%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+[data-slot='announcement-banner-action'],
+[data-slot='announcement-banner-dismiss'] {
+	display: inline-flex;
+	height: 1.5rem;
+	flex-shrink: 0;
+	align-items: center;
+	border: 0;
+	border-radius: 2px;
+	background-color: var(--banner-accent);
+	color: var(--banner-accent-fg);
+	font-size: 0.75rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: opacity 150ms ease;
+}
+
+[data-slot='announcement-banner-action'] {
+	padding: 0 0.5rem;
+}
+
+[data-slot='announcement-banner-dismiss'] {
+	width: 1.5rem;
+	justify-content: center;
+	padding: 0;
+}
+
+[data-slot='announcement-banner-action']:hover,
+[data-slot='announcement-banner-dismiss']:hover {
+	opacity: 0.9;
+}
