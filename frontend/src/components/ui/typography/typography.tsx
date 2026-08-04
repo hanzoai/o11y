@@ -1,9 +1,10 @@
 import type React from 'react';
 import { forwardRef, useCallback, useState } from 'react';
-import { Slot } from '@radix-ui/react-slot';
 import { Check, Copy } from 'lucide-react';
 
 import { cn } from '@hanzo/ui/core';
+
+import { Slot } from '../lib/slot';
 
 export type TypographySize =
 	| 'small'

@@ -1,7 +1,8 @@
 import './index.css';
-import * as SwitchPrimitive from '@radix-ui/react-switch';
 import React from 'react';
 import { cn } from '@hanzo/ui/core';
+
+import { useControllable } from '../lib/use-controllable';
 
 type SwitchColor =
 	| 'robin'
@@ -82,24 +83,38 @@ const SwitchBase = React.forwardRef<HTMLButtonElement, SwitchBaseProps>(
 			...props
 		},
 		ref,
-	) => (
-		<SwitchPrimitive.Root
-			ref={ref}
-			data-slot="switch"
-			data-color={color}
-			className={cn(className)}
-			data-testid={testId}
-			style={style}
-			checked={value}
-			onCheckedChange={onChange}
-			defaultChecked={defaultValue}
-			{...props}
-		>
-			<SwitchPrimitive.Thumb data-slot="switch-thumb" />
-		</SwitchPrimitive.Root>
-	),
+	) => {
+		const { disabled, required, name, ...rest } = props;
+		const [checked, setChecked] = useControllable(
+			value,
+			defaultValue ?? false,
+			onChange,
+		);
+
+		return (
+			<button
+				ref={ref}
+				type="button"
+				role="switch"
+				aria-checked={checked}
+				aria-required={required || undefined}
+				data-slot="switch"
+				data-color={color}
+				data-state={checked ? 'checked' : 'unchecked'}
+				className={cn(className)}
+				data-testid={testId}
+				style={style}
+				disabled={disabled}
+				name={name}
+				onClick={(): void => setChecked(!checked)}
+				{...rest}
+			>
+				<span data-slot="switch-thumb" />
+			</button>
+		);
+	},
 );
-SwitchBase.displayName = SwitchPrimitive.Root.displayName;
+SwitchBase.displayName = 'SwitchBase';
 
 /**
  * A toggle switch component for binary on/off or true/false selections.
