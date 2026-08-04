@@ -346,12 +346,10 @@ const ComboboxSimpleInner = forwardRef<
 		const spinnerOrChevron = loading ? (
 			<LoaderCircle
 				data-slot="combobox-spinner"
-				className="size-4 shrink-0 animate-spin opacity-50"
 			/>
 		) : (
 			<ChevronDown
 				data-slot="combobox-icon"
-				className="size-4 shrink-0 opacity-50"
 			/>
 		);
 
