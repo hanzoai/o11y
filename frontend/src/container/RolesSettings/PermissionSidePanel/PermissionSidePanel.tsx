@@ -84,7 +84,6 @@ function ResourceRow({
 							<RadioGroupItem
 								value={PermissionScope.ALL}
 								id={`${resource.id}-all`}
-								color="robin"
 							/>
 							<Label htmlFor={`${resource.id}-all`}>All</Label>
 						</div>
