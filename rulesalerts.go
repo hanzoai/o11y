@@ -60,7 +60,7 @@ import (
 // safely: the router matches the most specific pattern, so /rules/test is never
 // swallowed by /rules/:id, the same disambiguation the runtime's own tree makes.
 func mountRulesAlerts(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	// alert rules (runtime gate per op: see each op's comment)
 	zip.Get(g, "/rules", listRules, zip.WithOperationID("ListRules"))

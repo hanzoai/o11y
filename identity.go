@@ -46,7 +46,7 @@ import (
 // matches the most specific pattern, so /users/me can never be swallowed by
 // /users/:id, which is the same disambiguation the runtime's own tree makes.
 func mountIdentity(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	// users and invites (runtime gate per op: see each op's comment)
 	zip.Post(g, "/invite", createInvite, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateInvite"))
