@@ -37,7 +37,7 @@ import (
 // Collection routes register before the parameterised one so an id can never
 // shadow a collection.
 func mountTelemetry(app *zip.App) {
-	g := app.Group(sentryRoot)
+	g := under{app, sentryRoot}
 	zip.Post(g, "/discover", discover)
 	zip.Get(g, "/logs", logs)
 	zip.Get(g, "/traces", traces)

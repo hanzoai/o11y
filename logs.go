@@ -45,7 +45,7 @@ import (
 // pipelines routes keep the mux tree's discipline — preview registers before
 // the parameterised version read so a version can never shadow it.
 func mountLogs(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 	zip.Get(g, "/logs", logRecords)
 	zip.Get(g, "/logs/fields", logFields)
 	zip.Post(g, "/logs/fields", logFieldUpdate)

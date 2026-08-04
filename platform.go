@@ -47,7 +47,7 @@ import (
 // routes_licenses.go, then the o11yapiserver singletons). It registers on the
 // SAME o11yRoot group logs.go mounts on, ahead of the delegation wildcard.
 func mountPlatform(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	// routes_misc.go
 	zip.Get(g, "/query", promQuery)

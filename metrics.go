@@ -35,7 +35,7 @@ import (
 // Collection routes register before the parameterised ones so an id can never
 // shadow a collection.
 func mountMetrics(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	zip.Get(g, "/metrics", listMetrics, zip.WithOperationID("ListMetrics"))
 	zip.Post(g, "/metrics/stats", metricStats, zip.WithOperationID("GetMetricsStats"))

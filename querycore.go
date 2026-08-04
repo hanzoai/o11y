@@ -59,7 +59,7 @@ import (
 // The saved-view collection routes register before the parameterised ones so a
 // view id can never shadow the collection, exactly as the mux tree ordered them.
 func mountQueryCore(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	// the v5 composite query engine
 	zip.Post(g, "/query_range", querierQueryRange)

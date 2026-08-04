@@ -41,7 +41,7 @@ import (
 // parameterised /:funnel_id ones so a funnel id can never shadow them — the same
 // discipline the mux tree keeps by registering the literals first.
 func mountTraceFunnels(app *zip.App) {
-	g := app.Group(o11yRoot + "/trace-funnels")
+	g := under{app, o11yRoot + "/trace-funnels"}
 
 	zip.Post(g, "/new", funnelCreate, op("CreateTraceFunnel"))
 	zip.Get(g, "/list", funnelList, op("ListTraceFunnels"))

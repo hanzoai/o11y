@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/zap-proto/zip"
@@ -71,6 +72,43 @@ func operations(t *testing.T, doc map[string]any) int {
 	return n
 }
 
+// mcpTools counts the tools the router offers, read the way an MCP client reads
+// them: a tools/list over the served door.
+//
+// It used to be len(app.MCPTools()) — an in-process accessor on the app the test
+// had just built, which is the shape of proof this file exists to reject. The
+// declaration lives on an app of its own now (see publish), so that accessor
+// answers 0 on the serving app whether or not the tool surface is reachable, and
+// a count taken off the declaration object instead would prove only that the
+// object knows its own ops. Asking the ROUTER is what proves a caller can reach
+// them.
+func mcpTools(t *testing.T, app *zip.App) int {
+	t.Helper()
+	req := httptest.NewRequest(http.MethodPost, "/mcp",
+		strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"tools/list"}`))
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := app.Fiber().Test(req)
+	if err != nil {
+		t.Fatalf("POST /mcp: %v", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("POST /mcp status=%d, want 200 — the tool surface answers on no port", resp.StatusCode)
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("read body: %v", err)
+	}
+	var out struct {
+		Result struct {
+			Tools []map[string]any `json:"tools"`
+		} `json:"result"`
+	}
+	if err := json.Unmarshal(body, &out); err != nil {
+		t.Fatalf("tools/list is not JSON-RPC: %v — body: %.120s", err, body)
+	}
+	return len(out.Result.Tools)
+}
+
 // THE PAYOFF, on the router the binary serves. 353 is the same count
 // routes_test.go pins on the table itself; asserting it HERE is what makes the
 // two the same 353 rather than two numbers that happen to agree.
@@ -83,7 +121,7 @@ func TestPublishServesTheDocument(t *testing.T) {
 	if got := operations(t, documentOf(t, app)); got != 353 {
 		t.Fatalf("the served document publishes %d operations, want 353", got)
 	}
-	if got := len(app.MCPTools()); got != 353 {
+	if got := mcpTools(t, app); got != 353 {
 		t.Fatalf("the served router offers %d MCP tools, want 353", got)
 	}
 }
