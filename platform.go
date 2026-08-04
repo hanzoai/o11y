@@ -50,35 +50,35 @@ func mountPlatform(app *zip.App) {
 	g := under{app, o11yRoot}
 
 	// routes_misc.go
-	zip.Get(g, "/query", promQuery)
-	zip.Post(g, "/variables/query", dashboardVars)
-	zip.Post(g, "/event", event)
-	zip.Get(g, "/usage", usage)
-	zip.Post(g, "/dependency_graph", dependencyGraph)
-	zip.Get(g, "/version", version)
-	zip.Get(g, "/health", health)
-	zip.Get(g, "/disks", disks)
-	zip.Post(g, "/register", register)
-	zip.Post(g, "/span_percentile", spanPercentile)
-	zip.Post(g, "/query_filter/analyze", analyzeQueryFilter)
-	zip.Get(g, "/filter_suggestions", filterSuggestions)
-	zip.Get(g, "/infra_onboarding/k8s/status", k8sOnboarding)
-	zip.Get(g, "/metric/metric_metadata", legacyMetricMetadata)
+	opGet(g, "/query", promQuery)
+	opPost(g, "/variables/query", dashboardVars)
+	opPost(g, "/event", event)
+	opGet(g, "/usage", usage)
+	opPost(g, "/dependency_graph", dependencyGraph)
+	opGet(g, "/version", version)
+	opGet(g, "/health", health)
+	opGet(g, "/disks", disks)
+	opPost(g, "/register", register)
+	opPost(g, "/span_percentile", spanPercentile)
+	opPost(g, "/query_filter/analyze", analyzeQueryFilter)
+	opGet(g, "/filter_suggestions", filterSuggestions)
+	opGet(g, "/infra_onboarding/k8s/status", k8sOnboarding)
+	opGet(g, "/metric/metric_metadata", legacyMetricMetadata)
 
 	// routes_settings.go
-	zip.Post(g, "/settings/ttl", setRetention)
-	zip.Get(g, "/settings/ttl", retention)
-	zip.Post(g, "/settings/apdex", setApdex)
-	zip.Get(g, "/settings/apdex", apdex)
+	opPost(g, "/settings/ttl", setRetention)
+	opGet(g, "/settings/ttl", retention)
+	opPost(g, "/settings/apdex", setApdex)
+	opGet(g, "/settings/apdex", apdex)
 
 	// routes_licenses.go
-	zip.Get(g, "/licenses", licenses)
-	zip.Get(g, "/licenses/active", activateLicense)
+	opGet(g, "/licenses", licenses)
+	opGet(g, "/licenses/active", activateLicense)
 
 	// o11yapiserver: global.go, flagger.go, statsreporter.go
-	zip.Get(g, "/global/config", globalConfig)
-	zip.Get(g, "/features", features)
-	zip.Get(g, "/stats", orgStats)
+	opGet(g, "/global/config", globalConfig)
+	opGet(g, "/features", features)
+	opGet(g, "/stats", orgStats)
 }
 
 // ── the operations ────────────────────────────────────────────────────────────

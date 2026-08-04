@@ -44,28 +44,28 @@ import (
 func mountAccess(app *zip.App) {
 	g := under{app, o11yRoot}
 
-	zip.Post(g, "/roles", createRole, op("CreateRole"), zip.WithStatus(http.StatusCreated))
-	zip.Get(g, "/roles", listRoles, op("ListRoles"))
-	zip.Get(g, "/roles/:id", getRole, op("GetRole"))
-	zip.Put(g, "/roles/:id", updateRole, op("UpdateRole"), zip.WithStatus(http.StatusNoContent))
-	zip.Delete(g, "/roles/:id", deleteRole, op("DeleteRole"), zip.WithStatus(http.StatusNoContent))
+	opPost(g, "/roles", createRole, op("CreateRole"), zip.WithStatus(http.StatusCreated))
+	opGet(g, "/roles", listRoles, op("ListRoles"))
+	opGet(g, "/roles/:id", getRole, op("GetRole"))
+	opPut(g, "/roles/:id", updateRole, op("UpdateRole"), zip.WithStatus(http.StatusNoContent))
+	opDelete(g, "/roles/:id", deleteRole, op("DeleteRole"), zip.WithStatus(http.StatusNoContent))
 
-	zip.Post(g, "/service_accounts", createServiceAccount, op("CreateServiceAccount"), zip.WithStatus(http.StatusCreated))
-	zip.Get(g, "/service_accounts", listServiceAccounts, op("ListServiceAccounts"))
-	zip.Get(g, "/service_accounts/me", getMyServiceAccount, op("GetMyServiceAccount"))
-	zip.Put(g, "/service_accounts/me", updateMyServiceAccount, op("UpdateMyServiceAccount"), zip.WithStatus(http.StatusNoContent))
-	zip.Get(g, "/service_accounts/:id", getServiceAccount, op("GetServiceAccount"))
-	zip.Put(g, "/service_accounts/:id", updateServiceAccount, op("UpdateServiceAccount"), zip.WithStatus(http.StatusNoContent))
-	zip.Delete(g, "/service_accounts/:id", deleteServiceAccount, op("DeleteServiceAccount"), zip.WithStatus(http.StatusNoContent))
-	zip.Get(g, "/service_accounts/:id/roles", listServiceAccountRoles, op("GetServiceAccountRoles"))
-	zip.Post(g, "/service_accounts/:id/roles", grantServiceAccountRole, op("CreateServiceAccountRole"), zip.WithStatus(http.StatusNoContent))
-	zip.Delete(g, "/service_accounts/:id/roles/:rid", revokeServiceAccountRole, op("DeleteServiceAccountRole"), zip.WithStatus(http.StatusNoContent))
-	zip.Post(g, "/service_accounts/:id/keys", createServiceAccountKey, op("CreateServiceAccountKey"), zip.WithStatus(http.StatusCreated))
-	zip.Get(g, "/service_accounts/:id/keys", listServiceAccountKeys, op("ListServiceAccountKeys"))
-	zip.Put(g, "/service_accounts/:id/keys/:fid", updateServiceAccountKey, op("UpdateServiceAccountKey"), zip.WithStatus(http.StatusNoContent))
-	zip.Delete(g, "/service_accounts/:id/keys/:fid", revokeServiceAccountKey, op("RevokeServiceAccountKey"), zip.WithStatus(http.StatusNoContent))
+	opPost(g, "/service_accounts", createServiceAccount, op("CreateServiceAccount"), zip.WithStatus(http.StatusCreated))
+	opGet(g, "/service_accounts", listServiceAccounts, op("ListServiceAccounts"))
+	opGet(g, "/service_accounts/me", getMyServiceAccount, op("GetMyServiceAccount"))
+	opPut(g, "/service_accounts/me", updateMyServiceAccount, op("UpdateMyServiceAccount"), zip.WithStatus(http.StatusNoContent))
+	opGet(g, "/service_accounts/:id", getServiceAccount, op("GetServiceAccount"))
+	opPut(g, "/service_accounts/:id", updateServiceAccount, op("UpdateServiceAccount"), zip.WithStatus(http.StatusNoContent))
+	opDelete(g, "/service_accounts/:id", deleteServiceAccount, op("DeleteServiceAccount"), zip.WithStatus(http.StatusNoContent))
+	opGet(g, "/service_accounts/:id/roles", listServiceAccountRoles, op("GetServiceAccountRoles"))
+	opPost(g, "/service_accounts/:id/roles", grantServiceAccountRole, op("CreateServiceAccountRole"), zip.WithStatus(http.StatusNoContent))
+	opDelete(g, "/service_accounts/:id/roles/:rid", revokeServiceAccountRole, op("DeleteServiceAccountRole"), zip.WithStatus(http.StatusNoContent))
+	opPost(g, "/service_accounts/:id/keys", createServiceAccountKey, op("CreateServiceAccountKey"), zip.WithStatus(http.StatusCreated))
+	opGet(g, "/service_accounts/:id/keys", listServiceAccountKeys, op("ListServiceAccountKeys"))
+	opPut(g, "/service_accounts/:id/keys/:fid", updateServiceAccountKey, op("UpdateServiceAccountKey"), zip.WithStatus(http.StatusNoContent))
+	opDelete(g, "/service_accounts/:id/keys/:fid", revokeServiceAccountKey, op("RevokeServiceAccountKey"), zip.WithStatus(http.StatusNoContent))
 
-	zip.Post(g, "/authz/check", checkAccess, op("AuthzCheck"))
+	opPost(g, "/authz/check", checkAccess, op("AuthzCheck"))
 }
 
 // ── roles ─────────────────────────────────────────────────────────────────────
