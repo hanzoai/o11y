@@ -66,7 +66,7 @@ func runtime(t *testing.T, payload any) (wrote *[]byte, asked **http.Request) {
 // would receive.
 func call(t *testing.T, app *zip.App, r *http.Request) (int, []byte) {
 	t.Helper()
-	resp, err := app.Fiber().Test(r)
+	resp, err := app.Test(r)
 	if err != nil {
 		t.Fatalf("Test: %v", err)
 	}

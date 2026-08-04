@@ -43,7 +43,7 @@ func newMounted(t *testing.T) *zip.App {
 
 func get(t *testing.T, app *zip.App, path string) (*http.Response, string) {
 	t.Helper()
-	resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, path, nil))
+	resp, err := app.Test(httptest.NewRequest(http.MethodGet, path, nil))
 	if err != nil {
 		t.Fatalf("Test %s: %v", path, err)
 	}
@@ -143,7 +143,7 @@ func TestNativeParamAndMethod(t *testing.T) {
 	app.Get("/thing/:id", func(c *zip.Ctx) error { return c.String(http.StatusOK, "get:"+c.Param("id")) })
 	app.Post("/thing/:id", func(c *zip.Ctx) error { return c.String(http.StatusCreated, "post:"+c.Param("id")) })
 
-	resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, "/thing/abc", nil))
+	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/thing/abc", nil))
 	if err != nil {
 		t.Fatalf("Test: %v", err)
 	}
@@ -152,7 +152,7 @@ func TestNativeParamAndMethod(t *testing.T) {
 		t.Fatalf("GET => %d %q, want 200 get:abc", resp.StatusCode, string(b))
 	}
 
-	resp, err = app.Fiber().Test(httptest.NewRequest(http.MethodPost, "/thing/xyz", nil))
+	resp, err = app.Test(httptest.NewRequest(http.MethodPost, "/thing/xyz", nil))
 	if err != nil {
 		t.Fatalf("Test: %v", err)
 	}

@@ -28,7 +28,7 @@ import (
 // documentOf fetches the OpenAPI document off a router the way a caller does.
 func documentOf(t *testing.T, app *zip.App) map[string]any {
 	t.Helper()
-	resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, zip.SpecPath, nil))
+	resp, err := app.Test(httptest.NewRequest(http.MethodGet, zip.SpecPath, nil))
 	if err != nil {
 		t.Fatalf("GET %s: %v", zip.SpecPath, err)
 	}
@@ -87,7 +87,7 @@ func mcpTools(t *testing.T, app *zip.App) int {
 	req := httptest.NewRequest(http.MethodPost, "/mcp",
 		strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"tools/list"}`))
 	req.Header.Set("Content-Type", "application/json")
-	resp, err := app.Fiber().Test(req)
+	resp, err := app.Test(req)
 	if err != nil {
 		t.Fatalf("POST /mcp: %v", err)
 	}
@@ -169,7 +169,7 @@ func TestServiceRoutesOutrankTheDeclaration(t *testing.T) {
 		t.Fatalf("publish: %v", err)
 	}
 
-	resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, path, nil))
+	resp, err := app.Test(httptest.NewRequest(http.MethodGet, path, nil))
 	if err != nil {
 		t.Fatalf("GET %s: %v", path, err)
 	}
