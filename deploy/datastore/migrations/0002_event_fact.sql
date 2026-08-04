@@ -64,10 +64,16 @@
 -- 1) THE CUTOVER — metadata-only, reversible, and it goes FIRST.
 -- =====================================================================
 --
--- Measured on the live warehouse: `event.trace` holds ONE row against 9,130 distinct
--- trace ids in `event.span`, and `event.operation` holds two against 68 distinct
--- (service, name) pairs. Nothing ever fed them. Any design that leans on them as a
--- fallback is leaning on nothing, so step 4 rebuilds them as rollups of the fact table.
+-- Measured on the live warehouse: `event.trace` holds ONE row and `event.operation` two,
+-- against the whole trace and (service, name) population of `event.span`. Nothing ever
+-- fed them. Any design that leans on them as a fallback is leaning on nothing, so step 4
+-- rebuilds them as rollups of the fact table.
+--
+-- The populations those two are measured against are deliberately not written here. An
+-- earlier draft said 9,130 traces and 68 pairs; the live numbers are 168,151 and 300, an
+-- 18x drift on a plane that is still growing — which is the same reason step 5 refuses to
+-- write a row count into a comment. The ONE and the TWO are worth stating because they do
+-- not move: nothing writes them.
 --
 -- The gate below does not restate those numbers, it RE-DERIVES them: each rollup is
 -- refused if it holds as much as a tenth of the population it would hold were it alive.
@@ -76,6 +82,43 @@
 -- `attic` is where a superseded object waits out its own TTL. It is a DATABASE, not a
 -- suffix: nothing in this namespace is ever named `_old`, `_v2` or `_new`. Both tables
 -- carry a 30-day TTL, so they read out and leave without anyone deciding to delete them.
+--
+-- DEAD BY POPULATION IS NOT UNREAD BY CODE, AND THIS STEP SHIPS WITH THE READERS.
+-- The gate below asks how many rows a table holds. That is the wrong question to ask
+-- about a name, because a name is read by CODE and code does not appear in a row count.
+-- Both gates pass on this deployment, and three live consumers still spell the old
+-- columns:
+--
+--     pkg/datastoretraces/writer.go             INSERT INTO event.operation
+--                                                   (org, serviceName, name, time)
+--                                               INSERT INTO event.trace
+--                                                   (org, trace_id, start, end, num_spans)
+--     pkg/modules/tracedetail/.../store.go      SELECT … sum(num_spans) FROM event.trace
+--                                               — the FIRST query the trace detail page
+--                                                 issues, so the whole page depends on it
+--     pkg/telemetrytraces/condition_builder.go  SELECT DISTINCT name, serviceName
+--                                                   FROM event.operation
+--
+-- Step 4 drops `num_spans` and renames `serviceName` to `service`. Naming a column that
+-- is gone is not an empty answer, it is `UNKNOWN_IDENTIFIER` — so this step converts a
+-- read that returned NOTHING (which is what a one-row table returns against 168,151
+-- traces) into a read that THROWS. Measured on the live warehouse, both shapes, after the
+-- rename: Code 47 for `num_spans` and Code 47 for `serviceName`.
+--
+-- That is strictly worse than the state it replaces, and it is invisible until someone
+-- opens the page. No reader here has moved yet: `uniqExactIfMerge`, which is the ONLY way
+-- to read the new shape, appears in zero .go files in this repo.
+--
+-- A QUERY LOG CANNOT CLEAR THIS, and the attempt is what makes the trap worth writing
+-- down. `system.query_log` over a 2.5-day window holding 20.1 million queries showed
+-- every touch of these two tables to be interactive investigation and not one from a
+-- service — which reads exactly like proof and is not. A path that exists and has not
+-- been walked leaves the same trace as a path that does not exist. Absence of a query is
+-- absence of evidence.
+--
+-- So steps 1 and 4 belong in the SAME window as the reader repoint, never ahead of it.
+-- Landing them early is reversible — the rename is metadata and `attic` still holds the
+-- originals — but it is a live break until it is reversed.
 
 CREATE DATABASE IF NOT EXISTS attic;
 
