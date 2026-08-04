@@ -90,22 +90,13 @@ const AnnouncementBanner = forwardRef<HTMLDivElement, AnnouncementBannerProps>(
 				className={cn(className)}
 				style={style}
 			>
-				<div
-					data-slot="announcement-banner-body"
-				>
+				<div data-slot="announcement-banner-body">
 					{resolvedIcon && (
-						<span
-							data-slot="announcement-banner-icon"
-							data-testid="banner-icon"
-						>
+						<span data-slot="announcement-banner-icon" data-testid="banner-icon">
 							{resolvedIcon}
 						</span>
 					)}
-					<div
-						data-slot="announcement-banner-message"
-					>
-						{children}
-					</div>
+					<div data-slot="announcement-banner-message">{children}</div>
 					{action && (
 						<button
 							type="button"

@@ -15,9 +15,12 @@ const ITEM = '[data-roving-item]';
 /** Enabled items of the group that owns `from`, in document order. */
 function items(from: HTMLElement): HTMLElement[] {
 	const group = from.closest('[data-roving-group]');
-	if (!group) return [from];
+	if (!group) {
+		return [from];
+	}
 	return Array.from(group.querySelectorAll<HTMLElement>(ITEM)).filter(
-		(el) => !el.hasAttribute('disabled') && el.getAttribute('aria-disabled') !== 'true',
+		(el) =>
+			!el.hasAttribute('disabled') && el.getAttribute('aria-disabled') !== 'true',
 	);
 }
 
@@ -37,20 +40,28 @@ export function rovingKeyDown(
 	dir: 'ltr' | 'rtl' = 'ltr',
 ): void {
 	const { key } = event;
-	if (!NEXT.has(key) && !PREV.has(key) && key !== 'Home' && key !== 'End') return;
+	if (!NEXT.has(key) && !PREV.has(key) && key !== 'Home' && key !== 'End') {
+		return;
+	}
 
 	const current = event.currentTarget;
 	const list = items(current);
-	if (list.length === 0) return;
+	if (list.length === 0) {
+		return;
+	}
 
 	const flip = dir === 'rtl' && (key === 'ArrowLeft' || key === 'ArrowRight');
 	const forward = flip ? PREV.has(key) : NEXT.has(key);
 	const index = list.indexOf(current);
 
 	let next: HTMLElement;
-	if (key === 'Home') next = list[0];
-	else if (key === 'End') next = list[list.length - 1];
-	else next = list[(index + (forward ? 1 : -1) + list.length) % list.length];
+	if (key === 'Home') {
+		next = list[0];
+	} else if (key === 'End') {
+		next = list[list.length - 1];
+	} else {
+		next = list[(index + (forward ? 1 : -1) + list.length) % list.length];
+	}
 
 	event.preventDefault();
 	next.focus();
@@ -66,6 +77,10 @@ export function focusFirstItem(event: {
 	target: EventTarget | null;
 	currentTarget: HTMLElement;
 }): void {
-	if (event.target !== event.currentTarget) return;
-	event.currentTarget.querySelector<HTMLElement>(`${ITEM}:not([disabled])`)?.focus();
+	if (event.target !== event.currentTarget) {
+		return;
+	}
+	event.currentTarget
+		.querySelector<HTMLElement>(`${ITEM}:not([disabled])`)
+		?.focus();
 }

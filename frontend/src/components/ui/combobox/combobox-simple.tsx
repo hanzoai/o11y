@@ -344,13 +344,9 @@ const ComboboxSimpleInner = forwardRef<
 		);
 
 		const spinnerOrChevron = loading ? (
-			<LoaderCircle
-				data-slot="combobox-spinner"
-			/>
+			<LoaderCircle data-slot="combobox-spinner" />
 		) : (
-			<ChevronDown
-				data-slot="combobox-icon"
-			/>
+			<ChevronDown data-slot="combobox-icon" />
 		);
 
 		if (multiple) {

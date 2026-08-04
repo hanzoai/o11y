@@ -67,7 +67,9 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
 		const isOpen = isControlled ? open : uncontrolledOpen;
 
 		const setOpen = (next: boolean): void => {
-			if (!isControlled) setUncontrolledOpen(next);
+			if (!isControlled) {
+				setUncontrolledOpen(next);
+			}
 			onOpenChange?.(next);
 		};
 
@@ -80,7 +82,9 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
 			setLoading(true);
 			try {
 				const result = await onConfirm();
-				if (result === false) return;
+				if (result === false) {
+					return;
+				}
 				setOpen(false);
 			} finally {
 				setLoading(false);

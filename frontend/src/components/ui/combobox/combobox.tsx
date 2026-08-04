@@ -67,14 +67,10 @@ const ComboboxTrigger = forwardRef<HTMLButtonElement, ComboboxTriggerProps>(
 				className={cn(className)}
 				{...props}
 			>
-				<span
-					data-slot="combobox-value"
-				>
+				<span data-slot="combobox-value">
 					{value || placeholder || 'Select an option...'}
 				</span>
-				<ChevronDown
-					data-slot="combobox-icon"
-				/>
+				<ChevronDown data-slot="combobox-icon" />
 			</PopoverPrimitive.Trigger>
 		);
 	},
@@ -310,10 +306,7 @@ const ComboboxItem = forwardRef<HTMLDivElement, ComboboxItemProps>(
 	) => {
 		const resolvedPrefix =
 			prefix === undefined ? (
-				<span
-					data-slot="combobox-item-indicator"
-					data-selected={isSelected}
-				>
+				<span data-slot="combobox-item-indicator" data-selected={isSelected}>
 					<Check />
 				</span>
 			) : (
@@ -340,20 +333,10 @@ const ComboboxItem = forwardRef<HTMLDivElement, ComboboxItemProps>(
 				{...props}
 			>
 				{resolvedPrefix != null && (
-					<span
-						data-slot="combobox-item-prefix"
-					>
-						{resolvedPrefix}
-					</span>
+					<span data-slot="combobox-item-prefix">{resolvedPrefix}</span>
 				)}
 				{children}
-				{suffix != null && (
-					<span
-						data-slot="combobox-item-suffix"
-					>
-						{suffix}
-					</span>
-				)}
+				{suffix != null && <span data-slot="combobox-item-suffix">{suffix}</span>}
 			</CommandItem>
 		);
 	},
@@ -395,16 +378,8 @@ export type ComboboxPillProps = {
  */
 const ComboboxPill = forwardRef<HTMLSpanElement, ComboboxPillProps>(
 	({ value, onRemove, children, className }, ref) => (
-		<span
-			ref={ref}
-			data-slot="combobox-pill"
-			className={cn(className)}
-		>
-			<span
-				data-slot="combobox-pill-text"
-			>
-				{children}
-			</span>
+		<span ref={ref} data-slot="combobox-pill" className={cn(className)}>
+			<span data-slot="combobox-pill-text">{children}</span>
 			<button
 				type="button"
 				data-slot="combobox-pill-remove"
@@ -514,9 +489,7 @@ const ComboboxCreateItem = forwardRef<HTMLDivElement, ComboboxCreateItemProps>(
 			className={cn(className)}
 			{...props}
 		>
-			{prefix != null && (
-				<span data-slot="combobox-item-prefix">{prefix}</span>
-			)}
+			{prefix != null && <span data-slot="combobox-item-prefix">{prefix}</span>}
 			{children ?? `Create "${inputValue}"`}
 		</CommandItem>
 	),
@@ -547,9 +520,7 @@ const ComboboxHint = forwardRef<HTMLDivElement, ComboboxHintProps>(
 			onSelect={(): void => onInsert(insertValue)}
 			{...props}
 		>
-			{prefix != null && (
-				<span data-slot="combobox-item-prefix">{prefix}</span>
-			)}
+			{prefix != null && <span data-slot="combobox-item-prefix">{prefix}</span>}
 			{children}
 		</CommandItem>
 	),

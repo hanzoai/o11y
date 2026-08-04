@@ -157,9 +157,7 @@ export const ToggleGroup = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
 				toggle: (item): void => {
 					if (multiple) {
 						setSelection(
-							list.includes(item)
-								? list.filter((v) => v !== item)
-								: [...list, item],
+							list.includes(item) ? list.filter((v) => v !== item) : [...list, item],
 						);
 					} else {
 						// Radix's single-mode rule: pressing the pressed item clears it.
@@ -249,7 +247,9 @@ export const ToggleGroupItem = React.forwardRef<
 				group?.toggle(value);
 			}}
 			onKeyDown={(event): void => {
-				if (group?.roving) rovingKeyDown(event, undefined, group.dir);
+				if (group?.roving) {
+					rovingKeyDown(event, undefined, group.dir);
+				}
 			}}
 			{...props}
 		/>
