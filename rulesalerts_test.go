@@ -68,7 +68,7 @@ func TestRulesAlertsOpsRelayVerbatim(t *testing.T) {
 			if tc.body != "" {
 				req.Header.Set("Content-Type", "application/json")
 			}
-			resp, err := app.Fiber().Test(req)
+			resp, err := app.Test(req)
 			if err != nil {
 				t.Fatalf("Test: %v", err)
 			}
@@ -102,7 +102,7 @@ func TestRulesAlertsHistoryQueryForwarded(t *testing.T) {
 	}))
 	defer SetHandler(nil)
 
-	resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, "/v1/o11y/rules/r1/history/stats?start=10&end=20", http.NoBody))
+	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/v1/o11y/rules/r1/history/stats?start=10&end=20", http.NoBody))
 	if err != nil {
 		t.Fatalf("Test: %v", err)
 	}
@@ -118,7 +118,7 @@ func TestRulesAlertsHistoryQueryForwarded(t *testing.T) {
 
 	// An unset downtime filter must not be forwarded (tri-state preserved).
 	sawQuery = nil
-	if _, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, "/v1/o11y/downtime_schedules", http.NoBody)); err != nil {
+	if _, err := app.Test(httptest.NewRequest(http.MethodGet, "/v1/o11y/downtime_schedules", http.NoBody)); err != nil {
 		t.Fatalf("Test: %v", err)
 	}
 	if sawQuery.Has("active") || sawQuery.Has("recurring") {

@@ -55,41 +55,41 @@ import (
 // carries the operation id its mux registration always declared, so the document
 // names it exactly as it was named before.
 func mountDashboards(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	// Dashboards — list, per-user list, create, clone, read, update, patch, delete.
-	zip.Get(g, "/dashboards", dashboardListV2, zip.WithOperationID("ListDashboardsV2"))
-	zip.Get(g, "/users/me/dashboards", dashboardListForUserV2, zip.WithOperationID("ListDashboardsForUserV2"))
-	zip.Post(g, "/dashboards", dashboardCreateV2, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateDashboardV2"))
-	zip.Post(g, "/dashboards/:id/clone", dashboardCloneV2, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CloneDashboardV2"))
-	zip.Get(g, "/dashboards/:id", dashboardGetV2, zip.WithOperationID("GetDashboardV2"))
-	zip.Put(g, "/dashboards/:id", dashboardUpdateV2, zip.WithOperationID("UpdateDashboardV2"))
-	zip.Patch(g, "/dashboards/:id", dashboardPatchV2, zip.WithOperationID("PatchDashboardV2"))
-	zip.Delete(g, "/dashboards/:id", dashboardDeleteV2, zip.WithOperationID("DeleteDashboardV2"))
+	opGet(g, "/dashboards", dashboardListV2, zip.WithOperationID("ListDashboardsV2"))
+	opGet(g, "/users/me/dashboards", dashboardListForUserV2, zip.WithOperationID("ListDashboardsForUserV2"))
+	opPost(g, "/dashboards", dashboardCreateV2, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateDashboardV2"))
+	opPost(g, "/dashboards/:id/clone", dashboardCloneV2, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CloneDashboardV2"))
+	opGet(g, "/dashboards/:id", dashboardGetV2, zip.WithOperationID("GetDashboardV2"))
+	opPut(g, "/dashboards/:id", dashboardUpdateV2, zip.WithOperationID("UpdateDashboardV2"))
+	opPatch(g, "/dashboards/:id", dashboardPatchV2, zip.WithOperationID("PatchDashboardV2"))
+	opDelete(g, "/dashboards/:id", dashboardDeleteV2, zip.WithOperationID("DeleteDashboardV2"))
 
 	// Lock / unlock — only the creator or an org admin; the runtime decides.
-	zip.Put(g, "/dashboards/:id/lock", dashboardLockV2, zip.WithOperationID("LockDashboardV2"))
-	zip.Delete(g, "/dashboards/:id/lock", dashboardUnlockV2, zip.WithOperationID("UnlockDashboardV2"))
+	opPut(g, "/dashboards/:id/lock", dashboardLockV2, zip.WithOperationID("LockDashboardV2"))
+	opDelete(g, "/dashboards/:id/lock", dashboardUnlockV2, zip.WithOperationID("UnlockDashboardV2"))
 
 	// Per-user pins — a viewer bookmark, mutating only the caller's pin list.
-	zip.Put(g, "/users/me/dashboards/:id/pins", dashboardPinV2, zip.WithOperationID("PinDashboardV2"))
-	zip.Delete(g, "/users/me/dashboards/:id/pins", dashboardUnpinV2, zip.WithOperationID("UnpinDashboardV2"))
+	opPut(g, "/users/me/dashboards/:id/pins", dashboardPinV2, zip.WithOperationID("PinDashboardV2"))
+	opDelete(g, "/users/me/dashboards/:id/pins", dashboardUnpinV2, zip.WithOperationID("UnpinDashboardV2"))
 
 	// Saved views — org-shared dashboard-listing state.
-	zip.Get(g, "/dashboard_views", dashboardListViews, zip.WithOperationID("ListDashboardViews"))
-	zip.Post(g, "/dashboard_views", dashboardCreateView, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateDashboardView"))
-	zip.Put(g, "/dashboard_views/:id", dashboardUpdateView, zip.WithOperationID("UpdateDashboardView"))
-	zip.Delete(g, "/dashboard_views/:id", dashboardDeleteView, zip.WithOperationID("DeleteDashboardView"))
+	opGet(g, "/dashboard_views", dashboardListViews, zip.WithOperationID("ListDashboardViews"))
+	opPost(g, "/dashboard_views", dashboardCreateView, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateDashboardView"))
+	opPut(g, "/dashboard_views/:id", dashboardUpdateView, zip.WithOperationID("UpdateDashboardView"))
+	opDelete(g, "/dashboard_views/:id", dashboardDeleteView, zip.WithOperationID("DeleteDashboardView"))
 
 	// Public sharing config — org-admin only.
-	zip.Post(g, "/dashboards/:id/public", dashboardCreatePublic, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreatePublicDashboard"))
-	zip.Get(g, "/dashboards/:id/public", dashboardGetPublic, zip.WithOperationID("GetPublicDashboard"))
-	zip.Put(g, "/dashboards/:id/public", dashboardUpdatePublic, zip.WithOperationID("UpdatePublicDashboard"))
-	zip.Delete(g, "/dashboards/:id/public", dashboardDeletePublic, zip.WithOperationID("DeletePublicDashboard"))
+	opPost(g, "/dashboards/:id/public", dashboardCreatePublic, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreatePublicDashboard"))
+	opGet(g, "/dashboards/:id/public", dashboardGetPublic, zip.WithOperationID("GetPublicDashboard"))
+	opPut(g, "/dashboards/:id/public", dashboardUpdatePublic, zip.WithOperationID("UpdatePublicDashboard"))
+	opDelete(g, "/dashboards/:id/public", dashboardDeletePublic, zip.WithOperationID("DeletePublicDashboard"))
 
 	// Anonymous public reads — scoped to the public dashboard's read scope.
-	zip.Get(g, "/public/dashboards/:id", dashboardGetPublicData, zip.WithOperationID("GetPublicDashboardData"))
-	zip.Get(g, "/public/dashboards/:id/widgets/:idx/query_range", dashboardGetPublicWidgetQueryRange, zip.WithOperationID("GetPublicDashboardWidgetQueryRange"))
+	opGet(g, "/public/dashboards/:id", dashboardGetPublicData, zip.WithOperationID("GetPublicDashboardData"))
+	opGet(g, "/public/dashboards/:id/widgets/:idx/query_range", dashboardGetPublicWidgetQueryRange, zip.WithOperationID("GetPublicDashboardWidgetQueryRange"))
 }
 
 // ── the twenty-two operations ───────────────────────────────────────────────────

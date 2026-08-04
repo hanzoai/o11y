@@ -7,6 +7,7 @@ import (
 
 	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/spantypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
@@ -320,8 +321,8 @@ func (m *defaultFieldMapper) FieldFor(
 			}
 			// have to add ::string as datastore throws an error :- data types Variant/Dynamic are not allowed in GROUP BY
 			// once datastore dependency is updated, we need to check if we can remove it.
-			exprs = append(exprs, fmt.Sprintf("%s.`%s`::String", columnName, key.Name))
-			existExpr = append(existExpr, fmt.Sprintf("%s.`%s` IS NOT NULL", columnName, key.Name))
+			exprs = append(exprs, fmt.Sprintf("%s.%s::String", columnName, querybuilder.QuoteIdent(key.Name)))
+			existExpr = append(existExpr, fmt.Sprintf("%s.%s IS NOT NULL", columnName, querybuilder.QuoteIdent(key.Name)))
 		case schema.ColumnTypeEnumString,
 			schema.ColumnTypeEnumUInt64,
 			schema.ColumnTypeEnumUInt32,
@@ -349,7 +350,7 @@ func (m *defaultFieldMapper) FieldFor(
 				// The envelope keeps ONE attributes map with String values and no
 				// materialized columns, so every key is a map access; the requested
 				// value type decides the cast (number -> toFloat64OrNull, bool -> = 'true').
-				access := fmt.Sprintf("%s['%s']", columnName, key.Name)
+				access := fmt.Sprintf("%s['%s']", columnName, querybuilder.EscapeLiteral(key.Name))
 				switch valueType.GetType() {
 				case schema.ColumnTypeEnumFloat64:
 					access = fmt.Sprintf("toFloat64OrNull(%s)", access)
@@ -357,7 +358,7 @@ func (m *defaultFieldMapper) FieldFor(
 					access = fmt.Sprintf("%s = 'true'", access)
 				}
 				exprs = append(exprs, access)
-				existExpr = append(existExpr, fmt.Sprintf("mapContains(%s, '%s')", columnName, key.Name))
+				existExpr = append(existExpr, fmt.Sprintf("mapContains(%s, '%s')", columnName, querybuilder.EscapeLiteral(key.Name)))
 			default:
 				return "", errors.NewInvalidInputf(errors.CodeInvalidInput, "value type %s is not supported for map column type %s", valueType, column.Type)
 			}
@@ -425,5 +426,5 @@ func (m *defaultFieldMapper) ColumnExpressionFor(
 		}
 	}
 
-	return fmt.Sprintf("%s AS `%s`", sqlbuilder.Escape(fieldExpression), field.Name), nil
+	return fmt.Sprintf("%s AS %s", sqlbuilder.Escape(fieldExpression), querybuilder.QuoteIdent(field.Name)), nil
 }
