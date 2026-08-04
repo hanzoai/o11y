@@ -1,7 +1,22 @@
 import './index.css';
-import * as ToggleGroupPrimitive from '@radix-ui/react-toggle-group';
 import React from 'react';
 import { cn } from '@hanzo/ui/core';
+
+import { focusFirstItem, rovingKeyDown } from '../lib/roving-focus';
+import { useControllable } from '../lib/use-controllable';
+
+interface ToggleGroupContextValue {
+	pressed: (value: string) => boolean;
+	toggle: (value: string) => void;
+	disabled?: boolean;
+	roving: boolean;
+	anyPressed: boolean;
+	dir: 'ltr' | 'rtl';
+}
+
+const ToggleGroupContext = React.createContext<ToggleGroupContextValue | null>(
+	null,
+);
 
 export const ToggleColorValue = {
 	Primary: 'primary',
@@ -109,21 +124,75 @@ export const ToggleGroup = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
 		},
 		ref,
 	) => {
-		const rootProps = {
-			'data-slot': 'toggle-group',
-			'data-size': size,
-			'data-color': color,
-			'data-testid': testId,
-			className: cn(className),
-			onValueChange: onChange,
-			...props,
-		} as unknown as React.ComponentPropsWithoutRef<
-			typeof ToggleGroupPrimitive.Root
-		>;
+		const {
+			type,
+			value,
+			defaultValue,
+			disabled,
+			rovingFocus = true,
+			orientation,
+			dir = 'ltr',
+			// `loop` is radix vocabulary no call site sets: navigation always wraps.
+			loop: _loop,
+			...rest
+		} = props as Omit<ToggleGroupProps, 'onChange' | 'children'> & {
+			type: 'single' | 'multiple';
+			value?: string | string[];
+			defaultValue?: string | string[];
+		};
+
+		const multiple = type === 'multiple';
+		const empty = multiple ? [] : null;
+		const [selection, setSelection] = useControllable<string | string[] | null>(
+			value ?? undefined,
+			defaultValue ?? empty,
+			onChange as ((next: string | string[] | null) => void) | undefined,
+		);
+
+		const context = React.useMemo<ToggleGroupContextValue>(() => {
+			const list = multiple ? (selection as string[]) : [];
+			return {
+				pressed: (item): boolean =>
+					multiple ? list.includes(item) : selection === item,
+				toggle: (item): void => {
+					if (multiple) {
+						setSelection(
+							list.includes(item)
+								? list.filter((v) => v !== item)
+								: [...list, item],
+						);
+					} else {
+						// Radix's single-mode rule: pressing the pressed item clears it.
+						setSelection(selection === item ? '' : item);
+					}
+				},
+				disabled,
+				roving: rovingFocus,
+				anyPressed: multiple ? list.length > 0 : Boolean(selection),
+				dir,
+			};
+		}, [multiple, selection, setSelection, disabled, rovingFocus, dir]);
+
 		return (
-			<ToggleGroupPrimitive.Root ref={ref} {...rootProps}>
-				{children}
-			</ToggleGroupPrimitive.Root>
+			<ToggleGroupContext.Provider value={context}>
+				<div
+					ref={ref}
+					role="group"
+					dir={dir}
+					aria-orientation={orientation}
+					data-slot="toggle-group"
+					data-size={size}
+					data-color={color}
+					data-testid={testId}
+					data-roving-group={rovingFocus ? '' : undefined}
+					className={cn(className)}
+					tabIndex={rovingFocus && !context.anyPressed ? 0 : -1}
+					onFocus={focusFirstItem}
+					{...rest}
+				>
+					{children}
+				</div>
+			</ToggleGroupContext.Provider>
 		);
 	},
 );
@@ -155,14 +224,33 @@ export type ToggleGroupItemProps = {
 export const ToggleGroupItem = React.forwardRef<
 	HTMLButtonElement,
 	ToggleGroupItemProps
->(({ className, value, testId, ...props }, ref) => (
-	<ToggleGroupPrimitive.Item
-		ref={ref}
-		data-slot="toggle-group-item"
-		data-testid={testId}
-		value={value}
-		className={cn(className)}
-		{...props}
-	/>
-));
+>(({ className, value, testId, onClick, disabled, ...props }, ref) => {
+	const group = React.useContext(ToggleGroupContext);
+	const pressed = group?.pressed(value) ?? false;
+	const isDisabled = disabled || group?.disabled;
+
+	return (
+		<button
+			ref={ref}
+			type="button"
+			aria-pressed={pressed}
+			data-slot="toggle-group-item"
+			data-state={pressed ? 'on' : 'off'}
+			data-roving-item=""
+			data-testid={testId}
+			value={value}
+			disabled={isDisabled}
+			className={cn(className)}
+			tabIndex={!group?.roving || pressed ? 0 : -1}
+			onClick={(event): void => {
+				onClick?.(event);
+				group?.toggle(value);
+			}}
+			onKeyDown={(event): void => {
+				if (group?.roving) rovingKeyDown(event, undefined, group.dir);
+			}}
+			{...props}
+		/>
+	);
+});
 ToggleGroupItem.displayName = 'ToggleGroupItem';

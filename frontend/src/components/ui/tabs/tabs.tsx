@@ -1,8 +1,28 @@
 import './index.css';
 import * as React from 'react';
-import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { Lock } from 'lucide-react';
 import { cn } from '@hanzo/ui/core';
+
+import { rovingKeyDown } from '../lib/roving-focus';
+import { useControllable } from '../lib/use-controllable';
+
+interface TabsContextValue {
+	value: string | null;
+	select: (value: string) => void;
+	/** Prefix for the trigger/panel id pair that wires aria-controls to aria-labelledby. */
+	baseId: string;
+	automatic: boolean;
+	dir: 'ltr' | 'rtl';
+}
+
+const TabsContext = React.createContext<TabsContextValue | null>(null);
+
+const useTabs = (): TabsContextValue | null => React.useContext(TabsContext);
+
+const triggerId = (baseId: string, value: string): string =>
+	`${baseId}-trigger-${value}`;
+const contentId = (baseId: string, value: string): string =>
+	`${baseId}-content-${value}`;
 
 export type TabVariants = 'primary' | 'secondary';
 
@@ -52,15 +72,51 @@ export type TabsRootProps = Pick<
  * Use this when you need full control over the tabs structure.
  */
 export const TabsRoot = React.forwardRef<HTMLDivElement, TabsRootProps>(
-	({ className, testId, ...props }, ref) => (
-		<TabsPrimitive.Root
-			ref={ref}
-			data-slot="tabs"
-			className={cn('tabs', className)}
-			data-testid={testId}
-			{...props}
-		/>
-	),
+	(
+		{
+			className,
+			testId,
+			value,
+			defaultValue,
+			onValueChange,
+			orientation = 'horizontal',
+			dir = 'ltr',
+			activationMode = 'automatic',
+			...props
+		},
+		ref,
+	) => {
+		const baseId = React.useId();
+		const [active, select] = useControllable<string | null>(
+			value,
+			defaultValue ?? null,
+			onValueChange as ((next: string | null) => void) | undefined,
+		);
+		const context = React.useMemo<TabsContextValue>(
+			() => ({
+				value: active,
+				select: select as (next: string) => void,
+				baseId,
+				automatic: activationMode === 'automatic',
+				dir,
+			}),
+			[active, select, baseId, activationMode, dir],
+		);
+
+		return (
+			<TabsContext.Provider value={context}>
+				<div
+					ref={ref}
+					dir={dir}
+					data-orientation={orientation}
+					data-slot="tabs"
+					className={cn('tabs', className)}
+					data-testid={testId}
+					{...props}
+				/>
+			</TabsContext.Provider>
+		);
+	},
 );
 TabsRoot.displayName = 'TabsRoot';
 
@@ -81,7 +137,18 @@ export type TabsListProps = Pick<
  * In the primary variant it renders animated hover/active sliders.
  */
 export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
-	({ className, variant = 'primary', children, testId, ...props }, ref) => {
+	(
+		{
+			className,
+			variant = 'primary',
+			children,
+			testId,
+			// `loop` is radix vocabulary no call site sets: navigation always wraps.
+			loop: _loop,
+			...props
+		},
+		ref,
+	) => {
 		const listRef = React.useRef<HTMLDivElement | null>(null);
 		const activeSliderRef = React.useRef<HTMLDivElement | null>(null);
 		const hoverSliderRef = React.useRef<HTMLDivElement | null>(null);
@@ -162,9 +229,11 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 		return (
 			<div data-slot="tabs-list-wrapper" data-variant={variant}>
 				{variant === 'secondary' && <div data-slot="tabs-border-spacer" />}
-				<TabsPrimitive.List
+				<div
 					ref={listRef}
+					role="tablist"
 					data-slot="tabs-list"
+					data-roving-group=""
 					className={cn('tabs-list', className)}
 					data-variant={variant}
 					data-testid={testId}
@@ -173,7 +242,7 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 					{...props}
 				>
 					{children}
-				</TabsPrimitive.List>
+				</div>
 				{variant === 'secondary' ? (
 					<div data-slot="tabs-border-spacer" data-grow />
 				) : (
@@ -225,21 +294,52 @@ export const TabsTrigger = React.forwardRef<
 	TabsTriggerProps
 >(
 	(
-		{ className, children, variant = 'primary', disabled, testId, ...props },
+		{
+			className,
+			children,
+			variant = 'primary',
+			disabled,
+			testId,
+			value,
+			...props
+		},
 		ref,
-	) => (
-		<TabsPrimitive.Trigger
-			ref={ref}
-			data-slot="tabs-trigger"
-			data-variant={variant}
-			data-testid={testId}
-			className={cn('tabs-trigger', className)}
-			disabled={disabled}
-			{...props}
-		>
-			{children}
-		</TabsPrimitive.Trigger>
-	),
+	) => {
+		const tabs = useTabs();
+		const active = tabs?.value === value;
+
+		return (
+			<button
+				ref={ref}
+				type="button"
+				role="tab"
+				id={tabs ? triggerId(tabs.baseId, value) : undefined}
+				aria-selected={active}
+				aria-controls={tabs ? contentId(tabs.baseId, value) : undefined}
+				data-slot="tabs-trigger"
+				data-state={active ? 'active' : 'inactive'}
+				data-roving-item=""
+				data-variant={variant}
+				data-testid={testId}
+				className={cn('tabs-trigger', className)}
+				disabled={disabled}
+				tabIndex={active ? 0 : -1}
+				onClick={(): void => tabs?.select(value)}
+				onKeyDown={(event): void =>
+					rovingKeyDown(
+						event,
+						// Automatic activation is the WAI-ARIA default: moving focus moves
+						// the selection. Manual mode leaves selection to the click/Enter.
+						tabs?.automatic ? (el): void => el.click() : undefined,
+						tabs?.dir ?? 'ltr',
+					)
+				}
+				{...props}
+			>
+				{children}
+			</button>
+		);
+	},
 );
 TabsTrigger.displayName = 'TabsTrigger';
 
@@ -259,15 +359,30 @@ export type TabsContentProps = Pick<
  * Container for the content associated with a tab trigger.
  */
 export const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
-	({ className, testId, ...props }, ref) => (
-		<TabsPrimitive.Content
-			ref={ref}
-			data-slot="tabs-content"
-			className={cn('tabs-content', className)}
-			data-testid={testId}
-			{...props}
-		/>
-	),
+	({ className, testId, value, forceMount, ...props }, ref) => {
+		const tabs = useTabs();
+		const active = tabs?.value === value;
+		// An inactive panel unmounts unless forceMount holds it — so a tab's subtree
+		// re-runs its effects on every visit, which is the behaviour call sites here
+		// already build on.
+		if (!active && !forceMount) return null;
+
+		return (
+			<div
+				ref={ref}
+				role="tabpanel"
+				id={tabs ? contentId(tabs.baseId, value) : undefined}
+				aria-labelledby={tabs ? triggerId(tabs.baseId, value) : undefined}
+				hidden={!active}
+				tabIndex={0}
+				data-slot="tabs-content"
+				data-state={active ? 'active' : 'inactive'}
+				className={cn('tabs-content', className)}
+				data-testid={testId}
+				{...props}
+			/>
+		);
+	},
 );
 TabsContent.displayName = 'TabsContent';
 
