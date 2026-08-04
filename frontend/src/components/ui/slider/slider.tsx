@@ -1,16 +1,23 @@
 import './index.css';
-import * as SliderPrimitive from '@radix-ui/react-slider';
 import React from 'react';
 import { cn } from '@hanzo/ui/core';
 import { SliderThumb } from './slider-thumb';
 import { toArray } from './slider-utils';
 
 export interface SliderProps extends Omit<
-	React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>,
-	'onChange' | 'value' | 'defaultValue'
+	React.ComponentPropsWithoutRef<'span'>,
+	'onChange' | 'defaultValue'
 > {
 	value?: number | number[];
 	defaultValue?: number | number[];
+	/** The lowest selectable value. */
+	min?: number;
+	/** The highest selectable value. */
+	max?: number;
+	/** The granularity the value moves in. */
+	step?: number;
+	/** When true, the slider cannot be moved. */
+	disabled?: boolean;
 	/**
 	 * Tick marks along the track. The key is the numerical value, and the value can be a string, a React node, or an object with label and style.
 	 */
@@ -19,7 +26,7 @@ export interface SliderProps extends Omit<
 		React.ReactNode | { style?: React.CSSProperties; label: React.ReactNode }
 	>;
 	/**
-	 * Configuration for the tooltip wrapped around the slider thumb.
+	 * Configuration for the tooltip shown above the slider thumb.
 	 */
 	tooltip?: {
 		formatter?: (value: number) => React.ReactNode;
@@ -56,15 +63,19 @@ export interface SliderProps extends Omit<
 	 * Test ID for testing purposes (mapped to data-testid).
 	 */
 	testId?: string;
-	/**
-	 * Unique identifier for the slider root element.
-	 */
-	id?: string;
-	/**
-	 * Inline style for the slider root element.
-	 */
-	style?: React.CSSProperties;
 }
+
+const clamp = (value: number, min: number, max: number): number =>
+	Math.min(Math.max(value, min), max);
+
+/** Snap to the step grid measured from `min`, then keep the result in range. */
+const snap = (value: number, min: number, max: number, step: number): number => {
+	const snapped = min + Math.round((value - min) / step) * step;
+	// Steps rarely divide the range evenly, so round away the float dust the
+	// division leaves rather than surfacing 33.800000000000004 to a formatter.
+	const decimals = (String(step).split('.')[1] ?? '').length;
+	return clamp(Number(snapped.toFixed(decimals)), min, max);
+};
 
 /**
  * Slider component for selecting a value or range from a continuous set of values.
@@ -84,6 +95,8 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 			defaultValue,
 			min = 0,
 			max = 100,
+			step = 1,
+			disabled,
 			id,
 			style,
 			testId,
@@ -102,6 +115,8 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 		const [localValues, setLocalValues] = React.useState<number[]>(
 			internalValue || internalDefaultValue || [min],
 		);
+		const trackRef = React.useRef<HTMLSpanElement | null>(null);
+		const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
 		React.useEffect(() => {
 			if (internalValue !== undefined) {
@@ -109,25 +124,120 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 			}
 		}, [internalValue]);
 
-		const handleValueChange = React.useCallback(
-			(newValues: number[]): void => {
+		const emit = React.useCallback(
+			(newValues: number[], commit: boolean): void => {
 				if (internalValue === undefined) {
 					setLocalValues(newValues);
 				}
-				if (onChange) {
-					onChange(range ? newValues : newValues[0]);
+				onChange?.(range ? newValues : newValues[0]);
+				if (commit) {
+					onAfterChange?.(range ? newValues : newValues[0]);
 				}
 			},
-			[internalValue, onChange, range],
+			[internalValue, onChange, onAfterChange, range],
 		);
 
-		const handleValueCommit = React.useCallback(
-			(newValues: number[]): void => {
-				if (onAfterChange) {
-					onAfterChange(range ? newValues : newValues[0]);
+		/** Value under the pointer, read off the track's own box. */
+		const valueAt = React.useCallback(
+			(clientX: number): number => {
+				const rect = trackRef.current?.getBoundingClientRect();
+				if (!rect || rect.width === 0) return min;
+				const ratio = clamp((clientX - rect.left) / rect.width, 0, 1);
+				return snap(min + ratio * (max - min), min, max, step);
+			},
+			[min, max, step],
+		);
+
+		/** Move one thumb, keeping thumbs in order — a range cannot cross itself. */
+		const moveThumb = React.useCallback(
+			(index: number, next: number, commit: boolean): void => {
+				const lower = index > 0 ? localValues[index - 1] : min;
+				const upper =
+					index < localValues.length - 1 ? localValues[index + 1] : max;
+				const bounded = clamp(next, lower, upper);
+				if (bounded === localValues[index] && !commit) return;
+				const updated = [...localValues];
+				updated[index] = bounded;
+				emit(updated, commit);
+			},
+			[localValues, min, max, emit],
+		);
+
+		const nearestThumb = React.useCallback(
+			(value: number): number => {
+				let best = 0;
+				let bestDistance = Infinity;
+				localValues.forEach((current, index) => {
+					const distance = Math.abs(current - value);
+					if (distance < bestDistance) {
+						bestDistance = distance;
+						best = index;
+					}
+				});
+				return best;
+			},
+			[localValues],
+		);
+
+		const startDrag = React.useCallback(
+			(event: React.PointerEvent<HTMLSpanElement>, index?: number): void => {
+				if (disabled) return;
+				const value = valueAt(event.clientX);
+				const target = index ?? nearestThumb(value);
+				setActiveIndex(target);
+				// The pointer belongs to the slider until it is released, so a drag that
+				// leaves the element still moves the thumb it grabbed.
+				event.currentTarget.setPointerCapture?.(event.pointerId);
+				if (index === undefined) moveThumb(target, value, false);
+			},
+			[disabled, valueAt, nearestThumb, moveThumb],
+		);
+
+		React.useEffect(() => {
+			if (activeIndex === null) return undefined;
+			const onMove = (event: PointerEvent): void =>
+				moveThumb(activeIndex, valueAt(event.clientX), false);
+			const onUp = (event: PointerEvent): void => {
+				moveThumb(activeIndex, valueAt(event.clientX), true);
+				setActiveIndex(null);
+			};
+			window.addEventListener('pointermove', onMove);
+			window.addEventListener('pointerup', onUp);
+			return (): void => {
+				window.removeEventListener('pointermove', onMove);
+				window.removeEventListener('pointerup', onUp);
+			};
+		}, [activeIndex, moveThumb, valueAt]);
+
+		const keyStep = React.useCallback(
+			(event: React.KeyboardEvent, index: number): void => {
+				const big = (max - min) / 10;
+				const delta = {
+					ArrowRight: step,
+					ArrowUp: step,
+					ArrowLeft: -step,
+					ArrowDown: -step,
+					PageUp: big,
+					PageDown: -big,
+				}[event.key];
+				if (delta !== undefined) {
+					event.preventDefault();
+					moveThumb(index, snap(localValues[index] + delta, min, max, step), false);
+				} else if (event.key === 'Home') {
+					event.preventDefault();
+					moveThumb(index, min, false);
+				} else if (event.key === 'End') {
+					event.preventDefault();
+					moveThumb(index, max, false);
 				}
 			},
-			[onAfterChange, range],
+			[localValues, min, max, step, moveThumb],
+		);
+
+		const percentOf = React.useCallback(
+			(value: number): number =>
+				max === min ? 0 : ((clamp(value, min, max) - min) / (max - min)) * 100,
+			[min, max],
 		);
 
 		const markList = React.useMemo(() => {
@@ -184,52 +294,48 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 							: [...localValues.slice(0, lastIndex), markVal];
 					newValues = [...newValues].sort((a, b) => a - b);
 				}
-				if (internalValue === undefined) {
-					setLocalValues(newValues);
-				}
-				if (onChange) {
-					onChange(range ? newValues : newValues[0]);
-				}
-				if (onAfterChange) {
-					onAfterChange(range ? newValues : newValues[0]);
-				}
+				emit(newValues, true);
 			},
-			[localValues, internalValue, onChange, onAfterChange, range],
+			[localValues, emit],
 		);
 
 		const internalId = React.useId();
+		const rangeStart = localValues.length > 1 ? percentOf(localValues[0]) : 0;
+		const rangeEnd = percentOf(localValues[localValues.length - 1]);
 
 		return (
-			<SliderPrimitive.Root
+			<span
 				ref={ref}
 				id={id}
 				style={style}
 				data-slot="slider-root"
+				data-orientation="horizontal"
+				data-disabled={disabled ? '' : undefined}
 				data-with-marks={markList.length > 0 ? '' : undefined}
 				data-testid={testId}
-				min={min}
-				max={max}
-				value={localValues}
-				defaultValue={internalDefaultValue}
-				onValueChange={handleValueChange}
-				onValueCommit={handleValueCommit}
 				className={cn(className)}
+				onPointerDown={startDrag}
 				{...props}
 			>
-				<SliderPrimitive.Track
+				<span
+					ref={trackRef}
 					data-slot="slider-track"
 					className={cn(classNames?.track)}
 					style={inlineStyles?.track}
 				>
-					<SliderPrimitive.Range
+					<span
 						data-slot="slider-range"
 						className={cn(classNames?.range)}
-						style={inlineStyles?.range}
+						style={{
+							left: `${rangeStart}%`,
+							width: `${rangeEnd - rangeStart}%`,
+							...inlineStyles?.range,
+						}}
 					/>
-				</SliderPrimitive.Track>
+				</span>
 
 				{markList.length > 0 && (
-					<div data-slot="slider-dots">
+					<span data-slot="slider-dots">
 						{markList.map(({ key, markVal, percent }) => (
 							<span
 								key={`slider-${internalId}-dot-${key}`}
@@ -238,7 +344,7 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 								style={{ left: `${percent}%` }}
 							/>
 						))}
-					</div>
+					</span>
 				)}
 
 				{localValues.map((val, index) => (
@@ -248,14 +354,25 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 						// eslint-disable-next-line react/no-array-index-key
 						key={`slider-${internalId}-thumb-${index}`}
 						value={val}
+						min={min}
+						max={max}
+						percent={percentOf(val)}
+						disabled={disabled}
+						active={activeIndex === index}
 						className={cn(classNames?.thumb)}
 						style={inlineStyles?.thumb}
 						tooltip={tooltip}
+						onPointerDown={(event): void => {
+							event.stopPropagation();
+							startDrag(event, index);
+						}}
+						onKeyDown={(event): void => keyStep(event, index)}
+						onKeyUp={(): void => emit(localValues, true)}
 					/>
 				))}
 
 				{markList.length > 0 && (
-					<div data-slot="slider-marks">
+					<span data-slot="slider-marks">
 						{markList.map(({ key, markVal, percent, label, markStyle }) => (
 							<button
 								key={`slider-${internalId}-mark-${key}`}
@@ -268,9 +385,9 @@ const Slider = React.forwardRef<HTMLSpanElement, SliderProps>(
 								{label}
 							</button>
 						))}
-					</div>
+					</span>
 				)}
-			</SliderPrimitive.Root>
+			</span>
 		);
 	},
 );
