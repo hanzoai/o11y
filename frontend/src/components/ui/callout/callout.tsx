@@ -81,10 +81,7 @@ function Callout({
 					</div>
 				)}
 				{description && (
-					<div
-						data-slot="callout-description"
-						className="hz-callout__description"
-					>
+					<div data-slot="callout-description" className="hz-callout__description">
 						{description}
 					</div>
 				)}

@@ -157,7 +157,9 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 		const updateSliderPosition = React.useCallback(
 			(slider: HTMLDivElement | null, trigger: Element | null) => {
 				if (!slider || !trigger || !listRef.current) {
-					if (slider) slider.style.opacity = '0';
+					if (slider) {
+						slider.style.opacity = '0';
+					}
 					return;
 				}
 				const listRect = listRef.current.getBoundingClientRect();
@@ -171,7 +173,9 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 		);
 
 		const updateActiveSlider = React.useCallback(() => {
-			if (variant !== 'primary' || !listRef.current) return;
+			if (variant !== 'primary' || !listRef.current) {
+				return;
+			}
 			const activeTrigger = listRef.current.querySelector(
 				'[data-slot="tabs-trigger"][data-state="active"]',
 			);
@@ -179,10 +183,14 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 		}, [variant, updateSliderPosition]);
 
 		React.useEffect(() => {
-			if (variant !== 'primary') return undefined;
+			if (variant !== 'primary') {
+				return undefined;
+			}
 			requestAnimationFrame(updateActiveSlider);
 			const list = listRef.current;
-			if (!list) return undefined;
+			if (!list) {
+				return undefined;
+			}
 			const observer = new MutationObserver((mutations) => {
 				for (const mutation of mutations) {
 					if (
@@ -203,7 +211,9 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 		}, [variant, updateActiveSlider]);
 
 		React.useEffect(() => {
-			if (variant !== 'primary') return undefined;
+			if (variant !== 'primary') {
+				return undefined;
+			}
 			const handleResize = (): void => updateActiveSlider();
 			window.addEventListener('resize', handleResize);
 			return (): void => window.removeEventListener('resize', handleResize);
@@ -211,19 +221,27 @@ export const TabsList = React.forwardRef<HTMLDivElement, TabsListProps>(
 
 		const handleMouseOver = React.useCallback(
 			(e: React.MouseEvent) => {
-				if (variant !== 'primary') return;
+				if (variant !== 'primary') {
+					return;
+				}
 				const trigger = (e.target as HTMLElement).closest(
 					'[data-slot="tabs-trigger"]',
 				);
-				if (trigger) updateSliderPosition(hoverSliderRef.current, trigger);
+				if (trigger) {
+					updateSliderPosition(hoverSliderRef.current, trigger);
+				}
 			},
 			[variant, updateSliderPosition],
 		);
 
 		const handleMouseLeave = React.useCallback(() => {
-			if (variant !== 'primary') return;
+			if (variant !== 'primary') {
+				return;
+			}
 			const slider = hoverSliderRef.current;
-			if (slider) slider.style.opacity = '0';
+			if (slider) {
+				slider.style.opacity = '0';
+			}
 		}, [variant]);
 
 		return (
@@ -365,7 +383,9 @@ export const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
 		// An inactive panel unmounts unless forceMount holds it — so a tab's subtree
 		// re-runs its effects on every visit, which is the behaviour call sites here
 		// already build on.
-		if (!active && !forceMount) return null;
+		if (!active && !forceMount) {
+			return null;
+		}
 
 		return (
 			<div
