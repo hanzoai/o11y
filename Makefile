@@ -76,6 +76,11 @@ lint: ## Runs golangci-lint over the go tree (.golangci.yml).
 clean: ## Removes generated build output (./target, frontend/build). Never node_modules.
 	@rm -rf $(TARGET_DIR) $(JS_BUILD_CONTEXT)/build
 
+# dev runs the same variant build ships (community), so what you run locally is
+# what the image runs. Needs a datastore on :9000 — `make devenv-up` brings one up.
+.PHONY: dev
+dev: go-run-community ## Runs the community server locally against the devenv datastore.
+
 ##############################################################
 # devenv commands
 ##############################################################
