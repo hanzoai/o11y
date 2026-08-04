@@ -198,7 +198,7 @@ func TestHatchesDelegateVerbatim(t *testing.T) {
 func TestHatchWithoutRuntimeIs503(t *testing.T) {
 	app := mounted(t)
 	o11y.SetHandler(nil)
-	resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, "/v1/o11y/logs/livetail", nil))
+	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/v1/o11y/logs/livetail", nil))
 	if err != nil {
 		t.Fatalf("Test: %v", err)
 	}

@@ -1068,6 +1068,8 @@ github.com/zap-proto/zap2pb v0.2.0 h1:sos6HnayhGMGLRO54px1InzimDzTZ2o5TSMEatYBjz
 github.com/zap-proto/zap2pb v0.2.0/go.mod h1:wD97Z2VTPabDq/4AMNL++PWnQ0YwEtajiuNkLGg3/18=
 github.com/zap-proto/zip v1.23.0 h1:R2uZV7SJouchj0BtSYk1Z6nTh3tSGaKGwV/XjuZqaSU=
 github.com/zap-proto/zip v1.23.0/go.mod h1:EKMmUX9wCPvpkhpMBQRqa17YVXNXRYEjj7X+65Y+J9E=
+github.com/zap-proto/zip v1.24.1 h1:HF3Tm30bRBfFaAMkH0nsdrVku1XTvbqVSqhqWrOtf9k=
+github.com/zap-proto/zip v1.24.1/go.mod h1:EKMmUX9wCPvpkhpMBQRqa17YVXNXRYEjj7X+65Y+J9E=
 github.com/zeebo/xxh3 v1.1.0 h1:s7DLGDK45Dyfg7++yxI0khrfwq9661w9EN78eP/UZVs=
 github.com/zeebo/xxh3 v1.1.0/go.mod h1:IisAie1LELR4xhVinxWS5+zf1lA4p0MW4T+w+W07F5s=
 go.etcd.io/etcd/api/v3 v3.5.4/go.mod h1:5GB2vv4A4AOn3yk7MftYGHkUfGtDHnEraIjym4dYz5A=
