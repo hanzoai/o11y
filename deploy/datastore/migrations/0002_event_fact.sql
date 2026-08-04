@@ -443,6 +443,45 @@ GROUP BY org, service, name;
 -- rollup backfill to write, and therefore no second spelling of the rollup's SELECT to
 -- keep in sync with the view's.
 --
+-- IDEMPOTENT IS A PROPERTY OF A TARGET, NOT OF A STATEMENT, and that is what the gate
+-- below exists to say. These four are idempotent in `event.fact`: Replacing collapses a
+-- re-derived row onto the one already there. The property does not travel. A
+-- materialized view attached to `event.fact` fires on the INSERTED BLOCK — it never sees
+-- the collapse — so it forwards every re-derived row downstream, where the guarantee is
+-- whatever THAT table's engine happens to be, and where rows the fact table has never
+-- held arrive for the first time and collide with nothing.
+--
+-- The three rollups above are exempt BY CONSTRUCTION rather than by exception: they
+-- count ids and not rows (step 3 says why), so they collapse the same re-derive the fact
+-- table does. A consumer this file did not write has semantics this file cannot know, so
+-- the gate refuses and names it rather than guessing.
+--
+-- `dependencies_table` is the engine's own list, kept current as views attach and
+-- detach. Asking the same question of `create_table_query` with a LIKE is asking a
+-- string, and it answers differently the day someone aliases the table.
+--
+-- IF THE GATE FIRES, THERE ARE TWO WAYS FORWARD AND ONLY ONE OF THEM IS THIS STEP.
+-- Detach the consumer, run the backfill, re-attach it — or skip step 5 and populate the
+-- three rollups straight from `event.fact`:
+--
+--     INSERT INTO event.session <the body of event.session_roll, verbatim>
+--
+-- which reaches no consumer at all, because the views are attached to the fact table and
+-- not to the rollups. Read the body from the view rather than copying it into a runbook:
+-- `SELECT as_select FROM system.tables WHERE database = 'event' AND name = 'session_roll'`
+-- is the same one spelling this file already refuses to duplicate.
+
+SELECT throwIf(length(unowned) > 0,
+    'A CONSUMER THIS FILE DOES NOT OWN IS ATTACHED TO event.fact. The backfill fires it once per re-derived row and it carries no collapse guarantee. See the two remedies above this statement.') AS ok,
+       unowned
+FROM (
+    SELECT arrayFilter(
+               d -> NOT has([('event', 'session_roll'), ('event', 'trace_roll'), ('event', 'operation_roll')], d),
+               arrayZip(dependencies_database, dependencies_table)) AS unowned
+    FROM system.tables
+    WHERE database = 'event' AND name = 'fact'
+);
+--
 -- NO ROW COUNT IS WRITTEN HERE. The plane is live and growing — the `log` signal alone
 -- passed two million while this file was being corrected, against the 825,095 an
 -- earlier draft asserted for all four — so a total in a comment is a total that is
