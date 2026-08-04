@@ -45,7 +45,7 @@ func TestNamedRouteWithoutRuntimeReturns503(t *testing.T) {
 		"/v1/o11y/logs/livetail", // a hatch
 		"/v1/o11y/logs",          // a typed op
 	} {
-		resp, err := app.Fiber().Test(httptest.NewRequest(http.MethodGet, target, nil))
+		resp, err := app.Test(httptest.NewRequest(http.MethodGet, target, nil))
 		if err != nil {
 			t.Fatalf("Test: %v", err)
 		}
