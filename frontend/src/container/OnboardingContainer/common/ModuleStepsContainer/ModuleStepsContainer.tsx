@@ -35,7 +35,6 @@ interface ModuleStepsContainerProps {
 	onReselectModule: any;
 	selectedModule: ModuleProps;
 	selectedModuleSteps: SelectedModuleStepProps[];
-	setIsInviteTeamMemberModalOpen: (value: SetStateAction<boolean>) => void;
 }
 
 interface MetaDataProps {
@@ -66,7 +65,6 @@ export default function ModuleStepsContainer({
 	onReselectModule,
 	selectedModule,
 	selectedModuleSteps,
-	setIsInviteTeamMemberModalOpen,
 }: ModuleStepsContainerProps): JSX.Element {
 	const { safeNavigate } = useSafeNavigate();
 	const {
@@ -407,19 +405,6 @@ export default function ModuleStepsContainer({
 						items={selectedModuleSteps}
 					/>
 				</div>
-				<Button
-					onClick={(): void => {
-						logEvent('Onboarding V2: Invite Member', {
-							module: selectedModule?.id,
-							page: 'sidebar',
-						});
-						setIsInviteTeamMemberModalOpen(true);
-					}}
-					icon={<UserPlus size={16} />}
-					className="invite-user-btn"
-				>
-					Invite teammates
-				</Button>
 			</div>
 
 			<div className="selected-step-content">

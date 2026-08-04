@@ -75,10 +75,6 @@ export const UsageExplorerPage = Loadable(
 	() => import(/* webpackChunkName: "UsageExplorerPage" */ 'modules/Usage'),
 );
 
-export const SignupPage = Loadable(
-	() => import(/* webpackChunkName: "SignupPage" */ 'pages/SignUp'),
-);
-
 export const SettingsPage = Loadable(
 	() => import(/* webpackChunkName: "SettingsPage" */ 'pages/Settings'),
 );
@@ -187,20 +183,8 @@ export const PipelinePage = Loadable(
 	() => import(/* webpackChunkName: "Pipelines" */ 'pages/LogsModulePage'),
 );
 
-export const Login = Loadable(
-	() => import(/* webpackChunkName: "Login" */ 'pages/Login'),
-);
-
-export const ForgotPassword = Loadable(
-	() => import(/* webpackChunkName: "ForgotPassword" */ 'pages/ForgotPassword'),
-);
-
 export const UnAuthorized = Loadable(
 	() => import(/* webpackChunkName: "UnAuthorized" */ 'pages/UnAuthorized'),
-);
-
-export const PasswordReset = Loadable(
-	() => import(/* webpackChunkName: "ResetPassword" */ 'pages/ResetPassword'),
 );
 
 export const SomethingWentWrong = Loadable(

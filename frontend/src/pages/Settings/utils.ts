@@ -11,7 +11,6 @@ import {
 	ingestionSettings,
 	keyboardShortcuts,
 	mcpServerSettings,
-	membersSettings,
 	multiIngestionSettings,
 	mySettings,
 	organizationSettings,
@@ -37,7 +36,6 @@ export const getRoutes = (
 	if (isWorkspaceBlocked && isAdmin) {
 		settings.push(
 			...organizationSettings(t),
-			...membersSettings(t),
 			...mySettings(t),
 			...billingSettings(t),
 			...keyboardShortcuts(t),
@@ -69,10 +67,10 @@ export const getRoutes = (
 		...roleDetails(t),
 	);
 
-	// Admin-only: members management
-	if (isAdmin) {
-		settings.push(...membersSettings(t));
-	}
+	// NO MEMBERS TAB. Listing, inviting, editing and removing members is the Hanzo
+	// IAM console's, and o11y no longer serves the routes it would have called.
+	// The ROLES tab stays: o11y's roles are its own vocabulary for what may be
+	// done to its own dashboards, alerts and views.
 
 	if ((isCloudUser || isEnterpriseSelfHostedUser) && isAdmin) {
 		settings.push(...billingSettings(t));

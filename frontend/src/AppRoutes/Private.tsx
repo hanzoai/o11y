@@ -2,14 +2,12 @@ import { ReactElement, useCallback, useEffect, useMemo, type JSX } from 'react';
 import { matchPath, Redirect, useHistory, useLocation } from 'react-router-dom';
 import getLocalStorageApi from 'api/browser/localstorage/get';
 import setLocalStorageApi from 'api/browser/localstorage/set';
-import { useListUsers } from 'api/generated/services/users';
 import { FeatureKeys } from 'constants/features';
 import { LOCALSTORAGE } from 'constants/localStorage';
 import { ORG_PREFERENCES } from 'constants/orgPreferences';
 import ROUTES from 'constants/routes';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import { useIsAIAssistantEnabled } from 'hooks/useIsAIAssistantEnabled';
-import { isEmpty } from 'lodash-es';
 import { useAppContext } from 'providers/App/App';
 import { LicensePlatform, LicenseState } from 'types/api/licensesV3/getActive';
 import { OrgPreference } from 'types/api/preferences/preference';
@@ -67,39 +65,23 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 		return undefined;
 	}, [org]);
 
-	const { data: usersData, isFetching: isFetchingUsers } = useListUsers({
-		query: {
-			enabled: !isEmpty(orgData) && user.role === 'ADMIN',
-		},
-	});
-
-	const checkFirstTimeUser = useCallback((): boolean => {
-		const users = usersData?.data || [];
-
-		const remainingUsers = (Array.isArray(users) ? users : []).filter(
-			(user) => user.email !== 'admin@o11y.cloud',
-		);
-
-		return remainingUsers.length === 1;
-	}, [usersData?.data]);
-
+	// ONBOARDING IS AN ORG PREFERENCE, not a headcount.
+	//
+	// This used to LIST THE ORG'S MEMBERS on every private route — GET
+	// /v1/o11y/users, admin-gated — purely to ask "is this the only person here
+	// yet?", and route the answer into a redirect. o11y does not serve a member
+	// roster any more; Hanzo IAM does, and o11y should not be reading one to make
+	// a UI decision about itself. The org preference already records whether
+	// onboarding is done, is written when it completes, and is the same answer
+	// for every member — so it is the whole condition.
 	useEffect(() => {
-		if (
-			isCloudUserVal &&
-			!isFetchingOrgPreferences &&
-			orgPreferences &&
-			!isFetchingUsers &&
-			usersData &&
-			usersData.data
-		) {
+		if (isCloudUserVal && !isFetchingOrgPreferences && orgPreferences) {
 			const isOnboardingComplete = orgPreferences?.find(
 				(preference: OrgPreference) =>
 					preference.name === ORG_PREFERENCES.ORG_ONBOARDING,
 			)?.value;
 
-			const isFirstUser = checkFirstTimeUser();
 			if (
-				isFirstUser &&
 				!isOnboardingComplete &&
 				// if the current route is allowed to be overriden by org onboarding then only do the same
 				!ROUTES_NOT_TO_BE_OVERRIDEN.includes(pathname)
@@ -107,15 +89,7 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 				history.push(ROUTES.ONBOARDING);
 			}
 		}
-	}, [
-		checkFirstTimeUser,
-		isCloudUserVal,
-		isFetchingOrgPreferences,
-		isFetchingUsers,
-		orgPreferences,
-		usersData,
-		pathname,
-	]);
+	}, [isCloudUserVal, isFetchingOrgPreferences, orgPreferences, pathname]);
 
 	const navigateToWorkSpaceBlocked = (route: any): void => {
 		const { path } = route;
@@ -247,8 +221,17 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 						history.push(ROUTES.UN_AUTHORIZED);
 					}
 				} else {
-					setLocalStorageApi(LOCALSTORAGE.UNAUTHENTICATED_ROUTE_HIT, pathname);
-					history.push(ROUTES.LOGIN);
+					// THE EDGE DECIDES WHO YOU ARE, so this app has nowhere to send you.
+					//
+					// It used to push /login: an o11y sign-in page. That page is gone —
+					// credentials live at hanzo.id — and reaching this branch behind the
+					// guard means something other than "not signed in", because the guard
+					// answers an unauthenticated page load with a 302 to hanzo.id before
+					// this bundle ever loads. What it means is that o11y would not confirm
+					// the identity the guard asserted, which is a fault, not a login
+					// prompt, and the only thing that can re-establish a session is a full
+					// navigation back through the guard.
+					history.push(ROUTES.SOMETHING_WENT_WRONG);
 				}
 			} else if (isLoggedInState) {
 				const fromPathname = getLocalStorageApi(
@@ -261,8 +244,8 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 					history.push(ROUTES.HOME);
 				}
 			} else {
-				// do nothing as the unauthenticated routes are LOGIN and SIGNUP and the LOGIN container takes care of routing to signup if
-				// setup is not completed
+				// A public route (the shared-dashboard page, the error page) with no
+				// identity: nothing to do, the route is meant to be reachable this way.
 			}
 		} else if (isLoggedInState) {
 			const fromPathname = getLocalStorageApi(
@@ -275,8 +258,7 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 				history.push(ROUTES.HOME);
 			}
 		} else {
-			setLocalStorageApi(LOCALSTORAGE.UNAUTHENTICATED_ROUTE_HIT, pathname);
-			history.push(ROUTES.LOGIN);
+			history.push(ROUTES.SOMETHING_WENT_WRONG);
 		}
 	}, [isLoggedInState, pathname, user, isOldRoute, currentRoute, location]);
 
@@ -336,7 +318,6 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 			isAdmin &&
 			(pathname === ROUTES.SETTINGS ||
 				pathname === ROUTES.ORG_SETTINGS ||
-				pathname === ROUTES.MEMBERS_SETTINGS ||
 				pathname === ROUTES.BILLING ||
 				pathname === ROUTES.MY_SETTINGS);
 
@@ -348,15 +329,8 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 		}
 	}
 
-	// Check for onboarding redirect (cloud users, first user, onboarding not complete)
-	if (
-		isCloudUserVal &&
-		!isFetchingOrgPreferences &&
-		orgPreferences &&
-		!isFetchingUsers &&
-		usersData &&
-		usersData.data
-	) {
+	// Check for onboarding redirect (cloud users, onboarding not complete)
+	if (isCloudUserVal && !isFetchingOrgPreferences && orgPreferences) {
 		const isOnboardingComplete = orgPreferences?.find(
 			(preference: OrgPreference) =>
 				preference.name === ORG_PREFERENCES.ORG_ONBOARDING,
@@ -373,16 +347,13 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 		const hasWorkspaceIssue =
 			isWorkspaceBlocked || isWorkspaceSuspended || isWorkspaceAccessRestricted;
 
-		if (!hasWorkspaceIssue) {
-			const isFirstUser = checkFirstTimeUser();
-			if (
-				isFirstUser &&
-				!isOnboardingComplete &&
-				!ROUTES_NOT_TO_BE_OVERRIDEN.includes(pathname) &&
-				pathname !== ROUTES.ONBOARDING
-			) {
-				return <Redirect to={ROUTES.ONBOARDING} />;
-			}
+		if (
+			!hasWorkspaceIssue &&
+			!isOnboardingComplete &&
+			!ROUTES_NOT_TO_BE_OVERRIDEN.includes(pathname) &&
+			pathname !== ROUTES.ONBOARDING
+		) {
+			return <Redirect to={ROUTES.ONBOARDING} />;
 		}
 	}
 
@@ -404,9 +375,7 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 					return <Redirect to={ROUTES.UN_AUTHORIZED} />;
 				}
 			} else {
-				// Save current path and redirect to login
-				setLocalStorageApi(LOCALSTORAGE.UNAUTHENTICATED_ROUTE_HIT, pathname);
-				return <Redirect to={ROUTES.LOGIN} />;
+				return <Redirect to={ROUTES.SOMETHING_WENT_WRONG} />;
 			}
 		} else if (isLoggedInState) {
 			// Non-private route, but user is logged in
@@ -433,9 +402,8 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 		}
 		return <Redirect to={ROUTES.HOME} />;
 	} else {
-		// Unknown route, not logged in
-		setLocalStorageApi(LOCALSTORAGE.UNAUTHENTICATED_ROUTE_HIT, pathname);
-		return <Redirect to={ROUTES.LOGIN} />;
+		// Unknown route, no identity
+		return <Redirect to={ROUTES.SOMETHING_WENT_WRONG} />;
 	}
 
 	return <>{children}</>;

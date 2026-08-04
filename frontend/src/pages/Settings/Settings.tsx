@@ -62,7 +62,6 @@ function SettingsPage(): JSX.Element {
 						isAdmin &&
 						(item.key === ROUTES.BILLING ||
 							item.key === ROUTES.ORG_SETTINGS ||
-							item.key === ROUTES.MEMBERS_SETTINGS ||
 							item.key === ROUTES.MY_SETTINGS ||
 							item.key === ROUTES.SHORTCUTS)
 					),
@@ -91,7 +90,6 @@ function SettingsPage(): JSX.Element {
 							item.key === ROUTES.INTEGRATIONS ||
 							item.key === ROUTES.INGESTION_SETTINGS ||
 							item.key === ROUTES.ORG_SETTINGS ||
-							item.key === ROUTES.MEMBERS_SETTINGS ||
 							item.key === ROUTES.SHORTCUTS ||
 							item.key === ROUTES.MCP_SERVER
 								? true
@@ -139,7 +137,6 @@ function SettingsPage(): JSX.Element {
 							item.key === ROUTES.BILLING ||
 							item.key === ROUTES.INTEGRATIONS ||
 							item.key === ROUTES.ORG_SETTINGS ||
-							item.key === ROUTES.MEMBERS_SETTINGS ||
 							item.key === ROUTES.INGESTION_SETTINGS ||
 							item.key === ROUTES.MCP_SERVER
 								? true
@@ -183,7 +180,7 @@ function SettingsPage(): JSX.Element {
 					updatedItems = updatedItems.map((item) => ({
 						...item,
 						isEnabled:
-							item.key === ROUTES.ORG_SETTINGS || item.key === ROUTES.MEMBERS_SETTINGS
+							item.key === ROUTES.ORG_SETTINGS
 								? true
 								: item.isEnabled,
 					}));

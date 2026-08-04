@@ -25,9 +25,6 @@
 
 import axios from 'axios';
 import getLocalStorageApi from 'api/browser/localstorage/get';
-import { Logout } from 'api/utils';
-import rotateSession from 'api/v2/sessions/rotate/post';
-import afterLogin from 'AppRoutes/utils';
 import type {
 	ActionResultResponseDTO,
 	ApprovalEventDTO,
@@ -68,44 +65,18 @@ import {
 import { getO11yInstanceUrl } from 'utils/o11yInstanceUrl';
 
 // ---------------------------------------------------------------------------
-// SSE-only auth wrapper.
+// SSE open, with the session the BROWSER already holds.
 //
-// REST calls go through `AIAssistantInstance` (axios) and get refresh-token
-// behaviour from the shared `interceptorRejected`. The SSE call has to use
-// raw `fetch` (axios can't stream a `ReadableStream`), so it can't ride that
-// interceptor — this small wrapper handles 401 at SSE open time by hitting
-// the same rotate endpoint and replaying the request once.
+// This used to carry a rotate-and-replay wrapper: on a 401 at stream open it
+// exchanged a refresh token for a fresh access token and sent the request
+// again. There is no refresh token to exchange — o11y minted the pair and it
+// mints nothing now — and the session it would have been refreshing is a cookie
+// the browser attaches on its own. A 401 here means the EDGE has stopped
+// vouching for this browser, and the only thing that can fix that is a full
+// navigation back through the guard, which no fetch can perform.
 //
-// In typical use a REST call (e.g. sendMessage / loadThread) precedes every
-// stream open, so axios will already have refreshed the token and `fetch`
-// just reads the fresh one from localStorage. The wrapper exists for the
-// edge case where SSE is the first call to encounter a 401.
+// So the 401 is returned as the answer it is, and the caller renders it.
 // ---------------------------------------------------------------------------
-
-let pendingRotate: Promise<string | null> | null = null;
-
-async function rotateAccessToken(): Promise<string | null> {
-	if (pendingRotate) {
-		return pendingRotate;
-	}
-	const refreshToken = getLocalStorageApi(LOCALSTORAGE.REFRESH_AUTH_TOKEN) || '';
-	if (!refreshToken) {
-		return null;
-	}
-	pendingRotate = (async (): Promise<string | null> => {
-		try {
-			const response = await rotateSession({ refreshToken });
-			afterLogin(response.data.accessToken, response.data.refreshToken, true);
-			return response.data.accessToken;
-		} catch {
-			Logout();
-			return null;
-		} finally {
-			pendingRotate = null;
-		}
-	})();
-	return pendingRotate;
-}
 
 // Backoff schedule for 429 retries on SSE open. Three attempts is enough to
 // absorb the brief window between cancel→send→stream when the backend is
@@ -142,20 +113,7 @@ async function fetchSSEWithAuth(
 		return fetch(url, { headers, signal });
 	};
 
-	const sendWithAuth = async (): Promise<Response> => {
-		const initialToken = getLocalStorageApi(LOCALSTORAGE.AUTH_TOKEN) || '';
-		const res = await send(initialToken);
-		if (res.status !== 401) {
-			return res;
-		}
-		const refreshed = await rotateAccessToken();
-		if (!refreshed) {
-			return res;
-		}
-		return send(refreshed);
-	};
-
-	let res = await sendWithAuth();
+	let res = await send(getLocalStorageApi(LOCALSTORAGE.AUTH_TOKEN) || '');
 	for (const baseDelay of SSE_429_BACKOFF_MS) {
 		if (res.status !== 429 || signal?.aborted) {
 			return res;
@@ -175,7 +133,7 @@ async function fetchSSEWithAuth(
 			);
 		});
 		// eslint-disable-next-line no-await-in-loop
-		res = await sendWithAuth();
+		res = await send(getLocalStorageApi(LOCALSTORAGE.AUTH_TOKEN) || '');
 	}
 	return res;
 }

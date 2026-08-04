@@ -17,7 +17,6 @@ import { showErrorNotification } from 'utils/error';
 
 import LicenseSection from './LicenseSection';
 import TimezoneAdaptation from './TimezoneAdaptation/TimezoneAdaptation';
-import UserInfo from './UserInfo';
 
 import './MySettings.styles.scss';
 
@@ -158,21 +157,17 @@ function MySettings(): JSX.Element {
 	};
 
 	return (
+		// THE ACCOUNT SECTION IS GONE, and it is not hiding anywhere else.
+		//
+		// It edited a display name through PUT /v1/o11y/users/me and changed a
+		// password through PUT /v1/o11y/users/me/factor_password. Both were o11y's
+		// copy of something Hanzo IAM owns: the name it showed came from the row
+		// iamidentn seats from the asserted address, and the password it changed was
+		// the one nothing signs in with any more. Editing a copy of an identity is
+		// how the copy comes to disagree with the identity. Account settings live at
+		// hanzo.id; what is left here is what o11y genuinely owns — this console's
+		// preferences.
 		<div className="my-settings-container">
-			<div className="user-info-section">
-				<div className="user-info-section-header">
-					<div className="user-info-section-title">Account </div>
-
-					<div className="user-info-section-subtitle">
-						Manage your account settings.
-					</div>
-				</div>
-
-				<div className="user-info-container">
-					<UserInfo />
-				</div>
-			</div>
-
 			<div className="user-preference-section">
 				<div className="user-preference-section-header">
 					<div className="user-preference-section-title">User Preferences</div>

@@ -15,7 +15,6 @@ import {
 	DashboardWidget,
 	EditRulesPage,
 	ErrorDetails,
-	ForgotPassword,
 	Home,
 	InfrastructureMonitoring,
 	Integrations,
@@ -23,7 +22,6 @@ import {
 	LicensePage,
 	ListAllALertsPage,
 	LiveLogs,
-	Login,
 	Logs,
 	LogsExplorer,
 	LogsIndexToFields,
@@ -35,7 +33,6 @@ import {
 	Onboarding,
 	OnboardingV2,
 	OrgOnboarding,
-	PasswordReset,
 	PipelinePage,
 	PublicDashboardPage,
 	ServiceMapPage,
@@ -43,7 +40,6 @@ import {
 	ServicesTablePage,
 	ServiceTopLevelOperationsPage,
 	SettingsPage,
-	SignupPage,
 	SomethingWentWrong,
 	StatusPage,
 	SupportPage,
@@ -62,13 +58,6 @@ import {
 } from './pageComponents';
 
 const routes: AppRoutes[] = [
-	{
-		component: SignupPage,
-		path: ROUTES.SIGN_UP,
-		exact: true,
-		isPrivate: false,
-		key: 'SIGN_UP',
-	},
 	{
 		path: ROUTES.GET_STARTED,
 		exact: false,
@@ -339,32 +328,11 @@ const routes: AppRoutes[] = [
 		isPrivate: true,
 	},
 	{
-		path: ROUTES.LOGIN,
-		exact: true,
-		component: Login,
-		isPrivate: false,
-		key: 'LOGIN',
-	},
-	{
-		path: ROUTES.FORGOT_PASSWORD,
-		exact: true,
-		component: ForgotPassword,
-		isPrivate: false,
-		key: 'FORGOT_PASSWORD',
-	},
-	{
 		path: ROUTES.UN_AUTHORIZED,
 		exact: true,
 		component: UnAuthorized,
 		key: 'UN_AUTHORIZED',
 		isPrivate: true,
-	},
-	{
-		path: ROUTES.PASSWORD_RESET,
-		exact: true,
-		component: PasswordReset,
-		key: 'PASSWORD_RESET',
-		isPrivate: false,
 	},
 	{
 		path: ROUTES.SOMETHING_WENT_WRONG,
