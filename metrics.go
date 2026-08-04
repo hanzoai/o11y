@@ -34,7 +34,7 @@ import (
 // mountMetrics registers the nineteen typed metrics ops on the native router.
 // Collection routes register before the parameterised ones so an id can never
 // shadow a collection.
-func mountMetrics(app *zip.App) {
+func mountMetrics(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	zip.Get(g, "/metrics", listMetrics, zip.WithOperationID("ListMetrics"))

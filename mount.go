@@ -53,8 +53,19 @@ import (
 // PATH UNTOUCHED. Delegation never rewrites r.URL: every route is registered at
 // its full public path, so the route literal IS the contract — one spelling,
 // nothing to translate, nothing to drift.
-func Mount(app *zip.App) error {
-	app.Logger().Info("o11y: mounting routes", "prefix", o11yRoot)
+func Mount(host *zip.App) error {
+	host.Logger().Info("o11y: mounting routes", "prefix", o11yRoot)
+
+	// THE TABLE YIELDS. Every route below is registered through a shadow scope,
+	// which is zip's way of saying "this op is in the DOCUMENT; a handler
+	// registered ahead of it ANSWERS the address". That is exactly what this
+	// table has always been in the community binary — publish() installs it
+	// AFTER the service's own routes, so the handler that has always answered
+	// still does — and until zip.Shadow existed the fact had no spelling, so the
+	// composition was refused for a conflict this file had already reasoned
+	// about in prose. In a host with no implementation the table is the only
+	// claim at its addresses, and answers. One table, both hosts.
+	app := host.Shadow()
 
 	// Native probe group, registered ahead of everything else so Fiber's
 	// in-order match serves it off the mux tree (see health.go).
@@ -171,7 +182,7 @@ func Mount(app *zip.App) error {
 // this pass: /ws/query_progress and the two /v1/sentry ingest routes sit outside
 // /v1/o11y, so the old catch-all never saw them. That is the second thing a
 // wildcard hides — not just which routes are un-typed, but which are missing.
-func mountHatches(app *zip.App) {
+func mountHatches(app zip.Router) {
 	h := zip.AdaptNetHTTP(handlerAdapter{})
 
 	// ── 1. STREAMS: there is no one answer to name ───────────────────────────

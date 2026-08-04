@@ -45,7 +45,7 @@ import (
 // Collection routes sit beside their parameterised siblings safely: the router
 // matches the most specific pattern, so /users/me can never be swallowed by
 // /users/:id, which is the same disambiguation the runtime's own tree makes.
-func mountIdentity(app *zip.App) {
+func mountIdentity(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	// users and invites (runtime gate per op: see each op's comment)

@@ -46,7 +46,7 @@ import (
 // order the mux tree declares them (routes_misc.go, routes_settings.go,
 // routes_licenses.go, then the o11yapiserver singletons). It registers on the
 // SAME o11yRoot group logs.go mounts on, ahead of the delegation wildcard.
-func mountPlatform(app *zip.App) {
+func mountPlatform(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	// routes_misc.go

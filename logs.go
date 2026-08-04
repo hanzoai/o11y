@@ -44,7 +44,7 @@ import (
 // mountLogs registers the nine typed logs ops on the native router. The
 // pipelines routes keep the mux tree's discipline — preview registers before
 // the parameterised version read so a version can never shadow it.
-func mountLogs(app *zip.App) {
+func mountLogs(app zip.Router) {
 	g := app.Group(o11yRoot)
 	zip.Get(g, "/logs", logRecords)
 	zip.Get(g, "/logs/fields", logFields)

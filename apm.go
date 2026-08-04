@@ -40,7 +40,7 @@ import (
 // mountAPM registers the twenty-one typed APM ops on the native router — the
 // service catalog first, then the messaging-queue groups in the order the mux
 // tree declares them, then the third-party API overview.
-func mountAPM(app *zip.App) {
+func mountAPM(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	// The service catalog: /services collection, /service/* breakdowns.

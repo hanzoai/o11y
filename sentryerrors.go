@@ -59,7 +59,7 @@ import (
 // the sentryRoot group, and the error-tracking and legacy exceptions faces on
 // the o11yRoot group. Both roots and the seam they relay through are spelled
 // once each, in relay.go.
-func mountSentryErrors(app *zip.App) {
+func mountSentryErrors(app zip.Router) {
 	gsentry := app.Group(sentryRoot)
 	zip.Get(gsentry, "/projects", sentryListProjects)
 	zip.Post(gsentry, "/projects", sentryCreateProject)

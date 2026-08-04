@@ -51,7 +51,7 @@ func getHealth() factory.Handler {
 // /v1/o11y/* delegation wildcard. The paths are the SAME literals the runtime
 // registers on mux (o11yapiserver registry.go), so native dispatch and the
 // fall-through answer the same request — one spelling per probe, not two.
-func mountHealth(app *zip.App) {
+func mountHealth(app zip.Router) {
 	app.Get("/v1/o11y/livez", livez)
 	app.Get("/v1/o11y/healthz", probe(func(h factory.Handler) http.HandlerFunc { return h.Healthz }))
 	app.Get("/v1/o11y/readyz", probe(func(h factory.Handler) http.HandlerFunc { return h.Readyz }))

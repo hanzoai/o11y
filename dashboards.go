@@ -54,7 +54,7 @@ import (
 // mux tree's discipline so a param can never shadow a sibling literal. Each
 // carries the operation id its mux registration always declared, so the document
 // names it exactly as it was named before.
-func mountDashboards(app *zip.App) {
+func mountDashboards(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	// Dashboards — list, per-user list, create, clone, read, update, patch, delete.

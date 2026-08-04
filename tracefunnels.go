@@ -40,7 +40,7 @@ import (
 // /list, /new, /steps/update and /analytics/* routes register ahead of the
 // parameterised /:funnel_id ones so a funnel id can never shadow them — the same
 // discipline the mux tree keeps by registering the literals first.
-func mountTraceFunnels(app *zip.App) {
+func mountTraceFunnels(app zip.Router) {
 	g := app.Group(o11yRoot + "/trace-funnels")
 
 	zip.Post(g, "/new", funnelCreate, op("CreateTraceFunnel"))

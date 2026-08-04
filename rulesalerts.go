@@ -59,7 +59,7 @@ import (
 // native router. Collection routes sit beside their parameterised siblings
 // safely: the router matches the most specific pattern, so /rules/test is never
 // swallowed by /rules/:id, the same disambiguation the runtime's own tree makes.
-func mountRulesAlerts(app *zip.App) {
+func mountRulesAlerts(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	// alert rules (runtime gate per op: see each op's comment)

@@ -39,7 +39,7 @@ import (
 // literal /traces/fields routes register ahead of the parameterised trace read
 // so a trace id can never shadow the catalog — the same defence the mux tree
 // gives them by registering fields first.
-func mountTraces(app *zip.App) {
+func mountTraces(app zip.Router) {
 	g := app.Group(o11yRoot)
 	zip.Get(g, "/traces/fields", traceFields, op("GetTraceFields"))
 	zip.Post(g, "/traces/fields", traceFieldUpdate, op("UpdateTraceField"))

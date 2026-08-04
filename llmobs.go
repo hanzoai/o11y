@@ -58,7 +58,7 @@ import (
 // The operation ids are carried over verbatim from the routes' prior OpenAPI
 // declarations, so the SDK method, the CLI command and the MCP tool a caller
 // already knows keep their names as the routes cross into the document.
-func mountLLMObs(app *zip.App) {
+func mountLLMObs(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	// The four gen_ai span views — projections over spans, not tables.

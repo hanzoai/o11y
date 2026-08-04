@@ -36,7 +36,7 @@ import (
 // mountTelemetry registers the five typed telemetry ops on the native router.
 // Collection routes register before the parameterised one so an id can never
 // shadow a collection.
-func mountTelemetry(app *zip.App) {
+func mountTelemetry(app zip.Router) {
 	g := app.Group(sentryRoot)
 	zip.Post(g, "/discover", discover)
 	zip.Get(g, "/logs", logs)

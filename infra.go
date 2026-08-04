@@ -44,7 +44,7 @@ import (
 // three per resource face (attribute_keys, attribute_values, list) for the
 // eleven infra resources, the ten infra_monitoring rollups, and the setup
 // checks.
-func mountInfra(app *zip.App) {
+func mountInfra(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	zip.Get(g, "/hosts/attribute_keys", hostAttributeKeys)

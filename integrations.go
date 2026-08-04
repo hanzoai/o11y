@@ -58,7 +58,7 @@ import (
 // router matches the most specific pattern, so /integrations/install can never
 // be swallowed by /integrations/:integrationId, the same disambiguation the
 // runtime's own mux tree makes.
-func mountIntegrations(app *zip.App) {
+func mountIntegrations(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	// integration catalog and install lifecycle (runtime gate: ViewAccess)

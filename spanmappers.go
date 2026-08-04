@@ -33,7 +33,7 @@ import (
 )
 
 // mountSpanMappers registers the eight typed span-mapper ops.
-func mountSpanMappers(app *zip.App) {
+func mountSpanMappers(app zip.Router) {
 	// The group is o11yRoot, not o11yRoot+"/span_mapper_groups": a zip group
 	// with the collection as its prefix would register the collection routes at
 	// the empty sub-path, which lands them on a TRAILING SLASH the runtime does

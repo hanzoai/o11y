@@ -58,7 +58,7 @@ import (
 // router, all on the shared /v1/o11y group (o11yRoot, spelled once in logs.go).
 // The saved-view collection routes register before the parameterised ones so a
 // view id can never shadow the collection, exactly as the mux tree ordered them.
-func mountQueryCore(app *zip.App) {
+func mountQueryCore(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	// the v5 composite query engine

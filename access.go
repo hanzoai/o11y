@@ -41,7 +41,7 @@ import (
 // router. The literal /service_accounts/me routes register ahead of the
 // parameterised ones so an id can never shadow them — the same defence
 // telemetry.go gives its collection routes.
-func mountAccess(app *zip.App) {
+func mountAccess(app zip.Router) {
 	g := app.Group(o11yRoot)
 
 	zip.Post(g, "/roles", createRole, op("CreateRole"), zip.WithStatus(http.StatusCreated))
