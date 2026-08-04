@@ -150,7 +150,7 @@ func TestCompleteCallbacksAreNamedHatches(t *testing.T) {
 		{http.MethodGet, "/v1/o11y/complete/oidc"},
 	} {
 		saw = ""
-		resp, err := app.Fiber().Test(member(cb.method, cb.target, nil))
+		resp, err := app.Test(member(cb.method, cb.target, nil))
 		if err != nil {
 			t.Fatalf("Test: %v", err)
 		}

@@ -8,6 +8,7 @@ import (
 	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/flagger"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
@@ -192,8 +193,8 @@ func (m *fieldMapper) FieldFor(ctx context.Context, tsStart, tsEnd uint64, key *
 		case schema.ColumnTypeEnumJSON:
 			switch key.FieldContext {
 			case telemetrytypes.FieldContextResource:
-				exprs = append(exprs, fmt.Sprintf("%s.`%s`::String", columnName, key.Name))
-				existExpr = append(existExpr, fmt.Sprintf("%s.`%s` IS NOT NULL", columnName, key.Name))
+				exprs = append(exprs, fmt.Sprintf("%s.%s::String", columnName, querybuilder.QuoteIdent(key.Name)))
+				existExpr = append(existExpr, fmt.Sprintf("%s.%s IS NOT NULL", columnName, querybuilder.QuoteIdent(key.Name)))
 			case telemetrytypes.FieldContextBody:
 				if key.Name == messageSubField {
 					exprs = append(exprs, messageSubColumn)
@@ -235,7 +236,7 @@ func (m *fieldMapper) FieldFor(ctx context.Context, tsStart, tsEnd uint64, key *
 				// The envelope keeps ONE attributes map with String values and no
 				// materialized columns, so every key is a map access; the requested
 				// value type decides the cast (number -> toFloat64OrNull, bool -> = 'true').
-				access := fmt.Sprintf("%s['%s']", columnName, key.Name)
+				access := fmt.Sprintf("%s['%s']", columnName, querybuilder.EscapeLiteral(key.Name))
 				switch valueType.GetType() {
 				case schema.ColumnTypeEnumFloat64:
 					access = fmt.Sprintf("toFloat64OrNull(%s)", access)
@@ -243,7 +244,7 @@ func (m *fieldMapper) FieldFor(ctx context.Context, tsStart, tsEnd uint64, key *
 					access = fmt.Sprintf("%s = 'true'", access)
 				}
 				exprs = append(exprs, access)
-				existExpr = append(existExpr, fmt.Sprintf("mapContains(%s, '%s')", columnName, key.Name))
+				existExpr = append(existExpr, fmt.Sprintf("mapContains(%s, '%s')", columnName, querybuilder.EscapeLiteral(key.Name)))
 			default:
 				return "", errors.NewInvalidInputf(errors.CodeInvalidInput, "exists operator is not supported for map column type %s", valueType)
 			}
@@ -314,7 +315,7 @@ func (m *fieldMapper) ColumnExpressionFor(
 		return "", err
 	}
 
-	return fmt.Sprintf("%s AS `%s`", sqlbuilder.Escape(fieldExpression), field.Name), nil
+	return fmt.Sprintf("%s AS %s", sqlbuilder.Escape(fieldExpression), querybuilder.QuoteIdent(field.Name)), nil
 }
 
 // buildFieldForJSON builds the field expression for body JSON fields using arrayConcat pattern.

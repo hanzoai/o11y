@@ -53,8 +53,23 @@ import (
 // PATH UNTOUCHED. Delegation never rewrites r.URL: every route is registered at
 // its full public path, so the route literal IS the contract — one spelling,
 // nothing to translate, nothing to drift.
-func Mount(app *zip.App) error {
-	app.Logger().Info("o11y: mounting routes", "prefix", o11yRoot)
+// A HOST MAY TAKE AN ADDRESS. Since every route is named there is no wildcard
+// left for a host's own route to shadow, so a host that serves one of these
+// addresses itself has to say so with [Claimed] — see claim.go for why that is a
+// statement of ownership rather than a filter. Without one, nothing changes and
+// the whole table is declared.
+func Mount(app *zip.App, opts ...Option) error {
+	c := new(conf)
+	for _, o := range opts {
+		o(c)
+	}
+	// Read by the declaration verbs below, for this call only: Mount is the
+	// composition root, so the set is written once here and every declaration it
+	// makes happens before it returns.
+	mounting = c
+	defer func() { mounting = nil }()
+
+	app.Logger().Info("o11y: mounting routes", "prefix", o11yRoot, "claimed", len(c.claimed))
 
 	// Native probe group, registered ahead of everything else so Fiber's
 	// in-order match serves it off the mux tree (see health.go).
@@ -180,19 +195,19 @@ func mountHatches(app *zip.App) {
 	// livetail would hang on the first tail, and a typed progress poll would
 	// return only after the query it reports on had already finished — which is
 	// the one thing a progress endpoint must not do.
-	app.Get(o11yRoot+"/logs/livetail", h)    // unbounded stream of log records
-	app.Get(o11yRoot+"/query_progress", h)   // long-poll: holds the connection until the next tick
-	app.Get("/ws/query_progress", h)         // the same read over a websocket; the Upgrade IS the contract
-	app.Post(o11yRoot+"/export_raw_data", h) // chunked CSV/JSONL attachment, X-Response-Complete trailer
+	route(app, http.MethodGet, o11yRoot+"/logs/livetail", h)    // unbounded stream of log records
+	route(app, http.MethodGet, o11yRoot+"/query_progress", h)   // long-poll: holds the connection until the next tick
+	route(app, http.MethodGet, "/ws/query_progress", h)         // the same read over a websocket; the Upgrade IS the contract
+	route(app, http.MethodPost, o11yRoot+"/export_raw_data", h) // chunked CSV/JSONL attachment, X-Response-Complete trailer
 
 	// ── 2. REDIRECTS: the answer is a Location, not a body ───────────────────
 	// The three sign-in callbacks answer 303 with a Location header and no
 	// payload. A typed op declares a 2xx JSON contract, so typing these would
 	// publish a response schema for a response that does not exist, and hide the
 	// header that is the entire point of the call.
-	app.Get(o11yRoot+"/complete/google", h) // Google OIDC callback → 303 to the console
-	app.Get(o11yRoot+"/complete/oidc", h)   // generic OIDC callback → 303
-	app.Post(o11yRoot+"/complete/saml", h)  // SAML assertion consumer → 303
+	route(app, http.MethodGet, o11yRoot+"/complete/google", h) // Google OIDC callback → 303 to the console
+	route(app, http.MethodGet, o11yRoot+"/complete/oidc", h)   // generic OIDC callback → 303
+	route(app, http.MethodPost, o11yRoot+"/complete/saml", h)  // SAML assertion consumer → 303
 
 	// ── 3. A FOREIGN PROTOCOL WE RECEIVE ─────────────────────────────────────
 	// Sentry-compatible ingest. The body is an application/x-sentry-envelope
@@ -201,10 +216,10 @@ func mountHatches(app *zip.App) {
 	// name: an SDK appends its own fixed /api/<project>/envelope/ suffix to
 	// whatever DSN path it is given, so renaming it would break every SDK in the
 	// field. We RECEIVE this shape; we do not publish it.
-	app.Post(o11yRoot+"/api/:project_id/envelope/", h) // Sentry envelope ingest
-	app.Post(o11yRoot+"/api/:project_id/store/", h)    // legacy single-event ingest
-	app.Post(sentryRoot+"/:project/envelope/", h)      // the same wire on the clean /v1/sentry root
-	app.Post(sentryRoot+"/:project/store/", h)         // same
+	route(app, http.MethodPost, o11yRoot+"/api/:project_id/envelope/", h) // Sentry envelope ingest
+	route(app, http.MethodPost, o11yRoot+"/api/:project_id/store/", h)    // legacy single-event ingest
+	route(app, http.MethodPost, sentryRoot+"/:project/envelope/", h)      // the same wire on the clean /v1/sentry root
+	route(app, http.MethodPost, sentryRoot+"/:project/store/", h)         // same
 }
 
 // handlerAdapter forwards each request to the registered runtime handler

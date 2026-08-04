@@ -509,10 +509,10 @@ func (b *traceQueryStatementBuilder) buildTimeSeriesQuery(
 		if err != nil {
 			return nil, err
 		}
-		colExpr := fmt.Sprintf("toString(%s) AS `%s`", expr, gb.Name)
+		colExpr := fmt.Sprintf("toString(%s) AS %s", expr, querybuilder.QuoteIdent(gb.Name))
 		allGroupByArgs = append(allGroupByArgs, args...)
 		sb.SelectMore(colExpr)
-		fieldNames = append(fieldNames, fmt.Sprintf("`%s`", gb.Name))
+		fieldNames = append(fieldNames, querybuilder.QuoteIdent(gb.Name))
 	}
 
 	// Aggregations
@@ -570,7 +570,7 @@ func (b *traceQueryStatementBuilder) buildTimeSeriesQuery(
 			for _, orderBy := range query.Order {
 				_, ok := aggOrderBy(orderBy, query)
 				if !ok {
-					sb.OrderBy(fmt.Sprintf("`%s` %s", orderBy.Key.Name, orderBy.Direction.StringValue()))
+					sb.OrderBy(fmt.Sprintf("%s %s", querybuilder.QuoteIdent(orderBy.Key.Name), orderBy.Direction.StringValue()))
 				}
 			}
 			sb.OrderBy("ts desc")
@@ -599,7 +599,7 @@ func (b *traceQueryStatementBuilder) buildTimeSeriesQuery(
 			for _, orderBy := range query.Order {
 				_, ok := aggOrderBy(orderBy, query)
 				if !ok {
-					sb.OrderBy(fmt.Sprintf("`%s` %s", orderBy.Key.Name, orderBy.Direction.StringValue()))
+					sb.OrderBy(fmt.Sprintf("%s %s", querybuilder.QuoteIdent(orderBy.Key.Name), orderBy.Direction.StringValue()))
 				}
 			}
 			sb.OrderBy("ts desc")
@@ -657,7 +657,7 @@ func (b *traceQueryStatementBuilder) buildScalarQuery(
 		if err != nil {
 			return nil, err
 		}
-		colExpr := fmt.Sprintf("toString(%s) AS `%s`", expr, gb.Name)
+		colExpr := fmt.Sprintf("toString(%s) AS %s", expr, querybuilder.QuoteIdent(gb.Name))
 		allGroupByArgs = append(allGroupByArgs, args...)
 		sb.SelectMore(colExpr)
 	}
@@ -710,7 +710,7 @@ func (b *traceQueryStatementBuilder) buildScalarQuery(
 		if ok {
 			sb.OrderBy(fmt.Sprintf("__result_%d %s", idx, orderBy.Direction.StringValue()))
 		} else {
-			sb.OrderBy(fmt.Sprintf("`%s` %s", orderBy.Key.Name, orderBy.Direction.StringValue()))
+			sb.OrderBy(fmt.Sprintf("%s %s", querybuilder.QuoteIdent(orderBy.Key.Name), orderBy.Direction.StringValue()))
 		}
 	}
 

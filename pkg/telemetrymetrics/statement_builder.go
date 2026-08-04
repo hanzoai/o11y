@@ -8,13 +8,13 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzo-ds/sqlbuilder"
 	"golang.org/x/exp/slices"
 )
 
@@ -262,7 +262,7 @@ func (b *MetricQueryStatementBuilder) buildPipelineStatement(
 func unionStatements(main, reduced *qbtypes.Statement, query qbtypes.QueryBuilderQuery[qbtypes.MetricAggregation]) (*qbtypes.Statement, error) {
 	orderBy := "ts"
 	for _, g := range query.GroupBy {
-		orderBy = fmt.Sprintf("`%s`, ", g.Name) + orderBy
+		orderBy = querybuilder.QuoteIdent(g.Name) + ", " + orderBy
 	}
 	q := fmt.Sprintf("SELECT * FROM (%s) UNION ALL SELECT * FROM (%s) ORDER BY %s", main.Query, reduced.Query, orderBy)
 	args := append(append([]any{}, main.Args...), reduced.Args...)
@@ -358,7 +358,7 @@ func (b *MetricQueryStatementBuilder) buildReducedTemporalAggregationCTE(
 	sb.Select("fingerprint")
 	sb.SelectMore(fmt.Sprintf("toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), toIntervalSecond(%d)) AS ts", stepSec))
 	for _, g := range query.GroupBy {
-		sb.SelectMore(fmt.Sprintf("`%s`", g.Name))
+		sb.SelectMore(querybuilder.QuoteIdent(g.Name))
 	}
 	sb.SelectMore(fmt.Sprintf("%s AS per_series_value", ReducedTimeAggregationColumn(agg.TimeAggregation, stepSec)))
 	if weight != "" {
@@ -392,7 +392,7 @@ func (b *MetricQueryStatementBuilder) buildReducedSpatialAggregationCTE(
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("ts")
 	for _, g := range query.GroupBy {
-		sb.SelectMore(fmt.Sprintf("`%s`", g.Name))
+		sb.SelectMore(querybuilder.QuoteIdent(g.Name))
 	}
 	sb.SelectMore(spatial + " AS value")
 	sb.From("__temporal_aggregation_cte")
@@ -419,7 +419,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggDeltaFastPath(
 		stepSec,
 	))
 	for _, g := range query.GroupBy {
-		sb.SelectMore(fmt.Sprintf("`%s`", g.Name))
+		sb.SelectMore(querybuilder.QuoteIdent(g.Name))
 	}
 
 	aggCol, err := AggregationColumnForSamplesTable(
@@ -562,7 +562,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggDelta(
 		stepSec,
 	))
 	for _, g := range query.GroupBy {
-		sb.SelectMore(fmt.Sprintf("`%s`", g.Name))
+		sb.SelectMore(querybuilder.QuoteIdent(g.Name))
 	}
 
 	aggCol, err := AggregationColumnForSamplesTable(samplesTable, query.Aggregations[0].Temporality, query.Aggregations[0].TimeAggregation)
@@ -608,7 +608,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggCumulativeOrUnspecified(
 		stepSec,
 	))
 	for _, g := range query.GroupBy {
-		baseSb.SelectMore(fmt.Sprintf("`%s`", g.Name))
+		baseSb.SelectMore(querybuilder.QuoteIdent(g.Name))
 	}
 
 	aggCol, err := AggregationColumnForSamplesTable(samplesTable, query.Aggregations[0].Temporality, query.Aggregations[0].TimeAggregation)
@@ -635,7 +635,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggCumulativeOrUnspecified(
 		wrapped := sqlbuilder.NewSelectBuilder()
 		wrapped.Select("ts")
 		for _, g := range query.GroupBy {
-			wrapped.SelectMore(fmt.Sprintf("`%s`", g.Name))
+			wrapped.SelectMore(querybuilder.QuoteIdent(g.Name))
 		}
 		wrapped.SelectMore(fmt.Sprintf("%s AS per_series_value", RateTmpl))
 		wrapped.From(fmt.Sprintf("(%s) WINDOW rate_window AS (PARTITION BY fingerprint ORDER BY fingerprint, ts)", innerQuery))
@@ -646,7 +646,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggCumulativeOrUnspecified(
 		wrapped := sqlbuilder.NewSelectBuilder()
 		wrapped.Select("ts")
 		for _, g := range query.GroupBy {
-			wrapped.SelectMore(fmt.Sprintf("`%s`", g.Name))
+			wrapped.SelectMore(querybuilder.QuoteIdent(g.Name))
 		}
 		wrapped.SelectMore(fmt.Sprintf("%s AS per_series_value", IncreaseTmpl))
 		wrapped.From(fmt.Sprintf("(%s) WINDOW rate_window AS (PARTITION BY fingerprint ORDER BY fingerprint, ts)", innerQuery))
@@ -673,7 +673,7 @@ func (b *MetricQueryStatementBuilder) buildTemporalAggForMultipleTemporalities(
 		stepSec,
 	))
 	for _, g := range query.GroupBy {
-		sb.SelectMore(fmt.Sprintf("`%s`", g.Name))
+		sb.SelectMore(querybuilder.QuoteIdent(g.Name))
 	}
 
 	aggForDeltaTemporality, err := AggregationColumnForSamplesTable(samplesTable, metrictypes.Delta, query.Aggregations[0].TimeAggregation)
@@ -733,7 +733,7 @@ func (b *MetricQueryStatementBuilder) buildSpatialAggregationCTE(
 
 	sb.Select("ts")
 	for _, g := range query.GroupBy {
-		sb.SelectMore(fmt.Sprintf("`%s`", g.Name))
+		sb.SelectMore(querybuilder.QuoteIdent(g.Name))
 	}
 	sb.SelectMore(fmt.Sprintf("%s(per_series_value) AS value", query.Aggregations[0].SpaceAggregation.StringValue()))
 	sb.From("__temporal_aggregation_cte")
@@ -769,7 +769,7 @@ func (b *MetricQueryStatementBuilder) BuildFinalSelect(
 		quantile := query.Aggregations[0].SpaceAggregation.Percentile()
 		sb.Select("ts")
 		for _, g := range query.GroupBy {
-			sb.SelectMore(fmt.Sprintf("`%s`", g.Name))
+			sb.SelectMore(querybuilder.QuoteIdent(g.Name))
 		}
 		sb.SelectMore(fmt.Sprintf(
 			"histogramQuantile(arrayMap(x -> toFloat64(x), groupArray(le)), groupArray(value), %.3f) AS value",
@@ -790,7 +790,7 @@ func (b *MetricQueryStatementBuilder) BuildFinalSelect(
 		sb.Select("ts")
 
 		for _, g := range query.GroupBy {
-			sb.SelectMore(fmt.Sprintf("`%s`", g.Name))
+			sb.SelectMore(querybuilder.QuoteIdent(g.Name))
 		}
 
 		aggQuery, err := AggregationQueryForHistogramCountWithParams(query.Aggregations[0].ComparisonSpaceAggregationParam)

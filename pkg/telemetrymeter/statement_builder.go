@@ -7,6 +7,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
@@ -14,7 +15,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 type meterQueryStatementBuilder struct {
@@ -340,7 +340,7 @@ func (b *meterQueryStatementBuilder) buildTemporalAggCumulativeOrUnspecified(
 		wrapped := sqlbuilder.NewSelectBuilder()
 		wrapped.Select("ts")
 		for _, g := range query.GroupBy {
-			wrapped.SelectMore(fmt.Sprintf("`%s`", g.Name))
+			wrapped.SelectMore(querybuilder.QuoteIdent(g.Name))
 		}
 		wrapped.SelectMore(fmt.Sprintf("%s AS per_series_value", telemetrymetrics.RateTmpl))
 		wrapped.From(fmt.Sprintf("(%s) WINDOW rate_window AS (PARTITION BY fingerprint ORDER BY fingerprint, ts)", innerQuery))
@@ -351,7 +351,7 @@ func (b *meterQueryStatementBuilder) buildTemporalAggCumulativeOrUnspecified(
 		wrapped := sqlbuilder.NewSelectBuilder()
 		wrapped.Select("ts")
 		for _, g := range query.GroupBy {
-			wrapped.SelectMore(fmt.Sprintf("`%s`", g.Name))
+			wrapped.SelectMore(querybuilder.QuoteIdent(g.Name))
 		}
 		wrapped.SelectMore(fmt.Sprintf("%s AS per_series_value", telemetrymetrics.IncreaseTmpl))
 		wrapped.From(fmt.Sprintf("(%s) WINDOW rate_window AS (PARTITION BY fingerprint ORDER BY fingerprint, ts)", innerQuery))
@@ -381,7 +381,7 @@ func (b *meterQueryStatementBuilder) buildSpatialAggregationCTE(
 
 	sb.Select("ts")
 	for _, g := range query.GroupBy {
-		sb.SelectMore(fmt.Sprintf("`%s`", g.Name))
+		sb.SelectMore(querybuilder.QuoteIdent(g.Name))
 	}
 	sb.SelectMore(fmt.Sprintf("%s(per_series_value) AS value", query.Aggregations[0].SpaceAggregation.StringValue()))
 	sb.From("__temporal_aggregation_cte")

@@ -60,57 +60,57 @@ import (
 // safely: the router matches the most specific pattern, so /rules/test is never
 // swallowed by /rules/:id, the same disambiguation the runtime's own tree makes.
 func mountRulesAlerts(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	// alert rules (runtime gate per op: see each op's comment)
-	zip.Get(g, "/rules", listRules, zip.WithOperationID("ListRules"))
-	zip.Get(g, "/rules/:id", getRuleByID, zip.WithOperationID("GetRuleByID"))
-	zip.Post(g, "/rules", createRule, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateRule"))
-	zip.Put(g, "/rules/:id", updateRuleByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("UpdateRuleByID"))
-	zip.Delete(g, "/rules/:id", deleteRuleByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("DeleteRuleByID"))
-	zip.Patch(g, "/rules/:id", patchRuleByID, zip.WithOperationID("PatchRuleByID"))
-	zip.Post(g, "/rules/test", testRule, zip.WithOperationID("TestRule"))
+	opGet(g, "/rules", listRules, zip.WithOperationID("ListRules"))
+	opGet(g, "/rules/:id", getRuleByID, zip.WithOperationID("GetRuleByID"))
+	opPost(g, "/rules", createRule, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateRule"))
+	opPut(g, "/rules/:id", updateRuleByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("UpdateRuleByID"))
+	opDelete(g, "/rules/:id", deleteRuleByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("DeleteRuleByID"))
+	opPatch(g, "/rules/:id", patchRuleByID, zip.WithOperationID("PatchRuleByID"))
+	opPost(g, "/rules/test", testRule, zip.WithOperationID("TestRule"))
 
 	// planned maintenance / downtime schedules
-	zip.Get(g, "/downtime_schedules", listDowntimeSchedules, zip.WithOperationID("ListDowntimeSchedules"))
-	zip.Get(g, "/downtime_schedules/:id", getDowntimeScheduleByID, zip.WithOperationID("GetDowntimeScheduleByID"))
-	zip.Post(g, "/downtime_schedules", createDowntimeSchedule, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateDowntimeSchedule"))
-	zip.Put(g, "/downtime_schedules/:id", updateDowntimeScheduleByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("UpdateDowntimeScheduleByID"))
-	zip.Delete(g, "/downtime_schedules/:id", deleteDowntimeScheduleByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("DeleteDowntimeScheduleByID"))
+	opGet(g, "/downtime_schedules", listDowntimeSchedules, zip.WithOperationID("ListDowntimeSchedules"))
+	opGet(g, "/downtime_schedules/:id", getDowntimeScheduleByID, zip.WithOperationID("GetDowntimeScheduleByID"))
+	opPost(g, "/downtime_schedules", createDowntimeSchedule, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateDowntimeSchedule"))
+	opPut(g, "/downtime_schedules/:id", updateDowntimeScheduleByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("UpdateDowntimeScheduleByID"))
+	opDelete(g, "/downtime_schedules/:id", deleteDowntimeScheduleByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("DeleteDowntimeScheduleByID"))
 
 	// rule state history — v2 reads (GET, URL query parameters)
-	zip.Get(g, "/rules/:id/history/stats", getRuleHistoryStats, zip.WithOperationID("GetRuleHistoryStats"))
-	zip.Get(g, "/rules/:id/history/timeline", getRuleHistoryTimeline, zip.WithOperationID("GetRuleHistoryTimeline"))
-	zip.Get(g, "/rules/:id/history/top_contributors", getRuleHistoryTopContributors, zip.WithOperationID("GetRuleHistoryTopContributors"))
-	zip.Get(g, "/rules/:id/history/filter_keys", getRuleHistoryFilterKeys, zip.WithOperationID("GetRuleHistoryFilterKeys"))
-	zip.Get(g, "/rules/:id/history/filter_values", getRuleHistoryFilterValues, zip.WithOperationID("GetRuleHistoryFilterValues"))
-	zip.Get(g, "/rules/:id/history/overall_status", getRuleHistoryOverallStatus, zip.WithOperationID("GetRuleHistoryOverallStatus"))
+	opGet(g, "/rules/:id/history/stats", getRuleHistoryStats, zip.WithOperationID("GetRuleHistoryStats"))
+	opGet(g, "/rules/:id/history/timeline", getRuleHistoryTimeline, zip.WithOperationID("GetRuleHistoryTimeline"))
+	opGet(g, "/rules/:id/history/top_contributors", getRuleHistoryTopContributors, zip.WithOperationID("GetRuleHistoryTopContributors"))
+	opGet(g, "/rules/:id/history/filter_keys", getRuleHistoryFilterKeys, zip.WithOperationID("GetRuleHistoryFilterKeys"))
+	opGet(g, "/rules/:id/history/filter_values", getRuleHistoryFilterValues, zip.WithOperationID("GetRuleHistoryFilterValues"))
+	opGet(g, "/rules/:id/history/overall_status", getRuleHistoryOverallStatus, zip.WithOperationID("GetRuleHistoryOverallStatus"))
 
 	// rule state history — v1 reads (POST, JSON body) and the legacy test-fire
-	zip.Post(g, "/testRule", testRuleNotification, zip.WithOperationID("TestRuleNotification"))
-	zip.Post(g, "/rules/:id/history/stats", getRuleStats, zip.WithOperationID("GetRuleStats"))
-	zip.Post(g, "/rules/:id/history/timeline", getRuleStateHistory, zip.WithOperationID("GetRuleStateHistory"))
-	zip.Post(g, "/rules/:id/history/top_contributors", getRuleStateHistoryTopContributors, zip.WithOperationID("GetRuleStateHistoryTopContributors"))
-	zip.Post(g, "/rules/:id/history/overall_status", getOverallStateTransitions, zip.WithOperationID("GetOverallStateTransitions"))
+	opPost(g, "/testRule", testRuleNotification, zip.WithOperationID("TestRuleNotification"))
+	opPost(g, "/rules/:id/history/stats", getRuleStats, zip.WithOperationID("GetRuleStats"))
+	opPost(g, "/rules/:id/history/timeline", getRuleStateHistory, zip.WithOperationID("GetRuleStateHistory"))
+	opPost(g, "/rules/:id/history/top_contributors", getRuleStateHistoryTopContributors, zip.WithOperationID("GetRuleStateHistoryTopContributors"))
+	opPost(g, "/rules/:id/history/overall_status", getOverallStateTransitions, zip.WithOperationID("GetOverallStateTransitions"))
 
 	// notification channels
-	zip.Get(g, "/channels", listChannels, zip.WithOperationID("ListChannels"))
-	zip.Get(g, "/channels/:id", getChannelByID, zip.WithOperationID("GetChannelByID"))
-	zip.Post(g, "/channels", createChannel, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateChannel"))
-	zip.Put(g, "/channels/:id", updateChannelByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("UpdateChannelByID"))
-	zip.Delete(g, "/channels/:id", deleteChannelByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("DeleteChannelByID"))
-	zip.Post(g, "/channels/test", testChannel, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("TestChannel"))
-	zip.Post(g, "/testChannel", testChannelDeprecated, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("TestChannelDeprecated"))
+	opGet(g, "/channels", listChannels, zip.WithOperationID("ListChannels"))
+	opGet(g, "/channels/:id", getChannelByID, zip.WithOperationID("GetChannelByID"))
+	opPost(g, "/channels", createChannel, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateChannel"))
+	opPut(g, "/channels/:id", updateChannelByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("UpdateChannelByID"))
+	opDelete(g, "/channels/:id", deleteChannelByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("DeleteChannelByID"))
+	opPost(g, "/channels/test", testChannel, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("TestChannel"))
+	opPost(g, "/testChannel", testChannelDeprecated, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("TestChannelDeprecated"))
 
 	// route policies
-	zip.Get(g, "/route_policies", getAllRoutePolicies, zip.WithOperationID("GetAllRoutePolicies"))
-	zip.Get(g, "/route_policies/:id", getRoutePolicyByID, zip.WithOperationID("GetRoutePolicyByID"))
-	zip.Post(g, "/route_policies", createRoutePolicy, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateRoutePolicy"))
-	zip.Put(g, "/route_policies/:id", updateRoutePolicy, zip.WithOperationID("UpdateRoutePolicy"))
-	zip.Delete(g, "/route_policies/:id", deleteRoutePolicyByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("DeleteRoutePolicyByID"))
+	opGet(g, "/route_policies", getAllRoutePolicies, zip.WithOperationID("GetAllRoutePolicies"))
+	opGet(g, "/route_policies/:id", getRoutePolicyByID, zip.WithOperationID("GetRoutePolicyByID"))
+	opPost(g, "/route_policies", createRoutePolicy, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateRoutePolicy"))
+	opPut(g, "/route_policies/:id", updateRoutePolicy, zip.WithOperationID("UpdateRoutePolicy"))
+	opDelete(g, "/route_policies/:id", deleteRoutePolicyByID, zip.WithStatus(http.StatusNoContent), zip.WithOperationID("DeleteRoutePolicyByID"))
 
 	// alerts
-	zip.Get(g, "/alerts", getAlerts, zip.WithOperationID("GetAlerts"))
+	opGet(g, "/alerts", getAlerts, zip.WithOperationID("GetAlerts"))
 }
 
 // ── alert rules ─────────────────────────────────────────────────────────────

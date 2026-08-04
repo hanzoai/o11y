@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/hanzo-ds/sqlbuilder"
+	"github.com/hanzoai/o11y/pkg/querybuilder"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 var (
@@ -73,14 +74,14 @@ func (m *fieldMapper) FieldFor(ctx context.Context, startNs, endNs uint64, key *
 
 	switch key.FieldContext {
 	case telemetrytypes.FieldContextResource, telemetrytypes.FieldContextScope, telemetrytypes.FieldContextAttribute:
-		return fmt.Sprintf("JSONExtractString(%s, '%s')", columns[0].Name, key.Name), nil
+		return fmt.Sprintf("JSONExtractString(%s, '%s')", columns[0].Name, querybuilder.EscapeLiteral(key.Name)), nil
 	case telemetrytypes.FieldContextMetric:
 		return columns[0].Name, nil
 	case telemetrytypes.FieldContextUnspecified:
 		if slices.Contains(IntrinsicFields, key.Name) {
 			return columns[0].Name, nil
 		}
-		return fmt.Sprintf("JSONExtractString(%s, '%s')", columns[0].Name, key.Name), nil
+		return fmt.Sprintf("JSONExtractString(%s, '%s')", columns[0].Name, querybuilder.EscapeLiteral(key.Name)), nil
 	}
 
 	return columns[0].Name, nil
@@ -102,5 +103,5 @@ func (m *fieldMapper) ColumnExpressionFor(
 		return "", err
 	}
 
-	return fmt.Sprintf("%s AS `%s`", sqlbuilder.Escape(fieldExpression), field.Name), nil
+	return fmt.Sprintf("%s AS %s", sqlbuilder.Escape(fieldExpression), querybuilder.QuoteIdent(field.Name)), nil
 }
