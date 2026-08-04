@@ -201,7 +201,6 @@ export function renderComboboxMultiPills(
 	return (
 		<span
 			data-slot="combobox-pills"
-			className="flex flex-wrap items-center gap-1"
 		>
 			{displayed.map((v) => (
 				<ComboboxPill key={v} value={v} onRemove={p.onRemove}>
@@ -213,7 +212,6 @@ export function renderComboboxMultiPills(
 					<TooltipPrimitive.Trigger asChild>
 						<span
 							data-slot="combobox-pill-overflow"
-							className="inline-flex h-5 shrink-0 cursor-default items-center justify-center rounded-[2px] bg-[var(--muted)] px-2 text-xs font-medium leading-none text-[var(--muted-foreground)]"
 						>
 							+{overflowCount}
 						</span>
@@ -221,7 +219,7 @@ export function renderComboboxMultiPills(
 					<TooltipPrimitive.Portal>
 						<TooltipPrimitive.Content
 							sideOffset={4}
-							className="z-50 max-w-xs rounded-[2px] border border-[var(--border)] bg-[var(--popover)] px-2 py-1 text-xs text-[var(--popover-foreground)] shadow-md"
+							data-slot="combobox-pill-overflow-tooltip"
 						>
 							{overflowTitle}
 						</TooltipPrimitive.Content>

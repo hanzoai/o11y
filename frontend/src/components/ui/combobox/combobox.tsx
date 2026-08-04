@@ -1,3 +1,4 @@
+import './index.css';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import {
 	Command,
@@ -21,9 +22,6 @@ import {
 	useRef,
 } from 'react';
 import { cn } from '@hanzo/ui/core';
-
-const itemBaseClass =
-	'relative flex cursor-pointer select-none items-center gap-2 rounded-sm px-2 py-1.5 text-[13px] leading-5 outline-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 data-[selected=true]:bg-[var(--accent)] data-[selected=true]:text-[var(--accent-foreground)]';
 
 /**
  * Root component for the combobox. Controls open/close state of the popover.
@@ -66,21 +64,16 @@ const ComboboxTrigger = forwardRef<HTMLButtonElement, ComboboxTriggerProps>(
 				id={id}
 				data-slot="combobox-trigger"
 				data-testid={testId}
-				className={cn(
-					'flex h-8 w-full items-center justify-between gap-2 whitespace-nowrap rounded-[calc(var(--radius)-2px)] border border-[var(--input)] bg-transparent px-3 py-2 text-[13px] leading-5 shadow-sm cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ring)] disabled:cursor-not-allowed disabled:opacity-50',
-					className,
-				)}
+				className={cn(className)}
 				{...props}
 			>
 				<span
 					data-slot="combobox-value"
-					className="flex items-center gap-2 overflow-hidden text-[13px] leading-5 [&_svg]:size-4 [&_svg]:shrink-0"
 				>
 					{value || placeholder || 'Select an option...'}
 				</span>
 				<ChevronDown
 					data-slot="combobox-icon"
-					className="size-4 shrink-0 opacity-50"
 				/>
 			</PopoverPrimitive.Trigger>
 		);
@@ -121,11 +114,7 @@ const ComboboxContent = forwardRef<HTMLDivElement, ComboboxContentProps>(
 				data-testid={testId}
 				align={align}
 				sideOffset={sideOffset}
-				className={cn(
-					'z-50 min-w-[var(--radix-popover-trigger-width)] overflow-hidden rounded-[2px] border border-[var(--border)] bg-[var(--popover)] p-0 text-[var(--popover-foreground)] shadow-md',
-					'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-					className,
-				)}
+				className={cn(className)}
 				{...props}
 			/>
 		);
@@ -150,7 +139,7 @@ const ComboboxCommand = forwardRef<HTMLDivElement, ComboboxCommandProps>(
 			ref={ref}
 			data-slot="combobox-command"
 			data-testid={testId}
-			className={cn('flex h-full w-full flex-col overflow-hidden', className)}
+			className={cn(className)}
 			{...props}
 		/>
 	),
@@ -188,20 +177,14 @@ const ComboboxInput = forwardRef<HTMLInputElement, ComboboxInputProps>(
 			id={containerId}
 			data-testid={containerTestId}
 			style={containerStyle}
-			className={cn(
-				'flex items-center gap-2 border-b border-[var(--border)] px-3',
-				containerClassName,
-			)}
+			className={cn(containerClassName)}
 		>
-			<Search className="size-4 shrink-0 opacity-50" />
+			<Search />
 			<CommandInput
 				ref={ref}
 				data-slot="combobox-input"
 				data-testid={testId}
-				className={cn(
-					'flex h-9 w-full bg-transparent py-2 text-[13px] leading-5 outline-none placeholder:text-[var(--muted-foreground)] disabled:cursor-not-allowed disabled:opacity-50',
-					className,
-				)}
+				className={cn(className)}
 				{...props}
 			/>
 		</div>
@@ -219,10 +202,7 @@ const ComboboxList = forwardRef<HTMLDivElement, ComboboxListProps>(
 		<CommandList
 			ref={ref}
 			data-slot="combobox-list"
-			className={cn(
-				'max-h-[300px] overflow-y-auto overflow-x-hidden p-1',
-				className,
-			)}
+			className={cn(className)}
 			{...props}
 		/>
 	),
@@ -239,10 +219,7 @@ const ComboboxEmpty = forwardRef<HTMLDivElement, ComboboxEmptyProps>(
 		<CommandEmpty
 			ref={ref}
 			data-slot="combobox-empty"
-			className={cn(
-				'py-6 text-center text-[13px] text-[var(--muted-foreground)]',
-				className,
-			)}
+			className={cn(className)}
 			{...props}
 		/>
 	),
@@ -264,10 +241,7 @@ const ComboboxLoading = forwardRef<HTMLDivElement, ComboboxLoadingProps>(
 			ref={ref}
 			data-slot="combobox-loading"
 			data-testid={testId}
-			className={cn(
-				'flex items-center justify-center gap-2 px-2 py-3 text-[13px] text-[var(--muted-foreground)]',
-				className,
-			)}
+			className={cn(className)}
 			{...props}
 		/>
 	),
@@ -289,10 +263,7 @@ const ComboboxGroup = forwardRef<HTMLDivElement, ComboboxGroupProps>(
 			ref={ref}
 			data-slot="combobox-group"
 			data-testid={testId}
-			className={cn(
-				'overflow-hidden text-[var(--popover-foreground)] [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-[var(--muted-foreground)]',
-				className,
-			)}
+			className={cn(className)}
 			{...props}
 		>
 			{children}
@@ -342,7 +313,6 @@ const ComboboxItem = forwardRef<HTMLDivElement, ComboboxItemProps>(
 				<span
 					data-slot="combobox-item-indicator"
 					data-selected={isSelected}
-					className="flex size-4 shrink-0 items-center justify-center opacity-0 data-[selected=true]:opacity-100 [&_svg]:size-4"
 				>
 					<Check />
 				</span>
@@ -366,13 +336,12 @@ const ComboboxItem = forwardRef<HTMLDivElement, ComboboxItemProps>(
 				data-testid={testId}
 				value={value}
 				onSelect={handleSelect}
-				className={cn(itemBaseClass, className)}
+				className={cn(className)}
 				{...props}
 			>
 				{resolvedPrefix != null && (
 					<span
 						data-slot="combobox-item-prefix"
-						className="flex shrink-0 items-center"
 					>
 						{resolvedPrefix}
 					</span>
@@ -381,7 +350,6 @@ const ComboboxItem = forwardRef<HTMLDivElement, ComboboxItemProps>(
 				{suffix != null && (
 					<span
 						data-slot="combobox-item-suffix"
-						className="ml-auto flex shrink-0 items-center"
 					>
 						{suffix}
 					</span>
@@ -404,7 +372,7 @@ const ComboboxSeparator = forwardRef<HTMLDivElement, ComboboxSeparatorProps>(
 		<CommandSeparator
 			ref={ref}
 			data-slot="combobox-separator"
-			className={cn('-mx-1 my-1 h-px bg-[var(--border)]', className)}
+			className={cn(className)}
 			{...props}
 		/>
 	),
@@ -430,14 +398,10 @@ const ComboboxPill = forwardRef<HTMLSpanElement, ComboboxPillProps>(
 		<span
 			ref={ref}
 			data-slot="combobox-pill"
-			className={cn(
-				'inline-flex h-5 items-center gap-0.5 rounded-[2px] bg-[var(--accent)] px-1.5 text-xs leading-none text-[var(--accent-foreground)]',
-				className,
-			)}
+			className={cn(className)}
 		>
 			<span
 				data-slot="combobox-pill-text"
-				className="max-w-32 overflow-hidden text-ellipsis whitespace-nowrap"
 			>
 				{children}
 			</span>
@@ -445,7 +409,6 @@ const ComboboxPill = forwardRef<HTMLSpanElement, ComboboxPillProps>(
 				type="button"
 				data-slot="combobox-pill-remove"
 				aria-label={`Remove ${value}`}
-				className="flex size-3.5 items-center justify-center rounded-[2px] opacity-70 transition-opacity hover:bg-black/10 hover:opacity-100 [&_svg]:size-2.5"
 				onClick={(e): void => {
 					e.preventDefault();
 					e.stopPropagation();
@@ -512,10 +475,7 @@ const ComboboxMultiTrigger = forwardRef<
 				data-testid={testId}
 				data-disabled={disabled}
 				style={style}
-				className={cn(
-					'flex min-h-8 w-full flex-wrap items-center gap-1 rounded-[calc(var(--radius)-2px)] border border-[var(--input)] bg-transparent px-2 py-1 text-[13px] leading-5 shadow-sm cursor-text focus-within:outline-none focus-within:ring-1 focus-within:ring-[var(--ring)] data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-50',
-					className,
-				)}
+				className={cn(className)}
 				onClick={handleContainerClick}
 			>
 				{children}
@@ -523,7 +483,6 @@ const ComboboxMultiTrigger = forwardRef<
 					ref={inputRef}
 					type="text"
 					data-slot="combobox-multi-input"
-					className="min-w-16 flex-1 border-0 bg-transparent py-0.5 text-[13px] leading-5 outline-none placeholder:text-[var(--muted-foreground)]"
 					placeholder={Children.count(children) === 0 ? placeholder : undefined}
 					value={inputValue}
 					onChange={(e): void => onInputChange(e.target.value)}
@@ -552,15 +511,11 @@ const ComboboxCreateItem = forwardRef<HTMLDivElement, ComboboxCreateItemProps>(
 		<CommandItem
 			ref={ref}
 			data-slot="combobox-create-item"
-			className={cn(
-				itemBaseClass,
-				'italic text-[var(--muted-foreground)]',
-				className,
-			)}
+			className={cn(className)}
 			{...props}
 		>
 			{prefix != null && (
-				<span className="flex shrink-0 items-center">{prefix}</span>
+				<span data-slot="combobox-item-prefix">{prefix}</span>
 			)}
 			{children ?? `Create "${inputValue}"`}
 		</CommandItem>
@@ -588,16 +543,12 @@ const ComboboxHint = forwardRef<HTMLDivElement, ComboboxHintProps>(
 		<CommandItem
 			ref={ref}
 			data-slot="combobox-hint"
-			className={cn(
-				itemBaseClass,
-				'italic text-[var(--muted-foreground)]',
-				className,
-			)}
+			className={cn(className)}
 			onSelect={(): void => onInsert(insertValue)}
 			{...props}
 		>
 			{prefix != null && (
-				<span className="flex shrink-0 items-center">{prefix}</span>
+				<span data-slot="combobox-item-prefix">{prefix}</span>
 			)}
 			{children}
 		</CommandItem>
