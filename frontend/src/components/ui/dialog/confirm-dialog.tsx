@@ -109,7 +109,7 @@ export const ConfirmDialog = forwardRef<HTMLDivElement, ConfirmDialogProps>(
 						<DialogTitle icon={titleIcon}>{title}</DialogTitle>
 					</DialogHeader>
 					<DialogDescription>{children}</DialogDescription>
-					<DialogFooter className="gap-3 p-4 pt-0">
+					<DialogFooter>
 						<Button
 							variant="outlined"
 							color="secondary"
