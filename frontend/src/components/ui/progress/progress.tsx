@@ -1,10 +1,10 @@
 import './index.css';
-import * as ProgressPrimitive from '@radix-ui/react-progress';
 import React from 'react';
 import { cn } from '@hanzo/ui/core';
 
-export interface ProgressProps extends React.ComponentPropsWithoutRef<
-	typeof ProgressPrimitive.Root
+export interface ProgressProps extends Omit<
+	React.ComponentPropsWithoutRef<'div'>,
+	'children'
 > {
 	/**
 	 * The completion value from 0 to 100.
@@ -92,15 +92,20 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
 				id={id}
 				style={style}
 			>
-				<ProgressPrimitive.Root
+				<div
 					ref={ref}
 					data-slot="progress"
 					data-size={size}
 					data-linecap={strokeLinecap}
-					value={clampedPercent}
+					data-state={clampedPercent === 100 ? 'complete' : 'loading'}
+					data-value={clampedPercent}
+					role="progressbar"
+					aria-valuemin={0}
+					aria-valuemax={100}
+					aria-valuenow={clampedPercent}
 					{...props}
 				>
-					<ProgressPrimitive.Indicator
+					<div
 						data-slot="progress-indicator"
 						data-status={status}
 						style={{
@@ -119,7 +124,7 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
 							))}
 						</div>
 					) : null}
-				</ProgressPrimitive.Root>
+				</div>
 				{showInfo && <span data-slot="progress-info">{clampedPercent}%</span>}
 			</div>
 		);

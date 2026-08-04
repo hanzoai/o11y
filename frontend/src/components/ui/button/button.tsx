@@ -1,10 +1,11 @@
 import './index.css';
 import type React from 'react';
 import { createContext, forwardRef, useContext } from 'react';
-import { Slot } from '@radix-ui/react-slot';
 import { LoaderCircle } from 'lucide-react';
 
 import { cn } from '@hanzo/ui/core';
+
+import { Slot } from '../lib/slot';
 
 export const ButtonVariant = {
 	Solid: 'solid',

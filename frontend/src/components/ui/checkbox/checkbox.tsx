@@ -1,9 +1,12 @@
 import './index.css';
-import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import type { CheckedState } from '@radix-ui/react-checkbox';
 import { Check, Slash } from 'lucide-react';
 import React from 'react';
 import { cn } from '@hanzo/ui/core';
+
+import { useControllable } from '../lib/use-controllable';
+
+/** Tri-state: on, off, or "some of my children are on". */
+export type CheckedState = boolean | 'indeterminate';
 
 type CheckboxColor =
 	| 'primary'
@@ -85,27 +88,59 @@ const CheckboxBase = React.forwardRef<
 	Omit<CheckboxProps, 'testId'>
 >(
 	(
-		{ className, color = 'primary', onChange, value, defaultValue, ...props },
+		{
+			className,
+			color = 'primary',
+			onChange,
+			value,
+			defaultValue,
+			onClick,
+			required,
+			name,
+			...props
+		},
 		ref,
-	) => (
-		<CheckboxPrimitive.Root
-			ref={ref}
-			data-slot="checkbox"
-			data-color={colorMap[color] || color}
-			className={cn(className)}
-			checked={value}
-			defaultChecked={defaultValue}
-			onCheckedChange={onChange}
-			{...props}
-		>
-			<CheckboxPrimitive.Indicator data-slot="checkbox-indicator">
-				<Slash data-slot="checkbox-icon-slash" />
-				<Check data-slot="checkbox-icon-check" />
-			</CheckboxPrimitive.Indicator>
-		</CheckboxPrimitive.Root>
-	),
+	) => {
+		const [checked, setChecked] = useControllable<CheckedState>(
+			value,
+			defaultValue ?? false,
+			onChange,
+		);
+		const state =
+			checked === 'indeterminate'
+				? 'indeterminate'
+				: (checked && 'checked') || 'unchecked';
+
+		return (
+			<button
+				ref={ref}
+				type="button"
+				role="checkbox"
+				aria-checked={checked === 'indeterminate' ? 'mixed' : checked}
+				aria-required={required || undefined}
+				data-slot="checkbox"
+				data-color={colorMap[color] || color}
+				data-state={state}
+				className={cn(className)}
+				name={name}
+				onClick={(event): void => {
+					onClick?.(event);
+					// Radix's rule, kept: a mixed box resolves to on, never back to mixed.
+					setChecked(checked === 'indeterminate' ? true : !checked);
+				}}
+				{...props}
+			>
+				{checked !== false && (
+					<span data-slot="checkbox-indicator">
+						<Slash data-slot="checkbox-icon-slash" />
+						<Check data-slot="checkbox-icon-check" />
+					</span>
+				)}
+			</button>
+		);
+	},
 );
-CheckboxBase.displayName = CheckboxPrimitive.Root.displayName;
+CheckboxBase.displayName = 'CheckboxBase';
 
 const CheckboxWrapper = React.forwardRef<HTMLButtonElement, CheckboxProps>(
 	({ id, children, testId, className, ...props }, ref) => {
