@@ -38,7 +38,7 @@ func mountSpanMappers(app *zip.App) {
 	// with the collection as its prefix would register the collection routes at
 	// the empty sub-path, which lands them on a TRAILING SLASH the runtime does
 	// not serve. The collection is a path, not a prefix.
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	zip.Get(g, "/span_mapper_groups", spanMapperGroups, op("ListSpanMapperGroups"))
 	zip.Post(g, "/span_mapper_groups", spanMapperGroupCreate, op("CreateSpanMapperGroup"), zip.WithStatus(http.StatusCreated))

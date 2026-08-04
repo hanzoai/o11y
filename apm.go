@@ -41,7 +41,7 @@ import (
 // service catalog first, then the messaging-queue groups in the order the mux
 // tree declares them, then the third-party API overview.
 func mountAPM(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	// The service catalog: /services collection, /service/* breakdowns.
 	zip.Post(g, "/services", services)

@@ -66,6 +66,41 @@ const (
 	sentryRoot = "/v1/sentry"
 )
 
+// under is the OpTarget that registers on app at a ROOT — the one place this
+// package's two public roots become route prefixes.
+//
+// It replaces app.Group(o11yRoot), and the difference is the operation ids.
+// zip v1.23 qualifies an op's id by the prefix of the OCCURRENCE it answers
+// under (walk.go occurrenceID), because a definition included TWICE declares one
+// id and produces two operations, and an OpenAPI document cannot hold two
+// operations under one operationId. Sound rule — and o11yRoot is not that kind
+// of prefix. It is not a composition point a host chose; it is this service's
+// own address, fixed by HIP-0106 and spelled above. Reached through a Group it
+// read as one, and all 353 published ids became "v1.o11y.CreateRole" — renaming
+// every MCP tool, OpenAPI operationId, CLI command and generated SDK method in a
+// patch release. There is no opt-out: an explicit WithOperationID is qualified
+// too.
+//
+// An occurrence at the ROOT prefix is unqualified, so this registers the ops on
+// app itself and lets OpScope.Prefix do what it documents — prepend to the op's
+// path. Same method, same full path, same middleware; the id is the one the
+// declaration wrote. That is also what mount.go's PATH UNTOUCHED already claimed
+// and what mountHealth already does by hand, so the Group was the odd one out.
+//
+// The middleware comes from app's own scope rather than being zeroed: Group
+// inherits the app's wrap, and dropping it here would silently unwrap every
+// typed op.
+type under struct {
+	app  *zip.App
+	root string
+}
+
+func (u under) OpScope() zip.OpScope {
+	s := u.app.OpScope()
+	s.Prefix = u.root
+	return s
+}
+
 // relay sends one typed op's call to the runtime at the FULL public path and
 // decodes the answer into the op's Out. Pass out == nil for the operations
 // whose answer is a 204 with no body.

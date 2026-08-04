@@ -281,11 +281,11 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 	return app, nil
 }
 
-// publish installs THE PUBLISHED TABLE — the module's own declaration of this
-// service's surface, github.com/hanzoai/o11y — onto the router this binary
-// serves, then installs zip's projections of it.
+// declaration builds THE PUBLISHED TABLE — the module's own declaration of this
+// service's surface, github.com/hanzoai/o11y — on an app OF ITS OWN, and renders
+// its projections.
 //
-// The registrations above publish's call site are the service's IMPLEMENTATION:
+// The registrations at publish's call site are the service's IMPLEMENTATION:
 // real handlers, one per route. The table is the DECLARATION of the same 367:
 // 353 typed ops that each carry a named input, a named output and their prose,
 // 11 named escape hatches with the reason each cannot be typed, and the 3
@@ -295,31 +295,78 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 // logger), so the community graph could not reach it without dragging the host
 // in. It did not, so 353 published operations and 353 MCP tools were true of the
 // source and absent from the process. Un-braiding Mount is what let this line
-// exist; this line is what puts the conversion in the binary.
+// exist; this is what puts the conversion in the binary.
 //
-// ORDER IS THE CONTRACT, twice over:
+// AN APP OF ITS OWN IS THE POINT, and it is what zip v1.23 forced. The
+// declaration and the implementation describe THE SAME 367 ADDRESSES, and one
+// address may now have exactly one definition: Build refuses a program where two
+// claim the same door, naming both claimants. That rule is right — for a
+// composition, where two claimants means one of them is silently dead. Here
+// neither is dead and neither is a mistake: the implementation SERVES the
+// address and the declaration DESCRIBES it, which is a distinction zip has no
+// way to spell (typed.go: "the route and the op are the same fact recorded
+// once"). So the two facts go on two apps. The service's app holds the doors;
+// this app holds the description of them, and never claims a door on the
+// listener.
 //
-//   - AFTER the service's own routes. Fiber matches in registration order, so
-//     every one of these paths is still answered by the handler that has always
-//     answered it — no relay hop, no buffered round-trip, and therefore livetail,
-//     the long-poll and the chunked export still stream on this listener. The
-//     table names the surface here; it does not stand in front of it.
-//   - BEFORE the console's terminal catch-all. Prepare's routes are ordinary
-//     routes; registered after /* the SPA would answer for them.
+// That also makes the old ORDER IS THE CONTRACT structural rather than
+// positional. It used to hold only because the declaration was registered AFTER
+// the service's routes and fiber matches in registration order — every one of
+// these paths was answered by the handler that had always answered it, so
+// livetail, the long-poll and the chunked export still streamed instead of going
+// through a relay's buffered round-trip. A silent property of line order,
+// pinned by one test. Now the declaration is not on the listener at all, so
+// there is no order to get wrong.
 //
-// Prepare is what turns the in-memory registry into doors: the OpenAPI document
-// at /.well-known/openapi.json, /docs, the MCP tool surface at /mcp and the
-// by-name call plane. zip defers it so a host can finish mounting first, and
-// Listen calls it — but this server serves through Fiber().Listener rather than
-// zip's own Listen, so without this call the document would exist in the process
-// and answer on no port. It is guarded to run once however it is reached.
+// Build is what turns the in-memory registry into doors, and it RETURNS THE
+// VERDICT — which is why it replaced zip's Prepare at v1.23. Prepare's silence
+// meant an invalid program started anyway and its routes were simply missing.
+func declaration() (*zip.App, error) {
+	d := zip.New(zip.Config{AppName: "o11y", DisableStartupMessage: true})
+	if err := published.Mount(d); err != nil {
+		return nil, err
+	}
+	if err := d.Build(); err != nil {
+		return nil, err
+	}
+	return d, nil
+}
+
+// publish serves the declaration's PROJECTIONS on the router this binary serves:
+// the OpenAPI document at /.well-known/openapi.json, /docs, the MCP tool surface
+// at /mcp, the by-name call plane and the plugin declaration.
+//
+// Only the projections. The declaration's 353 ops answer on ITS app, and the
+// five paths below are the only ones that cross over — zip calls them CONTROL
+// routes, keeps them off the walk and excludes them from a Declaration, because
+// they are projections of the app rather than doors its owner wrote. None of
+// them is one of this service's 367, so nothing here can shadow a handler and
+// nothing here can be shadowed by one.
+//
+// zip's own Listen would have served these; this server serves through
+// Fiber().Listener instead, so without this the document would exist in the
+// process and answer on no port — the defect this whole path exists to fix.
 func publish(app *zip.App) error {
-	if err := published.Mount(app); err != nil {
+	d, err := declaration()
+	if err != nil {
 		return err
 	}
-	app.Prepare()
+	// One handler for all five: the declaration app answers by PATH, so routing
+	// to it is the same decision it would make on its own listener.
+	serve := zip.AdaptNetHTTP(adaptor.FiberApp(d.Fiber()))
+	app.Get(zip.SpecPath, serve)
+	app.Get(zip.DocsPath, serve)
+	app.Get(zip.PluginPath, serve)
+	// mcpPath is zip's default; it has no exported spelling, and this server
+	// does not set Config.MCP.Path, so the default is the contract.
+	app.Post(mcpPath, serve)
+	// The call plane is CallPath + the op name.
+	app.Post(zip.CallPath+"*", serve)
 	return nil
 }
+
+// mcpPath is where zip installs the MCP tool surface by default.
+const mcpPath = "/mcp"
 
 // initListeners initialises listeners of the server
 func (s *Server) initListeners() error {

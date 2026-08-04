@@ -42,7 +42,7 @@ import (
 // parameterised ones so an id can never shadow them — the same defence
 // telemetry.go gives its collection routes.
 func mountAccess(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 
 	zip.Post(g, "/roles", createRole, op("CreateRole"), zip.WithStatus(http.StatusCreated))
 	zip.Get(g, "/roles", listRoles, op("ListRoles"))

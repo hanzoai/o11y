@@ -40,7 +40,7 @@ import (
 // so a trace id can never shadow the catalog — the same defence the mux tree
 // gives them by registering fields first.
 func mountTraces(app *zip.App) {
-	g := app.Group(o11yRoot)
+	g := under{app, o11yRoot}
 	zip.Get(g, "/traces/fields", traceFields, op("GetTraceFields"))
 	zip.Post(g, "/traces/fields", traceFieldUpdate, op("UpdateTraceField"))
 	zip.Get(g, "/traces/:traceId", traceSpans, op("SearchTraces"))
