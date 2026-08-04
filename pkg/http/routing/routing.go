@@ -85,6 +85,18 @@ type Router struct {
 	zip   zip.Router
 	chain Chain
 	table *Table
+
+	// pfx is the composed prefix, in the SPELLING the public template uses.
+	//
+	// It used to be read back off the zip router (OpScope().Prefix), which was
+	// the right instinct — one source, no drift — and stopped being possible at
+	// zip v1.19. A group is now an App included at a prefix rather than a router
+	// carrying one, and one definition may be included at two prefixes, so the
+	// absolute path is a property of the INCLUSION and the walk computes it;
+	// OpScope().Prefix is empty for every group and would silently record every
+	// nested route at its leaf path. The prefix is therefore composed here, at
+	// the one call that knows it, by the same join the recorded path uses.
+	pfx string
 }
 
 // New starts a route tree on r, serving every handler through chain.
@@ -100,6 +112,7 @@ func (r Router) Table() *Table { return r.table }
 // path segment sequence, exactly as the tree it replaces used it.
 func (r Router) Group(prefix string) Router {
 	r.zip = r.zip.Group(colonize(prefix))
+	r.pfx = join(r.pfx, prefix)
 	return r
 }
 
@@ -162,9 +175,10 @@ func (r Router) Delete(path string, h http.Handler) Router {
 	return r.Handle(http.MethodDelete, path, h)
 }
 
-// prefix reads the composed prefix off the zip router rather than keeping a
-// second copy of it, so a recorded path cannot drift from where the route landed.
-func (r Router) prefix() string { return r.zip.OpScope().Prefix }
+// prefix is the composed prefix — see the field. Group composes it with the same
+// join Handle records with, so a recorded path cannot drift from where the route
+// landed.
+func (r Router) prefix() string { return r.pfx }
 
 // Serve is a one-route tree, as a net/http handler.
 //

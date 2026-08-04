@@ -304,21 +304,25 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 //     answered it — no relay hop, no buffered round-trip, and therefore livetail,
 //     the long-poll and the chunked export still stream on this listener. The
 //     table names the surface here; it does not stand in front of it.
-//   - BEFORE the console's terminal catch-all. Prepare's routes are ordinary
+//   - BEFORE the console's terminal catch-all. Build's routes are ordinary
 //     routes; registered after /* the SPA would answer for them.
 //
-// Prepare is what turns the in-memory registry into doors: the OpenAPI document
+// Build is what turns the in-memory registry into doors: the OpenAPI document
 // at /.well-known/openapi.json, /docs, the MCP tool surface at /mcp and the
 // by-name call plane. zip defers it so a host can finish mounting first, and
 // Listen calls it — but this server serves through Fiber().Listener rather than
 // zip's own Listen, so without this call the document would exist in the process
 // and answer on no port. It is guarded to run once however it is reached.
+//
+// Build RETURNS THE VERDICT where the old Prepare returned nothing, so a
+// composition this server cannot serve — two definitions on one address, a
+// cycle — now fails here, at startup, naming both claimants. Previously it
+// could only be discovered by the routes going missing at runtime.
 func publish(app *zip.App) error {
 	if err := published.Mount(app); err != nil {
 		return err
 	}
-	app.Prepare()
-	return nil
+	return app.Build()
 }
 
 // initListeners initialises listeners of the server
