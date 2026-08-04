@@ -8,7 +8,7 @@ const config: Config.InitialOptions = {
 	coverageDirectory: 'coverage',
 	coverageReporters: ['text', 'cobertura', 'html', 'json-summary'],
 	collectCoverageFrom: ['src/**/*.{ts,tsx}'],
-	moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
+	moduleFileExtensions: ['ts', 'tsx', 'js', 'mjs', 'json'],
 	modulePathIgnorePatterns: ['dist'],
 	moduleNameMapper: {
 		'\\.(png|jpg|jpeg|gif|svg|webp|avif|ico|bmp|tiff)$':
@@ -30,24 +30,26 @@ const config: Config.InitialOptions = {
 			'<rootDir>/node_modules/react-syntax-highlighter/dist/cjs/$1',
 		'^@o11yhq/([^/]+)$': '<rootDir>/node_modules/@o11yhq/$1/dist/$1.js',
 	},
-	extensionsToTreatAsEsm: ['.ts'],
 	testMatch: ['<rootDir>/src/**/*?(*.)(test).(ts|js)?(x)'],
-	preset: 'ts-jest/presets/js-with-ts-esm',
+	// ONE transform for every source extension. babel-jest reads babel.config.js,
+	// whose `test` env already compiles TS + JSX to CommonJS for node. ts-jest is
+	// gone because it drives the TypeScript compiler's JS API — and typescript 7,
+	// the native Go compiler this repo builds with, does not expose it: every
+	// suite died in ts-jest's config-set with
+	//   TypeError: Cannot read properties of undefined (reading 'readFile')
+	// before a single test ran. Type checking is `tsc --noEmit`'s job, not the
+	// test runner's; jest's job is to execute.
 	transform: {
-		'^.+\\.(ts|tsx)?$': [
-			'ts-jest',
-			{
-				useESM: true,
-				tsconfig: '<rootDir>/tsconfig.jest.json',
-			},
-		],
-		'^.+\\.(js|jsx)$': 'babel-jest',
+		'^.+\\.(ts|tsx|js|jsx|mjs)$': 'babel-jest',
 	},
 	transformIgnorePatterns: [
 		// pnpm's real path is node_modules/.pnpm/<pkg>@<ver>/node_modules/<pkg>/…,
 		// so skip the .pnpm indirection segment and let the allowlist below judge
 		// the inner node_modules/<pkg>/, which is identical in either layout.
-		'node_modules/(?!\\.pnpm/|(lodash-es|react-dnd|core-dnd|@react-dnd|dnd-core|react-dnd-html5-backend|axios|@o11yhq/design-tokens|@o11yhq/table|@o11yhq/calendar|@o11yhq/input|@o11yhq/popover|@o11yhq/button|@o11yhq/sonner|@o11yhq/*|date-fns|d3-interpolate|d3-color|api|@codemirror|@lezer|@marijn|@grafana|nuqs)/)',
+		// @hanzo/* and @hanzogui/* ship ESM only (dist/esm/index.mjs). They are the
+		// design system, so they are on the import path of most of this app — leave
+		// them untransformed and 202 suites die on `export` before a test runs.
+		'node_modules/(?!\\.pnpm/|(@hanzo/[a-z0-9-]+|@hanzogui/[a-z0-9-]+|react-native-svg-web|react-native-web|lodash-es|react-dnd|core-dnd|@react-dnd|dnd-core|react-dnd-html5-backend|axios|@o11yhq/design-tokens|@o11yhq/table|@o11yhq/calendar|@o11yhq/input|@o11yhq/popover|@o11yhq/button|@o11yhq/sonner|@o11yhq/*|date-fns|d3-interpolate|d3-color|api|@codemirror|@lezer|@marijn|@grafana|nuqs)/)',
 	],
 	setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 	testPathIgnorePatterns: ['/node_modules/', '/public/'],
