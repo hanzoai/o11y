@@ -62,27 +62,27 @@ func mountLLMObs(app *zip.App) {
 	g := under{app, o11yRoot}
 
 	// The four gen_ai span views — projections over spans, not tables.
-	zip.Get(g, "/llm/observations", llmObservations, zip.WithOperationID("ListLLMObservations"))
-	zip.Get(g, "/llm/traces", llmTraces, zip.WithOperationID("ListLLMTraces"))
-	zip.Get(g, "/llm/sessions", llmSessions, zip.WithOperationID("ListLLMSessions"))
-	zip.Get(g, "/llm/users", llmUsers, zip.WithOperationID("ListLLMUsers"))
+	opGet(g, "/llm/observations", llmObservations, zip.WithOperationID("ListLLMObservations"))
+	opGet(g, "/llm/traces", llmTraces, zip.WithOperationID("ListLLMTraces"))
+	opGet(g, "/llm/sessions", llmSessions, zip.WithOperationID("ListLLMSessions"))
+	opGet(g, "/llm/users", llmUsers, zip.WithOperationID("ListLLMUsers"))
 
 	// Eval scores — CRUD over a net-new table.
-	zip.Get(g, "/llm/scores", llmListScores, zip.WithOperationID("ListLLMScores"))
-	zip.Post(g, "/llm/scores", llmCreateScore, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateLLMScore"))
-	zip.Get(g, "/llm/score/:id", llmGetScore, zip.WithOperationID("GetLLMScore"))
-	zip.Delete(g, "/llm/score/:id", llmDeleteScore, zip.WithOperationID("DeleteLLMScore"))
+	opGet(g, "/llm/scores", llmListScores, zip.WithOperationID("ListLLMScores"))
+	opPost(g, "/llm/scores", llmCreateScore, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateLLMScore"))
+	opGet(g, "/llm/score/:id", llmGetScore, zip.WithOperationID("GetLLMScore"))
+	opDelete(g, "/llm/score/:id", llmDeleteScore, zip.WithOperationID("DeleteLLMScore"))
 
 	// Human annotations — a note plus an optional review queue.
-	zip.Get(g, "/llm/annotation", llmListAnnotations, zip.WithOperationID("ListLLMAnnotations"))
-	zip.Post(g, "/llm/annotation", llmCreateAnnotation, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateLLMAnnotation"))
+	opGet(g, "/llm/annotation", llmListAnnotations, zip.WithOperationID("ListLLMAnnotations"))
+	opPost(g, "/llm/annotation", llmCreateAnnotation, zip.WithStatus(http.StatusCreated), zip.WithOperationID("CreateLLMAnnotation"))
 
 	// LLM pricing rules — the read, the single bulk write shared by the user and
 	// the Zeus sync job, and the per-rule read and delete.
-	zip.Get(g, "/llm_pricing_rules", llmListPricingRules, zip.WithOperationID("ListLLMPricingRules"))
-	zip.Put(g, "/llm_pricing_rules", llmUpsertPricingRules, zip.WithOperationID("CreateOrUpdateLLMPricingRules"))
-	zip.Get(g, "/llm_pricing_rules/:id", llmGetPricingRule, zip.WithOperationID("GetLLMPricingRule"))
-	zip.Delete(g, "/llm_pricing_rules/:id", llmDeletePricingRule, zip.WithOperationID("DeleteLLMPricingRule"))
+	opGet(g, "/llm_pricing_rules", llmListPricingRules, zip.WithOperationID("ListLLMPricingRules"))
+	opPut(g, "/llm_pricing_rules", llmUpsertPricingRules, zip.WithOperationID("CreateOrUpdateLLMPricingRules"))
+	opGet(g, "/llm_pricing_rules/:id", llmGetPricingRule, zip.WithOperationID("GetLLMPricingRule"))
+	opDelete(g, "/llm_pricing_rules/:id", llmDeletePricingRule, zip.WithOperationID("DeleteLLMPricingRule"))
 }
 
 // ── the fourteen operations ─────────────────────────────────────────────────────
