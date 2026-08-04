@@ -179,7 +179,9 @@ export const ToggleGroup = React.forwardRef<HTMLDivElement, ToggleGroupProps>(
 					ref={ref}
 					role="group"
 					dir={dir}
-					aria-orientation={orientation}
+					// role="group" takes no aria-orientation — only a toolbar, listbox or
+					// radiogroup does. The orientation is ours to style on, not to announce.
+					data-orientation={orientation}
 					data-slot="toggle-group"
 					data-size={size}
 					data-color={color}
