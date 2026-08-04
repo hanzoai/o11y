@@ -87,28 +87,22 @@ const AnnouncementBanner = forwardRef<HTMLDivElement, AnnouncementBannerProps>(
 				data-testid={testId}
 				data-type={type}
 				data-slot="announcement-banner"
-				className={cn(
-					'flex items-center justify-between gap-2 px-4 py-2 text-[13px] font-medium leading-5 tracking-[-0.065px]',
-					className,
-				)}
+				className={cn(className)}
 				style={style}
 			>
 				<div
 					data-slot="announcement-banner-body"
-					className="flex min-w-0 flex-1 items-center gap-2"
 				>
 					{resolvedIcon && (
 						<span
 							data-slot="announcement-banner-icon"
 							data-testid="banner-icon"
-							className="flex shrink-0 items-center"
 						>
 							{resolvedIcon}
 						</span>
 					)}
 					<div
 						data-slot="announcement-banner-message"
-						className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
 					>
 						{children}
 					</div>
@@ -116,7 +110,6 @@ const AnnouncementBanner = forwardRef<HTMLDivElement, AnnouncementBannerProps>(
 						<button
 							type="button"
 							data-slot="announcement-banner-action"
-							className="inline-flex h-6 shrink-0 cursor-pointer items-center rounded-[2px] bg-[var(--banner-accent)] px-2 text-xs font-medium text-[var(--banner-accent-fg)] transition-opacity hover:opacity-90"
 							onClick={action.onClick}
 						>
 							{action.label}
@@ -128,7 +121,6 @@ const AnnouncementBanner = forwardRef<HTMLDivElement, AnnouncementBannerProps>(
 						type="button"
 						data-slot="announcement-banner-dismiss"
 						aria-label="Dismiss"
-						className="inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-[2px] bg-[var(--banner-accent)] text-[var(--banner-accent-fg)] transition-opacity hover:opacity-90"
 						onClick={onClose}
 					>
 						<X size={14} />
