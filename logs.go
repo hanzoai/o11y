@@ -46,15 +46,15 @@ import (
 // the parameterised version read so a version can never shadow it.
 func mountLogs(app *zip.App) {
 	g := under{app, o11yRoot}
-	zip.Get(g, "/logs", logRecords)
-	zip.Get(g, "/logs/fields", logFields)
-	zip.Post(g, "/logs/fields", logFieldUpdate)
-	zip.Get(g, "/logs/aggregate", logAggregate)
-	zip.Post(g, "/logs/pipelines/preview", logPipelinePreview)
-	zip.Get(g, "/logs/pipelines/:version", logPipelines)
-	zip.Post(g, "/logs/pipelines", logPipelineCreate)
-	zip.Post(g, "/logs/promote_paths", logPromote, zip.WithStatus(http.StatusCreated))
-	zip.Get(g, "/logs/promote_paths", logPromoted)
+	opGet(g, "/logs", logRecords)
+	opGet(g, "/logs/fields", logFields)
+	opPost(g, "/logs/fields", logFieldUpdate)
+	opGet(g, "/logs/aggregate", logAggregate)
+	opPost(g, "/logs/pipelines/preview", logPipelinePreview)
+	opGet(g, "/logs/pipelines/:version", logPipelines)
+	opPost(g, "/logs/pipelines", logPipelineCreate)
+	opPost(g, "/logs/promote_paths", logPromote, zip.WithStatus(http.StatusCreated))
+	opGet(g, "/logs/promote_paths", logPromoted)
 }
 
 // ── the nine operations ───────────────────────────────────────────────────────

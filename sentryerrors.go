@@ -61,26 +61,26 @@ import (
 // once each, in relay.go.
 func mountSentryErrors(app *zip.App) {
 	gsentry := under{app, sentryRoot}
-	zip.Get(gsentry, "/projects", sentryListProjects)
-	zip.Post(gsentry, "/projects", sentryCreateProject)
-	zip.Get(gsentry, "/projects/:id", sentryGetProject)
-	zip.Delete(gsentry, "/projects/:id", sentryDeleteProject)
-	zip.Post(gsentry, "/projects/:id/keys/rotate", sentryRotateProjectKey)
-	zip.Get(gsentry, "/issues", sentryListIssues)
-	zip.Get(gsentry, "/issues/:id", sentryGetIssue)
-	zip.Put(gsentry, "/issues/:id", sentryUpdateIssue)
-	zip.Get(gsentry, "/issues/:id/events", sentryIssueEvents)
-	zip.Get(gsentry, "/events/:id", sentryGetEvent)
+	opGet(gsentry, "/projects", sentryListProjects)
+	opPost(gsentry, "/projects", sentryCreateProject)
+	opGet(gsentry, "/projects/:id", sentryGetProject)
+	opDelete(gsentry, "/projects/:id", sentryDeleteProject)
+	opPost(gsentry, "/projects/:id/keys/rotate", sentryRotateProjectKey)
+	opGet(gsentry, "/issues", sentryListIssues)
+	opGet(gsentry, "/issues/:id", sentryGetIssue)
+	opPut(gsentry, "/issues/:id", sentryUpdateIssue)
+	opGet(gsentry, "/issues/:id/events", sentryIssueEvents)
+	opGet(gsentry, "/events/:id", sentryGetEvent)
 
 	go11y := under{app, o11yRoot}
-	zip.Get(go11y, "/errortracking/issues", errorListIssues)
-	zip.Get(go11y, "/errortracking/issues/:id", errorGetIssue)
-	zip.Post(go11y, "/errortracking/issues/:id", errorUpdateIssue)
-	zip.Post(go11y, "/listErrors", errorsList)
-	zip.Post(go11y, "/countErrors", errorsCount)
-	zip.Get(go11y, "/errorFromErrorID", errorFromErrorID)
-	zip.Get(go11y, "/errorFromGroupID", errorFromGroupID)
-	zip.Get(go11y, "/nextPrevErrorIDs", nextPrevErrorIDs)
+	opGet(go11y, "/errortracking/issues", errorListIssues)
+	opGet(go11y, "/errortracking/issues/:id", errorGetIssue)
+	opPost(go11y, "/errortracking/issues/:id", errorUpdateIssue)
+	opPost(go11y, "/listErrors", errorsList)
+	opPost(go11y, "/countErrors", errorsCount)
+	opGet(go11y, "/errorFromErrorID", errorFromErrorID)
+	opGet(go11y, "/errorFromGroupID", errorFromGroupID)
+	opGet(go11y, "/nextPrevErrorIDs", nextPrevErrorIDs)
 }
 
 // ── sentry projects ─────────────────────────────────────────────────────────
