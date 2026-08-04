@@ -1,7 +1,22 @@
 import './index.css';
-import * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import React from 'react';
 import { cn } from '@hanzo/ui/core';
+
+import { focusFirstItem, rovingKeyDown } from '../lib/roving-focus';
+import { useControllable } from '../lib/use-controllable';
+
+interface RadioGroupContextValue {
+	value: string | null;
+	select: (value: string) => void;
+	name?: string;
+	required?: boolean;
+	disabled?: boolean;
+	dir: 'ltr' | 'rtl';
+}
+
+const RadioGroupContext = React.createContext<RadioGroupContextValue | null>(
+	null,
+);
 
 export type RadioColorProps =
 	| 'robin'
@@ -113,21 +128,65 @@ export type RadioGroupLabelProps = Pick<
  * RadioGroup component for managing a group of radio button options.
  */
 const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
-	({ className, onChange, color = 'robin', testId, ...props }, ref) => (
-		<RadioGroupPrimitive.Root
-			ref={ref}
-			data-slot="radio-group"
-			data-color={color}
-			data-testid={testId}
-			className={cn(className)}
-			onValueChange={onChange}
-			{...(props as React.ComponentPropsWithoutRef<
-				typeof RadioGroupPrimitive.Root
-			>)}
-		/>
-	),
+	(
+		{
+			className,
+			onChange,
+			color = 'robin',
+			testId,
+			value,
+			defaultValue,
+			name,
+			required,
+			disabled,
+			dir = 'ltr',
+			orientation,
+			// `loop` is radix vocabulary the CSS and call sites never read: navigation
+			// here always wraps, which is what every call site already relied on.
+			loop: _loop,
+			...props
+		},
+		ref,
+	) => {
+		const [selected, select] = useControllable<string | null>(
+			value,
+			defaultValue ?? null,
+			onChange as ((next: string | null) => void) | undefined,
+		);
+		const context = React.useMemo<RadioGroupContextValue>(
+			() => ({
+				value: selected,
+				select: select as (next: string) => void,
+				name,
+				required,
+				disabled,
+				dir,
+			}),
+			[selected, select, name, required, disabled, dir],
+		);
+
+		return (
+			<RadioGroupContext.Provider value={context}>
+				<div
+					ref={ref}
+					role="radiogroup"
+					dir={dir}
+					aria-orientation={orientation}
+					aria-required={required || undefined}
+					data-slot="radio-group"
+					data-color={color}
+					data-testid={testId}
+					data-roving-group=""
+					className={cn(className)}
+					tabIndex={selected === null ? 0 : -1}
+					onFocus={focusFirstItem}
+					{...props}
+				/>
+			</RadioGroupContext.Provider>
+		);
+	},
 );
-RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
+RadioGroup.displayName = 'RadioGroup';
 
 const RadioGroupLabel = React.forwardRef<
 	HTMLLabelElement,
@@ -162,48 +221,62 @@ const RadioGroupItem = React.forwardRef<HTMLButtonElement, RadioGroupItemProps>(
 		},
 		ref,
 	) => {
+		const group = React.useContext(RadioGroupContext);
 		const fallbackId = React.useId();
 		const radioId = props.id || fallbackId;
-		if (children) {
-			return (
-				<div
-					data-slot="radio-group-item-wrapper"
-					className={cn(containerClassName)}
-					data-testid={containerTestId}
-					id={containerId}
-					style={containerStyle}
-				>
-					<RadioGroupPrimitive.Item
-						ref={ref}
-						data-slot="radio-group-item"
-						className={cn(className)}
-						id={radioId}
-						data-testid={testId}
-						style={style}
-						{...props}
-					>
-						<RadioGroupPrimitive.Indicator data-slot="radio-group-indicator" />
-					</RadioGroupPrimitive.Item>
-					<RadioGroupLabel htmlFor={radioId} aria-disabled={props.disabled}>
-						{children}
-					</RadioGroupLabel>
-				</div>
-			);
-		}
-		return (
-			<RadioGroupPrimitive.Item
+		const { value, disabled, required, ...rest } = props;
+		const checked = group?.value === value;
+		const isDisabled = disabled || group?.disabled;
+
+		const item = (
+			<button
 				ref={ref}
+				type="button"
+				role="radio"
+				aria-checked={checked}
+				aria-required={required ?? group?.required ?? undefined}
 				data-slot="radio-group-item"
-				className={cn(className)}
+				data-state={checked ? 'checked' : 'unchecked'}
+				data-roving-item=""
 				data-testid={testId}
+				className={cn(className)}
 				style={style}
-				{...props}
+				disabled={isDisabled}
+				name={group?.name}
+				value={value}
+				tabIndex={checked ? 0 : -1}
+				onClick={(): void => group?.select(value)}
+				onKeyDown={(event): void =>
+					rovingKeyDown(
+						event,
+						(el) => el.click(),
+						group?.dir ?? 'ltr',
+					)
+				}
+				{...rest}
 			>
-				<RadioGroupPrimitive.Indicator data-slot="radio-group-indicator" />
-			</RadioGroupPrimitive.Item>
+				{checked && <span data-slot="radio-group-indicator" />}
+			</button>
+		);
+
+		if (!children) return item;
+
+		return (
+			<div
+				data-slot="radio-group-item-wrapper"
+				className={cn(containerClassName)}
+				data-testid={containerTestId}
+				id={containerId}
+				style={containerStyle}
+			>
+				{React.cloneElement(item, { id: radioId })}
+				<RadioGroupLabel htmlFor={radioId} aria-disabled={isDisabled}>
+					{children}
+				</RadioGroupLabel>
+			</div>
 		);
 	},
 );
-RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
+RadioGroupItem.displayName = 'RadioGroupItem';
 
 export { RadioGroup, RadioGroupItem, RadioGroupLabel };
