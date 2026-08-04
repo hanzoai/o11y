@@ -14,8 +14,6 @@ import { useQueryClient } from 'react-query';
 import { apiV3 } from 'api/apiV1';
 import getLocalStorageApi from 'api/browser/localstorage/get';
 import { Logout } from 'api/utils';
-import post from 'api/v2/sessions/rotate/post';
-import afterLogin from 'AppRoutes/utils';
 import { ENVIRONMENT } from 'constants/env';
 import { LIVE_TAIL_HEARTBEAT_TIMEOUT } from 'constants/liveTail';
 import { LOCALSTORAGE } from 'constants/localStorage';
@@ -74,41 +72,20 @@ export function EventSourceProvider({
 		setInitialLoading(false);
 	}, []);
 
-	const handleErrorConnection: EventListener = useCallback(async () => {
+	// A DROPPED STREAM IS A DROPPED STREAM, not a stale token.
+	//
+	// This used to rotate the session on every EventSource error and sign the
+	// user out when the rotation failed — so a network blip, a proxy timeout or a
+	// pod restart logged people out of an app whose session they still held.
+	// There is no session here to rotate: identity is a cookie the edge issued,
+	// and it outlives the stream. Reconnecting is the whole of the response.
+	const handleErrorConnection: EventListener = useCallback(() => {
 		setIsConnectionOpen(false);
 		setIsConnectionLoading(true);
 		setInitialLoading(false);
-
-		try {
-			const accessToken = getLocalStorageApi(LOCALSTORAGE.AUTH_TOKEN);
-			const refreshToken = getLocalStorageApi(LOCALSTORAGE.REFRESH_AUTH_TOKEN);
-
-			const response = await queryClient.fetchQuery({
-				queryFn: () => post({ refreshToken: refreshToken || '' }),
-				queryKey: ['/v1/o11y/sessions/rotate', accessToken, refreshToken],
-			});
-			afterLogin(response.data.accessToken, response.data.refreshToken, true);
-
-			// If token refresh was successful, we'll let the component
-			// handle reconnection through the reconnectDueToError state
-			setReconnectDueToError(true);
-			setIsConnectionError(true);
-			return;
-		} catch (error) {
-			// If there was an error during token refresh, we'll just
-			// let the component handle the error state
-			notifications.error({
-				message: (error as APIError).getErrorCode(),
-				description: (error as APIError).getErrorMessage(),
-			});
-			setIsConnectionError(true);
-			if (!eventSourceRef.current) {
-				return;
-			}
-			eventSourceRef.current.close();
-			Logout();
-		}
-	}, [notifications, queryClient]);
+		setReconnectDueToError(true);
+		setIsConnectionError(true);
+	}, []);
 
 	const destroyEventSourceSession = useCallback(() => {
 		if (!eventSourceRef.current) {

@@ -12,7 +12,6 @@ import { SOMETHING_WENT_WRONG } from 'constants/api';
 import { FeatureKeys } from 'constants/features';
 import { ORG_PREFERENCES } from 'constants/orgPreferences';
 import ROUTES from 'constants/routes';
-import { InviteTeamMembersProps } from 'container/OrganizationSettings/utils';
 import { useNotifications } from 'hooks/useNotifications';
 import history from 'lib/history';
 import { useAppContext } from 'providers/App/App';
@@ -21,7 +20,6 @@ import {
 	AboutHanzoQuestions,
 	O11yDetails,
 } from './AboutO11yQuestions/AboutO11yQuestions';
-import InviteTeamMembers from './InviteTeamMembers/InviteTeamMembers';
 import OptimiseO11yNeeds, {
 	OptimiseO11yDetails,
 } from './OptimiseO11yNeeds/OptimiseO11yNeeds';
@@ -75,12 +73,20 @@ function OnboardingQuestionaire(): JSX.Element {
 
 	const [optimiseO11yDetails, setOptimiseO11yDetails] =
 		useState<OptimiseO11yDetails>(INITIAL_OPTIMISE_HANZO_DETAILS);
-	const [teamMembers, setTeamMembers] = useState<
-		InviteTeamMembersProps[] | null
-	>(null);
-
 	const [updatingOrgOnboardingStatus, setUpdatingOrgOnboardingStatus] =
 		useState<boolean>(false);
+
+	const handleOnboardingComplete = (): void => {
+		logEvent(ONBOARDING_COMPLETE_EVENT_NAME, {
+			currentPageID: 3,
+		});
+
+		setUpdatingOrgOnboardingStatus(true);
+		updateOrgPreference({
+			name: ORG_PREFERENCES.ORG_ONBOARDING,
+			value: true,
+		});
+	};
 
 	useEffect(() => {
 		logEvent('Org Onboarding: Started', {
@@ -165,29 +171,22 @@ function OnboardingQuestionaire(): JSX.Element {
 				},
 			},
 			{
+				// STEP 3 IS THE LAST STEP. There used to be a fourth — "invite your team"
+				// — which posted to o11y's own invite route. o11y does not invite anyone
+				// now: members arrive the first time the edge sends them, and inviting
+				// them is the Hanzo IAM console's job. Completing here rather than
+				// walking to a step that cannot do anything.
 				onSuccess: () => {
-					setCurrentStep(4);
+					handleOnboardingComplete();
 				},
 				onError: (error: any) => {
 					toast.error(error?.message || SOMETHING_WENT_WRONG);
 
 					// Allow user to proceed even if API fails
-					setCurrentStep(4);
+					handleOnboardingComplete();
 				},
 			},
 		);
-	};
-
-	const handleOnboardingComplete = (): void => {
-		logEvent(ONBOARDING_COMPLETE_EVENT_NAME, {
-			currentPageID: 4,
-		});
-
-		setUpdatingOrgOnboardingStatus(true);
-		updateOrgPreference({
-			name: ORG_PREFERENCES.ORG_ONBOARDING,
-			value: true,
-		});
 	};
 
 	return (
@@ -236,14 +235,6 @@ function OnboardingQuestionaire(): JSX.Element {
 					/>
 				)}
 
-				{currentStep === 4 && (
-					<InviteTeamMembers
-						isLoading={updatingOrgOnboardingStatus}
-						teamMembers={teamMembers}
-						setTeamMembers={setTeamMembers}
-						onNext={handleOnboardingComplete}
-					/>
-				)}
 			</div>
 		</div>
 	);

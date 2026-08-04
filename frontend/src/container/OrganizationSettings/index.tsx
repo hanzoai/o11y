@@ -1,7 +1,6 @@
 import { Space } from 'antd';
 import { useAppContext } from 'providers/App/App';
 
-import AuthDomain from './AuthDomain';
 import DisplayName from './DisplayName';
 
 import './OrganizationSettings.styles.scss';
@@ -22,8 +21,6 @@ function OrganizationSettings(): JSX.Element {
 					<DisplayName key={e.id} id={e.id} index={index} />
 				))}
 			</Space>
-
-			<AuthDomain />
 		</div>
 	);
 }

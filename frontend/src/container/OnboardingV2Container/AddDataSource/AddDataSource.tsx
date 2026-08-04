@@ -5,7 +5,7 @@ import React, {
 	useState,
 	type JSX,
 } from 'react';
-import { Check, Goal, Search, UserPlus, X } from 'components/ui/icons';
+import { Check, Goal, Search, X } from 'components/ui/icons';
 import {
 	Button,
 	Flex,
@@ -31,7 +31,6 @@ import { isModifierKeyPressed } from 'utils/app';
 import o11yBrandLogoUrl from '@/assets/Logos/o11y-brand-logo.svg';
 
 import OnboardingIngestionDetails from '../IngestionDetails/IngestionDetails';
-import InviteTeamMembers from '../InviteTeamMembers/InviteTeamMembers';
 import onboardingConfigWithLinks from '../onboarding-configs/onboarding-config-with-links';
 
 import '../OnboardingV2.styles.scss';
@@ -180,8 +179,6 @@ function OnboardingAddDataSource(): JSX.Element {
 	const [showRequestDataSourceModal, setShowRequestDataSourceModal] =
 		useState<boolean>(false);
 
-	const [showInviteTeamMembersModal, setShowInviteTeamMembersModal] =
-		useState<boolean>(false);
 
 	const [docsUrl, setDocsUrl] = useState<string>(
 		`${DOCS_BASE_URL}/docs/instrumentation/`,
@@ -492,19 +489,6 @@ function OnboardingAddDataSource(): JSX.Element {
 		}
 	};
 
-	const handleShowInviteTeamMembersModal = (): void => {
-		void logEvent(
-			`${ONBOARDING_V3_ANALYTICS_EVENTS_MAP?.BASE}: ${ONBOARDING_V3_ANALYTICS_EVENTS_MAP?.INVITE_TEAM_MEMBER_BUTTON_CLICKED}`,
-			{
-				dataSource: selectedDataSource?.label,
-				framework: selectedFramework?.label,
-				environment: selectedEnvironment?.label,
-				currentPage: setupStepItems[currentStep]?.title || '',
-			},
-		);
-		setShowInviteTeamMembersModal(true);
-	};
-
 	const handleSubmitDataSourceRequest = (): void => {
 		void logEvent(
 			`${ONBOARDING_V3_ANALYTICS_EVENTS_MAP?.BASE}: ${ONBOARDING_V3_ANALYTICS_EVENTS_MAP?.DATA_SOURCE_REQUESTED}`,
@@ -657,15 +641,6 @@ function OnboardingAddDataSource(): JSX.Element {
 						</div>
 
 						<div className="header-right-section">
-							<Button
-								type="default"
-								className="periscope-btn invite-teammate-btn outlined"
-								onClick={handleShowInviteTeamMembersModal}
-								icon={<UserPlus size={16} />}
-							>
-								Invite a teammate
-							</Button>
-
 							<LaunchChatSupport
 								attributes={{
 									dataSource: selectedDataSource?.dataSource,
@@ -1090,27 +1065,6 @@ function OnboardingAddDataSource(): JSX.Element {
 						{currentStep === 2 && <OnboardingIngestionDetails />}
 					</div>
 				</div>
-
-				<Modal
-					className="invite-team-member-modal"
-					title={<span className="title">Invite a team member</span>}
-					open={showInviteTeamMembersModal}
-					closable
-					onCancel={(): void => setShowInviteTeamMembersModal(false)}
-					width="640px"
-					footer={null}
-					destroyOnClose
-				>
-					<div className="invite-team-member-modal-content">
-						<InviteTeamMembers
-							isLoading={false}
-							teamMembers={null}
-							setTeamMembers={(): void => {}}
-							onNext={(): void => setShowInviteTeamMembersModal(false)}
-							onClose={(): void => setShowInviteTeamMembersModal(false)}
-						/>
-					</div>
-				</Modal>
 
 				<Modal
 					className="request-data-source-modal"

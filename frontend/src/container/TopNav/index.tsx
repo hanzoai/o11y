@@ -28,17 +28,12 @@ function TopNav(): JSX.Element | null {
 		[location.pathname],
 	);
 
-	const isSignUpPage = useMemo(
-		() => matchPath(location.pathname, { path: ROUTES.SIGN_UP, exact: true }),
-		[location.pathname],
-	);
-
 	const isAlertCreationPage = useMemo(
 		() => matchPath(location.pathname, { path: ROUTES.ALERTS_NEW, exact: true }),
 		[location.pathname],
 	);
 
-	if (isSignUpPage || isDisabled || isRouteToSkip || isAlertCreationPage) {
+	if (isDisabled || isRouteToSkip || isAlertCreationPage) {
 		return null;
 	}
 

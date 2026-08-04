@@ -381,13 +381,6 @@ export const settingsNavSections: SettingsNavSection[] = [
 				isBeta: true,
 			},
 			{
-				key: ROUTES.MEMBERS_SETTINGS,
-				label: 'Members',
-				icon: <Users size={16} />,
-				isEnabled: false,
-				itemKey: 'members',
-			},
-			{
 				key: ROUTES.SERVICE_ACCOUNTS_SETTINGS,
 				label: 'Service Accounts',
 				icon: <Bot size={16} />,

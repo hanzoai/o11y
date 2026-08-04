@@ -277,16 +277,6 @@ export function createShortcutActions(deps: ActionDeps): CmdAction[] {
 			roles: ['ADMIN'],
 			perform: (): void => navigate(ROUTES.ROLES_SETTINGS),
 		},
-		{
-			id: 'my-settings-members',
-			name: 'Go to Members',
-			shortcut: [GlobalShortcutsName.NavigateToSettingsMembers],
-			keywords: 'settings members',
-			section: 'Settings',
-			icon: <Settings size={14} />,
-			roles: ['ADMIN'],
-			perform: (): void => navigate(ROUTES.MEMBERS_SETTINGS),
-		},
 	];
 
 	if (aiAssistant) {
