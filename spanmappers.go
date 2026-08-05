@@ -59,7 +59,7 @@ func mountSpanMappers(app *zip.App) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func spanMapperGroups(ctx context.Context, in *O11ySpanMapperGroupsIn) (*O11ySpanMapperGroupsOut, error) {
 	out := new(O11ySpanMapperGroupsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/span_mapper_groups", query("enabled", in.Enabled), nil, out)
+	return out, relay(ctx, query("enabled", in.Enabled), nil, out)
 }
 
 // spanMapperGroupCreate creates a mapping group: the name it is known by, the
@@ -69,7 +69,7 @@ func spanMapperGroups(ctx context.Context, in *O11ySpanMapperGroupsIn) (*O11ySpa
 // Callers need the admin role; the runtime's own gate enforces it.
 func spanMapperGroupCreate(ctx context.Context, in *spantypes.PostableSpanMapperGroup) (*O11ySpanMapperGroupOut, error) {
 	out := new(O11ySpanMapperGroupOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/span_mapper_groups", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // spanMapperGroupUpdate changes a group's name, condition or enabled state.
@@ -77,14 +77,14 @@ func spanMapperGroupCreate(ctx context.Context, in *spantypes.PostableSpanMapper
 //
 // Callers need the admin role; the runtime's own gate enforces it.
 func spanMapperGroupUpdate(ctx context.Context, in *O11ySpanMapperGroupUpdateIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPatch, groupPath(in.GroupID), nil, in.UpdatableSpanMapperGroup, nil)
+	return nil, relay(ctx, nil, in.UpdatableSpanMapperGroup, nil)
 }
 
 // spanMapperGroupDelete deletes a mapping group and every mapper under it.
 //
 // Callers need the admin role; the runtime's own gate enforces it.
 func spanMapperGroupDelete(ctx context.Context, in *O11ySpanMapperGroupRef) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodDelete, groupPath(in.GroupID), nil, nil, nil)
+	return nil, relay(ctx, nil, nil, nil)
 }
 
 // ── mappers ───────────────────────────────────────────────────────────────────
@@ -95,7 +95,7 @@ func spanMapperGroupDelete(ctx context.Context, in *O11ySpanMapperGroupRef) (*st
 // Callers need the viewer role; the runtime's own gate enforces it.
 func spanMappers(ctx context.Context, in *O11ySpanMapperGroupRef) (*O11ySpanMappersOut, error) {
 	out := new(O11ySpanMappersOut)
-	return out, relay(ctx, http.MethodGet, groupPath(in.GroupID)+"/span_mappers", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // spanMapperCreate adds a mapper to a group: which field context it reads, the
@@ -104,7 +104,7 @@ func spanMappers(ctx context.Context, in *O11ySpanMapperGroupRef) (*O11ySpanMapp
 // Callers need the admin role; the runtime's own gate enforces it.
 func spanMapperCreate(ctx context.Context, in *O11ySpanMapperCreateIn) (*O11ySpanMapperOut, error) {
 	out := new(O11ySpanMapperOut)
-	return out, relay(ctx, http.MethodPost, groupPath(in.GroupID)+"/span_mappers", nil, in.PostableSpanMapper, out)
+	return out, relay(ctx, nil, in.PostableSpanMapper, out)
 }
 
 // spanMapperUpdate changes a mapper's field context, config or enabled state.
@@ -112,14 +112,14 @@ func spanMapperCreate(ctx context.Context, in *O11ySpanMapperCreateIn) (*O11ySpa
 //
 // Callers need the admin role; the runtime's own gate enforces it.
 func spanMapperUpdate(ctx context.Context, in *O11ySpanMapperUpdateIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPatch, mapperPath(in.GroupID, in.MapperID), nil, in.UpdatableSpanMapper, nil)
+	return nil, relay(ctx, nil, in.UpdatableSpanMapper, nil)
 }
 
 // spanMapperDelete deletes one mapper from a group.
 //
 // Callers need the admin role; the runtime's own gate enforces it.
 func spanMapperDelete(ctx context.Context, in *O11ySpanMapperRef) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodDelete, mapperPath(in.GroupID, in.MapperID), nil, nil, nil)
+	return nil, relay(ctx, nil, nil, nil)
 }
 
 // groupPath and mapperPath are the one place these ids become a path. Each id

@@ -77,34 +77,34 @@ func mountAccess(app *zip.App) {
 // reserved managed-role prefix; the runtime refuses anything else.
 func createRole(ctx context.Context, in *O11yRoleCreateIn) (*O11yRoleCreateOut, error) {
 	out := new(O11yRoleCreateOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/roles", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // listRoles lists every role in the caller's org — the managed ones the
 // platform seeds and the custom ones its admins created.
 func listRoles(ctx context.Context, in *O11yRolesIn) (*O11yRolesOut, error) {
 	out := new(O11yRolesOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/roles", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // getRole returns one role with the transaction groups it grants.
 func getRole(ctx context.Context, in *O11yRoleGetIn) (*O11yRoleOut, error) {
 	out := new(O11yRoleOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/roles/"+in.ID, nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // updateRole replaces a custom role's description and transaction groups.
 // Both fields are mandatory — send an empty string or an empty array to clear
 // one — and managed roles cannot be edited.
 func updateRole(ctx context.Context, in *O11yRoleUpdateIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPut, o11yRoot+"/roles/"+in.ID, nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // deleteRole deletes a custom role. A role that still has user or
 // service-account assignees, or an auth-domain mapping, is refused; managed
 // roles cannot be deleted.
 func deleteRole(ctx context.Context, in *O11yRoleDeleteIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/roles/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, nil, nil, nil)
 }
 
 // ── service accounts ──────────────────────────────────────────────────────────
@@ -114,59 +114,59 @@ func deleteRole(ctx context.Context, in *O11yRoleDeleteIn) (*struct{}, error) {
 // letters, digits or hyphens — becomes the account's email local part.
 func createServiceAccount(ctx context.Context, in *O11yServiceAccountCreateIn) (*O11yServiceAccountCreateOut, error) {
 	out := new(O11yServiceAccountCreateOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/service_accounts", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // listServiceAccounts lists the caller's org's service accounts.
 func listServiceAccounts(ctx context.Context, in *O11yServiceAccountsIn) (*O11yServiceAccountsOut, error) {
 	out := new(O11yServiceAccountsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/service_accounts", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // getMyServiceAccount returns the calling service account itself, with the
 // roles it holds — the self-inspection read for a key-authenticated caller.
 func getMyServiceAccount(ctx context.Context, in *O11yMyServiceAccountIn) (*O11yServiceAccountOut, error) {
 	out := new(O11yServiceAccountOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/service_accounts/me", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // updateMyServiceAccount renames the calling service account.
 func updateMyServiceAccount(ctx context.Context, in *O11yMyServiceAccountUpdateIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPut, o11yRoot+"/service_accounts/me", nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // getServiceAccount returns one service account with the roles it holds.
 func getServiceAccount(ctx context.Context, in *O11yServiceAccountGetIn) (*O11yServiceAccountOut, error) {
 	out := new(O11yServiceAccountOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/service_accounts/"+in.ID, nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // updateServiceAccount renames a service account.
 func updateServiceAccount(ctx context.Context, in *O11yServiceAccountUpdateIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPut, o11yRoot+"/service_accounts/"+in.ID, nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // deleteServiceAccount deletes a service account and revokes every key it
 // holds.
 func deleteServiceAccount(ctx context.Context, in *O11yServiceAccountDeleteIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/service_accounts/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, nil, nil, nil)
 }
 
 // listServiceAccountRoles lists the roles a service account holds.
 func listServiceAccountRoles(ctx context.Context, in *O11yServiceAccountRolesIn) (*O11yServiceAccountRolesOut, error) {
 	out := new(O11yServiceAccountRolesOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/service_accounts/"+in.ID+"/roles", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // grantServiceAccountRole assigns a role, named by its id, to a service
 // account.
 func grantServiceAccountRole(ctx context.Context, in *O11yServiceAccountRoleGrantIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPost, o11yRoot+"/service_accounts/"+in.ServiceAccountID+"/roles", nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // revokeServiceAccountRole removes a role from a service account.
 func revokeServiceAccountRole(ctx context.Context, in *O11yServiceAccountRoleRevokeIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/service_accounts/"+in.ID+"/roles/"+in.RoleID, nil, nil, nil)
+	return nil, relay(ctx, nil, nil, nil)
 }
 
 // ── service-account keys ──────────────────────────────────────────────────────
@@ -178,25 +178,25 @@ func revokeServiceAccountRole(ctx context.Context, in *O11yServiceAccountRoleRev
 // and a timestamp in the past is refused.
 func createServiceAccountKey(ctx context.Context, in *O11yAPIKeyCreateIn) (*O11yAPIKeyCreateOut, error) {
 	out := new(O11yAPIKeyCreateOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/service_accounts/"+in.ServiceAccountID+"/keys", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // listServiceAccountKeys lists a service account's API keys — metadata only,
 // never the secrets.
 func listServiceAccountKeys(ctx context.Context, in *O11yAPIKeysIn) (*O11yAPIKeysOut, error) {
 	out := new(O11yAPIKeysOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/service_accounts/"+in.ID+"/keys", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // updateServiceAccountKey renames an API key or moves its expiry.
 func updateServiceAccountKey(ctx context.Context, in *O11yAPIKeyUpdateIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPut, o11yRoot+"/service_accounts/"+in.ServiceAccountID+"/keys/"+in.KeyID, nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // revokeServiceAccountKey revokes an API key. Revocation is immediate and
 // permanent.
 func revokeServiceAccountKey(ctx context.Context, in *O11yAPIKeyRevokeIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/service_accounts/"+in.ID+"/keys/"+in.KeyID, nil, nil, nil)
+	return nil, relay(ctx, nil, nil, nil)
 }
 
 // ── authorization probe ───────────────────────────────────────────────────────
@@ -207,7 +207,7 @@ func revokeServiceAccountKey(ctx context.Context, in *O11yAPIKeyRevokeIn) (*stru
 // to show.
 func checkAccess(ctx context.Context, in *O11yCheckIn) (*O11yCheckOut, error) {
 	out := new(O11yCheckOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/authz/check", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────

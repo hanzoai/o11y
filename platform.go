@@ -35,7 +35,6 @@ package o11y
 import (
 	"context"
 	"encoding/json"
-	"net/http"
 	"net/url"
 	"time"
 
@@ -93,7 +92,7 @@ func mountPlatform(app *zip.App) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func promQuery(ctx context.Context, in *O11yPromQueryIn) (*O11yPromQueryOut, error) {
 	out := new(O11yPromQueryOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/query", query(
+	return out, relay(ctx, query(
 		"query", in.Query,
 		"time", in.Time,
 		"stats", in.Stats,
@@ -107,7 +106,7 @@ func promQuery(ctx context.Context, in *O11yPromQueryIn) (*O11yPromQueryOut, err
 // Callers need the viewer role; the runtime's own gate enforces it.
 func dashboardVars(ctx context.Context, in *O11yDashboardVarsIn) (*O11yDashboardVarsOut, error) {
 	out := new(O11yDashboardVarsOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/variables/query", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // event records one product-analytics event for the signed-in user — a track
@@ -116,7 +115,7 @@ func dashboardVars(ctx context.Context, in *O11yDashboardVarsIn) (*O11yDashboard
 // Callers need the viewer role; the runtime's own gate enforces it.
 func event(ctx context.Context, in *O11yEventIn) (*O11yMessage, error) {
 	out := new(O11yMessage)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/event", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // usage returns ingestion usage counts bucketed over the requested window,
@@ -125,7 +124,7 @@ func event(ctx context.Context, in *O11yEventIn) (*O11yMessage, error) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func usage(ctx context.Context, in *O11yUsageIn) (*O11yUsageList, error) {
 	out := new(O11yUsageList)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/usage", query(
+	return out, relay(ctx, query(
 		"start", in.Start,
 		"end", in.End,
 		"step", in.Step,
@@ -140,7 +139,7 @@ func usage(ctx context.Context, in *O11yUsageIn) (*O11yUsageList, error) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func dependencyGraph(ctx context.Context, in *O11yDependencyGraphIn) (*O11yDependencyList, error) {
 	out := new(O11yDependencyList)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/dependency_graph", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // version reports the running build: its version, whether an enterprise
@@ -150,7 +149,7 @@ func dependencyGraph(ctx context.Context, in *O11yDependencyGraphIn) (*O11yDepen
 // Open by design; the runtime's own gate is OpenAccess.
 func version(ctx context.Context, _ *struct{}) (*O11yVersionOut, error) {
 	out := new(O11yVersionOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/version", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // health reports service health. With live set, the datastore connection is
@@ -164,7 +163,7 @@ func health(ctx context.Context, in *O11yHealthIn) (*O11yHealthOut, error) {
 		// The runtime tests presence, not value.
 		p.Set("live", "true")
 	}
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/health", p, nil, out)
+	return out, relay(ctx, p, nil, out)
 }
 
 // disks lists the storage disks the datastore reports, with their names and
@@ -173,7 +172,7 @@ func health(ctx context.Context, in *O11yHealthIn) (*O11yHealthOut, error) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func disks(ctx context.Context, _ *struct{}) (*O11yDiskList, error) {
 	out := new(O11yDiskList)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/disks", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // register creates the FIRST organization and its admin user. It is open by
@@ -183,7 +182,7 @@ func disks(ctx context.Context, _ *struct{}) (*O11yDiskList, error) {
 // Open by design; the runtime's own gate is OpenAccess.
 func register(ctx context.Context, in *O11yRegisterIn) (*O11yRegisterOut, error) {
 	out := new(O11yRegisterOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/register", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // spanPercentile places one span's duration among its peers: the p50/p90/p99
@@ -192,7 +191,7 @@ func register(ctx context.Context, in *O11yRegisterIn) (*O11yRegisterOut, error)
 // Callers need the viewer role; the runtime's own gate enforces it.
 func spanPercentile(ctx context.Context, in *O11ySpanPercentileIn) (*O11ySpanPercentileOut, error) {
 	out := new(O11ySpanPercentileOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/span_percentile", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // analyzeQueryFilter analyzes a query and extracts the metric names it reads
@@ -201,7 +200,7 @@ func spanPercentile(ctx context.Context, in *O11ySpanPercentileIn) (*O11ySpanPer
 // Callers need the viewer role; the runtime's own gate enforces it.
 func analyzeQueryFilter(ctx context.Context, in *O11yAnalyzeIn) (*O11yAnalyzeOut, error) {
 	out := new(O11yAnalyzeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/query_filter/analyze", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // filterSuggestions suggests attribute keys and example filter queries for the
@@ -211,7 +210,7 @@ func analyzeQueryFilter(ctx context.Context, in *O11yAnalyzeIn) (*O11yAnalyzeOut
 // Callers need the viewer role; the runtime's own gate enforces it.
 func filterSuggestions(ctx context.Context, in *O11yFilterSuggestionsIn) (*O11yFilterSuggestionsOut, error) {
 	out := new(O11yFilterSuggestionsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/filter_suggestions", query(
+	return out, relay(ctx, query(
 		"dataSource", in.DataSource,
 		"searchText", in.SearchText,
 		"existingFilter", in.ExistingFilter,
@@ -227,7 +226,7 @@ func filterSuggestions(ctx context.Context, in *O11yFilterSuggestionsIn) (*O11yF
 // Callers need the viewer role; the runtime's own gate enforces it.
 func k8sOnboarding(ctx context.Context, _ *struct{}) (*O11yOnboardingOut, error) {
 	out := new(O11yOnboardingOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/infra_onboarding/k8s/status", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // legacyMetricMetadata serves the OLDER /metric/metric_metadata route. It is
@@ -243,7 +242,7 @@ func k8sOnboarding(ctx context.Context, _ *struct{}) (*O11yOnboardingOut, error)
 // Callers need the viewer role; the runtime's own gate enforces it.
 func legacyMetricMetadata(ctx context.Context, in *O11yMetricMetadataIn) (*O11yMetricMetadataOut, error) {
 	out := new(O11yMetricMetadataOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metric/metric_metadata", query(
+	return out, relay(ctx, query(
 		"metricName", in.MetricName,
 		"serviceName", in.ServiceName,
 	), nil, out)
@@ -257,7 +256,7 @@ func legacyMetricMetadata(ctx context.Context, in *O11yMetricMetadataIn) (*O11yM
 // own gate enforces it.
 func setRetention(ctx context.Context, in *O11yRetentionSetIn) (*O11yRetentionSetOut, error) {
 	out := new(O11yRetentionSetOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/settings/ttl", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // retention returns the org's current retention policy: default TTL, custom
@@ -266,7 +265,7 @@ func setRetention(ctx context.Context, in *O11yRetentionSetIn) (*O11yRetentionSe
 // Callers need the viewer role; the runtime's own gate enforces it.
 func retention(ctx context.Context, _ *struct{}) (*O11yRetentionOut, error) {
 	out := new(O11yRetentionOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/settings/ttl", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // setApdex sets one service's apdex threshold and the status codes excluded
@@ -276,7 +275,7 @@ func retention(ctx context.Context, _ *struct{}) (*O11yRetentionOut, error) {
 // own gate enforces it.
 func setApdex(ctx context.Context, in *O11yApdexSetIn) (*O11yApdexSetOut, error) {
 	out := new(O11yApdexSetOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/settings/apdex", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // apdex returns apdex settings for the named services.
@@ -284,7 +283,7 @@ func setApdex(ctx context.Context, in *O11yApdexSetIn) (*O11yApdexSetOut, error)
 // Callers need the viewer role; the runtime's own gate enforces it.
 func apdex(ctx context.Context, in *O11yApdexIn) (*O11yApdexOut, error) {
 	out := new(O11yApdexOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/settings/apdex", query(
+	return out, relay(ctx, query(
 		"services", in.Services,
 	), nil, out)
 }
@@ -295,7 +294,7 @@ func apdex(ctx context.Context, in *O11yApdexIn) (*O11yApdexOut, error) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func licenses(ctx context.Context, _ *struct{}) (*O11yLicensesOut, error) {
 	out := new(O11yLicensesOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/licenses", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // activateLicense activates the enterprise license. This build has no
@@ -304,7 +303,7 @@ func licenses(ctx context.Context, _ *struct{}) (*O11yLicensesOut, error) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func activateLicense(ctx context.Context, _ *struct{}) (*O11yLicenseActiveOut, error) {
 	out := new(O11yLicenseActiveOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/licenses/active", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // globalConfig returns the deployment's global configuration: its public
@@ -314,7 +313,7 @@ func activateLicense(ctx context.Context, _ *struct{}) (*O11yLicenseActiveOut, e
 // Open by design; the runtime's own gate is OpenAccess.
 func globalConfig(ctx context.Context, _ *struct{}) (*O11yGlobalConfigOut, error) {
 	out := new(O11yGlobalConfigOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/global/config", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // features returns the supported feature flags and their resolved values for
@@ -323,7 +322,7 @@ func globalConfig(ctx context.Context, _ *struct{}) (*O11yGlobalConfigOut, error
 // Callers need the viewer role; the runtime's own gate enforces it.
 func features(ctx context.Context, _ *struct{}) (*O11yFeaturesOut, error) {
 	out := new(O11yFeaturesOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/features", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // orgStats returns the collected usage statistics for the caller's org, as the
@@ -333,7 +332,7 @@ func features(ctx context.Context, _ *struct{}) (*O11yFeaturesOut, error) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func orgStats(ctx context.Context, _ *struct{}) (*O11yOrgStatsOut, error) {
 	out := new(O11yOrgStatsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/stats", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────

@@ -53,13 +53,19 @@ func BindRoute(set func(key, value any), template string, params map[string]stri
 	set(routeKey{}, routeValues{template: template, params: params})
 }
 
-// SetRoute binds a request to the route TEMPLATE that matched it, filling the
+// SetRoute binds a request to the route TEMPLATE it answers, filling the
 // segments the template names from the request's own path. It is the WRITER half
 // of the read below, and it belongs next to it: a test that injects through one
 // mechanism while the handler reads through another passes for the wrong reason.
 //
-// Tests only. Nothing in the serving path calls it — the router fills these,
-// through BindRoute, from the values it actually matched.
+// It is the writer for a request that arrives at a route BY NAME rather than by
+// matching — the module's own declaration of this surface calls its handler
+// directly, having named the address, so no router runs in front of it (see
+// routing.Table.Handler). Deriving the segments positionally is exact there,
+// because the caller built the path from that same template.
+//
+// BindRoute is the writer for a request the ROUTER matched, which knows its
+// bindings without deriving them. Two entries, one representation, one read.
 func SetRoute(req *http.Request, template string) *http.Request {
 	if req == nil {
 		return nil

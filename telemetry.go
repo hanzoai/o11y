@@ -27,7 +27,6 @@ package o11y
 
 import (
 	"context"
-	"net/http"
 	"time"
 
 	"github.com/zap-proto/zip"
@@ -56,14 +55,14 @@ func mountTelemetry(app *zip.App) {
 // rather than as data.
 func discover(ctx context.Context, in *O11yDiscoverIn) (*O11yDiscoverOut, error) {
 	out := new(O11yDiscoverOut)
-	return out, relay(ctx, http.MethodPost, sentryRoot+"/discover", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // logs lists a project's captured error events, newest first, optionally
 // narrowed to those whose message or exception text contains a search string.
 func logs(ctx context.Context, in *O11yLogsIn) (*O11yLogsOut, error) {
 	out := new(O11yLogsOut)
-	return out, relay(ctx, http.MethodGet, sentryRoot+"/logs", query(
+	return out, relay(ctx, query(
 		"project", in.Project,
 		"query", in.Query,
 		"period", in.Period,
@@ -76,7 +75,7 @@ func logs(ctx context.Context, in *O11yLogsIn) (*O11yLogsOut, error) {
 // message seen — the entry point for "which requests are failing".
 func traces(ctx context.Context, in *O11yTracesIn) (*O11yTracesOut, error) {
 	out := new(O11yTracesOut)
-	return out, relay(ctx, http.MethodGet, sentryRoot+"/traces", query(
+	return out, relay(ctx, query(
 		"project", in.Project,
 		"period", in.Period,
 		"limit", in.Limit,
@@ -92,7 +91,7 @@ func trace(ctx context.Context, in *O11yTraceIn) (*O11yTraceOut, error) {
 	// runtime a different id than the caller named — for the one id spelling
 	// that matters, an escaped slash, that is the difference between the answer
 	// the face has always given and a new one.
-	return out, relay(ctx, http.MethodGet, sentryRoot+"/traces/"+in.ID, query(
+	return out, relay(ctx, query(
 		"project", in.Project,
 	), nil, out)
 }
@@ -101,7 +100,7 @@ func trace(ctx context.Context, in *O11yTraceIn) (*O11yTraceOut, error) {
 // the requested period, counting the events in it.
 func stats(ctx context.Context, in *O11yStatsIn) (*O11yStatsOut, error) {
 	out := new(O11yStatsOut)
-	return out, relay(ctx, http.MethodGet, sentryRoot+"/stats", query(
+	return out, relay(ctx, query(
 		"project", in.Project,
 		"field", in.Field,
 		"period", in.Period,

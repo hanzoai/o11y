@@ -30,7 +30,6 @@ package o11y
 
 import (
 	"context"
-	"net/http"
 
 	tf "github.com/hanzoai/o11y/pkg/types/tracefunneltypes"
 	"github.com/zap-proto/zip"
@@ -76,7 +75,7 @@ func mountTraceFunnels(app *zip.App) {
 // Callers need the editor role; the runtime's own gate enforces it.
 func funnelCreate(ctx context.Context, in *O11yFunnelCreateIn) (*O11yFunnelOut, error) {
 	out := new(O11yFunnelOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/trace-funnels/new", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // funnelList lists the caller's org's funnels, each with its steps and who last
@@ -85,7 +84,7 @@ func funnelCreate(ctx context.Context, in *O11yFunnelCreateIn) (*O11yFunnelOut, 
 // Callers need the viewer role; the runtime's own gate enforces it.
 func funnelList(ctx context.Context, _ *struct{}) (*O11yFunnelsOut, error) {
 	out := new(O11yFunnelsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/trace-funnels/list", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // funnelStepsUpdate replaces a funnel's steps — the funnel is named in the body
@@ -95,7 +94,7 @@ func funnelList(ctx context.Context, _ *struct{}) (*O11yFunnelsOut, error) {
 // Callers need the editor role; the runtime's own gate enforces it.
 func funnelStepsUpdate(ctx context.Context, in *O11yFunnelStepsUpdateIn) (*O11yFunnelOut, error) {
 	out := new(O11yFunnelOut)
-	return out, relay(ctx, http.MethodPut, o11yRoot+"/trace-funnels/steps/update", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // funnelGet returns one funnel with its steps.
@@ -103,7 +102,7 @@ func funnelStepsUpdate(ctx context.Context, in *O11yFunnelStepsUpdateIn) (*O11yF
 // Callers need the viewer role; the runtime's own gate enforces it.
 func funnelGet(ctx context.Context, in *O11yFunnelRef) (*O11yFunnelOut, error) {
 	out := new(O11yFunnelOut)
-	return out, relay(ctx, http.MethodGet, funnelPath(in.FunnelID), nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // funnelUpdate renames a funnel or rewrites its description, answering the
@@ -112,7 +111,7 @@ func funnelGet(ctx context.Context, in *O11yFunnelRef) (*O11yFunnelOut, error) {
 // Callers need the editor role; the runtime's own gate enforces it.
 func funnelUpdate(ctx context.Context, in *O11yFunnelUpdateIn) (*O11yFunnelOut, error) {
 	out := new(O11yFunnelOut)
-	return out, relay(ctx, http.MethodPut, funnelPath(in.FunnelID), nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // funnelDelete deletes a funnel. The answer carries no data — the runtime
@@ -121,7 +120,7 @@ func funnelUpdate(ctx context.Context, in *O11yFunnelUpdateIn) (*O11yFunnelOut, 
 // Callers need the editor role; the runtime's own gate enforces it.
 func funnelDelete(ctx context.Context, in *O11yFunnelRef) (*O11yFunnelDeleteOut, error) {
 	out := new(O11yFunnelDeleteOut)
-	return out, relay(ctx, http.MethodDelete, funnelPath(in.FunnelID), nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // ── analytics over a SAVED funnel ─────────────────────────────────────────────
@@ -212,13 +211,13 @@ func funnelPath(id string) string { return o11yRoot + "/trace-funnels/" + id }
 // computations they name and where the funnel came from.
 func funnelAnalytics(ctx context.Context, id, view string, body any) (*O11yFunnelRowsOut, error) {
 	out := new(O11yFunnelRowsOut)
-	return out, relay(ctx, http.MethodPost, funnelPath(id)+"/analytics/"+view, nil, body, out)
+	return out, relay(ctx, nil, body, out)
 }
 
 // draftAnalytics runs one of the six reads against a funnel described inline.
 func draftAnalytics(ctx context.Context, view string, in *O11yDraftFunnelIn) (*O11yFunnelRowsOut, error) {
 	out := new(O11yFunnelRowsOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/trace-funnels/analytics/"+view, nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────

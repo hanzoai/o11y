@@ -116,6 +116,82 @@ func TestRouteValuesReachTheHandler(t *testing.T) {
 	}
 }
 
+// BY NAME AND BY MATCHING ARE THE SAME ANSWER, and that is the property the
+// seam rests on.
+//
+// A handler reached by matching is handed its route by the router that matched
+// it. A handler reached through [Table.Handler] has no router in front of it —
+// the caller named the address instead of asking one to find it — so the two
+// chain members that need the route (Audit keys its record on the template,
+// Resource resolves the route's declared resources) would read an empty one, and
+// would do it SILENTLY: an audit record keyed on "" is still a record, and
+// Param("id") returning "" is still a string. Nothing would go red.
+//
+// So both doors are driven here, against one registration, and compared to each
+// other. Comparing them to a written-down expectation would pin what someone
+// believed; comparing them to each other pins what the seam promises.
+func TestByNameCarriesTheSameRouteAsMatching(t *testing.T) {
+	type reading struct {
+		id, template string
+		wrapped      bool
+	}
+	var got reading
+	read := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		got.id, got.template = coretypes.Param(req, "id"), coretypes.RoutePath(req)
+		w.WriteHeader(http.StatusNoContent)
+	})
+	chain := func([]handler.ResourceDef) func(http.Handler) http.Handler {
+		return func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				got.wrapped = true
+				next.ServeHTTP(w, req)
+			})
+		}
+	}
+
+	app := zip.New(zip.Config{DisableStartupMessage: true})
+	r := routing.New(app.Group(""), chain)
+	r.Get("/v1/o11y/rules/{id}", read)
+
+	got = reading{}
+	adaptor.FiberApp(app.Fiber()).ServeHTTP(
+		httptest.NewRecorder(), httptest.NewRequest(http.MethodGet, "/v1/o11y/rules/7", http.NoBody))
+	byMatching := got
+
+	byName := r.Table().Handler(http.MethodGet, "/v1/o11y/rules/{id}")
+	if byName == nil {
+		t.Fatal("the registration does not resolve by name, so the seam has nothing to reach")
+	}
+	got = reading{}
+	byName.ServeHTTP(httptest.NewRecorder(), httptest.NewRequest(http.MethodGet, "/v1/o11y/rules/7", http.NoBody))
+
+	if byMatching.id == "" || byMatching.template == "" || !byMatching.wrapped {
+		t.Fatalf("matching itself read %+v — the control did not run, so nothing is being compared", byMatching)
+	}
+	if got != byMatching {
+		t.Errorf("by name the route reads %+v, by matching %+v", got, byMatching)
+	}
+}
+
+// An address nothing registered resolves to nothing, which is what lets the seam
+// say "this declaration has drifted" instead of handing the request to a router
+// that answers 404 for either reason.
+func TestUnregisteredAddressResolvesToNothing(t *testing.T) {
+	app := zip.New(zip.Config{DisableStartupMessage: true})
+	r := routing.New(app.Group(""), nil)
+	r.Get("/v1/o11y/rules/{id}", nothing())
+
+	for _, address := range []struct{ method, path string }{
+		{http.MethodPost, "/v1/o11y/rules/{id}"},    // registered, other method
+		{http.MethodGet, "/v1/o11y/rules/{ruleId}"}, // same shape, other segment NAME
+		{http.MethodGet, "/v1/o11y/rules/:id"},      // the router's spelling, not the public one
+	} {
+		if r.Table().Handler(address.method, address.path) != nil {
+			t.Errorf("%s %s resolves, and nothing registered it", address.method, address.path)
+		}
+	}
+}
+
 // A constrained segment only matches values it accepts: the two Sentry ingest
 // routes take a UUID project and nothing else, so a resource word can never be
 // swallowed by the wildcard that follows the static routes.

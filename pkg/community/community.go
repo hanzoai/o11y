@@ -183,9 +183,12 @@ func NewO11y(ctx context.Context, config o11y.Config) (*o11y.O11y, error) {
 //
 //   - standalone (cmd/community): server.Start binds the listeners; O11y.Start
 //     runs background evaluation; O11y.Wait blocks.
-//   - embedded (hanzoai/cloud): O11y.Start runs background evaluation, and
-//     server.PublicHandler() is installed via o11y.SetHandler — cloud's own HTTP
-//     stack serves /v1/o11y/*; the listeners are never bound.
+//   - embedded (hanzoai/cloud): O11y.Start runs background evaluation, and the
+//     server's route table is installed via o11y.SetRuntime — cloud's own HTTP
+//     stack serves /v1/o11y/*, resolving each address against that table; the
+//     listeners are never bound. A host that runs the runtime as a separate
+//     Deployment installs o11y.Whole over its proxy instead, because for a
+//     remote every address really is the same door.
 //
 // Both paths share this ONE construction, so identity and authz are identical.
 func NewServer(ctx context.Context, config o11y.Config) (*app.Server, *o11y.O11y, error) {

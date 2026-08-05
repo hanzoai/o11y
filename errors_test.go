@@ -58,7 +58,7 @@ func errorsRuntime(t *testing.T, payload any) (wrote *[]byte, asked **http.Reque
 	t.Helper()
 	var body []byte
 	var req *http.Request
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		read, _ := io.ReadAll(r.Body)
 		r.Body = io.NopCloser(bytes.NewReader(read))
 		req = r.Clone(r.Context())
@@ -72,8 +72,8 @@ func errorsRuntime(t *testing.T, payload any) (wrote *[]byte, asked **http.Reque
 		body = marshalled
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write(body)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 	return &body, &req
 }
 
@@ -300,12 +300,12 @@ func TestErrorReadsReachTheDocument(t *testing.T) {
 // the reason are the ones the runtime chose, not a status invented at the relay.
 func TestErrorReadsRefusalKeepsTheRuntimeStatus(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		_, _ = io.WriteString(w, `{"status":"error","errorType":"forbidden","error":"user is not authorized"}`)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	for _, probe := range []struct {
 		method, target string
@@ -335,7 +335,7 @@ func TestErrorReadsRefusalKeepsTheRuntimeStatus(t *testing.T) {
 // THERE — a 400 from the binder would prove nothing about the seam.
 func TestErrorReadsFailClosedWithoutARuntime(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	for _, probe := range []struct {
 		method, target string

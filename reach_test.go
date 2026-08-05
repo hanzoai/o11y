@@ -88,8 +88,8 @@ func routingRuntime(t *testing.T, patterns map[string]bool) (seen *[]string) {
 		method, path, _ := strings.Cut(route, " ")
 		rt.Fiber().Add([]string{method}, path, answer)
 	}
-	o11y.SetHandler(adaptor.FiberApp(rt.Fiber()))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	o11y.SetRuntime(o11y.Whole(adaptor.FiberApp(rt.Fiber())))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 	return &targets
 }
 

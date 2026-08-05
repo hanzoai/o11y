@@ -144,6 +144,15 @@ func (s Server) HealthCheckStatus() chan healthcheck.Status {
 	return s.unavailableChannel
 }
 
+// Routes is this server's registration: every address it serves and the handler
+// at each, answerable BY NAME (see routing.Table.Handler).
+//
+// It is what the module's own declaration of this surface reaches through, and
+// it is what an embedding host installs when it wants to wrap that reach —
+// hanzoai/cloud puts its own principal gate around each answer, which it cannot
+// do if this server is the only one that ever names the table.
+func (s *Server) Routes() *routing.Table { return s.routes }
+
 // PublicHandler returns the fully-wired public HTTP surface as a net/http
 // handler — every middleware (IdentN identity resolution over the
 // gateway-injected Hanzo IAM session headers X-Org-Id/X-User-Id/X-User-Email,
@@ -252,6 +261,20 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 
 	s.o11y.APIServer.AddToRouter(r)
 	s.routes = r.Table()
+
+	// THE IMPLEMENTATION, HANDED TO THE DECLARATION BY NAME.
+	//
+	// The table above is this service's 367 addresses and the handler at each. The
+	// module's own declaration of the same 367 (published.Mount, below) has always
+	// had to reach them, and until now the only way it could was to speak HTTP to
+	// the whole router — which this server could not do without an op relaying into
+	// the router it was already being served by. So it installed nothing, and every
+	// op on this binary's /mcp tool surface and its by-name call plane answered 503
+	// while all 367 handlers sat in memory one map lookup away.
+	//
+	// A route table IS a map from address to handler. Handing it over as one is
+	// what makes the declaration answerable in the process that implements it.
+	published.SetRuntime(s.routes)
 
 	// The module's own declaration of this surface, and its projections. After the
 	// service's own routes, before the console catch-all — see publish.

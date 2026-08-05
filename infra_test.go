@@ -238,7 +238,7 @@ func TestChecksTypeIsMandatory(t *testing.T) {
 // delegation wildcard gives before a handler is registered.
 func TestInfraFailsClosedWithoutARuntime(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	for _, probe := range []struct{ method, target string }{
 		{http.MethodGet, "/v1/o11y/hosts/attribute_keys?dataSource=metrics"},
@@ -337,12 +337,12 @@ func TestInfraRoutesAreTheSameFortyFour(t *testing.T) {
 func TestUnnamedPathsAreNotServedButTypedOnesReachTheRuntime(t *testing.T) {
 	app := mounted(t)
 	var askedPath string
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		askedPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = io.WriteString(w, `{"status":"success","data":{"door":"runtime","path":"`+r.URL.Path+`"}}`)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	// A path no slice names: 404, and the runtime is never asked. Under the old
 	// catch-all this same request was answered, which is exactly why an unmounted
@@ -447,12 +447,12 @@ func TestInfraIdentityIsPropagated(t *testing.T) {
 // half's legacy {status, errorType, error} answer included.
 func TestInfraRefusalKeepsTheRuntimeStatus(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		_, _ = io.WriteString(w, `{"status":"error","errorType":"forbidden","error":"API Key is not allowed"}`)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	status, got := call(t, app, member(http.MethodPost, "/v1/o11y/hosts/list", strings.NewReader(`{"start":1,"end":2}`)))
 	if status != http.StatusForbidden {
