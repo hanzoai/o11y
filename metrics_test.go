@@ -207,12 +207,12 @@ func TestMetricsIdentityIsPropagated(t *testing.T) {
 // second policy.
 func TestMetricsRefusalKeepsTheRuntimeStatus(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		_, _ = io.WriteString(w, `{"status":"error","error":{"code":"forbidden","message":"admin access is required"}}`)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	sent := `{"metricName":"m","matchType":"drop","labels":["host"]}`
 	status, got := call(t, app, member(http.MethodPost, "/v1/o11y/metric_reduction_rules", strings.NewReader(sent)))
@@ -228,7 +228,7 @@ func TestMetricsRefusalKeepsTheRuntimeStatus(t *testing.T) {
 // wildcard gives when nothing has been registered yet.
 func TestMetricsFailClosedWithoutARuntime(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	for _, tc := range []struct {
 		method, target, body string

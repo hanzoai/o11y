@@ -33,7 +33,7 @@ func (s *stubModule) GetWaterfallV4(_ context.Context, traceID, _ string, _ []st
 // template through a REAL router and asserts the module was asked about it.
 func TestGetWaterfallActsOnTheTraceTheRouterMatched(t *testing.T) {
 	module := &stubModule{}
-	router := routing.Serve(http.MethodPost, "/v1/o11y/traces/{traceID}/waterfall", http.HandlerFunc(NewHandler(module).GetWaterfallV4))
+	router := routing.Serve(http.MethodPost, "/v1/o11y/traces/{traceId}/waterfall", http.HandlerFunc(NewHandler(module).GetWaterfallV4))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, httptest.NewRequest(http.MethodPost, "/v1/o11y/traces/0a1b2c3d/waterfall", strings.NewReader(`{}`)))
@@ -46,7 +46,7 @@ func TestGetWaterfallActsOnTheTraceTheRouterMatched(t *testing.T) {
 // for it, or a caller could name one trace in the path and read another.
 func TestGetWaterfallIgnoresATraceIDQueryValue(t *testing.T) {
 	module := &stubModule{}
-	router := routing.Serve(http.MethodPost, "/v1/o11y/traces/{traceID}/waterfall", http.HandlerFunc(NewHandler(module).GetWaterfallV4))
+	router := routing.Serve(http.MethodPost, "/v1/o11y/traces/{traceId}/waterfall", http.HandlerFunc(NewHandler(module).GetWaterfallV4))
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, httptest.NewRequest(http.MethodPost, "/v1/o11y/traces/0a1b2c3d/waterfall?traceID=deadbeef", strings.NewReader(`{}`)))

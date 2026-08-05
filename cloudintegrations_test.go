@@ -530,12 +530,12 @@ func TestCloudIntegrationsIdentityIsPropagated(t *testing.T) {
 // route sees the 403 it always saw.
 func TestCloudIntegrationsRefusalKeepsTheRuntimeStatus(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		_, _ = io.WriteString(w, `{"status":"error","errorType":"forbidden","error":"caller is not an admin"}`)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	status, got := call(t, app, member(http.MethodGet, "/v1/o11y/cloud_integrations/aws/accounts", nil))
 	if status != http.StatusForbidden {
@@ -560,7 +560,7 @@ func TestCloudIntegrationsRefusalKeepsTheRuntimeStatus(t *testing.T) {
 // binder instead of the seam.
 func TestCloudIntegrationsFailClosedWithoutARuntime(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	postableAccount := `{"config":{"aws":{"regions":["us-east-1"]}},"credentials":` +
 		`{"o11yApiUrl":"https://api.hanzo.ai/v1/o11y","o11yApiKey":"pat_maxpower_7",` +

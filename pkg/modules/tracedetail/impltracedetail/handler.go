@@ -30,7 +30,7 @@ func (h *handler) GetWaterfallV4(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.module.GetWaterfallV4(r.Context(), coretypes.Param(r, "traceID"), req.SelectedSpanID, req.UncollapsedSpans)
+	result, err := h.module.GetWaterfallV4(r.Context(), coretypes.Param(r, "traceId"), req.SelectedSpanID, req.UncollapsedSpans)
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -51,7 +51,7 @@ func (h *handler) GetTraceAggregations(rw http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	result, err := h.module.GetTraceAggregations(r.Context(), coretypes.Param(r, "traceID"), req)
+	result, err := h.module.GetTraceAggregations(r.Context(), coretypes.Param(r, "traceId"), req)
 	if err != nil {
 		render.Error(rw, err)
 		return
@@ -67,7 +67,7 @@ func (h *handler) GetFlamegraph(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := h.module.GetFlamegraph(r.Context(), coretypes.Param(r, "traceID"), req.SelectedSpanID, req.SelectFields)
+	result, err := h.module.GetFlamegraph(r.Context(), coretypes.Param(r, "traceId"), req.SelectedSpanID, req.SelectFields)
 	if err != nil {
 		render.Error(rw, err)
 		return

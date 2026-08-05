@@ -2,7 +2,6 @@ package o11y
 
 import (
 	"net/http"
-	"sync"
 
 	"github.com/zap-proto/zip"
 )
@@ -36,9 +35,9 @@ import (
 //
 // The o11y runtime (metrics, traces, logs, dashboards, alerts) is heavy:
 // telemetry stores, rule manager, websocket attachments, opamp server. These
-// routes do not re-implement it — each hands its call to the handler the runtime
-// registers via SetHandler (see relay), and until one is registered they 503
-// with a clear error rather than pretending.
+// routes do not re-implement it — each hands its call to the runtime's handler
+// FOR ITS OWN ADDRESS (see [SetRuntime] and relay), and until a runtime is
+// installed they 503 with a clear error rather than pretending.
 //
 // EVERY ROUTE IS NAMED. There is no /v1/o11y/* catch-all any more. The runtime
 // registers 367 method+path pairs; 356 of them are typed ops declared in the
@@ -187,27 +186,25 @@ func Mount(app *zip.App, opts ...Option) error {
 // /v1/o11y, so the old catch-all never saw them. That is the second thing a
 // wildcard hides — not just which routes are un-typed, but which are missing.
 func mountHatches(app *zip.App) {
-	h := zip.AdaptNetHTTP(handlerAdapter{})
-
 	// ── 1. STREAMS: there is no one answer to name ───────────────────────────
 	// These never produce a single complete JSON value. relay buffers a whole
 	// answer through an httptest recorder before decoding it, so a typed
 	// livetail would hang on the first tail, and a typed progress poll would
 	// return only after the query it reports on had already finished — which is
 	// the one thing a progress endpoint must not do.
-	route(app, http.MethodGet, o11yRoot+"/logs/livetail", h)    // unbounded stream of log records
-	route(app, http.MethodGet, o11yRoot+"/query_progress", h)   // long-poll: holds the connection until the next tick
-	route(app, http.MethodGet, "/ws/query_progress", h)         // the same read over a websocket; the Upgrade IS the contract
-	route(app, http.MethodPost, o11yRoot+"/export_raw_data", h) // chunked CSV/JSONL attachment, X-Response-Complete trailer
+	route(app, http.MethodGet, o11yRoot+"/logs/livetail")    // unbounded stream of log records
+	route(app, http.MethodGet, o11yRoot+"/query_progress")   // long-poll: holds the connection until the next tick
+	route(app, http.MethodGet, "/ws/query_progress")         // the same read over a websocket; the Upgrade IS the contract
+	route(app, http.MethodPost, o11yRoot+"/export_raw_data") // chunked CSV/JSONL attachment, X-Response-Complete trailer
 
 	// ── 2. REDIRECTS: the answer is a Location, not a body ───────────────────
 	// The three sign-in callbacks answer 303 with a Location header and no
 	// payload. A typed op declares a 2xx JSON contract, so typing these would
 	// publish a response schema for a response that does not exist, and hide the
 	// header that is the entire point of the call.
-	route(app, http.MethodGet, o11yRoot+"/complete/google", h) // Google OIDC callback → 303 to the console
-	route(app, http.MethodGet, o11yRoot+"/complete/oidc", h)   // generic OIDC callback → 303
-	route(app, http.MethodPost, o11yRoot+"/complete/saml", h)  // SAML assertion consumer → 303
+	route(app, http.MethodGet, o11yRoot+"/complete/google") // Google OIDC callback → 303 to the console
+	route(app, http.MethodGet, o11yRoot+"/complete/oidc")   // generic OIDC callback → 303
+	route(app, http.MethodPost, o11yRoot+"/complete/saml")  // SAML assertion consumer → 303
 
 	// ── 3. A FOREIGN PROTOCOL WE RECEIVE ─────────────────────────────────────
 	// Sentry-compatible ingest. The body is an application/x-sentry-envelope
@@ -216,58 +213,8 @@ func mountHatches(app *zip.App) {
 	// name: an SDK appends its own fixed /api/<project>/envelope/ suffix to
 	// whatever DSN path it is given, so renaming it would break every SDK in the
 	// field. We RECEIVE this shape; we do not publish it.
-	route(app, http.MethodPost, o11yRoot+"/api/:project_id/envelope/", h) // Sentry envelope ingest
-	route(app, http.MethodPost, o11yRoot+"/api/:project_id/store/", h)    // legacy single-event ingest
-	route(app, http.MethodPost, sentryRoot+"/:project/envelope/", h)      // the same wire on the clean /v1/sentry root
-	route(app, http.MethodPost, sentryRoot+"/:project/store/", h)         // same
-}
-
-// handlerAdapter forwards each request to the registered runtime handler
-// or returns 503 if none is set yet. It does NOT touch r.URL: the runtime's
-// routes are registered at their full public /v1/o11y/<resource> paths, so a
-// rewrite here could only ever move a request OFF its route. The previous
-// rewrite onto an /api/ namespace outlived that namespace and 404'd everything.
-type handlerAdapter struct{}
-
-func (handlerAdapter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h := getHandler()
-	if h == nil {
-		http.Error(w, "o11y runtime not initialized", http.StatusServiceUnavailable)
-		return
-	}
-	h.ServeHTTP(w, r)
-}
-
-var (
-	hmu        sync.RWMutex
-	registered http.Handler
-)
-
-// SetHandler registers the o11y runtime's public HTTP handler — the destination
-// every op in this table relays to.
-//
-// A HOST SETS THIS WHEN THE RUNTIME IS SOMEWHERE ELSE. The unified cloud binary
-// does: it mounts this table on its own router and points it at the runtime it
-// embedded (or, failing that, at the standalone Deployment it proxies), so the
-// table names a surface that answers one hop away.
-//
-// The standalone server does NOT, and must not: there the table is mounted on
-// the very router the runtime already answers on (pkg/query-service/app, see
-// publish), so the service's own handler answers first and relay is never
-// reached. Pointing this back at that same router would make an op that ever DID
-// dispatch relay into itself. Nothing to set is the correct configuration for a
-// host that IS the runtime.
-//
-// Safe for concurrent use; pass nil to unset.
-func SetHandler(h http.Handler) {
-	hmu.Lock()
-	registered = h
-	hmu.Unlock()
-}
-
-func getHandler() http.Handler {
-	hmu.RLock()
-	h := registered
-	hmu.RUnlock()
-	return h
+	route(app, http.MethodPost, o11yRoot+"/api/:project_id/envelope/") // Sentry envelope ingest
+	route(app, http.MethodPost, o11yRoot+"/api/:project_id/store/")    // legacy single-event ingest
+	route(app, http.MethodPost, sentryRoot+"/:project/envelope/")      // the same wire on the clean /v1/sentry root
+	route(app, http.MethodPost, sentryRoot+"/:project/store/")         // same
 }

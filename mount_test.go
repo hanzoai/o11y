@@ -39,7 +39,7 @@ func TestNamedRouteWithoutRuntimeReturns503(t *testing.T) {
 	if err := o11y.Mount(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	for _, target := range []string{
 		"/v1/o11y/logs/livetail", // a hatch

@@ -26,14 +26,14 @@ func TestRulesAlertsOpsRelayVerbatim(t *testing.T) {
 		sawPath   string
 		sawBody   []byte
 	)
-	SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	SetRuntime(Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sawMethod, sawPath = r.Method, r.URL.Path
 		sawBody, _ = io.ReadAll(r.Body)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{"status":"success"}`))
-	}))
-	defer SetHandler(nil)
+	})))
+	defer SetRuntime(nil)
 
 	cases := []struct {
 		name       string
@@ -94,13 +94,13 @@ func TestRulesAlertsHistoryQueryForwarded(t *testing.T) {
 
 	var sawPath string
 	var sawQuery url.Values
-	SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	SetRuntime(Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sawPath, sawQuery = r.URL.Path, r.URL.Query()
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(`{"status":"success"}`))
-	}))
-	defer SetHandler(nil)
+	})))
+	defer SetRuntime(nil)
 
 	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/v1/o11y/rules/r1/history/stats?start=10&end=20", http.NoBody))
 	if err != nil {

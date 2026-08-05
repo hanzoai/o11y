@@ -33,15 +33,16 @@ func declaredAt(t *testing.T, app *zip.App, method, target string) bool {
 	return resp.StatusCode != http.StatusNotFound && resp.StatusCode != http.StatusMethodNotAllowed
 }
 
-// mount builds an app with the given claims. SetHandler(nil) makes "declared"
-// answer 503 rather than reaching a runtime.
+// mountClaiming builds an app with the given claims. With no runtime installed,
+// a declared address answers 503 rather than reaching one — which is what lets
+// this file read "declared" off the answer without standing a runtime up.
 func mountClaiming(t *testing.T, opts ...o11y.Option) *zip.App {
 	t.Helper()
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	if err := o11y.Mount(app, opts...); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 	return app
 }
 

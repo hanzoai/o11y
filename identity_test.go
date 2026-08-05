@@ -137,12 +137,12 @@ func TestCompleteCallbacksAreNamedHatches(t *testing.T) {
 	app := mounted(t)
 
 	var saw string
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		saw = r.URL.Path
 		w.Header().Set("Location", "https://console.hanzo.ai/")
 		w.WriteHeader(http.StatusSeeOther)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	for _, cb := range []struct{ method, target string }{
 		{http.MethodGet, "/v1/o11y/complete/google"},
@@ -305,7 +305,7 @@ func TestIdentityPropagatesTheCaller(t *testing.T) {
 // wildcard gives when nothing has been registered yet.
 func TestIdentityFailsClosedWithoutARuntime(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	for _, tc := range []struct{ method, target string }{
 		{http.MethodGet, "/v1/o11y/users"},

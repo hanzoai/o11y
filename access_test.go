@@ -34,7 +34,7 @@ import (
 func answers(t *testing.T, status int, body string) **http.Request {
 	t.Helper()
 	var req *http.Request
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		read, _ := io.ReadAll(r.Body)
 		r.Body = io.NopCloser(bytes.NewReader(read))
 		req = r.Clone(r.Context())
@@ -45,8 +45,8 @@ func answers(t *testing.T, status int, body string) **http.Request {
 		if body != "" {
 			_, _ = io.WriteString(w, body)
 		}
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 	return &req
 }
 
@@ -176,7 +176,7 @@ func TestAccessRefusalKeepsTheRuntimeStatus(t *testing.T) {
 // wildcard gives when nothing has been registered yet.
 func TestAccessFailsClosedWithoutARuntime(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	for _, tc := range []struct {
 		method, target, body string
