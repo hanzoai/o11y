@@ -56,6 +56,12 @@ type Chain func(defs []handler.ResourceDef) func(http.Handler) http.Handler
 
 // Route is one registration: the method, the PUBLIC template in brace spelling,
 // and the handler that answers it.
+//
+// Handler is the WHOLE answer — the chain composed around the leaf, not the bare
+// body underneath it. A route's handler is what happens when you knock on that
+// door, and the audit record, the timeout and the resource resolution are part of
+// what happens. Recording the bare one would make the census describe a route
+// nobody can reach.
 type Route struct {
 	Method  string
 	Path    string
@@ -68,6 +74,9 @@ type Route struct {
 // what registration did is the only evidence the routes are there.
 type Table struct {
 	routes []Route
+	// at is the same registrations keyed by address, so a caller that KNOWS the
+	// address does not have to re-derive it by matching. See [Table.Handler].
+	at map[string]http.Handler
 }
 
 // Routes returns the registrations in the order they were made — which is the
@@ -77,6 +86,38 @@ func (t *Table) Routes() []Route {
 		return nil
 	}
 	return t.routes
+}
+
+// Handler is the answer at one ADDRESS, reached by name.
+//
+// THE TABLE IS THE SEAM. This service's surface is stated twice — once here, as
+// the implementation, and once in the module's own declaration of it
+// (github.com/hanzoai/o11y's typed ops), which names the same 367 addresses with
+// an input, an output and their prose. The declaration has always had to REACH
+// the implementation, and until now it did so by speaking HTTP to the whole
+// service: it built a request, handed it to an http.Handler that was the entire
+// router, and that router matched the path a second time to find the handler the
+// declaration had already named. An in-process round trip to answer a question
+// the caller had the answer to.
+//
+// A registration is a map from address to handler. Reading it as one deletes the
+// second match — and, more than that, it deletes the possibility of the two sides
+// disagreeing silently: a declared address that no registration answers is a nil
+// here, at the seam, instead of a 404 from a router the declaration never
+// intended to consult.
+//
+// path is the PUBLIC template in brace spelling — "/v1/o11y/traces/{traceId}",
+// the same string [Route.Path] carries and the same string the document
+// publishes. That is the one spelling the two sides agree on: the router's
+// (":traceId", ":project<guid>") carries matching rules that are the router's own
+// business and that the declaration does not state.
+//
+// A nil answer means no registration claims that address.
+func (t *Table) Handler(method, path string) http.Handler {
+	if t == nil {
+		return nil
+	}
+	return t.at[method+" "+path]
 }
 
 // Router registers routes on a zip router. Copying one is free and copies share
@@ -126,17 +167,25 @@ func (r Router) Group(prefix string) Router {
 // hold these silently let the first one win.
 func (r Router) Handle(method, path string, h http.Handler) Router {
 	full := template(join(r.prefix(), path))
-	for _, existing := range r.table.routes {
-		if existing.Method == method && existing.Path == full {
-			panic("routing: " + method + " " + full + " is registered twice")
-		}
+	if r.table.at == nil {
+		r.table.at = map[string]http.Handler{}
 	}
-	r.table.routes = append(r.table.routes, Route{Method: method, Path: full, Handler: h})
+	if _, taken := r.table.at[method+" "+full]; taken {
+		panic("routing: " + method + " " + full + " is registered twice")
+	}
 
 	served := h
 	if r.chain != nil {
 		served = r.chain(resourceDefs(h))(h)
 	}
+	// What the census records and what a by-name caller reaches are ONE value.
+	// Recording the chain here is also what lets a caller that arrives by name
+	// rather than by matching still be served exactly what the router serves —
+	// see [Table.Handler] and [addressed].
+	answer := addressed{template: full, served: served}
+	r.table.routes = append(r.table.routes, Route{Method: method, Path: full, Handler: answer})
+	r.table.at[method+" "+full] = answer
+
 	leaf := bind(full, zip.AdaptNetHTTP(served))
 	spelled := colonize(path)
 	switch method {
@@ -200,6 +249,26 @@ func Serve(method, template string, h http.Handler) http.Handler {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	New(app.Group(""), nil).Handle(method, template, h)
 	return adaptor.FiberApp(app.Fiber())
+}
+
+// addressed is one route's whole answer, carrying the address it answers at.
+//
+// A handler reached BY MATCHING is handed the route's values by the router that
+// matched it (see bind). A handler reached BY NAME has no router in front of it,
+// and the two members of the chain that need the route — Audit keys its record on
+// the template, Resource resolves the route's declared resources — would read an
+// empty route. So the address travels WITH the handler: the value that knows the
+// template is the value that was registered at it.
+//
+// The values are derived from the request's own path against that template, which
+// is exact because the caller built the path FROM the template ([zip.Address]).
+type addressed struct {
+	template string
+	served   http.Handler
+}
+
+func (a addressed) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	a.served.ServeHTTP(w, coretypes.SetRoute(r, a.template))
 }
 
 // bind puts the matched route's values on the request before the net/http chain

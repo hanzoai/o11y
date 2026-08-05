@@ -47,18 +47,19 @@ func getHealth() factory.Handler {
 	return h
 }
 
-// mountHealth registers the probe group on the native router, ahead of the
-// /v1/o11y/* delegation wildcard. The paths are the SAME literals the runtime
-// registers on mux (o11yapiserver registry.go), so native dispatch and the
-// fall-through answer the same request — one spelling per probe, not two.
+// mountHealth registers the probe group. The paths are the SAME literals the
+// runtime registers, so native dispatch and the fall-through answer the same
+// request — one spelling per probe, not two, and each probe's fall-through is now
+// the runtime's handler for that probe's OWN address rather than for the whole
+// surface.
 func mountHealth(app *zip.App) {
-	app.Get("/v1/o11y/livez", livez)
-	app.Get("/v1/o11y/healthz", probe(func(h factory.Handler) http.HandlerFunc { return h.Healthz }))
-	app.Get("/v1/o11y/readyz", probe(func(h factory.Handler) http.HandlerFunc { return h.Readyz }))
+	app.Get(o11yRoot+"/livez", livez(o11yRoot+"/livez"))
+	app.Get(o11yRoot+"/healthz", probe(o11yRoot+"/healthz", func(h factory.Handler) http.HandlerFunc { return h.Healthz }))
+	app.Get(o11yRoot+"/readyz", probe(o11yRoot+"/readyz", func(h factory.Handler) http.HandlerFunc { return h.Readyz }))
 }
 
-// delegate is the probe group's fall-through: the registered runtime handler,
-// named directly.
+// The fall-through is the runtime's handler for the probe's own address, reached
+// through the same hatch every un-typed route uses (claim.go).
 //
 // It used to be c.Next(), which worked only because a /v1/o11y/* catch-all was
 // registered after the probes and caught whatever they declined. Every route is
@@ -67,24 +68,27 @@ func mountHealth(app *zip.App) {
 // SetHealth yet, which is exactly when a liveness probe matters most. Naming the
 // destination is both the fix and the honest statement of what "fall through"
 // always meant here.
-var delegate = zip.AdaptNetHTTP(handlerAdapter{})
 
 // livez reports process liveness. factory.Handler.Livez renders an empty success
 // envelope with 200 unconditionally, so it is rendered natively here through the
 // shared render types rather than bridged. Falls through to the runtime when no
 // handler is set.
-func livez(c *zip.Ctx) error {
-	if getHealth() == nil {
-		return delegate(c)
+func livez(path string) zip.Handler {
+	delegate := hatch(http.MethodGet, path)
+	return func(c *zip.Ctx) error {
+		if getHealth() == nil {
+			return delegate(c)
+		}
+		return c.JSON(http.StatusOK, render.SuccessResponse{Status: render.StatusSuccess.String()})
 	}
-	return c.JSON(http.StatusOK, render.SuccessResponse{Status: render.StatusSuccess.String()})
 }
 
 // probe dispatches a stateful health check (healthz, readyz) through the runtime
 // handler selected by sel. The check reads the service registry, so its body
 // stays in factory.Handler (one home) and is reached over the net/http bridge;
 // the routing is native. Falls through to the runtime when no handler is set.
-func probe(sel func(factory.Handler) http.HandlerFunc) zip.Handler {
+func probe(path string, sel func(factory.Handler) http.HandlerFunc) zip.Handler {
+	delegate := hatch(http.MethodGet, path)
 	return func(c *zip.Ctx) error {
 		h := getHealth()
 		if h == nil {

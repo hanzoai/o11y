@@ -35,7 +35,7 @@ import (
 func apmRuntimeRaw(t *testing.T, raw string) (asked **http.Request) {
 	t.Helper()
 	var req *http.Request
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		read, _ := io.ReadAll(r.Body)
 		r.Body = io.NopCloser(bytes.NewReader(read))
 		req = r.Clone(r.Context())
@@ -43,8 +43,8 @@ func apmRuntimeRaw(t *testing.T, raw string) (asked **http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_, _ = io.WriteString(w, raw)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 	return &req
 }
 
@@ -417,12 +417,12 @@ func TestAPMIdentityIsPropagated(t *testing.T) {
 // legacy {status, errorType, error} answer read through apmRefusal.
 func TestAPMRefusalKeepsTheRuntimeStatus(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		_, _ = io.WriteString(w, `{"status":"error","errorType":"forbidden","error":"API Key is not allowed"}`)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	status, got := call(t, app, member(http.MethodPost, "/v1/o11y/services", strings.NewReader(`{"start":"1","end":"2"}`)))
 	if status != http.StatusForbidden {
@@ -437,7 +437,7 @@ func TestAPMRefusalKeepsTheRuntimeStatus(t *testing.T) {
 // delegation wildcard gives before a handler is registered.
 func TestAPMFailsClosedWithoutARuntime(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	for _, probe := range []struct{ method, target string }{
 		{http.MethodGet, "/v1/o11y/services/list"},

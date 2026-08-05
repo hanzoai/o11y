@@ -5,10 +5,10 @@ package o11y_test
 // It names every function in the package that SYNTHESIZES a request for the
 // runtime: one that builds an http.Request and hands it to the runtime
 // handler's ServeHTTP. Both halves are required, which is what separates a
-// relay from mount.go's handlerAdapter — the adapter forwards the request the
-// SERVER already built (whose request-target the server itself populated) and
-// so can never carry this defect. A relay builds the request, and a built
-// request is only server-shaped if the builder makes it so.
+// relay from claim.go's hatch — a hatch passes on the request the SERVER
+// already built (whose request-target the server itself populated) and so can
+// never carry this defect. A relay builds the request, and a built request is
+// only server-shaped if the builder makes it so.
 
 import (
 	"go/ast"

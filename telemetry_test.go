@@ -43,7 +43,7 @@ func runtime(t *testing.T, payload any) (wrote *[]byte, asked **http.Request) {
 	t.Helper()
 	var body []byte
 	var req *http.Request
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		read, _ := io.ReadAll(r.Body)
 		r.Body = io.NopCloser(bytes.NewReader(read))
 		req = r.Clone(r.Context())
@@ -57,8 +57,8 @@ func runtime(t *testing.T, payload any) (wrote *[]byte, asked **http.Request) {
 		}
 		w.WriteHeader(rec.Code)
 		_, _ = w.Write(body)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 	return &body, &req
 }
 
@@ -271,12 +271,12 @@ func TestRefusalKeepsTheRuntimeStatus(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			app := mounted(t)
-			o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(tc.status)
 				_, _ = io.WriteString(w, tc.body)
-			}))
-			t.Cleanup(func() { o11y.SetHandler(nil) })
+			})))
+			t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 			status, got := call(t, app, member(http.MethodGet, "/v1/sentry/logs?project=p1", nil))
 			if status != tc.status {
@@ -293,7 +293,7 @@ func TestRefusalKeepsTheRuntimeStatus(t *testing.T) {
 // wildcard gives when nothing has been registered yet.
 func TestTelemetryFailsClosedWithoutARuntime(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	for _, target := range []string{
 		"/v1/sentry/logs?project=p1",
@@ -376,12 +376,12 @@ func TestTheIngestDoorIsANamedHatch(t *testing.T) {
 	app := mounted(t)
 
 	var saw string
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		saw = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = io.WriteString(w, `{"id":"e1"}`)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	const target = "/v1/sentry/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"
 	if status, body := call(t, app, member(http.MethodPost, target, strings.NewReader("{}"))); status != http.StatusOK {

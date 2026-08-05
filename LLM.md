@@ -120,7 +120,54 @@ did: **233** routes from `pkg/apiserver/o11yapiserver` + **134** from
 = 353 OpenAPI operations = 353 MCP tools, 11 hatches, 3 probes). This repo has
 shipped the other outcome — 83 typed ops in files nothing called, building green
 and serving nothing — so the arithmetic is a test, not a comment
-(`pkg/apiserver/o11yapiserver/routes_test.go`, `pkg/http/routing/routing_test.go`).
+(`wantAPIServerRoutes` in `pkg/apiserver/o11yapiserver/routes_test.go`,
+`wantQueryServiceRoutes` in `pkg/query-service/app/address_test.go`, and 367 in
+`routes_test.go`). All three terms are asserted, because the sum is what turns
+"registered ⊆ declared, on both halves" into set equality — 134 was a sentence
+for one release, and a sentence cannot fail.
+
+## The table IS the seam — `Table.Handler`, and there is no second registration
+
+The service's surface used to be stated twice over: once here as the
+implementation, and once in this module's own declaration of it (the 353 typed
+ops), which named the same 367 addresses with an input, an output and their
+prose. The declaration had to REACH the implementation, and the only way it could
+was to speak HTTP to the WHOLE service — build a request, hand it to one
+`http.Handler` that was the entire router, and let that router match the path a
+second time to find the handler the declaration had already named. An in-process
+round trip, across a `net/http`↔fasthttp bridge, through an `httptest` recorder,
+353 times over.
+
+A registration is a map from address to handler. `Table.Handler(method, path)`
+reads it as one, and `o11y.SetRuntime` hands the whole table over
+(`server.go`'s `published.SetRuntime(s.routes)`). What that deletes:
+
+- **the second match**, and with it the entire failure class the reachability
+  census exists for — a request cannot lose its route to a router that is never
+  consulted;
+- **the silence**. A declared address no registration answers is now a `nil` at
+  the seam, sayable at boot, instead of the runtime's own 404 — indistinguishable
+  from a caller's typo and discovered by a customer. The two sides HAD drifted:
+  three addresses the declaration names `{traceId}` were registered `{traceID}`,
+  invisible because a router matches by POSITION;
+- **the 503 in the process that has all the handlers.** The standalone server
+  could not install itself as that one handler without an op relaying into the
+  router already serving it, so it installed nothing — and every op on its `/mcp`
+  surface and its by-name call plane answered 503 with all 367 handlers one map
+  lookup away. It now installs its own table.
+
+The address is stated ONCE, at the registration, and rides the call
+(`address.go`'s `addressed` → `zip.Address`); `relay` takes no method and no path.
+That retired 706 spellings of 367 addresses down to 367. A host whose runtime is
+in ANOTHER process installs `o11y.Whole(proxy)` — one door, honestly, because for
+a remote every address really does resolve to the same door.
+
+Reached BY NAME there is no router in front of the handler, so the two chain
+members that need the route (`Audit` keys on the template, `Resource` resolves the
+declared resources) would read an empty one. `routing.addressed` carries the
+template with the handler it was registered at and writes it via
+`coretypes.SetRoute` — the same representation `bind` writes for a matched
+request, one read on the other side.
 
 **The chain is composed at the LEAF, not registered as ambient middleware.** Two
 of its members need the route: Audit keys on the template, Resource resolves the

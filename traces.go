@@ -29,7 +29,6 @@ package o11y
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/hanzoai/o11y/pkg/types/spantypes"
 	"github.com/zap-proto/zip"
@@ -57,7 +56,7 @@ func mountTraces(app *zip.App) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func traceFields(ctx context.Context, _ *struct{}) (*O11yFieldCatalogOut, error) {
 	out := new(O11yFieldCatalogOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/traces/fields", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // traceFieldUpdate changes how one span field is stored — selects or deselects
@@ -66,7 +65,7 @@ func traceFields(ctx context.Context, _ *struct{}) (*O11yFieldCatalogOut, error)
 // Callers need the editor role; the runtime's own gate enforces it.
 func traceFieldUpdate(ctx context.Context, in *O11yFieldSetting) (*O11yFieldSetting, error) {
 	out := new(O11yFieldSetting)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/traces/fields", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // traceSpans returns one trace's spans as a column/row table, optionally
@@ -79,7 +78,7 @@ func traceSpans(ctx context.Context, in *O11yTraceSpansIn) (*O11yTraceSpansOut, 
 	// The trace id goes on VERBATIM, as the segment the router matched: it
 	// arrived percent-encoded or it did not, and re-encoding it here would hand
 	// the runtime a different id than the caller named.
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/traces/"+in.TraceID, query(
+	return out, relay(ctx, query(
 		"spanId", in.SpanID,
 		"levelUp", in.LevelUp,
 		"levelDown", in.LevelDown,
@@ -94,7 +93,7 @@ func traceSpans(ctx context.Context, in *O11yTraceSpansIn) (*O11yTraceSpansOut, 
 // Callers need the viewer role; the runtime's own gate enforces it.
 func traceWaterfall(ctx context.Context, in *O11yTraceWaterfallIn) (*O11yTraceWaterfallOut, error) {
 	out := new(O11yTraceWaterfallOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/traces/"+in.TraceID+"/waterfall", nil, in.PostableWaterfall, out)
+	return out, relay(ctx, nil, in.PostableWaterfall, out)
 }
 
 // traceFlamegraph returns a trace's flamegraph: spans bucketed by depth level,
@@ -103,7 +102,7 @@ func traceWaterfall(ctx context.Context, in *O11yTraceWaterfallIn) (*O11yTraceWa
 // Callers need the viewer role; the runtime's own gate enforces it.
 func traceFlamegraph(ctx context.Context, in *O11yTraceFlamegraphIn) (*O11yTraceFlamegraphOut, error) {
 	out := new(O11yTraceFlamegraphOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/traces/"+in.TraceID+"/flamegraph", nil, in.PostableFlamegraph, out)
+	return out, relay(ctx, nil, in.PostableFlamegraph, out)
 }
 
 // traceAggregations computes span aggregations over one trace — span count,
@@ -113,7 +112,7 @@ func traceFlamegraph(ctx context.Context, in *O11yTraceFlamegraphIn) (*O11yTrace
 // Callers need the viewer role; the runtime's own gate enforces it.
 func traceAggregations(ctx context.Context, in *O11yTraceAggregationsIn) (*O11yTraceAggregationsOut, error) {
 	out := new(O11yTraceAggregationsOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/traces/"+in.TraceID+"/aggregations", nil, in.PostableTraceAggregations, out)
+	return out, relay(ctx, nil, in.PostableTraceAggregations, out)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────

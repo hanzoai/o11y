@@ -109,20 +109,21 @@ func TestLivezRendersNatively(t *testing.T) {
 	}
 }
 
-// TestHealthFallsThroughWhenUnset proves the group degrades to the delegated
-// wildcard when no runtime handler is registered: the probe request reaches the
-// mux-tree handler installed via SetHandler, so behavior is unchanged until the
-// native path is wired.
+// TestHealthFallsThroughWhenUnset proves the probe group degrades to the runtime
+// when no native health handler is set: the request reaches the runtime's own
+// answer at that address, so behaviour is unchanged until the native path is
+// wired. Installed here through o11y.Whole, which is the runtime shape a probe
+// falling through is indifferent to — it wants the answer, not the lookup.
 func TestHealthFallsThroughWhenUnset(t *testing.T) {
 	app := newMounted(t)
 	o11y.SetHealth(nil)
 
 	var reached string
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		reached = r.URL.Path
 		w.WriteHeader(http.StatusOK)
-	}))
-	defer o11y.SetHandler(nil)
+	})))
+	defer o11y.SetRuntime(nil)
 
 	resp, _ := get(t, app, "/v1/o11y/livez")
 	if resp.StatusCode != http.StatusOK {

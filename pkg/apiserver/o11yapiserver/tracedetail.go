@@ -10,7 +10,7 @@ import (
 )
 
 func (provider *provider) addTraceDetailRoutes(router routing.Router) {
-	router.Post("/v1/o11y/traces/{traceID}/waterfall", handler.New(
+	router.Post("/v1/o11y/traces/{traceId}/waterfall", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.traceDetailHandler.GetWaterfallV4),
 		handler.OpenAPIDef{
 			ID:                  "GetWaterfallV4",
@@ -27,7 +27,7 @@ func (provider *provider) addTraceDetailRoutes(router routing.Router) {
 		},
 	))
 
-	router.Post("/v1/o11y/traces/{traceID}/aggregations", handler.New(
+	router.Post("/v1/o11y/traces/{traceId}/aggregations", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.traceDetailHandler.GetTraceAggregations),
 		handler.OpenAPIDef{
 			ID:                  "GetTraceAggregations",
@@ -44,7 +44,7 @@ func (provider *provider) addTraceDetailRoutes(router routing.Router) {
 		},
 	))
 
-	router.Post("/v1/o11y/traces/{traceID}/flamegraph", handler.New(
+	router.Post("/v1/o11y/traces/{traceId}/flamegraph", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.traceDetailHandler.GetFlamegraph),
 		handler.OpenAPIDef{
 			ID:                  "GetFlamegraph",

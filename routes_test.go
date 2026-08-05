@@ -143,8 +143,8 @@ func TestUnnamedPathIsNotServed(t *testing.T) {
 // setRuntime installs a stand-in runtime for the duration of the test.
 func setRuntime(t *testing.T, fn http.HandlerFunc) {
 	t.Helper()
-	o11y.SetHandler(fn)
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	o11y.SetRuntime(o11y.Whole(fn))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 }
 
 // THE ELEVEN. Each hatch is registered at its exact method and path, and each
@@ -197,7 +197,7 @@ func TestHatchesDelegateVerbatim(t *testing.T) {
 // its own route.
 func TestHatchWithoutRuntimeIs503(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/v1/o11y/logs/livetail", nil))
 	if err != nil {
 		t.Fatalf("Test: %v", err)

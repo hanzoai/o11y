@@ -31,7 +31,6 @@ package o11y
 import (
 	"context"
 	"encoding/json"
-	"net/http"
 	"time"
 
 	"github.com/zap-proto/zip"
@@ -80,35 +79,35 @@ func mountAPM(app *zip.App) {
 // error rates, and the entry-point operations the numbers were computed over.
 func services(ctx context.Context, in *O11yServicesIn) (*O11yServicesOut, error) {
 	out := new(O11yServicesOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/services", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // serviceNames lists the name of every service the trace store holds, with no
 // window applied — the complete catalog, for pickers and autocomplete.
 func serviceNames(ctx context.Context, in *O11yServiceNamesIn) (*O11yServiceNames, error) {
 	out := new(O11yServiceNames)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/services/list", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // topOperations returns one service's heaviest operations in the window, each
 // with p50/p95/p99 latency, how often it ran and how often it errored.
 func topOperations(ctx context.Context, in *O11yOperationsIn) (*O11yOperationsOut, error) {
 	out := new(O11yOperationsOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/service/top_operations", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // topLevelOperations maps each service to its entry-point span names — for the
 // one service named in the request, or for every service when none is.
 func topLevelOperations(ctx context.Context, in *O11yTopLevelOpsIn) (*O11yServiceOperations, error) {
 	out := new(O11yServiceOperations)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/service/top_level_operations", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // entryPointOperations returns one service's entry-point operations with the
 // same latency and error profile topOperations reports.
 func entryPointOperations(ctx context.Context, in *O11yOperationsIn) (*O11yOperationsOut, error) {
 	out := new(O11yOperationsOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/service/entry_point_operations", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // ── the messaging-queue surface ───────────────────────────────────────────────
@@ -119,7 +118,7 @@ func entryPointOperations(ctx context.Context, in *O11yOperationsIn) (*O11yOpera
 // span attribute.
 func queueOverview(ctx context.Context, in *O11yQueueListIn) (*O11yQueueRowsOut, error) {
 	out := new(O11yQueueRowsOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/queue-overview", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // producersOnboarding checks whether the spans the Kafka producer views need
@@ -127,35 +126,35 @@ func queueOverview(ctx context.Context, in *O11yQueueListIn) (*O11yQueueRowsOut,
 // and, on failure, what is missing from the instrumentation.
 func producersOnboarding(ctx context.Context, in *O11yQueueIn) (*O11yQueueChecksOut, error) {
 	out := new(O11yQueueChecksOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/onboarding/producers", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // consumersOnboarding checks whether the spans the Kafka consumer views need
 // are arriving, row for row like producersOnboarding.
 func consumersOnboarding(ctx context.Context, in *O11yQueueIn) (*O11yQueueChecksOut, error) {
 	out := new(O11yQueueChecksOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/onboarding/consumers", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // kafkaOnboarding checks whether Kafka's own metrics — consumer lag and
 // partition telemetry — are arriving, so the lag views can be lit up.
 func kafkaOnboarding(ctx context.Context, in *O11yQueueIn) (*O11yQueueChecksOut, error) {
 	out := new(O11yQueueChecksOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/onboarding/kafka", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // partitionLatency returns the per-partition latency overview for the window —
 // each topic/partition with its throughput and latency profile.
 func partitionLatency(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/partition-latency/overview", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // consumerPartitionLatency returns the consumer-group latency detail for the
 // topic and partition named in the request's variables.
 func consumerPartitionLatency(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/partition-latency/consumer", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // producerLagDetails returns the producer side of a consumer-lag view: the
@@ -163,7 +162,7 @@ func consumerPartitionLatency(ctx context.Context, in *O11yQueueIn) (*O11yQueryR
 // throughput and latency over the window.
 func producerLagDetails(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/consumer-lag/producer-details", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // consumerLagDetails returns the consumer side of a consumer-lag view: the
@@ -171,7 +170,7 @@ func producerLagDetails(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOu
 // throughput and latency over the window.
 func consumerLagDetails(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/consumer-lag/consumer-details", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // consumerLagNetwork returns consumer network latency correlated per client:
@@ -179,35 +178,35 @@ func consumerLagDetails(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOu
 // fetch latency joins in as a latency column per client/instance/service.
 func consumerLagNetwork(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/consumer-lag/network-latency", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // producerThroughput returns the producer topic-throughput overview for the
 // window — what each producer service wrote, per topic.
 func producerThroughput(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/topic-throughput/producer", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // producerThroughputDetails breaks one producer topic's throughput down using
 // the topic and service named in variables.
 func producerThroughputDetails(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/topic-throughput/producer-details", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // consumerThroughput returns the consumer topic-throughput overview for the
 // window — what each consumer group read, per topic.
 func consumerThroughput(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/topic-throughput/consumer", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // consumerThroughputDetails breaks one consumer topic's throughput down using
 // the topic and service named in variables.
 func consumerThroughputDetails(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/topic-throughput/consumer-details", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // spanEvaluation correlates producer and consumer spans over the evaluation
@@ -215,7 +214,7 @@ func consumerThroughputDetails(ctx context.Context, in *O11yQueueIn) (*O11yQuery
 // end-to-end delay — the check that messages produced are being consumed.
 func spanEvaluation(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, error) {
 	out := new(O11yQueryRangeOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/messaging-queues/kafka/span/evaluation", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // ── the third-party API overview ──────────────────────────────────────────────
@@ -225,14 +224,14 @@ func spanEvaluation(ctx context.Context, in *O11yQueueIn) (*O11yQueryRangeOut, e
 // a bare IP address are dropped unless show_ip asks for them.
 func domainList(ctx context.Context, in *O11yDomainsIn) (*O11yDomainsOut, error) {
 	out := new(O11yDomainsOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/third-party-apis/overview/list", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // domainInfo returns one external domain's endpoint-level breakdown — each
 // endpoint with its rate, error and latency columns over the window.
 func domainInfo(ctx context.Context, in *O11yDomainsIn) (*O11yDomainsOut, error) {
 	out := new(O11yDomainsOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/third-party-apis/overview/domain", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────

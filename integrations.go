@@ -108,7 +108,7 @@ func mountIntegrations(app *zip.App) {
 // not-installed. Viewer gate.
 func listIntegrations(ctx context.Context, in *O11yListIntegrationsIn) (*O11yIntegrationsListOut, error) {
 	out := new(O11yIntegrationsListOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/integrations", query("is_installed", in.IsInstalled), nil, out)
+	return out, relay(ctx, query("is_installed", in.IsInstalled), nil, out)
 }
 
 // getIntegration returns one integration's full detail — its overview,
@@ -116,7 +116,7 @@ func listIntegrations(ctx context.Context, in *O11yListIntegrationsIn) (*O11yInt
 // installation record when the org has installed it. Viewer gate.
 func getIntegration(ctx context.Context, in *O11yIntegrationRef) (*O11yIntegrationOut, error) {
 	out := new(O11yIntegrationOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/integrations/"+in.IntegrationID, nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // getIntegrationConnectionStatus reports whether the integration's logs and
@@ -125,21 +125,21 @@ func getIntegration(ctx context.Context, in *O11yIntegrationRef) (*O11yIntegrati
 // empty status rather than an error. Viewer gate.
 func getIntegrationConnectionStatus(ctx context.Context, in *O11yConnectionStatusIn) (*O11yConnectionStatusOut, error) {
 	out := new(O11yConnectionStatusOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/integrations/"+in.IntegrationID+"/connection_status", query("lookback_seconds", in.LookbackSeconds), nil, out)
+	return out, relay(ctx, query("lookback_seconds", in.LookbackSeconds), nil, out)
 }
 
 // installIntegration installs an integration into the caller's org from its id
 // and configuration, answering with the installed catalog item. Viewer gate.
 func installIntegration(ctx context.Context, in *integrations.InstallIntegrationRequest) (*O11yInstallOut, error) {
 	out := new(O11yInstallOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/integrations/install", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // uninstallIntegration removes an integration from the caller's org by id.
 // Viewer gate.
 func uninstallIntegration(ctx context.Context, in *integrations.UninstallIntegrationRequest) (*O11yIntegrationAck, error) {
 	out := new(O11yIntegrationAck)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/integrations/uninstall", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // ── cloud integrations — accounts ─────────────────────────────────────────────
@@ -148,7 +148,7 @@ func uninstallIntegration(ctx context.Context, in *integrations.UninstallIntegra
 // to establish the cloud integration, for the given cloud provider. Admin gate.
 func getConnectionCredentials(ctx context.Context, in *O11yCloudProviderRef) (*O11yCredentialsOut, error) {
 	out := new(O11yCredentialsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/credentials", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // createAccount connects a new cloud-integration account for the given
@@ -156,33 +156,33 @@ func getConnectionCredentials(ctx context.Context, in *O11yCloudProviderRef) (*O
 // and the artifact the agent deploys to complete the connection. Admin gate.
 func createAccount(ctx context.Context, in *O11yCreateAccountIn) (*O11yCreateAccountOut, error) {
 	out := new(O11yCreateAccountOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/accounts", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // listAccounts lists the cloud-integration accounts connected for the given
 // provider. Admin gate.
 func listAccounts(ctx context.Context, in *O11yCloudProviderRef) (*O11yAccountsOut, error) {
 	out := new(O11yAccountsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/accounts", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // getAccount returns one connected account for the given provider, by id. Admin
 // gate.
 func getAccount(ctx context.Context, in *O11yAccountRef) (*O11yAccountOut, error) {
 	out := new(O11yAccountOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/accounts/"+in.ID, nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // updateAccount changes a connected account's configuration for the given
 // provider, by id. Admin gate.
 func updateAccount(ctx context.Context, in *O11yUpdateAccountIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPut, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/accounts/"+in.ID, nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // disconnectAccount tears down a connected account for the given provider, by
 // id. Admin gate.
 func disconnectAccount(ctx context.Context, in *O11yAccountRef) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/accounts/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, nil, nil, nil)
 }
 
 // ── cloud integrations — services ─────────────────────────────────────────────
@@ -191,34 +191,34 @@ func disconnectAccount(ctx context.Context, in *O11yAccountRef) (*struct{}, erro
 // optionally scoped to one cloud integration. Admin gate.
 func listServicesMetadata(ctx context.Context, in *O11yListServicesMetadataIn) (*O11yServicesMetadataOut, error) {
 	out := new(O11yServicesMetadataOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/services", query("cloud_integration_id", in.CloudIntegrationID), nil, out)
+	return out, relay(ctx, query("cloud_integration_id", in.CloudIntegrationID), nil, out)
 }
 
 // listAccountServicesMetadata lists the services metadata for one connected
 // account of the given provider, by account id. Admin gate.
 func listAccountServicesMetadata(ctx context.Context, in *O11yAccountRef) (*O11yServicesMetadataOut, error) {
 	out := new(O11yServicesMetadataOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/accounts/"+in.ID+"/services", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // getService returns one service the given provider can collect from, by
 // service id, optionally scoped to one cloud integration. Admin gate.
 func getService(ctx context.Context, in *O11yGetServiceIn) (*O11yServiceOut, error) {
 	out := new(O11yServiceOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/services/"+in.ServiceID, query("cloud_integration_id", in.CloudIntegrationID), nil, out)
+	return out, relay(ctx, query("cloud_integration_id", in.CloudIntegrationID), nil, out)
 }
 
 // updateService changes a service's configuration for one connected account of
 // the given provider, by account id and service id. Admin gate.
 func updateService(ctx context.Context, in *O11yUpdateServiceIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPut, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/accounts/"+in.ID+"/services/"+in.ServiceID, nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // getAccountService returns one service and its configuration for a connected
 // account of the given provider, by account id and service id. Admin gate.
 func getAccountService(ctx context.Context, in *O11yAccountServiceRef) (*O11yServiceOut, error) {
 	out := new(O11yServiceOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/accounts/"+in.ID+"/services/"+in.ServiceID, nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // agentCheckInDeprecated is the deployed agent's check-in on its original
@@ -226,7 +226,7 @@ func getAccountService(ctx context.Context, in *O11yAccountServiceRef) (*O11ySer
 // running. Viewer gate — the agent's role is viewer.
 func agentCheckInDeprecated(ctx context.Context, in *O11yAgentCheckInIn) (*O11yAgentCheckInOut, error) {
 	out := new(O11yAgentCheckInOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/cloud-integrations/"+in.CloudProvider+"/agent-check-in", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // agentCheckIn is the deployed agent's check-in — the path consistent with the
@@ -234,7 +234,7 @@ func agentCheckInDeprecated(ctx context.Context, in *O11yAgentCheckInIn) (*O11yA
 // connection can be tracked. Viewer gate — the agent's role is viewer.
 func agentCheckIn(ctx context.Context, in *O11yAgentCheckInIn) (*O11yAgentCheckInOut, error) {
 	out := new(O11yAgentCheckInOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/cloud_integrations/"+in.CloudProvider+"/accounts/check_in", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // ── gateway ingestion keys ────────────────────────────────────────────────────
@@ -243,50 +243,50 @@ func agentCheckIn(ctx context.Context, in *O11yAgentCheckInIn) (*O11yAgentCheckI
 // gate.
 func getIngestionKeys(ctx context.Context, in *O11yIngestionKeysIn) (*O11yIngestionKeysOut, error) {
 	out := new(O11yIngestionKeysOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/gateway/ingestion_keys", query("page", in.Page, "per_page", in.PerPage), nil, out)
+	return out, relay(ctx, query("page", in.Page, "per_page", in.PerPage), nil, out)
 }
 
 // searchIngestionKeys lists the workspace's ingestion keys whose name matches
 // the search, paginated. Editor gate.
 func searchIngestionKeys(ctx context.Context, in *O11ySearchIngestionKeysIn) (*O11yIngestionKeysOut, error) {
 	out := new(O11yIngestionKeysOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/gateway/ingestion_keys/search", query("name", in.Name, "page", in.Page, "per_page", in.PerPage), nil, out)
+	return out, relay(ctx, query("name", in.Name, "page", in.Page, "per_page", in.PerPage), nil, out)
 }
 
 // createIngestionKey mints an ingestion key for the workspace, answering with
 // the created key. Editor gate.
 func createIngestionKey(ctx context.Context, in *gatewaytypes.PostableIngestionKey) (*O11yCreatedIngestionKeyOut, error) {
 	out := new(O11yCreatedIngestionKeyOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/gateway/ingestion_keys", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // updateIngestionKey changes an ingestion key, by id. Editor gate.
 func updateIngestionKey(ctx context.Context, in *O11yUpdateIngestionKeyIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPatch, o11yRoot+"/gateway/ingestion_keys/"+in.KeyID, nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // deleteIngestionKey removes an ingestion key, by id. Editor gate.
 func deleteIngestionKey(ctx context.Context, in *O11yIngestionKeyRef) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/gateway/ingestion_keys/"+in.KeyID, nil, nil, nil)
+	return nil, relay(ctx, nil, nil, nil)
 }
 
 // createIngestionKeyLimit sets a signal limit on an ingestion key, by key id,
 // answering with the created limit. Editor gate.
 func createIngestionKeyLimit(ctx context.Context, in *O11yCreateLimitIn) (*O11yCreatedLimitOut, error) {
 	out := new(O11yCreatedLimitOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/gateway/ingestion_keys/"+in.KeyID+"/limits", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // updateIngestionKeyLimit changes an ingestion key limit, by limit id. Editor
 // gate.
 func updateIngestionKeyLimit(ctx context.Context, in *O11yUpdateLimitIn) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPatch, o11yRoot+"/gateway/ingestion_keys/limits/"+in.LimitID, nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // deleteIngestionKeyLimit removes an ingestion key limit, by limit id. Editor
 // gate.
 func deleteIngestionKeyLimit(ctx context.Context, in *O11yLimitRef) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/gateway/ingestion_keys/limits/"+in.LimitID, nil, nil, nil)
+	return nil, relay(ctx, nil, nil, nil)
 }
 
 // ── Zeus — deployment profile and host ────────────────────────────────────────
@@ -295,19 +295,19 @@ func deleteIngestionKeyLimit(ctx context.Context, in *O11yLimitRef) (*struct{}, 
 // observability today and what they plan — overwriting any prior one. Admin
 // gate.
 func putProfile(ctx context.Context, in *zeustypes.PostableProfile) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPut, o11yRoot+"/zeus/profiles", nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // getHosts returns the deployment's host info from Zeus. Viewer gate.
 func getHosts(ctx context.Context, _ *struct{}) (*O11yGettableHostOut, error) {
 	out := new(O11yGettableHostOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/zeus/hosts", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // putHost records the deployment's host in Zeus, overwriting any prior one.
 // Admin gate.
 func putHost(ctx context.Context, in *zeustypes.PostableHost) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodPut, o11yRoot+"/zeus/hosts", nil, in, nil)
+	return nil, relay(ctx, nil, in, nil)
 }
 
 // ── inputs the URL carries ────────────────────────────────────────────────────

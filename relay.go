@@ -14,21 +14,45 @@ package o11y
 // per value — so a change to the seam had five sites to find, and a change to
 // the root had eight.
 //
-// The fix is the obvious one once seen: the path a caller reaches is a VALUE,
-// so ops pass the whole public path (o11yRoot+"/logs") and relay concatenates
-// nothing. Which face an op belongs to is a fact about the file it lives in,
-// not a parameter of the transport.
+// THE ADDRESS IS NOT A PARAMETER OF THE TRANSPORT. That collapse left one seam
+// and one root, and one thing still spelled twice: the address. Every op stated
+// it at its registration and then stated it AGAIN, by hand, in the call —
 //
-// What relay is: it hands a typed op's call to the handler SetHandler
-// registered — the same value the delegation wildcard forwards to — so the
-// request runs the whole chain it always ran, in order. The auth middleware
-// resolves the same identity, the SAME ViewAccess/EditAccess/AdminAccess gate
-// the route has always had refuses the same callers, the audit record is
-// written where it always was, and the bytes it answers with are the bytes the
-// runtime wrote. There is no policy here: no tenant is resolved, no role is
-// checked, nothing is scoped. Those all happen where they already do, one layer
-// in. That is what keeps a typed op a NAMING of the wire rather than a second
+//	opGet(g, "/traces/:traceId", traceSpans)                    // once
+//	relay(ctx, "GET", o11yRoot+"/traces/"+in.TraceID, …)        // and again
+//
+// — 706 spellings of 367 addresses, and the second spelling is the one that got
+// requested, so a route pattern that stopped agreeing with it was never
+// consulted and never contradicted. That is not hypothetical: three of these
+// addresses name their segment traceId while the runtime registered traceID, and
+// nothing in the process could tell, because a router matches by POSITION and a
+// parameter's name is invisible to it.
+//
+// So the address is stated once, at the registration, and travels with the call
+// (see claim.go's addressed). relay takes no method and no path: it reads the
+// address of the door that was knocked on, which is a fact about the call and
+// not a decision this function makes. The 119 hand-built paths are gone with it —
+// zip.Address renders the concrete one from the same input zip bound the segments
+// into, so the round trip is exact by construction.
+//
+// What relay is: it hands a typed op's call to the handler the runtime serves AT
+// THAT ADDRESS — the same handler the runtime's own router would dispatch to, so
+// the request runs the whole chain it always ran, in order. The auth middleware
+// resolves the same identity, the SAME ViewAccess/EditAccess/AdminAccess gate the
+// route has always had refuses the same callers, the audit record is written
+// where it always was, and the bytes it answers with are the bytes the runtime
+// wrote. There is no policy here: no tenant is resolved, no role is checked,
+// nothing is scoped. Those all happen where they already do, one layer in. That
+// is what keeps a typed op a NAMING of the wire rather than a second
 // implementation of it.
+//
+// What is GONE is the second match. The old seam handed the request to the
+// runtime's whole router, which parsed the path this function had just built to
+// find the handler this function had already named — an in-process HTTP round
+// trip to answer a question the caller had the answer to. Naming the address
+// deletes it, and deletes with it the entire failure class the reachability
+// census exists for: a request cannot lose its route to a router that is never
+// consulted.
 //
 // Identity is PROPAGATED, never minted: the gateway's assertion about the
 // caller travels on as the same headers it arrived on (zip.CallerOf reads
@@ -66,61 +90,26 @@ const (
 	sentryRoot = "/v1/sentry"
 )
 
-// under is the OpTarget that registers on app at a ROOT — the one place this
-// package's two public roots become route prefixes.
-//
-// It replaces app.Group(o11yRoot), and the difference is the operation ids.
-// zip qualifies an op's id by the prefix of the OCCURRENCE it answers under
-// (walk.go occurrenceID), because a definition included TWICE declares one id
-// and produces two operations, and an OpenAPI document cannot hold two
-// operations under one operationId. Sound rule — and o11yRoot is not that kind
-// of prefix. It is not a composition point a host chose; it is this service's
-// own address, fixed by HIP-0106 and spelled above. Reached through a Group it
-// read as one, and all 353 published ids became "v1.o11y.CreateRole" — renaming
-// every MCP tool, OpenAPI operationId, CLI command and generated SDK method in a
-// patch release.
-//
-// zip v1.24.2 fixed HALF of that: a DECLARED id (WithOperationID, or the op
-// helper below) now survives composition verbatim, so a Group can no longer
-// rename one. It is still only half. 217 of this package's 353 ops declare an
-// id; the other 136 take zip's shape-derived id, and that half IS still
-// qualified by the occurrence's prefix — deterministically and correctly, since
-// an undeclared id carries no promise to keep. Reached through a Group those 136
-// would publish as "v1.o11y.get_v1_o11y_…" instead of "get_v1_o11y_…", which is
-// the same rename in a smaller font. So this type stays until the count is 353,
-// and TestUnderIsStillLoadBearing measures it rather than trusting this
-// sentence.
-//
-// An occurrence at the ROOT prefix is unqualified, so this registers the ops on
-// app itself and lets OpScope.Prefix do what it documents — prepend to the op's
-// path. Same method, same full path, same middleware; the id is the one the
-// declaration wrote. That is also what mount.go's PATH UNTOUCHED already claimed
-// and what mountHealth already does by hand, so the Group was the odd one out.
-//
-// The middleware comes from app's own scope rather than being zeroed: Group
-// inherits the app's wrap, and dropping it here would silently unwrap every
-// typed op.
-type under struct {
-	app  *zip.App
-	root string
-}
-
-func (u under) OpScope() zip.OpScope {
-	s := u.app.OpScope()
-	s.Prefix = u.root
-	return s
-}
-
-// relay sends one typed op's call to the runtime at the FULL public path and
-// decodes the answer into the op's Out. Pass out == nil for the operations
+// relay hands one typed op's call to the runtime handler at the op's OWN address
+// and decodes the answer into the op's Out. Pass out == nil for the operations
 // whose answer is a 204 with no body.
-func relay(ctx context.Context, method, path string, params url.Values, body, out any) error {
-	h := getHandler()
-	if h == nil {
-		return zip.Errorf(http.StatusServiceUnavailable, "o11y runtime not initialized")
+//
+// The address comes from the context, not from the caller — see the file comment
+// and claim.go's addressed.
+func relay(ctx context.Context, params url.Values, body, out any) error {
+	a, known := addressOf(ctx)
+	if !known {
+		// Only reachable by calling an op's function directly rather than through
+		// the declaration that registered it, which is a programming error and not
+		// a request that can arrive.
+		return zip.ErrInternal("o11y: this operation was invoked outside its own registration, so it has no address to relay to")
+	}
+	h, err := at(a.method, a.template)
+	if err != nil {
+		return err
 	}
 
-	target := path
+	target := a.path
 	if q := params.Encode(); q != "" {
 		target += "?" + q
 	}
@@ -133,7 +122,7 @@ func relay(ctx context.Context, method, path string, params url.Values, body, ou
 		}
 		payload = bytes.NewReader(b)
 	}
-	req, err := http.NewRequestWithContext(ctx, method, target, payload)
+	req, err := http.NewRequestWithContext(ctx, a.method, target, payload)
 	if err != nil {
 		return zip.ErrBadRequest(err.Error())
 	}
@@ -144,22 +133,23 @@ func relay(ctx context.Context, method, path string, params url.Values, body, ou
 	// this request to a wire: it goes straight into an http.Handler, and a
 	// handler is entitled to read the field the server would have populated.
 	//
-	// It is not cosmetic. When the host embeds the runtime IN-PROCESS, that
-	// handler is adaptor.FiberApp, which copies r.RequestURI into the fasthttp
-	// request verbatim — so an empty one erased the path, fasthttp normalized it
-	// to "/", no API route matched, and the request fell through to the console
-	// web provider, which answers http.NotFound. That is why the unified door
-	// answered every relayed op
+	// The in-process case no longer depends on it — nothing matches this path any
+	// more, because the handler was chosen by name. It stays for the case that
+	// still does: a runtime in ANOTHER process is reached through [Whole], and
+	// behind that one door is a proxy that has to forward a request-target. It is
+	// also the field a middleware logs, and a blank one there reads as a lost
+	// request.
+	//
+	// The bug it was written for is worth keeping in view, because it is the whole
+	// argument for naming addresses. When the host embedded the runtime
+	// IN-PROCESS, that single handler was adaptor.FiberApp, which copies
+	// r.RequestURI into the fasthttp request verbatim — so an empty one erased the
+	// path, fasthttp normalized it to "/", no API route matched, and the request
+	// fell through to the console web provider, which answers http.NotFound. That
+	// is why the unified door answered every relayed op
 	//   404 {"status":404,"error":"404 page not found"}
 	// — /version, /health, /global/config, /users/me, all 353 typed ops — while
-	// the standalone runtime served the identical paths 200. The three native
-	// probes (livez/healthz/readyz) kept working precisely because mountHealth
-	// dispatches them itself and never comes through here, which is what made the
-	// break look like an auth problem instead of a lost path.
-	//
-	// The out-of-process host was immune (its handler is a reverse proxy, which
-	// re-derives the target from URL), so this only ever bit the embed — the
-	// configuration cloud runs in production.
+	// the standalone runtime served the identical paths 200.
 	req.RequestURI = target
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")

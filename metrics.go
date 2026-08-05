@@ -65,7 +65,7 @@ func mountMetrics(app *zip.App) {
 // its description, type, unit, temporality and monotonicity.
 func listMetrics(ctx context.Context, in *O11yMetricListIn) (*O11yMetricListOut, error) {
 	out := new(O11yMetricListOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics", query(
+	return out, relay(ctx, query(
 		"start", int(in.Start),
 		"end", int(in.End),
 		"limit", in.Limit,
@@ -78,21 +78,21 @@ func listMetrics(ctx context.Context, in *O11yMetricListIn) (*O11yMetricListOut,
 // time range — the volume view of the metrics explorer, pageable and sortable.
 func metricStats(ctx context.Context, in *O11yMetricStatsIn) (*O11yMetricStatsOut, error) {
 	out := new(O11yMetricStatsOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/metrics/stats", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // metricTreemap returns the proportional distribution of metrics by sample
 // count or time-series count, as the entries of a treemap.
 func metricTreemap(ctx context.Context, in *O11yMetricTreemapIn) (*O11yMetricTreemapOut, error) {
 	out := new(O11yMetricTreemapOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/metrics/treemap", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // metricAttributes returns one metric's attribute keys, each with its unique
 // values and their count.
 func metricAttributes(ctx context.Context, in *O11yMetricAttributesIn) (*O11yMetricAttributesOut, error) {
 	out := new(O11yMetricAttributesOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/attributes", query(
+	return out, relay(ctx, query(
 		"metricName", in.MetricName,
 		"start", int(in.Start),
 		"end", int(in.End),
@@ -103,7 +103,7 @@ func metricAttributes(ctx context.Context, in *O11yMetricAttributesIn) (*O11yMet
 // temporality and monotonicity.
 func metricMetadata(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricMetadataOut, error) {
 	out := new(O11yMetricMetadataOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/metadata", query(
+	return out, relay(ctx, query(
 		"metricName", in.MetricName,
 	), nil, out)
 }
@@ -112,14 +112,14 @@ func metricMetadata(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricMetad
 // temporality, monotonicity — and answers with the bare success envelope.
 func saveMetricMetadata(ctx context.Context, in *O11yMetricMetadataSaveIn) (*O11yMetricAckOut, error) {
 	out := new(O11yMetricAckOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/metrics/metadata", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // metricHighlights returns one metric's headline numbers: data points, total
 // and active time series, and when it was last received.
 func metricHighlights(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricHighlightsOut, error) {
 	out := new(O11yMetricHighlightsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/highlights", query(
+	return out, relay(ctx, query(
 		"metricName", in.MetricName,
 	), nil, out)
 }
@@ -127,7 +127,7 @@ func metricHighlights(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricHig
 // metricAlerts lists the alert rules that reference a metric.
 func metricAlerts(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricAlertsOut, error) {
 	out := new(O11yMetricAlertsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/alerts", query(
+	return out, relay(ctx, query(
 		"metricName", in.MetricName,
 	), nil, out)
 }
@@ -135,7 +135,7 @@ func metricAlerts(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricAlertsO
 // metricDashboards lists the dashboard panels that reference a metric.
 func metricDashboards(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricDashboardsOut, error) {
 	out := new(O11yMetricDashboardsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/dashboards", query(
+	return out, relay(ctx, query(
 		"metricName", in.MetricName,
 	), nil, out)
 }
@@ -144,14 +144,14 @@ func metricDashboards(ctx context.Context, in *O11yMetricNameIn) (*O11yMetricDas
 // thirty minutes — each series with its labels and timestamp/value pairs.
 func inspectMetric(ctx context.Context, in *O11yMetricInspectIn) (*O11yMetricInspectOut, error) {
 	out := new(O11yMetricInspectOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/metrics/inspect", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // metricsOnboarding reports whether any non-O11y metrics have been ingested —
 // the lightweight check onboarding polls.
 func metricsOnboarding(ctx context.Context, _ *struct{}) (*O11yMetricOnboardingOut, error) {
 	out := new(O11yMetricOnboardingOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metrics/onboarding", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // ── the metric reduction rule operations ──────────────────────────────────────
@@ -160,7 +160,7 @@ func metricsOnboarding(ctx context.Context, _ *struct{}) (*O11yMetricOnboardingO
 // rules, pageable and sortable by name, volume or recency.
 func listReductionRules(ctx context.Context, in *O11yReductionRuleListIn) (*O11yReductionRuleListOut, error) {
 	out := new(O11yReductionRuleListOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metric_reduction_rules", query(
+	return out, relay(ctx, query(
 		"orderBy", in.OrderBy,
 		"order", in.Order,
 		"search", in.Search,
@@ -174,14 +174,14 @@ func listReductionRules(ctx context.Context, in *O11yReductionRuleListIn) (*O11y
 // it with its id; a metric that already has a rule is refused.
 func createReductionRule(ctx context.Context, in *O11yReductionRuleCreateIn) (*O11yReductionRuleOut, error) {
 	out := new(O11yReductionRuleOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/metric_reduction_rules", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // reductionRuleStats returns total ingested vs retained series and samples and
 // the estimated monthly savings across all volume-control rules.
 func reductionRuleStats(ctx context.Context, _ *struct{}) (*O11yReductionStatsOut, error) {
 	out := new(O11yReductionStatsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metric_reduction_rules/stats", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // reductionRuleTimeseries returns ingested vs retained series over time across
@@ -189,14 +189,14 @@ func reductionRuleStats(ctx context.Context, _ *struct{}) (*O11yReductionStatsOu
 // response shape.
 func reductionRuleTimeseries(ctx context.Context, _ *struct{}) (*O11yReductionSeriesOut, error) {
 	out := new(O11yReductionSeriesOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metric_reduction_rules/timeseries", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // previewReductionRule estimates the series reduction and the dashboards and
 // alerts a candidate volume-control rule would touch, without persisting it.
 func previewReductionRule(ctx context.Context, in *O11yReductionRulePreviewIn) (*O11yReductionRulePreviewOut, error) {
 	out := new(O11yReductionRulePreviewOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/metric_reduction_rules/preview", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // reductionRule returns one volume-control rule by its id.
@@ -204,7 +204,7 @@ func reductionRule(ctx context.Context, in *O11yReductionRuleRef) (*O11yReductio
 	out := new(O11yReductionRuleOut)
 	// The id goes on VERBATIM, as the segment the router matched — re-encoding
 	// it here would hand the runtime a different id than the caller named.
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/metric_reduction_rules/"+in.ID, nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // saveReductionRule updates the match type and labels of a volume-control rule
@@ -214,12 +214,12 @@ func saveReductionRule(ctx context.Context, in *O11yReductionRuleSaveIn) (*O11yR
 	// The whole In rides as the body, id included. The runtime's decoder is
 	// tolerant and binds only matchType and labels; the PATH is the addressing
 	// authority at both hops, exactly as it was on the mux tree.
-	return out, relay(ctx, http.MethodPut, o11yRoot+"/metric_reduction_rules/"+in.ID, nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // deleteReductionRule deletes a volume-control rule by its id.
 func deleteReductionRule(ctx context.Context, in *O11yReductionRuleRef) (*struct{}, error) {
-	return nil, relay(ctx, http.MethodDelete, o11yRoot+"/metric_reduction_rules/"+in.ID, nil, nil, nil)
+	return nil, relay(ctx, nil, nil, nil)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────

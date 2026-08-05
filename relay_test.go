@@ -42,8 +42,8 @@ func adaptorRuntime(t *testing.T) {
 	rt.Fiber().Get(o11yHealthPath, func(c fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "ok"})
 	})
-	o11y.SetHandler(adaptor.FiberApp(rt.Fiber()))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	o11y.SetRuntime(o11y.Whole(adaptor.FiberApp(rt.Fiber())))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 }
 
 const (
@@ -90,12 +90,12 @@ func TestRelaySetsRequestURI(t *testing.T) {
 	app := mounted(t)
 
 	var gotURI, gotPath, gotQuery string
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotURI, gotPath, gotQuery = r.RequestURI, r.URL.Path, r.URL.RawQuery
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{"version":"v","ee":"N","setupCompleted":true}`))
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	if code, body := call(t, app, member(http.MethodGet, o11yVersionPath, nil)); code != http.StatusOK {
 		t.Fatalf("GET %s = %d %s, want 200", o11yVersionPath, code, body)
@@ -118,12 +118,12 @@ func TestRelayCarriesQueryIntoRequestURI(t *testing.T) {
 	app := mounted(t)
 
 	var gotURI string
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotURI = r.RequestURI
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	// /v1/o11y/logs?... is a params-carrying op; any non-2xx here still records
 	// the target, which is what this asserts.

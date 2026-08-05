@@ -514,6 +514,8 @@ github.com/gophercloud/gophercloud/v2 v2.11.1/go.mod h1:Rm0YvKQ4QYX2rY9XaDKnjRzS
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/gopherjs/gopherjs v1.17.2 h1:fQnZVsXk8uxXIStYb0N4bGk7jeyTalG/wsZjQ25dO0g=
 github.com/gopherjs/gopherjs v1.17.2/go.mod h1:pRRIvn/QzFLrKfvEz3qUuEhtE/zLCWfreZ6J5gM2i+k=
+github.com/gorilla/rpc v1.2.1 h1:yC+LMV5esttgpVvNORL/xX4jvTTEUE30UZhZ5JF7K9k=
+github.com/gorilla/rpc v1.2.1/go.mod h1:uNpOihAlF5xRFLuTYhfR0yfCTm0WTQSQttkMSptRfGk=
 github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674 h1:JeSE6pjso5THxAzdVpqr6/geYxZytqFMBCOtn/ujyeo=
 github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674/go.mod h1:r4w70xmWCQKmi1ONH4KIaBptdivuRPyosB9RmPlGEwA=
 github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 h1:cLN4IBkmkYZNnk7EAJ0BHIethd+J6LqxFNw5mSiI2bM=
@@ -716,6 +718,8 @@ github.com/luxfi/log v1.6.0 h1:BbV7kOAK9nrUcrpr4/yCw0ODaBtQOLR5Cjj/NLWwZqo=
 github.com/luxfi/log v1.6.0/go.mod h1:NWkRRwwXPPphCUwC0+UemY0eoedQEFmhSIZXTxdA9VQ=
 github.com/luxfi/mdns v0.1.1 h1:g2eRr9AXcziPkkcd24M+Qu9ApEpoKKjfI79QSNqv0rQ=
 github.com/luxfi/mdns v0.1.1/go.mod h1:dbp5f3h3aE7CGzwbaWzBM9cwdcekhmSrWhQevgYhhNA=
+github.com/luxfi/metric v1.9.1 h1:dyIHgdZ9mvvlppbbvccRoDyOYjXmLWEZYA45rDRm398=
+github.com/luxfi/metric v1.9.1/go.mod h1:JhVJPOM10FEpGSSaP8QrGLi7w0D3pjJ2kwWwmGi+9YI=
 github.com/luxfi/pq v1.1.0 h1:ADplfUSyirLymSxs3Ix0HeDTyl5oswCNUpXJt/5vLY8=
 github.com/luxfi/pq v1.1.0/go.mod h1:KT5rG9ztpzIkT9QSnXK4WFqBBLzKCLjY7l1c/unBi8I=
 github.com/luxfi/zap v1.2.7 h1:LzYit+1xLoQRT0ahYsoYcdoDz5I5gc0ltLvBXRkPpwQ=
@@ -1068,6 +1072,8 @@ github.com/zap-proto/zap2pb v0.2.0 h1:sos6HnayhGMGLRO54px1InzimDzTZ2o5TSMEatYBjz
 github.com/zap-proto/zap2pb v0.2.0/go.mod h1:wD97Z2VTPabDq/4AMNL++PWnQ0YwEtajiuNkLGg3/18=
 github.com/zap-proto/zip v1.24.3 h1:xq0Lu4F/x06ACHyZ/Lxz8oj/X6LL3gBqRM69c5I7ubQ=
 github.com/zap-proto/zip v1.24.3/go.mod h1:EKMmUX9wCPvpkhpMBQRqa17YVXNXRYEjj7X+65Y+J9E=
+github.com/zap-proto/zip v1.24.8 h1:hImKWtW2GSwfOODKhNkON3Afi8JK0Pgt22G/j1X30d4=
+github.com/zap-proto/zip v1.24.8/go.mod h1:zKkCI6moJOWNngJvSv44pOH6vLt5o8NdCZwg2RBuKjU=
 github.com/zeebo/xxh3 v1.1.0 h1:s7DLGDK45Dyfg7++yxI0khrfwq9661w9EN78eP/UZVs=
 github.com/zeebo/xxh3 v1.1.0/go.mod h1:IisAie1LELR4xhVinxWS5+zf1lA4p0MW4T+w+W07F5s=
 go.etcd.io/etcd/api/v3 v3.5.4/go.mod h1:5GB2vv4A4AOn3yk7MftYGHkUfGtDHnEraIjym4dYz5A=

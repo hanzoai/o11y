@@ -66,7 +66,7 @@ func mountLogs(app *zip.App) {
 // Callers need the viewer role; the runtime's own gate enforces it.
 func logRecords(ctx context.Context, in *O11yLogRecordsIn) (*O11yLogRecordsOut, error) {
 	out := new(O11yLogRecordsOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/logs", query(
+	return out, relay(ctx, query(
 		"limit", in.Limit,
 		"timestampStart", nanos(in.TimestampStart),
 		"timestampEnd", nanos(in.TimestampEnd),
@@ -79,7 +79,7 @@ func logRecords(ctx context.Context, in *O11yLogRecordsIn) (*O11yLogRecordsOut, 
 // Callers need the viewer role; the runtime's own gate enforces it.
 func logFields(ctx context.Context, _ *struct{}) (*O11yFieldCatalogOut, error) {
 	out := new(O11yFieldCatalogOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/logs/fields", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // logFieldUpdate changes how one log field is stored — selects or deselects it
@@ -88,7 +88,7 @@ func logFields(ctx context.Context, _ *struct{}) (*O11yFieldCatalogOut, error) {
 // Callers need the editor role; the runtime's own gate enforces it.
 func logFieldUpdate(ctx context.Context, in *O11yFieldSetting) (*O11yFieldSetting, error) {
 	out := new(O11yFieldSetting)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/logs/fields", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // logAggregate returns the logs aggregate buckets for the query window. The
@@ -97,7 +97,7 @@ func logFieldUpdate(ctx context.Context, in *O11yFieldSetting) (*O11yFieldSettin
 // Callers need the viewer role; the runtime's own gate enforces it.
 func logAggregate(ctx context.Context, _ *struct{}) (*O11yLogAggregateOut, error) {
 	out := new(O11yLogAggregateOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/logs/aggregate", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // logPipelinePreview runs the given log parsing pipelines over the given
@@ -107,7 +107,7 @@ func logAggregate(ctx context.Context, _ *struct{}) (*O11yLogAggregateOut, error
 // Callers need the viewer role; the runtime's own gate enforces it.
 func logPipelinePreview(ctx context.Context, in *O11yLogPipelinePreviewIn) (*O11yLogPipelinePreviewOut, error) {
 	out := new(O11yLogPipelinePreviewOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/logs/pipelines/preview", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // logPipelines returns the caller's org's log parsing pipelines at one config
@@ -119,7 +119,7 @@ func logPipelines(ctx context.Context, in *O11yLogPipelinesIn) (*O11yLogPipeline
 	out := new(O11yLogPipelinesOut)
 	// The version goes on VERBATIM, as the segment the router matched, so the
 	// runtime reads exactly the version the caller named.
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/logs/pipelines/"+in.Version, nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // logPipelineCreate saves the given log parsing pipelines as the new config
@@ -130,7 +130,7 @@ func logPipelines(ctx context.Context, in *O11yLogPipelinesIn) (*O11yLogPipeline
 // Callers need the editor role; the runtime's own gate enforces it.
 func logPipelineCreate(ctx context.Context, in *O11yLogPipelineCreateIn) (*O11yLogPipelinesOut, error) {
 	out := new(O11yLogPipelinesOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/logs/pipelines", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // logPromote promotes and indexes log body paths: each named path is lifted
@@ -140,7 +140,7 @@ func logPipelineCreate(ctx context.Context, in *O11yLogPipelineCreateIn) (*O11yL
 // Callers need the editor role; the runtime's own gate enforces it.
 func logPromote(ctx context.Context, in *O11yLogPromoteIn) (*O11yLogPromoteOut, error) {
 	out := new(O11yLogPromoteOut)
-	return out, relay(ctx, http.MethodPost, o11yRoot+"/logs/promote_paths", nil, in, out)
+	return out, relay(ctx, nil, in, out)
 }
 
 // logPromoted lists the log body paths already promoted or indexed, with the
@@ -149,7 +149,7 @@ func logPromote(ctx context.Context, in *O11yLogPromoteIn) (*O11yLogPromoteOut, 
 // Callers need the viewer role; the runtime's own gate enforces it.
 func logPromoted(ctx context.Context, _ *struct{}) (*O11yLogPromotedOut, error) {
 	out := new(O11yLogPromotedOut)
-	return out, relay(ctx, http.MethodGet, o11yRoot+"/logs/promote_paths", nil, nil, out)
+	return out, relay(ctx, nil, nil, out)
 }
 
 // ── inputs ────────────────────────────────────────────────────────────────────

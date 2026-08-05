@@ -314,7 +314,7 @@ func TestDashboardIdentityIsPropagated(t *testing.T) {
 // wildcard gives when nothing has been registered yet.
 func TestDashboardFailsClosedWithoutARuntime(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	for _, tc := range []struct{ method, target string }{
 		{http.MethodGet, "/v1/o11y/dashboards"},

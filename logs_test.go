@@ -39,7 +39,7 @@ import (
 func logsRuntime(t *testing.T, status int, body []byte) (asked **http.Request) {
 	t.Helper()
 	var req *http.Request
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		read, _ := io.ReadAll(r.Body)
 		req = r.Clone(r.Context())
 		req.Body = io.NopCloser(bytes.NewReader(read))
@@ -47,8 +47,8 @@ func logsRuntime(t *testing.T, status int, body []byte) (asked **http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(status)
 		_, _ = w.Write(body)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 	return &req
 }
 
@@ -496,12 +496,12 @@ func TestLivetailIsANamedHatch(t *testing.T) {
 	app := mounted(t)
 	frame := "event: log\ndata: {\"body\":\"boom\"}\n\n"
 	var askedPath string
-	o11y.SetHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		askedPath = r.URL.Path
 		w.Header().Set("Content-Type", "text/event-stream")
 		_, _ = io.WriteString(w, frame)
-	}))
-	t.Cleanup(func() { o11y.SetHandler(nil) })
+	})))
+	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
 	status, got := call(t, app, member(http.MethodGet, "/v1/o11y/logs/livetail?q=service%3Dapi", nil))
 	if status != http.StatusOK {
@@ -570,7 +570,7 @@ func TestLogsRefusalKeepsTheRuntimeStatus(t *testing.T) {
 // same 503.
 func TestLogsFailClosedWithoutARuntime(t *testing.T) {
 	app := mounted(t)
-	o11y.SetHandler(nil)
+	o11y.SetRuntime(nil)
 
 	for _, target := range []string{
 		"/v1/o11y/logs",
