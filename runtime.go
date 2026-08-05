@@ -59,6 +59,19 @@ type Runtime interface {
 	Handler(method, path string) http.Handler
 }
 
+// Func is a Runtime that resolves with a function, the way http.HandlerFunc is a
+// Handler that serves with one. Runtime has a single method, so a host that wants
+// to DECORATE the reach — hanzoai/cloud puts its own principal gate around each
+// answer — otherwise has to declare a struct and a method to say one expression.
+//
+// It is what keeps the decoration out of here. Resolution is o11y's concern and
+// admission is the host's; composing them wants nothing more than a function that
+// calls one and wraps the other.
+type Func func(method, path string) http.Handler
+
+// Handler resolves through f.
+func (f Func) Handler(method, path string) http.Handler { return f(method, path) }
+
 // Whole is a Runtime whose every address is the same handler — the honest shape
 // for a runtime that is somewhere ELSE. A reverse proxy has one door and the
 // request's own path is what selects the route on the other side, so there is
