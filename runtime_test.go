@@ -240,3 +240,33 @@ func TestCallByNameReachesTheRuntime(t *testing.T) {
 		t.Fatalf("with no runtime, POST %s%s = %d, want 503", zip.CallPath, name, status)
 	}
 }
+
+// A Func resolves the way the interface does, and decorating the answer is the
+// case it exists for: the host wraps what o11y resolved without either side
+// holding the other's concern.
+func TestFuncResolvesAndComposes(t *testing.T) {
+	inner := named{"GET /v1/o11y/version": http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusNoContent)
+	})}
+	var wrapped int
+	rt := o11y.Func(func(method, path string) http.Handler {
+		h := inner.Handler(method, path)
+		if h == nil {
+			return nil
+		}
+		wrapped++
+		return h
+	})
+
+	if rt.Handler(http.MethodGet, "/v1/o11y/version") == nil {
+		t.Fatal("a served address did not resolve through the Func")
+	}
+	// An address the inner runtime does not serve stays unserved: a decorator has
+	// no opinion about a door that is not there.
+	if rt.Handler(http.MethodGet, "/v1/o11y/nothing") != nil {
+		t.Error("an unserved address resolved through the Func")
+	}
+	if wrapped != 1 {
+		t.Errorf("the decoration ran %d times, want once — only for the address that resolved", wrapped)
+	}
+}
