@@ -3,9 +3,11 @@ package implsentry
 import (
 	"context"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/identn/iamidentn"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking/implerrortracking"
 	"github.com/hanzoai/o11y/pkg/modules/sentry"
@@ -14,6 +16,33 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
+
+// IngestKeyResolver maps a presented publishable key (pk-…) to the org slug it
+// attributes to. It is the embedding host's job — the host dials IAM (org keys)
+// and/or the projects app (per-project keys), and o11y must not import cloud — so
+// the host injects it at mount via SetIngestKeyResolver. Returns ok=false for a
+// key that names no org.
+type IngestKeyResolver func(ctx context.Context, key string) (orgSlug string, ok bool)
+
+var (
+	ingestKeyMu       sync.RWMutex
+	ingestKeyResolver IngestKeyResolver
+)
+
+// SetIngestKeyResolver installs the host's pk- → org resolver. Mirrors o11y's
+// SetHandler seam exactly: set once at mount, read per request. Nil (the default)
+// leaves keyed ingest fail-closed.
+func SetIngestKeyResolver(fn IngestKeyResolver) {
+	ingestKeyMu.Lock()
+	ingestKeyResolver = fn
+	ingestKeyMu.Unlock()
+}
+
+func getIngestKeyResolver() IngestKeyResolver {
+	ingestKeyMu.RLock()
+	defer ingestKeyMu.RUnlock()
+	return ingestKeyResolver
+}
 
 // nowUTC is the ONE package time source for lifecycle writes (overridable in tests).
 var nowUTC = func() time.Time { return time.Now().UTC() }
@@ -78,21 +107,58 @@ func (m *module) Ingest(ctx context.Context, orgID, projectID valuer.UUID, occs 
 	return nil
 }
 
-// ResolveIngest maps a DSN project id to its owning org, verifying the presented key
-// against the project's rotation watermark. Fail-closed at every step: unknown or
-// disabled project, or a key below the watermark, returns ok=false.
+// ResolveIngest attributes a keyed ingest to its org. ONE auth path: the presented
+// publishable key (pk-…) — the SAME key /v1/event accepts — resolves to an org via
+// the host-injected resolver, and the project named in the DSN is born under that
+// org on first sight (the zero-onboarding move o11y already makes for a tenant). So
+// a surface declares nothing: the org key that already feeds analytics + insights
+// feeds errors too. Fail-closed — no resolver, or a key that names no org, returns
+// ok=false.
+//
+// The prior per-project DSN watermark is GONE: it was a second attribution model
+// braided beside the org key (its own secret, its own per-project keys, provisioned
+// out of band), and it is exactly what left this plane dark. One key, not two.
 func (m *module) ResolveIngest(ctx context.Context, projectID valuer.UUID, presentedKey string) (valuer.UUID, bool) {
-	if len(m.cfg.IngestSecret) == 0 {
+	resolve := getIngestKeyResolver()
+	if resolve == nil {
 		return valuer.UUID{}, false
 	}
-	orgID, keyVersion, status, found, err := m.projects.Resolve(ctx, projectID)
-	if err != nil || !found || status != sentrytypes.ProjectActive {
+	orgSlug, ok := resolve(ctx, presentedKey)
+	if !ok || orgSlug == "" {
 		return valuer.UUID{}, false
 	}
-	if !implerrortracking.VerifyKey(m.cfg.IngestSecret, projectID.String(), presentedKey, keyVersion) {
-		return valuer.UUID{}, false
-	}
+	orgID := iamidentn.OrgUUID(orgSlug)
+	m.ensureProject(ctx, orgID, projectID)
 	return orgID, true
+}
+
+// ensureProject provisions the DSN's project under the org on first keyed ingest,
+// so a surface's errors land under a stable project without anyone creating one —
+// the same auto-provision o11y does for a tenant on first session. Idempotent and
+// fail-soft: a create race or a store miss must never fail the ingest (the org is
+// the authoritative scope; a missing project row only affects Issues-UI grouping,
+// which the next occurrence re-attempts).
+func (m *module) ensureProject(ctx context.Context, orgID, projectID valuer.UUID) {
+	if orgID.IsZero() || projectID.IsZero() {
+		return
+	}
+	if _, _, _, found, _ := m.projects.Resolve(ctx, projectID); found {
+		return
+	}
+	short := projectID.String()
+	if len(short) > 8 {
+		short = short[:8]
+	}
+	now := nowUTC()
+	_ = m.projects.Create(ctx, &sentrytypes.Project{
+		Identifiable:  types.Identifiable{ID: projectID},
+		TimeAuditable: types.TimeAuditable{CreatedAt: now, UpdatedAt: now},
+		OrgID:         orgID,
+		Name:          short,
+		Slug:          "p-" + short,
+		Status:        sentrytypes.ProjectActive,
+		KeyVersion:    1,
+	})
 }
 
 func (m *module) RateAllow(projectID valuer.UUID) bool { return m.limiter.Allow(projectID) }
