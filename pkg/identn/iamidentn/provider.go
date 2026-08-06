@@ -252,3 +252,10 @@ func toUUID(kind, value string) valuer.UUID {
 	derived := uuid.NewSHA1(uuid.NameSpaceURL, []byte("hanzo:o11y:"+kind+":"+value))
 	return valuer.MustNewUUID(derived.String())
 }
+
+// OrgUUID maps a Hanzo org slug to its o11y org UUID — the SAME deterministic
+// mapping a session takes, so a KEYED (pk-) ingest that has only the org slug
+// resolves to the exact org a logged-in session would. Exported for the keyed
+// ingest path (implsentry.ResolveIngest), which has no session to read `owner`
+// from. One mapping, one place: this is the whole tenant identity, no state.
+func OrgUUID(slug string) valuer.UUID { return toUUID("org", slug) }
