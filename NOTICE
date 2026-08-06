@@ -43,3 +43,4 @@ are recorded for provenance and do not alter the MIT Expat license terms above.
   the unified cloud binary per HIP-0106.
 * Operator-facing environment variables and configuration keys are Hanzo-branded
   rather than SigNoz-branded.
+

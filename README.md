@@ -56,7 +56,6 @@ Hanzo subsystems, and mounts under the unified cloud binary per HIP-0106.
 
 ## Lineage
 
-Forked from [SigNoz](https://github.com/SigNoz/signoz) (MIT Expat, copyright
 2020–present SigNoz Inc.), synced to upstream `main` at commit `3e6339019`. The import
 history was squashed, so the root commit here is a Hanzo branding commit rather than
 upstream's history. See [`NOTICE`](NOTICE).
