@@ -434,6 +434,27 @@ table names. Those are interop identifiers other tools match on, not naming surf
   `zapmetricreceiver.New(Config{OnBatch: w.WriteMetrics})`. Consumed by `hanzoai/cloud`'s
   embedded o11y runtime (opt-in `O11Y_METRICS_ZAP_LISTEN`, fail-soft) so the standalone
   `otel-collector` metrics path can later repoint to cloud (verify-then-cutover).
-- **Boundary unchanged**: the physical `o11y_metrics.*_v4` names still live in
-  `telemetrymetrics` (the source of truth this driver reuses) — renaming them is a
-  datastore migration, out of scope here.
+- **Boundary**: the physical names live in `telemetrymetrics` and ONLY there — it is
+  the source of truth this driver reuses. That migration has since happened: the
+  tables are `event.metric` and `event.series` (plus `metric_5m`/`metric_30m` and
+  `series_6h`/`series_1d`/`series_1w`), NOT `o11y_metrics.*_v4`. There are no
+  `distributed_` wrappers on this deployment, so a table's local and distributed
+  name are the same string.
+
+  **Read the names from `telemetrymetrics`; never respell them.** `pkg/prometheus/
+  datastoreprometheus` kept its own copy of the old spelling and so went on
+  addressing `o11y_metrics`, a database that does not exist — every PromQL read
+  failed with "Database o11y_metrics does not exist", which is 14 platform alert
+  rules (`queryType: promql`: service-down, memory-critical, ingest-drop-rate,
+  event-warehouse-write-stopped, alert-egress-failing, …) evaluating against an
+  error, plus every PromQL dashboard panel drawing an empty chart. A copy has no
+  reason to change when the original does, and the copy the migration does not read
+  is the one that rots. Fixed in v1.5.62; `table_test.go` asserts the rendered SQL
+  so the next drift fails a test instead of a dashboard.
+
+  Still on their own databases, and still to converge: `telemetrymetadata`
+  (`o11y_metadata`), `telemetrymeter` (`o11y_meter`), `telemetryaudit`
+  (`o11y_audit`), `rulestatehistory` (`o11y_analytics` — this one EXISTS), and the
+  legacy `query-service` builders (`constants.O11Y_METRIC_DBNAME` and
+  `datastorereader`'s const block), which are not reached by cloud's embedded
+  runtime but would break the same way if they were.
