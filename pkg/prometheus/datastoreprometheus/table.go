@@ -1,41 +1,30 @@
 package datastoreprometheus
 
-import "time"
+import (
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+)
 
+// PromQL reads the same two tables every other metrics query reads, so it reads
+// their names from telemetrymetrics and nowhere else. This package used to keep
+// its own copy — o11y_metrics.distributed_time_series_v4 and friends — and that
+// is how it went on addressing a database that stopped existing when metrics
+// moved into the one event plane: a copy has no reason to change when the
+// original does. A second spelling of a physical name is a second thing to
+// migrate, and the one the migration does not read is the one that rots.
 const (
-	databaseName                string = "o11y_metrics"
-	distributedTimeSeriesV4     string = "distributed_time_series_v4"
-	distributedTimeSeriesV46hrs string = "distributed_time_series_v4_6hrs"
-	distributedTimeSeriesV41day string = "distributed_time_series_v4_1day"
-	distributedSamplesV4        string = "distributed_samples_v4"
+	databaseName     = telemetrymetrics.DBName
+	samplesTableName = telemetrymetrics.MetricTableName
 )
 
-var (
-	sixHoursInMilliseconds = time.Hour.Milliseconds() * 6
-	oneDayInMilliseconds   = time.Hour.Milliseconds() * 24
-)
-
-// Returns the start time, end time and the table name to use for the query.
+// getStartAndEndAndTableName returns the start time, end time and the series
+// table to read, picking the coarsest rollup the requested window can afford.
 //
-//	If time range is less than 6 hours, we need to use the `time_series_v4` table
-//	else if time range is less than 1 day and greater than 6 hours, we need to use the `time_series_v4_6hrs` table
-//	else we need to use the `time_series_v4_1day` table
+// The choice is telemetrymetrics.WhichTSTableToUse — the same function every
+// other metrics query builder calls, so one window resolves to one table across
+// the whole service. PromQL has no read buffer and no table hints to offer it.
 func getStartAndEndAndTableName(start, end int64) (int64, int64, string) {
-	var tableName string
-
-	if end-start <= sixHoursInMilliseconds {
-		// adjust the start time to nearest 1 hour
-		start = start - (start % (time.Hour.Milliseconds() * 1))
-		tableName = distributedTimeSeriesV4
-	} else if end-start <= oneDayInMilliseconds {
-		// adjust the start time to nearest 6 hours
-		start = start - (start % (time.Hour.Milliseconds() * 6))
-		tableName = distributedTimeSeriesV46hrs
-	} else {
-		// adjust the start time to nearest 1 day
-		start = start - (start % (time.Hour.Milliseconds() * 24))
-		tableName = distributedTimeSeriesV41day
-	}
-
-	return start, end, tableName
+	adjustedStart, adjustedEnd, tableName, _ := telemetrymetrics.WhichTSTableToUse(
+		uint64(start), uint64(end), false, nil,
+	)
+	return int64(adjustedStart), int64(adjustedEnd), tableName
 }
