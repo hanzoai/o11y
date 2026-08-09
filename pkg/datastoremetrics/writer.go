@@ -139,6 +139,62 @@ func NewWriter(conn datastore.Conn, opts ...Option) *Writer {
 
 // WriteMetrics is the zapmetricreceiver.Handler: it decomposes a batch into
 // series + samples and writes both tables. A nil / empty batch is a no-op.
+// WriteMetricsMany writes N batches in TWO inserts instead of 2N, and that
+// ratio is the whole point.
+//
+// Every insert into the samples table fans out through the 5m and 30m rollup
+// views, so one INSERT becomes three parts — and the ZAP wire carries one
+// batch per RESOURCE, so a fleet of collectors produces inserts in proportion
+// to the number of OBJECTS it observes rather than the amount of data. Measured
+// 2026-08-08 on hanzo-k8s: ~518 writes a minute against a merge pool already
+// pinned 32/32, event.metric_30m climbing past 3,000 parts in one partition,
+// and ClickHouse then answering code 252 to EVERY metric write — app telemetry
+// that had been landing for months included. A k8s_cluster receiver, which
+// models each object as its own resource, would have been ~16,000 a minute.
+//
+// Rows are cheap to concatenate and inserts are not, so the caller can buffer
+// whatever arrives in a window and land it as one pair of statements. The
+// per-batch semantics are untouched: buildRows still runs per batch, so each
+// batch keeps its own resource attributes and fingerprints exactly as it would
+// alone. Only the STATEMENT COUNT changes.
+//
+// A nil or empty batch is skipped rather than refused — one bad sender must not
+// discard a window's worth of everyone else's metrics.
+func (w *Writer) WriteMetricsMany(ctx context.Context, batches []*zapmetricreceiver.MetricBatch) error {
+	ts, samples := w.buildRowsMany(batches)
+	if len(ts) == 0 && len(samples) == 0 {
+		return nil
+	}
+	if err := w.writeTimeSeries(ctx, ts); err != nil {
+		return fmt.Errorf("datastoremetrics: write time_series: %w", err)
+	}
+	if err := w.writeSamples(ctx, samples); err != nil {
+		return fmt.Errorf("datastoremetrics: write samples: %w", err)
+	}
+	return nil
+}
+
+// buildRowsMany is the row half of WriteMetricsMany, split out so the
+// concatenation is testable without standing up a datastore connection. Each
+// batch is still built on its own — same resource attributes, same
+// fingerprints — so this is a change of statement count, not of meaning.
+func (w *Writer) buildRowsMany(batches []*zapmetricreceiver.MetricBatch) ([]tsRow, []sampleRow) {
+	var ts []tsRow
+	var samples []sampleRow
+	for _, batch := range batches {
+		if batch == nil || len(batch.Families) == 0 {
+			continue
+		}
+		if batch.TimestampNs == 0 {
+			batch.TimestampNs = w.nowMilli() * 1e6
+		}
+		t, s := buildRows(batch)
+		ts = append(ts, t...)
+		samples = append(samples, s...)
+	}
+	return ts, samples
+}
+
 func (w *Writer) WriteMetrics(ctx context.Context, batch *zapmetricreceiver.MetricBatch) error {
 	if batch == nil || len(batch.Families) == 0 {
 		return nil
