@@ -278,3 +278,68 @@ func TestDeterministicAcrossCalls(t *testing.T) {
 		t.Fatalf("fingerprints must be stable across calls: %d != %d", s1[0].fingerprint, s2[0].fingerprint)
 	}
 }
+
+// TestBuildRowsManyPreservesPerBatchIdentity is the batched-insert contract:
+// N batches must yield exactly the rows the N separate writes would, so the
+// only thing that changes is the number of INSERT statements.
+//
+// That ratio is why WriteMetricsMany exists. Each insert into the samples table
+// fans out through the 5m and 30m rollup views — one insert, three parts — and
+// the ZAP wire carries one batch per RESOURCE, so insert volume tracks the
+// number of objects observed rather than the amount of data. Measured
+// 2026-08-08 on hanzo-k8s: ~518 writes a minute drove event.metric_30m past its
+// part ceiling and ClickHouse answered code 252 to EVERY metric write, killing
+// app telemetry that had been landing for months.
+func TestBuildRowsManyPreservesPerBatchIdentity(t *testing.T) {
+	mk := func(env, metric string, v float64) *zapmetricreceiver.MetricBatch {
+		return &zapmetricreceiver.MetricBatch{
+			AppName:     "gateway",
+			Resource:    map[string]string{"deployment.environment": env},
+			TimestampNs: 1_700_000_000_000 * 1e6,
+			Families: []zapmetricreceiver.MetricFamily{{
+				Name: metric, Type: "counter",
+				Metrics: []zapmetricreceiver.Metric{{Value: f64(v)}},
+			}},
+		}
+	}
+	batches := []*zapmetricreceiver.MetricBatch{
+		mk("prod", "a_total", 1),
+		nil, // a dead sender must not discard the window
+		mk("staging", "b_total", 2),
+		{Families: nil}, // an empty batch, likewise
+		mk("prod", "c_total", 3),
+	}
+
+	w := &Writer{nowMilli: func() int64 { return 1_700_000_000_000 }}
+	ts, samples := w.buildRowsMany(batches)
+
+	if len(samples) != 3 || len(ts) != 3 {
+		t.Fatalf("got %d samples %d ts, want 3/3 (nil and empty batches skipped)", len(samples), len(ts))
+	}
+
+	// Identical to building each batch alone — same rows, same fingerprints.
+	var wantTS []tsRow
+	var wantSamples []sampleRow
+	for _, b := range []*zapmetricreceiver.MetricBatch{batches[0], batches[2], batches[4]} {
+		t2, s2 := buildRows(b)
+		wantTS = append(wantTS, t2...)
+		wantSamples = append(wantSamples, s2...)
+	}
+	for i := range samples {
+		if samples[i] != wantSamples[i] {
+			t.Fatalf("sample %d differs from the single-batch build: got %+v want %+v", i, samples[i], wantSamples[i])
+		}
+	}
+	for i := range ts {
+		if ts[i].fingerprint != wantTS[i].fingerprint || ts[i].env != wantTS[i].env {
+			t.Fatalf("ts %d differs: got fp=%d env=%q, want fp=%d env=%q",
+				i, ts[i].fingerprint, ts[i].env, wantTS[i].fingerprint, wantTS[i].env)
+		}
+	}
+
+	// Per-batch resource attributes must survive the merge — the whole risk of
+	// coalescing is one batch's env leaking onto another's rows.
+	if samples[0].env != "prod" || samples[1].env != "staging" || samples[2].env != "prod" {
+		t.Fatalf("env leaked across batches: %q %q %q", samples[0].env, samples[1].env, samples[2].env)
+	}
+}
