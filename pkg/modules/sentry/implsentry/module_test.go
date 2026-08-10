@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/identn/iamidentn"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking"
 	"github.com/hanzoai/o11y/pkg/modules/errortracking/implerrortracking"
 	"github.com/hanzoai/o11y/pkg/modules/sentry"
@@ -163,58 +164,92 @@ func TestIngest_WritesEventsAndIssues(t *testing.T) {
 	assert.Equal(t, int64(2), issues.Items[0].Count)
 }
 
-// TestResolveIngest_FailsClosed is the DSN gate: unknown project, disabled project,
-// wrong key and a below-watermark (rotated) key all return ok=false; only a correct,
-// current key resolves — to the OWNING org.
+// withIngestKeyResolver installs a resolver for one test and puts back whatever
+// was there. The resolver is package state read per request, so a test that left
+// its own behind would decide the answer for every test after it.
+func withIngestKeyResolver(t *testing.T, fn IngestKeyResolver) {
+	t.Helper()
+	prev := getIngestKeyResolver()
+	SetIngestKeyResolver(fn)
+	t.Cleanup(func() { SetIngestKeyResolver(prev) })
+}
+
+const testOrgSlug = "acme"
+
+// resolverFor answers only for key, and names no org for anything else — a stand-in
+// for the host asking IAM whether a publishable key belongs to somebody.
+func resolverFor(key string) IngestKeyResolver {
+	return func(_ context.Context, presented string) (string, bool) {
+		if presented == key {
+			return testOrgSlug, true
+		}
+		return "", false
+	}
+}
+
+// TestResolveIngest_FailsClosed is the ingest gate. Attribution is the org's
+// publishable key — the same one /v1/event takes — resolved by the host, so what
+// has to hold is that every way of not presenting a good one stays shut: no
+// resolver installed at all, a key the resolver rejects, an empty key, and a
+// resolver that answers ok with no org. Only a key naming an org resolves, and the
+// project in the DSN is born under that org on first sight.
 func TestResolveIngest_FailsClosed(t *testing.T) {
 	ctx := context.Background()
 	h := newModuleHarness(t)
-	org := valuer.GenerateUUID()
-	proj := mustProject(t, h, org, "web")
-	pid := proj.Project.ID
+	pid := valuer.GenerateUUID()
+	const goodKey = "pk-live-good"
 
-	validKey := implerrortracking.PublicKeyForVersion([]byte(testSecret), pid.String(), 1)
+	// The default. A host that never installed a resolver ingests nothing.
+	_, ok := h.mod.ResolveIngest(ctx, pid, goodKey)
+	assert.False(t, ok, "no resolver installed must not resolve")
 
-	// Valid key + active project -> resolves to the owning org.
-	gotOrg, ok := h.mod.ResolveIngest(ctx, pid, validKey)
+	withIngestKeyResolver(t, resolverFor(goodKey))
+
+	gotOrg, ok := h.mod.ResolveIngest(ctx, pid, goodKey)
 	require.True(t, ok)
-	assert.Equal(t, org, gotOrg)
+	assert.Equal(t, iamidentn.OrgUUID(testOrgSlug), gotOrg, "resolves to the org the key names")
 
-	// Unknown project -> closed.
-	_, ok = h.mod.ResolveIngest(ctx, valuer.GenerateUUID(), validKey)
+	// The DSN's project is provisioned under that org, so nobody had to create it.
+	_, _, status, found, err := h.projects.Resolve(ctx, pid)
+	require.NoError(t, err)
+	require.True(t, found, "first keyed ingest provisions the project")
+	assert.Equal(t, sentrytypes.ProjectActive, status)
+
+	// A key the resolver does not recognise.
+	_, ok = h.mod.ResolveIngest(ctx, pid, "pk-live-someone-else")
 	assert.False(t, ok)
 
-	// Wrong key -> closed.
-	_, ok = h.mod.ResolveIngest(ctx, pid, "1:deadbeef")
-	assert.False(t, ok)
-
-	// Empty key -> closed.
+	// No key at all.
 	_, ok = h.mod.ResolveIngest(ctx, pid, "")
 	assert.False(t, ok)
 
-	// After rotation, the old v1 key is below the watermark -> closed; the new one works.
-	_, err := h.projects.Rotate(ctx, org, pid)
-	require.NoError(t, err)
-	_, ok = h.mod.ResolveIngest(ctx, pid, validKey)
-	assert.False(t, ok, "a below-watermark (pre-rotation) key must stop resolving")
-	v2 := implerrortracking.PublicKeyForVersion([]byte(testSecret), pid.String(), 2)
-	_, ok = h.mod.ResolveIngest(ctx, pid, v2)
-	assert.True(t, ok)
+	// A resolver that says yes but names no org is not an authorisation.
+	withIngestKeyResolver(t, func(context.Context, string) (string, bool) { return "", true })
+	_, ok = h.mod.ResolveIngest(ctx, pid, goodKey)
+	assert.False(t, ok, "ok with an empty org slug must not resolve")
 }
 
+// TestResolveIngest_DisabledProjectFailsClosed covers the other half: the key is
+// good and the org is real, and the project still refuses because it was disabled.
+// Turning a project off is how ingest is stopped without rotating an org's key.
 func TestResolveIngest_DisabledProjectFailsClosed(t *testing.T) {
 	ctx := context.Background()
 	h := newModuleHarness(t)
-	org := valuer.GenerateUUID()
+	org := iamidentn.OrgUUID(testOrgSlug)
 	proj := mustProject(t, h, org, "web")
 	pid := proj.Project.ID
+	const goodKey = "pk-live-good"
 
-	// Disable the project directly in the store.
+	withIngestKeyResolver(t, resolverFor(goodKey))
+
+	// Active first, so the disabled result below is the disabling and nothing else.
+	_, ok := h.mod.ResolveIngest(ctx, pid, goodKey)
+	require.True(t, ok, "an active project resolves with a good key")
+
 	disableProject(t, h, org, pid)
 
-	key := implerrortracking.PublicKeyForVersion([]byte(testSecret), pid.String(), 1)
-	_, ok := h.mod.ResolveIngest(ctx, pid, key)
-	assert.False(t, ok, "a disabled project must not resolve even with a valid key")
+	_, ok = h.mod.ResolveIngest(ctx, pid, goodKey)
+	assert.False(t, ok, "a disabled project must not resolve even with a good key")
 }
 
 // TestReads_ForeignProjectDenied is the mandatory read isolation: a project id that

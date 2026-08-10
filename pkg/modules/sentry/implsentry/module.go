@@ -128,6 +128,14 @@ func (m *module) ResolveIngest(ctx context.Context, projectID valuer.UUID, prese
 		return valuer.UUID{}, false
 	}
 	orgID := iamidentn.OrgUUID(orgSlug)
+	// A project that already exists and has been disabled stops accepting ingest,
+	// which is what disabling one is for and what ProjectStatus documents. Only an
+	// existing row can say this: a project unseen until now is provisioned active
+	// just below, and a store that cannot answer must not silently open the door.
+	if _, _, status, found, err := m.projects.Resolve(ctx, projectID); err == nil && found &&
+		status != sentrytypes.ProjectActive {
+		return valuer.UUID{}, false
+	}
 	m.ensureProject(ctx, orgID, projectID)
 	return orgID, true
 }
