@@ -70,9 +70,33 @@ RENAME TABLE o11y_traces.distributed_signoz_spans        TO o11y_traces.distribu
 -- — outside DDL scope. If a backfill is desired it is a plain UPDATE on the
 -- metric-name column, still no drop.
 --
--- CAVEAT (coordination) — as of otel-collector v0.144.7 the collector's SQL
--- schema (cmd/o11yschemamigrator) still CREATES/writes the physical objects
--- under the `signoz_*` names above (only its Go package paths were debranded).
--- Apply this migration only in lockstep with a collector release whose schema
--- migrator emits the `o11y_*` identifiers, otherwise new ingest lands in the old
--- names. This file is the read-plane/data half of that coordinated rename.
+-- COORDINATION — the write side has since caught up, so the lockstep condition
+-- this file used to wait on is MET. The debrand lands in `hanzoai/otel-collector`
+-- at **v1.2.0**, and that is the threshold worth remembering rather than whichever
+-- tag is newest: `cmd/o11yschemamigrator` goes from 633 `signoz_` spellings at
+-- v1.1.0 to ZERO at v1.2.0, where the `o11y_metrics` / `o11y_metadata` identifiers
+-- appear. A collector at or after v1.2.0 CREATES the debranded objects; one before
+-- it creates the legacy names. o11y's own `go.mod` pins v1.2.0, i.e. the first tag
+-- on the correct side of that line. Read this as clearance to apply.
+--
+-- The earlier text here said the opposite — that as of v0.144.7 the migrator
+-- "still CREATES/writes the physical objects under the `signoz_*` names" — and
+-- it is left named rather than silently swapped, because a stale caveat fails in
+-- the expensive direction: an operator who believes new ingest still lands in
+-- `signoz_*` does NOT run the rename, and a legacy deployment's telemetry stays
+-- stranded under names the querier no longer reads.
+--
+-- STILL TRUE, and the reason to check rather than assume: this file is only the
+-- READ-plane half. Confirm your collector's tag before applying, because the two
+-- halves are separately deployed and a collector older than the debrand really
+-- does write the legacy names.
+--
+-- NOT COVERED HERE — metrics moved further than a rename. The querier reads the
+-- `event` database (`event.metric`, `event.series`, … — pkg/telemetrymetrics/
+-- tables.go), NOT `o11y_metrics.*_v4`, and this script renames neither into the
+-- other. On this deployment that is harmless: metrics are written in-process by
+-- cloud's own `pkg/datastoremetrics` writer, which takes its table names from
+-- those same constants, so its writes and the querier's reads cannot disagree.
+-- A deployment that ALSO points a standalone collector's metrics exporter at the
+-- same store gets rows in `o11y_metrics` that nothing reads — silently, since a
+-- write to a table no query names raises no error anywhere.
