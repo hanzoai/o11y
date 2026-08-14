@@ -247,7 +247,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
 	github.com/hanzo-ds/mock v0.14.4
 	github.com/hanzo-ds/sqlbuilder v1.42.2
-	github.com/hanzo-ds/sqlparser v0.4.16
+	github.com/hanzo-ds/sqlparser v0.4.17
 	github.com/hanzokv/go/extra/kvcmd/v9 v9.22.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
