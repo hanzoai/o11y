@@ -1,19 +1,85 @@
 # Canonical CI/CD config for hanzoai/o11y — the one file both the hanzoai/ci
 # reusable (.hanzo/workflows/cicd.yml) and platform.hanzo.ai read.
 #
-# GATE ONLY, deliberately. The image lane already exists and works
-# (.hanzo/workflows/docker.yaml): it mounts a `gh_token` build secret that the
-# Dockerfile needs to fetch the PRIVATE hanzoai/sqlite + hanzoai/datastore-go
-# modules, and pushes ghcr.io/hanzoai/o11y with registry cache. Declaring the
-# same image here would build it twice per push for one artifact — so this file
-# owns the gate and docker.yaml keeps owning the image until that lane is folded
-# in with its build secret intact.
+# THE GATE AND THE IMAGE ARE ONE LANE, and that is the whole point of this file.
 #
-# The gate is the pair that has been green on this fleet already
-# (.hanzo/workflows/ci.yaml). `go build ./...` fails fast on a break; the test
-# run is `-count=1` so nothing is served from cache. TestEmailRejected is the one
-# skip: it asserts an emersion/go-smtp v0.24.0 error string that upstream
-# formats with quotes, so it is wrong about this dependency, not about us.
+# They were four separate workflows — ci.yaml, cicd.yml, docker.yaml,
+# docker-site.yaml — with no `needs:` between them, because separate workflows
+# cannot have one. So they raced rather than ordered, and a red gate published
+# an image anyway. Not hypothetically: v1.5.61, v1.5.62 and v1.5.63 were each
+# built and pushed on a commit whose gate had ALREADY failed on that same
+# commit, and production ran v1.5.62 for a week.
+#
+#   v1.5.61  7faaa81  gate 35417 FAILURE   image 35419 success
+#   v1.5.62  23945f7  gate 35624 FAILURE   image 35625 success   <- shipped
+#   v1.5.63  0a75f53  gate 46116 FAILURE   image 46117 success
+#
+# This is the inverse of the usual CI complaint. A failed publish that looks
+# like a release is loud; a failed GATE that still produces one is silent, and
+# the artifact it leaves behind is a claim that the commit passed.
+#
+# The fix is not to wire four workflows together — that is a second mechanism to
+# keep in step, and the one thing worse than a gate nobody runs is two that
+# disagree. `images:` lives here instead, so the shared lane's single sequential
+# job runs `test:` and only then builds: one job, one order, no wiring.
+#
+# The blocker this file used to record — "docker.yaml mounts a `gh_token` build
+# secret the Dockerfile needs for the PRIVATE hanzoai/sqlite + hanzoai/datastore-go
+# modules" — is stale. The shared lane mounts that secret on every image build
+# from KMS (falling back to the org GH_PAT), which is the same BuildKit
+# `gh_token` this Dockerfile already reads. Nothing had to be given up to fold.
+#
+# No `version:` key: this repo carries no package.json/VERSION for it to name,
+# so bin/imgver derives the series from the highest semver already published for
+# each image and adds a patch — 1.5.63 -> 1.5.64 — which is the numbering the
+# v1.5.x tags already follow. A release tag still publishes itself verbatim.
+
+images:
+  # The headless server (./cmd/community, O11Y_WEB_ENABLED=false). This is the
+  # image cloud embeds and the one serving /v1/o11y in production.
+  - name: o11y
+    context: .
+    dockerfile: Dockerfile
+    repo: ghcr.io/hanzoai/o11y
+    args:
+      # The Dockerfile ldflags these into pkg/version, so the binary can name
+      # its own release. They are per-build values, so they are the shared
+      # lane's placeholders rather than fixed strings — spelled out because an
+      # image reporting `dev` while its tag reads v1.5.64 is an image that
+      # cannot answer "which build is this", and this one is the thing the rest
+      # of the estate asks that question WITH.
+      VERSION: "${VERSION}"
+      COMMIT_HASH: "${SHA}"
+      BUILD_TIME: "${BUILD_TIME}"
+      BRANCH: "${BRANCH}"
+      VARIANT: community
+
+  # The browser SPA (frontend/), served by hanzoai/static at the edge while
+  # /api/* goes to the server above. Takes no build-args and no secrets.
+  #
+  # It builds on every push now, where docker-site.yaml filtered on
+  # `paths: [Dockerfile.site, frontend/**]`. That filter is not expressible in
+  # the shared lane and is not worth reintroducing: it saves build minutes by
+  # deciding, from a diff, that a commit cannot have broken the SPA — which is
+  # the same reasoning that let a red gate ship an image.
+  - name: o11y-site
+    context: .
+    dockerfile: Dockerfile.site
+    repo: ghcr.io/hanzoai/o11y-site
+
+# The pair that has been green on this fleet already. `go build ./...` fails
+# fast on a break; the test run is `-count=1` so nothing is served from cache.
+# TestEmailRejected is the one skip: it asserts an emersion/go-smtp v0.24.0
+# error string that upstream formats with quotes, so it is wrong about this
+# dependency, not about us.
+#
+# This block used to be duplicated in .hanzo/workflows/ci.yaml, which also
+# checked out hanzoai/cloud at a pinned SHA to satisfy a
+# `replace github.com/hanzoai/cloud => ../cloud`. That replace is GONE from
+# go.mod — the module no longer depends on cloud at all — so the checkout was
+# fetching a pinned commit of an unrelated repo to support a directive that no
+# longer exists, and a second gate that can go red for a reason having nothing
+# to do with this repo is how a fleet learns to ignore red.
 test:
   - name: build
     run: |
