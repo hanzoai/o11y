@@ -16,10 +16,12 @@
 #
 # cmd/community's graph pulls PRIVATE hanzoai/* forks (hanzoai/sqlite +
 # hanzoai/datastore-go — the sqlite + datastore drivers added by the driver
-# swap), so the module fetch DOES need git auth. A `gh_token` build secret
-# (docker.yaml passes secrets.GH_PAT) is mounted and wired via git
-# url.insteadOf before the build; GOPRIVATE + GOSUMDB=off route hanzoai/*
-# direct and skip the sumdb.
+# swap), so the module fetch DOES need git auth. A `gh_token` build secret is
+# mounted and wired via git url.insteadOf before the build; GOPRIVATE +
+# GOSUMDB=off route hanzoai/* direct and skip the sumdb. The shared lane
+# supplies that secret on every image build (KMS, falling back to the org
+# GH_PAT) — see `images:` in the repo-root hanzo.yml, which is the whole of
+# this repo's CI config.
 #
 # The browser SPA is served at the edge by hanzoai/static (house-native static
 # plugin), not bundled here, so the server runs headless (O11Y_WEB_ENABLED=false).
