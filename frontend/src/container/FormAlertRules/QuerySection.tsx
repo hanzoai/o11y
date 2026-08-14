@@ -24,11 +24,7 @@ import { FormContainer, StepHeading } from './styles';
 
 import './QuerySection.styles.scss';
 
-const ANOMALY_QUERY_SUPPORT_DATASTORE_ISSUE =
-	'https://github.com/SigNoz/signoz/issues/11034';
-
-const ANOMALY_QUERY_SUPPORT_PROMQL_ISSUE =
-	'https://github.com/SigNoz/signoz/issues/11036';
+const ANOMALY_DISABLED_TOOLTIP = 'Coming soon for anomaly detection.';
 
 function QuerySection({
 	queryCategory,
@@ -81,21 +77,6 @@ function QuerySection({
 			onSignalSourceChange={handleSignalSourceChange}
 			signalSourceChangeEnabled
 		/>
-	);
-
-	const anomalyDisabledTooltip = (url: string): JSX.Element => (
-		<span>
-			Coming soon for anomaly detection.{' '}
-			<Typography.Link
-				href={url}
-				target="_blank"
-				rel="noopener noreferrer"
-				style={{ color: 'inherit', textDecoration: 'underline' }}
-			>
-				Leave a thumbs-up
-			</Typography.Link>{' '}
-			to help us prioritize!
-		</span>
 	);
 
 	const tabs = [
@@ -156,13 +137,7 @@ function QuerySection({
 			},
 			{
 				label: (
-					<Tooltip
-						title={
-							isAnomalyDetection
-								? anomalyDisabledTooltip(ANOMALY_QUERY_SUPPORT_PROMQL_ISSUE)
-								: 'PromQL'
-						}
-					>
+					<Tooltip title={isAnomalyDetection ? ANOMALY_DISABLED_TOOLTIP : 'PromQL'}>
 						<Button className="nav-btns" disabled={isAnomalyDetection}>
 							<PromQLIcon
 								fillColor={isDarkMode ? Color.BG_VANILLA_200 : Color.BG_INK_300}
@@ -175,7 +150,7 @@ function QuerySection({
 				disabled: isAnomalyDetection,
 			},
 		],
-		[isDarkMode, isAnomalyDetection, anomalyDisabledTooltip],
+		[isDarkMode, isAnomalyDetection],
 	);
 
 	const { registerShortcut, deregisterShortcut } = useKeyboardHotkeys();
