@@ -88,8 +88,15 @@ type Handler func(ctx context.Context, batch *MetricBatch) error
 
 // Config drives the receiver.
 type Config struct {
-	// Listen is the TCP address the ZAP server binds to. Empty defaults
-	// to ":4317" — the canonical o11y ZAP port. Shared with
+	// Listen is where the ZAP server binds. A host:port binds TCP; a path —
+	// anything starting /, ./, ../ or @ — binds a unix socket, because zap
+	// reads the address's form to choose the network. Empty defaults to
+	// ":4319", the canonical o11y ZAP port for metrics.
+	//
+	// A socket is the right answer where sender and receiver share a pod: it
+	// needs no port, cannot be reached from another pod, and lets the
+	// filesystem's permissions say who may write telemetry. A TCP ear is
+	// reachable by anything in the cluster. Shared with
 	// pkg/zapreceiver (span transport); a single zap.Node serves both
 	// MsgTypes when wired with both handlers.
 	Listen string
@@ -132,9 +139,22 @@ func New(cfg Config) (*Receiver, error) {
 		cfg.Logger = slog.Default()
 	}
 
-	port, err := portOf(cfg.Listen)
-	if err != nil {
-		return nil, fmt.Errorf("zapmetricreceiver: parse Listen %q: %w", cfg.Listen, err)
+	// Listen is passed to zap WHOLE. zap.Network reads its form to choose the
+	// network — a leading /, ./, ../ or @ is a unix socket, anything else is
+	// TCP — so a path here binds a socket with no other change. This used to
+	// narrow the address through parsePort into NodeConfig.Port, which threw
+	// the host away and made a socket path unrepresentable: the receiver could
+	// only ever bind a TCP port, while both emit sides already spoke either.
+	//
+	// A socket is what the in-pod hop wants. ~110 plugin processes and the o11y
+	// process share a pod and a run directory, so their telemetry crosses
+	// loopback TCP today for no reason, unauthenticated on 0.0.0.0. Over a
+	// socket the filesystem's own permissions decide who may write, which is
+	// the discipline the rest of the plane already keeps (0700 dir, 0600 sock).
+	if zap.Network(cfg.Listen) == "tcp" {
+		if _, err := portOf(cfg.Listen); err != nil {
+			return nil, fmt.Errorf("zapmetricreceiver: invalid Listen %q: %w", cfg.Listen, err)
+		}
 	}
 
 	r := &Receiver{
@@ -144,7 +164,7 @@ func New(cfg Config) (*Receiver, error) {
 	r.node = zap.NewNode(zap.NodeConfig{
 		NodeID:      cfg.NodeID,
 		ServiceType: "_o11y._tcp",
-		Port:        port,
+		Address:     cfg.Listen,
 		Logger:      cfg.Logger,
 		NoDiscovery: true,
 	})
