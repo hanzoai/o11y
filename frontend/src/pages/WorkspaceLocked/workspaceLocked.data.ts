@@ -27,7 +27,7 @@ export const enterpriseGradeValuesData = [
 		title: 'Query API keys',
 	},
 	{
-		title: 'Advanced security with SOC 2 Type I certification',
+		title: 'Advanced security with SOC 2 Type II controls',
 	},
 	{
 		title: 'AWS Private Link',
