@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<clickhouse>
+<datastore>
 <storage_configuration>
     <disks>
         <default>
@@ -38,4 +38,4 @@
         </tiered>
     </policies>
 </storage_configuration>
-</clickhouse>
+</datastore>
