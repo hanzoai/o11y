@@ -1,11 +1,11 @@
-<clickhouse replace="true">
+<datastore replace="true">
     <logger>
         <level>information</level>
         <formatting>
             <type>json</type>
         </formatting>
-        <log>/var/log/clickhouse-server/clickhouse-server.log</log>
-        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+        <log>/var/log/datastore-server/clickhouse-server.log</log>
+        <errorlog>/var/log/datastore-server/clickhouse-server.err.log</errorlog>
         <size>1000M</size>
         <count>3</count>
     </logger>
@@ -18,7 +18,7 @@
             <path>users.xml</path>
         </users_xml>
         <local_directory>
-            <path>/var/lib/clickhouse/access/</path>
+            <path>/var/lib/datastore/access/</path>
         </local_directory>
     </user_directories>
     <distributed_ddl>
@@ -28,7 +28,7 @@
         <cluster>
             <shard>
                 <replica>
-                    <host>clickhouse</host>
+                    <host>datastore</host>
                     <port>9000</port>
                 </replica>
             </shard>
@@ -45,5 +45,5 @@
         <replica>01</replica>
     </macros>
     <user_defined_executable_functions_config>*function.xml</user_defined_executable_functions_config>
-    <user_scripts_path>/var/lib/clickhouse/user_scripts/</user_scripts_path>
-</clickhouse>
+    <user_scripts_path>/var/lib/datastore/user_scripts/</user_scripts_path>
+</datastore>
