@@ -132,7 +132,7 @@ services:
       retries: 3
   otel-collector:
     !!merge <<: *db-depend
-    image: ghcr.io/hanzoai/otel-collector:${OTELCOL_TAG:-v0.144.2}
+    image: ghcr.io/hanzoai/otel-collector:${OTELCOL_TAG:-sha-b58ddaa}
     container_name: o11y-otel-collector
     entrypoint:
       - /bin/sh
@@ -157,7 +157,7 @@ services:
       - "4318:4318" # OTLP HTTP receiver
   o11y-telemetrystore-migrator:
     !!merge <<: *db-depend
-    image: ghcr.io/hanzoai/otel-collector:${OTELCOL_TAG:-v0.144.2}
+    image: ghcr.io/hanzoai/otel-collector:${OTELCOL_TAG:-sha-b58ddaa}
     container_name: o11y-telemetrystore-migrator
     environment:
       - O11Y_OTEL_COLLECTOR_DATASTORE_DSN=tcp://clickhouse:9000
