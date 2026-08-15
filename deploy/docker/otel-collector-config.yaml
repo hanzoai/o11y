@@ -1,5 +1,5 @@
 connectors:
-  observemeter:
+  o11ydatastoremeter:
     metrics_flush_interval: 1h
     dimensions:
       - name: service.name
@@ -36,8 +36,8 @@ processors:
     # Using OTEL_RESOURCE_ATTRIBUTES envvar, env detector adds custom labels.
     detectors: [env, system]
     timeout: 2s
-  observespanmetrics/delta:
-    metrics_exporter: observeclickhousemetrics
+  o11yspanmetrics/delta:
+    metrics_exporter: o11ydatastoremetrics
     metrics_flush_interval: 60s
     latency_histogram_buckets: [100us, 1ms, 2ms, 6ms, 10ms, 50ms, 100ms, 250ms, 500ms, 1000ms, 1400ms, 2000ms, 5s, 10s, 20s, 40s, 60s ]
     dimensions_cache_size: 100000
@@ -67,25 +67,25 @@ extensions:
   pprof:
     endpoint: 0.0.0.0:1777
 exporters:
-  clickhousetraces:
-    datasource: tcp://clickhouse:9000/observe_traces
+  datastoretraces:
+    datasource: tcp://datastore:9000/observe_traces
     low_cardinal_exception_grouping: ${env:LOW_CARDINAL_EXCEPTION_GROUPING}
     use_new_schema: true
-  observeclickhousemetrics:
-    dsn: tcp://clickhouse:9000/observe_metrics
-  clickhouselogsexporter:
-    dsn: tcp://clickhouse:9000/observe_logs
+  o11ydatastoremetrics:
+    dsn: tcp://datastore:9000/observe_metrics
+  datastorelogsexporter:
+    dsn: tcp://datastore:9000/observe_logs
     timeout: 10s
     use_new_schema: true
-  observeclickhousemeter:
-    dsn: tcp://clickhouse:9000/observe_meter
+  o11ydatastoremeter:
+    dsn: tcp://datastore:9000/observe_meter
     timeout: 45s
     sending_queue:
       enabled: false
   metadataexporter:
     cache:
       provider: in_memory
-    dsn: tcp://clickhouse:9000/observe_metadata
+    dsn: tcp://datastore:9000/observe_metadata
     enabled: true
     timeout: 45s
 service:
@@ -98,21 +98,21 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [observespanmetrics/delta, batch]
-      exporters: [clickhousetraces, metadataexporter, observemeter]
+      processors: [o11yspanmetrics/delta, batch]
+      exporters: [datastoretraces, metadataexporter, o11ydatastoremeter]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [observeclickhousemetrics, metadataexporter, observemeter]
+      exporters: [o11ydatastoremetrics, metadataexporter, o11ydatastoremeter]
     metrics/prometheus:
       receivers: [prometheus]
       processors: [batch]
-      exporters: [observeclickhousemetrics, metadataexporter, observemeter]
+      exporters: [o11ydatastoremetrics, metadataexporter, o11ydatastoremeter]
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [clickhouselogsexporter, metadataexporter, observemeter]
+      exporters: [datastorelogsexporter, metadataexporter, o11ydatastoremeter]
     metrics/meter:
-      receivers: [observemeter]
+      receivers: [o11ydatastoremeter]
       processors: [batch/meter]
-      exporters: [observeclickhousemeter]
+      exporters: [o11ydatastoremeter]
