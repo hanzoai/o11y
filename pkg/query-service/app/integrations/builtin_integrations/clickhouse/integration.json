@@ -1,11 +1,11 @@
 {
   "id": "clickhouse",
-  "title": "Clickhouse",
-  "description": "Monitor Clickhouse with metrics and logs",
+  "title": "Hanzo Datastore",
+  "description": "Monitor Hanzo Datastore with metrics and logs",
   "author": {
-    "name": "O11y",
-    "email": "integrations@o11y.io",
-    "homepage": "https://o11y.io"
+    "name": "Hanzo",
+    "email": "integrations@hanzo.ai",
+    "homepage": "https://o11y.hanzo.ai"
   },
   "icon": "file://icon.svg",
   "categories": [

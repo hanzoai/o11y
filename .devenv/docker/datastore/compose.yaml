@@ -1,7 +1,7 @@
 services:
-  init-clickhouse:
+  init-datastore:
     image: ghcr.io/hanzoai/datastore:26.6.1.1
-    container_name: init-clickhouse
+    container_name: init-datastore
     command:
       - bash
       - -c
@@ -13,19 +13,19 @@ services:
         cd /tmp
         wget -O histogram-quantile.tar.gz "https://github.com/Hanzo O11y/observe/releases/download/histogram-quantile%2F$${version}/histogram-quantile_$${node_os}_$${node_arch}.tar.gz"
         tar -xvzf histogram-quantile.tar.gz
-        mv histogram-quantile /var/lib/clickhouse/user_scripts/histogramQuantile
+        mv histogram-quantile /var/lib/datastore/user_scripts/histogramQuantile
     restart: on-failure
     volumes:
-      - ${PWD}/fs/tmp/var/lib/clickhouse/user_scripts/:/var/lib/clickhouse/user_scripts/
-  clickhouse:
+      - ${PWD}/fs/tmp/var/lib/datastore/user_scripts/:/var/lib/datastore/user_scripts/
+  datastore:
     image: ghcr.io/hanzoai/datastore:26.6.1.1
-    container_name: clickhouse
+    container_name: datastore
     volumes:
-      - ${PWD}/fs/etc/clickhouse-server/config.d/config.xml:/etc/clickhouse-server/config.d/config.xml
-      - ${PWD}/fs/etc/clickhouse-server/users.d/users.xml:/etc/clickhouse-server/users.d/users.xml
-      - ${PWD}/fs/tmp/var/lib/clickhouse/:/var/lib/clickhouse/
-      - ${PWD}/fs/tmp/var/lib/clickhouse/user_scripts/:/var/lib/clickhouse/user_scripts/
-      - ${PWD}/../../../deploy/common/clickhouse/custom-function.xml:/etc/clickhouse-server/custom-function.xml
+      - ${PWD}/fs/etc/datastore-server/config.d/config.xml:/etc/datastore-server/config.d/config.xml
+      - ${PWD}/fs/etc/datastore-server/users.d/users.xml:/etc/datastore-server/users.d/users.xml
+      - ${PWD}/fs/tmp/var/lib/datastore/:/var/lib/datastore/
+      - ${PWD}/fs/tmp/var/lib/datastore/user_scripts/:/var/lib/datastore/user_scripts/
+      - ${PWD}/../../../deploy/common/datastore/custom-function.xml:/etc/datastore-server/custom-function.xml
     ports:
       - "127.0.0.1:8123:8123"
       - "127.0.0.1:9000:9000"
@@ -41,12 +41,12 @@ services:
       timeout: 5s
       retries: 3
     depends_on:
-      init-clickhouse:
+      init-datastore:
         condition: service_completed_successfully
       zookeeper:
         condition: service_healthy
     environment:
-      - CLICKHOUSE_SKIP_USER_SETUP=1
+      - DATASTORE_SKIP_USER_SETUP=1
     networks:
       - default
       - o11y-devenv
@@ -70,9 +70,9 @@ services:
     image: observe/observe-otel-collector:v0.142.0
     container_name: telemetrystore-migrator
     environment:
-      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_DSN=tcp://clickhouse:9000
-      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_CLUSTER=cluster
-      - O11Y_OTEL_COLLECTOR_CLICKHOUSE_REPLICATION=true
+      - O11Y_OTEL_COLLECTOR_DATASTORE_DSN=tcp://datastore:9000
+      - O11Y_OTEL_COLLECTOR_DATASTORE_CLUSTER=cluster
+      - O11Y_OTEL_COLLECTOR_DATASTORE_REPLICATION=true
       - O11Y_OTEL_COLLECTOR_TIMEOUT=10m
     entrypoint:
       - /bin/sh
@@ -83,7 +83,7 @@ services:
       /observe-otel-collector migrate sync up &&
       /observe-otel-collector migrate async up
     depends_on:
-      clickhouse:
+      datastore:
         condition: service_healthy
     restart: on-failure
     networks:
