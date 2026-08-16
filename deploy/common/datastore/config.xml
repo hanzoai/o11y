@@ -5,7 +5,7 @@
   You can either move the settings to the right place inside "users.xml" file
    or add <skip_check_for_incorrect_settings>1</skip_check_for_incorrect_settings> here.
 -->
-<clickhouse>
+<datastore>
     <logger>
         <!-- Possible levels [1]:
 
@@ -26,8 +26,8 @@
         <formatting>
             <type>json</type>
         </formatting>
-        <log>/var/log/clickhouse-server/clickhouse-server.log</log>
-        <errorlog>/var/log/clickhouse-server/clickhouse-server.err.log</errorlog>
+        <log>/var/log/datastore-server/clickhouse-server.log</log>
+        <errorlog>/var/log/datastore-server/clickhouse-server.err.log</errorlog>
         <!-- Rotation policy
              See https://github.com/pocoproject/poco/blob/poco-1.9.4-release/Foundation/include/Poco/FileChannel.h#L54-L85
           -->
@@ -86,7 +86,7 @@
         </header>
     </http_options_response -->
 
-    <!-- It is the name that will be shown in the clickhouse-client.
+    <!-- It is the name that will be shown in the datastore-client.
          By default, anything with "production" will be highlighted in red in query prompt.
     -->
     <!--display_name>production</display_name-->
@@ -98,7 +98,7 @@
     <http_port>8123</http_port>
 
     <!-- Port for interaction by native protocol with:
-         - clickhouse-client and other native ClickHouse tools (clickhouse-benchmark, clickhouse-copier);
+         - datastore-client and other native ClickHouse tools (clickhouse-benchmark, clickhouse-copier);
          - clickhouse-server with other clickhouse-servers for distributed query processing;
          - ClickHouse drivers and applications supporting native protocol
          (this protocol is also informally called as "the TCP protocol");
@@ -177,7 +177,7 @@
          - all users are restricted to subset of network addresses (see users.xml);
          - all users have strong passwords, only secure (TLS) interfaces are accessible, or connections are only made via TLS interfaces.
          - users without password have readonly access.
-         See also: https://www.shodan.io/search?query=clickhouse
+         See also: https://www.shodan.io/search?query=datastore
       -->
     <!-- <listen_host>::</listen_host> -->
 
@@ -238,15 +238,15 @@
     <!-- Used with https_port and tcp_port_secure. Full ssl options list: https://github.com/ClickHouse-Extras/poco/blob/master/NetSSL_OpenSSL/include/Poco/Net/SSLManager.h#L71 -->
     <openSSL>
         <server> <!-- Used for https server AND secure tcp port -->
-            <!-- openssl req -subj "/CN=localhost" -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /etc/clickhouse-server/server.key -out /etc/clickhouse-server/server.crt -->
-            <!-- <certificateFile>/etc/clickhouse-server/server.crt</certificateFile> -->
-            <!-- <privateKeyFile>/etc/clickhouse-server/server.key</privateKeyFile> -->
+            <!-- openssl req -subj "/CN=localhost" -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout /etc/datastore-server/server.key -out /etc/datastore-server/server.crt -->
+            <!-- <certificateFile>/etc/datastore-server/server.crt</certificateFile> -->
+            <!-- <privateKeyFile>/etc/datastore-server/server.key</privateKeyFile> -->
             <!-- dhparams are optional. You can delete the <dhParamsFile> element.
                  To generate dhparams, use the following command:
-                  openssl dhparam -out /etc/clickhouse-server/dhparam.pem 4096
+                  openssl dhparam -out /etc/datastore-server/dhparam.pem 4096
                  Only file format with BEGIN DH PARAMETERS is supported.
               -->
-            <!-- <dhParamsFile>/etc/clickhouse-server/dhparam.pem</dhParamsFile>-->
+            <!-- <dhParamsFile>/etc/datastore-server/dhparam.pem</dhParamsFile>-->
             <verificationMode>none</verificationMode>
             <loadDefaultCAFile>true</loadDefaultCAFile>
             <cacheSessions>true</cacheSessions>
@@ -366,10 +366,10 @@
     <compiled_expression_cache_elements_size>10000</compiled_expression_cache_elements_size>
 
     <!-- Path to data directory, with trailing slash. -->
-    <path>/var/lib/clickhouse/</path>
+    <path>/var/lib/datastore/</path>
 
     <!-- Path to temporary data for processing hard queries. -->
-    <tmp_path>/var/lib/clickhouse/tmp/</tmp_path>
+    <tmp_path>/var/lib/datastore/tmp/</tmp_path>
 
     <!-- Disable AuthType plaintext_password and no_password for ACL. -->
     <!-- <allow_plaintext_password>0</allow_plaintext_password> -->
@@ -387,7 +387,7 @@
     <!-- <tmp_policy>tmp</tmp_policy> -->
 
     <!-- Directory with user provided files that are accessible by 'file' table function. -->
-    <user_files_path>/var/lib/clickhouse/user_files/</user_files_path>
+    <user_files_path>/var/lib/datastore/user_files/</user_files_path>
 
     <!-- LDAP server definitions. -->
     <ldap_servers>
@@ -487,7 +487,7 @@
         </users_xml>
         <local_directory>
             <!-- Path to folder where users created by SQL commands are stored. -->
-            <path>/var/lib/clickhouse/access/</path>
+            <path>/var/lib/datastore/access/</path>
         </local_directory>
 
         <!-- To add an LDAP server as a remote user directory of users that are not defined locally, define a single 'ldap' section
@@ -586,7 +586,7 @@
     <!-- <umask>022</umask> -->
 
     <!-- Perform mlockall after startup to lower first queries latency
-          and to prevent clickhouse executable from being paged out under high IO load.
+          and to prevent datastore executable from being paged out under high IO load.
          Enabling this option is recommended but will lead to increased startup time for up to a few seconds.
     -->
     <mlock_executable>true</mlock_executable>
@@ -888,7 +888,7 @@
         <flush_interval_milliseconds>7500</flush_interval_milliseconds>
     </processors_profile_log>
 
-    <!-- <top_level_domains_path>/var/lib/clickhouse/top_level_domains/</top_level_domains_path> -->
+    <!-- <top_level_domains_path>/var/lib/datastore/top_level_domains/</top_level_domains_path> -->
     <!-- Custom TLD lists.
          Format: <name>/path/to/file</name>
 
@@ -908,7 +908,7 @@
 
     <!-- Configuration of user defined executable functions -->
     <user_defined_executable_functions_config>*function.xml</user_defined_executable_functions_config>
-    <user_scripts_path>/var/lib/clickhouse/user_scripts/</user_scripts_path>
+    <user_scripts_path>/var/lib/datastore/user_scripts/</user_scripts_path>
 
     <!-- Uncomment if you want data to be compressed 30-100% better.
          Don't do that if you just started using ClickHouse.
@@ -1033,7 +1033,7 @@
     <!-- Directory in <clickhouse-path> containing schema files for various input formats.
          The directory will be created if it doesn't exist.
       -->
-    <format_schema_path>/var/lib/clickhouse/format_schemas/</format_schema_path>
+    <format_schema_path>/var/lib/datastore/format_schemas/</format_schema_path>
 
     <!-- Default query masking rules, matching lines would be replaced with something else in the logs
         (both text logs and system.query_log).
@@ -1139,4 +1139,4 @@
         <lru_cache_size>268435456</lru_cache_size>
         <continue_if_corrupted>true</continue_if_corrupted>
     </merge_tree_metadata_cache>
-</clickhouse>
+</datastore>

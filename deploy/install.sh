@@ -363,7 +363,7 @@ else
     O11Y_INSTALLATION_ID=$(echo "$sysinfo" | $digest_cmd | grep -E -o '[a-zA-Z0-9]{64}')
 fi
 
-setup_type='clickhouse'
+setup_type='datastore'
 
 # Run bye if failure happens
 trap bye EXIT
