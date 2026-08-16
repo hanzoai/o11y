@@ -7,7 +7,7 @@ x-common: &common
     options:
       max-size: 50m
       max-file: "3"
-x-clickhouse-defaults: &clickhouse-defaults
+x-datastore-defaults: &datastore-defaults
   !!merge <<: *common
   # addding non LTS version due to this fix https://github.com/ClickHouse/ClickHouse/commit/32caf8716352f45c1b617274c7508c86b7d1afab
   image: ghcr.io/hanzoai/datastore:26.6.1.1
@@ -17,7 +17,7 @@ x-clickhouse-defaults: &clickhouse-defaults
     o11y.hanzo.ai/port: "9363"
     o11y.hanzo.ai/path: "/metrics"
   depends_on:
-    init-clickhouse:
+    init-datastore:
       condition: service_completed_successfully
     zookeeper-1:
       condition: service_healthy
@@ -41,7 +41,7 @@ x-clickhouse-defaults: &clickhouse-defaults
       soft: 262144
       hard: 262144
   environment:
-    - CLICKHOUSE_SKIP_USER_SETUP=1
+    - DATASTORE_SKIP_USER_SETUP=1
 x-zookeeper-defaults: &zookeeper-defaults
   !!merge <<: *common
   image: ghcr.io/hanzoai/zookeeper:3.7.1
@@ -60,14 +60,14 @@ x-zookeeper-defaults: &zookeeper-defaults
 x-db-depend: &db-depend
   !!merge <<: *common
   depends_on:
-    clickhouse:
+    datastore:
       condition: service_healthy
-    clickhouse-2:
+    datastore-2:
       condition: service_healthy
-    clickhouse-3:
+    datastore-3:
       condition: service_healthy
 services:
-  init-clickhouse:
+  init-datastore:
     !!merge <<: *common
     image: ghcr.io/hanzoai/datastore:26.6.1.1
     container_name: o11y-init-datastore
@@ -82,10 +82,10 @@ services:
         cd /tmp
         wget -O histogram-quantile.tar.gz "https://github.com/Hanzo O11y/observe/releases/download/histogram-quantile%2F$${version}/histogram-quantile_$${node_os}_$${node_arch}.tar.gz"
         tar -xvzf histogram-quantile.tar.gz
-        mv histogram-quantile /var/lib/clickhouse/user_scripts/histogramQuantile
+        mv histogram-quantile /var/lib/datastore/user_scripts/histogramQuantile
     restart: on-failure
     volumes:
-      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
+      - ../common/datastore/user_scripts:/var/lib/datastore/user_scripts/
   zookeeper-1:
     !!merge <<: *zookeeper-defaults
     container_name: o11y-zookeeper-1
@@ -134,51 +134,51 @@ services:
       - ZOO_AUTOPURGE_INTERVAL=1
       - ZOO_ENABLE_PROMETHEUS_METRICS=yes
       - ZOO_PROMETHEUS_METRICS_PORT_NUMBER=9141
-  clickhouse:
-    !!merge <<: *clickhouse-defaults
+  datastore:
+    !!merge <<: *datastore-defaults
     container_name: o11y-datastore
     # ports:
     #   - "9000:9000"
     #   - "8123:8123"
     #   - "9181:9181"
     volumes:
-      - ../common/datastore/config.xml:/etc/clickhouse-server/config.xml
-      - ../common/datastore/users.xml:/etc/clickhouse-server/users.xml
-      - ../common/datastore/custom-function.xml:/etc/clickhouse-server/custom-function.xml
-      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
-      - ../common/datastore/cluster.ha.xml:/etc/clickhouse-server/config.d/cluster.xml
-      - clickhouse:/var/lib/clickhouse/
-      # - ../common/datastore/storage.xml:/etc/clickhouse-server/config.d/storage.xml
-  clickhouse-2:
-    !!merge <<: *clickhouse-defaults
+      - ../common/datastore/config.xml:/etc/datastore-server/config.xml
+      - ../common/datastore/users.xml:/etc/datastore-server/users.xml
+      - ../common/datastore/custom-function.xml:/etc/datastore-server/custom-function.xml
+      - ../common/datastore/user_scripts:/var/lib/datastore/user_scripts/
+      - ../common/datastore/cluster.ha.xml:/etc/datastore-server/config.d/cluster.xml
+      - datastore:/var/lib/datastore/
+      # - ../common/datastore/storage.xml:/etc/datastore-server/config.d/storage.xml
+  datastore-2:
+    !!merge <<: *datastore-defaults
     container_name: o11y-datastore-2
     # ports:
     #   - "9001:9000"
     #   - "8124:8123"
     #   - "9182:9181"
     volumes:
-      - ../common/datastore/config.xml:/etc/clickhouse-server/config.xml
-      - ../common/datastore/users.xml:/etc/clickhouse-server/users.xml
-      - ../common/datastore/custom-function.xml:/etc/clickhouse-server/custom-function.xml
-      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
-      - ../common/datastore/cluster.ha.xml:/etc/clickhouse-server/config.d/cluster.xml
-      - clickhouse-2:/var/lib/clickhouse/
-      # - ../common/datastore/storage.xml:/etc/clickhouse-server/config.d/storage.xml
-  clickhouse-3:
-    !!merge <<: *clickhouse-defaults
+      - ../common/datastore/config.xml:/etc/datastore-server/config.xml
+      - ../common/datastore/users.xml:/etc/datastore-server/users.xml
+      - ../common/datastore/custom-function.xml:/etc/datastore-server/custom-function.xml
+      - ../common/datastore/user_scripts:/var/lib/datastore/user_scripts/
+      - ../common/datastore/cluster.ha.xml:/etc/datastore-server/config.d/cluster.xml
+      - datastore-2:/var/lib/datastore/
+      # - ../common/datastore/storage.xml:/etc/datastore-server/config.d/storage.xml
+  datastore-3:
+    !!merge <<: *datastore-defaults
     container_name: o11y-datastore-3
     # ports:
     #   - "9002:9000"
     #   - "8125:8123"
     #   - "9183:9181"
     volumes:
-      - ../common/datastore/config.xml:/etc/clickhouse-server/config.xml
-      - ../common/datastore/users.xml:/etc/clickhouse-server/users.xml
-      - ../common/datastore/custom-function.xml:/etc/clickhouse-server/custom-function.xml
-      - ../common/datastore/user_scripts:/var/lib/clickhouse/user_scripts/
-      - ../common/datastore/cluster.ha.xml:/etc/clickhouse-server/config.d/cluster.xml
-      - clickhouse-3:/var/lib/clickhouse/
-      # - ../common/datastore/storage.xml:/etc/clickhouse-server/config.d/storage.xml
+      - ../common/datastore/config.xml:/etc/datastore-server/config.xml
+      - ../common/datastore/users.xml:/etc/datastore-server/users.xml
+      - ../common/datastore/custom-function.xml:/etc/datastore-server/custom-function.xml
+      - ../common/datastore/user_scripts:/var/lib/datastore/user_scripts/
+      - ../common/datastore/cluster.ha.xml:/etc/datastore-server/config.d/cluster.xml
+      - datastore-3:/var/lib/datastore/
+      # - ../common/datastore/storage.xml:/etc/datastore-server/config.d/storage.xml
   observe:
     !!merge <<: *db-depend
     image: ghcr.io/hanzoai/o11y:${VERSION:-v0.115.0}
@@ -189,7 +189,7 @@ services:
       - sqlite:/var/lib/observe/
     environment:
       - O11Y_ALERTMANAGER_PROVIDER=observe
-      - O11Y_DATASTORE_DSN=tcp://clickhouse:9000
+      - O11Y_DATASTORE_DSN=tcp://datastore:9000
       - O11Y_SQLSTORE_SQLITE_PATH=/var/lib/ghcr.io/hanzoai/o11y.db
       - O11Y_TOKENIZER_JWT_SECRET=secret
     healthcheck:
@@ -219,7 +219,7 @@ services:
     environment:
       - OTEL_RESOURCE_ATTRIBUTES=host.name=observe-host,os.type=linux
       - LOW_CARDINAL_EXCEPTION_GROUPING=false
-      - O11Y_OTEL_COLLECTOR_DATASTORE_DSN=tcp://clickhouse:9000
+      - O11Y_OTEL_COLLECTOR_DATASTORE_DSN=tcp://datastore:9000
       - O11Y_OTEL_COLLECTOR_DATASTORE_CLUSTER=cluster
       - O11Y_OTEL_COLLECTOR_DATASTORE_REPLICATION=true
       - O11Y_OTEL_COLLECTOR_TIMEOUT=10m
@@ -232,7 +232,7 @@ services:
     image: ghcr.io/hanzoai/otel-collector:${OTELCOL_TAG:-sha-b58ddaa}
     container_name: o11y-telemetrystore-migrator
     environment:
-      - O11Y_OTEL_COLLECTOR_DATASTORE_DSN=tcp://clickhouse:9000
+      - O11Y_OTEL_COLLECTOR_DATASTORE_DSN=tcp://datastore:9000
       - O11Y_OTEL_COLLECTOR_DATASTORE_CLUSTER=cluster
       - O11Y_OTEL_COLLECTOR_DATASTORE_REPLICATION=true
       - O11Y_OTEL_COLLECTOR_TIMEOUT=10m
@@ -249,11 +249,11 @@ networks:
   o11y-net:
     name: o11y-net
 volumes:
-  clickhouse:
+  datastore:
     name: o11y-datastore
-  clickhouse-2:
+  datastore-2:
     name: o11y-datastore-2
-  clickhouse-3:
+  datastore-3:
     name: o11y-datastore-3
   sqlite:
     name: o11y-sqlite
