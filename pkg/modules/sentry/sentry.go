@@ -62,11 +62,11 @@ type Module interface {
 	Stats(ctx context.Context, orgID, projectID valuer.UUID, field, period string) ([]sentrytypes.StatsPoint, error)
 }
 
-// Handler is the HTTP surface under /v1/sentinel. The two ingest endpoints are PUBLIC
-// (DSN-authenticated in-handler); everything else is behind Hanzo IAM authz and
-// org-scoped from the validated claims.
+// Handler is the HTTP surface of Hanzo Sentry: the product face under /v1/sentinel,
+// behind Hanzo IAM authz and org-scoped from the validated claims, plus the ingest
+// door under /v1/event, which is PUBLIC and DSN-authenticated in-handler.
 type Handler interface {
-	// Ingest (public, DSN-auth): POST /v1/sentinel/{project}/envelope|store/.
+	// Ingest (public, DSN-auth): POST /v1/event/{project}/envelope|store/.
 	EnvelopeIngest(http.ResponseWriter, *http.Request)
 	StoreIngest(http.ResponseWriter, *http.Request)
 

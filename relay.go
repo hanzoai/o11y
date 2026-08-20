@@ -78,16 +78,26 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-// The two public roots this package answers on, each spelled ONCE.
+// The three public roots this package answers on, each spelled ONCE.
+//
+// Two of them are FACES and one is a DOOR, and that is the whole reason there
+// are three. A face is read by a signed-in person and answers about what is
+// already stored; a door is knocked on by a keyed beacon that holds no session
+// and carries something in. Different nouns, different callers, different
+// credentials — so the same wire does not get to answer at both.
 //
 //   - o11yRoot is the observability face: metrics, traces, logs, dashboards,
 //     alerts, identity, access, infra, LLM observability — everything the
 //     console calls.
-//   - sentinelRoot is the error-tracking face's own contract, kept separate
-//     because a Sentry SDK reaches it with a DSN key rather than a session.
+//   - sentinelRoot is the error-tracking face: projects, issues, occurrences,
+//     discover and the event-rate stats.
+//   - eventRoot is the ingest door. It is the address a minted DSN spells
+//     (implsentry's mintDSN), so the door a client is TOLD about and the door
+//     this service OPENS are one string.
 const (
-	o11yRoot   = "/v1/o11y"
+	o11yRoot     = "/v1/o11y"
 	sentinelRoot = "/v1/sentinel"
+	eventRoot    = "/v1/event"
 )
 
 // relay hands one typed op's call to the runtime handler at the op's OWN address
