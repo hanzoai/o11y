@@ -137,20 +137,22 @@ func publicDashboardRead(method, path string) bool {
 // project segment. Refusing it for lacking a principal it can never carry would
 // take every SDK in the field off the air.
 //
-//	POST /v1/o11y/api/{project}/envelope|store  (the DSN path an SDK appends to)
-//	POST /v1/sentinel/{project}/envelope|store    (the same wire on the clean root)
+//	POST /v1/event/{project}/envelope|store     (the ingest door a minted DSN names)
+//	POST /v1/o11y/api/{project}/envelope|store  (the suffix a stock SDK appends)
 //
-// It matches by METHOD + PREFIX + SUFFIX and never by a bare prefix, so the read
-// APIs under both roots — issues, discover, logs, traces, stats — stay gated.
-// The trailing slash is the protocol's form; the slash-less variant is tolerated
-// defensively. Exported because the EDGE needs the identical answer: the gateway
-// waives its JWT check on exactly these, and a request the gateway lets through
-// tokenless must not then be refused here for having no token.
+// It matches by METHOD + PREFIX + SUFFIX and never by a bare prefix, so nothing
+// else on either root is reachable through it: the faces stay gated — issues,
+// discover, logs, traces, stats — and so does /v1/event itself, the product
+// event door beside this one. The trailing slash is the protocol's form; the
+// slash-less variant is tolerated defensively. Exported because the EDGE needs
+// the identical answer: the gateway waives its JWT check on exactly these, and a
+// request the gateway lets through tokenless must not then be refused here for
+// having no token.
 func IngestWire(method, path string) bool {
 	if method != http.MethodPost {
 		return false
 	}
-	if !strings.HasPrefix(path, o11yRoot+"/api/") && !strings.HasPrefix(path, sentinelRoot+"/") {
+	if !strings.HasPrefix(path, eventRoot+"/") && !strings.HasPrefix(path, o11yRoot+"/api/") {
 		return false
 	}
 	return strings.HasSuffix(path, "/envelope/") || strings.HasSuffix(path, "/envelope") ||

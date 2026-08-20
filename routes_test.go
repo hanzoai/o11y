@@ -162,10 +162,10 @@ func TestHatchesDelegateVerbatim(t *testing.T) {
 		{http.MethodGet, "/v1/o11y/complete/oidc"},
 		{http.MethodPost, "/v1/o11y/complete/saml"},
 
+		{http.MethodPost, "/v1/event/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
+		{http.MethodPost, "/v1/event/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
 		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
 		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
-		{http.MethodPost, "/v1/sentinel/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
-		{http.MethodPost, "/v1/sentinel/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
 	}
 	if len(hatches) != 11 {
 		t.Fatalf("the census itself is wrong: %d", len(hatches))

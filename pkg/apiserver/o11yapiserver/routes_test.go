@@ -3,6 +3,7 @@ package o11yapiserver
 import (
 	"log/slog"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/hanzoai/o11y/pkg/alertmanager"
@@ -120,14 +121,16 @@ func TestEveryAPIServerRouteIsRegistered(t *testing.T) {
 		t.Fatalf("router holds %d routes, the table recorded %d", onRouter, len(table))
 	}
 
-	// Every route answers on one of the two public roots and carries no leftover
-	// spelling from the tree this replaced.
+	// Every route answers on one of the three public roots — the two faces and
+	// the ingest door — and carries no leftover spelling from the tree this
+	// replaced.
 	for _, route := range table {
 		switch {
-		case route.Path[:len("/v1/o11y")] == "/v1/o11y":
-		case route.Path[:len("/v1/sentinel")] == "/v1/sentinel":
+		case strings.HasPrefix(route.Path, "/v1/o11y"):
+		case strings.HasPrefix(route.Path, "/v1/sentinel"):
+		case strings.HasPrefix(route.Path, "/v1/event"):
 		default:
-			t.Errorf("%s %s is on neither public root", route.Method, route.Path)
+			t.Errorf("%s %s is on none of the public roots", route.Method, route.Path)
 		}
 	}
 }

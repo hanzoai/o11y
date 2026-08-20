@@ -126,11 +126,13 @@ func TestPublishServesTheDocument(t *testing.T) {
 	}
 }
 
-// The two public roots this service answers on. Named here so the assertion and
-// the message cannot disagree about what "o11y's surface" means.
+// The three public roots this service answers on — two faces and the ingest
+// door. Named here so the assertion and the message cannot disagree about what
+// "o11y's surface" means.
 const (
 	o11yRootPath     = "/v1/o11y"
 	sentinelRootPath = "/v1/sentinel"
+	eventRootPath    = "/v1/event"
 )
 
 // Every operation the document publishes is o11y's own surface. A host that
@@ -150,7 +152,8 @@ func TestPublishedDocumentIsO11ysSurface(t *testing.T) {
 		// Prefix, not a fixed slice: the roots are different lengths, so an index
 		// is a second place the root's spelling lives and it goes stale the moment
 		// one of them is renamed.
-		if !strings.HasPrefix(path, o11yRootPath) && !strings.HasPrefix(path, sentinelRootPath) {
+		if !strings.HasPrefix(path, o11yRootPath) && !strings.HasPrefix(path, sentinelRootPath) &&
+			!strings.HasPrefix(path, eventRootPath) {
 			t.Errorf("the document publishes %s, which is not o11y's surface", path)
 		}
 	}

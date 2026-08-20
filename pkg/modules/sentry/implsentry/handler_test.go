@@ -65,7 +65,7 @@ func TestGetEventReadsThePathIDAndTheQueryProject(t *testing.T) {
 // It is spelled here exactly as sentry.go spells it: a stale copy is not a
 // smaller version of this test, it is a different route (see the constraint
 // test below).
-const ingestRoute = "/v1/sentinel/{project:guid}/envelope/"
+const ingestRoute = "/v1/event/{project:guid}/envelope/"
 
 // The ingest route is the one segment read that decides TENANCY: the project in
 // the path is what the DSN key is verified against, so reading the wrong one
@@ -77,7 +77,7 @@ func TestIngestVerifiesTheProjectTheRouterMatched(t *testing.T) {
 	router := routing.Serve(http.MethodPost, ingestRoute, http.HandlerFunc(NewHandler(module, true, false).EnvelopeIngest))
 
 	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, httptest.NewRequest(http.MethodPost, "/v1/sentinel/"+project.String()+"/envelope/", strings.NewReader("{}")))
+	router.ServeHTTP(rec, httptest.NewRequest(http.MethodPost, "/v1/event/"+project.String()+"/envelope/", strings.NewReader("{}")))
 
 	// Fails closed on the key, which is the stub's answer — and it can only have
 	// been asked about the project the router matched.
@@ -86,22 +86,21 @@ func TestIngestVerifiesTheProjectTheRouterMatched(t *testing.T) {
 	assert.Equal(t, project, module.gotIngestProj)
 }
 
-// The constraint is the whole reason the ingest wildcard can never shadow a
-// static /v1/sentinel resource word, so a non-uuid segment must not reach the
-// handler at all. This is pinned because the constraint is silently OPTIONAL:
-// the router names its constraints, an unrecognised name is DROPPED rather than
-// refused, and a dropped constraint matches everything. Spelling this route with
-// the hand-written character class the runtime used to carry produces exactly
-// that — a route that answers /v1/sentinel/projects/envelope/ with 418 instead of
-// 404 — which is why the template above is the runtime's own `guid` and is
-// asserted here rather than trusted.
+// The constraint is what keeps the project segment a project id, so a non-uuid
+// segment must not reach the handler at all. This is pinned because the
+// constraint is silently OPTIONAL: the router names its constraints, an
+// unrecognised name is DROPPED rather than refused, and a dropped constraint
+// matches everything — a route that answers /v1/event/anything/envelope/ with
+// 418 instead of 404, handing the DSN verifier a project that cannot exist.
+// That is why the template above is the runtime's own `guid` and is asserted
+// here rather than trusted.
 func TestIngestConstraintRefusesANonUUIDProject(t *testing.T) {
 	module := &stubSentry{}
 
 	router := routing.Serve(http.MethodPost, ingestRoute, http.HandlerFunc(NewHandler(module, true, false).EnvelopeIngest))
 
 	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, httptest.NewRequest(http.MethodPost, "/v1/sentinel/projects/envelope/", strings.NewReader("{}")))
+	router.ServeHTTP(rec, httptest.NewRequest(http.MethodPost, "/v1/event/anything/envelope/", strings.NewReader("{}")))
 
 	require.Equal(t, http.StatusNotFound, rec.Code, rec.Body.String())
 	assert.Equal(t, valuer.UUID{}, module.gotIngestProj, "a segment the constraint refuses must not reach the handler")

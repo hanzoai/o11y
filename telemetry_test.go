@@ -320,6 +320,15 @@ func TestProjectIsMandatory(t *testing.T) {
 
 // THE ROUTES, exactly as they were. Five paths, five methods; the router's own
 // spelling of a parameter differs from the mux tree's, the wire path does not.
+//
+// THE FACE CARRIES NO INGEST. The two ingest doors used to land in this census
+// as well, and that is the shape this asserts against coming back: an
+// unauthenticated write registered inside a principal-gated subtree means the
+// gate has to carry an exemption shaped like it, and everything else under the
+// root has to be checked against that exemption. The doors answer on /v1/event
+// now (mount.go mountHatches, counted in routes_test.go), so everything here is
+// a read — and TestTheFaceIsGatedWholesale below states that as a property
+// rather than leaving it to this closed list.
 func TestTelemetryRoutesAreTheSameFive(t *testing.T) {
 	app := mounted(t)
 	want := map[string]bool{
@@ -328,22 +337,11 @@ func TestTelemetryRoutesAreTheSameFive(t *testing.T) {
 		"GET /v1/sentinel/traces":     true,
 		"GET /v1/sentinel/traces/:id": true,
 		"GET /v1/sentinel/stats":      true,
-
-		// The two ingest doors are NAMED hatches (mount.go mountHatches), and they
-		// land in this census because it counts what is registered. They were not
-		// here before for a reason worth recording: the composed binary only ever
-		// wildcarded /v1/o11y/*, so these two /v1/sentinel paths reached NOTHING —
-		// a Sentry SDK pointed at the clean root got a 404. Naming every route is
-		// what surfaced it.
-		"POST /v1/sentinel/:project/envelope/": true,
-		"POST /v1/sentinel/:project/store/":    true,
 	}
 	got := map[string]bool{}
 	for _, r := range app.Fiber().GetRoutes(true) {
 		// /v1/sentinel is shared: THIS face owns the telemetry reads (discover, logs,
 		// traces, trace/:id, stats); sentryerrors.go owns projects and issues/*.
-		// Counting the whole prefix made this census fail the moment
-		// mountSentryErrors was wired in — the doors were always defined, just dark.
 		if strings.HasPrefix(r.Path, "/v1/sentinel") &&
 			!strings.Contains(r.Path, "/projects") && !strings.Contains(r.Path, "/issues") &&
 			!strings.Contains(r.Path, "/events/") &&
@@ -363,15 +361,23 @@ func TestTelemetryRoutesAreTheSameFive(t *testing.T) {
 	}
 }
 
+// NOTHING ON THE FACE IS EXEMPT FROM THE PRINCIPAL GATE. The set above is a
+// closed list and would catch this instance; this states the PROPERTY, so a
+// route added to both the face and the list still fails. The face is read with
+// a session — an exempt write here is an unauthenticated door inside a gated
+// subtree, and the exemption that admits it is what every sibling then has to
+// be checked against.
+func TestTheFaceIsGatedWholesale(t *testing.T) {
+	for route := range registered(t, mounted(t)) {
+		method, path, _ := strings.Cut(route, " ")
+		if strings.HasPrefix(path, "/v1/sentinel") && o11y.Anonymous(method, path) {
+			t.Errorf("%s is on the face and answers a caller with no principal", route)
+		}
+	}
+}
+
 // The ingest door reaches the runtime through its OWN named route, path
-// untouched, while the typed reads next to it dispatch as ops.
-//
-// This test used to install a host wildcard and assert the ingest paths fell
-// into it. That framing hid a live defect: the composed binary's only wildcard
-// was /v1/o11y/*, so nothing in the real deployment ever answered
-// /v1/sentinel/<project>/envelope/ — the test passed because the test itself had
-// registered the door. Naming every route removed both the wildcard and the
-// illusion.
+// untouched, while the typed reads on the face dispatch as ops.
 func TestTheIngestDoorIsANamedHatch(t *testing.T) {
 	app := mounted(t)
 
@@ -383,7 +389,7 @@ func TestTheIngestDoorIsANamedHatch(t *testing.T) {
 	})))
 	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
-	const target = "/v1/sentinel/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"
+	const target = "/v1/event/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"
 	if status, body := call(t, app, member(http.MethodPost, target, strings.NewReader("{}"))); status != http.StatusOK {
 		t.Fatalf("status=%d body=%s", status, body)
 	}

@@ -275,8 +275,7 @@ func (provider *provider) AddToRouter(router routing.Router) {
 	provider.addLLMPricingRuleRoutes(router)
 	provider.addLLMObsRoutes(router)
 	provider.addErrorTrackingRoutes(router)
-	// Hanzo Sentry product face — clean /v1/sentinel/* routes on THIS router.
-	// Registered here so its literal paths precede the ingest wildcards.
+	// Hanzo Sentry: the /v1/sentinel product face and the /v1/event ingest door.
 	provider.addSentryRoutes(router)
 	provider.addTraceDetailRoutes(router)
 	provider.addRulerRoutes(router)

@@ -181,10 +181,11 @@ func Mount(app *zip.App, opts ...Option) error {
 // than being absent from it — a generated client that trusts a false contract
 // fails at the customer, not at review.
 //
-// Two of these eleven were not reachable AT ALL from the composed binary before
-// this pass: /ws/query_progress and the two /v1/sentinel ingest routes sit outside
-// /v1/o11y, so the old catch-all never saw them. That is the second thing a
-// wildcard hides — not just which routes are un-typed, but which are missing.
+// Three of these eleven sit OUTSIDE /v1/o11y — /ws/query_progress and the two
+// ingest routes on eventRoot — which is the second thing a wildcard hides. A
+// catch-all on one root cannot reach a route on another, so it does not merely
+// obscure which routes are un-typed, it obscures which are missing: those three
+// were unreachable from the composed binary until every route was named.
 func mountHatches(app *zip.App) {
 	// ── 1. STREAMS: there is no one answer to name ───────────────────────────
 	// These never produce a single complete JSON value. relay buffers a whole
@@ -207,14 +208,21 @@ func mountHatches(app *zip.App) {
 	route(app, http.MethodPost, o11yRoot+"/complete/saml")  // SAML assertion consumer → 303
 
 	// ── 3. A FOREIGN PROTOCOL WE RECEIVE ─────────────────────────────────────
-	// Sentry-compatible ingest. The body is an application/x-sentry-envelope
-	// frame, not JSON, and the caller is a Sentry SDK authenticating with a DSN
-	// public key rather than a Hanzo session. The /api/ segment is NOT ours to
-	// name: an SDK appends its own fixed /api/<project>/envelope/ suffix to
-	// whatever DSN path it is given, so renaming it would break every SDK in the
-	// field. We RECEIVE this shape; we do not publish it.
-	route(app, http.MethodPost, o11yRoot+"/api/:project_id/envelope/") // Sentry envelope ingest
-	route(app, http.MethodPost, o11yRoot+"/api/:project_id/store/")    // legacy single-event ingest
-	route(app, http.MethodPost, sentinelRoot+"/:project/envelope/")      // the same wire on the clean /v1/sentinel root
-	route(app, http.MethodPost, sentinelRoot+"/:project/store/")         // same
+	// Sentry-compatible ingest, and the only thing in this table that is not a
+	// face. The body is an application/x-sentry-envelope frame, not JSON, and
+	// the caller is a Sentry SDK authenticating with a DSN public key rather
+	// than a Hanzo session.
+	//
+	// SO IT ANSWERS ON THE INGEST DOOR, NOT UNDER A PRODUCT'S ROOT (relay.go).
+	// eventRoot is what a minted DSN spells, so a beacon has exactly one address
+	// to knock on and the face beside it keeps its own gate.
+	//
+	// The /api/ segment is NOT ours to name: a stock SDK appends its own fixed
+	// /api/<project>/envelope/ suffix to whatever DSN path it is given, so
+	// renaming it would break every SDK in the field. We RECEIVE this shape; we
+	// do not publish it.
+	route(app, http.MethodPost, eventRoot+"/:project/envelope/")       // the door a minted DSN names
+	route(app, http.MethodPost, eventRoot+"/:project/store/")          // the same door, single-event form
+	route(app, http.MethodPost, o11yRoot+"/api/:project_id/envelope/") // the suffix a stock SDK appends
+	route(app, http.MethodPost, o11yRoot+"/api/:project_id/store/")    // the same suffix, single-event form
 }

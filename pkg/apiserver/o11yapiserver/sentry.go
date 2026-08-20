@@ -10,26 +10,33 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
 )
 
-// The ingest {project} path var is constrained to a UUID — {project:guid} — so the
-// wildcard ingest routes can NEVER shadow a static /v1/sentinel resource word (projects,
-// issues, discover, events, logs, traces, stats). Combined with static-before-wildcard
-// registration order below and the reserved-slug check at project creation, a project
-// segment and a resource route are structurally unambiguous. The constraint is the
-// router's own `guid` — a UUID parse, not a hand-written character class that has to
-// be read to know what it accepts.
+// The ingest {project} path var is constrained to a UUID — {project:guid} — so a
+// project segment is a UUID and nothing else, and a garbage segment is a 404 from the
+// router rather than a body handed to the DSN verifier. The constraint is the router's
+// own `guid` — a UUID parse, not a hand-written character class that has to be read to
+// know what it accepts.
 
-// addSentryRoutes serves Hanzo Sentry — the Sentry-parity product face — under the
-// CLEAN /v1/sentinel contract (no /api/ segment anywhere). Two families:
+// addSentryRoutes registers TWO families, and they answer on two roots because they
+// answer two different callers:
 //
-//   - INGEST (public, DSN-authenticated in-handler): POST /v1/sentinel/{project}/envelope/
-//     and /store/. OpenAccess (no IAM): a Sentry SDK presents a DSN key, not a Hanzo
-//     session; the handler verifies that key against the project's rotation watermark.
-//     The {project} var is UUID-constrained and these are registered LAST.
-//   - READ (Hanzo IAM authz, org-scoped): projects, issues, discover, events, logs,
-//     traces, stats — every one scoped to the caller's org from the validated claims.
+//   - The FACE, /v1/sentinel — Hanzo Sentry, the Sentry-parity product read by a
+//     signed-in person: projects, issues, discover, events, logs, traces, stats. Hanzo
+//     IAM authz, every one scoped to the caller's org from the validated claims.
+//   - The DOOR, POST /v1/event/{project}/envelope/ and /store/ — a keyed beacon. It is
+//     the address a minted DSN spells (implsentry's mintDSN), so the address a client
+//     is told and the address this router opens are one string. OpenAccess (no IAM):
+//     a Sentry SDK presents a DSN key, not a Hanzo session; the handler verifies that
+//     key against the project's rotation watermark.
 //
-// These paths are literal /v1/sentinel/… on the SAME router the o11y read plane uses, so
-// no /v1/o11y→/api rewrite applies (see createPublicServer's /v1/sentinel passthrough).
+// ONE WIRE, ONE PUBLIC ADDRESS. The door used to sit under the face's root as well,
+// which put one wire at two addresses and put an unauthenticated write inside a
+// principal-gated subtree — so the face's gate had to carry an exemption shaped like
+// the ingest paths, and the exemption is what anything under that root had to be
+// checked against. Off the face there is nothing to exempt.
+//
+// Both are literal paths on the SAME router the o11y read plane uses, so no
+// /v1/o11y→/api rewrite applies (see createPublicServer: the path that arrives is the
+// path that matches).
 //
 // FIVE of the read routes — discover, logs, traces, traces/{id}, stats — are ALSO
 // declared as typed ops at the module's mount seam (telemetry.go in the repo root),
@@ -43,13 +50,14 @@ import (
 // The OTHER ten reads/writes of this face — projects (list/create/get/delete/
 // rotate-key), issues (list/get/update/events) and one event — are ALSO typed ops
 // at that seam (sentryerrors.go), the same second DISPATCH into this router. The two
-// INGEST routes below stay ONLY here: OpenAccess, DSN-authenticated, carrying an
-// opaque Sentry-envelope body a typed relay would corrupt, so they are a deliberate
-// escape hatch, out of the document by design.
+// INGEST routes below are named at that seam as HATCHES rather than ops (mount.go's
+// mountHatches): OpenAccess, DSN-authenticated, carrying an opaque Sentry-envelope
+// body a typed relay would corrupt, so they are named but not typed and stay out of
+// the document by design.
 func (provider *provider) addSentryRoutes(router routing.Router) {
 	h := provider.sentryHandler
 
-	// STATIC resource routes — registered BEFORE the ingest wildcard.
+	// The FACE.
 	staticRoutes := []struct {
 		method string
 		path   string
@@ -147,13 +155,13 @@ func (provider *provider) addSentryRoutes(router routing.Router) {
 		router.Handle(rt.method, rt.path, handler.New(rt.fn, rt.def))
 	}
 
-	// INGEST wildcard routes — registered LAST, UUID-constrained project segment.
+	// INGEST — the door, on its own root, UUID-constrained project segment.
 	ingestRoutes := []struct {
 		path string
 		fn   http.HandlerFunc
 		def  handler.OpenAPIDef
 	}{
-		{"/v1/sentinel/{project:guid}/envelope/", provider.authzMiddleware.OpenAccess(h.EnvelopeIngest), handler.OpenAPIDef{
+		{"/v1/event/{project:guid}/envelope/", provider.authzMiddleware.OpenAccess(h.EnvelopeIngest), handler.OpenAPIDef{
 			ID: "SentryIngestEnvelope", Tags: []string{"sentry"}, Summary: "Ingest a Sentry envelope",
 			Description:         "Sentry-envelope-compatible ingest. Authenticated by the DSN public key (X-Sentry-Auth or ?sentry_key), not a Hanzo session.",
 			RequestContentType:  "application/x-sentry-envelope",
@@ -161,7 +169,7 @@ func (provider *provider) addSentryRoutes(router routing.Router) {
 			ErrorStatusCodes: []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusServiceUnavailable},
 			SecuritySchemes:  []handler.OpenAPISecurityScheme{},
 		}},
-		{"/v1/sentinel/{project:guid}/store/", provider.authzMiddleware.OpenAccess(h.StoreIngest), handler.OpenAPIDef{
+		{"/v1/event/{project:guid}/store/", provider.authzMiddleware.OpenAccess(h.StoreIngest), handler.OpenAPIDef{
 			ID: "SentryIngestStore", Tags: []string{"sentry"}, Summary: "Ingest a legacy Sentry store event",
 			Description:         "Legacy single-event Sentry ingest. Authenticated by the DSN public key.",
 			RequestContentType:  "application/json",
