@@ -15,7 +15,7 @@ package o11y
 // THE WIRE DOES NOT MOVE, the same way telemetry.go's and logs.go's ops do not
 // move it: these ops do not re-implement the reads and writes. Each hands the
 // call to the SAME runtime handler the wildcard delegates to (relay for
-// /v1/sentry, relayAt for /v1/o11y — telemetry.go's and logs.go's seams), so
+// /v1/sentinel, relayAt for /v1/o11y — telemetry.go's and logs.go's seams), so
 // identity resolution, the org gate, the exact role check each route has always
 // had, the audit record and the success envelope stay where they were and run
 // in the order they always did. What is new here is the TYPE — the In a caller
@@ -33,7 +33,7 @@ package o11y
 //   - Legacy exceptions (listErrors, countErrors, errorFromErrorID,
 //     errorFromGroupID, nextPrevErrorIDs): ViewAccess, every one.
 //
-// The FOUR ingest routes of this face — POST /v1/sentry/{project}/envelope|store/
+// The FOUR ingest routes of this face — POST /v1/sentinel/{project}/envelope|store/
 // and POST /v1/o11y/api/{project}/envelope|store/ — are the deliberate escape
 // hatches, NOT typed here. They are OpenAccess (a Sentry SDK presents a DSN key,
 // not a Hanzo session) and carry an OPAQUE Sentry-envelope body — a foreign wire
@@ -55,11 +55,11 @@ import (
 )
 
 // mountSentryErrors registers the eighteen typed ops: the sentry product face on
-// the sentryRoot group, and the error-tracking and legacy exceptions faces on
+// the sentinelRoot group, and the error-tracking and legacy exceptions faces on
 // the o11yRoot group. Both roots and the seam they relay through are spelled
 // once each, in relay.go.
 func mountSentryErrors(app *zip.App) {
-	gsentry := under{app, sentryRoot}
+	gsentry := under{app, sentinelRoot}
 	opGet(gsentry, "/projects", sentryListProjects)
 	opPost(gsentry, "/projects", sentryCreateProject)
 	opGet(gsentry, "/projects/:id", sentryGetProject)

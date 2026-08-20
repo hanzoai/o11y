@@ -98,8 +98,8 @@ func TestPublicOpsAreExempt(t *testing.T) {
 		"GET /v1/o11y/public/dashboards/d1/widgets/0/query_range",
 		"POST /v1/o11y/api/proj/envelope/",
 		"POST /v1/o11y/api/proj/store",
-		"POST /v1/sentry/proj/envelope/",
-		"POST /v1/sentry/proj/store",
+		"POST /v1/sentinel/proj/envelope/",
+		"POST /v1/sentinel/proj/store",
 	} {
 		method, path, _ := strings.Cut(route, " ")
 		if !o11y.Anonymous(method, path) {
@@ -122,7 +122,7 @@ func TestTenantOpsStayGated(t *testing.T) {
 		"GET /v1/o11y/public/dashboards/d1/widgets/0/query_rangex",
 		"GET /v1/o11y/api/proj/envelope/", // ingest is a WRITE; a GET is not it
 		"POST /v1/o11y/api/v3/issues",     // a read API under the DSN prefix
-		"POST /v1/sentry/issues",          // ditto on the clean root
+		"POST /v1/sentinel/issues",          // ditto on the clean root
 		"POST /v1/o11y/api/proj/envelopes",
 		"GET /v1/o11y/version/", // a route that does not exist is not public
 		"GET /V1/O11Y/VERSION",  // and the match is exact, never folded

@@ -138,7 +138,7 @@ func publicDashboardRead(method, path string) bool {
 // take every SDK in the field off the air.
 //
 //	POST /v1/o11y/api/{project}/envelope|store  (the DSN path an SDK appends to)
-//	POST /v1/sentry/{project}/envelope|store    (the same wire on the clean root)
+//	POST /v1/sentinel/{project}/envelope|store    (the same wire on the clean root)
 //
 // It matches by METHOD + PREFIX + SUFFIX and never by a bare prefix, so the read
 // APIs under both roots — issues, discover, logs, traces, stats — stay gated.
@@ -150,7 +150,7 @@ func IngestWire(method, path string) bool {
 	if method != http.MethodPost {
 		return false
 	}
-	if !strings.HasPrefix(path, o11yRoot+"/api/") && !strings.HasPrefix(path, sentryRoot+"/") {
+	if !strings.HasPrefix(path, o11yRoot+"/api/") && !strings.HasPrefix(path, sentinelRoot+"/") {
 		return false
 	}
 	return strings.HasSuffix(path, "/envelope/") || strings.HasSuffix(path, "/envelope") ||

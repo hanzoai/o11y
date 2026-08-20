@@ -105,7 +105,7 @@ type Modules struct {
 	// ErrorTrackingRevocations backs per-org DSN-key rotation; the handler consults
 	// it on every ingest. Built here because it needs the sqlstore.
 	ErrorTrackingRevocations implerrortracking.RevocationStore
-	// Sentry is the /v1/sentry product face: it COMPOSES the reused errortracking
+	// Sentry is the /v1/sentinel product face: it COMPOSES the reused errortracking
 	// engine + issue lifecycle, the columnar events plane (telemetryStore) and the
 	// reused tracedetail read. Built here because it needs BOTH the sqlstore (projects)
 	// and the telemetryStore (events plane).

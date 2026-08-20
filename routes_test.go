@@ -94,7 +94,7 @@ func TestEveryRouteIsNamedAndCounted(t *testing.T) {
 	}
 	ops := 0
 	for path, item := range paths {
-		if !strings.HasPrefix(path, "/v1/o11y") && !strings.HasPrefix(path, "/v1/sentry") {
+		if !strings.HasPrefix(path, "/v1/o11y") && !strings.HasPrefix(path, "/v1/sentinel") {
 			t.Errorf("OpenAPI published %s, which is not o11y's surface", path)
 		}
 		for method := range item {
@@ -164,8 +164,8 @@ func TestHatchesDelegateVerbatim(t *testing.T) {
 
 		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
 		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
-		{http.MethodPost, "/v1/sentry/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
-		{http.MethodPost, "/v1/sentry/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
+		{http.MethodPost, "/v1/sentinel/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
+		{http.MethodPost, "/v1/sentinel/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
 	}
 	if len(hatches) != 11 {
 		t.Fatalf("the census itself is wrong: %d", len(hatches))

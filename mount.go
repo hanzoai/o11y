@@ -182,7 +182,7 @@ func Mount(app *zip.App, opts ...Option) error {
 // fails at the customer, not at review.
 //
 // Two of these eleven were not reachable AT ALL from the composed binary before
-// this pass: /ws/query_progress and the two /v1/sentry ingest routes sit outside
+// this pass: /ws/query_progress and the two /v1/sentinel ingest routes sit outside
 // /v1/o11y, so the old catch-all never saw them. That is the second thing a
 // wildcard hides — not just which routes are un-typed, but which are missing.
 func mountHatches(app *zip.App) {
@@ -215,6 +215,6 @@ func mountHatches(app *zip.App) {
 	// field. We RECEIVE this shape; we do not publish it.
 	route(app, http.MethodPost, o11yRoot+"/api/:project_id/envelope/") // Sentry envelope ingest
 	route(app, http.MethodPost, o11yRoot+"/api/:project_id/store/")    // legacy single-event ingest
-	route(app, http.MethodPost, sentryRoot+"/:project/envelope/")      // the same wire on the clean /v1/sentry root
-	route(app, http.MethodPost, sentryRoot+"/:project/store/")         // same
+	route(app, http.MethodPost, sentinelRoot+"/:project/envelope/")      // the same wire on the clean /v1/sentinel root
+	route(app, http.MethodPost, sentinelRoot+"/:project/store/")         // same
 }

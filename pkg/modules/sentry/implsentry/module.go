@@ -53,7 +53,7 @@ type Config struct {
 	// errortracking ingest path verifies against). Empty => ingest fails closed.
 	IngestSecret []byte
 	// Host is the DSN endpoint origin (e.g. "api.hanzo.ai"); the minted DSN points at
-	// https://<key>@<host>/v1/sentry/<project>.
+	// https://<key>@<host>/v1/event/<project>.
 	Host string
 	// CapturePII retains end-user PII (email/ip) when true; default false = scrub.
 	CapturePII bool
@@ -458,7 +458,7 @@ func firstNonEmpty(vals ...string) string {
 	return ""
 }
 
-// reservedSlugs are the static /v1/sentry resource words a project slug may not take,
+// reservedSlugs are the static /v1/sentinel resource words a project slug may not take,
 // so a slug can never be confused with a route (belt-and-suspenders alongside the
 // UUID-constrained ingest route and static-before-wildcard registration).
 var reservedSlugs = map[string]bool{
