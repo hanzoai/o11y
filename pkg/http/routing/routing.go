@@ -315,10 +315,10 @@ func resourceDefs(h http.Handler) []handler.ResourceDef {
 // own answer to one is to DROP it: an unrecognised name parses to "no
 // constraint", and a dropped constraint matches everything. That is the failure
 // mode this service can least afford to have be silent — the two Sentry ingest
-// routes are wildcards that sit after the static /v1/sentry words, and they are
+// routes are wildcards that sit after the static /v1/sentinel words, and they are
 // safe there only because the constraint refuses anything that is not a UUID.
 // Spell it with a pattern the router does not recognise and the wildcard
-// silently swallows every /v1/sentry/<word>/envelope/ instead.
+// silently swallows every /v1/sentinel/<word>/envelope/ instead.
 func colonize(path string) string {
 	return respell(path, func(name, constraint string) string {
 		if constraint == "" {

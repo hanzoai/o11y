@@ -293,7 +293,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 	app.All("/*", zip.AdaptNetHTTP(chain(nil)(web)))
 
 	// No prefix stripping. Every route is registered at its full public path
-	// (/v1/o11y/…, /v1/sentry/…), so the request path that arrives is the path that
+	// (/v1/o11y/…, /v1/sentinel/…), so the request path that arrives is the path that
 	// matches — standalone and embedded in the cloud binary alike. The former
 	// StripPrefix(Global.ExternalPath()) wrapper predates that: it existed to graft a
 	// mount prefix onto routes registered at bare names, and once the names carried

@@ -126,6 +126,13 @@ func TestPublishServesTheDocument(t *testing.T) {
 	}
 }
 
+// The two public roots this service answers on. Named here so the assertion and
+// the message cannot disagree about what "o11y's surface" means.
+const (
+	o11yRootPath     = "/v1/o11y"
+	sentinelRootPath = "/v1/sentinel"
+)
+
 // Every operation the document publishes is o11y's own surface. A host that
 // mounts this table is publishing these paths under its own name, so a path that
 // is not ours would be this service claiming someone else's door.
@@ -140,7 +147,10 @@ func TestPublishedDocumentIsO11ysSurface(t *testing.T) {
 		t.Fatal("document has no paths")
 	}
 	for path := range paths {
-		if len(path) < 4 || (path[:8] != "/v1/o11y" && path[:10] != "/v1/sentry") {
+		// Prefix, not a fixed slice: the roots are different lengths, so an index
+		// is a second place the root's spelling lives and it goes stale the moment
+		// one of them is renamed.
+		if !strings.HasPrefix(path, o11yRootPath) && !strings.HasPrefix(path, sentinelRootPath) {
 			t.Errorf("the document publishes %s, which is not o11y's surface", path)
 		}
 	}

@@ -125,7 +125,7 @@ func TestEveryAPIServerRouteIsRegistered(t *testing.T) {
 	for _, route := range table {
 		switch {
 		case route.Path[:len("/v1/o11y")] == "/v1/o11y":
-		case route.Path[:len("/v1/sentry")] == "/v1/sentry":
+		case route.Path[:len("/v1/sentinel")] == "/v1/sentinel":
 		default:
 			t.Errorf("%s %s is on neither public root", route.Method, route.Path)
 		}

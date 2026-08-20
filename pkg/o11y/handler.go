@@ -171,7 +171,7 @@ func errorTrackingCapturePII() bool {
 }
 
 // sentryIngestHost is the DSN endpoint origin the Sentry product mints into project
-// DSNs (https://<key>@<host>/v1/sentry/<project>). Defaults to the public API host;
+// DSNs (https://<key>@<host>/v1/event/<project>). Defaults to the public API host;
 // O11Y_SENTRY_INGEST_HOST overrides per deployment/brand.
 func sentryIngestHost() string {
 	if v := strings.TrimSpace(os.Getenv("O11Y_SENTRY_INGEST_HOST")); v != "" {

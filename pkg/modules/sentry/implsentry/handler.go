@@ -35,7 +35,7 @@ type handler struct {
 	capturePII    bool
 }
 
-// NewHandler builds the /v1/sentry HTTP surface. ingestEnabled reflects whether the
+// NewHandler builds the /v1/sentinel HTTP surface. ingestEnabled reflects whether the
 // KMS ingest secret is configured (empty => ingest fails closed 503, reads still
 // work); capturePII retains end-user PII on ingest when true (default false = scrub).
 func NewHandler(module sentry.Module, ingestEnabled, capturePII bool) sentry.Handler {

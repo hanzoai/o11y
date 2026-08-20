@@ -196,11 +196,11 @@ func TestUnregisteredAddressResolvesToNothing(t *testing.T) {
 // routes take a UUID project and nothing else, so a resource word can never be
 // swallowed by the wildcard that follows the static routes.
 func TestConstrainedSegmentRefusesAValueItDoesNotAccept(t *testing.T) {
-	served := routing.Serve(http.MethodPost, "/v1/sentry/{project:guid}/envelope/", nothing())
+	served := routing.Serve(http.MethodPost, "/v1/sentinel/{project:guid}/envelope/", nothing())
 
 	for path, want := range map[string]int{
-		"/v1/sentry/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/": http.StatusNoContent,
-		"/v1/sentry/projects/envelope/":                             http.StatusNotFound,
+		"/v1/sentinel/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/": http.StatusNoContent,
+		"/v1/sentinel/projects/envelope/":                             http.StatusNotFound,
 	} {
 		rec := httptest.NewRecorder()
 		served.ServeHTTP(rec, httptest.NewRequest(http.MethodPost, path, http.NoBody))
@@ -216,9 +216,9 @@ func TestConstrainedSegmentRefusesAValueItDoesNotAccept(t *testing.T) {
 func TestTableRecordsThePublicSpelling(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	r := routing.New(app.Group(""), nil)
-	r.Post("/v1/sentry/{project:guid}/envelope/", nothing())
+	r.Post("/v1/sentinel/{project:guid}/envelope/", nothing())
 
-	if got := r.Table().Routes()[0].Path; got != "/v1/sentry/{project}/envelope/" {
+	if got := r.Table().Routes()[0].Path; got != "/v1/sentinel/{project}/envelope/" {
 		t.Fatalf("table records %q, want the constraint dropped", got)
 	}
 }
@@ -270,5 +270,5 @@ func TestUnknownConstraintPanics(t *testing.T) {
 	}()
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	routing.New(app.Group(""), nil).
-		Post("/v1/sentry/{project:[0-9a-fA-F]{8}}/envelope/", nothing())
+		Post("/v1/sentinel/{project:[0-9a-fA-F]{8}}/envelope/", nothing())
 }

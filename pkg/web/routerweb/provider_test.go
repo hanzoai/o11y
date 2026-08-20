@@ -126,7 +126,7 @@ func TestServeSPA(t *testing.T) {
 			"/v1",
 			"/v1/o11y/version",
 			"/v1/o11y/pods/bogus",
-			"/v1/sentry/1/envelope/",
+			"/v1/sentinel/1/envelope/",
 			"/ws",
 			"/ws/query_progress",
 		} {

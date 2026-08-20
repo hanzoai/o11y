@@ -10,7 +10,7 @@ package o11y
 // whether they took query parameters. Alongside them sat NINE names for one
 // value: identityPrefix, infraPrefix, integrationsPrefix, metricsRoot,
 // apmPrefix, accessPrefix, rulesAlertsPrefix and o11yRoot were all the string
-// "/v1/o11y", and prefix was "/v1/sentry". A name per place instead of a name
+// "/v1/o11y", and prefix was "/v1/sentinel". A name per place instead of a name
 // per value — so a change to the seam had five sites to find, and a change to
 // the root had eight.
 //
@@ -83,11 +83,11 @@ import (
 //   - o11yRoot is the observability face: metrics, traces, logs, dashboards,
 //     alerts, identity, access, infra, LLM observability — everything the
 //     console calls.
-//   - sentryRoot is the error-tracking face's own contract, kept separate
+//   - sentinelRoot is the error-tracking face's own contract, kept separate
 //     because a Sentry SDK reaches it with a DSN key rather than a session.
 const (
 	o11yRoot   = "/v1/o11y"
-	sentryRoot = "/v1/sentry"
+	sentinelRoot = "/v1/sentinel"
 )
 
 // relay hands one typed op's call to the runtime handler at the op's OWN address
