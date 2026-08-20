@@ -33,9 +33,11 @@ package o11y
 //   - Legacy exceptions (listErrors, countErrors, errorFromErrorID,
 //     errorFromGroupID, nextPrevErrorIDs): ViewAccess, every one.
 //
-// The FOUR ingest routes of this face — POST /v1/sentinel/{project}/envelope|store/
-// and POST /v1/o11y/api/{project}/envelope|store/ — are the deliberate escape
-// hatches, NOT typed here. They are OpenAccess (a Sentry SDK presents a DSN key,
+// The FOUR ingest routes — POST /v1/event/{project}/envelope|store/ and POST
+// /v1/o11y/api/{project}/envelope|store/ — are the deliberate escape hatches,
+// NOT typed here and not on this face at all: ingest is a keyed beacon and a
+// face is read by a person, so the door has its own root (relay.go's eventRoot,
+// the address a minted DSN spells). They are OpenAccess (a Sentry SDK presents a DSN key,
 // not a Hanzo session) and carry an OPAQUE Sentry-envelope body — a foreign wire
 // protocol we receive verbatim, like /.well-known. A typed relay JSON-encodes
 // its input, which would corrupt that raw envelope, so they stay on the runtime
