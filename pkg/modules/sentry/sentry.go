@@ -1,5 +1,5 @@
 // Package sentry is Hanzo Sentry — the Sentry-parity error/log/trace product face
-// under /v1/sentry. It is a COMPOSITION, not a refork: the ingest engine (envelope
+// under /v1/sentinel. It is a COMPOSITION, not a refork: the ingest engine (envelope
 // parse, fingerprint, DSN verify, scrub, rate-limit) is the reused errortracking
 // engine; identity is Hanzo IAM; storage is the ONE datastore (columnar events) plus
 // o11y_issues (grouped-issue lifecycle, reused verbatim). This package owns only the
@@ -62,11 +62,11 @@ type Module interface {
 	Stats(ctx context.Context, orgID, projectID valuer.UUID, field, period string) ([]sentrytypes.StatsPoint, error)
 }
 
-// Handler is the HTTP surface under /v1/sentry. The two ingest endpoints are PUBLIC
+// Handler is the HTTP surface under /v1/sentinel. The two ingest endpoints are PUBLIC
 // (DSN-authenticated in-handler); everything else is behind Hanzo IAM authz and
 // org-scoped from the validated claims.
 type Handler interface {
-	// Ingest (public, DSN-auth): POST /v1/sentry/{project}/envelope|store/.
+	// Ingest (public, DSN-auth): POST /v1/sentinel/{project}/envelope|store/.
 	EnvelopeIngest(http.ResponseWriter, *http.Request)
 	StoreIngest(http.ResponseWriter, *http.Request)
 
