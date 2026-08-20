@@ -7,9 +7,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+
 	"github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4/helpers"
 	"github.com/hanzoai/o11y/pkg/query-service/common"
-	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
@@ -72,7 +73,7 @@ func (n *NodesRepo) DidSendNodeMetrics(ctx context.Context) (bool, error) {
 	namesStr := "'" + strings.Join(nodeMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(didSendNodeMetricsQuery,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
+		telemetrymetrics.DBName, telemetrymetrics.Series1dTableName, namesStr)
 
 	count, err := n.reader.GetCountOfThings(ctx, query)
 	if err != nil {

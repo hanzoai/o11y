@@ -14,16 +14,16 @@
 //	rcv, _ := zapmetricreceiver.New(zapmetricreceiver.Config{OnBatch: w.WriteMetrics})
 //
 // WHY THIS EXISTS — the unblock. The stock histogram exporter serialises OTLP
-// exponential histograms as a DDSketch into the `exp_hist.sketch` column, which
+// exponential histograms as a DDSketch into the histogram sketch column, which
 // needs a FORKED ch-go exposing proto.DD / proto.Store / proto.IndexMapping.
 // That fork conflicts with the upstream ch-go the query plane pins, which is why
 // metrics ingest could not move in-process. This driver sidesteps the fork
 // entirely: the ZAP wire (luxfi/metric.MetricBatch) already carries CLASSIC
 // Prometheus shapes — explicit histogram buckets, summary quantiles — so every
-// series decomposes into plain samples_v4 rows (`<name>.bucket{le=…}`,
+// series decomposes into plain metric rows (`<name>.bucket{le=…}`,
 // `<name>.count`, `<name>.sum`, `<name>.quantile{quantile=…}`). No sketch, no
-// exp_hist, no fork — just the two tables the query plane already reads
-// (time_series_v4 + samples_v4), keyed by the identical labels fingerprint.
+// sketch, no fork — just the two tables the query plane already reads
+// (series + metric), keyed by the identical labels fingerprint.
 package datastoremetrics
 
 import (
@@ -61,13 +61,13 @@ const (
 )
 
 // INSERT templates — identical column order to the datastore metrics schema.
-// exp_hist is intentionally absent: the native path never writes a sketch.
+// The sketch column is intentionally absent: the native path never writes a sketch.
 const (
 	samplesSQLTmpl    = "INSERT INTO %s.%s (env, temporality, metric_name, fingerprint, unix_milli, value, flags, inserted_at_unix_milli) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
 	timeSeriesSQLTmpl = "INSERT INTO %s.%s (env, temporality, metric_name, description, unit, type, is_monotonic, fingerprint, unix_milli, labels, attrs, scope_attrs, resource_attrs, __normalized, inserted_at_unix_milli) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 )
 
-// sampleRow maps 1:1 to a samples_v4 row (minus the write-time inserted_at).
+// sampleRow maps 1:1 to a metric row (minus the write-time inserted_at).
 type sampleRow struct {
 	env         string
 	temporality string
@@ -78,7 +78,7 @@ type sampleRow struct {
 	flags       uint32
 }
 
-// tsRow maps 1:1 to a time_series_v4 row (minus __normalized / inserted_at).
+// tsRow maps 1:1 to a series row (minus __normalized / inserted_at).
 type tsRow struct {
 	env           string
 	temporality   string
@@ -127,8 +127,8 @@ func NewWriter(conn datastore.Conn, opts ...Option) *Writer {
 	w := &Writer{
 		conn:         conn,
 		db:           telemetrymetrics.DBName,
-		tsTable:      telemetrymetrics.TimeseriesV4TableName,
-		samplesTable: telemetrymetrics.SamplesV4TableName,
+		tsTable:      telemetrymetrics.SeriesTableName,
+		samplesTable: telemetrymetrics.MetricTableName,
 		nowMilli:     func() int64 { return time.Now().UnixMilli() },
 	}
 	for _, o := range opts {

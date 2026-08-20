@@ -7,9 +7,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+
 	"github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4/helpers"
 	"github.com/hanzoai/o11y/pkg/query-service/common"
-	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
@@ -115,7 +116,7 @@ func (p *PodsRepo) DidSendPodMetrics(ctx context.Context) (bool, error) {
 	namesStr := "'" + strings.Join(podMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(didSendPodMetricsQuery,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
+		telemetrymetrics.DBName, telemetrymetrics.Series1dTableName, namesStr)
 
 	count, err := p.reader.GetCountOfThings(ctx, query)
 	if err != nil {
@@ -129,7 +130,7 @@ func (p *PodsRepo) DidSendClusterMetrics(ctx context.Context) (bool, error) {
 	namesStr := "'" + strings.Join(clusterMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(didSendClusterMetricsQuery,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
+		telemetrymetrics.DBName, telemetrymetrics.Series1dTableName, namesStr)
 
 	count, err := p.reader.GetCountOfThings(ctx, query)
 	if err != nil {
@@ -143,7 +144,7 @@ func (p *PodsRepo) IsSendingOptionalPodMetrics(ctx context.Context) (bool, error
 	namesStr := "'" + strings.Join(optionalPodMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(isSendingOptionalPodMetricsQuery,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_v4_1DAY_TABLENAME, namesStr)
+		telemetrymetrics.DBName, telemetrymetrics.Series1dTableName, namesStr)
 
 	count, err := p.reader.GetCountOfThings(ctx, query)
 	if err != nil {
@@ -157,7 +158,7 @@ func (p *PodsRepo) SendingRequiredMetadata(ctx context.Context) ([]model.PodOnbo
 	namesStr := "'" + strings.Join(podMetricNamesToCheck, "','") + "'"
 
 	query := fmt.Sprintf(isSendingRequiredMetadataQuery,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_V4_TABLENAME, namesStr)
+		telemetrymetrics.DBName, telemetrymetrics.SeriesTableName, namesStr)
 
 	result, err := p.reader.GetListResultV3(ctx, query)
 	if err != nil {

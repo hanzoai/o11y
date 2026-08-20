@@ -15,6 +15,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/telemetrymetadata"
+	"github.com/hanzoai/o11y/pkg/telemetrymeter"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
+
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+
 	"github.com/uptrace/bun"
 
 	"github.com/hanzoai/o11y/pkg/flagger"
@@ -58,54 +64,58 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 )
 
+// Table names resolve to the shared per-signal constants — this reader used to keep
+// its own copy of all of them, which is how a rename leaves half a codebase pointing
+// at a table that no longer exists. There is one span table and one of each metric
+// rollup now, so the distributed/local pairs resolve to the same name.
 const (
 	primaryNamespace          = "datastore"
 	archiveNamespace          = "datastore-archive"
-	o11yTraceDBName           = "o11y_traces"
-	o11yHistoryDBName         = "o11y_analytics"
-	ruleStateHistoryTableName = "distributed_rule_state_history_v0"
-	o11yDurationMVTable       = "distributed_durationSort"
-	o11yUsageExplorerTable    = "distributed_usage_explorer"
-	o11ySpansTable            = "distributed_o11y_spans"
-	o11yErrorIndexTable       = "distributed_o11y_error_index_v2"
-	o11yTraceTableName        = "distributed_o11y_index_v2"
-	o11yTraceLocalTableName   = "o11y_index_v2"
-	o11yMetricDBName          = "o11y_metrics"
-	o11yMetadataDbName        = "o11y_metadata"
-	o11yMeterDBName           = "o11y_meter"
-	o11yMeterSamplesName      = "samples_agg_1d"
+	o11yTraceDBName           = telemetrytraces.DBName
+	o11yHistoryDBName         = "event"
+	ruleStateHistoryTableName = "rule_state_history"
+	o11yDurationMVTable       = "span_duration"
+	o11yUsageExplorerTable    = "span_usage"
+	o11ySpansTable            = "span_raw"
+	o11yErrorIndexTable       = "span_error"
+	o11yTraceTableName        = telemetrytraces.SpanTableName
+	o11yTraceLocalTableName   = telemetrytraces.SpanLocalTableName
+	o11yMetricDBName          = telemetrymetrics.DBName
+	o11yMetadataDbName        = telemetrymetadata.DBName
+	o11yMeterDBName           = telemetrymeter.DBName
+	o11yMeterSamplesName      = telemetrymeter.SamplesAgg1dLocalTableName
 
-	o11ySampleLocalTableName = "samples_v4"
-	o11ySampleTableName      = "distributed_samples_v4"
+	o11ySampleLocalTableName = telemetrymetrics.MetricLocalTableName
+	o11ySampleTableName      = telemetrymetrics.MetricTableName
 
-	o11ySamplesAgg5mLocalTableName = "samples_v4_agg_5m"
-	o11ySamplesAgg5mTableName      = "distributed_samples_v4_agg_5m"
+	o11ySamplesAgg5mLocalTableName = telemetrymetrics.Metric5mLocalTableName
+	o11ySamplesAgg5mTableName      = telemetrymetrics.Metric5mTableName
 
-	o11ySamplesAgg30mLocalTableName = "samples_v4_agg_30m"
-	o11ySamplesAgg30mTableName      = "distributed_samples_v4_agg_30m"
+	o11ySamplesAgg30mLocalTableName = telemetrymetrics.Metric30mLocalTableName
+	o11ySamplesAgg30mTableName      = telemetrymetrics.Metric30mTableName
 
-	o11yExpHistLocalTableName = "exp_hist"
-	o11yExpHistTableName      = "distributed_exp_hist"
+	o11yExpHistLocalTableName = telemetrymetrics.HistogramLocalTableName
+	o11yExpHistTableName      = telemetrymetrics.HistogramTableName
 
-	o11yTSLocalTableNameV4 = "time_series_v4"
-	o11yTSTableNameV4      = "distributed_time_series_v4"
+	o11yTSLocalTableNameV4 = telemetrymetrics.SeriesLocalTableName
+	o11yTSTableNameV4      = telemetrymetrics.SeriesTableName
 
-	o11yTSLocalTableNameV46Hrs = "time_series_v4_6hrs"
-	o11yTSTableNameV46Hrs      = "distributed_time_series_v4_6hrs"
+	o11yTSLocalTableNameV46Hrs = telemetrymetrics.Series6hLocalTableName
+	o11yTSTableNameV46Hrs      = telemetrymetrics.Series6hTableName
 
-	o11yTSLocalTableNameV41Day = "time_series_v4_1day"
-	o11yTSTableNameV41Day      = "distributed_time_series_v4_1day"
+	o11yTSLocalTableNameV41Day = telemetrymetrics.Series1dLocalTableName
+	o11yTSTableNameV41Day      = telemetrymetrics.Series1dTableName
 
-	o11yTSLocalTableNameV41Week = "time_series_v4_1week"
-	o11yTSTableNameV41Week      = "distributed_time_series_v4_1week"
+	o11yTSLocalTableNameV41Week = telemetrymetrics.Series1wLocalTableName
+	o11yTSTableNameV41Week      = telemetrymetrics.Series1wTableName
 
-	o11yTSTableNameV4Reduced = "distributed_time_series_v4_reduced"
+	o11yTSTableNameV4Reduced = telemetrymetrics.SeriesReducedTableName
 
-	o11yTableAttributesMetadata      = "distributed_attributes_metadata"
-	o11yLocalTableAttributesMetadata = "attributes_metadata"
+	o11yTableAttributesMetadata      = telemetrymetadata.AttributeTableName
+	o11yLocalTableAttributesMetadata = telemetrymetadata.AttributeLocalTableName
 
-	o11yUpdatedMetricsMetadataLocalTable  = "updated_metadata"
-	o11yUpdatedMetricsMetadataTable       = "distributed_updated_metadata"
+	o11yUpdatedMetricsMetadataLocalTable  = telemetrymetrics.DescriptorLocalTableName
+	o11yUpdatedMetricsMetadataTable       = telemetrymetrics.DescriptorTableName
 	minTimespanForProgressiveSearch       = time.Hour
 	minTimespanForProgressiveSearchMargin = time.Minute
 	maxProgressiveSteps                   = 4
@@ -919,11 +929,43 @@ func (r *DatastoreReader) GetDependencyGraph(ctx context.Context, queryParams *m
 	return &response, nil
 }
 
+// metricPlaneTables are the tables whose rows are timed by unix_milli rather than
+// timestamp_ms. Naming them is the only honest test: the column a table uses is a fact
+// about that table, not something a substring of its name can be trusted to imply.
+var metricPlaneTables = map[string]bool{
+	telemetrymetrics.MetricTableName:        true,
+	telemetrymetrics.Metric5mTableName:      true,
+	telemetrymetrics.Metric30mTableName:     true,
+	telemetrymetrics.HistogramTableName:     true,
+	telemetrymetrics.SeriesTableName:        true,
+	telemetrymetrics.Series6hTableName:      true,
+	telemetrymetrics.Series1dTableName:      true,
+	telemetrymetrics.Series1wTableName:      true,
+	telemetrymetrics.SeriesReducedTableName: true,
+	telemetrymeter.SamplesTableName:         true,
+	telemetrymeter.SamplesAgg1dTableName:    true,
+}
+
+// isMetricPlaneTable reports whether a bare or db-qualified table name is one of them.
+func isMetricPlaneTable(tableName string) bool {
+	if _, table, ok := strings.Cut(tableName, "."); ok {
+		tableName = table
+	}
+	return metricPlaneTables[strings.TrimPrefix(tableName, "distributed_")]
+}
+
+// getLocalTableName maps a qualified table to the local table behind it. There are no
+// Distributed wrappers on this deployment, so a name is already local and this is the
+// identity; a sharded deployment prefixing them again still resolves.
+//
+// It used to split on "distributed_" and take index 1, which panics on any name
+// without that prefix — that is every table now. TrimPrefix is the total operation.
 func getLocalTableName(tableName string) string {
-
-	tableNameSplit := strings.Split(tableName, ".")
-	return tableNameSplit[0] + "." + strings.Split(tableNameSplit[1], "distributed_")[1]
-
+	db, table, ok := strings.Cut(tableName, ".")
+	if !ok {
+		return strings.TrimPrefix(tableName, "distributed_")
+	}
+	return db + "." + strings.TrimPrefix(table, "distributed_")
 }
 
 func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *retentiontypes.TTLParams) (*retentiontypes.SetTTLResponseItem, *model.ApiError) {
@@ -966,7 +1008,7 @@ func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *
 		}
 	}
 
-	// TTL query for logs_v2 table
+	// TTL query for the log table
 	ttlLogsV2 := fmt.Sprintf(
 		"ALTER TABLE %v ON CLUSTER %s MODIFY TTL toDateTime(timestamp / 1000000000) + "+
 			"INTERVAL %v SECOND DELETE", tableNameArray[0], r.cluster, params.DelDuration)
@@ -976,7 +1018,7 @@ func (r *DatastoreReader) setTTLLogs(ctx context.Context, orgID string, params *
 			params.ToColdStorageDuration, params.ColdStorageVolume)
 	}
 
-	// TTL query for logs_v2_resource table
+	// TTL query for the log_resource table
 	// adding 1800 as our bucket size is 1800 seconds
 	ttlLogsV2Resource := fmt.Sprintf(
 		"ALTER TABLE %v ON CLUSTER %s MODIFY TTL toDateTime(seen_at_ts_bucket_start) + toIntervalSecond(1800) + "+
@@ -1844,8 +1886,11 @@ func (r *DatastoreReader) setTTLMetrics(ctx context.Context, orgID string, param
 			r.logger.Error("error in inserting to ttl_status table", errorsV2.Attr(dbErr))
 			return
 		}
+		// The metric plane times its rows in unix_milli; everything else in
+		// timestamp_ms. This used to sniff the table name for a version substring,
+		// which silently picks the wrong column the moment a table is renamed.
 		timeColumn := "timestamp_ms"
-		if strings.Contains(tableName, "v4") || strings.Contains(tableName, "exp_hist") {
+		if isMetricPlaneTable(tableName) {
 			timeColumn = "unix_milli"
 		}
 
@@ -2037,8 +2082,7 @@ func (r *DatastoreReader) GetDisks(ctx context.Context) (*[]model.DiskItem, *mod
 func getLocalTableNameArray(tableNames []string) []string {
 	var localTableNames []string
 	for _, name := range tableNames {
-		tableNameSplit := strings.Split(name, ".")
-		localTableNames = append(localTableNames, tableNameSplit[0]+"."+strings.Split(tableNameSplit[1], "distributed_")[1])
+		localTableNames = append(localTableNames, getLocalTableName(name))
 	}
 	return localTableNames
 }
@@ -2964,7 +3008,7 @@ func (r *DatastoreReader) GetMetricAggregateAttributes(ctx context.Context, orgI
 
 	reductionEnabled := r.fl.BooleanOrEmpty(ctx, flagger.FeatureEnableMetricsReduction, featuretypes.NewFlaggerEvaluationContext(orgID))
 
-	// Query all relevant metric names from time_series_v4, but leave metadata retrieval to cache/db.
+	// Query all relevant metric names from series, but leave metadata retrieval to cache/db.
 	var query string
 	if reductionEnabled {
 		query = fmt.Sprintf(
@@ -3054,7 +3098,7 @@ func (r *DatastoreReader) GetMeterAggregateAttributes(ctx context.Context, orgID
 		instrumentationtypes.CodeFunctionName: "GetMeterAggregateAttributes",
 	})
 	var response v3.AggregateAttributeResponse
-	// Query all relevant metric names from time_series_v4, but leave metadata retrieval to cache/db
+	// Query all relevant metric names from series, but leave metadata retrieval to cache/db
 	query := fmt.Sprintf(
 		`SELECT metric_name,type,temporality,is_monotonic
 		 FROM %s.%s
@@ -3372,7 +3416,7 @@ func (r *DatastoreReader) GetActiveHostsFromMetricMetadata(ctx context.Context, 
 		  AND attr_name = @attrName
 		  AND last_reported_unix_milli >= @sinceUnixMilli`,
 		o11yMetricDBName,
-		constants.O11Y_METADATA_TABLENAME,
+		telemetrymetrics.AttributeTableName,
 	)
 
 	rows, err := r.db.Query(ctx, query,
@@ -4214,7 +4258,7 @@ func (r *DatastoreReader) GetListResultV3(ctx context.Context, query string) ([]
 }
 
 // GetHostMetricsExistenceAndEarliestTime returns (count, minFirstReportedUnixMilli, error) for the given host metric names
-// from distributed_metadata. When count is 0, minFirstReportedUnixMilli is 0.
+// from the metric metadata. When count is 0, minFirstReportedUnixMilli is 0.
 func (r *DatastoreReader) GetMetricsExistenceAndEarliestTime(ctx context.Context, metricNames []string) (uint64, uint64, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.TelemetrySignal:  telemetrytypes.SignalMetrics.StringValue(),
@@ -4229,7 +4273,7 @@ func (r *DatastoreReader) GetMetricsExistenceAndEarliestTime(ctx context.Context
 		`SELECT count(*) AS cnt, min(first_reported_unix_milli) AS min_first_reported
 		FROM %s.%s
 		WHERE metric_name IN @metric_names`,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_METADATA_TABLENAME)
+		telemetrymetrics.DBName, telemetrymetrics.AttributeTableName)
 
 	var count, minFirstReported uint64
 	err := r.db.QueryRow(ctx, query, datastore.Named("metric_names", metricNames)).Scan(&count, &minFirstReported)
@@ -5297,7 +5341,7 @@ func (r *DatastoreReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID v
 		}
 	}
 
-	// 3. Fallback: Try time_series_v4_1week table
+	// 3. Fallback: Try the series_1w table
 	if len(stillMissing) > 0 {
 		metricList := "'" + strings.Join(stillMissing, "', '") + "'"
 		reductionEnabled := r.fl.BooleanOrEmpty(ctx, flagger.FeatureEnableMetricsReduction, featuretypes.NewFlaggerEvaluationContext(orgID))
@@ -5317,7 +5361,7 @@ func (r *DatastoreReader) GetUpdatedMetricsMetadata(ctx context.Context, orgID v
 		valueCtx := context.WithValue(ctx, "datastore_max_threads", constants.MetricsExplorerDatastoreThreads)
 		rows, err := r.db.Query(valueCtx, query)
 		if err != nil {
-			return cachedMetadata, &model.ApiError{Typ: "DatastoreErr", Err: fmt.Errorf("error querying time_series_v4 to get metrics metadata: %v", err)}
+			return cachedMetadata, &model.ApiError{Typ: "DatastoreErr", Err: fmt.Errorf("error querying series to get metrics metadata: %v", err)}
 		}
 		defer rows.Close()
 		for rows.Next() {

@@ -9,11 +9,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+
 	"log/slog"
 
 	"github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4/helpers"
 	"github.com/hanzoai/o11y/pkg/query-service/common"
-	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/interfaces"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
@@ -320,7 +321,7 @@ func (h *HostsRepo) getTopHostGroups(ctx context.Context, orgID valuer.UUID, req
 }
 
 // GetHostMetricsExistenceAndEarliestTime returns (count, minFirstReportedUnixMilli, error) for host metrics
-// in distributed_metadata. Uses metricNamesForHosts plus system.filesystem.usage.
+// in the metric metadata. Uses metricNamesForHosts plus system.filesystem.usage.
 func (h *HostsRepo) GetHostMetricsExistenceAndEarliestTime(ctx context.Context, req model.HostListRequest) (uint64, uint64, error) {
 	names := []string{}
 	for _, metricName := range metricNamesForHosts {
@@ -342,7 +343,7 @@ func (h *HostsRepo) IsSendingK8SAgentMetrics(ctx context.Context, req model.Host
 	FROM %s.%s
 	WHERE metric_name IN (%s)
 		AND unix_milli >= toUnixTimestamp(now() - INTERVAL 5 MINUTE) * 1000`,
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_SAMPLES_V4_TABLENAME, namesStr)
+		telemetrymetrics.DBName, telemetrymetrics.MetricTableName, namesStr)
 
 	query := fmt.Sprintf(`
 	SELECT DISTINCT JSONExtractString(labels, '%s') as k8s_cluster_name, JSONExtractString(labels, '%s') as k8s_node_name
@@ -352,7 +353,7 @@ func (h *HostsRepo) IsSendingK8SAgentMetrics(ctx context.Context, req model.Host
 		AND JSONExtractString(labels, '%s') LIKE '%%-otel-agent%%'
 		AND fingerprint GLOBAL IN (%s)`,
 		GetDotMetrics("k8s_cluster_name"), GetDotMetrics("k8s_node_name"),
-		constants.O11Y_METRIC_DBNAME, constants.O11Y_TIMESERIES_V4_TABLENAME, namesStr, GetDotMetrics("host_name"), queryForRecentFingerprints)
+		telemetrymetrics.DBName, telemetrymetrics.SeriesTableName, namesStr, GetDotMetrics("host_name"), queryForRecentFingerprints)
 
 	result, err := h.reader.GetListResultV3(ctx, query)
 	if err != nil {

@@ -30,11 +30,11 @@ type ProjectStore interface {
 	Resolve(ctx context.Context, id valuer.UUID) (orgID valuer.UUID, keyVersion int, status ProjectStatus, found bool, err error)
 }
 
-// EventStore is the columnar events plane on the ONE datastore. Insert is the finished
-// ingest sink; the reads back Discover / event detail / issue occurrences / logs /
-// traces / stats. Every read takes the org (mandatory tenant boundary) and a project
-// as separate, server-validated arguments — no query shape carries a client-named
-// tenant.
+// EventStore is event.error, the ONE error table on the shared datastore. Insert is
+// the finished ingest sink; the reads back Discover / event detail / issue occurrences
+// / logs / traces / stats. Every read takes the org (mandatory tenant boundary) and a
+// project as separate, server-validated arguments — no query shape carries a
+// client-named tenant.
 type EventStore interface {
 	// Insert writes a batch of occurrences for one (org, project). Fail-soft is the
 	// caller's contract: the durable issue upsert must not depend on this write.
@@ -53,8 +53,8 @@ type EventStore interface {
 	ListForFingerprint(ctx context.Context, orgID, projectID valuer.UUID, fingerprint string, limit int) ([]*Event, error)
 
 	// ListForTrace returns the (org, project)-scoped error events referencing a trace
-	// id — the tenant-safe "errors in this trace" detail (the o11y_traces span plane is
-	// NOT read: it has no general org column and cannot be tenant-scoped).
+	// id — the tenant-safe "errors in this trace" detail. It reads errors on the trace,
+	// not the span waterfall.
 	ListForTrace(ctx context.Context, orgID, projectID valuer.UUID, traceID string, limit int) ([]*Event, error)
 
 	// DistinctFingerprints returns the set of issue fingerprints seen for (org,

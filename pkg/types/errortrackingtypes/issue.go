@@ -38,10 +38,11 @@ func (s IssueStatus) Valid() bool {
 // Default severity level for an issue when the SDK sends none.
 const DefaultLevel = "error"
 
-// Issue is the grouped error — a fingerprint bucket. It is the ONE net-new table
-// backing error tracking. Occurrences live in the telemetry store (o11y_traces /
-// o11y_logs); only the lifecycle state that CANNOT be derived from telemetry —
-// status, assignee, first/last-seen, running count, regression — lives here.
+// Issue is the grouped error — a fingerprint bucket, which is what event.error sorts
+// by as `group`. The occurrences themselves are event.error rows; only the lifecycle
+// state that CANNOT be derived from telemetry — status, assignee, first/last-seen,
+// running count, regression — lives here, and it stays relational because it is
+// mutable state per (org, group), not a fact that happened.
 // Grouping is done at INGEST (the shim computes the fingerprint), so the Issues
 // list is a plain org-scoped SELECT, never an unscoped scan over an org-less
 // exception table.

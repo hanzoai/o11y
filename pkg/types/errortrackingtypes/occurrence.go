@@ -4,9 +4,9 @@ import "time"
 
 // Occurrence is a single normalized error event (one exception instance). It is
 // derived from a Sentry event (envelope / legacy store item) or, later, from an
-// OTel exception span-event. It is the OTel-shaped occurrence the shim persists
-// to o11y_logs (the reused occurrence store) and the "latest event" sample kept
-// on the issue for the detail view. Purely a value — no store, no tags of its own.
+// OTel exception span-event. It is the wire-shaped value the ingest path normalizes
+// to: the Sentry face turns it into an event.error row, and the issue lifecycle keeps
+// the latest one as the sample for the detail view. Purely a value — no store.
 type Occurrence struct {
 	EventID     string            `json:"eventId"`
 	Fingerprint string            `json:"fingerprint"`

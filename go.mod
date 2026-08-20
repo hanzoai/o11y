@@ -151,18 +151,19 @@ require (
 	github.com/hanzo-ds/native v0.72.0 // indirect
 	github.com/hanzoai/account v0.2.0 // indirect
 	github.com/hanzoai/builder v0.3.13 // indirect
-	github.com/hanzoai/commerce v1.49.25 // indirect
+	github.com/hanzoai/commerce v1.49.30 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/dbx v1.17.2 // indirect
 	github.com/hanzoai/decimal v0.1.1 // indirect
 	github.com/hanzoai/go-openai v1.41.0 // indirect
 	github.com/hanzoai/ha v0.1.1 // indirect
 	github.com/hanzoai/iam v1.33.26 // indirect
+	github.com/hanzoai/metrics v1.110.2 // indirect
 	github.com/hanzoai/money v0.2.1 // indirect
-	github.com/hanzoai/orm v0.6.16 // indirect
+	github.com/hanzoai/orm v0.6.18 // indirect
 	github.com/hanzoai/s3-go v1.0.0 // indirect
 	github.com/hanzoai/sqlcipher v0.1.1 // indirect
-	github.com/hanzoai/tasks v1.51.4 // indirect
+	github.com/hanzoai/tasks v1.52.3 // indirect
 	github.com/hanzoai/vfs v0.6.6 // indirect
 	github.com/hanzoai/xorm v1.4.4 // indirect
 	github.com/hashicorp/go-metrics v0.5.4 // indirect
@@ -330,7 +331,7 @@ require (
 	github.com/leodido/go-syslog/v4 v4.3.0 // indirect
 	github.com/leodido/ragel-machinery v0.0.0-20190525184631-5f46317e436b // indirect
 	github.com/lufia/plan9stats v0.0.0-20260216142805-b3301c5f2a88 // indirect
-	github.com/luxfi/log v1.5.0
+	github.com/luxfi/log v1.6.0
 	github.com/magefile/mage v1.17.1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mdlayher/socket v0.5.1 // indirect
@@ -381,7 +382,7 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	github.com/zap-proto/zip v1.17.2
+	github.com/zap-proto/zip v1.18.2
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/collector/component v1.54.0 // indirect
 	go.opentelemetry.io/collector/component/componentstatus v0.148.0 // indirect
@@ -436,8 +437,8 @@ require (
 	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.40.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.44.0 // indirect
-	go.opentelemetry.io/otel/log v0.19.0 // indirect
-	go.opentelemetry.io/otel/sdk/log v0.19.0 // indirect
+	go.opentelemetry.io/otel/log v0.20.0 // indirect
+	go.opentelemetry.io/otel/sdk/log v0.20.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.44.0
 	go.opentelemetry.io/proto/otlp v1.10.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect

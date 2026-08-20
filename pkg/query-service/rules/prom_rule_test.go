@@ -768,13 +768,13 @@ func TestPromRuleUnitCombinations(t *testing.T) {
 		},
 	}
 
-	// time_series_v4 cols of interest
+	// series cols of interest
 	fingerprintCols := []dsmock.ColumnType{
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "any(labels)", Type: "String"},
 	}
 
-	// samples_v4 columns
+	// metric columns
 	samplesCols := []dsmock.ColumnType{
 		{Name: "metric_name", Type: "String"},
 		{Name: "fingerprint", Type: "UInt64"},
@@ -1029,7 +1029,7 @@ func TestPromRuleNoData(t *testing.T) {
 		},
 	}
 
-	// time_series_v4 cols of interest
+	// series cols of interest
 	fingerprintCols := []dsmock.ColumnType{
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "any(labels)", Type: "String"},
@@ -1382,13 +1382,13 @@ func TestPromRule_NoData(t *testing.T) {
 		},
 	}
 
-	// time_series_v4 cols of interest
+	// series cols of interest
 	fingerprintCols := []dsmock.ColumnType{
 		{Name: "fingerprint", Type: "UInt64"},
 		{Name: "any(labels)", Type: "String"},
 	}
 
-	// samples_v4 columns
+	// metric columns
 	samplesCols := []dsmock.ColumnType{
 		{Name: "metric_name", Type: "String"},
 		{Name: "fingerprint", Type: "UInt64"},

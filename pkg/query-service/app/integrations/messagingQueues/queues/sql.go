@@ -65,7 +65,7 @@ WITH
             ) AS destination,
             durationNano,
             status_code
-        FROM o11y_traces.distributed_o11y_index_v3
+        FROM event.span
         WHERE
             ts_bucket_start >= toDateTime64(%f, 9)
             AND ts_bucket_start <= toDateTime64(%f, 9)

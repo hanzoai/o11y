@@ -6,8 +6,8 @@ package datastoremetrics
 import "sort"
 
 // Metric-series fingerprinting — the native port of the labels-hash the
-// datastore metrics schema uses to join a sample (samples_v4) to its series
-// metadata (time_series_v4). It is a plain FNV-1a walk over the sorted
+// datastore metrics schema uses to join a sample (metric) to its series
+// metadata (series). It is a plain FNV-1a walk over the sorted
 // (key, value) attribute pairs with a 0xFF separator, seeded by a parent
 // offset so the hierarchy resource → scope → point composes: the scope hash
 // seeds the point hash, which is finally salted with the metric __name__.
@@ -62,7 +62,7 @@ func fingerprint(offset uint64, attrs map[string]string) uint64 {
 
 // hashWithName salts a series fingerprint with the metric name, matching the
 // schema's __name__ dimension. This is the value stored in the `fingerprint`
-// column of both samples_v4 and time_series_v4.
+// column of both metric and series.
 func hashWithName(h uint64, name string) uint64 {
 	sum := hashAdd(h, "__name__")
 	sum = hashAddByte(sum, separatorByte)

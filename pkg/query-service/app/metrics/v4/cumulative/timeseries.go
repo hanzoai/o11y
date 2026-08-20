@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+
 	"github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4/helpers"
-	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 )
@@ -126,7 +127,7 @@ func prepareTimeAggregationSubQuery(start, end, step int64, mq *v3.BuilderQuery)
 		"SELECT fingerprint, %s" +
 			" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 			" %s as per_series_value" +
-			" FROM " + constants.O11Y_METRIC_DBNAME + "." + tableName +
+			" FROM " + telemetrymetrics.DBName + "." + tableName +
 			" INNER JOIN" +
 			" (%s) as filtered_time_series" +
 			" USING fingerprint" +

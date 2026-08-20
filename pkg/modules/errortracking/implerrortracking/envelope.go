@@ -13,6 +13,11 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/errortrackingtypes"
 )
 
+// maxCompressedBody bounds the raw request body before decompression; the decoded
+// payload is separately bounded by maxDecodedBytes and the event count by
+// maxEventsPerEnvelope.
+const maxCompressedBody = 6 << 20
+
 // maxDecodedBytes caps the decompressed payload so a small gzip bomb cannot
 // exhaust memory on this public endpoint. 24 MiB comfortably fits large stack
 // traces / batched envelopes while staying bounded.

@@ -7,59 +7,32 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/google/uuid"
-	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
-// The ingest endpoints authenticate with the Sentry-native DSN model: the caller
-// presents a public key that proves it holds an org's ingest credential. We make
-// that key STATELESS and KMS-backed rather than adding a per-key secret table:
+// This is the Sentry-native DSN credential model, shared by every ingest face: the
+// caller presents a public key that proves it holds the ingest credential for one
+// segment. The key is STATELESS and KMS-backed rather than a per-key secret table:
 //
-//	publicKey(org, v) = "<v>:" + hex(HMAC-SHA256(platformIngestSecret, "org:"+org+":v"+v))
+//	publicKey(segment, v) = "<v>:" + hex(HMAC-SHA256(platformIngestSecret, "org:"+segment+":v"+v))
 //
 // The platform secret comes from KMS (never plaintext, never committed). The key
-// carries its VERSION so ONE org can be rotated in isolation: bump that org's
-// min-version (RevocationStore.Rotate) and only its below-min DSNs stop verifying —
-// no global secret roll. Verifying is a version check + a constant-time compare.
+// carries its VERSION so ONE segment can be rotated in isolation: bump that segment's
+// watermark and only its below-watermark DSNs stop verifying — no global secret roll.
+// Verifying is a version check plus a constant-time compare.
 //
-// The org travels in the DSN project segment; the key proves the caller may write
-// to THAT org at THAT version. Resolution reuses iamidentn's exact UUIDv5 mapping so
-// the row written here is read back by exactly that tenant.
+// The segment is the /v1/sentry project UUID, and its watermark is the project's own
+// KeyVersion column, so rotation is a single-row bump with no shared revocation table.
 
-const defaultKeyVersion = 1
-
-// orgUUIDFromProject maps a DSN project segment to the o11y org UUID. It mirrors
-// iamidentn.toUUID("org", …) BYTE-FOR-BYTE (a raw UUID passes through; a slug is
-// UUIDv5 over the URL namespace with the "hanzo:o11y:org:" prefix) so ingest and
-// the IAM read path resolve the SAME tenant id.
-func orgUUIDFromProject(project string) (valuer.UUID, bool) {
-	project = strings.TrimSpace(project)
-	if project == "" {
-		return valuer.UUID{}, false
-	}
-	if u, err := valuer.NewUUID(project); err == nil {
-		return u, true
-	}
-	derived := uuid.NewSHA1(uuid.NameSpaceURL, []byte("hanzo:o11y:org:"+project))
-	return valuer.MustNewUUID(derived.String()), true
-}
-
-// publicKeyForVersion derives the versioned ingest public key for a project.
+// publicKeyForVersion derives the versioned ingest public key for a DSN segment.
 func publicKeyForVersion(secret []byte, project string, version int) string {
 	m := hmac.New(sha256.New, secret)
 	m.Write([]byte("org:" + strings.TrimSpace(project) + ":v" + strconv.Itoa(version)))
 	return strconv.Itoa(version) + ":" + hex.EncodeToString(m.Sum(nil))
 }
 
-// publicKeyFor derives the default (v1) key.
-func publicKeyFor(secret []byte, project string) string {
-	return publicKeyForVersion(secret, project, defaultKeyVersion)
-}
-
 // verifyKey constant-time compares a presented "<v>:<hmac>" key against the expected
-// one for its project, rejecting versions below the org's revocation watermark. An
-// empty secret or key, a malformed version, or a below-min version never verify
+// one for its segment, rejecting versions below the rotation watermark. An empty
+// secret or key, a malformed version, or a below-min version never verify
 // (fail closed).
 func verifyKey(secret []byte, project, presented string, minVersion int) bool {
 	if len(secret) == 0 || presented == "" {
@@ -107,17 +80,4 @@ func parseSentryAuthHeader(h string) string {
 		}
 	}
 	return ""
-}
-
-// MintDSN builds the default-version DSN an operator hands to an app to report into
-// an org. host is the ingest origin (e.g. "o11y.hanzo.ai"); the SDK derives its
-// endpoint as https://<host>/v1/o11y/api/<org>/envelope/, which the existing
-// /v1/o11y mount forwards to this module's ingest route.
-func MintDSN(secret []byte, host, org string) string {
-	return MintDSNVersion(secret, host, org, defaultKeyVersion)
-}
-
-// MintDSNVersion builds a DSN at a specific key version (used after rotating an org).
-func MintDSNVersion(secret []byte, host, org string, version int) string {
-	return "https://" + publicKeyForVersion(secret, org, version) + "@" + host + "/v1/o11y/" + org
 }

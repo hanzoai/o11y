@@ -259,8 +259,8 @@ func (s SpaceAggregation) Percentile() float64 {
 // MetricTableHints is a struct that contains tables to use instead of the derived tables
 //
 // Convention :
-//   - TimeSeriesTableName: the LOCAL table name (e.g. "time_series_v4_1day").
-//   - SamplesTableName: the DISTRIBUTED table name (e.g. "distributed_samples_v4_agg_5m").
+//   - TimeSeriesTableName: the LOCAL table name (e.g. "series_1d").
+//   - SamplesTableName: the DISTRIBUTED table name (e.g. "metric_5m").
 type MetricTableHints struct {
 	TimeSeriesTableName string
 	SamplesTableName    string

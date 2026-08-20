@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/telemetrysignal"
+
 	"github.com/dustin/go-humanize"
 	"golang.org/x/exp/maps"
 
@@ -296,9 +298,7 @@ func (q *querier) populateQBEvent(event *qbtypes.QBEvent, queries []qbtypes.Quer
 		case qbtypes.QueryTypeDatastoreSQL:
 			sql := query.GetQuery()
 			if strings.TrimSpace(sql) != "" {
-				event.MetricsUsed = strings.Contains(sql, "o11y_metrics")
-				event.LogsUsed = strings.Contains(sql, "o11y_logs")
-				event.TracesUsed = strings.Contains(sql, "o11y_traces")
+				event.MetricsUsed, event.LogsUsed, event.TracesUsed = telemetrysignal.Used(sql)
 			}
 		}
 	}

@@ -1,13 +1,17 @@
 package datastoreprometheus
 
-import "time"
+import (
+	"time"
 
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+)
+
+// The metric plane is named in ONE place. This package used to keep its own copy of
+// the database and table names, which is how a rename leaves half a codebase pointing
+// at a table that no longer exists.
 const (
-	databaseName                string = "o11y_metrics"
-	distributedTimeSeriesV4     string = "distributed_time_series_v4"
-	distributedTimeSeriesV46hrs string = "distributed_time_series_v4_6hrs"
-	distributedTimeSeriesV41day string = "distributed_time_series_v4_1day"
-	distributedSamplesV4        string = "distributed_samples_v4"
+	databaseName = telemetrymetrics.DBName
+	metricTable  = telemetrymetrics.MetricTableName
 )
 
 var (
@@ -17,24 +21,23 @@ var (
 
 // Returns the start time, end time and the table name to use for the query.
 //
-//	If time range is less than 6 hours, we need to use the `time_series_v4` table
-//	else if time range is less than 1 day and greater than 6 hours, we need to use the `time_series_v4_6hrs` table
-//	else we need to use the `time_series_v4_1day` table
+// Pick the coarsest series rollup the window can afford: series under 6 hours,
+// series_6h under a day, series_1d beyond that.
 func getStartAndEndAndTableName(start, end int64) (int64, int64, string) {
 	var tableName string
 
 	if end-start <= sixHoursInMilliseconds {
 		// adjust the start time to nearest 1 hour
 		start = start - (start % (time.Hour.Milliseconds() * 1))
-		tableName = distributedTimeSeriesV4
+		tableName = telemetrymetrics.SeriesTableName
 	} else if end-start <= oneDayInMilliseconds {
 		// adjust the start time to nearest 6 hours
 		start = start - (start % (time.Hour.Milliseconds() * 6))
-		tableName = distributedTimeSeriesV46hrs
+		tableName = telemetrymetrics.Series6hTableName
 	} else {
 		// adjust the start time to nearest 1 day
 		start = start - (start % (time.Hour.Milliseconds() * 24))
-		tableName = distributedTimeSeriesV41day
+		tableName = telemetrymetrics.Series1dTableName
 	}
 
 	return start, end, tableName

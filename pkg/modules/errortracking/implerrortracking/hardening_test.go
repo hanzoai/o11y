@@ -166,7 +166,11 @@ func TestNormalize_ScrubsByDefault(t *testing.T) {
 	assert.NotContains(t, occ.Value, "a@b.com")
 }
 
-// --- MEDIUM-3: versioned, per-org-revocable DSN keys ---
+// --- versioned, revocable DSN keys ---
+//
+// The watermark itself is per-project state on the project row (sentrytypes.Project
+// KeyVersion); this asserts the shared key primitive honours whatever watermark it is
+// handed.
 
 func TestVerifyKey_VersionedAndRevocation(t *testing.T) {
 	secret := []byte("kms")
@@ -182,20 +186,6 @@ func TestVerifyKey_VersionedAndRevocation(t *testing.T) {
 	// A malformed version prefix fails closed.
 	assert.False(t, verifyKey(secret, "acme", "notanumber:"+v1, 0))
 	assert.False(t, verifyKey(secret, "acme", "0:"+strings.TrimPrefix(v1, "1:"), 0))
-}
-
-func TestSQLRevocations_RotateIsolatesOneOrg(t *testing.T) {
-	ctx := context.Background()
-	store := newTestStore(t)
-	r := NewSQLRevocations(store)
-	orgA := valuer.GenerateUUID()
-	orgB := valuer.GenerateUUID()
-
-	assert.Equal(t, 0, r.MinVersion(ctx, orgA), "default min-version is 0")
-
-	require.NoError(t, r.Rotate(ctx, orgA, 2))
-	assert.Equal(t, 2, r.MinVersion(ctx, orgA), "rotated org sees its new watermark")
-	assert.Equal(t, 0, r.MinVersion(ctx, orgB), "other orgs are untouched (isolated rotation)")
 }
 
 // --- LOW-1: optimistic concurrency on lifecycle update ---

@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+
 	"github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4/helpers"
-	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 )
@@ -54,7 +55,7 @@ func buildDeltaMetricQueryForTable(start, end, _ int64, mq *v3.BuilderQuery) (st
 	queryTmpl :=
 		"SELECT %s toStartOfHour(now()) as ts," + // now() has no menaing & used as a placeholder for ts
 			" %s as value" +
-			" FROM " + constants.O11Y_METRIC_DBNAME + "." + constants.O11Y_SAMPLES_V4_TABLENAME +
+			" FROM " + telemetrymetrics.DBName + "." + telemetrymetrics.MetricTableName +
 			" INNER JOIN" +
 			" (%s) as filtered_time_series" +
 			" USING fingerprint" +

@@ -19,8 +19,8 @@ import (
 )
 
 const (
-	o11yHistoryDBName         = "o11y_analytics"
-	ruleStateHistoryTableName = "distributed_rule_state_history_v0"
+	o11yHistoryDBName         = "event"
+	ruleStateHistoryTableName = "rule_state_history"
 )
 
 type store struct {

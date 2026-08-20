@@ -87,7 +87,7 @@ func (m *module) getPerGroupHostStatusCounts(
 
 		reducedSrc := sqlbuilder.NewSelectBuilder()
 		reducedSrc.Select("labels")
-		reducedSrc.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
+		reducedSrc.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesReducedTableName))
 		reducedSrc.Where(
 			reducedSrc.In("metric_name", sqlbuilder.List(metricNames)),
 			reducedSrc.GE("unix_milli", tsAdjustedStartMs),
@@ -359,7 +359,7 @@ func (m *module) getActiveHostsQuery(metricNames []string, hostNameAttr string, 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Distinct()
 	sb.Select("attr_string_value")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(
 		sb.In("metric_name", sqlbuilder.List(metricNames)),
 		sb.E("attr_name", hostNameAttr),
@@ -371,7 +371,7 @@ func (m *module) getActiveHostsQuery(metricNames []string, hostNameAttr string, 
 }
 
 // getActiveHosts returns a set of host names that have reported metrics recently.
-// It queries distributed_metadata for hosts where last_reported_unix_milli >= sinceUnixMilli.
+// It queries the metric metadata for hosts where last_reported_unix_milli >= sinceUnixMilli.
 func (m *module) getActiveHosts(ctx context.Context, metricNames []string, hostNameAttr string, sinceUnixMilli int64) (map[string]bool, error) {
 	sb := m.getActiveHostsQuery(metricNames, hostNameAttr, sinceUnixMilli)
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)

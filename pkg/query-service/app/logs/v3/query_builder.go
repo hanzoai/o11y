@@ -284,7 +284,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 	queryTmpl =
 		queryTmpl + selectLabels +
 			" %s as value " +
-			"from o11y_logs.distributed_logs " +
+			"from event.log " +
 			"where " + timeFilter + "%s" +
 			"%s%s" +
 			"%s"
@@ -356,7 +356,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 		query := fmt.Sprintf(queryTmpl, op, filterSubQuery, groupBy, having, orderBy)
 		return query, nil
 	case v3.AggregateOperatorNoOp:
-		queryTmpl := constants.LogsSQLSelect + "from o11y_logs.distributed_logs where %s%s order by %s"
+		queryTmpl := constants.LogsSQLSelect + "from event.log where %s%s order by %s"
 		query := fmt.Sprintf(queryTmpl, timeFilter, filterSubQuery, orderBy)
 		return query, nil
 	default:
@@ -372,7 +372,7 @@ func buildLogsLiveTailQuery(mq *v3.BuilderQuery) (string, error) {
 
 	switch mq.AggregateOperator {
 	case v3.AggregateOperatorNoOp:
-		query := constants.LogsSQLSelect + "from o11y_logs.distributed_logs where "
+		query := constants.LogsSQLSelect + "from event.log where "
 		if len(filterSubQuery) > 0 {
 			query = query + filterSubQuery + " AND "
 		}

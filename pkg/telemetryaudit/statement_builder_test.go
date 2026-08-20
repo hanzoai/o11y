@@ -93,7 +93,7 @@ func TestStatementBuilder(t *testing.T) {
 				Limit: 100,
 			},
 			expected: qbtypes.Statement{
-				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, event_name, attributes_string, attributes_number, attributes_bool, resource, scope_string FROM o11y_audit.distributed_logs WHERE (`attribute_string_o11y$$audit$$principal$$id` = ? AND `attribute_string_o11y$$audit$$principal$$id_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, event_name, attributes_string, attributes_number, attributes_bool, resource, scope_string FROM event.audit WHERE (`attribute_string_o11y$$audit$$principal$$id` = ? AND `attribute_string_o11y$$audit$$principal$$id_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
 				Args:  []any{"019a-1234-abcd-5678", true, "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 100},
 			},
 		},
@@ -110,7 +110,7 @@ func TestStatementBuilder(t *testing.T) {
 				Limit: 100,
 			},
 			expected: qbtypes.Statement{
-				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, event_name, attributes_string, attributes_number, attributes_bool, resource, scope_string FROM o11y_audit.distributed_logs WHERE (`attribute_string_o11y$$audit$$outcome` = ? AND `attribute_string_o11y$$audit$$outcome_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, event_name, attributes_string, attributes_number, attributes_bool, resource, scope_string FROM event.audit WHERE (`attribute_string_o11y$$audit$$outcome` = ? AND `attribute_string_o11y$$audit$$outcome_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
 				Args:  []any{"failure", true, "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 100},
 			},
 		},
@@ -127,7 +127,7 @@ func TestStatementBuilder(t *testing.T) {
 				Limit: 100,
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __resource_filter AS (SELECT fingerprint FROM o11y_audit.distributed_logs_resource WHERE ((simpleJSONExtractString(labels, 'o11y.audit.resource.kind') = ? AND labels LIKE ? AND labels LIKE ?) AND (simpleJSONExtractString(labels, 'o11y.audit.resource.id') = ? AND labels LIKE ? AND labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, event_name, attributes_string, attributes_number, attributes_bool, resource, scope_string FROM o11y_audit.distributed_logs WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.audit_resource WHERE ((simpleJSONExtractString(labels, 'o11y.audit.resource.kind') = ? AND labels LIKE ? AND labels LIKE ?) AND (simpleJSONExtractString(labels, 'o11y.audit.resource.id') = ? AND labels LIKE ? AND labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, event_name, attributes_string, attributes_number, attributes_bool, resource, scope_string FROM event.audit WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
 				Args:  []any{"dashboard", "%o11y.audit.resource.kind%", "%o11y.audit.resource.kind\":\"dashboard%", "019b-5678-efgh-9012", "%o11y.audit.resource.id%", "%o11y.audit.resource.id\":\"019b-5678-efgh-9012%", uint64(1747945619), uint64(1747983448), "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 100},
 			},
 		},
@@ -144,7 +144,7 @@ func TestStatementBuilder(t *testing.T) {
 				Limit: 100,
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __resource_filter AS (SELECT fingerprint FROM o11y_audit.distributed_logs_resource WHERE (simpleJSONExtractString(labels, 'o11y.audit.resource.kind') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, event_name, attributes_string, attributes_number, attributes_bool, resource, scope_string FROM o11y_audit.distributed_logs WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND (`attribute_string_o11y$$audit$$action` = ? AND `attribute_string_o11y$$audit$$action_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.audit_resource WHERE (simpleJSONExtractString(labels, 'o11y.audit.resource.kind') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, event_name, attributes_string, attributes_number, attributes_bool, resource, scope_string FROM event.audit WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND (`attribute_string_o11y$$audit$$action` = ? AND `attribute_string_o11y$$audit$$action_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
 				Args:  []any{"dashboard", "%o11y.audit.resource.kind%", "%o11y.audit.resource.kind\":\"dashboard%", uint64(1747945619), uint64(1747983448), "delete", true, "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 100},
 			},
 		},
@@ -161,7 +161,7 @@ func TestStatementBuilder(t *testing.T) {
 				Limit: 100,
 			},
 			expected: qbtypes.Statement{
-				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, event_name, attributes_string, attributes_number, attributes_bool, resource, scope_string FROM o11y_audit.distributed_logs WHERE (`attribute_string_o11y$$audit$$principal$$type` = ? AND `attribute_string_o11y$$audit$$principal$$type_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
+				Query: "SELECT timestamp, id, trace_id, span_id, trace_flags, severity_text, severity_number, scope_name, scope_version, body, event_name, attributes_string, attributes_number, attributes_bool, resource, scope_string FROM event.audit WHERE (`attribute_string_o11y$$audit$$principal$$type` = ? AND `attribute_string_o11y$$audit$$principal$$type_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? LIMIT ?",
 				Args:  []any{"service_account", true, "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 100},
 			},
 		},
@@ -181,7 +181,7 @@ func TestStatementBuilder(t *testing.T) {
 				},
 			},
 			expected: qbtypes.Statement{
-				Query: "SELECT count() AS __result_0 FROM o11y_audit.distributed_logs WHERE ((`attribute_string_o11y$$audit$$outcome` = ? AND `attribute_string_o11y$$audit$$outcome_exists` = ?) AND (`attribute_string_o11y$$audit$$action` = ? AND `attribute_string_o11y$$audit$$action_exists` = ?)) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? ORDER BY __result_0 DESC",
+				Query: "SELECT count() AS __result_0 FROM event.audit WHERE ((`attribute_string_o11y$$audit$$outcome` = ? AND `attribute_string_o11y$$audit$$outcome_exists` = ?) AND (`attribute_string_o11y$$audit$$action` = ? AND `attribute_string_o11y$$audit$$action_exists` = ?)) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? ORDER BY __result_0 DESC",
 				Args:  []any{"failure", true, "update", true, "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448)},
 			},
 		},
@@ -205,7 +205,7 @@ func TestStatementBuilder(t *testing.T) {
 				Limit: 5,
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __limit_cte AS (SELECT toString(multiIf(`attribute_string_o11y$$audit$$principal$$email_exists` = ?, `attribute_string_o11y$$audit$$principal$$email`, NULL)) AS `o11y.audit.principal.email`, count() AS __result_0 FROM o11y_audit.distributed_logs WHERE (`attribute_string_o11y$$audit$$outcome` = ? AND `attribute_string_o11y$$audit$$outcome_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? GROUP BY `o11y.audit.principal.email` ORDER BY __result_0 DESC LIMIT ?) SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, toString(multiIf(`attribute_string_o11y$$audit$$principal$$email_exists` = ?, `attribute_string_o11y$$audit$$principal$$email`, NULL)) AS `o11y.audit.principal.email`, count() AS __result_0 FROM o11y_audit.distributed_logs WHERE (`attribute_string_o11y$$audit$$outcome` = ? AND `attribute_string_o11y$$audit$$outcome_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? AND (`o11y.audit.principal.email`) GLOBAL IN (SELECT `o11y.audit.principal.email` FROM __limit_cte) GROUP BY ts, `o11y.audit.principal.email`",
+				Query: "WITH __limit_cte AS (SELECT toString(multiIf(`attribute_string_o11y$$audit$$principal$$email_exists` = ?, `attribute_string_o11y$$audit$$principal$$email`, NULL)) AS `o11y.audit.principal.email`, count() AS __result_0 FROM event.audit WHERE (`attribute_string_o11y$$audit$$outcome` = ? AND `attribute_string_o11y$$audit$$outcome_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? GROUP BY `o11y.audit.principal.email` ORDER BY __result_0 DESC LIMIT ?) SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, toString(multiIf(`attribute_string_o11y$$audit$$principal$$email_exists` = ?, `attribute_string_o11y$$audit$$principal$$email`, NULL)) AS `o11y.audit.principal.email`, count() AS __result_0 FROM event.audit WHERE (`attribute_string_o11y$$audit$$outcome` = ? AND `attribute_string_o11y$$audit$$outcome_exists` = ?) AND timestamp >= ? AND ts_bucket_start >= ? AND timestamp < ? AND ts_bucket_start <= ? AND (`o11y.audit.principal.email`) GLOBAL IN (SELECT `o11y.audit.principal.email` FROM __limit_cte) GROUP BY ts, `o11y.audit.principal.email`",
 				Args:  []any{true, "failure", true, "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 5, true, "failure", true, "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448)},
 			},
 		},

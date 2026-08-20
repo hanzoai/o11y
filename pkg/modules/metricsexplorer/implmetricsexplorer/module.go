@@ -166,7 +166,7 @@ func (m *module) listMetrics(ctx context.Context, orgID valuer.UUID, params *met
 		rawSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, distributedTsTable))
 		rawSB.Where(rawSB.Between("unix_milli", rangeStart, rangeEnd))
 	} else {
-		rawSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV41weekTableName))
+		rawSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.Series1wTableName))
 	}
 
 	applyListFilters(rawSB)
@@ -176,7 +176,7 @@ func (m *module) listMetrics(ctx context.Context, orgID valuer.UUID, params *met
 	if reductionEnabled {
 		reducedSB := sqlbuilder.NewSelectBuilder()
 		reducedSB.Select("DISTINCT metric_name")
-		reducedSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
+		reducedSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesReducedTableName))
 		if hasRange {
 			reducedSB.Where(reducedSB.Between("unix_milli", rangeStart, rangeEnd))
 		}
@@ -514,7 +514,7 @@ func (m *module) CheckMetricExists(ctx context.Context, orgID valuer.UUID, metri
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("count(*) > 0 as metricExists")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(sb.E("metric_name", metricName))
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
@@ -536,7 +536,7 @@ func (m *module) HasNonO11yMetrics(ctx context.Context) (bool, error) {
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("count(*) > 0")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV41weekTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.Series1wTableName))
 	sb.Where("metric_name NOT LIKE 'o11y_%'")
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
@@ -627,7 +627,7 @@ func (m *module) InspectMetrics(
 
 	samplesSb := sqlbuilder.NewSelectBuilder()
 	samplesSb.Select("fingerprint", "unix_milli", "value")
-	samplesSb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4TableName))
+	samplesSb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricTableName))
 	samplesSb.Where(
 		samplesSb.In("fingerprint", fingerprints...),
 		samplesSb.E("metric_name", req.MetricName),
@@ -719,7 +719,7 @@ func (m *module) fetchUpdatedMetadata(ctx context.Context, orgID valuer.UUID, me
 		"argMax(temporality, created_at) AS temporality",
 		"argMax(is_monotonic, created_at) AS is_monotonic",
 	)
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.UpdatedMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.DescriptorTableName))
 	sb.Where(sb.In("metric_name", args...))
 	sb.GroupBy("metric_name")
 
@@ -779,7 +779,7 @@ func (m *module) fetchTimeseriesMetadata(ctx context.Context, orgID valuer.UUID,
 		"anyLast(temporality) AS temporality",
 		"anyLast(is_monotonic) AS is_monotonic",
 	)
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4TableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesTableName))
 	sb.Where(sb.In("metric_name", args...))
 	sb.GroupBy("metric_name")
 
@@ -893,7 +893,7 @@ func (m *module) checkForLabelInMetric(ctx context.Context, metricName string, l
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("count(*) > 0 AS has_label")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(sb.E("metric_name", metricName))
 	sb.Where(sb.E("attr_name", label))
 	sb.Limit(1)
@@ -916,7 +916,7 @@ func (m *module) insertMetricsMetadata(ctx context.Context, orgID valuer.UUID, r
 	createdAt := time.Now().UnixMilli()
 
 	ib := sqlbuilder.NewInsertBuilder()
-	ib.InsertInto(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.UpdatedMetadataTableName))
+	ib.InsertInto(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.DescriptorTableName))
 	ib.Cols("metric_name", "temporality", "is_monotonic", "type", "description", "unit", "created_at")
 	ib.Values(
 		req.MetricName,
@@ -1092,18 +1092,18 @@ func (m *module) fetchMetricsStatsWithSamples(
 		// the data lands either of the _reduced_last/_reduced_sum tables
 		reducedLastSB := sqlbuilder.NewSelectBuilder()
 		reducedLastSB.Select("metric_name", "uniq(reduced_fingerprint, unix_milli) AS cnt")
-		reducedLastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedLastTableName))
+		reducedLastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricReducedLastTableName))
 		reducedLastSB.Where(reducedLastSB.Between("unix_milli", req.Start, req.End))
 		reducedLastSB.Where("NOT startsWith(metric_name, 'o11y')")
 
 		reducedSumSB := sqlbuilder.NewSelectBuilder()
 		reducedSumSB.Select("metric_name", "uniq(reduced_fingerprint, unix_milli) AS cnt")
-		reducedSumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedSumTableName))
+		reducedSumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricReducedSumTableName))
 		reducedSumSB.Where(reducedSumSB.Between("unix_milli", req.Start, req.End))
 		reducedSumSB.Where("NOT startsWith(metric_name, 'o11y')")
 
 		// separate query for reduced series counts
-		reducedTsSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
+		reducedTsSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesReducedTableName))
 		reducedTsSB.Where(reducedTsSB.Between("unix_milli", start, end))
 		reducedTsSB.Where("NOT startsWith(metric_name, 'o11y')")
 		reducedTsSB.GroupBy("metric_name")
@@ -1114,7 +1114,7 @@ func (m *module) fetchMetricsStatsWithSamples(
 			// samples uses a separate cte with local table
 			reducedFpSB := sqlbuilder.NewSelectBuilder()
 			reducedFpSB.Select("fingerprint")
-			reducedFpSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedLocalTableName))
+			reducedFpSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesReducedLocalTableName))
 			reducedFpSB.Where(reducedFpSB.Between("unix_milli", start, end))
 			reducedFpSB.Where("NOT startsWith(metric_name, 'o11y')")
 			reducedFpSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
@@ -1246,7 +1246,7 @@ func (m *module) computeTimeseriesTreemap(ctx context.Context, orgID valuer.UUID
 	if reductionEnabled {
 		reducedTotalTSBuilder := sqlbuilder.NewSelectBuilder()
 		reducedTotalTSBuilder.Select("uniq(fingerprint) AS total_time_series")
-		reducedTotalTSBuilder.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
+		reducedTotalTSBuilder.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesReducedTableName))
 		reducedTotalTSBuilder.Where(reducedTotalTSBuilder.Between("unix_milli", start, end))
 
 		reducedMetricsSB := sqlbuilder.NewSelectBuilder()
@@ -1254,7 +1254,7 @@ func (m *module) computeTimeseriesTreemap(ctx context.Context, orgID valuer.UUID
 			"metric_name",
 			"uniq(fingerprint) AS total_value",
 		)
-		reducedMetricsSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
+		reducedMetricsSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesReducedTableName))
 		reducedMetricsSB.Where(reducedMetricsSB.Between("unix_milli", start, end))
 		reducedMetricsSB.Where("NOT startsWith(metric_name, 'o11y')")
 		if filterWhereClause != nil {
@@ -1366,7 +1366,7 @@ func (m *module) computeSamplesTreemap(ctx context.Context, orgID valuer.UUID, r
 	if reductionEnabled {
 		reducedCandidatesSB = sqlbuilder.NewSelectBuilder()
 		reducedCandidatesSB.Select("metric_name")
-		reducedCandidatesSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
+		reducedCandidatesSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesReducedTableName))
 		reducedCandidatesSB.Where("NOT startsWith(metric_name, 'o11y')")
 		reducedCandidatesSB.Where(reducedCandidatesSB.Between("unix_milli", start, end))
 		if filterWhereClause != nil {
@@ -1399,13 +1399,13 @@ func (m *module) computeSamplesTreemap(ctx context.Context, orgID valuer.UUID, r
 	if reductionEnabled {
 		reducedLastSB = sqlbuilder.NewSelectBuilder()
 		reducedLastSB.Select("metric_name", "uniq(reduced_fingerprint, unix_milli) AS cnt")
-		reducedLastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedLastTableName))
+		reducedLastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricReducedLastTableName))
 		reducedLastSB.Where(reducedLastSB.Between("unix_milli", req.Start, req.End))
 		reducedLastSB.Where("metric_name GLOBAL IN (SELECT metric_name FROM __reduced_metric_candidates)")
 
 		reducedSumSB = sqlbuilder.NewSelectBuilder()
 		reducedSumSB.Select("metric_name", "uniq(reduced_fingerprint, unix_milli) AS cnt")
-		reducedSumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedSumTableName))
+		reducedSumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricReducedSumTableName))
 		reducedSumSB.Where(reducedSumSB.Between("unix_milli", req.Start, req.End))
 		reducedSumSB.Where("metric_name GLOBAL IN (SELECT metric_name FROM __reduced_metric_candidates)")
 	}
@@ -1425,7 +1425,7 @@ func (m *module) computeSamplesTreemap(ctx context.Context, orgID valuer.UUID, r
 		if reductionEnabled {
 			reducedFingerprintSB := sqlbuilder.NewSelectBuilder()
 			reducedFingerprintSB.Select("fingerprint")
-			reducedFingerprintSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedLocalTableName))
+			reducedFingerprintSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesReducedLocalTableName))
 			reducedFingerprintSB.Where(reducedFingerprintSB.Between("unix_milli", start, end))
 			reducedFingerprintSB.Where("NOT startsWith(metric_name, 'o11y')")
 			reducedFingerprintSB.AddWhereClause(sqlbuilder.CopyWhereClause(filterWhereClause))
@@ -1459,12 +1459,12 @@ func (m *module) computeSamplesTreemap(ctx context.Context, orgID valuer.UUID, r
 		// Grand total includes reduced sample volume so percentages stay consistent.
 		reducedTotalLastSB := sqlbuilder.NewSelectBuilder()
 		reducedTotalLastSB.Select("uniq(reduced_fingerprint, unix_milli) AS cnt")
-		reducedTotalLastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedLastTableName))
+		reducedTotalLastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricReducedLastTableName))
 		reducedTotalLastSB.Where(reducedTotalLastSB.Between("unix_milli", req.Start, req.End))
 
 		reducedTotalSumSB := sqlbuilder.NewSelectBuilder()
 		reducedTotalSumSB.Select("uniq(reduced_fingerprint, unix_milli) AS cnt")
-		reducedTotalSumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedSumTableName))
+		reducedTotalSumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricReducedSumTableName))
 		reducedTotalSumSB.Where(reducedTotalSumSB.Between("unix_milli", req.Start, req.End))
 
 		reducedTotalSamplesSB := sqlbuilder.NewSelectBuilder()
@@ -1554,7 +1554,7 @@ func (m *module) getMetricDataPoints(ctx context.Context, metricName string) (ui
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("sum(count) AS data_points")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4Agg30mTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.Metric30mTableName))
 	sb.Where(sb.E("metric_name", metricName))
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
@@ -1576,7 +1576,7 @@ func (m *module) getMetricLastReceived(ctx context.Context, metricName string) (
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("MAX(last_reported_unix_milli) AS last_received_time")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(sb.E("metric_name", metricName))
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
 
@@ -1601,7 +1601,7 @@ func (m *module) getTotalTimeSeriesForMetricName(ctx context.Context, metricName
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("uniq(fingerprint) AS time_series_count")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV41weekTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.Series1wTableName))
 	sb.Where(sb.E("metric_name", metricName))
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
@@ -1625,7 +1625,7 @@ func (m *module) getActiveTimeSeriesForMetricName(ctx context.Context, metricNam
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("uniq(fingerprint) AS active_time_series")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4TableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesTableName))
 	sb.Where(sb.E("metric_name", metricName))
 	sb.Where(sb.GTE("unix_milli", milli))
 
@@ -1651,7 +1651,7 @@ func (m *module) fetchMetricAttributes(ctx context.Context, metricName string, s
 		"groupUniqArray(1000)(attr_string_value) AS values",
 		"uniq(attr_string_value) AS valueCount",
 	)
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(sb.E("metric_name", metricName))
 	sb.Where("NOT startsWith(attr_name, '__')")
 

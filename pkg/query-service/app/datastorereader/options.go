@@ -3,6 +3,10 @@ package datastorereader
 import (
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/telemetrymetadata"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
+
 	"github.com/hanzo-ds/go"
 )
 
@@ -15,42 +19,55 @@ const (
 	EncodingProto Encoding = "protobuf"
 )
 
+// These are this reader's DEFAULTS, not a second definition of the schema — each one
+// resolves to the shared per-signal constant, so a table is named in exactly one place.
+// This reader carried its own copy of every name, including several that predate the
+// current span and log tables; there is one span table and one log table now, so the
+// generations that used to be distinct all resolve to the same name.
 const (
-	defaultTraceDB                 string        = "o11y_traces"
-	defaultOperationsTable         string        = "distributed_o11y_operations"
-	defaultIndexTable              string        = "distributed_o11y_index_v2"
-	defaultLocalIndexTable         string        = "o11y_index_v2"
-	defaultErrorTable              string        = "distributed_o11y_error_index_v2"
-	defaultDurationTable           string        = "distributed_durationSort"
-	defaultUsageExplorerTable      string        = "distributed_usage_explorer"
-	defaultSpansTable              string        = "distributed_o11y_spans"
-	defaultDependencyGraphTable    string        = "distributed_dependency_graph_minutes_v2"
-	defaultTopLevelOperationsTable string        = "distributed_top_level_operations"
-	defaultSpanAttributeTableV2    string        = "distributed_tag_attributes_v2"
-	defaultSpanAttributeKeysTable  string        = "distributed_span_attributes_keys"
-	defaultLogsDB                  string        = "o11y_logs"
-	defaultLogsTable               string        = "distributed_logs"
-	defaultLogsLocalTable          string        = "logs"
-	defaultLogAttributeKeysTable   string        = "distributed_logs_attribute_keys"
-	defaultLogResourceKeysTable    string        = "distributed_logs_resource_keys"
-	defaultLogTagAttributeTableV2  string        = "distributed_tag_attributes_v2"
+	defaultTraceDB                 string        = telemetrytraces.DBName
+	defaultIndexTable              string        = telemetrytraces.SpanTableName
+	defaultLocalIndexTable         string        = telemetrytraces.SpanLocalTableName
+	defaultTopLevelOperationsTable string        = telemetrytraces.OperationTableName
+	defaultSpanAttributeTableV2    string        = telemetrytraces.SpanAttributeTableName
+	defaultSpanAttributeKeysTable  string        = telemetrytraces.SpanKeyTableName
+	defaultLogsDB                  string        = telemetrylogs.DBName
+	defaultLogsTable               string        = telemetrylogs.LogTableName
+	defaultLogsLocalTable          string        = telemetrylogs.LogLocalTableName
+	defaultLogAttributeKeysTable   string        = telemetrylogs.LogKeyTableName
+	defaultLogResourceKeysTable    string        = telemetrylogs.LogResourceKeyTableName
+	defaultLogTagAttributeTableV2  string        = telemetrylogs.LogAttributeTableName
 	defaultLiveTailRefreshSeconds  int           = 5
 	defaultWriteBatchDelay         time.Duration = 5 * time.Second
 	defaultWriteBatchSize          int           = 10000
 	defaultEncoding                Encoding      = EncodingJSON
 
-	defaultLogsLocalTableV2         string = "logs_v2"
-	defaultLogsTableV2              string = "distributed_logs_v2"
-	defaultLogsResourceLocalTableV2 string = "logs_v2_resource"
-	defaultLogsResourceTableV2      string = "distributed_logs_v2_resource"
+	defaultLogsLocalTableV2         string = telemetrylogs.LogLocalTableName
+	defaultLogsTableV2              string = telemetrylogs.LogTableName
+	defaultLogsResourceLocalTableV2 string = telemetrylogs.LogResourceTableName
+	defaultLogsResourceTableV2      string = telemetrylogs.LogResourceTableName
 
-	defaultTraceIndexTableV3    string = "distributed_o11y_index_v3"
-	defaultTraceLocalTableName  string = "o11y_index_v3"
-	defaultTraceResourceTableV3 string = "distributed_traces_v3_resource"
-	defaultTraceSummaryTable    string = "distributed_trace_summary"
+	defaultTraceIndexTableV3    string = telemetrytraces.SpanTableName
+	defaultTraceLocalTableName  string = telemetrytraces.SpanLocalTableName
+	defaultTraceResourceTableV3 string = telemetrytraces.SpanResourceTableName
+	defaultTraceSummaryTable    string = telemetrytraces.TraceTableName
 
-	defaultMetadataDB    string = "o11y_metadata"
-	defaultMetadataTable string = "distributed_attributes_metadata"
+	defaultMetadataDB    string = telemetrymetadata.DBName
+	defaultMetadataTable string = telemetrymetadata.AttributeTableName
+)
+
+// The tables below belong to this reader alone and have no successor in the applied
+// event schema — the deployed database holds event, error, log, span and the metric
+// tables and nothing else. They are named under the one scheme (a table that supports
+// a signal is prefixed by that signal) so nothing carries a second naming scheme; a
+// query through them fails on a missing table, which is the honest outcome.
+const (
+	defaultOperationsTable      string = "span_operation"
+	defaultErrorTable           string = "span_error"
+	defaultDurationTable        string = "span_duration"
+	defaultUsageExplorerTable   string = "span_usage"
+	defaultSpansTable           string = "span_raw"
+	defaultDependencyGraphTable string = "dependency"
 )
 
 // NamespaceConfig is Datastore's internal configuration data

@@ -7,12 +7,19 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 )
 
+// The meter plane records metered usage samples. It is NOT part of the applied event
+// schema — the deployed database holds event, error, log, span and the metric tables
+// and nothing else — but it is named under the one scheme so it lands in the event
+// plane the day the tables are added rather than carrying a second scheme.
+//
+// A row of meter is one metered sample; meter_1d is its daily rollup.
 const (
-	DBName                     = "o11y_meter"
-	SamplesTableName           = "distributed_samples"
-	SamplesLocalTableName      = "samples"
-	SamplesAgg1dTableName      = "distributed_samples_agg_1d"
-	SamplesAgg1dLocalTableName = "samples_agg_1d"
+	DBName = "event"
+
+	SamplesTableName           = "meter"
+	SamplesLocalTableName      = "meter"
+	SamplesAgg1dTableName      = "meter_1d"
+	SamplesAgg1dLocalTableName = "meter_1d"
 )
 
 var (
@@ -27,8 +34,8 @@ var (
 
 // start and end are in milliseconds
 // we have two tables for samples
-// 1. distributed_samples
-// 2. distributed_samples_agg_1d - for queries with time range above or equal to 30 days
+// 1. meter
+// 2. meter_1d - for queries with time range above or equal to 30 days
 // if the `timeAggregation` is `count_distinct` we can't use the aggregated tables because they don't support it.
 func WhichSamplesTableToUse(
 	start, end uint64,
@@ -45,7 +52,7 @@ func WhichSamplesTableToUse(
 		}
 	}
 
-	// if the time aggregation is count_distinct, we need to use the distributed_samples table
+	// if the time aggregation is count_distinct, we need to use the raw meter table
 	// because the aggregated tables don't support count_distinct
 	if timeAggregation == metrictypes.TimeAggregationCountDistinct {
 		return SamplesTableName

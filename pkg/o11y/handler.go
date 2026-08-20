@@ -147,22 +147,21 @@ func NewHandlers(
 		RulerHandler:            o11yruler.NewHandler(rulerService),
 		LLMPricingRuleHandler:   impllmpricingrule.NewHandler(modules.LLMPricingRule),
 		LLMObsHandler:           impllmobs.NewHandler(modules.LLMObs),
-		ErrorTrackingHandler:    implerrortracking.NewHandler(modules.ErrorTracking, errorTrackingIngestSecret(), errorTrackingCapturePII(), modules.ErrorTrackingRevocations),
+		ErrorTrackingHandler:    implerrortracking.NewHandler(modules.ErrorTracking),
 		SentryHandler:           implsentry.NewHandler(modules.Sentry, len(errorTrackingIngestSecret()) > 0, errorTrackingCapturePII()),
 		StatsHandler:            statsreporter.NewHandler(statsAggregator),
 	}
 }
 
 // errorTrackingIngestSecret is the platform secret used to verify Sentry DSN keys
-// on the public error-ingest endpoints. It is sourced from KMS (synced to this env
-// var via a KMSSecret CRD) — never committed, never plaintext at rest. When unset,
-// the ingest endpoints fail closed (503) while the IAM-scoped read endpoints keep
-// working.
+// on the public /v1/sentry ingest endpoints. It is sourced from KMS (synced to this
+// env var via a KMSSecret CRD) — never committed, never plaintext at rest. When unset,
+// ingest fails closed (503) while the IAM-scoped read endpoints keep working.
 func errorTrackingIngestSecret() []byte {
 	return []byte(os.Getenv("O11Y_ERRORTRACKING_INGEST_SECRET"))
 }
 
-// errorTrackingCapturePII reports whether the error-ingest path retains end-user
+// errorTrackingCapturePII reports whether the ingest path retains end-user
 // PII (email/IP). Default false = scrub (fail-secure), mirroring the llmobs
 // O11Y_GENAI_CAPTURE_MESSAGES precedent. Secrets are always redacted regardless.
 func errorTrackingCapturePII() bool {

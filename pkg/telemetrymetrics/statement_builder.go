@@ -183,8 +183,8 @@ func (b *MetricQueryStatementBuilder) buildPipelineStatement(
 	agg := query.Aggregations[0]
 
 	// A reduced metric reads the raw buffer for recent short windows, and
-	// samples_v4/agg (unioned with the reduced tables) otherwise. The buffer is
-	// shaped exactly like samples_v4 / time_series_v4, so once the table names are
+	// metric/rollup (unioned with the reduced tables) otherwise. The buffer is
+	// shaped exactly like metric / series, so once the table names are
 	// chosen the rest of the pipeline is unchanged.
 	useBuffer := agg.Reduced &&
 		end-start < oneDayInMilliseconds &&
@@ -298,7 +298,7 @@ func (b *MetricQueryStatementBuilder) buildReducedTimeSeriesCTE(
 		}
 	}
 
-	sb.From(fmt.Sprintf("%s.%s", DBName, TimeseriesV4ReducedLocalTableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, SeriesReducedLocalTableName))
 	sb.Select("fingerprint")
 	for _, g := range query.GroupBy {
 		col, err := b.fm.ColumnExpressionFor(ctx, start, end, &g.TelemetryFieldKey, keys)
@@ -512,7 +512,7 @@ func (b *MetricQueryStatementBuilder) buildTimeSeriesCTE(
 
 	// the buffer holds both raw rows and the reduced catalog rows; the raw read
 	// only wants the original series
-	if tsTable == TimeseriesV4BufferLocalTableName {
+	if tsTable == SeriesBufferLocalTableName {
 		sb.Where(sb.EQ("is_reduced", false))
 	}
 

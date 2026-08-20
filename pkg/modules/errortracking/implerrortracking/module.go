@@ -24,7 +24,6 @@ const (
 
 type module struct {
 	store     errortrackingtypes.Store
-	sink      OccurrenceSink
 	retention time.Duration
 }
 
@@ -38,13 +37,13 @@ func WithRetention(d time.Duration) Option {
 	return func(m *module) { m.retention = d }
 }
 
-// NewModule wires the issue store and the (default no-op) occurrence sink. When a
-// positive retention is configured it starts the TTL sweeper.
-func NewModule(store errortrackingtypes.Store, sink OccurrenceSink, opts ...Option) errortracking.Module {
-	if sink == nil {
-		sink = NoopSink{}
-	}
-	m := &module{store: store, sink: sink}
+// NewModule wires the issue store. When a positive retention is configured it starts
+// the TTL sweeper.
+//
+// There is no occurrence sink. The occurrences themselves are event.error rows written
+// by the one ingest face; this module owns only the grouped-issue lifecycle over them.
+func NewModule(store errortrackingtypes.Store, opts ...Option) errortracking.Module {
+	m := &module{store: store}
 	for _, o := range opts {
 		o(m)
 	}
@@ -58,7 +57,7 @@ func NewModule(store errortrackingtypes.Store, sink OccurrenceSink, opts ...Opti
 // FIRST collapsed by fingerprint (a flood of identical events becomes one upsert
 // with an incremented count) and then written in ONE transaction under the per-org
 // ceiling — so a single request can never fan out into a transaction-per-event
-// write storm. The occurrence sink is fail-soft (owns its own errors).
+// write storm.
 func (m *module) Ingest(ctx context.Context, orgID valuer.UUID, occs []*errortrackingtypes.Occurrence) (int, error) {
 	if orgID.IsZero() {
 		return 0, errors.Newf(errors.TypeInvalidInput, errortrackingtypes.ErrCodeErrorTrackingInvalidInput, "ingest has no org")
@@ -75,16 +74,7 @@ func (m *module) Ingest(ctx context.Context, orgID valuer.UUID, occs []*errortra
 		issues = append(issues, issueFromGroup(orgID, fp, g, now))
 	}
 
-	written, err := m.store.UpsertIssues(ctx, orgID, issues, maxIssuesPerOrg)
-	if err != nil {
-		return 0, err
-	}
-	// Reused occurrence store; bounded to one write per distinct fingerprint and
-	// fail-soft — the issues are already durable.
-	for _, g := range groups {
-		_ = m.sink.Write(ctx, orgID, g.sample)
-	}
-	return written, nil
+	return m.store.UpsertIssues(ctx, orgID, issues, maxIssuesPerOrg)
 }
 
 func (m *module) ListIssues(ctx context.Context, orgID valuer.UUID, q *errortrackingtypes.IssuesQuery) ([]*errortrackingtypes.Issue, int, error) {

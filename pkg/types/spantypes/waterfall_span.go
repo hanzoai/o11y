@@ -13,9 +13,9 @@ import (
 
 const (
 	// Datastore database and table names for trace queries.
-	TraceDB           = "o11y_traces"
-	TraceTable        = "distributed_o11y_index_v3"
-	TraceSummaryTable = "distributed_trace_summary"
+	TraceDB           = "event"
+	TraceTable        = "span"
+	TraceSummaryTable = "trace"
 )
 
 // ErrTraceNotFound is returned when a trace ID has no matching spans in Datastore.

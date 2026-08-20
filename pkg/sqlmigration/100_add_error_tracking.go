@@ -11,10 +11,10 @@ import (
 )
 
 // addErrorTracking creates the one net-new table backing error/crash tracking:
-// o11y_issues (grouped-error lifecycle). Occurrences stay in the telemetry store
-// (o11y_traces / o11y_logs); only non-derivable lifecycle state lives here. The
-// unique index on (org_id, fingerprint) is the grouping key the ingest upsert
-// conflicts on; (org_id, last_seen) serves the default list ordering.
+// o11y_issues (grouped-error lifecycle). The occurrences themselves are event.error
+// rows on the datastore; only non-derivable lifecycle state lives here. The unique
+// index on (org_id, fingerprint) is the grouping key the ingest upsert conflicts on;
+// (org_id, last_seen) serves the default list ordering.
 type addErrorTracking struct {
 	sqlschema sqlschema.SQLSchema
 	sqlstore  sqlstore.SQLStore
@@ -74,19 +74,6 @@ func (migration *addErrorTracking) Up(ctx context.Context, db *bun.DB) error {
 		PrimaryKeyConstraint:  &sqlschema.PrimaryKeyConstraint{ColumnNames: []sqlschema.ColumnName{"id"}},
 		ForeignKeyConstraints: []*sqlschema.ForeignKeyConstraint{orgFK("org_id")},
 	})
-
-	// o11y_ingest_revocations: the per-org DSN-key rotation watermark. A DSN key is
-	// "<version>:<hmac>"; raising min_version for ONE org revokes only that org's
-	// below-min DSNs — isolated rotation without a global secret roll.
-	sqls = append(sqls, migration.sqlschema.Operator().CreateTable(&sqlschema.Table{
-		Name: "o11y_ingest_revocations",
-		Columns: []*sqlschema.Column{
-			{Name: "org_id", DataType: sqlschema.DataTypeText, Nullable: false},
-			{Name: "min_version", DataType: sqlschema.DataTypeBigInt, Nullable: false, Default: "0"},
-			{Name: "updated_at", DataType: sqlschema.DataTypeTimestamp, Nullable: false},
-		},
-		PrimaryKeyConstraint: &sqlschema.PrimaryKeyConstraint{ColumnNames: []sqlschema.ColumnName{"org_id"}},
-	})...)
 
 	// The grouping key (ingest upserts ON CONFLICT here) and the list-ordering index.
 	sqls = append(sqls,

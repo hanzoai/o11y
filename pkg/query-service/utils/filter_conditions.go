@@ -3,7 +3,7 @@ package utils
 import (
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/query-service/constants"
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
 )
 
 var (
@@ -19,23 +19,23 @@ func WhichTSTableToUse(start, end int64) (int64, int64, string, string) {
 	if end-start < sixHoursInMilliseconds {
 		// adjust the start time to nearest 1 hour
 		start = start - (start % (time.Hour.Milliseconds() * 1))
-		tableName = constants.O11Y_TIMESERIES_v4_TABLENAME
-		localTableName = constants.O11Y_TIMESERIES_v4_LOCAL_TABLENAME
+		tableName = telemetrymetrics.SeriesTableName
+		localTableName = telemetrymetrics.SeriesLocalTableName
 	} else if end-start < oneDayInMilliseconds {
 		// adjust the start time to nearest 6 hours
 		start = start - (start % (time.Hour.Milliseconds() * 6))
-		tableName = constants.O11Y_TIMESERIES_v4_6HRS_TABLENAME
-		localTableName = constants.O11Y_TIMESERIES_v4_6HRS_LOCAL_TABLENAME
+		tableName = telemetrymetrics.Series6hTableName
+		localTableName = telemetrymetrics.Series6hLocalTableName
 	} else if end-start < oneWeekInMilliseconds {
 		// adjust the start time to nearest 1 day
 		start = start - (start % (time.Hour.Milliseconds() * 24))
-		tableName = constants.O11Y_TIMESERIES_v4_1DAY_TABLENAME
-		localTableName = constants.O11Y_TIMESERIES_v4_1DAY_LOCAL_TABLENAME
+		tableName = telemetrymetrics.Series1dTableName
+		localTableName = telemetrymetrics.Series1dLocalTableName
 	} else {
 		// adjust the start time to nearest 1 week
 		start = start - (start % (time.Hour.Milliseconds() * 24 * 7))
-		tableName = constants.O11Y_TIMESERIES_v4_1WEEK_TABLENAME
-		localTableName = constants.O11Y_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME
+		tableName = telemetrymetrics.Series1wTableName
+		localTableName = telemetrymetrics.Series1wLocalTableName
 	}
 
 	return start, end, tableName, localTableName
@@ -43,11 +43,11 @@ func WhichTSTableToUse(start, end int64) (int64, int64, string, string) {
 
 func WhichSampleTableToUse(start, end int64) (string, string) {
 	if end-start < oneDayInMilliseconds {
-		return constants.O11Y_SAMPLES_V4_TABLENAME, "count(*)"
+		return telemetrymetrics.MetricTableName, "count(*)"
 	} else if end-start < oneWeekInMilliseconds {
-		return constants.O11Y_SAMPLES_V4_AGG_5M_TABLENAME, "sum(count)"
+		return telemetrymetrics.Metric5mTableName, "sum(count)"
 	} else {
-		return constants.O11Y_SAMPLES_V4_AGG_30M_TABLENAME, "sum(count)"
+		return telemetrymetrics.Metric30mTableName, "sum(count)"
 	}
 }
 
@@ -55,5 +55,5 @@ func WhichAttributesTableToUse(start, end int64) (int64, int64, string, string) 
 	if end-start < sixHoursInMilliseconds {
 		start = start - (start % (time.Hour.Milliseconds() * 6))
 	}
-	return start, end, constants.O11Y_ATTRIBUTES_METADATA_TABLENAME, constants.O11Y_ATTRIBUTES_METADATA_LOCAL_TABLENAME
+	return start, end, telemetrymetrics.AttributeTableName, telemetrymetrics.AttributeLocalTableName
 }

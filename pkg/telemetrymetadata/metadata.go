@@ -1918,25 +1918,25 @@ func (t *telemetryMetaStore) getIntrinsicMetricFieldValues(ctx context.Context, 
 		return &telemetrytypes.TelemetryFieldValues{}, nil
 	}
 
-	// Reduced metrics live in time_series_v4_reduced + the buffer (is_reduced=false), not the raw
+	// Reduced metrics live in series_reduced + the buffer (is_reduced=false), not the raw
 	// tables; query those only when reduction is enabled (the tables may not exist otherwise).
 	reductionEnabled := t.fl.BooleanOrEmpty(ctx, flagger.FeatureEnableMetricsReduction, featuretypes.NewFlaggerEvaluationContext(orgID))
 	sources := []struct {
 		tableName  string
 		extraConds []string
 	}{
-		{telemetrymetrics.TimeseriesV41weekTableName, nil},
+		{telemetrymetrics.Series1wTableName, nil},
 	}
 	if reductionEnabled {
 		sources = append(sources,
 			struct {
 				tableName  string
 				extraConds []string
-			}{telemetrymetrics.TimeseriesV4BufferTableName, []string{"is_reduced = false"}},
+			}{telemetrymetrics.SeriesBufferTableName, []string{"is_reduced = false"}},
 			struct {
 				tableName  string
 				extraConds []string
-			}{telemetrymetrics.TimeseriesV4ReducedTableName, nil},
+			}{telemetrymetrics.SeriesReducedTableName, nil},
 		)
 	}
 
@@ -2274,7 +2274,7 @@ func (t *telemetryMetaStore) fetchMetricsTemporalityAndType(ctx context.Context,
 
 	reduced := make(map[string]bool)
 	if reductionEnabled {
-		bufferTemporalities, bufferTypes, err := t.fetchTemporalityTypeForTable(ctx, telemetrymetrics.TimeseriesV4BufferTableName, adjustedStartTs, adjustedEndTs, metricNames, "is_reduced = false")
+		bufferTemporalities, bufferTypes, err := t.fetchTemporalityTypeForTable(ctx, telemetrymetrics.SeriesBufferTableName, adjustedStartTs, adjustedEndTs, metricNames, "is_reduced = false")
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -2287,7 +2287,7 @@ func (t *telemetryMetaStore) fetchMetricsTemporalityAndType(ctx context.Context,
 			}
 		}
 
-		reducedTemporalities, reducedTypes, err := t.fetchTemporalityTypeForTable(ctx, telemetrymetrics.TimeseriesV4ReducedTableName, adjustedStartTs, adjustedEndTs, metricNames)
+		reducedTemporalities, reducedTypes, err := t.fetchTemporalityTypeForTable(ctx, telemetrymetrics.SeriesReducedTableName, adjustedStartTs, adjustedEndTs, metricNames)
 		if err != nil {
 			return nil, nil, nil, err
 		}
@@ -2619,13 +2619,13 @@ func (t *telemetryMetaStore) GetFirstSeenFromMetricMetadata(ctx context.Context,
 }
 
 func (t *telemetryMetaStore) FetchLastSeenInfoMulti(ctx context.Context, orgID valuer.UUID, metricNames ...string) (map[string]int64, error) {
-	lastSeenInfo, err := t.fetchLastSeenInfoForTable(ctx, telemetrymetrics.TimeseriesV4TableName, metricNames)
+	lastSeenInfo, err := t.fetchLastSeenInfoForTable(ctx, telemetrymetrics.SeriesTableName, metricNames)
 	if err != nil {
 		return nil, err
 	}
 
 	if t.fl.BooleanOrEmpty(ctx, flagger.FeatureEnableMetricsReduction, featuretypes.NewFlaggerEvaluationContext(orgID)) {
-		reducedLastSeen, err := t.fetchLastSeenInfoForTable(ctx, telemetrymetrics.TimeseriesV4ReducedTableName, metricNames)
+		reducedLastSeen, err := t.fetchLastSeenInfoForTable(ctx, telemetrymetrics.SeriesReducedTableName, metricNames)
 		if err != nil {
 			return nil, err
 		}

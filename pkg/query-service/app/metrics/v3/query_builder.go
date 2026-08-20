@@ -5,10 +5,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+
 	"github.com/hanzoai/o11y/pkg/query-service/app/metrics"
 	"github.com/hanzoai/o11y/pkg/query-service/app/metrics/v4/helpers"
 	"github.com/hanzoai/o11y/pkg/query-service/common"
-	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
@@ -67,7 +68,7 @@ func buildMetricQuery(start, end, step int64, mq *v3.BuilderQuery) (string, erro
 		"SELECT %s" +
 			" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 			" %s as value" +
-			" FROM " + constants.O11Y_METRIC_DBNAME + "." + constants.O11Y_SAMPLES_V4_TABLENAME +
+			" FROM " + telemetrymetrics.DBName + "." + telemetrymetrics.MetricTableName +
 			" INNER JOIN" +
 			" (%s) as filtered_time_series" +
 			" USING fingerprint" +
@@ -198,7 +199,7 @@ func buildMetricQuery(start, end, step int64, mq *v3.BuilderQuery) (string, erro
 			"SELECT fingerprint, labels as fullLabels," +
 				" toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL %d SECOND) as ts," +
 				" any(value) as value" +
-				" FROM " + constants.O11Y_METRIC_DBNAME + "." + constants.O11Y_SAMPLES_V4_TABLENAME +
+				" FROM " + telemetrymetrics.DBName + "." + telemetrymetrics.MetricTableName +
 				" INNER JOIN" +
 				" (%s) as filtered_time_series" +
 				" USING fingerprint" +

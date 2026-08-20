@@ -72,7 +72,7 @@ func TestPrepareQuery(t *testing.T) {
 		{
 			name: "query text produces template exec error",
 			postData: &model.DashboardVars{
-				Query: "SELECT durationNano from o11y_traces.o11y_index_v2 WHERE id = {{if .X}}1{{else}}2{{else}}3{{end}}",
+				Query: "SELECT durationNano from event.span WHERE id = {{if .X}}1{{else}}2{{else}}3{{end}}",
 			},
 			expectedErr: true,
 			errMsg:      "expected end; found {{else}}",

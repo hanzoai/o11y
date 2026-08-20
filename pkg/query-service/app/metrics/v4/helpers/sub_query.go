@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
@@ -29,16 +31,16 @@ func whichTSTableToUse(start, end int64, mq *v3.BuilderQuery) (int64, int64, str
 	if mq.MetricTableHints != nil {
 		if mq.MetricTableHints.TimeSeriesTableName != "" {
 			switch mq.MetricTableHints.TimeSeriesTableName {
-			case constants.O11Y_TIMESERIES_v4_LOCAL_TABLENAME:
+			case telemetrymetrics.SeriesLocalTableName:
 				// adjust the start time to nearest 1 hour
 				start = start - (start % (time.Hour.Milliseconds() * 1))
-			case constants.O11Y_TIMESERIES_v4_6HRS_LOCAL_TABLENAME:
+			case telemetrymetrics.Series6hLocalTableName:
 				// adjust the start time to nearest 6 hours
 				start = start - (start % (time.Hour.Milliseconds() * 6))
-			case constants.O11Y_TIMESERIES_v4_1DAY_LOCAL_TABLENAME:
+			case telemetrymetrics.Series1dLocalTableName:
 				// adjust the start time to nearest 1 day
 				start = start - (start % (time.Hour.Milliseconds() * 24))
-			case constants.O11Y_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME:
+			case telemetrymetrics.Series1wLocalTableName:
 				// adjust the start time to nearest 1 week
 				start = start - (start % (time.Hour.Milliseconds() * 24 * 7))
 			}
@@ -46,27 +48,25 @@ func whichTSTableToUse(start, end int64, mq *v3.BuilderQuery) (int64, int64, str
 		}
 	}
 
-	// If time range is less than 6 hours, we need to use the `time_series_v4` table
-	// else if time range is less than 1 day and greater than 6 hours, we need to use the `time_series_v4_6hrs` table
-	// else if time range is less than 1 week and greater than 1 day, we need to use the `time_series_v4_1day` table
-	// else we need to use the `time_series_v4_1week` table
+	// Pick the coarsest rollup the window can afford: series under 6 hours, then
+	// series_6h under a day, series_1d under a week, series_1w beyond that.
 	var tableName string
 	if end-start < sixHoursInMilliseconds {
 		// adjust the start time to nearest 1 hour
 		start = start - (start % (time.Hour.Milliseconds() * 1))
-		tableName = constants.O11Y_TIMESERIES_v4_LOCAL_TABLENAME
+		tableName = telemetrymetrics.SeriesLocalTableName
 	} else if end-start < oneDayInMilliseconds {
 		// adjust the start time to nearest 6 hours
 		start = start - (start % (time.Hour.Milliseconds() * 6))
-		tableName = constants.O11Y_TIMESERIES_v4_6HRS_LOCAL_TABLENAME
+		tableName = telemetrymetrics.Series6hLocalTableName
 	} else if end-start < oneWeekInMilliseconds {
 		// adjust the start time to nearest 1 day
 		start = start - (start % (time.Hour.Milliseconds() * 24))
-		tableName = constants.O11Y_TIMESERIES_v4_1DAY_LOCAL_TABLENAME
+		tableName = telemetrymetrics.Series1dLocalTableName
 	} else {
 		// adjust the start time to nearest 1 week
 		start = start - (start % (time.Hour.Milliseconds() * 24 * 7))
-		tableName = constants.O11Y_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME
+		tableName = telemetrymetrics.Series1wLocalTableName
 	}
 
 	return start, end, tableName
@@ -74,9 +74,9 @@ func whichTSTableToUse(start, end int64, mq *v3.BuilderQuery) (int64, int64, str
 
 // start and end are in milliseconds
 // we have three tables for samples
-// 1. distributed_samples_v4
-// 2. distributed_samples_v4_agg_5m - for queries with time range above or equal to 1 day and less than 1 week
-// 3. distributed_samples_v4_agg_30m - for queries with time range above or equal to 1 week
+// 1. metric
+// 2. metric_5m - for queries with time range above or equal to 1 day and less than 1 week
+// 3. metric_30m - for queries with time range above or equal to 1 week
 // if the `timeAggregation` is `count_distinct` we can't use the aggregated tables because they don't support it
 func WhichSamplesTableToUse(start, end int64, mq *v3.BuilderQuery) string {
 
@@ -90,13 +90,13 @@ func WhichSamplesTableToUse(start, end int64, mq *v3.BuilderQuery) string {
 
 	// we don't have any aggregated table for sketches (yet)
 	if mq.AggregateAttribute.Type == v3.AttributeKeyType(v3.MetricTypeExponentialHistogram) {
-		return constants.O11Y_EXP_HISTOGRAM_TABLENAME
+		return telemetrymetrics.HistogramTableName
 	}
 
-	// if the time aggregation is count_distinct, we need to use the distributed_samples_v4 table
+	// if the time aggregation is count_distinct, we need to use the raw metric table
 	// because the aggregated tables don't support count_distinct
 	if mq.TimeAggregation == v3.TimeAggregationCountDistinct {
-		return constants.O11Y_SAMPLES_V4_TABLENAME
+		return telemetrymetrics.MetricTableName
 	}
 
 	if end-start < oneDayInMilliseconds+offsetBucket {
@@ -104,16 +104,16 @@ func WhichSamplesTableToUse(start, end int64, mq *v3.BuilderQuery) string {
 		// why would interval be greater than 5 minutes?
 		// we allow people to configure the step interval so we can make use of this
 		if mq.Temporality == v3.Delta && mq.TimeAggregation == v3.TimeAggregationIncrease && mq.StepInterval >= 300 && mq.StepInterval < 1800 {
-			return constants.O11Y_SAMPLES_V4_AGG_5M_TABLENAME
+			return telemetrymetrics.Metric5mTableName
 		} else if mq.Temporality == v3.Delta && mq.TimeAggregation == v3.TimeAggregationIncrease && mq.StepInterval >= 1800 {
 			// if we are dealing with delta metrics and interval is greater than 30 minutes, we can use the 30m aggregated table
-			return constants.O11Y_SAMPLES_V4_AGG_30M_TABLENAME
+			return telemetrymetrics.Metric30mTableName
 		}
-		return constants.O11Y_SAMPLES_V4_TABLENAME
+		return telemetrymetrics.MetricTableName
 	} else if end-start < oneWeekInMilliseconds+offsetBucket {
-		return constants.O11Y_SAMPLES_V4_AGG_5M_TABLENAME
+		return telemetrymetrics.Metric5mTableName
 	} else {
-		return constants.O11Y_SAMPLES_V4_AGG_30M_TABLENAME
+		return telemetrymetrics.Metric30mTableName
 	}
 }
 
@@ -126,7 +126,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 		// although it doesn't make sense to use anyLast, avg, min, max, count on delta metrics,
 		// we are keeping it here to make sure that query will not be invalid
 		switch tableName {
-		case constants.O11Y_SAMPLES_V4_TABLENAME:
+		case telemetrymetrics.MetricTableName:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(value)"
@@ -145,7 +145,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 			case v3.TimeAggregationRate, v3.TimeAggregationIncrease: // only these two options give meaningful results
 				aggregationColumn = "sum(value)"
 			}
-		case constants.O11Y_SAMPLES_V4_AGG_5M_TABLENAME, constants.O11Y_SAMPLES_V4_AGG_30M_TABLENAME:
+		case telemetrymetrics.Metric5mTableName, telemetrymetrics.Metric30mTableName:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(last)"
@@ -168,7 +168,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 		// for cumulative metrics, we only support `RATE`/`INCREASE`. The max value in window is
 		// used to calculate the sum which is then divided by the window size to get the rate
 		switch tableName {
-		case constants.O11Y_SAMPLES_V4_TABLENAME:
+		case telemetrymetrics.MetricTableName:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(value)"
@@ -187,7 +187,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 			case v3.TimeAggregationRate, v3.TimeAggregationIncrease: // only these two options give meaningful results
 				aggregationColumn = "max(value)"
 			}
-		case constants.O11Y_SAMPLES_V4_AGG_5M_TABLENAME, constants.O11Y_SAMPLES_V4_AGG_30M_TABLENAME:
+		case telemetrymetrics.Metric5mTableName, telemetrymetrics.Metric30mTableName:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(last)"
@@ -208,7 +208,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 		}
 	case v3.Unspecified:
 		switch tableName {
-		case constants.O11Y_SAMPLES_V4_TABLENAME:
+		case telemetrymetrics.MetricTableName:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(value)"
@@ -227,7 +227,7 @@ func AggregationColumnForSamplesTable(start, end int64, mq *v3.BuilderQuery) str
 			case v3.TimeAggregationRate, v3.TimeAggregationIncrease: // ideally, this should never happen
 				aggregationColumn = "sum(value)"
 			}
-		case constants.O11Y_SAMPLES_V4_AGG_5M_TABLENAME, constants.O11Y_SAMPLES_V4_AGG_30M_TABLENAME:
+		case telemetrymetrics.Metric5mTableName, telemetrymetrics.Metric30mTableName:
 			switch mq.TimeAggregation {
 			case v3.TimeAggregationAnyLast:
 				aggregationColumn = "anyLast(last)"
@@ -338,7 +338,7 @@ func PrepareTimeseriesFilterQuery(start, end int64, mq *v3.BuilderQuery) (string
 	filterSubQuery := fmt.Sprintf(
 		"SELECT DISTINCT %s FROM %s.%s WHERE %s",
 		selectLabels,
-		constants.O11Y_METRIC_DBNAME,
+		telemetrymetrics.DBName,
 		tableName,
 		whereClause,
 	)
@@ -428,7 +428,7 @@ func PrepareTimeseriesFilterQueryV3(start, end int64, mq *v3.BuilderQuery) (stri
 	filterSubQuery := fmt.Sprintf(
 		"SELECT DISTINCT %s FROM %s.%s WHERE %s",
 		selectLabels,
-		constants.O11Y_METRIC_DBNAME,
+		telemetrymetrics.DBName,
 		tableName,
 		whereClause,
 	)
@@ -437,7 +437,7 @@ func PrepareTimeseriesFilterQueryV3(start, end int64, mq *v3.BuilderQuery) (stri
 }
 
 func AddFlagsFilters(samplesTableFilter string, tableName string) string {
-	if tableName == constants.O11Y_SAMPLES_V4_TABLENAME || tableName == constants.O11Y_SAMPLES_V4_LOCAL_TABLENAME || tableName == constants.O11Y_EXP_HISTOGRAM_TABLENAME || tableName == constants.O11Y_EXP_HISTOGRAM_LOCAL_TABLENAME {
+	if tableName == telemetrymetrics.MetricTableName || tableName == telemetrymetrics.MetricLocalTableName || tableName == telemetrymetrics.HistogramTableName || tableName == telemetrymetrics.HistogramLocalTableName {
 		samplesTableFilter = fmt.Sprintf("%s AND %s", samplesTableFilter, "bitAnd(flags, 1) = 0")
 	}
 	return samplesTableFilter

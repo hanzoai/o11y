@@ -8,15 +8,18 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
-// Module is the native error/crash tracking surface (Sentry-class Issues) folded
-// into the o11y plane. Occurrences are OTel exception data in the telemetry store;
-// this module owns the grouped-Issue lifecycle over that data and the ingest that
-// normalizes Sentry-SDK reports into it.
+// Module owns the grouped-Issue lifecycle over captured errors: the mutable state per
+// (org, group) that cannot be derived from the facts themselves — status, assignee,
+// counts, regression. The facts are event.error rows.
+//
+// It does not accept wire traffic. Errors enter through the ONE ingest face,
+// /v1/sentry, which writes event.error and then calls Ingest here to fold the batch
+// into its issues. One writer per table.
 type Module interface {
 	// Ingest groups a BATCH of normalized occurrences into the caller's org (resolved
-	// from the DSN by the handler): occurrences are collapsed by fingerprint and
-	// upserted in one transaction under the per-org issue ceiling, bounding the write
-	// amplification of a single request. Returns issues written.
+	// from the DSN by the Sentry ingest handler): occurrences are collapsed by
+	// fingerprint and upserted in one transaction under the per-org issue ceiling,
+	// bounding the write amplification of a single request. Returns issues written.
 	Ingest(ctx context.Context, orgID valuer.UUID, occs []*errortrackingtypes.Occurrence) (int, error)
 
 	ListIssues(ctx context.Context, orgID valuer.UUID, q *errortrackingtypes.IssuesQuery) ([]*errortrackingtypes.Issue, int, error)
@@ -24,17 +27,10 @@ type Module interface {
 	UpdateIssue(ctx context.Context, orgID, id valuer.UUID, in *errortrackingtypes.UpdateIssue) (*errortrackingtypes.Issue, error)
 }
 
-// Handler is the HTTP surface. The ingest endpoints are PUBLIC (OpenAccess) and
-// authenticate the Sentry DSN key in-handler; the read endpoints are behind the
-// shared Hanzo IAM authz middleware and are org-scoped from the validated claims.
+// Handler is the read surface: the Issues list/detail/update the console Errors tab
+// consumes. Every endpoint is behind the shared Hanzo IAM authz middleware and is
+// org-scoped from the validated claims.
 type Handler interface {
-	// EnvelopeIngest accepts the modern Sentry envelope wire format
-	// (POST /api/{project}/envelope/).
-	EnvelopeIngest(rw http.ResponseWriter, r *http.Request)
-	// StoreIngest accepts the legacy single-event wire format
-	// (POST /api/{project}/store/).
-	StoreIngest(rw http.ResponseWriter, r *http.Request)
-
 	ListIssues(rw http.ResponseWriter, r *http.Request)
 	GetIssue(rw http.ResponseWriter, r *http.Request)
 	UpdateIssue(rw http.ResponseWriter, r *http.Request)

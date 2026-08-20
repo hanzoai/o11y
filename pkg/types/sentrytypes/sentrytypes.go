@@ -3,9 +3,15 @@
 // the shared observability substrate rather than reforking it:
 //
 //   - Projects are the DSN-bearing unit under an IAM org (relational lifecycle).
-//   - Raw error EVENTS are columnar rows on the ONE datastore (high-volume, queried
-//     by Discover / events / stats / logs / traces).
+//   - Raw error EVENTS are rows of event.error, the ONE error table on the shared
+//     datastore (queried by Discover / events / stats / logs / traces).
 //   - Grouped ISSUE lifecycle stays in o11y_issues (errortracking, reused verbatim).
+//
+// event.error carries the same 15-column envelope as event.event / event.log /
+// event.span, so a Sentry field is the envelope's field wherever one exists: the org
+// is the tenant, the project is the envelope's product, the event id is the id, and
+// the error group is the group. Cross-signal correlation is then a UNION ALL rather
+// than a translation layer.
 //
 // Every read is org-scoped from the validated IAM principal; the client never names
 // its own tenant. A project param is always validated against the caller's org
@@ -82,11 +88,27 @@ type GettableProjects struct {
 	Total int                `json:"total" required:"true"`
 }
 
-// Event is one columnar error occurrence on the datastore events plane. It carries
-// exactly the fields Discover / events / stats / logs / traces need, org+project
-// scoped and timestamp-bucketed. It is the realized "raw error events" sink the
-// errortracking OccurrenceSink note deferred (that seam was org-only; the events
-// plane needs the project dimension, so it lives here in the product face).
+// Frame is one stack frame of an error. Frames are stored as parallel arrays on
+// event.error (frames.function / .file / .line / .column / .own), so "which function
+// throws most often" is a GROUP BY rather than a JSON scan.
+type Frame struct {
+	Function string `json:"function,omitempty"`
+	File     string `json:"file,omitempty"`
+	Line     uint32 `json:"line,omitempty"`
+	Column   uint32 `json:"column,omitempty"`
+	// Own marks a frame in the reporting application's own code, as opposed to a
+	// dependency or an injected browser extension.
+	Own bool `json:"own"`
+}
+
+// Event is one error occurrence — a row of event.error. It carries exactly the fields
+// Discover / events / stats / logs / traces need, org+project scoped and time-bucketed.
+//
+// Two fields the pre-event.error shape carried are deliberately gone:
+//
+//   - value duplicated message on every stored row, so message is the one field.
+//   - sample was an opaque JSON blob of the whole occurrence, which made stack frames
+//     unqueryable. Frames replaces it with queryable columns.
 type Event struct {
 	OrgID       string            `json:"orgId"`
 	ProjectID   string            `json:"projectId"`
@@ -95,10 +117,10 @@ type Event struct {
 	ReceivedAt  time.Time         `json:"receivedAt"`
 	Level       string            `json:"level"`
 	Type        string            `json:"type"`
-	Value       string            `json:"value"`
 	Message     string            `json:"message"`
 	Culprit     string            `json:"culprit"`
 	Fingerprint string            `json:"fingerprint"`
+	Handled     bool              `json:"handled"`
 	Platform    string            `json:"platform,omitempty"`
 	Environment string            `json:"environment,omitempty"`
 	Release     string            `json:"release,omitempty"`
@@ -111,7 +133,7 @@ type Event struct {
 	UserEmail   string            `json:"userEmail,omitempty"`
 	UserIP      string            `json:"userIp,omitempty"`
 	Tags        map[string]string `json:"tags,omitempty"`
-	Sample      string            `json:"-"` // full normalized Occurrence JSON, for event detail
+	Frames      []Frame           `json:"frames,omitempty"`
 }
 
 // Window is a resolved absolute time range [From, To]. Every columnar read is bounded
@@ -156,11 +178,12 @@ type StatsPoint struct {
 }
 
 // TraceSummary is an error-correlated trace: the trace id plus the count and span of
-// captured error events that referenced it, for the project.
+// captured error events that referenced it, for the project. Message is the latest
+// error message on the trace, so a trace list reads without a second query.
 type TraceSummary struct {
 	TraceID   string    `json:"traceId"`
 	Count     uint64    `json:"count"`
 	FirstSeen time.Time `json:"firstSeen"`
 	LastSeen  time.Time `json:"lastSeen"`
-	Sample    string    `json:"sample,omitempty"`
+	Message   string    `json:"message,omitempty"`
 }

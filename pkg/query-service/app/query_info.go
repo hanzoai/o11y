@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/telemetrysignal"
+
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
@@ -68,15 +70,10 @@ func NewQueryInfoResult(postData *v3.QueryRangeParamsV3, version string) QueryIn
 		}
 	} else if postData.CompositeQuery.QueryType == v3.QueryTypeDatastoreSQL {
 		for _, query := range postData.CompositeQuery.DatastoreQueries {
-			if strings.Contains(query.Query, "o11y_metrics") && len(query.Query) > 0 {
-				queryInfoResult.MetricsUsed = true
-			}
-			if strings.Contains(query.Query, "o11y_logs") && len(query.Query) > 0 {
-				queryInfoResult.LogsUsed = true
-			}
-			if strings.Contains(query.Query, "o11y_traces") && len(query.Query) > 0 {
-				queryInfoResult.TracesUsed = true
-			}
+			metrics, logs, traces := telemetrysignal.Used(query.Query)
+			queryInfoResult.MetricsUsed = queryInfoResult.MetricsUsed || metrics
+			queryInfoResult.LogsUsed = queryInfoResult.LogsUsed || logs
+			queryInfoResult.TracesUsed = queryInfoResult.TracesUsed || traces
 		}
 	}
 

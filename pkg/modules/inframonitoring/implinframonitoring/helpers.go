@@ -377,7 +377,7 @@ func (m *module) buildSamplesTblFingerprintSubQuery(metricNames []string, sample
 func (m *module) buildReducedSamplesTblFingerprintSubQuery(metricNames []string, flooredStart, flooredEnd uint64) *sqlbuilder.SelectBuilder {
 	lastSB := sqlbuilder.NewSelectBuilder()
 	lastSB.Select("reduced_fingerprint")
-	lastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedLastTableName))
+	lastSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricReducedLastTableName))
 	lastSB.Where(
 		lastSB.In("metric_name", sqlbuilder.List(metricNames)),
 		lastSB.GE("unix_milli", flooredStart),
@@ -386,7 +386,7 @@ func (m *module) buildReducedSamplesTblFingerprintSubQuery(metricNames []string,
 
 	sumSB := sqlbuilder.NewSelectBuilder()
 	sumSB.Select("reduced_fingerprint")
-	sumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SamplesV4ReducedSumTableName))
+	sumSB.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.MetricReducedSumTableName))
 	sumSB.Where(
 		sumSB.In("metric_name", sqlbuilder.List(metricNames)),
 		sumSB.GE("unix_milli", flooredStart),
@@ -442,7 +442,7 @@ func (m *module) buildFilterClause(ctx context.Context, filter *qbtypes.Filter, 
 	return whereClause.WhereClause, nil
 }
 
-// NOTE: this method is not specific to infra monitoring — it queries attributes_metadata generically.
+// NOTE: this method is not specific to infra monitoring — it queries the metric metadata generically.
 // Consider moving to telemetryMetaStore when a second use case emerges.
 //
 // getEarliestMetricTime returns the earliest first_reported_unix_milli across the
@@ -455,7 +455,7 @@ func (m *module) getEarliestMetricTime(ctx context.Context, metricNames []string
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("min(first_reported_unix_milli) AS min_first_reported")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(sb.In("metric_name", sqlbuilder.List(metricNames)))
 
 	query, args := sb.BuildWithFlavor(datastoresql.Flavor)
@@ -469,7 +469,7 @@ func (m *module) getEarliestMetricTime(ctx context.Context, metricNames []string
 }
 
 // getMetricsExistence returns, for each requested metric name, whether it has ever
-// been reported (present in o11y_metrics.distributed_metadata). No time window.
+// been reported (present in the metric metadata). No time window.
 func (m *module) getMetricsExistence(ctx context.Context, metricNames []string) (map[string]bool, error) {
 	present := make(map[string]bool, len(metricNames))
 	for _, n := range metricNames {
@@ -481,7 +481,7 @@ func (m *module) getMetricsExistence(ctx context.Context, metricNames []string) 
 
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("metric_name", "count(*) AS cnt")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(sb.In("metric_name", sqlbuilder.List(metricNames)))
 	sb.GroupBy("metric_name")
 
@@ -512,7 +512,7 @@ func (m *module) getMetricsExistence(ctx context.Context, metricNames []string) 
 
 // getAttributesExistence returns, for each requested attrName, whether it has ever
 // been reported as a label on any of the given metricNames. Presence is checked
-// against distributed_metadata without a time-range filter.
+// against the metric metadata without a time-range filter.
 func (m *module) getAttributesExistence(ctx context.Context, metricNames, attrNames []string) (map[string]bool, error) {
 	present := make(map[string]bool, len(attrNames))
 	for _, a := range attrNames {
@@ -526,7 +526,7 @@ func (m *module) getAttributesExistence(ctx context.Context, metricNames, attrNa
 	}
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("attr_name", "count(*) AS cnt")
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributesMetadataTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.AttributeTableName))
 	sb.Where(
 		sb.In("metric_name", sqlbuilder.List(metricNames)),
 		sb.In("attr_name", sqlbuilder.List(attrNames)),
@@ -646,7 +646,7 @@ func (m *module) getMetadata(
 
 		reducedSrc := sqlbuilder.NewSelectBuilder()
 		reducedSrc.Select("labels", "unix_milli")
-		reducedSrc.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.TimeseriesV4ReducedTableName))
+		reducedSrc.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesReducedTableName))
 		reducedSrc.Where(
 			reducedSrc.In("metric_name", sqlbuilder.List(metricNames)),
 			reducedSrc.GE("unix_milli", tsAdjustedStartMs),

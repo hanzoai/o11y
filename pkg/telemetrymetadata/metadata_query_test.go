@@ -43,25 +43,25 @@ func TestGetFirstSeenFromMetricMetadata(t *testing.T) {
 		instrumentationtest.New().ToProviderSettings(),
 		mockTelemetryStore,
 		telemetrytraces.DBName,
-		telemetrytraces.TagAttributesV2TableName,
-		telemetrytraces.SpanAttributesKeysTblName,
-		telemetrytraces.SpanIndexV3TableName,
+		telemetrytraces.SpanAttributeTableName,
+		telemetrytraces.SpanKeyTableName,
+		telemetrytraces.SpanTableName,
 		telemetrymetrics.DBName,
-		telemetrymetrics.AttributesMetadataTableName,
+		telemetrymetrics.AttributeTableName,
 		telemetrymeter.DBName,
 		telemetrymeter.SamplesAgg1dTableName,
 		telemetrylogs.DBName,
-		telemetrylogs.LogsV2TableName,
-		telemetrylogs.TagAttributesV2TableName,
-		telemetrylogs.LogAttributeKeysTblName,
-		telemetrylogs.LogResourceKeysTblName,
+		telemetrylogs.LogTableName,
+		telemetrylogs.LogAttributeTableName,
+		telemetrylogs.LogKeyTableName,
+		telemetrylogs.LogResourceKeyTableName,
 		telemetryaudit.DBName,
 		telemetryaudit.AuditLogsTableName,
 		telemetryaudit.TagAttributesTableName,
 		telemetryaudit.LogAttributeKeysTblName,
 		telemetryaudit.LogResourceKeysTblName,
 		DBName,
-		AttributesMetadataLocalTableName,
+		AttributeLocalTableName,
 		ColumnEvolutionMetadataTableName,
 		flaggertest.New(t),
 	)
@@ -83,7 +83,7 @@ func TestGetFirstSeenFromMetricMetadata(t *testing.T) {
 	// the structure should lead to:
 	// SELECT ... WHERE (metric_name, attr_name, attr_string_value) IN ((?, ?, ?), (?, ?, ?)) ...
 
-	expectedQuery := `SELECT metric_name, attr_name, attr_string_value, min\(first_reported_unix_milli\) AS first_seen FROM o11y_metrics.distributed_metadata WHERE \(metric_name, attr_name, attr_string_value\) IN \(\(\?, \?, \?\), \(\?, \?, \?\)\) GROUP BY metric_name, attr_name, attr_string_value ORDER BY first_seen`
+	expectedQuery := `SELECT metric_name, attr_name, attr_string_value, min\(first_reported_unix_milli\) AS first_seen FROM event.metric_attribute WHERE \(metric_name, attr_name, attr_string_value\) IN \(\(\?, \?, \?\), \(\?, \?, \?\)\) GROUP BY metric_name, attr_name, attr_string_value ORDER BY first_seen`
 
 	// Note: regexMatcher uses regexp.MatchString, so we escape parens and ?
 
