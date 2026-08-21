@@ -127,7 +127,7 @@ func TestEveryAPIServerRouteIsRegistered(t *testing.T) {
 	for _, route := range table {
 		switch {
 		case strings.HasPrefix(route.Path, "/v1/o11y"):
-		case strings.HasPrefix(route.Path, "/v1/sentinel"):
+		case strings.HasPrefix(route.Path, "/v1/o11y/sentinel"):
 		case strings.HasPrefix(route.Path, "/v1/event"):
 		default:
 			t.Errorf("%s %s is on none of the public roots", route.Method, route.Path)

@@ -33,7 +33,7 @@ func (n named) Handler(method, path string) http.Handler { return n[method+" "+p
 
 // TestByNameArrivesWhereMatchingDid IS THE A/B, and it is exact.
 //
-// Both designs are driven over the same 367 addresses with the same requests.
+// Both designs are driven over the same 366 addresses with the same requests.
 // The old one hands every call to a single handler with a ROUTER behind it and
 // lets the path be matched a second time; the new one looks the address up and
 // calls the handler. The two must deliver the same calls to the same paths, or
@@ -192,7 +192,7 @@ func TestNoRuntimeSaysSo(t *testing.T) {
 // In the standalone server that seam was empty. The runtime could not install
 // itself as one handler without an op relaying into the router it was already
 // being served by, so it installed nothing, and every one of those 353 tools and
-// commands answered 503 in the binary that holds all 367 handlers. Naming the
+// commands answered 503 in the binary that holds all 366 handlers. Naming the
 // address is what makes the same process able to answer its own declaration:
 // SetRuntime takes the route table, and a call by name resolves to the handler
 // registered at the op's address.

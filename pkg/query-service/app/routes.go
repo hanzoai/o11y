@@ -68,12 +68,6 @@ func (aH *APIHandler) RegisterInfraMetricsRoutes(router routing.Router, am *midd
 	aH.mountInfraOnboarding(router, am)
 }
 
-// RegisterWebSocketPaths mounts the non-/v1/o11y websocket surface. 1 route.
-func (aH *APIHandler) RegisterWebSocketPaths(router routing.Router, am *middleware.AuthZ) {
-	subRouter := router.Group("/ws")
-	aH.mountWebSocketQueryProgress(subRouter, am)
-}
-
 // RegisterQueryRangeV4Routes mounts metric metadata. 1 route.
 func (aH *APIHandler) RegisterQueryRangeV4Routes(router routing.Router, am *middleware.AuthZ) {
 	subRouter := router.Group("/v1/o11y")

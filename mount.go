@@ -40,8 +40,8 @@ import (
 // installed they 503 with a clear error rather than pretending.
 //
 // EVERY ROUTE IS NAMED. There is no /v1/o11y/* catch-all any more. The runtime
-// registers 367 method+path pairs; 356 of them are typed ops declared in the
-// slice files below, and the remaining 11 are registered one by one in
+// registers 366 method+path pairs; 356 of them are typed ops declared in the
+// slice files below, and the remaining 10 are registered one by one in
 // mountHatches with the reason each cannot be typed written next to it. A
 // catch-all hides the difference between "converted" and "not converted" — the
 // dark-slice defect this package already shipped once was invisible precisely
@@ -164,12 +164,12 @@ func Mount(app *zip.App, opts ...Option) error {
 	// The TYPED span-mapper ops — the ingest-time rules that move or copy span
 	// attributes into resource attributes; see spanmappers.go.
 	mountSpanMappers(app)
-	// And the eleven that cannot be typed, each named and justified.
+	// And the ten that cannot be typed, each named and justified.
 	mountHatches(app)
 	return nil
 }
 
-// mountHatches registers the ELEVEN routes that cannot be typed ops, one route
+// mountHatches registers the TEN routes that cannot be typed ops, one route
 // literal each, with the reason next to it. This list is meant to shrink and is
 // meant to be hard to grow: adding to it costs a justification in review, where
 // a catch-all cost nothing.
@@ -181,11 +181,16 @@ func Mount(app *zip.App, opts ...Option) error {
 // than being absent from it — a generated client that trusts a false contract
 // fails at the customer, not at review.
 //
-// Three of these eleven sit OUTSIDE /v1/o11y — /ws/query_progress and the two
-// ingest routes on eventRoot — which is the second thing a wildcard hides. A
-// catch-all on one root cannot reach a route on another, so it does not merely
-// obscure which routes are un-typed, it obscures which are missing: those three
-// were unreachable from the composed binary until every route was named.
+// Two of these ten sit OUTSIDE /v1/o11y — the ingest routes on eventRoot —
+// which is the second thing a wildcard hides. A catch-all on one root cannot
+// reach a route on another, so it does not merely obscure which routes are
+// un-typed, it obscures which are missing: both were unreachable from the
+// composed binary until every route was named.
+//
+// It was three, and the third is gone rather than moved: /ws/query_progress was
+// the same read as o11yRoot+"/query_progress" over an Upgrade, and one read at
+// two addresses is one address too many. The Upgrade is a property of the
+// request, so both protocols answer at the /v1/o11y address now.
 func mountHatches(app *zip.App) {
 	// ── 1. STREAMS: there is no one answer to name ───────────────────────────
 	// These never produce a single complete JSON value. relay buffers a whole
@@ -194,8 +199,7 @@ func mountHatches(app *zip.App) {
 	// return only after the query it reports on had already finished — which is
 	// the one thing a progress endpoint must not do.
 	route(app, http.MethodGet, o11yRoot+"/logs/livetail")    // unbounded stream of log records
-	route(app, http.MethodGet, o11yRoot+"/query_progress")   // long-poll: holds the connection until the next tick
-	route(app, http.MethodGet, "/ws/query_progress")         // the same read over a websocket; the Upgrade IS the contract
+	route(app, http.MethodGet, o11yRoot+"/query_progress")   // progress: a long poll, or a websocket when the caller upgrades
 	route(app, http.MethodPost, o11yRoot+"/export_raw_data") // chunked CSV/JSONL attachment, X-Response-Complete trailer
 
 	// ── 2. REDIRECTS: the answer is a Location, not a body ───────────────────

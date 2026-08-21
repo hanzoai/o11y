@@ -116,14 +116,14 @@ func TestLogsAnswerIsTheRuntimeAnswer(t *testing.T) {
 	app := mounted(t)
 	wrote, asked := runtime(t, map[string]any{"items": []*sentrytypes.Event{full()}})
 
-	status, got := call(t, app, member(http.MethodGet, "/v1/sentinel/logs?project=p1&query=is+not&period=24h&limit=50", nil))
+	status, got := call(t, app, member(http.MethodGet, "/v1/o11y/sentinel/logs?project=p1&query=is+not&period=24h&limit=50", nil))
 	if status != http.StatusOK {
 		t.Fatalf("status=%d body=%s, want 200", status, got)
 	}
 	if !bytes.Equal(got, *wrote) {
 		t.Fatalf("the op changed the bytes.\n runtime: %s\n op:      %s", *wrote, got)
 	}
-	if r := *asked; r.URL.Path != "/v1/sentinel/logs" ||
+	if r := *asked; r.URL.Path != "/v1/o11y/sentinel/logs" ||
 		r.URL.Query().Get("project") != "p1" || r.URL.Query().Get("query") != "is not" ||
 		r.URL.Query().Get("period") != "24h" || r.URL.Query().Get("limit") != "50" {
 		t.Fatalf("runtime was asked %s?%s, want the caller's own inputs", r.URL.Path, r.URL.RawQuery)
@@ -138,14 +138,14 @@ func TestTracesAnswerIsTheRuntimeAnswer(t *testing.T) {
 		{TraceID: "t2", Count: 1, FirstSeen: at, LastSeen: at},
 	}})
 
-	status, got := call(t, app, member(http.MethodGet, "/v1/sentinel/traces?project=p1&period=7d&limit=25", nil))
+	status, got := call(t, app, member(http.MethodGet, "/v1/o11y/sentinel/traces?project=p1&period=7d&limit=25", nil))
 	if status != http.StatusOK {
 		t.Fatalf("status=%d body=%s, want 200", status, got)
 	}
 	if !bytes.Equal(got, *wrote) {
 		t.Fatalf("the op changed the bytes.\n runtime: %s\n op:      %s", *wrote, got)
 	}
-	if r := *asked; r.URL.Path != "/v1/sentinel/traces" || r.URL.Query().Get("limit") != "25" {
+	if r := *asked; r.URL.Path != "/v1/o11y/sentinel/traces" || r.URL.Query().Get("limit") != "25" {
 		t.Fatalf("runtime was asked %s?%s", r.URL.Path, r.URL.RawQuery)
 	}
 }
@@ -157,7 +157,7 @@ func TestTraceAnswerIsTheRuntimeAnswer(t *testing.T) {
 	app := mounted(t)
 	wrote, asked := runtime(t, map[string]any{"traceId": "t1/2", "events": []*sentrytypes.Event{full()}})
 
-	status, got := call(t, app, member(http.MethodGet, "/v1/sentinel/traces/t1%2F2?project=p1", nil))
+	status, got := call(t, app, member(http.MethodGet, "/v1/o11y/sentinel/traces/t1%2F2?project=p1", nil))
 	if status != http.StatusOK {
 		t.Fatalf("status=%d body=%s, want 200", status, got)
 	}
@@ -166,7 +166,7 @@ func TestTraceAnswerIsTheRuntimeAnswer(t *testing.T) {
 	}
 	// The trace id is a path segment, so it reaches the runtime escaped exactly
 	// as the caller wrote it.
-	if r := *asked; r.URL.EscapedPath() != "/v1/sentinel/traces/t1%2F2" {
+	if r := *asked; r.URL.EscapedPath() != "/v1/o11y/sentinel/traces/t1%2F2" {
 		t.Fatalf("runtime was asked %q, want the id kept whole", r.URL.EscapedPath())
 	}
 }
@@ -179,7 +179,7 @@ func TestStatsAnswerIsTheRuntimeAnswer(t *testing.T) {
 		{Time: at.Add(time.Hour), Value: 0},
 	}})
 
-	status, got := call(t, app, member(http.MethodGet, "/v1/sentinel/stats?project=p1&field=level&period=24h", nil))
+	status, got := call(t, app, member(http.MethodGet, "/v1/o11y/sentinel/stats?project=p1&field=level&period=24h", nil))
 	if status != http.StatusOK {
 		t.Fatalf("status=%d body=%s, want 200", status, got)
 	}
@@ -202,7 +202,7 @@ func TestDiscoverAnswerIsTheRuntimeAnswer(t *testing.T) {
 
 	sent := `{"project":"p1","filters":[{"field":"level","op":"eq","value":"error"}],` +
 		`"aggregations":["count"],"groupBy":["level"],"period":"24h","orderBy":"count","orderDir":"desc","limit":10}`
-	status, got := call(t, app, member(http.MethodPost, "/v1/sentinel/discover", strings.NewReader(sent)))
+	status, got := call(t, app, member(http.MethodPost, "/v1/o11y/sentinel/discover", strings.NewReader(sent)))
 	if status != http.StatusOK {
 		t.Fatalf("status=%d body=%s, want 200", status, got)
 	}
@@ -238,7 +238,7 @@ func TestIdentityIsPropagated(t *testing.T) {
 	app := mounted(t)
 	_, asked := runtime(t, map[string]any{"items": []*sentrytypes.Event{}})
 
-	r := member(http.MethodGet, "/v1/sentinel/logs?project=p1", nil)
+	r := member(http.MethodGet, "/v1/o11y/sentinel/logs?project=p1", nil)
 	r.Header.Set(zip.HeaderUserAdmin, "true")
 	r.Header.Set(zip.HeaderProject, "proj-9")
 	if status, body := call(t, app, r); status != http.StatusOK {
@@ -278,7 +278,7 @@ func TestRefusalKeepsTheRuntimeStatus(t *testing.T) {
 			})))
 			t.Cleanup(func() { o11y.SetRuntime(nil) })
 
-			status, got := call(t, app, member(http.MethodGet, "/v1/sentinel/logs?project=p1", nil))
+			status, got := call(t, app, member(http.MethodGet, "/v1/o11y/sentinel/logs?project=p1", nil))
 			if status != tc.status {
 				t.Fatalf("status=%d, want %d (the runtime's own)", status, tc.status)
 			}
@@ -296,10 +296,10 @@ func TestTelemetryFailsClosedWithoutARuntime(t *testing.T) {
 	o11y.SetRuntime(nil)
 
 	for _, target := range []string{
-		"/v1/sentinel/logs?project=p1",
-		"/v1/sentinel/traces?project=p1",
-		"/v1/sentinel/traces/t1?project=p1",
-		"/v1/sentinel/stats?project=p1",
+		"/v1/o11y/sentinel/logs?project=p1",
+		"/v1/o11y/sentinel/traces?project=p1",
+		"/v1/o11y/sentinel/traces/t1?project=p1",
+		"/v1/o11y/sentinel/stats?project=p1",
 	} {
 		if status, body := call(t, app, member(http.MethodGet, target, nil)); status != http.StatusServiceUnavailable {
 			t.Errorf("%s: status=%d body=%s, want 503", target, status, body)
@@ -313,7 +313,7 @@ func TestProjectIsMandatory(t *testing.T) {
 	app := mounted(t)
 	runtime(t, map[string]any{"items": []*sentrytypes.Event{}})
 
-	if status, body := call(t, app, member(http.MethodGet, "/v1/sentinel/logs", nil)); status != http.StatusBadRequest {
+	if status, body := call(t, app, member(http.MethodGet, "/v1/o11y/sentinel/logs", nil)); status != http.StatusBadRequest {
 		t.Fatalf("status=%d body=%s, want 400", status, body)
 	}
 }
@@ -332,17 +332,17 @@ func TestProjectIsMandatory(t *testing.T) {
 func TestTelemetryRoutesAreTheSameFive(t *testing.T) {
 	app := mounted(t)
 	want := map[string]bool{
-		"POST /v1/sentinel/discover":  true,
-		"GET /v1/sentinel/logs":       true,
-		"GET /v1/sentinel/traces":     true,
-		"GET /v1/sentinel/traces/:id": true,
-		"GET /v1/sentinel/stats":      true,
+		"POST /v1/o11y/sentinel/discover":  true,
+		"GET /v1/o11y/sentinel/logs":       true,
+		"GET /v1/o11y/sentinel/traces":     true,
+		"GET /v1/o11y/sentinel/traces/:id": true,
+		"GET /v1/o11y/sentinel/stats":      true,
 	}
 	got := map[string]bool{}
 	for _, r := range app.Fiber().GetRoutes(true) {
-		// /v1/sentinel is shared: THIS face owns the telemetry reads (discover, logs,
+		// /v1/o11y/sentinel is shared: THIS face owns the telemetry reads (discover, logs,
 		// traces, trace/:id, stats); sentryerrors.go owns projects and issues/*.
-		if strings.HasPrefix(r.Path, "/v1/sentinel") &&
+		if strings.HasPrefix(r.Path, "/v1/o11y/sentinel") &&
 			!strings.Contains(r.Path, "/projects") && !strings.Contains(r.Path, "/issues") &&
 			!strings.Contains(r.Path, "/events/") &&
 			r.Method != http.MethodHead && r.Method != http.MethodOptions {
@@ -370,7 +370,7 @@ func TestTelemetryRoutesAreTheSameFive(t *testing.T) {
 func TestTheFaceIsGatedWholesale(t *testing.T) {
 	for route := range registered(t, mounted(t)) {
 		method, path, _ := strings.Cut(route, " ")
-		if strings.HasPrefix(path, "/v1/sentinel") && o11y.Anonymous(method, path) {
+		if strings.HasPrefix(path, "/v1/o11y/sentinel") && o11y.Anonymous(method, path) {
 			t.Errorf("%s is on the face and answers a caller with no principal", route)
 		}
 	}
@@ -399,7 +399,7 @@ func TestTheIngestDoorIsANamedHatch(t *testing.T) {
 
 	// ...and the typed reads next to it still dispatch as ops.
 	runtime(t, map[string]any{"items": []*sentrytypes.Event{}})
-	if status, body := call(t, app, member(http.MethodGet, "/v1/sentinel/logs?project=p1", nil)); status != http.StatusOK {
+	if status, body := call(t, app, member(http.MethodGet, "/v1/o11y/sentinel/logs?project=p1", nil)); status != http.StatusOK {
 		t.Fatalf("the typed op did not answer: status=%d %s", status, body)
 	}
 }
@@ -431,11 +431,11 @@ func TestTelemetryReachesTheDocument(t *testing.T) {
 	}
 
 	for path, method := range map[string]string{
-		"/v1/sentinel/discover":    "post",
-		"/v1/sentinel/logs":        "get",
-		"/v1/sentinel/traces":      "get",
-		"/v1/sentinel/traces/{id}": "get",
-		"/v1/sentinel/stats":       "get",
+		"/v1/o11y/sentinel/discover":    "post",
+		"/v1/o11y/sentinel/logs":        "get",
+		"/v1/o11y/sentinel/traces":      "get",
+		"/v1/o11y/sentinel/traces/{id}": "get",
+		"/v1/o11y/sentinel/stats":       "get",
 	} {
 		op, ok := spec.Paths[path][method]
 		if !ok {

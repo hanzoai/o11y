@@ -2,8 +2,8 @@ package o11y
 
 // THE SEAM, AND WHY IT IS A NAME AND NOT A HANDLER.
 //
-// This table DECLARES 367 addresses. The o11y runtime — telemetry stores, rule
-// manager, opamp, the query engine — IMPLEMENTS the same 367. The declaration is
+// This table DECLARES 366 addresses. The o11y runtime — telemetry stores, rule
+// manager, opamp, the query engine — IMPLEMENTS the same 366. The declaration is
 // not a second implementation (that is the whole discipline: an op names the
 // wire, it does not re-serve it), so every op has to reach the implementation,
 // and the shape of that reach is the design decision.
@@ -29,7 +29,7 @@ package o11y
 //     could not install itself as that one handler without an op relaying into the
 //     router it was already being served by. So it installed nothing — and every
 //     op on its /mcp tool surface and its by-name call plane answered 503, in the
-//     binary that has all 367 handlers in memory. The declaration was published
+//     binary that has all 366 handlers in memory. The declaration was published
 //     by a process that could not answer it.
 //
 // A [Runtime] answers BY NAME. It is what a route table already is — a map from

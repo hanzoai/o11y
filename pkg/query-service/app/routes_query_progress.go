@@ -5,26 +5,24 @@ import (
 	"github.com/hanzoai/o11y/pkg/http/routing"
 )
 
-// Query progress streaming. 2 routes, one handler, two mount points — the
-// long-poll path under /v1/o11y and the websocket path under /ws. They are in
-// one file so the pair is retired together.
+// Query progress streaming. 1 route, one handler, one mount point.
 //
-// ESCAPE HATCH. Both are deliberately NOT typed query-core ops: GetQueryProgressUpdates
-// upgrades the connection to a websocket, and the query-core relay buffers a whole
-// answer through an httptest recorder that cannot hijack a connection — a typed
-// progress op would never complete the handshake. They stay where they are,
-// byte-identical; see the escape-hatch record in querycore.go.
+// It was two — the long-poll under /v1/o11y and a websocket under /ws — for one
+// handler that reads the same progress either way. The Upgrade is a property of
+// the REQUEST, not of the address: GetQueryProgressUpdates upgrades when the
+// caller asks and long-polls when it does not, so a second path bought a second
+// spelling of one read and nothing else. /ws was also the last address this
+// service answered outside /v1.
+//
+// ESCAPE HATCH. It is deliberately NOT a typed query-core op:
+// GetQueryProgressUpdates upgrades the connection to a websocket, and the
+// query-core relay buffers a whole answer through an httptest recorder that
+// cannot hijack a connection — a typed progress op would never complete the
+// handshake. It stays a hatch, byte-identical; see the escape-hatch record in
+// querycore.go.
 
-// mountQueryProgress registers the /v1/o11y long-poll path on the shared
-// subrouter owned by RegisterQueryRangeV3Routes. 1 route.
-//
-// TODO(Raj): Remove this handler after /ws based path has been completely rolled out.
+// mountQueryProgress registers the progress path on the shared /v1/o11y
+// subrouter owned by RegisterQueryRangeV3Routes. 1 route, both protocols.
 func (aH *APIHandler) mountQueryProgress(subRouter routing.Router, am *middleware.AuthZ) {
-	subRouter.Get("/query_progress", am.ViewAccess(aH.GetQueryProgressUpdates))
-}
-
-// mountWebSocketQueryProgress registers the websocket path on the /ws
-// subrouter owned by RegisterWebSocketPaths. 1 route.
-func (aH *APIHandler) mountWebSocketQueryProgress(subRouter routing.Router, am *middleware.AuthZ) {
 	subRouter.Get("/query_progress", am.ViewAccess(aH.GetQueryProgressUpdates))
 }

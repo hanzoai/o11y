@@ -26,7 +26,7 @@ import (
 // HTML where JSON belonged" failure — and it is what this catch-all did, because
 // gorilla resumes the parent router when a subrouter's prefix matches but none
 // of its routes do, so every miss inside /v1/o11y fell through to here.
-var apiPrefixes = []string{"/v1", "/ws"}
+var apiPrefixes = []string{"/v1"}
 
 // provider serves the o11y console: the templated index shell, the built assets
 // beside it, and the shell again for any client-side route. A stdlib

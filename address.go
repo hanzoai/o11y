@@ -10,7 +10,7 @@ package o11y
 //	opGet(g, "/traces/:traceId", traceSpans)                    // the declaration
 //	relay(ctx, "GET", o11yRoot+"/traces/"+in.TraceID, …)        // the body
 //
-// Two spellings of one value, 367 times over, and the second one is what got
+// Two spellings of one value, 366 times over, and the second one is what got
 // requested — so the first could stop agreeing with it and never be contradicted.
 // It has: three of these addresses declare {traceId} where the runtime registered
 // {traceID}. A router matches by POSITION, so a parameter's name is invisible to

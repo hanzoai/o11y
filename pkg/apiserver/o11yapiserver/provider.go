@@ -275,7 +275,7 @@ func (provider *provider) AddToRouter(router routing.Router) {
 	provider.addLLMPricingRuleRoutes(router)
 	provider.addLLMObsRoutes(router)
 	provider.addErrorTrackingRoutes(router)
-	// Hanzo Sentry: the /v1/sentinel product face and the /v1/event ingest door.
+	// Hanzo Sentry: the /v1/o11y/sentinel product face and the /v1/event ingest door.
 	provider.addSentryRoutes(router)
 	provider.addTraceDetailRoutes(router)
 	provider.addRulerRoutes(router)

@@ -116,7 +116,7 @@ func init() {
 			"O11yDashboardIDIn.id": "ID is the resource id from the path.",
 		},
 	})
-	zip.Describe("DELETE /v1/sentinel/projects/:id", zip.Doc{
+	zip.Describe("DELETE /v1/o11y/sentinel/projects/:id", zip.Doc{
 		Description: "Deletes one Sentry project of the caller's org. Its DSN\nstops resolving immediately, so ingest for that id fails closed exactly as an\nunknown project does; retained events are not touched. Answers 204.\n\nCallers need the editor role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11ySentryProjectRef.id": "ID is the project id.",
@@ -2502,7 +2502,7 @@ func init() {
 			"O11yGettableHostOut.status": "Status is \"success\".",
 		},
 	})
-	zip.Describe("GET /v1/sentinel/events/:id", zip.Doc{
+	zip.Describe("GET /v1/o11y/sentinel/events/:id", zip.Doc{
 		Description: "Returns one captured error event of a project, by its id.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11yEvent.culprit":          "Culprit is where it came from — the function or route blamed for it.",
@@ -2541,7 +2541,7 @@ func init() {
 			"O11ySentryEventRef.project": "Project is the project the event belongs to, by its id. Required.",
 		},
 	})
-	zip.Describe("GET /v1/sentinel/issues", zip.Doc{
+	zip.Describe("GET /v1/o11y/sentinel/issues", zip.Doc{
 		Description: "Lists the caller's org's grouped error issues, optionally\nnarrowed to one project and one time window, and filtered by status, level,\nenvironment, service, a free-text query and a sort.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11yErrorIssue.assignee":        "Assignee is who the issue is assigned to.",
@@ -2581,7 +2581,7 @@ func init() {
 			"O11ySentryIssuesIn.status":      "Status narrows to one lifecycle state: unresolved, resolved or ignored.",
 		},
 	})
-	zip.Describe("GET /v1/sentinel/issues/:id", zip.Doc{
+	zip.Describe("GET /v1/o11y/sentinel/issues/:id", zip.Doc{
 		Description: "Returns one grouped issue of the caller's org with its latest\noccurrence sample.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11yErrorGettableIssue.issue":       "Issue is the lifecycle row.",
@@ -2639,7 +2639,7 @@ func init() {
 			"O11ySentryIssueRef.id":              "ID is the issue id.",
 		},
 	})
-	zip.Describe("GET /v1/sentinel/issues/:id/events", zip.Doc{
+	zip.Describe("GET /v1/o11y/sentinel/issues/:id/events", zip.Doc{
 		Description: "Lists one issue's captured occurrences, scoped to a project\n— a project is an isolation unit, so the caller declares which project's\noccurrences to read.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11yEvent.culprit":               "Culprit is where it came from — the function or route blamed for it.",
@@ -2680,7 +2680,7 @@ func init() {
 			"O11ySentryIssueEventsOut.status": "Status is \"success\".",
 		},
 	})
-	zip.Describe("GET /v1/sentinel/logs", zip.Doc{
+	zip.Describe("GET /v1/o11y/sentinel/logs", zip.Doc{
 		Description: "Lists a project's captured error events, newest first, optionally\nnarrowed to those whose message or exception text contains a search string.",
 		Fields: map[string]string{
 			"O11yEvent.culprit":     "Culprit is where it came from — the function or route blamed for it.",
@@ -2722,7 +2722,7 @@ func init() {
 			"O11yLogsOut.status":    "Status is \"success\".",
 		},
 	})
-	zip.Describe("GET /v1/sentinel/projects", zip.Doc{
+	zip.Describe("GET /v1/o11y/sentinel/projects", zip.Doc{
 		Description: "Lists the caller's org's Sentry projects, each with its\nfreshly-derived DSN.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11ySentryProject.createdAt":  "CreatedAt is when the project was created.",
@@ -2739,7 +2739,7 @@ func init() {
 			"O11ySentryProjectsOut.status": "Status is \"success\".",
 		},
 	})
-	zip.Describe("GET /v1/sentinel/projects/:id", zip.Doc{
+	zip.Describe("GET /v1/o11y/sentinel/projects/:id", zip.Doc{
 		Description: "Returns one Sentry project of the caller's org, DSN included.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11ySentryProject.createdAt": "CreatedAt is when the project was created.",
@@ -2755,7 +2755,7 @@ func init() {
 			"O11ySentryProjectRef.id":     "ID is the project id.",
 		},
 	})
-	zip.Describe("GET /v1/sentinel/stats", zip.Doc{
+	zip.Describe("GET /v1/o11y/sentinel/stats", zip.Doc{
 		Description: "Returns a project's event-rate timeseries: one bucket per interval over\nthe requested period, counting the events in it.",
 		Fields: map[string]string{
 			"O11yStat.time":       "Time is the start of the bucket.",
@@ -2768,7 +2768,7 @@ func init() {
 			"O11yStatsOut.status": "Status is \"success\".",
 		},
 	})
-	zip.Describe("GET /v1/sentinel/traces", zip.Doc{
+	zip.Describe("GET /v1/o11y/sentinel/traces", zip.Doc{
 		Description: "Lists the traces a project's captured errors reference, each with how\nmany errors landed on it, when they started and stopped, and the latest\nmessage seen — the entry point for \"which requests are failing\".",
 		Fields: map[string]string{
 			"O11yTrace.count":      "Count is how many captured errors carried it.",
@@ -2784,7 +2784,7 @@ func init() {
 			"O11yTracesOut.status": "Status is \"success\".",
 		},
 	})
-	zip.Describe("GET /v1/sentinel/traces/:id", zip.Doc{
+	zip.Describe("GET /v1/o11y/sentinel/traces/:id", zip.Doc{
 		Description: "Returns one trace's captured errors for a project — every error event\nthat carried the trace id, in the order the events plane holds them.",
 		Fields: map[string]string{
 			"O11yEvent.culprit":       "Culprit is where it came from — the function or route blamed for it.",
@@ -4914,7 +4914,7 @@ func init() {
 			"O11yDashboardVarsOut.status":           "Status is \"success\".",
 		},
 	})
-	zip.Describe("POST /v1/sentinel/discover", zip.Doc{
+	zip.Describe("POST /v1/o11y/sentinel/discover", zip.Doc{
 		Description: "Aggregates a project's captured errors into a table — the caller\nnames the filters, the groupings and the aggregations, and gets back the\ncolumns and rows they asked for.\n\nThe project is mandatory and is checked against the caller's own org before it\nscopes anything, so a project id belonging to someone else reads as absent\nrather than as data.",
 		Fields: map[string]string{
 			"O11yDiscoverIn.aggregations": "Aggregations are the measures to compute per group. Empty means a count.",
@@ -4934,7 +4934,7 @@ func init() {
 			"O11yTable.rows":              "Rows are the result rows, each as long as Columns.",
 		},
 	})
-	zip.Describe("POST /v1/sentinel/projects", zip.Doc{
+	zip.Describe("POST /v1/o11y/sentinel/projects", zip.Doc{
 		Description: "Creates a Sentry project under the caller's org and\nreturns it, DSN included. Only the name, and optionally a slug and platform,\nare the caller's to set; the org, id and key are server-assigned.\n\nCallers need the editor role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11ySentryPostableProject.name":     "Name is the project's display name. Required.",
@@ -4952,7 +4952,7 @@ func init() {
 			"O11ySentryProjectOut.status":        "Status is \"success\".",
 		},
 	})
-	zip.Describe("POST /v1/sentinel/projects/:id/keys/rotate", zip.Doc{
+	zip.Describe("POST /v1/o11y/sentinel/projects/:id/keys/rotate", zip.Doc{
 		Description: "Rotates a project's DSN key — bumping its rotation\nwatermark so keys below it stop verifying — and returns the project with its\nnew DSN.\n\nCallers need the editor role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11ySentryProject.createdAt": "CreatedAt is when the project was created.",
@@ -5376,7 +5376,7 @@ func init() {
 	zip.Describe("PUT /v1/o11y/zeus/profiles", zip.Doc{
 		Description: "Records the deployment's profile in Zeus — how the team uses\nobservability today and what they plan — overwriting any prior one. Admin\ngate.",
 	})
-	zip.Describe("PUT /v1/sentinel/issues/:id", zip.Doc{
+	zip.Describe("PUT /v1/o11y/sentinel/issues/:id", zip.Doc{
 		Description: "Changes an issue's lifecycle — resolve, ignore, reopen or\nassign — and returns the updated issue. Fields left unset are left unchanged.\n\nCallers need the editor role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11yErrorIssue.assignee":          "Assignee is who the issue is assigned to.",
