@@ -174,7 +174,7 @@ func opDelete[In, Out any](on zip.OpTarget, path string, fn zip.TypedHandler[In,
 	zip.Delete(on, path, addressed(on, http.MethodDelete, path, fn), opts...)
 }
 
-// route declares one of the eleven escape hatches — a raw route rather than a
+// route declares one of the ten escape hatches — a raw route rather than a
 // typed op (see mountHatches) — and honours a claim the same way. A hatch is
 // still an address, so a host has to be able to take one.
 //

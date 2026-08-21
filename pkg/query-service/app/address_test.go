@@ -48,7 +48,7 @@ import (
 // term the equality argument was missing.
 //
 // The sibling at pkg/apiserver/o11yapiserver/address_test.go argues set equality
-// from four facts: registered ⊆ declared on both halves, 233 + 134 = 367, and a
+// from four facts: registered ⊆ declared on both halves, 233 + 133 = 366, and a
 // duplicate registration panicking at boot. Three of those four were measured;
 // 134 was a sentence. So a route deleted HERE left both address tests green — the
 // remaining ones are all still declared — while the declaration went on naming an
@@ -60,7 +60,7 @@ import (
 // the sets CONTAIN is checked by name below, and a cardinality is what closes
 // "⊆ on both halves" into "=". It is stated the way its sibling states its own so
 // the arithmetic reads as one argument in two files.
-const wantQueryServiceRoutes = 134
+const wantQueryServiceRoutes = 133
 
 // BY NAME, NOT BY COUNT — see the argument in full at
 // pkg/apiserver/o11yapiserver/address_test.go. This is the other half of it: the
@@ -110,7 +110,6 @@ func TestEveryRegisteredAddressIsDeclaredAndResolves(t *testing.T) {
 	aH.RegisterIntegrationRoutes(r, am)
 	aH.RegisterQueryRangeV3Routes(r, am)
 	aH.RegisterInfraMetricsRoutes(r, am)
-	aH.RegisterWebSocketPaths(r, am)
 	aH.RegisterQueryRangeV4Routes(r, am)
 	aH.RegisterMessagingQueuesRoutes(r, am)
 	aH.RegisterThirdPartyApiRoutes(r, am)
@@ -130,9 +129,9 @@ func TestEveryRegisteredAddressIsDeclaredAndResolves(t *testing.T) {
 
 	table := r.Table()
 	if got := len(table.Routes()); got != wantQueryServiceRoutes {
-		t.Errorf("this package registers %d addresses, want %d — the declaration names 367 and "+
+		t.Errorf("this package registers %d addresses, want %d — the declaration names 366 and "+
 			"the other registrar %d, so a move here leaves an address declared and unserved",
-			got, wantQueryServiceRoutes, 367-wantQueryServiceRoutes)
+			got, wantQueryServiceRoutes, 366-wantQueryServiceRoutes)
 	}
 	for _, route := range table.Routes() {
 		if !declared[route.Method+" "+route.Path] {

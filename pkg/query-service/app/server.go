@@ -165,9 +165,10 @@ func (s *Server) Routes() *routing.Table { return s.routes }
 // streamed answer straight through when the host's writer is an http.Flusher —
 // which it is, for every host that reaches this over zip — so livetail, the
 // long-poll and the chunked export all stream end to end. A CONNECTION HIJACK
-// does not survive it: the websocket at /ws/query_progress hijacks the
+// does not survive it: an upgraded /v1/o11y/query_progress hijacks the
 // connection, and a hijack handed to a request context that no server is
-// driving is dropped. A host that needs that route serves this Server's own
+// driving is dropped. The long-poll form of that same address answers fine over
+// the bridge; a host that needs the websocket form serves this Server's own
 // listener (Start) rather than embedding it, which is what the standalone
 // deployment does.
 func (s *Server) PublicHandler() http.Handler {
@@ -253,7 +254,6 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 	api.RegisterIntegrationRoutes(r, am)
 	api.RegisterQueryRangeV3Routes(r, am)
 	api.RegisterInfraMetricsRoutes(r, am)
-	api.RegisterWebSocketPaths(r, am)
 	api.RegisterQueryRangeV4Routes(r, am)
 	api.RegisterMessagingQueuesRoutes(r, am)
 	api.RegisterThirdPartyApiRoutes(r, am)
@@ -293,7 +293,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 	app.All("/*", zip.AdaptNetHTTP(chain(nil)(web)))
 
 	// No prefix stripping. Every route is registered at its full public path
-	// (/v1/o11y/…, /v1/sentinel/…), so the request path that arrives is the path that
+	// (/v1/o11y/…, /v1/o11y/sentinel/…), so the request path that arrives is the path that
 	// matches — standalone and embedded in the cloud binary alike. The former
 	// StripPrefix(Global.ExternalPath()) wrapper predates that: it existed to graft a
 	// mount prefix onto routes registered at bare names, and once the names carried

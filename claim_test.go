@@ -97,7 +97,7 @@ func TestClaimedAddressIsNotDeclared(t *testing.T) {
 
 // A hatch is an address too, so a host can take one. The hatches are raw routes
 // rather than typed ops, and they went through a different verb — this is what
-// keeps the seam from being true of 353 addresses and false of eleven.
+// keeps the seam from being true of 353 addresses and false of ten.
 func TestClaimedHatchIsNotDeclared(t *testing.T) {
 	app := mountClaiming(t, o11y.Claimed("GET /v1/o11y/logs/livetail"))
 	if declaredAt(t, app, http.MethodGet, "/v1/o11y/logs/livetail") {

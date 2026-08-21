@@ -487,7 +487,7 @@ func TestLogsRoutesAreTheSameNine(t *testing.T) {
 	}
 }
 
-// Live tail is the tenth route and one of the eleven honest escape hatches: a
+// Live tail is the tenth route and one of the ten honest escape hatches: a
 // stream that never completes cannot be a buffered typed op. It reaches the
 // runtime through its OWN named route now, bytes untouched — a typed relay would
 // have choked on a non-JSON stream frame, so verbatim arrival IS the proof of
