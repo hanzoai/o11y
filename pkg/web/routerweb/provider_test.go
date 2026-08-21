@@ -127,8 +127,6 @@ func TestServeSPA(t *testing.T) {
 			"/v1/o11y/version",
 			"/v1/o11y/pods/bogus",
 			"/v1/event/1/envelope/",
-			"/ws",
-			"/ws/query_progress",
 		} {
 			res := get(t, base+path)
 

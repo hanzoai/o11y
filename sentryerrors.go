@@ -15,7 +15,7 @@ package o11y
 // THE WIRE DOES NOT MOVE, the same way telemetry.go's and logs.go's ops do not
 // move it: these ops do not re-implement the reads and writes. Each hands the
 // call to the SAME runtime handler the wildcard delegates to (relay for
-// /v1/sentinel, relayAt for /v1/o11y — telemetry.go's and logs.go's seams), so
+// /v1/o11y/sentinel, relayAt for /v1/o11y — telemetry.go's and logs.go's seams), so
 // identity resolution, the org gate, the exact role check each route has always
 // had, the audit record and the success envelope stay where they were and run
 // in the order they always did. What is new here is the TYPE — the In a caller

@@ -17,7 +17,7 @@ import (
 // the one place the server states it.
 //
 // The product FACE — issues, projects, stats, traces, the reads a console makes —
-// is /v1/sentinel. Ingest and face are different nouns and do not share a root:
+// is /v1/o11y/sentinel. Ingest and face are different nouns and do not share a root:
 // ingest is keyed by a DSN and answers a beacon, the face is keyed by a session
 // and answers a person.
 func mintDSN(secret []byte, host string, projectID valuer.UUID, version int) string {

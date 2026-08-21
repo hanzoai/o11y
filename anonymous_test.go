@@ -122,11 +122,11 @@ func TestTenantOpsStayGated(t *testing.T) {
 		"GET /v1/o11y/public/dashboards/d1/widgets/0/query_rangex",
 		"GET /v1/event/proj/envelope/", // ingest is a WRITE; a GET is not it
 		"POST /v1/o11y/api/v3/issues",  // a read API under the DSN prefix
-		"POST /v1/sentinel/issues",     // the face is a face, whatever the suffix
+		"POST /v1/o11y/sentinel/issues",     // the face is a face, whatever the suffix
 		// The door moved off the face. The old spelling must buy nothing, or
 		// the move left an unauthenticated hole where the route used to be.
-		"POST /v1/sentinel/proj/envelope/",
-		"POST /v1/sentinel/proj/store",
+		"POST /v1/o11y/sentinel/proj/envelope/",
+		"POST /v1/o11y/sentinel/proj/store",
 		"POST /v1/o11y/api/proj/envelopes",
 		"POST /v1/event",        // the product event door is not the Sentry wire
 		"GET /v1/o11y/version/", // a route that does not exist is not public

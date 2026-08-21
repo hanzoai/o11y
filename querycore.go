@@ -26,10 +26,11 @@ package o11y
 // THREE routes of this slice are deliberately NOT typed, and stay on the
 // delegation wildcard byte-identical to what they always were:
 //
-//   - GET /v1/o11y/query_progress and GET /ws/query_progress both upgrade the
-//     connection to a websocket (GetQueryProgressUpdates), and the relay buffers
-//     a whole answer through an httptest recorder that cannot hijack a
-//     connection — a typed progress op would never complete the handshake.
+//   - GET /v1/o11y/query_progress upgrades the connection to a websocket when
+//     the caller asks (GetQueryProgressUpdates) and long-polls when it does not,
+//     and the relay buffers a whole answer through an httptest recorder that
+//     cannot hijack a connection — a typed progress op would never complete the
+//     handshake.
 //   - POST /v1/o11y/export_raw_data streams a chunked CSV/JSONL download with a
 //     Content-Disposition attachment and an X-Response-Complete trailer; it has
 //     no JSON answer to name, and buffering an unbounded export to re-marshal it

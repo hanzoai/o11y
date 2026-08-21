@@ -57,11 +57,11 @@ func assertRoutes(t *testing.T, want map[string]bool, prefix string) {
 	}
 }
 
-// THE WHOLE SURFACE, counted. 367 is the number of method+path pairs the o11y
+// THE WHOLE SURFACE, counted. 366 is the number of method+path pairs the o11y
 // runtime registers on its gorilla/mux tree (pkg/query-service/app/routes_*.go
-// and pkg/apiserver/o11yapiserver/*.go). Mount registers the same 367 — 353 as
+// and pkg/apiserver/o11yapiserver/*.go). Mount registers the same 366 — 353 as
 // typed ops that carry a named In, a named Out and their prose into the
-// document, 11 as named escape hatches, 3 as native service probes.
+// document, 10 as named escape hatches, 3 as native service probes.
 //
 // If this number moves, one of two things happened and both need a human: a
 // route was added to the runtime and not named here (it would 404 in the
@@ -73,7 +73,7 @@ func TestEveryRouteIsNamedAndCounted(t *testing.T) {
 
 	const (
 		wantTyped   = 353 // typed ops: in the OpenAPI document and the MCP tool list
-		wantHatches = 11  // mount.go mountHatches, each with its reason
+		wantHatches = 10  // mount.go mountHatches, each with its reason
 		wantProbes  = 3   // health.go livez/healthz/readyz, native with fall-through
 	)
 	if len(all) != wantTyped+wantHatches+wantProbes {
@@ -94,7 +94,7 @@ func TestEveryRouteIsNamedAndCounted(t *testing.T) {
 	}
 	ops := 0
 	for path, item := range paths {
-		if !strings.HasPrefix(path, "/v1/o11y") && !strings.HasPrefix(path, "/v1/sentinel") {
+		if !strings.HasPrefix(path, "/v1/o11y") && !strings.HasPrefix(path, "/v1/o11y/sentinel") {
 			t.Errorf("OpenAPI published %s, which is not o11y's surface", path)
 		}
 		for method := range item {
@@ -147,7 +147,7 @@ func setRuntime(t *testing.T, fn http.HandlerFunc) {
 	t.Cleanup(func() { o11y.SetRuntime(nil) })
 }
 
-// THE ELEVEN. Each hatch is registered at its exact method and path, and each
+// THE TEN. Each hatch is registered at its exact method and path, and each
 // delegates with the path UNTOUCHED — a rewrite at this seam can only ever move
 // a request off its own route, and a mangler is invisible to the compiler, so
 // this is the only thing that catches one coming back.
@@ -155,7 +155,6 @@ func TestHatchesDelegateVerbatim(t *testing.T) {
 	hatches := []struct{ method, path string }{
 		{http.MethodGet, "/v1/o11y/logs/livetail"},
 		{http.MethodGet, "/v1/o11y/query_progress"},
-		{http.MethodGet, "/ws/query_progress"},
 		{http.MethodPost, "/v1/o11y/export_raw_data"},
 
 		{http.MethodGet, "/v1/o11y/complete/google"},
@@ -167,7 +166,7 @@ func TestHatchesDelegateVerbatim(t *testing.T) {
 		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
 		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
 	}
-	if len(hatches) != 11 {
+	if len(hatches) != 10 {
 		t.Fatalf("the census itself is wrong: %d", len(hatches))
 	}
 

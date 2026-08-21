@@ -68,7 +68,7 @@ func concrete(pattern string) string {
 // It answers 204 with no body on purpose. This file measures ONE thing — does
 // the request arrive — and a stand-in payload would drag in a second: every
 // typed Out would be decoded from it and re-marshalled on the way back, so an
-// unrelated marshalling defect in any one of 367 Out types would land here
+// unrelated marshalling defect in any one of 366 Out types would land here
 // wearing a reachability failure's clothes. 204 keeps the concerns orthogonal:
 // relay treats it as success, the decode of an empty body fails, and the caller
 // gets 500 — which still proves arrival, because a request that never arrived

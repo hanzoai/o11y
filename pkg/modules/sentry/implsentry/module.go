@@ -458,7 +458,7 @@ func firstNonEmpty(vals ...string) string {
 	return ""
 }
 
-// reservedSlugs are the static /v1/sentinel resource words a project slug may not take,
+// reservedSlugs are the static /v1/o11y/sentinel resource words a project slug may not take,
 // so a slug can never be confused with a route (belt-and-suspenders alongside the
 // UUID-constrained ingest route and static-before-wildcard registration).
 var reservedSlugs = map[string]bool{

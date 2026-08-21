@@ -98,7 +98,7 @@ model and one middleware chain.
 
 `routing.Router` is the ONE registration surface — `Get/Post/Put/Patch/Delete`,
 `Handle(method, path, h)`, `Group(prefix)` — and it takes an `http.Handler`, so
-the 367 handler bodies did not change shape. It exists because a registration
+the 366 handler bodies did not change shape. It exists because a registration
 carries three facts zip has no slot for, each of which the old tree RECOVERED per
 request by asking the router what it had just matched:
 
@@ -110,27 +110,27 @@ request by asking the router what it had just matched:
 
 Paths are declared in the public brace spelling (`/v1/o11y/rules/{id}`) and
 respelled for the router in one function; a constrained segment
-(`/v1/sentry/{project:guid}/envelope/`) becomes fiber's own `guid` — a UUID parse,
+(`/v1/event/{project:guid}/envelope/`) becomes fiber's own `guid` — a UUID parse,
 replacing a hand-written character class. A **duplicate registration panics at
 boot**; the tree this replaces silently let the first one win.
 
 **Count the table.** `routing.Table` is the census of what registration actually
-did: **233** routes from `pkg/apiserver/o11yapiserver` + **134** from
-`pkg/query-service/app` = **367**, the same 367 the mount publishes (353 typed ops
-= 353 OpenAPI operations = 353 MCP tools, 11 hatches, 3 probes). This repo has
+did: **233** routes from `pkg/apiserver/o11yapiserver` + **133** from
+`pkg/query-service/app` = **366**, the same 366 the mount publishes (353 typed ops
+= 353 OpenAPI operations = 353 MCP tools, 10 hatches, 3 probes). This repo has
 shipped the other outcome — 83 typed ops in files nothing called, building green
 and serving nothing — so the arithmetic is a test, not a comment
 (`wantAPIServerRoutes` in `pkg/apiserver/o11yapiserver/routes_test.go`,
-`wantQueryServiceRoutes` in `pkg/query-service/app/address_test.go`, and 367 in
+`wantQueryServiceRoutes` in `pkg/query-service/app/address_test.go`, and 366 in
 `routes_test.go`). All three terms are asserted, because the sum is what turns
-"registered ⊆ declared, on both halves" into set equality — 134 was a sentence
+"registered ⊆ declared, on both halves" into set equality — the query-service term was a sentence
 for one release, and a sentence cannot fail.
 
 ## The table IS the seam — `Table.Handler`, and there is no second registration
 
 The service's surface used to be stated twice over: once here as the
 implementation, and once in this module's own declaration of it (the 353 typed
-ops), which named the same 367 addresses with an input, an output and their
+ops), which named the same 366 addresses with an input, an output and their
 prose. The declaration had to REACH the implementation, and the only way it could
 was to speak HTTP to the WHOLE service — build a request, hand it to one
 `http.Handler` that was the entire router, and let that router match the path a
@@ -153,12 +153,12 @@ reads it as one, and `o11y.SetRuntime` hands the whole table over
 - **the 503 in the process that has all the handlers.** The standalone server
   could not install itself as that one handler without an op relaying into the
   router already serving it, so it installed nothing — and every op on its `/mcp`
-  surface and its by-name call plane answered 503 with all 367 handlers one map
+  surface and its by-name call plane answered 503 with all 366 handlers one map
   lookup away. It now installs its own table.
 
 The address is stated ONCE, at the registration, and rides the call
 (`address.go`'s `addressed` → `zip.Address`); `relay` takes no method and no path.
-That retired 706 spellings of 367 addresses down to 367. A host whose runtime is
+That retired 706 spellings of 366 addresses down to 366. A host whose runtime is
 in ANOTHER process installs `o11y.Whole(proxy)` — one door, honestly, because for
 a remote every address really does resolve to the same door.
 
@@ -176,7 +176,7 @@ anything, so both would read an empty route. Composing per leaf reproduces the
 order the old tree ran in — match, then middleware, then handler.
 
 **Serving.** The standalone server hands its listener straight to the app
-(`app.Fiber().Listener(conn)`), so streams and the `/ws/query_progress` upgrade
+(`app.Fiber().Listener(conn)`), so streams and the `/v1/o11y/query_progress` upgrade
 run native fasthttp. `PublicHandler()` is the embedding host's door and bridges to
 `net/http`: streamed answers pump through it, a connection HIJACK does not, so a
 host that needs the websocket serves the listener rather than embedding it.

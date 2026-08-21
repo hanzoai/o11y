@@ -131,7 +131,7 @@ func TestPublishServesTheDocument(t *testing.T) {
 // "o11y's surface" means.
 const (
 	o11yRootPath     = "/v1/o11y"
-	sentinelRootPath = "/v1/sentinel"
+	sentinelRootPath = "/v1/o11y/sentinel"
 	eventRootPath    = "/v1/event"
 )
 

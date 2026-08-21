@@ -46,11 +46,11 @@ func TestGetEventReadsThePathIDAndTheQueryProject(t *testing.T) {
 	module := &stubSentry{}
 	org, project := valuer.GenerateUUID(), valuer.GenerateUUID()
 
-	router := routing.Serve(http.MethodGet, "/v1/sentinel/events/{id}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	router := routing.Serve(http.MethodGet, "/v1/o11y/sentinel/events/{id}", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		NewHandler(module, true, false).GetEvent(w, r.WithContext(authtypes.NewContextWithClaims(r.Context(), authtypes.Claims{OrgID: org.String()})))
 	}))
 
-	req := httptest.NewRequest(http.MethodGet, "/v1/sentinel/events/ev-42?project="+project.String(), http.NoBody)
+	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/sentinel/events/ev-42?project="+project.String(), http.NoBody)
 
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)

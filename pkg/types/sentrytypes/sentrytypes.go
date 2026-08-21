@@ -1,5 +1,5 @@
 // Package sentrytypes holds the value types and store seams for Hanzo Sentry — the
-// Sentry-parity error/log/trace product face served under /v1/sentinel. It COMPOSES
+// Sentry-parity error/log/trace product face served under /v1/o11y/sentinel. It COMPOSES
 // the shared observability substrate rather than reforking it:
 //
 //   - Projects are the DSN-bearing unit under an IAM org (relational lifecycle).
