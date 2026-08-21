@@ -534,8 +534,6 @@ github.com/hanzo-ds/native v0.72.0 h1:lQhH2dza3foJCHN6scIVsEpqdj/xzI1N0QlI94vtWh
 github.com/hanzo-ds/native v0.72.0/go.mod h1:11FZtFdtfXMnmpybDEW6+uPRWFeC3TOT59YaV+lED+E=
 github.com/hanzo-ds/sqlbuilder v1.42.2 h1:739sudcAav513tsIj57CUjADCcEUzrztpOPYHy1nzjE=
 github.com/hanzo-ds/sqlbuilder v1.42.2/go.mod h1:Nk+F+SDxtsqAeI63jT7JPACZQ60top3rQCmKXUhfKQw=
-github.com/hanzo-ds/sqlparser v0.4.16 h1:OeWiLSL6u/I/RzhUKHHbE33MevQ2b0QVyDgSJur6OTs=
-github.com/hanzo-ds/sqlparser v0.4.16/go.mod h1:b+9oCGF3WYGz4FfVo9eZ4wJiF7fiLa9aCWFGCcbqQbY=
 github.com/hanzo-ds/sqlparser v0.4.17 h1:yTBikkYx2NI2Fpd6lCp4GVEj/rMaV7w6N4R7PLJmoag=
 github.com/hanzo-ds/sqlparser v0.4.17/go.mod h1:b+9oCGF3WYGz4FfVo9eZ4wJiF7fiLa9aCWFGCcbqQbY=
 github.com/hanzoai/csqlite v0.1.0 h1:suwC3dh0INlfP/U0Es6cDf6JNQ+2+GVLLATPWCUux6k=
@@ -1072,8 +1070,6 @@ github.com/zap-proto/http v0.3.1 h1:A2rCPWYCX866eAsdiWuns0dvWnBmViZtGm4pwX7jwlY=
 github.com/zap-proto/http v0.3.1/go.mod h1:UYfGhDDCetgxs65XSev8Lpf65COg5vKQK+cWwZGh4zQ=
 github.com/zap-proto/zap2pb v0.2.0 h1:sos6HnayhGMGLRO54px1InzimDzTZ2o5TSMEatYBjzs=
 github.com/zap-proto/zap2pb v0.2.0/go.mod h1:wD97Z2VTPabDq/4AMNL++PWnQ0YwEtajiuNkLGg3/18=
-github.com/zap-proto/zip v1.24.3 h1:xq0Lu4F/x06ACHyZ/Lxz8oj/X6LL3gBqRM69c5I7ubQ=
-github.com/zap-proto/zip v1.24.3/go.mod h1:EKMmUX9wCPvpkhpMBQRqa17YVXNXRYEjj7X+65Y+J9E=
 github.com/zap-proto/zip v1.24.8 h1:hImKWtW2GSwfOODKhNkON3Afi8JK0Pgt22G/j1X30d4=
 github.com/zap-proto/zip v1.24.8/go.mod h1:zKkCI6moJOWNngJvSv44pOH6vLt5o8NdCZwg2RBuKjU=
 github.com/zeebo/xxh3 v1.1.0 h1:s7DLGDK45Dyfg7++yxI0khrfwq9661w9EN78eP/UZVs=
