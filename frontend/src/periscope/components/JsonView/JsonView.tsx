@@ -18,7 +18,7 @@ const editorOptions: EditorProps['options'] = {
 	wordWrap: 'on',
 	minimap: { enabled: false },
 	fontWeight: '400',
-	fontFamily: 'SF Mono, Geist Mono, Fira Code, monospace',
+	fontFamily: 'SF Mono, Zen Mono, Fira Code, monospace',
 	fontSize: 12,
 	lineHeight: 18,
 	colorDecorators: true,
@@ -45,7 +45,7 @@ function setEditorTheme(monaco: Monaco): void {
 		colors: {
 			'editor.background': '#00000000', // transparent
 		},
-		fontFamily: 'SF Mono, Geist Mono, Fira Code, monospace',
+		fontFamily: 'SF Mono, Zen Mono, Fira Code, monospace',
 		fontSize: 12,
 		fontWeight: 'normal',
 		lineHeight: 18,

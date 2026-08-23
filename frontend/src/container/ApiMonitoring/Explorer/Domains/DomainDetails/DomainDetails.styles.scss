@@ -47,7 +47,7 @@
 
 	.title {
 		color: var(--l2-foreground);
-		font-family: 'Geist Mono';
+		font-family: 'Zen Mono';
 		font-size: 14px;
 		font-style: normal;
 		font-weight: 500;
@@ -94,7 +94,7 @@
 
 			.domain-details-metadata-label {
 				color: var(--text-vanilla-400);
-				font-family: 'Geist Sans';
+				font-family: 'Zen';
 				font-size: 11px;
 				font-style: normal;
 				font-weight: 500;
@@ -105,7 +105,7 @@
 
 			.domain-details-metadata-value {
 				color: var(--l2-foreground);
-				font-family: 'Geist Mono';
+				font-family: 'Zen Mono';
 				font-size: 12px;
 				font-style: normal;
 				font-weight: 500;
@@ -188,7 +188,7 @@
 			background: var(--l3-background);
 
 			color: var(--Vanilla-400, #c0c1c3);
-			font-family: 'Geist Sans';
+			font-family: 'Zen';
 			font-size: 14px;
 			font-style: normal;
 			font-weight: 400;
@@ -223,7 +223,7 @@
 			gap: 10px;
 			padding: 12px;
 			color: var(--Vanilla-100, #fff);
-			font-family: 'Geist Sans';
+			font-family: 'Zen';
 			font-size: 14px;
 			font-style: normal;
 			font-weight: 400;
@@ -239,7 +239,7 @@
 				border-bottom: none;
 
 				color: var(--text-vanilla-400);
-				font-family: 'Geist Sans';
+				font-family: 'Zen';
 				font-size: 11px;
 				font-style: normal;
 				font-weight: 600;
@@ -460,7 +460,7 @@
 				border-bottom: none;
 
 				color: var(--text-vanilla-400);
-				font-family: 'Geist Sans';
+				font-family: 'Zen';
 				font-size: 11px;
 				font-style: normal;
 				font-weight: 600;
@@ -593,7 +593,7 @@
 
 	border-radius: 6px;
 	border: 1px dashed var(--bg-slate-500);
-	font-family: 'Geist Sans';
+	font-family: 'Zen';
 
 	.error-state-content-wrapper {
 		display: flex;
@@ -646,7 +646,7 @@
 		height: 100%;
 
 		color: var(--text-vanilla-400);
-		font-family: 'Geist Sans';
+		font-family: 'Zen';
 		font-size: 14px;
 		font-style: normal;
 		font-weight: 400;
@@ -669,7 +669,7 @@
 .top-services-content {
 	display: flex;
 	flex-direction: column;
-	font-family: 'Geist Mono' !important;
+	font-family: 'Zen Mono' !important;
 
 	border-radius: 3px;
 	border: 1px solid var(--l1-border);
@@ -682,7 +682,7 @@
 		background: color-mix(in srgb, var(--bg-robin-400) 8%, transparent);
 
 		color: var(--bg-robin-400);
-		font-family: 'Geist Sans';
+		font-family: 'Zen';
 		font-size: 14px;
 		font-style: normal;
 		font-weight: 400;
@@ -702,7 +702,7 @@
 				border-bottom: none;
 
 				color: var(--text-vanilla-400);
-				font-family: 'Geist Sans';
+				font-family: 'Zen';
 				font-size: 11px;
 				font-style: normal;
 				font-weight: 600;
@@ -855,7 +855,7 @@
 			padding: 10px;
 
 			color: var(--text-vanilla-400);
-			font-family: 'Geist Sans';
+			font-family: 'Zen';
 			font-size: 14px;
 			font-style: normal;
 			font-weight: 400;
@@ -923,7 +923,7 @@
 			justify-content: center;
 			gap: 8px;
 
-			font-family: 'Geist Sans';
+			font-family: 'Zen';
 			font-size: 14px;
 			font-style: normal;
 			font-weight: 400;

@@ -10,7 +10,7 @@
 			gap: 8px;
 
 			.ant-typography {
-				font-family: 'Geist Mono';
+				font-family: 'Zen Mono';
 			}
 		}
 
@@ -81,7 +81,7 @@
 
 			.values-row {
 				color: var(--l1-foreground);
-				font-family: 'Geist Mono';
+				font-family: 'Zen Mono';
 				font-style: normal;
 				font-weight: 600;
 				line-height: 20px; /* 142.857% */
@@ -172,7 +172,7 @@
 				}
 
 				.ant-typography {
-					font-family: 'Geist Mono';
+					font-family: 'Zen Mono';
 					color: var(--bg-robin-400);
 				}
 
@@ -188,7 +188,7 @@
 						align-items: center;
 						align-self: flex-start;
 						.ant-typography {
-							font-family: 'Geist Sans';
+							font-family: 'Zen';
 							color: var(--bg-vanilla-400);
 						}
 					}
@@ -207,7 +207,7 @@
 						align-items: center;
 						.ant-btn {
 							.ant-typography:first-child {
-								font-family: 'Geist Mono';
+								font-family: 'Zen Mono';
 								color: var(--bg-robin-400);
 								background-color: transparent;
 							}
@@ -219,7 +219,7 @@
 							animation: fade-in-out 1.5s ease-in-out;
 						}
 						.all-attributes-contribution {
-							font-family: 'Geist Mono';
+							font-family: 'Zen Mono';
 							color: var(--l2-foreground);
 						}
 					}
@@ -263,7 +263,7 @@
 							background-color: var(--l1-border);
 							.ant-typography {
 								color: var(--l2-foreground);
-								font-family: 'Geist Mono';
+								font-family: 'Zen Mono';
 								text-overflow: ellipsis;
 							}
 							&:hover {
@@ -342,7 +342,7 @@
 	flex-direction: column;
 	gap: 6px;
 	padding: 12px;
-	font-family: 'Geist Mono' !important;
+	font-family: 'Zen Mono' !important;
 	max-height: 300px;
 	overflow-y: scroll;
 	.top-attributes-item {
@@ -485,7 +485,7 @@
 		.all-values-item-text {
 			flex: 1;
 			min-width: 0;
-			font-family: 'Geist Mono';
+			font-family: 'Zen Mono';
 			font-size: 12px;
 		}
 

@@ -26,7 +26,7 @@
 
 	.title {
 		color: var(--l2-foreground);
-		font-family: 'Geist Mono';
+		font-family: 'Zen Mono';
 		font-size: 14px;
 		font-style: normal;
 		font-weight: 500;
@@ -60,7 +60,7 @@
 
 			.entity-details-metadata-label {
 				color: var(--text-vanilla-400);
-				font-family: 'Geist Sans';
+				font-family: 'Zen';
 				font-size: 11px;
 				font-style: normal;
 				font-weight: 500;
@@ -71,7 +71,7 @@
 
 			.entity-details-metadata-value {
 				color: var(--l2-foreground);
-				font-family: 'Geist Mono';
+				font-family: 'Zen Mono';
 				font-size: 12px;
 				font-style: normal;
 				font-weight: 500;
@@ -239,7 +239,7 @@
 				border-bottom: none;
 
 				color: var(--Vanilla-400, #c0c1c3);
-				font-family: 'Geist Sans';
+				font-family: 'Zen';
 				font-size: 11px;
 				font-style: normal;
 				font-weight: 600;
@@ -270,7 +270,7 @@
 
 			.entityname-column-value {
 				color: var(--l1-foreground);
-				font-family: 'Geist Mono';
+				font-family: 'Zen Mono';
 				font-style: normal;
 				font-weight: 600;
 				line-height: 20px; /* 142.857% */

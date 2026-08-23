@@ -17,7 +17,7 @@ const CHART_CONFIG: Partial<ChartConfiguration> = {
 				},
 				ticks: {
 					font: {
-						family: "'Geist Mono', monospace",
+						family: "'Zen Mono', monospace",
 					},
 				},
 			},
@@ -29,7 +29,7 @@ const CHART_CONFIG: Partial<ChartConfiguration> = {
 				},
 				ticks: {
 					font: {
-						family: "'Geist Mono', monospace",
+						family: "'Zen Mono', monospace",
 					},
 				},
 			},

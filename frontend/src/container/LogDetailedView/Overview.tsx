@@ -56,7 +56,7 @@ function Overview({
 			enabled: false,
 		},
 		fontWeight: '400',
-		fontFamily: 'Geist Mono',
+		fontFamily: 'Zen Mono',
 		fontSize: 13,
 		lineHeight: 18,
 		colorDecorators: true,
