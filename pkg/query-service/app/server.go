@@ -323,13 +323,13 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 // AN APP OF ITS OWN IS THE POINT, and it is what zip v1.23 forced. The
 // declaration and the implementation describe THE SAME 367 ADDRESSES, and one
 // address may now have exactly one definition: Build refuses a program where two
-// claim the same door, naming both claimants. That rule is right — for a
+// claim the same address, naming both claimants. That rule is right — for a
 // composition, where two claimants means one of them is silently dead. Here
 // neither is dead and neither is a mistake: the implementation SERVES the
 // address and the declaration DESCRIBES it, which is a distinction zip has no
 // way to spell (typed.go: "the route and the op are the same fact recorded
-// once"). So the two facts go on two apps. The service's app holds the doors;
-// this app holds the description of them, and never claims a door on the
+// once"). So the two facts go on two apps. The service's app holds the routes;
+// this app holds the description of them, and never claims an address on the
 // listener.
 //
 // That also makes the old ORDER IS THE CONTRACT structural rather than
@@ -341,7 +341,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 // pinned by one test. Now the declaration is not on the listener at all, so
 // there is no order to get wrong.
 //
-// Build is what turns the in-memory registry into doors, and it RETURNS THE
+// Build is what turns the in-memory registry into routes, and it RETURNS THE
 // VERDICT — which is why it replaced zip's Prepare at v1.23. Prepare's silence
 // meant an invalid program started anyway and its routes were simply missing.
 func declaration() (*zip.App, error) {
@@ -362,7 +362,7 @@ func declaration() (*zip.App, error) {
 // Only the projections. The declaration's 353 ops answer on ITS app, and the
 // five paths below are the only ones that cross over — zip calls them CONTROL
 // routes, keeps them off the walk and excludes them from a Declaration, because
-// they are projections of the app rather than doors its owner wrote. None of
+// they are projections of the app rather than routes its owner wrote. None of
 // them is one of this service's 367, so nothing here can shadow a handler and
 // nothing here can be shadowed by one.
 //

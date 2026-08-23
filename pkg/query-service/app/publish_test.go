@@ -73,7 +73,7 @@ func operations(t *testing.T, doc map[string]any) int {
 }
 
 // mcpTools counts the tools the router offers, read the way an MCP client reads
-// them: a tools/list over the served door.
+// them: a tools/list over the served MCP endpoint.
 //
 // It used to be len(app.MCPTools()) — an in-process accessor on the app the test
 // had just built, which is the shape of proof this file exists to reject. The
@@ -127,7 +127,7 @@ func TestPublishServesTheDocument(t *testing.T) {
 }
 
 // The three public roots this service answers on — two faces and the ingest
-// door. Named here so the assertion and the message cannot disagree about what
+// endpoint. Named here so the assertion and the message cannot disagree about what
 // "o11y's surface" means.
 const (
 	o11yRootPath     = "/v1/o11y"
@@ -137,7 +137,7 @@ const (
 
 // Every operation the document publishes is o11y's own surface. A host that
 // mounts this table is publishing these paths under its own name, so a path that
-// is not ours would be this service claiming someone else's door.
+// is not ours would be this service claiming someone else's address.
 func TestPublishedDocumentIsO11ysSurface(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	if err := publish(app); err != nil {

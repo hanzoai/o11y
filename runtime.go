@@ -11,7 +11,7 @@ package o11y
 // It used to be ONE HANDLER FOR EVERYTHING. A host installed the runtime's whole
 // public surface as a single http.Handler and every op spoke HTTP to it: build a
 // request at the op's path, hand it over, let the runtime's router MATCH that
-// path and dispatch. Which means the declaration knew exactly which door it
+// path and dispatch. Which means the declaration knew exactly which route it
 // wanted, threw the address away, and paid a router to find it again — inside the
 // same process, through an httptest recorder, across a net/http↔fasthttp bridge,
 // 353 times over.
@@ -36,7 +36,7 @@ package o11y
 // address to handler — read as one. The standalone server hands over its own
 // table; the composed cloud binary hands over the embedded runtime's; a host
 // whose runtime is in another process hands over [Whole], because for a remote
-// every address really does resolve to the same door.
+// every address really does resolve to the same handler.
 
 import (
 	"net/http"
@@ -73,7 +73,7 @@ type Func func(method, path string) http.Handler
 func (f Func) Handler(method, path string) http.Handler { return f(method, path) }
 
 // Whole is a Runtime whose every address is the same handler — the honest shape
-// for a runtime that is somewhere ELSE. A reverse proxy has one door and the
+// for a runtime that is somewhere ELSE. A reverse proxy has one address and the
 // request's own path is what selects the route on the other side, so there is
 // nothing to resolve here and pretending otherwise would be a lie with a map in
 // it.

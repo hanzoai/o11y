@@ -258,7 +258,7 @@ func TestInfraFailsClosedWithoutARuntime(t *testing.T) {
 
 // THE ROUTES, exactly the forty-four that were behind the wildcard: three per
 // resource face, ten rollups, one checks read. No more (the face grew no
-// door) and no fewer (every route reached the document).
+// route) and no fewer (every route reached the document).
 func TestInfraRoutesAreTheSameFortyFour(t *testing.T) {
 	app := mounted(t)
 	want := map[string]bool{}
@@ -284,7 +284,7 @@ func TestInfraRoutesAreTheSameFortyFour(t *testing.T) {
 	// The /list heuristic must stay inside infra's OWN resources: other faces
 	// carry /list routes too (the service catalog's /services/list, the
 	// third-party overview's .../overview/list), and a bare "/list" suffix
-	// would miscount those as infra doors. Scope it to the eleven resources the
+	// would miscount those as infra routes. Scope it to the eleven resources the
 	// want-set is built from, so any other face's /list route is ignored here.
 	infraList := map[string]bool{}
 	for _, r := range []string{
@@ -300,12 +300,12 @@ func TestInfraRoutesAreTheSameFortyFour(t *testing.T) {
 		}
 		if strings.HasPrefix(r.Path, "/v1/o11y/") && !strings.HasSuffix(r.Path, "*") &&
 			// query-core's autocomplete/auto_complete routes carry attribute_* in
-			// their paths too, and they are NOT infra doors — without this exclusion
+			// their paths too, and they are NOT infra routes — without this exclusion
 			// the census counts them and the 44-route assertion drifts.
 			!strings.Contains(r.Path, "auto") &&
 			// "/list" alone also matches /services/list (apm face) and
 			// /third-party-apis/overview/list (apm face). Each slice census counts
-			// only its OWN doors — a bare suffix was safe only while infra was the
+			// only its OWN routes — a bare suffix was safe only while infra was the
 			// sole owner of it. The explicit infraList literal is the real anchor.
 			!strings.HasPrefix(r.Path, "/v1/o11y/services") &&
 			!strings.Contains(r.Path, "third-party-apis") &&
@@ -325,7 +325,7 @@ func TestInfraRoutesAreTheSameFortyFour(t *testing.T) {
 	}
 	for route := range got {
 		if !want[route] {
-			t.Errorf("%s is registered and was not before — the face grew a door", route)
+			t.Errorf("%s is registered and was not before — the face grew a route", route)
 		}
 	}
 }

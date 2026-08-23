@@ -6,7 +6,7 @@
 // This code was github.com/hanzoai/metrics, whose NOTICE names this module its
 // successor. It arrived here whole — store, WAL, ZAP receiver, routes, tests —
 // because a retired module cannot hold running code: the succession was declared
-// while cloud still imported the archive, so the door and its store moved to the
+// while cloud still imported the archive, so the routes and their store moved to the
 // live module rather than leaving a read-only repository load-bearing.
 //
 // One store serves all three signals — metrics, logs, traces — and every route

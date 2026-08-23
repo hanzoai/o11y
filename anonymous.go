@@ -12,7 +12,7 @@ package o11y
 // existing and the paths that exist were never named, so the host's exemption
 // matched nothing at all and every public op — /version, /health, the three
 // probes, sign-in, the shared-dashboard reads — was refused 403 at the unified
-// door while the standalone door served them 200. A copy of a route fact, kept
+// binary while the standalone one served them 200. A copy of a route fact, kept
 // one repo away from the routes, drifted the moment the routes moved. There is
 // one copy now and it is this one.
 //
@@ -48,7 +48,7 @@ import (
 // argument are the same spelling.
 //
 // anonymous_test.go proves every static entry below is a route Mount actually
-// registers, which is the drift that broke the unified door: a path in an
+// registers, which is the drift that broke the unified binary: a path in an
 // exemption list that no route serves.
 func Anonymous(method, path string) bool {
 	if openOps[method+" "+path] {
@@ -137,13 +137,13 @@ func publicDashboardRead(method, path string) bool {
 // project segment. Refusing it for lacking a principal it can never carry would
 // take every SDK in the field off the air.
 //
-//	POST /v1/event/{project}/envelope|store     (the ingest door a minted DSN names)
+//	POST /v1/event/{project}/envelope|store     (the ingest endpoint a minted DSN names)
 //	POST /v1/o11y/api/{project}/envelope|store  (the suffix a stock SDK appends)
 //
 // It matches by METHOD + PREFIX + SUFFIX and never by a bare prefix, so nothing
 // else on either root is reachable through it: the faces stay gated — issues,
 // discover, logs, traces, stats — and so does /v1/event itself, the product
-// event door beside this one. The trailing slash is the protocol's form; the
+// event endpoint beside this one. The trailing slash is the protocol's form; the
 // slash-less variant is tolerated defensively. Exported because the EDGE needs
 // the identical answer: the gateway waives its JWT check on exactly these, and a
 // request the gateway lets through tokenless must not then be refused here for

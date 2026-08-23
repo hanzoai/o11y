@@ -20,7 +20,7 @@ package o11y
 // So the address travels WITH the call. The declaration verbs (claim.go) wrap
 // every op in [addressed], which puts the address the op was registered at into
 // the context, and relay reads it there. The op's body states no method and no
-// path at all, which is the honest end state: which door was knocked on is not
+// path at all, which is the honest end state: which endpoint was called is not
 // something the body decides.
 //
 // The concrete path comes from [zip.Address], the inverse of the binding zip
@@ -61,7 +61,7 @@ type addrKey struct{}
 //
 // The full address is the target's own prefix plus the declared path, the same
 // composition [claims] reads and the same one zip's registry records, so the
-// three cannot name different doors.
+// three cannot name different addresses.
 func addressed[In, Out any](on zip.OpTarget, method, path string, fn zip.TypedHandler[In, Out]) zip.TypedHandler[In, Out] {
 	pattern := on.OpScope().Prefix + path
 	template := zip.Template(pattern)

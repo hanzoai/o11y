@@ -22,13 +22,13 @@ import (
 //   - The FACE, /v1/o11y/sentinel — Hanzo Sentry, the Sentry-parity product read by a
 //     signed-in person: projects, issues, discover, events, logs, traces, stats. Hanzo
 //     IAM authz, every one scoped to the caller's org from the validated claims.
-//   - The DOOR, POST /v1/event/{project}/envelope/ and /store/ — a keyed beacon. It is
+//   - INGEST, POST /v1/event/{project}/envelope/ and /store/ — a keyed beacon. It is
 //     the address a minted DSN spells (implsentry's mintDSN), so the address a client
 //     is told and the address this router opens are one string. OpenAccess (no IAM):
 //     a Sentry SDK presents a DSN key, not a Hanzo session; the handler verifies that
 //     key against the project's rotation watermark.
 //
-// ONE WIRE, ONE PUBLIC ADDRESS. The door used to sit under the face's root as well,
+// ONE WIRE, ONE PUBLIC ADDRESS. Ingest used to sit under the face's root as well,
 // which put one wire at two addresses and put an unauthenticated write inside a
 // principal-gated subtree — so the face's gate had to carry an exemption shaped like
 // the ingest paths, and the exemption is what anything under that root had to be
@@ -155,7 +155,7 @@ func (provider *provider) addSentryRoutes(router routing.Router) {
 		router.Handle(rt.method, rt.path, handler.New(rt.fn, rt.def))
 	}
 
-	// INGEST — the door, on its own root, UUID-constrained project segment.
+	// INGEST — on its own root, UUID-constrained project segment.
 	ingestRoutes := []struct {
 		path string
 		fn   http.HandlerFunc
