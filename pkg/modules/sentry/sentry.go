@@ -64,7 +64,7 @@ type Module interface {
 
 // Handler is the HTTP surface of Hanzo Sentry: the product face under /v1/o11y/sentinel,
 // behind Hanzo IAM authz and org-scoped from the validated claims, plus the ingest
-// door under /v1/event, which is PUBLIC and DSN-authenticated in-handler.
+// endpoint under /v1/event, which is PUBLIC and DSN-authenticated in-handler.
 type Handler interface {
 	// Ingest (public, DSN-auth): POST /v1/event/{project}/envelope|store/.
 	EnvelopeIngest(http.ResponseWriter, *http.Request)

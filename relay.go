@@ -30,7 +30,7 @@ package o11y
 //
 // So the address is stated once, at the registration, and travels with the call
 // (see claim.go's addressed). relay takes no method and no path: it reads the
-// address of the door that was knocked on, which is a fact about the call and
+// address the request arrived at, which is a fact about the call and
 // not a decision this function makes. The 119 hand-built paths are gone with it —
 // zip.Address renders the concrete one from the same input zip bound the segments
 // into, so the round trip is exact by construction.
@@ -80,9 +80,9 @@ import (
 
 // The three public roots this package answers on, each spelled ONCE.
 //
-// Two of them are FACES and one is a DOOR, and that is the whole reason there
+// Two of them are FACES and one is INGEST, and that is the whole reason there
 // are three. A face is read by a signed-in person and answers about what is
-// already stored; a door is knocked on by a keyed beacon that holds no session
+// already stored; ingest is called by a keyed beacon that holds no session
 // and carries something in. Different nouns, different callers, different
 // credentials — so the same wire does not get to answer at both.
 //
@@ -91,9 +91,9 @@ import (
 //     console calls.
 //   - sentinelRoot is the error-tracking face: projects, issues, occurrences,
 //     discover and the event-rate stats.
-//   - eventRoot is the ingest door. It is the address a minted DSN spells
-//     (implsentry's mintDSN), so the door a client is TOLD about and the door
-//     this service OPENS are one string.
+//   - eventRoot is the ingest endpoint. It is the address a minted DSN spells
+//     (implsentry's mintDSN), so the address a client is TOLD about and the one
+//     this service SERVES are one string.
 const (
 	o11yRoot     = "/v1/o11y"
 	sentinelRoot = "/v1/o11y/sentinel"
@@ -146,7 +146,7 @@ func relay(ctx context.Context, params url.Values, body, out any) error {
 	// The in-process case no longer depends on it — nothing matches this path any
 	// more, because the handler was chosen by name. It stays for the case that
 	// still does: a runtime in ANOTHER process is reached through [Whole], and
-	// behind that one door is a proxy that has to forward a request-target. It is
+	// behind that one address is a proxy that has to forward a request-target. It is
 	// also the field a middleware logs, and a blank one there reads as a lost
 	// request.
 	//
@@ -156,7 +156,7 @@ func relay(ctx context.Context, params url.Values, body, out any) error {
 	// r.RequestURI into the fasthttp request verbatim — so an empty one erased the
 	// path, fasthttp normalized it to "/", no API route matched, and the request
 	// fell through to the console web provider, which answers http.NotFound. That
-	// is why the unified door answered every relayed op
+	// is why the unified binary answered every relayed op
 	//   404 {"status":404,"error":"404 page not found"}
 	// — /version, /health, /global/config, /users/me, all 353 typed ops — while
 	// the standalone runtime served the identical paths 200.

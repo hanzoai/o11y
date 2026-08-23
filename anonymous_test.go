@@ -38,7 +38,7 @@ var fixedExemptions = []string{
 	"PUT /v1/o11y/service_accounts/me",
 }
 
-// THE DRIFT GUARD. The unified door refused every public o11y op — /version,
+// THE DRIFT GUARD. The unified binary refused every public o11y op — /version,
 // /health, the three probes, sign-in — because the embedding host's exemption
 // list named /v1/o11y/api/v2/livez and three siblings under an internal /api/
 // namespace this module had stopped rewriting onto. Four names, zero routes,
@@ -58,7 +58,7 @@ func TestAnonymousNamesOnlyRealRoutes(t *testing.T) {
 			t.Errorf("%q is listed here but Anonymous says false — this table and anonymous.go disagree", route)
 		}
 		if !have[route] {
-			t.Errorf("Anonymous exempts %q, which Mount does not register — an exemption matching no route is how the unified door lost its public ops", route)
+			t.Errorf("Anonymous exempts %q, which Mount does not register — an exemption matching no route is how the unified binary lost its public ops", route)
 		}
 	}
 }
@@ -109,7 +109,7 @@ func TestPublicOpsAreExempt(t *testing.T) {
 }
 
 // The gate is still a gate. Telemetry is a tenant's own data; if these ever
-// answer true the door is open, which is worse than the 403 it replaced.
+// answer true the route is open, which is worse than the 403 it replaced.
 func TestTenantOpsStayGated(t *testing.T) {
 	for _, route := range []string{
 		"GET /v1/o11y/logs",
@@ -123,12 +123,12 @@ func TestTenantOpsStayGated(t *testing.T) {
 		"GET /v1/event/proj/envelope/", // ingest is a WRITE; a GET is not it
 		"POST /v1/o11y/api/v3/issues",  // a read API under the DSN prefix
 		"POST /v1/o11y/sentinel/issues",     // the face is a face, whatever the suffix
-		// The door moved off the face. The old spelling must buy nothing, or
+		// Ingest moved off the face. The old spelling must buy nothing, or
 		// the move left an unauthenticated hole where the route used to be.
 		"POST /v1/o11y/sentinel/proj/envelope/",
 		"POST /v1/o11y/sentinel/proj/store",
 		"POST /v1/o11y/api/proj/envelopes",
-		"POST /v1/event",        // the product event door is not the Sentry wire
+		"POST /v1/event",        // the product event endpoint is not the Sentry wire
 		"GET /v1/o11y/version/", // a route that does not exist is not public
 		"GET /V1/O11Y/VERSION",  // and the match is exact, never folded
 	} {

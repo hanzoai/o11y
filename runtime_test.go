@@ -262,7 +262,7 @@ func TestFuncResolvesAndComposes(t *testing.T) {
 		t.Fatal("a served address did not resolve through the Func")
 	}
 	// An address the inner runtime does not serve stays unserved: a decorator has
-	// no opinion about a door that is not there.
+	// no opinion about an address that is not there.
 	if rt.Handler(http.MethodGet, "/v1/o11y/nothing") != nil {
 		t.Error("an unserved address resolved through the Func")
 	}

@@ -391,7 +391,7 @@ func TestBothAgentCheckInsKeepTheirOwnPath(t *testing.T) {
 // THE ROUTES, exactly the thirteen the mux registers in
 // pkg/apiserver/o11yapiserver/cloudintegration.go: eleven on the underscored
 // root, the accounts/check_in twelfth, and the hyphenated agent-check-in that
-// is its own real path. No more (the face grew no door) and no fewer (every
+// is its own real path. No more (the face grew no route) and no fewer (every
 // route reached the document).
 func TestCloudIntegrationsRoutesAreTheSameThirteen(t *testing.T) {
 	app := mounted(t)
@@ -436,7 +436,7 @@ func TestCloudIntegrationsRoutesAreTheSameThirteen(t *testing.T) {
 	}
 	for route := range got {
 		if !want[route] {
-			t.Errorf("%s is registered and was not before — the face grew a door", route)
+			t.Errorf("%s is registered and was not before — the face grew a route", route)
 		}
 	}
 }
@@ -546,7 +546,7 @@ func TestCloudIntegrationsRefusalKeepsTheRuntimeStatus(t *testing.T) {
 	}
 }
 
-// No runtime, no answer: ALL THIRTEEN doors of this face fail closed with the
+// No runtime, no answer: ALL THIRTEEN routes of this face fail closed with the
 // same 503 the delegation wildcard gives before a handler is registered. An op
 // that answered anything else would be answering without the gate having run.
 //

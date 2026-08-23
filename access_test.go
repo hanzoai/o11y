@@ -199,7 +199,7 @@ func TestAccessFailsClosedWithoutARuntime(t *testing.T) {
 
 // THE ROUTES, exactly as they were. Twenty paths across the three files; the
 // router's own spelling of a parameter differs from the mux tree's, the wire
-// path does not, and no door was added or dropped.
+// path does not, and no route was added or dropped.
 func TestAccessRoutesAreTheSameTwenty(t *testing.T) {
 	app := mounted(t)
 	want := map[string]bool{
@@ -243,12 +243,12 @@ func TestAccessRoutesAreTheSameTwenty(t *testing.T) {
 	for route := range got {
 		if !want[route] {
 			// identity.go owns the role<->user join (roles/:id/users); this census
-			// counts the ACCESS face only. A door another slice converted is not
+			// counts the ACCESS face only. A route another slice converted is not
 			// this face growing one.
 			if route == "GET /v1/o11y/roles/:id/users" {
 				continue
 			}
-			t.Errorf("%s is registered and was not before — the face grew a door", route)
+			t.Errorf("%s is registered and was not before — the face grew a route", route)
 		}
 	}
 }

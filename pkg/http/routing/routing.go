@@ -58,8 +58,8 @@ type Chain func(defs []handler.ResourceDef) func(http.Handler) http.Handler
 // and the handler that answers it.
 //
 // Handler is the WHOLE answer — the chain composed around the leaf, not the bare
-// body underneath it. A route's handler is what happens when you knock on that
-// door, and the audit record, the timeout and the resource resolution are part of
+// body underneath it. A route's handler is what happens when a request arrives
+// at it, and the audit record, the timeout and the resource resolution are part of
 // what happens. Recording the bare one would make the census describe a route
 // nobody can reach.
 type Route struct {
@@ -162,7 +162,7 @@ func (r Router) Group(prefix string) Router {
 // brace spelling; the Router respells it for the router and records it verbatim.
 //
 // A duplicate registration PANICS. Registration runs once, at boot, from a fixed
-// list of literals — a second route at the same door is a mistake in the source,
+// list of literals — a second route at the same address is a mistake in the source,
 // not a condition a running server can encounter, and the router that used to
 // hold these silently let the first one win.
 func (r Router) Handle(method, path string, h http.Handler) Router {

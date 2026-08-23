@@ -22,7 +22,7 @@ package o11y_test
 // shape — adaptor.FiberApp over a runtime that routes, which is exactly what
 // Server.PublicHandler() returns and what the host installs — against a runtime
 // that serves every one of those paths. Any 404 is a request that never reached
-// the runtime, i.e. a lost door. There is no way to add a sixth relay body with
+// the runtime, i.e. a lost route. There is no way to add a sixth relay body with
 // this defect and keep this test green.
 
 import (
@@ -99,7 +99,7 @@ func routingRuntime(t *testing.T, patterns map[string]bool) (seen *[]string) {
 // The assertion is on 404 alone. Every other status proves the request ARRIVED
 // — a 400 from input validation, a 500 from decoding a stand-in body into a
 // typed Out, a 401 from the gate — and this file is only ever about whether the
-// door opens onto anything.
+// route resolves to anything.
 func TestEveryRouteReachesTheRuntime(t *testing.T) {
 	app := mounted(t)
 	patterns := registered(t, app)

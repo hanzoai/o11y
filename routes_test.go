@@ -33,7 +33,7 @@ func registered(t *testing.T, app *zip.App) map[string]bool {
 }
 
 // assertRoutes proves a slice registered EXACTLY its own routes under prefix —
-// no more, no fewer, at the same methods. Each slice counts only its own doors,
+// no more, no fewer, at the same methods. Each slice counts only its own routes,
 // so a slice that stops being mounted fails here rather than being quietly
 // answered by something else.
 func assertRoutes(t *testing.T, want map[string]bool, prefix string) {

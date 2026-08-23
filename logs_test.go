@@ -464,7 +464,7 @@ func TestLogsRoutesAreTheSameNine(t *testing.T) {
 		"POST /v1/o11y/logs/promote_paths":     true,
 		"GET /v1/o11y/logs/promote_paths":      true,
 
-		// The tenth door: a NAMED hatch, not a typed op and not a fall-through.
+		// The tenth route: a NAMED hatch, not a typed op and not a fall-through.
 		// It is in this census precisely because it is registered — a hatch that
 		// stops being registered is a 404 now, and this is what catches that.
 		"GET /v1/o11y/logs/livetail": true,
@@ -482,7 +482,7 @@ func TestLogsRoutesAreTheSameNine(t *testing.T) {
 	}
 	for route := range got {
 		if !want[route] {
-			t.Errorf("%s is registered and was not before — the face grew a door", route)
+			t.Errorf("%s is registered and was not before — the face grew a route", route)
 		}
 	}
 }
@@ -491,7 +491,7 @@ func TestLogsRoutesAreTheSameNine(t *testing.T) {
 // stream that never completes cannot be a buffered typed op. It reaches the
 // runtime through its OWN named route now, bytes untouched — a typed relay would
 // have choked on a non-JSON stream frame, so verbatim arrival IS the proof of
-// the door it went through.
+// the route it went through.
 func TestLivetailIsANamedHatch(t *testing.T) {
 	app := mounted(t)
 	frame := "event: log\ndata: {\"body\":\"boom\"}\n\n"

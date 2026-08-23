@@ -57,8 +57,8 @@ const wantAPIServerRoutes = 233
 
 // every handler field satisfied by an embedded nil interface: the route table is
 // a fact about REGISTRATION, and registration only takes method values off these
-// — it never calls one. Standing up 33 real modules to count doors would test
-// the modules, not the doors.
+// — it never calls one. Standing up 33 real modules to count routes would test
+// the modules, not the routes.
 func censusProvider() *provider {
 	return &provider{
 		authzMiddleware:            middleware.NewAuthZ(slog.Default(), nil, nil),
@@ -122,7 +122,7 @@ func TestEveryAPIServerRouteIsRegistered(t *testing.T) {
 	}
 
 	// Every route answers on one of the three public roots — the two faces and
-	// the ingest door — and carries no leftover spelling from the tree this
+	// the ingest endpoint — and carries no leftover spelling from the tree this
 	// replaced.
 	for _, route := range table {
 		switch {
