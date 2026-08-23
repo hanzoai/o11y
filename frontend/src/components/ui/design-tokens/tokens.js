@@ -4068,7 +4068,7 @@ const S = {
 						group: 'fonts',
 					},
 					'font-mono': {
-						value: "'Geist Mono'",
+						value: "'Zen Mono'",
 						description: '',
 						category: 'typography',
 						group: 'fonts',
@@ -4973,7 +4973,7 @@ const S = {
 						group: 'fonts',
 					},
 					'font-mono': {
-						value: "'Geist Mono'",
+						value: "'Zen Mono'",
 						description: '',
 						category: 'typography',
 						group: 'fonts',

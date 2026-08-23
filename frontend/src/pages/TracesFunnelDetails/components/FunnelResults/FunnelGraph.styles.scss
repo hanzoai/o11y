@@ -56,7 +56,7 @@
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			font-family: 'Geist Mono', monospace;
+			font-family: 'Zen Mono', monospace;
 			font-size: 12px;
 
 			&__left {
@@ -88,13 +88,13 @@
 
 			&__label {
 				color: var(--bg-vanilla-400);
-				font-family: 'Geist Sans';
+				font-family: 'Zen';
 				font-size: 12px;
 			}
 
 			&__value {
 				color: var(--l1-foreground);
-				font-family: 'Geist Mono';
+				font-family: 'Zen Mono';
 				font-size: 12px;
 			}
 		}

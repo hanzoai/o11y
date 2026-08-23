@@ -79,8 +79,8 @@ export const ExpandIconWrapper = styled(Col)`
 
 export const RawLogContent = styled.div<RawLogContentProps>`
 	margin-bottom: 0;
-	font-family: 'Geist Mono', monospace;
-	font-family: 'Geist Mono';
+	font-family: 'Zen Mono', monospace;
+	font-family: 'Zen Mono';
 	letter-spacing: -0.07px;
 	padding: 4px;
 	text-align: left;
