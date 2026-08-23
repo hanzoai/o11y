@@ -207,7 +207,7 @@ function timelinePlugin(opts: any): any {
 
 	const laneDistr = SPACE_BETWEEN;
 
-	const font = `${round(14 * pxRatio)}px Geist Mono`;
+	const font = `${round(14 * pxRatio)}px Zen Mono`;
 
 	function walk(
 		yIdx: number | null,

@@ -83,12 +83,12 @@
 						backdrop-filter: blur(20px);
 						box-sizing: border-box;
 						box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
-						font-family: 'Geist Mono', monospace !important;
+						font-family: 'Zen Mono', monospace !important;
 
 						ul {
 							width: 100% !important;
 							max-width: 100% !important;
-							font-family: 'Geist Mono', monospace !important;
+							font-family: 'Zen Mono', monospace !important;
 							min-height: 200px !important;
 
 							&::-webkit-scrollbar {
@@ -118,7 +118,7 @@
 								box-sizing: border-box;
 								overflow: hidden;
 
-								font-family: 'Geist Mono', monospace !important;
+								font-family: 'Zen Mono', monospace !important;
 
 								.cm-completionIcon {
 									display: none !important;
@@ -140,7 +140,7 @@
 
 					.cm-line {
 						line-height: 36px !important;
-						font-family: 'Geist Mono', monospace !important;
+						font-family: 'Zen Mono', monospace !important;
 						background-color: #121317 !important;
 
 						::-moz-selection {
@@ -219,7 +219,7 @@
 			border: 1px solid var(--l1-border);
 			box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.1);
 
-			font-family: 'Geist Mono', monospace !important;
+			font-family: 'Zen Mono', monospace !important;
 
 			&::placeholder {
 				color: var(--l1-foreground);
