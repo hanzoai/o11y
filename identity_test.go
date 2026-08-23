@@ -132,7 +132,7 @@ func TestIdentityRoutesAreTheSameFortyFive(t *testing.T) {
 // This test used to install a host wildcard and assert the callbacks fell into
 // it. That assertion could not distinguish a deliberate hatch from a route
 // nobody had converted, which is how three unmounted slices shipped; it now
-// asserts the named door instead.
+// asserts the named route instead.
 func TestCompleteCallbacksAreNamedHatches(t *testing.T) {
 	app := mounted(t)
 
@@ -165,7 +165,7 @@ func TestCompleteCallbacksAreNamedHatches(t *testing.T) {
 		}
 	}
 
-	// ...and a typed identity op next door still dispatches as an op.
+	// ...and a typed identity op beside it still dispatches as an op.
 	runtime(t, []any{})
 	if status, body := call(t, app, member(http.MethodGet, "/v1/o11y/users", nil)); status != http.StatusOK {
 		t.Fatalf("the typed users op did not answer: status=%d %s", status, body)

@@ -47,7 +47,7 @@ func TestListenOnAPathBindsASocket(t *testing.T) {
 
 // A host:port still binds TCP, so the off-pod senders that must keep reaching
 // this receiver — the otel agent on every node, the gateway, another cluster
-// through the otlz door — are unaffected. The socket is ADDITIVE.
+// through the otlz endpoint — are unaffected. The socket is ADDITIVE.
 func TestListenOnAPortStillBindsTCP(t *testing.T) {
 	r, err := zapreceiver.New(zapreceiver.Config{
 		Listen:  "127.0.0.1:0",

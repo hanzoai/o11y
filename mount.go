@@ -217,7 +217,7 @@ func mountHatches(app *zip.App) {
 	// the caller is a Sentry SDK authenticating with a DSN public key rather
 	// than a Hanzo session.
 	//
-	// SO IT ANSWERS ON THE INGEST DOOR, NOT UNDER A PRODUCT'S ROOT (relay.go).
+	// SO IT ANSWERS AT THE INGEST ENDPOINT, NOT UNDER A PRODUCT'S ROOT (relay.go).
 	// eventRoot is what a minted DSN spells, so a beacon has exactly one address
 	// to knock on and the face beside it keeps its own gate.
 	//
@@ -225,8 +225,8 @@ func mountHatches(app *zip.App) {
 	// /api/<project>/envelope/ suffix to whatever DSN path it is given, so
 	// renaming it would break every SDK in the field. We RECEIVE this shape; we
 	// do not publish it.
-	route(app, http.MethodPost, eventRoot+"/:project/envelope/")       // the door a minted DSN names
-	route(app, http.MethodPost, eventRoot+"/:project/store/")          // the same door, single-event form
+	route(app, http.MethodPost, eventRoot+"/:project/envelope/")       // the endpoint a minted DSN names
+	route(app, http.MethodPost, eventRoot+"/:project/store/")          // the same endpoint, single-event form
 	route(app, http.MethodPost, o11yRoot+"/api/:project_id/envelope/") // the suffix a stock SDK appends
 	route(app, http.MethodPost, o11yRoot+"/api/:project_id/store/")    // the same suffix, single-event form
 }

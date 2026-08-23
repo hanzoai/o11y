@@ -266,7 +266,7 @@ func TestDomainAnswerIsTheRuntimeAnswer(t *testing.T) {
 
 // THE ROUTES, exactly the twenty-one that were behind the wildcard: five for
 // the service catalog, fourteen for the messaging queues, two for the
-// third-party overview. No more (the face grew no door) and no fewer (every
+// third-party overview. No more (the face grew no route) and no fewer (every
 // route reached the document).
 func TestAPMRoutesAreTheSameTwentyOne(t *testing.T) {
 	app := mounted(t)
@@ -309,7 +309,7 @@ func TestAPMRoutesAreTheSameTwentyOne(t *testing.T) {
 		}
 		// "/service" alone also matches /service_accounts, which is the ACCESS
 		// face (access.go), not APM's. Each slice census must count only its own
-		// doors or every slice fails the moment another one converts — the
+		// routes or every slice fails the moment another one converts — the
 		// substring was safe only while APM was the sole owner of that prefix.
 		// cloud_integrations owns /…/services too (integrations.go). Same lesson as
 		// /service_accounts: a substring is only unambiguous while one face owns it.
@@ -329,7 +329,7 @@ func TestAPMRoutesAreTheSameTwentyOne(t *testing.T) {
 	}
 	for route := range got {
 		if !want[route] {
-			t.Errorf("%s is registered and was not before — the face grew a door", route)
+			t.Errorf("%s is registered and was not before — the face grew a route", route)
 		}
 	}
 }

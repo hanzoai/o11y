@@ -25,8 +25,8 @@ func TestMintDSN_ShapeAndVerify(t *testing.T) {
 	dsn := mintDSN(secret, "api.hanzo.ai", proj, 1)
 	// CLEAN path — no /api/ segment.
 	assert.True(t, strings.HasPrefix(dsn, "https://"))
-	// THE INGEST DOOR, not the product face. A DSN addresses /v1/event — the one
-	// door every beacon lands on — while /v1/o11y/sentinel is where a signed-in person
+	// THE INGEST ADDRESS, not the product face. A DSN addresses /v1/event — the one
+	// address every beacon lands on — while /v1/o11y/sentinel is where a signed-in person
 	// reads issues back. A DSN minted on the face would send the error plane to a
 	// second public spelling of one wire, which is the whole reason they converged.
 	assert.Contains(t, dsn, "@api.hanzo.ai/v1/event/"+proj.String())

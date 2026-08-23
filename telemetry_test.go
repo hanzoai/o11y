@@ -321,11 +321,11 @@ func TestProjectIsMandatory(t *testing.T) {
 // THE ROUTES, exactly as they were. Five paths, five methods; the router's own
 // spelling of a parameter differs from the mux tree's, the wire path does not.
 //
-// THE FACE CARRIES NO INGEST. The two ingest doors used to land in this census
+// THE FACE CARRIES NO INGEST. The two ingest routes used to land in this census
 // as well, and that is the shape this asserts against coming back: an
 // unauthenticated write registered inside a principal-gated subtree means the
 // gate has to carry an exemption shaped like it, and everything else under the
-// root has to be checked against that exemption. The doors answer on /v1/event
+// root has to be checked against that exemption. The routes answer on /v1/event
 // now (mount.go mountHatches, counted in routes_test.go), so everything here is
 // a read — and TestTheFaceIsGatedWholesale below states that as a property
 // rather than leaving it to this closed list.
@@ -356,7 +356,7 @@ func TestTelemetryRoutesAreTheSameFive(t *testing.T) {
 	}
 	for route := range got {
 		if !want[route] {
-			t.Errorf("%s is registered and was not before — the face grew a door", route)
+			t.Errorf("%s is registered and was not before — the face grew a route", route)
 		}
 	}
 }
@@ -364,7 +364,7 @@ func TestTelemetryRoutesAreTheSameFive(t *testing.T) {
 // NOTHING ON THE FACE IS EXEMPT FROM THE PRINCIPAL GATE. The set above is a
 // closed list and would catch this instance; this states the PROPERTY, so a
 // route added to both the face and the list still fails. The face is read with
-// a session — an exempt write here is an unauthenticated door inside a gated
+// a session — an exempt write here is an unauthenticated route inside a gated
 // subtree, and the exemption that admits it is what every sibling then has to
 // be checked against.
 func TestTheFaceIsGatedWholesale(t *testing.T) {
@@ -376,7 +376,7 @@ func TestTheFaceIsGatedWholesale(t *testing.T) {
 	}
 }
 
-// The ingest door reaches the runtime through its OWN named route, path
+// Ingest reaches the runtime through its OWN named route, path
 // untouched, while the typed reads on the face dispatch as ops.
 func TestTheIngestDoorIsANamedHatch(t *testing.T) {
 	app := mounted(t)

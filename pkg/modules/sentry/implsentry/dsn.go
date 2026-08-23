@@ -11,7 +11,7 @@ import (
 //
 //	https://<version>:<hmac>@<host>/v1/event/<projectID>
 //
-// THE INGEST DOOR IS /v1/event, and it is the same door the product event stream
+// THE INGEST ADDRESS IS /v1/event, the same one the product event stream
 // uses. @hanzo/event derives its ingest URL from the DSN's OWN path — base plus
 // /envelope/ — so this line decides where every reporting client posts, and it is
 // the one place the server states it.

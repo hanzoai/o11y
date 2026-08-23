@@ -13,7 +13,7 @@ package o11y_test
 // r.RequestURI into fasthttp verbatim. With RequestURI empty the path was
 // erased, fasthttp normalized it to "/", no API route matched, and the request
 // fell through to the console web provider's http.NotFound. Every relayed op
-// answered 404 {"status":404,"error":"404 page not found"} at the unified door
+// answered 404 {"status":404,"error":"404 page not found"} at the unified binary
 // while the standalone served the same paths 200.
 //
 // So this test installs the REAL wrapper rather than a stand-in. A fake that is

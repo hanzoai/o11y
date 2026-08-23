@@ -85,7 +85,7 @@ func TestTableAndRouterAgree(t *testing.T) {
 func TestDuplicateRegistrationPanics(t *testing.T) {
 	defer func() {
 		if recover() == nil {
-			t.Fatal("a second registration at the same door did not panic")
+			t.Fatal("a second registration at the same address did not panic")
 		}
 	}()
 	app := zip.New(zip.Config{DisableStartupMessage: true})
@@ -127,7 +127,7 @@ func TestRouteValuesReachTheHandler(t *testing.T) {
 // would do it SILENTLY: an audit record keyed on "" is still a record, and
 // Param("id") returning "" is still a string. Nothing would go red.
 //
-// So both doors are driven here, against one registration, and compared to each
+// So both paths are driven here, against one registration, and compared to each
 // other. Comparing them to a written-down expectation would pin what someone
 // believed; comparing them to each other pins what the seam promises.
 func TestByNameCarriesTheSameRouteAsMatching(t *testing.T) {
