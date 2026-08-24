@@ -316,7 +316,7 @@ func TestMetricsRestStillReachesTheWildcard(t *testing.T) {
 	// the order the composed binary uses.
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = io.WriteString(w, `{"door":"wildcard","path":"`+r.URL.Path+`"}`)
+		_, _ = io.WriteString(w, `{"endpoint":"wildcard","path":"`+r.URL.Path+`"}`)
 	})))
 	if err := o11y.Mount(app); err != nil {
 		t.Fatalf("Mount: %v", err)
@@ -324,11 +324,11 @@ func TestMetricsRestStillReachesTheWildcard(t *testing.T) {
 	runtime(t, map[string]any{"metrics": []any{}})
 
 	// A metrics path with no typed op keeps reaching the runtime.
-	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/metrics/samples", nil)); !strings.Contains(string(body), `"door":"wildcard"`) {
+	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/metrics/samples", nil)); !strings.Contains(string(body), `"endpoint":"wildcard"`) {
 		t.Errorf("an untyped metrics path no longer reaches the runtime: %s", body)
 	}
 	// ...and a typed path wins over the wildcard.
-	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/metrics?start=1&end=2", nil)); strings.Contains(string(body), `"door":"wildcard"`) {
+	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/metrics?start=1&end=2", nil)); strings.Contains(string(body), `"endpoint":"wildcard"`) {
 		t.Fatalf("the typed op did not take precedence: %s", body)
 	}
 }

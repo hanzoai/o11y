@@ -111,7 +111,7 @@ CREATE TABLE IF NOT EXISTS event.fact
     -- validated principal, first in every sort key in this namespace. Never a UUID,
     -- never an integer, never translated through a lookup table.
     `org`          LowCardinality(String),
-    -- signal is the closed discriminator: act | clip | error | log | span. The door
+    -- signal is the closed discriminator: act | clip | error | log | span. The endpoint
     -- derives what it accepts from the set of writers, so this vocabulary and the
     -- storage cannot disagree.
     `signal`       LowCardinality(String),
@@ -248,7 +248,7 @@ CREATE TABLE IF NOT EXISTS event.fact
     -- saw a fraction of its own errors.
     --
     -- A CONSTRAINT is the difference between a rule and a hope. It is evaluated on
-    -- INSERT, so a writer that regresses is REFUSED at the door rather than discovered
+    -- INSERT, so a writer that regresses is REFUSED at the edge rather than discovered
     -- later by a migration, and the contract lives in ONE place — here — instead of in
     -- prose plus a check somebody has to remember to run.
     --
@@ -270,7 +270,7 @@ PARTITION BY (signal, toYYYYMM(ingested_at))
 PRIMARY KEY (org, time)
 ORDER BY (org, time, id)
 -- The four retentions the plane already had, preserved. The signal set is CLOSED and
--- enforced at the door (a fact whose signal has no writer is refused, not accepted and
+-- enforced at the endpoint (a fact whose signal has no writer is refused, not accepted and
 -- discarded), so every partition this table can hold is covered by a clause below and
 -- nothing can grow without a retention.
 TTL toDateTime(ingested_at) + INTERVAL 30 DAY DELETE WHERE signal IN ('log', 'span', 'clip'),

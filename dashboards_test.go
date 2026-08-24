@@ -340,7 +340,7 @@ func TestDashboardTypedPathsWinOverWildcard(t *testing.T) {
 	// the order the composed binary uses.
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = io.WriteString(w, `{"door":"wildcard","path":"`+r.URL.Path+`"}`)
+		_, _ = io.WriteString(w, `{"endpoint":"wildcard","path":"`+r.URL.Path+`"}`)
 	})))
 	if err := o11y.Mount(app); err != nil {
 		t.Fatalf("Mount: %v", err)
@@ -348,11 +348,11 @@ func TestDashboardTypedPathsWinOverWildcard(t *testing.T) {
 	runtime(t, o11y.O11yDashboardList{})
 
 	// A deeper, unmodeled dashboard subpath still reaches the wildcard.
-	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/dashboards/d1/history", nil)); !strings.Contains(string(body), `"door":"wildcard"`) {
+	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/dashboards/d1/history", nil)); !strings.Contains(string(body), `"endpoint":"wildcard"`) {
 		t.Errorf("an unmodeled dashboard subpath no longer reaches the runtime through the wildcard: %s", body)
 	}
 	// ...and the typed list op wins over that wildcard.
-	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/dashboards", nil)); strings.Contains(string(body), `"door":"wildcard"`) {
+	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/dashboards", nil)); strings.Contains(string(body), `"endpoint":"wildcard"`) {
 		t.Fatalf("the typed dashboards op did not take precedence: %s", body)
 	}
 }
