@@ -159,8 +159,8 @@ reads it as one, and `o11y.SetRuntime` hands the whole table over
 The address is stated ONCE, at the registration, and rides the call
 (`address.go`'s `addressed` → `zip.Address`); `relay` takes no method and no path.
 That retired 706 spellings of 366 addresses down to 366. A host whose runtime is
-in ANOTHER process installs `o11y.Whole(proxy)` — one door, honestly, because for
-a remote every address really does resolve to the same door.
+in ANOTHER process installs `o11y.Whole(proxy)` — one endpoint, honestly, because for
+a remote every address really does resolve to the same endpoint.
 
 Reached BY NAME there is no router in front of the handler, so the two chain
 members that need the route (`Audit` keys on the template, `Resource` resolves the
@@ -177,7 +177,7 @@ order the old tree ran in — match, then middleware, then handler.
 
 **Serving.** The standalone server hands its listener straight to the app
 (`app.Fiber().Listener(conn)`), so streams and the `/v1/o11y/query_progress` upgrade
-run native fasthttp. `PublicHandler()` is the embedding host's door and bridges to
+run native fasthttp. `PublicHandler()` is the embedding host's endpoint and bridges to
 `net/http`: streamed answers pump through it, a connection HIJACK does not, so a
 host that needs the websocket serves the listener rather than embedding it.
 
@@ -245,7 +245,7 @@ the binary. `pkg/query-service/app`'s `publish()` mounts them onto the router th
 server serves — after the service's own routes (so the handler that always
 answered a path still answers it, and streams stay streams) and before the console
 catch-all — then calls `app.Prepare()`, which is what turns the registry into
-doors: `/.well-known/openapi.json`, `/docs`, `/mcp`, the by-name call plane. This
+endpoints: `/.well-known/openapi.json`, `/docs`, `/mcp`, the by-name call plane. This
 server serves through `Fiber().Listener`, not `zip.Listen`, so without that call
 the document exists in the process and answers on no port.
 

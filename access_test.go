@@ -312,7 +312,7 @@ func TestAccessTheRestOfTheFaceStillReachesTheRuntime(t *testing.T) {
 	// the order the composed binary uses.
 	app.All("/v1/o11y/*", zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = io.WriteString(w, `{"door":"wildcard","path":"`+r.URL.Path+`"}`)
+		_, _ = io.WriteString(w, `{"endpoint":"wildcard","path":"`+r.URL.Path+`"}`)
 	})))
 	if err := o11y.Mount(app); err != nil {
 		t.Fatalf("Mount: %v", err)
@@ -328,7 +328,7 @@ func TestAccessTheRestOfTheFaceStillReachesTheRuntime(t *testing.T) {
 	// still-wildcarded path left to sample from this face, so the fallthrough
 	// guard now lives where the hatches do: mount_test.go.
 	// ...and the typed access path wins over that wildcard.
-	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/roles", nil)); strings.Contains(string(body), `"door":"wildcard"`) {
+	if _, body := call(t, app, member(http.MethodGet, "/v1/o11y/roles", nil)); strings.Contains(string(body), `"endpoint":"wildcard"`) {
 		t.Fatalf("the typed op did not take precedence: %s", body)
 	}
 }
