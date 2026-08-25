@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -156,6 +157,181 @@ func TestPublishedDocumentIsO11ysSurface(t *testing.T) {
 			!strings.HasPrefix(path, eventRootPath) {
 			t.Errorf("the document publishes %s, which is not o11y's surface", path)
 		}
+	}
+}
+
+// THE FIVE CONTROL PATHS, BYTE FOR BYTE.
+//
+// publish's claim is that routing to the declaration app is "the same decision it
+// would make on its own listener". That is a claim about bytes, so it is checked
+// as one: every probe below is asked of the serving router AND of a declaration
+// app of its own, and the two answers must be identical — status, Content-Type,
+// the headers named here, and the body.
+//
+// The literal columns are what keeps the comparison from being circular. Two
+// routers that both stopped answering would agree with each other; a status, a
+// content type and, where the answer is short enough to write down, the bytes
+// themselves are read off the ROW rather than off the other router.
+type answer struct {
+	method string
+	path   string
+	body   string
+
+	status int
+	ctype  string
+	// allow is the Allow header, set only where the router refuses the method.
+	allow string
+	// bytes is the whole body, for the answers short enough to state. The long
+	// ones — the document, the tool list, the plugin declaration — are pinned by
+	// the comparison with the declaration app instead.
+	bytes string
+}
+
+var answers = []answer{
+	{method: http.MethodGet, path: zip.SpecPath, status: 200, ctype: "application/json"},
+	{method: http.MethodGet, path: zip.DocsPath, status: 200, ctype: "text/html; charset=utf-8"},
+	// Fiber matches with a trailing slash and answers HEAD off the GET route, so
+	// both reach the same handler as /docs. Registered once, answering three ways.
+	{method: http.MethodGet, path: zip.DocsPath + "/", status: 200, ctype: "text/html; charset=utf-8"},
+	{method: http.MethodHead, path: zip.DocsPath, status: 200, ctype: "text/html; charset=utf-8", bytes: ""},
+	{method: http.MethodGet, path: zip.PluginPath, status: 200, ctype: "application/json; charset=utf-8"},
+	{
+		method: http.MethodPost, path: mcpPath, body: `{"jsonrpc":"2.0","id":1,"method":"tools/list"}`,
+		status: 200, ctype: "application/json; charset=utf-8",
+	},
+	{
+		method: http.MethodPost, path: mcpPath, body: `{"jsonrpc":"2.0","id":2,"method":"initialize"}`,
+		status: 200, ctype: "application/json; charset=utf-8",
+		bytes: `{"id":2,"jsonrpc":"2.0","result":{"capabilities":{"tools":{"listChanged":false}},` +
+			`"protocolVersion":"2025-06-18","serverInfo":{"name":"o11y","version":""}}}`,
+	},
+	// The call plane names the op in the path and answers in ZAP, refusal
+	// included — application/json is the boundary encoding, and this plane is not
+	// the boundary.
+	{
+		method: http.MethodPost, path: zip.CallPath + "nope", body: `{}`,
+		status: 404, ctype: "application/zap",
+		bytes: "ZAP\x00\x01\x00\x00\x00\x10\x00\x00\x008\x00\x00\x00\x94\x01\x00\x00" +
+			"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\b\x00\x00\x00\x10\x00\x00\x00unknown op: nope",
+	},
+
+	// A MISS IS THE ROUTER'S OWN, and it does not look like net/http's. There is
+	// no path cleaning in front of these: a dot segment, a bare "." segment and a
+	// doubled slash are all matched literally and all miss, where an http.ServeMux
+	// would have answered 301 to the cleaned form before matching anything. The
+	// body is JSON, not "404 page not found", and no X-Content-Type-Options rides
+	// with it (see nosniffIsNotOurs).
+	{method: http.MethodPost, path: zip.CallPath, body: `{}`, status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
+	{method: http.MethodGet, path: "/docs/../docs", status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
+	{method: http.MethodGet, path: "//docs", status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
+	{method: http.MethodGet, path: "/./docs", status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
+	{method: http.MethodGet, path: zip.SpecPath + "/extra", status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
+	{method: http.MethodGet, path: "/missing", status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
+	{
+		method: http.MethodPost, path: zip.DocsPath,
+		status: 405, ctype: "application/json; charset=utf-8", allow: "GET, HEAD",
+		bytes: `{"status":405,"error":"Method Not Allowed"}`,
+	},
+}
+
+const missBody = `{"status":404,"error":"Not Found"}`
+
+// ask puts one probe to a router and returns the whole answer.
+func (a answer) ask(t *testing.T, app *zip.App) (*http.Response, []byte) {
+	t.Helper()
+	var body io.Reader
+	if a.body != "" {
+		body = strings.NewReader(a.body)
+	}
+	req := httptest.NewRequest(a.method, a.path, body)
+	if a.body != "" {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	resp, err := app.Test(req)
+	if err != nil {
+		t.Fatalf("%s %s: %v", a.method, a.path, err)
+	}
+	read, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatalf("%s %s: read body: %v", a.method, a.path, err)
+	}
+	return resp, read
+}
+
+func TestPublishServesTheDeclarationVerbatim(t *testing.T) {
+	app := zip.New(zip.Config{DisableStartupMessage: true})
+	if err := publish(app); err != nil {
+		t.Fatalf("publish: %v", err)
+	}
+	// A declaration of its own, to answer the same probes on its own router.
+	own, err := declaration()
+	if err != nil {
+		t.Fatalf("declaration: %v", err)
+	}
+
+	for _, a := range answers {
+		at := a.method + " " + a.path
+		resp, got := a.ask(t, app)
+
+		if resp.StatusCode != a.status {
+			t.Errorf("%s status=%d, want %d", at, resp.StatusCode, a.status)
+		}
+		if ct := resp.Header.Get("Content-Type"); ct != a.ctype {
+			t.Errorf("%s content-type=%q, want %q", at, ct, a.ctype)
+		}
+		if allow := resp.Header.Get("Allow"); allow != a.allow {
+			t.Errorf("%s allow=%q, want %q", at, allow, a.allow)
+		}
+		// net/http writes this beside every http.Error; a zip answer carries it
+		// only when a handler sets it, and none of these does.
+		if nosniff := resp.Header.Get("X-Content-Type-Options"); nosniff != "" {
+			t.Errorf("%s x-content-type-options=%q, want none", at, nosniff)
+		}
+		if a.bytes != "" || a.method == http.MethodHead {
+			if string(got) != a.bytes {
+				t.Errorf("%s body=%q, want %q", at, got, a.bytes)
+			}
+		}
+
+		mine, want := a.ask(t, own)
+		if resp.StatusCode != mine.StatusCode {
+			t.Errorf("%s status=%d on the serving router, %d on the declaration's own",
+				at, resp.StatusCode, mine.StatusCode)
+		}
+		if ct, mct := resp.Header.Get("Content-Type"), mine.Header.Get("Content-Type"); ct != mct {
+			t.Errorf("%s content-type=%q on the serving router, %q on the declaration's own", at, ct, mct)
+		}
+		if !bytes.Equal(got, want) {
+			t.Errorf("%s answers %d bytes, the declaration's own router %d — they must be the same bytes",
+				at, len(got), len(want))
+		}
+	}
+}
+
+// WHY THE DECLARATION IS DISPATCHED TO AND NOT COMPOSED IN.
+//
+// app.Use(d) would read the declaration's entries as if they had been written on
+// the serving app, which is exactly what must not happen: both name the same 367
+// addresses, and Build refuses a program where two definitions claim one address.
+// The refusal names the address and both claimants, so the reason this is a
+// dispatch is measurable rather than asserted in a comment.
+func TestTheDeclarationCannotBeComposedIn(t *testing.T) {
+	app := zip.New(zip.Config{AppName: "o11y", DisableStartupMessage: true})
+	const taken = "/v1/o11y/logs"
+	app.Get(taken, func(c *zip.Ctx) error { return c.NoContent(http.StatusOK) })
+
+	d, err := declaration()
+	if err != nil {
+		t.Fatalf("declaration: %v", err)
+	}
+	app.Use(d)
+
+	err = app.Build()
+	if err == nil {
+		t.Fatal("composing the declaration into the serving app built cleanly; one address now has two definitions")
+	}
+	if !strings.Contains(err.Error(), "GET "+taken) {
+		t.Fatalf("Build refused with %q, which does not name %s", err, taken)
 	}
 }
 

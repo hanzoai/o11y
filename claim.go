@@ -196,6 +196,44 @@ func route(app *zip.App, method, path string) {
 	}
 }
 
+// bridge is this package's ONE net/http adapter: every route that answers with a
+// handler the HOST installed is registered through here. (A typed op does not
+// come this way — relay drives the same handler with a recorder, from inside the
+// op, and never touches the router.)
+//
+// What it adapts is net/http on the far side by construction: a runtime resolves
+// to an http.Handler ([Runtime]), and a health handler is three
+// http.HandlerFuncs (factory.Handler). Neither is a value this package could ask
+// for natively — both are handed in by the host — so the request has to be
+// rendered as an http.Request once, here, to reach either.
+//
+// pick runs per request because both callers choose late: a hatch reads the
+// runtime SetRuntime installed, a probe the handler SetHealth did, and either can
+// change while the process serves. Only the CHOICE is late — the adapter itself
+// is built once, at registration. Building it per request is what this replaces:
+// probe called zip.AdaptNetHTTP inside its own handler, so every liveness poll
+// allocated an adapter and wrote zip's terminal marker into a process-wide map
+// again, to answer a request whose shape has not changed since boot.
+func bridge(pick func() http.Handler) zip.Handler {
+	return zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		pick().ServeHTTP(w, r)
+	}))
+}
+
+// answer is the runtime's handler for one address, or the refusal that says
+// which of the two reasons it has none. The refusal is net/http's own shape —
+// text/plain and nosniff — because it is written on the net/http side of the
+// bridge, and health_test.go's table pins it that way.
+func answer(method, template string) http.Handler {
+	h, err := at(method, template)
+	if err != nil {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			http.Error(w, err.Error(), http.StatusServiceUnavailable)
+		})
+	}
+	return h
+}
+
 // hatch serves ONE address by handing the request straight to the runtime's
 // handler for it — no recorder, no decode, no re-encode.
 //
@@ -207,12 +245,5 @@ func route(app *zip.App, method, path string) {
 // finished. Here the runtime's handler writes to the caller's own
 // ResponseWriter, so a stream stays a stream and a header stays a header.
 func hatch(method, template string) zip.Handler {
-	return zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h, err := at(method, template)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusServiceUnavailable)
-			return
-		}
-		h.ServeHTTP(w, r)
-	}))
+	return bridge(func() http.Handler { return answer(method, template) })
 }
