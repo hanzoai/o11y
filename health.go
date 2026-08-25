@@ -87,13 +87,16 @@ func livez(path string) zip.Handler {
 // handler selected by sel. The check reads the service registry, so its body
 // stays in factory.Handler (one home) and is reached over the net/http bridge;
 // the routing is native. Falls through to the runtime when no handler is set.
+//
+// Both sources are net/http handlers, so the choice between them is one pick on
+// the far side of ONE bridge rather than two handlers with a branch in front —
+// and the state is read once, where the answer is chosen, so a SetHealth landing
+// mid-request cannot make the branch and the call disagree.
 func probe(path string, sel func(factory.Handler) http.HandlerFunc) zip.Handler {
-	delegate := hatch(http.MethodGet, path)
-	return func(c *zip.Ctx) error {
-		h := getHealth()
-		if h == nil {
-			return delegate(c)
+	return bridge(func() http.Handler {
+		if h := getHealth(); h != nil {
+			return sel(h)
 		}
-		return zip.AdaptNetHTTP(sel(h))(c)
-	}
+		return answer(http.MethodGet, path)
+	})
 }

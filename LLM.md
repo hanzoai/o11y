@@ -181,6 +181,38 @@ run native fasthttp. `PublicHandler()` is the embedding host's door and bridges 
 `net/http`: streamed answers pump through it, a connection HIJACK does not, so a
 host that needs the websocket serves the listener rather than embedding it.
 
+**Three `zip.AdaptNetHTTP` remain on served paths, and each is one because its
+FAR SIDE is net/http** (the others in a grep are tests standing in for a
+net/http host). `routing.go`'s leaf — the 366 handler bodies and the chain around
+them are `http.Handler`, and `Table.Handler` hands the SAME value to a by-name
+caller, so a native leaf would be a second spelling of every route. The console
+catch-all — `web.Web` is `http.Handler` and nothing else, deliberately, so one
+value serves the net/http chain here and a zip route in cloud. And `claim.go`'s
+`bridge` — a host installs an `http.Handler` runtime (`SetRuntime`) and a
+net/http `factory.Handler` (`SetHealth`), so there is nothing native to call.
+That bridge is now the package's only one: `probe` used to build an adapter
+*inside its own handler*, so every liveness poll allocated one and re-wrote zip's
+terminal marker into a process-wide map.
+
+The fourth was not on a net/http far side at all. `publish` reached the
+declaration app through `zip.AdaptNetHTTP(adaptor.FiberApp(d.Fiber()))` — out
+through `net/http` and back into a router that is native at both ends, copying
+method, URI, host and every header into a second pooled `fasthttp.Request`,
+the body twice, `r.RemoteAddr` through `net.ResolveTCPAddr`, and every response
+header back one at a time. `dispatch` hands the live request to that router,
+which is what a listener does with one. Composing instead (`app.Use(d)`) is
+refused at build — both apps claim the same 367 addresses, and the refusal names
+the first one (`TestTheDeclarationCannotBeComposedIn`). The five control paths'
+whole answer is pinned byte for byte against the declaration app's own answer in
+`TestPublishServesTheDeclarationVerbatim`.
+
+Measured while pinning those answers, unrelated to the conversion and NOT fixed:
+`app.Fiber().Use(...)` at `server.go`'s compress and CORS is inert on this zip
+version. `Fiber()` builds a generation, and the routes registered after it build
+another that the app then serves, so neither an ordinary route nor a control
+route sees either middleware — no `Access-Control-Allow-Origin` and no
+`Content-Encoding` on any answer, in either registration order.
+
 ## Dependency ownership (fork boundary)
 
 All O11y-branded platform deps are OWNED as public `hanzoai/*` forks — never
