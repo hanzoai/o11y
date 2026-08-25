@@ -376,7 +376,7 @@ func publish(app *zip.App) error {
 	}
 	// One handler for all five: the declaration app answers by PATH, so routing
 	// to it is the same decision it would make on its own listener.
-	serve := zip.AdaptNetHTTP(adaptor.FiberApp(d.Fiber()))
+	serve := dispatch(d)
 	app.Get(zip.SpecPath, serve)
 	app.Get(zip.DocsPath, serve)
 	app.Get(zip.PluginPath, serve)
@@ -386,6 +386,37 @@ func publish(app *zip.App) error {
 	// The call plane is CallPath + the op name.
 	app.Post(zip.CallPath+"*", serve)
 	return nil
+}
+
+// dispatch answers with another app's router, on the request already in hand.
+//
+// Handing a request to a router is what a listener does with one — zip's own
+// generation is `g.serve = g.router.Handler()` — so a handler that answers with
+// another app is that same call, made from here.
+//
+// It used to be zip.AdaptNetHTTP(adaptor.FiberApp(d.Fiber())) — a round trip out
+// through net/http and back, for a router that was native at both ends. Per
+// request that is: the live fasthttp request rendered into an http.Request, then
+// a second fasthttp.Request taken from a pool and the method, URI, host, every
+// header and the whole body copied into it, r.RemoteAddr put through
+// net.ResolveTCPAddr, a second fasthttp.RequestCtx taken from a pool, and on the
+// way back every response header copied across one at a time and the body copied
+// again (adaptor.handlerFunc). The request that arrived was already the request
+// the declaration's router wanted.
+//
+// Composing instead — app.Use(d) — is not available and should not be: the
+// declaration names the same 367 addresses the service registers, and Build
+// refuses a program in which two definitions claim one address
+// (TestTheDeclarationCannotBeComposedIn measures the refusal). The two apps are
+// deliberately separate, so reaching one from the other is a dispatch.
+func dispatch(a *zip.App) zip.Handler {
+	answer := a.Fiber().Handler()
+	// TERMINAL: it writes the whole response, so it answers whatever address it
+	// is registered at and belongs on a route, never on a Use.
+	return zip.Terminal("app.dispatch", func(c *zip.Ctx) error {
+		answer(c.Fiber().RequestCtx())
+		return nil
+	})
 }
 
 // mcpPath is where zip installs the MCP tool surface by default.

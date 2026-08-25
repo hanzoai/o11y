@@ -104,18 +104,6 @@ func SetRuntime(rt Runtime) {
 	rmu.Unlock()
 }
 
-// answers is the handler for one address, or nil when no runtime is installed or
-// the installed one does not serve it.
-func answers(method, path string) http.Handler {
-	rmu.RLock()
-	rt := runtime
-	rmu.RUnlock()
-	if rt == nil {
-		return nil
-	}
-	return rt.Handler(method, path)
-}
-
 // at is the handler for one address, or the refusal that says which of the two
 // reasons it has none. The distinction is the whole point of naming addresses:
 // "nothing is installed" is a deployment that has not finished booting, and "this
