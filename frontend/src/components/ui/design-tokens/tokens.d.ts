@@ -1808,7 +1808,7 @@ export declare const semanticTokens: {
 					group: 'sidebar';
 				};
 				'font-sans': {
-					value: "'Inter'";
+					value: "'Zen'";
 					description: '';
 					category: 'typography';
 					group: 'fonts';
@@ -2706,7 +2706,7 @@ export declare const semanticTokens: {
 					group: 'sidebar';
 				};
 				'font-sans': {
-					value: "'Inter'";
+					value: "'Zen'";
 					description: '';
 					category: 'typography';
 					group: 'fonts';
