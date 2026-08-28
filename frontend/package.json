@@ -47,7 +47,7 @@
     "@dnd-kit/sortable": "8.0.0",
     "@dnd-kit/utilities": "3.2.2",
     "@grafana/data": "^11.6.14",
-    "@hanzo/font": "^1.8.12",
+    "@hanzo/font": "^1.9.1",
     "@hanzo/gui": "^8.0.1",
     "@hanzo/insights": "^1.358.1",
     "@hanzo/ui": "^8.0.39",
