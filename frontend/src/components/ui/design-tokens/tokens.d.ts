@@ -4006,7 +4006,7 @@ export declare const Typography: {
 	PERISCOPE_FONTSIZEMEDIUM: string;
 	PERISCOPE_FONTSIZEBASE: string;
 	PERISCOPE_FONTSIZESMALL: string;
-	FONTFAMILY_INTER: string;
+	FONTFAMILY_ZEN: string;
 	FONTFAMILY_SFMONO: string;
 	FONTSIZE_XS: string;
 	FONTSIZE_SM: string;
@@ -4239,126 +4239,126 @@ export declare type TypographyStyleName = keyof typeof TypographyStyles;
 
 export declare const TypographyStyles: {
 	readonly LABEL_LARGE_400: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '18px';
 		readonly fontWeight: '400';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '0px';
 	};
 	readonly LABEL_LARGE_500: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '18px';
 		readonly fontWeight: '500';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '0px';
 	};
 	readonly LABEL_LARGE_600: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '18px';
 		readonly fontWeight: '600';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '0px';
 	};
 	readonly LABEL_MEDIUM_400: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '16px';
 		readonly fontWeight: '400';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '0px';
 	};
 	readonly LABEL_MEDIUM_500: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '16px';
 		readonly fontWeight: '500';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '0px';
 	};
 	readonly LABEL_MEDIUM_600: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '16px';
 		readonly fontWeight: '600';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '0px';
 	};
 	readonly LABEL_BASE_400: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '13px';
 		readonly fontWeight: '400';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '-0.5px';
 	};
 	readonly LABEL_BASE_500: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '13px';
 		readonly fontWeight: '500';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '-0.5px';
 	};
 	readonly LABEL_BASE_600: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '13px';
 		readonly fontWeight: '600';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '-0.5px';
 	};
 	readonly LABEL_SMALL_400: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '11px';
 		readonly fontWeight: '400';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '0px';
 	};
 	readonly LABEL_SMALL_500: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '11px';
 		readonly fontWeight: '500';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '0px';
 	};
 	readonly LABEL_SMALL_600: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '11px';
 		readonly fontWeight: '600';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '0px';
 	};
 	readonly UPPERCASE_BASE_400: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '13px';
 		readonly fontWeight: '400';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '4px';
 	};
 	readonly UPPERCASE_BASE_500: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '13px';
 		readonly fontWeight: '500';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '4px';
 	};
 	readonly UPPERCASE_BASE_600: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '13px';
 		readonly fontWeight: '600';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '4px';
 	};
 	readonly UPPERCASE_SMALL_400: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '11px';
 		readonly fontWeight: '400';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '4px';
 	};
 	readonly UPPERCASE_SMALL_500: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '11px';
 		readonly fontWeight: '500';
 		readonly lineHeight: '1';
 		readonly letterSpacing: '4px';
 	};
 	readonly UPPERCASE_SMALL_600: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '11px';
 		readonly fontWeight: '600';
 		readonly lineHeight: '1';
@@ -4407,63 +4407,63 @@ export declare const TypographyStyles: {
 		readonly letterSpacing: '0px';
 	};
 	readonly PARAGRAPH_MEDIUM_400: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '16px';
 		readonly fontWeight: '400';
 		readonly lineHeight: '24px';
 		readonly letterSpacing: '0px';
 	};
 	readonly PARAGRAPH_MEDIUM_500: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '16px';
 		readonly fontWeight: '500';
 		readonly lineHeight: '24px';
 		readonly letterSpacing: '0px';
 	};
 	readonly PARAGRAPH_MEDIUM_600: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '16px';
 		readonly fontWeight: '600';
 		readonly lineHeight: '24px';
 		readonly letterSpacing: '0px';
 	};
 	readonly PARAGRAPH_BASE_400: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '13px';
 		readonly fontWeight: '400';
 		readonly lineHeight: '20px';
 		readonly letterSpacing: '-0.5px';
 	};
 	readonly PARAGRAPH_BASE_500: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '13px';
 		readonly fontWeight: '500';
 		readonly lineHeight: '20px';
 		readonly letterSpacing: '-0.5px';
 	};
 	readonly PARAGRAPH_BASE_600: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '13px';
 		readonly fontWeight: '600';
 		readonly lineHeight: '20px';
 		readonly letterSpacing: '-0.5px';
 	};
 	readonly PARAGRAPH_SMALL_400: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '11px';
 		readonly fontWeight: '400';
 		readonly lineHeight: '18px';
 		readonly letterSpacing: '-0.5px';
 	};
 	readonly PARAGRAPH_SMALL_500: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '11px';
 		readonly fontWeight: '500';
 		readonly lineHeight: '18px';
 		readonly letterSpacing: '-0.5px';
 	};
 	readonly PARAGRAPH_SMALL_600: {
-		readonly fontFamily: 'Inter, sans-serif';
+		readonly fontFamily: 'Zen, sans-serif';
 		readonly fontSize: '11px';
 		readonly fontWeight: '600';
 		readonly lineHeight: '18px';
@@ -4475,21 +4475,21 @@ export declare const typographyStylesTokens: {
 	label: {
 		large: {
 			'400': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '18px';
 				fontWeight: '400';
 				lineHeight: '1';
 				letterSpacing: '0px';
 			};
 			'500': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '18px';
 				fontWeight: '500';
 				lineHeight: '1';
 				letterSpacing: '0px';
 			};
 			'600': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '18px';
 				fontWeight: '600';
 				lineHeight: '1';
@@ -4498,21 +4498,21 @@ export declare const typographyStylesTokens: {
 		};
 		medium: {
 			'400': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '16px';
 				fontWeight: '400';
 				lineHeight: '1';
 				letterSpacing: '0px';
 			};
 			'500': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '16px';
 				fontWeight: '500';
 				lineHeight: '1';
 				letterSpacing: '0px';
 			};
 			'600': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '16px';
 				fontWeight: '600';
 				lineHeight: '1';
@@ -4521,21 +4521,21 @@ export declare const typographyStylesTokens: {
 		};
 		base: {
 			'400': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '13px';
 				fontWeight: '400';
 				lineHeight: '1';
 				letterSpacing: '-0.5px';
 			};
 			'500': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '13px';
 				fontWeight: '500';
 				lineHeight: '1';
 				letterSpacing: '-0.5px';
 			};
 			'600': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '13px';
 				fontWeight: '600';
 				lineHeight: '1';
@@ -4544,21 +4544,21 @@ export declare const typographyStylesTokens: {
 		};
 		small: {
 			'400': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '11px';
 				fontWeight: '400';
 				lineHeight: '1';
 				letterSpacing: '0px';
 			};
 			'500': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '11px';
 				fontWeight: '500';
 				lineHeight: '1';
 				letterSpacing: '0px';
 			};
 			'600': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '11px';
 				fontWeight: '600';
 				lineHeight: '1';
@@ -4569,21 +4569,21 @@ export declare const typographyStylesTokens: {
 	uppercase: {
 		base: {
 			'400': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '13px';
 				fontWeight: '400';
 				lineHeight: '1';
 				letterSpacing: '4px';
 			};
 			'500': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '13px';
 				fontWeight: '500';
 				lineHeight: '1';
 				letterSpacing: '4px';
 			};
 			'600': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '13px';
 				fontWeight: '600';
 				lineHeight: '1';
@@ -4592,21 +4592,21 @@ export declare const typographyStylesTokens: {
 		};
 		small: {
 			'400': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '11px';
 				fontWeight: '400';
 				lineHeight: '1';
 				letterSpacing: '4px';
 			};
 			'500': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '11px';
 				fontWeight: '500';
 				lineHeight: '1';
 				letterSpacing: '4px';
 			};
 			'600': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '11px';
 				fontWeight: '600';
 				lineHeight: '1';
@@ -4665,21 +4665,21 @@ export declare const typographyStylesTokens: {
 	paragraph: {
 		medium: {
 			'400': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '16px';
 				fontWeight: '400';
 				lineHeight: '24px';
 				letterSpacing: '0px';
 			};
 			'500': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '16px';
 				fontWeight: '500';
 				lineHeight: '24px';
 				letterSpacing: '0px';
 			};
 			'600': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '16px';
 				fontWeight: '600';
 				lineHeight: '24px';
@@ -4688,21 +4688,21 @@ export declare const typographyStylesTokens: {
 		};
 		base: {
 			'400': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '13px';
 				fontWeight: '400';
 				lineHeight: '20px';
 				letterSpacing: '-0.5px';
 			};
 			'500': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '13px';
 				fontWeight: '500';
 				lineHeight: '20px';
 				letterSpacing: '-0.5px';
 			};
 			'600': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '13px';
 				fontWeight: '600';
 				lineHeight: '20px';
@@ -4711,21 +4711,21 @@ export declare const typographyStylesTokens: {
 		};
 		small: {
 			'400': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '11px';
 				fontWeight: '400';
 				lineHeight: '18px';
 				letterSpacing: '-0.5px';
 			};
 			'500': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '11px';
 				fontWeight: '500';
 				lineHeight: '18px';
 				letterSpacing: '-0.5px';
 			};
 			'600': {
-				fontFamily: 'Inter, sans-serif';
+				fontFamily: 'Zen, sans-serif';
 				fontSize: '11px';
 				fontWeight: '600';
 				lineHeight: '18px';
@@ -4748,7 +4748,7 @@ export declare const typographyTokens: {
 			type: 'typography';
 		};
 		fontFamilySans: {
-			value: 'Inter, sans-serif';
+			value: 'Zen, sans-serif';
 			type: 'typography';
 		};
 		fontFamilySerif: {
@@ -4789,8 +4789,8 @@ export declare const typographyTokens: {
 		};
 	};
 	fontFamily: {
-		inter: {
-			value: 'Inter, sans-serif';
+		zen: {
+			value: 'Zen, sans-serif';
 			type: 'typography';
 		};
 		sfMono: {
@@ -4986,7 +4986,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5008,7 +5008,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5030,7 +5030,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5054,7 +5054,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5076,7 +5076,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5098,7 +5098,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5122,7 +5122,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5144,7 +5144,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5166,7 +5166,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5190,7 +5190,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5212,7 +5212,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5234,7 +5234,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5260,7 +5260,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5282,7 +5282,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5304,7 +5304,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5328,7 +5328,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5350,7 +5350,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5372,7 +5372,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5536,7 +5536,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5558,7 +5558,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5580,7 +5580,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5604,7 +5604,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5626,7 +5626,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5648,7 +5648,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5672,7 +5672,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5694,7 +5694,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
@@ -5716,7 +5716,7 @@ export declare const typographyTokens: {
 					type: 'typography';
 				};
 				fontFamily: {
-					value: 'Inter, sans-serif';
+					value: 'Zen, sans-serif';
 					type: 'typography';
 				};
 			};
