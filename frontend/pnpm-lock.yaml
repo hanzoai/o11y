@@ -63,8 +63,8 @@ importers:
         specifier: ^11.6.14
         version: 11.6.14(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@hanzo/font':
-        specifier: ^1.9.1
-        version: 1.9.1(next@16.2.1(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.55.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.97.3))
+        specifier: ^1.9.2
+        version: 1.9.2(next@16.2.1(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.55.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.97.3))
       '@hanzo/gui':
         specifier: ^8.0.1
         version: 8.0.1(react-dom@19.2.7(react@19.2.7))(react-native@0.86.2(@babel/core@7.29.0)(@react-native/metro-config@0.86.2(@babel/core@7.29.0))(@types/react@19.2.17)(react@19.2.7))(react@19.2.7)
@@ -1819,8 +1819,8 @@ packages:
       react:
         optional: true
 
-  '@hanzo/font@1.9.1':
-    resolution: {integrity: sha512-fZv8lzxUnz8g7SUP6yPoE1qKwJ6/yR0+PFhud5Vv6lEfxFdGCbsl3q86T6ZntzkC8ohoojXnNuhDAzvZCNVcCw==}
+  '@hanzo/font@1.9.2':
+    resolution: {integrity: sha512-CXKXhfRgAj9SnhRJtraS6jEToGz74hbrMSJm85Kp8y6uN64zOH+IvohpWT/Surh9Qn1KWIGXsIx216JMa++X6A==}
     peerDependencies:
       next: '>=13.2.0'
 
@@ -12011,7 +12011,7 @@ snapshots:
     optionalDependencies:
       react: 19.2.7
 
-  '@hanzo/font@1.9.1(next@16.2.1(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.55.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.97.3))':
+  '@hanzo/font@1.9.2(next@16.2.1(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.55.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.97.3))':
     dependencies:
       next: 16.2.1(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.55.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.97.3)
 
