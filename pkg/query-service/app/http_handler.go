@@ -36,14 +36,6 @@ import (
 	"github.com/gorilla/websocket"
 	jsoniter "github.com/json-iterator/go"
 
-	// The "sqlite" database/sql driver is registered exactly once by the sqlstore
-	// provider (pkg/sqlstore/sqlitesqlstore, which this package transitively
-	// imports and which must import modernc for the *sqlite.Error type). A second
-	// blank _ "modernc.org/sqlite" here was redundant, and re-pointing it at
-	// github.com/hanzoai/sqlite would double-register "sqlite" under CGO_ENABLED=1
-	// (the fork's cgo backend Register()s mattn while modernc's init Register()s
-	// modernc) — the exact "Register called twice" panic. One registration site.
-
 	"github.com/hanzoai/o11y/pkg/contextlinks"
 	traceFunnelsModule "github.com/hanzoai/o11y/pkg/modules/tracefunnel"
 	"github.com/hanzoai/o11y/pkg/query-service/agentConf"
