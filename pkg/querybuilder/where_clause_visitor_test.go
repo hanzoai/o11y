@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	"github.com/antlr4-go/antlr/v4"
+	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 	"github.com/stretchr/testify/assert"
 )
 

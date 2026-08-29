@@ -1,7 +1,7 @@
 // HIP-1241 metrics capability — one native store, three signals.
 //
 //	import "github.com/hanzoai/o11y/metrics"
-//	metrics.Mount(app, metrics.Deps{Logger: log, DataDir: dir, Brand: brand, Org: principal.Org})
+//	metrics.Use(app, metrics.Deps{Logger: log, DataDir: dir, Brand: brand, Org: principal.Org})
 //
 // This code was github.com/hanzoai/metrics, whose NOTICE names this module its
 // successor. It arrived here whole — store, WAL, ZAP receiver, routes, tests —
@@ -110,7 +110,7 @@ func tenant(c *zip.Ctx) (*tenantSet, bool) {
 }
 
 // Mount registers the native observability routes on the shared cloud App.
-func Mount(app *zip.App, deps Deps) error {
+func Use(app *zip.App, deps Deps) error {
 	// Fail closed, and fail at BOOT. A nil decision could only default to
 	// something, and every default here is a tenant an unauthenticated caller
 	// gets to name. Refusing to mount is the one outcome that cannot ship a

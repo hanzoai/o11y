@@ -13,7 +13,7 @@ const (
 	MaxExportBytesLimit = 10 * 1024 * 1024 * 1024 // 10 GB
 
 	// Query Limits.
-	ChunkSize                         = 5_000 // 5k
+	ChunkSize                        = 5_000 // 5k
 	DatastoreExportRawDataMaxThreads = 2
 	DatastoreExportRawDataTimeout    = 10 * time.Minute
 )

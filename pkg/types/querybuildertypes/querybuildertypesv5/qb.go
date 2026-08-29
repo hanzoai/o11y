@@ -3,10 +3,10 @@ package querybuildertypesv5
 import (
 	"context"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schema "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 var (

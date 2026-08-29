@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/antlr4-go/antlr/v4"
 	"github.com/hanzoai/o11y/pkg/errors"
 	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
-	"github.com/antlr4-go/antlr/v4"
 )
 
 // ErrorListener collects syntax errors during parsing.

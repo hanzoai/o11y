@@ -111,8 +111,8 @@ func NewPublicDashboardDataFromDashboard(dashboard *Dashboard, publicDashboard *
 					QueryTraceOperator []map[string]any `json:"queryTraceOperator"`
 				} `json:"builder"`
 				DatastoreSQL []map[string]any `json:"datastore_sql"`
-				PromQL        []map[string]any `json:"promql"`
-				QueryType     string           `json:"queryType"`
+				PromQL       []map[string]any `json:"promql"`
+				QueryType    string           `json:"queryType"`
 			} `json:"query"`
 		} `json:"widgets"`
 	}

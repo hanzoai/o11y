@@ -415,16 +415,16 @@ func buildCompositeQuery(chq *v3.DatastoreQuery, queryContext string) (*v3.Compo
 
 	if queryContext == "producer-consumer-eval" {
 		return &v3.CompositeQuery{
-			QueryType:         v3.QueryTypeDatastoreSQL,
+			QueryType:        v3.QueryTypeDatastoreSQL,
 			DatastoreQueries: map[string]*v3.DatastoreQuery{queryContext: chq},
-			PanelType:         v3.PanelTypeList,
+			PanelType:        v3.PanelTypeList,
 		}, nil
 	}
 
 	return &v3.CompositeQuery{
-		QueryType:         v3.QueryTypeDatastoreSQL,
+		QueryType:        v3.QueryTypeDatastoreSQL,
 		DatastoreQueries: map[string]*v3.DatastoreQuery{queryContext: chq},
-		PanelType:         v3.PanelTypeTable,
+		PanelType:        v3.PanelTypeTable,
 	}, nil
 }
 

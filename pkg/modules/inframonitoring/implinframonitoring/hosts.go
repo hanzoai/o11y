@@ -8,13 +8,13 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/flagger"
 	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	"github.com/hanzoai/o11y/pkg/types/inframonitoringtypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 // getPerGroupHostStatusCounts computes the number of active and inactive hosts per group

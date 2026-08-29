@@ -380,8 +380,8 @@ func (dashboard *Dashboard) GetWidgetQuery(startTime, endTime, widgetIndex uint6
 					QueryTraceOperator []map[string]any `json:"queryTraceOperator"`
 				} `json:"builder"`
 				DatastoreSQL []map[string]any `json:"datastore_sql"`
-				PromQL        []map[string]any `json:"promql"`
-				QueryType     string           `json:"queryType"`
+				PromQL       []map[string]any `json:"promql"`
+				QueryType    string           `json:"queryType"`
 			} `json:"query"`
 			FillGaps bool `json:"fillSpans"`
 		} `json:"widgets"`

@@ -1,8 +1,8 @@
 package jwttokenizer
 
 import (
-	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 var _ jwt.ClaimsValidator = (*Claims)(nil)

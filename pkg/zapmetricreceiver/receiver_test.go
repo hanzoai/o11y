@@ -31,9 +31,9 @@ func freePort(t *testing.T) int {
 // the OnBatch handler exactly once with the decoded batch.
 func TestReceiver_DecodesBatch(t *testing.T) {
 	var (
-		mu    sync.Mutex
-		got   *MetricBatch
-		done  = make(chan struct{}, 1)
+		mu   sync.Mutex
+		got  *MetricBatch
+		done = make(chan struct{}, 1)
 	)
 
 	port := freePort(t)

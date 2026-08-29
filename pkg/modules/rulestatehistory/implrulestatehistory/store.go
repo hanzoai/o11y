@@ -9,13 +9,13 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 )
 
 const (

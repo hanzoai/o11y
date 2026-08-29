@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/google/uuid"
+	"github.com/hanzoai/o11y/pkg/errors"
 )
 
 var _ Valuer = (*UUID)(nil)

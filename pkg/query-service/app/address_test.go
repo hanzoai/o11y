@@ -116,7 +116,7 @@ func TestEveryRegisteredAddressIsDeclaredAndResolves(t *testing.T) {
 	aH.RegisterTraceFunnelsRoutes(r, am)
 
 	d := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := published.Mount(d); err != nil {
+	if err := published.Use(d); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	declared := map[string]bool{}

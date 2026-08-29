@@ -13,9 +13,9 @@ type PostableProfile struct {
 
 // PostableHost is the body for PUT /v2/billing/hosts.
 type PostableHost struct {
-	Hostname string `json:"hostname,omitempty"`
-	IPv4     string `json:"ipv4,omitempty"`
-	IPv6     string `json:"ipv6,omitempty"`
+	Hostname string   `json:"hostname,omitempty"`
+	IPv4     string   `json:"ipv4,omitempty"`
+	IPv6     string   `json:"ipv6,omitempty"`
 	Tags     []string `json:"tags,omitempty"`
 }
 

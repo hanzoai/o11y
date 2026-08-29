@@ -7,9 +7,9 @@ import (
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
 	"github.com/antlr4-go/antlr/v4"
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	grammar "github.com/hanzoai/o11y/pkg/parser/havingexpression/grammar"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 // havingExpressionRewriteVisitor walks the parse tree of a HavingExpression in a single

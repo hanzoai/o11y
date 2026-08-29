@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/go-openapi/strfmt"
 	"github.com/hanzoai/o11y/pkg/alertmanager/alertmanagerstore/sqlalertmanagerstore"
 	"github.com/hanzoai/o11y/pkg/alertmanager/nfmanager/nfmanagertest"
 	"github.com/hanzoai/o11y/pkg/factory/factorytest"
@@ -18,7 +19,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstoretest"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes/alertmanagertypestest"
-	"github.com/go-openapi/strfmt"
 	"github.com/prometheus/alertmanager/api/v2/models"
 	"github.com/prometheus/alertmanager/config"
 	"github.com/prometheus/client_golang/prometheus"
