@@ -1,9 +1,9 @@
 package querybuilder
 
 import (
+	"github.com/antlr4-go/antlr/v4"
 	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	"github.com/antlr4-go/antlr/v4"
 )
 
 // QueryStringToKeysSelectors converts a query string to a list of field key selectors

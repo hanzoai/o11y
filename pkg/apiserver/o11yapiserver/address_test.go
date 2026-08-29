@@ -52,7 +52,7 @@ func TestEveryRegisteredAddressIsDeclaredAndResolves(t *testing.T) {
 func declared(t *testing.T) map[string]bool {
 	t.Helper()
 	d := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(d); err != nil {
+	if err := o11y.Use(d); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	out := map[string]bool{}

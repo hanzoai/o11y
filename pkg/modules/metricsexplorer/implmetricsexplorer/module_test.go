@@ -7,7 +7,6 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	dsmock "github.com/hanzo-ds/mock"
-	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoremock"
 	"github.com/hanzoai/o11y/pkg/cache"
 	"github.com/hanzoai/o11y/pkg/cache/cachetest"
 	"github.com/hanzoai/o11y/pkg/errors"
@@ -17,6 +16,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer"
 	"github.com/hanzoai/o11y/pkg/modules/metricsexplorer/implmetricsexplorer"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoremock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/hanzoai/o11y/pkg/types/metricsexplorertypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"

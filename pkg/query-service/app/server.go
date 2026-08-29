@@ -346,7 +346,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 // meant an invalid program started anyway and its routes were simply missing.
 func declaration() (*zip.App, error) {
 	d := zip.New(zip.Config{AppName: "o11y", DisableStartupMessage: true})
-	if err := published.Mount(d); err != nil {
+	if err := published.Use(d); err != nil {
 		return nil, err
 	}
 	if err := d.Build(); err != nil {

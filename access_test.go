@@ -314,7 +314,7 @@ func TestAccessTheRestOfTheFaceStillReachesTheRuntime(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = io.WriteString(w, `{"endpoint":"wildcard","path":"`+r.URL.Path+`"}`)
 	})))
-	if err := o11y.Mount(app); err != nil {
+	if err := o11y.Use(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	answers(t, http.StatusOK, `{"status":"success","data":[]}`)
