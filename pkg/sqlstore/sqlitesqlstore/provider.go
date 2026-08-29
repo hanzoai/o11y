@@ -13,11 +13,12 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/sqlitedialect"
 
-	// hanzoai/sqlite is the one dual-backend driver: importing it registers the
-	// "sqlite" database/sql driver (mattn/SQLCipher under cgo, modernc pure-Go
-	// otherwise) AND exposes backend-neutral constraint-error classification, so
-	// this package no longer imports modernc directly (which would double-register
-	// "sqlite" in the cgo cloud binary).
+	// hanzoai/sqlite names a facade, not an engine. Importing it registers the
+	// "sqlite" database/sql driver exactly once — SQLCipher/csqlite under cgo,
+	// pure-Go otherwise — and supplies the backend-neutral pragma and
+	// constraint-error primitives used below. Naming an engine here instead would
+	// claim that driver name a second time in the cgo cloud binary, panicking at
+	// init, and would pin this package to one backend's DSN dialect.
 	"github.com/hanzoai/sqlite"
 )
 

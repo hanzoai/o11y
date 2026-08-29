@@ -1,7 +1,7 @@
 {
   "name": "@hanzo/o11y",
   "version": "0.1.0",
-  "description": "Hanzo o11y SDK \u2014 traces over ZAP. No OpenTelemetry, no OTLP, no gRPC.",
+  "description": "Hanzo o11y SDK — traces over ZAP. No OpenTelemetry, no OTLP, no gRPC.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -22,8 +22,8 @@
     "@zap-proto/zap": "^1.6.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "typescript": "^5.6.0"
+    "@types/node": "26.4.0",
+    "typescript": "7.0.2"
   },
   "engines": {
     "node": ">=18.12.0"
