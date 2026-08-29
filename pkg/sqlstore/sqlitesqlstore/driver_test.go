@@ -11,16 +11,16 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestDriverRegisteredOnce proves the "sqlite" database/sql driver is registered
-// exactly once — via this provider's modernc import — and opens cleanly. It is the
-// guard for removing the now-redundant blank _ "modernc.org/sqlite" from
-// pkg/query-service/app/http_handler.go: registration must survive that removal,
-// and pointing that blank import at github.com/hanzoai/sqlite instead would
-// double-register "sqlite" under CGO_ENABLED=1 (the fork's cgo backend Register()s
-// mattn while modernc's init Register()s modernc) and panic. Opening the provider
-// here — under whatever CGO mode the test runs — fails loudly if either regression
-// returns. It also asserts the DSN pragmas take effect (journal_mode=wal,
-// busy_timeout>0) through the driver.
+// TestDriverRegisteredOnce opens the provider and drives the "sqlite" driver name
+// end to end, under whichever CGO mode go test runs.
+//
+// It catches the two ways this provider regresses. A duplicate
+// sql.Register("sqlite") panics during init, so the binary cannot reach the body
+// below if anything in the graph claims that name twice — which is what importing
+// a backend directly alongside the hanzoai/sqlite facade does under CGO_ENABLED=1,
+// where the facade already registers the name against csqlite. And the pragma
+// assertions read back through the driver, so a DSN in the other backend's dialect
+// is caught here rather than silently ignored at open.
 func TestDriverRegisteredOnce(t *testing.T) {
 	dbPath := filepath.Join(t.TempDir(), "o11y.db")
 	store, err := New(context.Background(), factorytest.NewSettings(), sqlstore.Config{
@@ -43,7 +43,7 @@ func TestDriverRegisteredOnce(t *testing.T) {
 
 	var journalMode string
 	require.NoError(t, sqldb.QueryRow("PRAGMA journal_mode").Scan(&journalMode))
-	require.Equal(t, "wal", journalMode, "journal_mode not applied — modernc _pragma DSN form not honored")
+	require.Equal(t, "wal", journalMode, "journal_mode not applied — PragmaDSN emitted a form the linked backend ignores")
 
 	var busyTimeout int
 	require.NoError(t, sqldb.QueryRow("PRAGMA busy_timeout").Scan(&busyTimeout))
