@@ -90,7 +90,7 @@ type queryEnvelopePromQL struct {
 
 // queryEnvelopeDatastoreSQL is the OpenAPI schema for a QueryEnvelope with type=datastore_sql.
 type queryEnvelopeDatastoreSQL struct {
-	Type QueryType       `json:"type" required:"true" description:"The type of the query."`
+	Type QueryType      `json:"type" required:"true" description:"The type of the query."`
 	Spec DatastoreQuery `json:"spec" description:"The Datastore SQL query specification."`
 }
 
@@ -123,7 +123,7 @@ func (QueryEnvelope) PrepareJSONSchema(s *jsonschema.Schema) error {
 			QueryTypeFormula.StringValue():       "#/components/schemas/Querybuildertypesv5QueryEnvelopeFormula",
 			QueryTypeTraceOperator.StringValue(): "#/components/schemas/Querybuildertypesv5QueryEnvelopeTraceOperator",
 			QueryTypePromQL.StringValue():        "#/components/schemas/Querybuildertypesv5QueryEnvelopePromQL",
-			QueryTypeDatastoreSQL.StringValue(): "#/components/schemas/Querybuildertypesv5QueryEnvelopeDatastoreSQL",
+			QueryTypeDatastoreSQL.StringValue():  "#/components/schemas/Querybuildertypesv5QueryEnvelopeDatastoreSQL",
 		},
 	}
 	return nil

@@ -5,9 +5,9 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
-	"github.com/go-viper/mapstructure/v2"
 )
 
 // fieldPath is a dotted mapstructure path into the templating data map,

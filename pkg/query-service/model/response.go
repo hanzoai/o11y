@@ -570,7 +570,7 @@ type AlertsInfo struct {
 	EmailChannels                int      `json:"emailChannels"`
 	MSTeamsChannels              int      `json:"microsoftTeamsChannels"`
 	MetricsBuilderQueries        int      `json:"metricsBuilderQueries"`
-	MetricsDatastoreQueries     int      `json:"metricsDatastoreQueries"`
+	MetricsDatastoreQueries      int      `json:"metricsDatastoreQueries"`
 	MetricsPrometheusQueries     int      `json:"metricsPrometheusQueries"`
 	SpanMetricsPrometheusQueries int      `json:"spanMetricsPrometheusQueries"`
 	AlertNames                   []string `json:"alertNames"`

@@ -20,7 +20,7 @@ import (
 // was not.
 func TestMountTakesOnlyTheRouter(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app); err != nil {
+	if err := o11y.Use(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 }
@@ -36,7 +36,7 @@ func TestMountTakesOnlyTheRouter(t *testing.T) {
 // that actually exist — one hatch and one typed op.
 func TestNamedRouteWithoutRuntimeReturns503(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app); err != nil {
+	if err := o11y.Use(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	o11y.SetRuntime(nil)

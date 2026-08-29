@@ -3,9 +3,9 @@ package dashboardtypes
 import (
 	"encoding/json"
 
+	jsonpatch "github.com/evanphx/json-patch/v5"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/valuer"
-	jsonpatch "github.com/evanphx/json-patch/v5"
 	"github.com/swaggest/jsonschema-go"
 )
 

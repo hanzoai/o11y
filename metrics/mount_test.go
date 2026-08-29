@@ -22,7 +22,7 @@ func newTestApp(t *testing.T) *zip.App {
 	t.Helper()
 	log := luxlog.NewNoOpLogger()
 	app := zip.New(zip.Config{AppName: "metrics-test", Logger: log})
-	if err := Mount(app, Deps{Logger: log, DataDir: t.TempDir(), Brand: "hanzo", Org: testOrg}); err != nil {
+	if err := Use(app, Deps{Logger: log, DataDir: t.TempDir(), Brand: "hanzo", Org: testOrg}); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	return app
@@ -266,7 +266,7 @@ func TestAnonymousCallerCannotNameATenant(t *testing.T) {
 func TestMountRefusesWithoutATenantDecision(t *testing.T) {
 	log := luxlog.NewNoOpLogger()
 	app := zip.New(zip.Config{AppName: "metrics-test", Logger: log})
-	if err := Mount(app, Deps{Logger: log, DataDir: t.TempDir(), Brand: "hanzo"}); err == nil {
+	if err := Use(app, Deps{Logger: log, DataDir: t.TempDir(), Brand: "hanzo"}); err == nil {
 		t.Fatal("Mount with no Org decision succeeded — it must refuse, not pick a default tenant")
 	}
 }

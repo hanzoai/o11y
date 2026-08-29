@@ -3,8 +3,8 @@ package telemetrytraces
 import (
 	"strings"
 
-	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	"github.com/antlr4-go/antlr/v4"
+	grammar "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 )
 
 type traceIDExtractor struct {

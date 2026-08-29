@@ -120,9 +120,9 @@ func TestTenantOpsStayGated(t *testing.T) {
 		"GET /v1/o11y/public/dashboards",   // the collection is not a share
 		"GET /v1/o11y/public/dashboards//", // an empty share id
 		"GET /v1/o11y/public/dashboards/d1/widgets/0/query_rangex",
-		"GET /v1/event/proj/envelope/", // ingest is a WRITE; a GET is not it
-		"POST /v1/o11y/api/v3/issues",  // a read API under the DSN prefix
-		"POST /v1/o11y/sentinel/issues",     // the face is a face, whatever the suffix
+		"GET /v1/event/proj/envelope/",  // ingest is a WRITE; a GET is not it
+		"POST /v1/o11y/api/v3/issues",   // a read API under the DSN prefix
+		"POST /v1/o11y/sentinel/issues", // the face is a face, whatever the suffix
 		// Ingest moved off the face. The old spelling must buy nothing, or
 		// the move left an unauthenticated hole where the route used to be.
 		"POST /v1/o11y/sentinel/proj/envelope/",

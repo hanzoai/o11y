@@ -57,7 +57,7 @@ import (
 // addresses itself has to say so with [Claimed] — see claim.go for why that is a
 // statement of ownership rather than a filter. Without one, nothing changes and
 // the whole table is declared.
-func Mount(app *zip.App, opts ...Option) error {
+func Use(app *zip.App, opts ...Option) error {
 	c := new(conf)
 	for _, o := range opts {
 		o(c)
