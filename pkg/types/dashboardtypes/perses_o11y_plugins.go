@@ -53,7 +53,7 @@ const (
 	QueryKindComposite     QueryPluginKind = "o11y/CompositeQuery"
 	QueryKindFormula       QueryPluginKind = "o11y/Formula"
 	QueryKindPromQL        QueryPluginKind = "o11y/PromQLQuery"
-	QueryKindDatastoreSQL QueryPluginKind = "o11y/DatastoreSQL"
+	QueryKindDatastoreSQL  QueryPluginKind = "o11y/DatastoreSQL"
 	QueryKindTraceOperator QueryPluginKind = "o11y/TraceOperator"
 )
 
@@ -62,12 +62,12 @@ func (QueryPluginKind) Enum() []any {
 }
 
 type (
-	CompositeQuerySpec     = qb.CompositeQuery
-	QueryEnvelope          = qb.QueryEnvelope
-	FormulaSpec            = qb.QueryBuilderFormula
-	PromQLQuerySpec        = qb.PromQuery
+	CompositeQuerySpec    = qb.CompositeQuery
+	QueryEnvelope         = qb.QueryEnvelope
+	FormulaSpec           = qb.QueryBuilderFormula
+	PromQLQuerySpec       = qb.PromQuery
 	DatastoreSQLQuerySpec = qb.DatastoreQuery
-	TraceOperatorSpec      = qb.QueryBuilderTraceOperator
+	TraceOperatorSpec     = qb.QueryBuilderTraceOperator
 )
 
 // BuilderQuerySpec dispatches to the correct generic QueryBuilderQuery type
