@@ -223,10 +223,10 @@ type PromQueryDashboard struct {
 }
 
 type Query struct {
-	Datastore     []DatastoreQueryDashboard `json:"datastore"`
-	PromQL         []PromQueryDashboard       `json:"promQL"`
-	MetricsBuilder MetricsBuilder             `json:"metricsBuilder"`
-	QueryType      int                        `json:"queryType"`
+	Datastore      []DatastoreQueryDashboard `json:"datastore"`
+	PromQL         []PromQueryDashboard      `json:"promQL"`
+	MetricsBuilder MetricsBuilder            `json:"metricsBuilder"`
+	QueryType      int                       `json:"queryType"`
 }
 
 type Widget struct {

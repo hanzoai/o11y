@@ -39,7 +39,7 @@ func declaredAt(t *testing.T, app *zip.App, method, target string) bool {
 func mountClaiming(t *testing.T, opts ...o11y.Option) *zip.App {
 	t.Helper()
 	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app, opts...); err != nil {
+	if err := o11y.Use(app, opts...); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	o11y.SetRuntime(nil)

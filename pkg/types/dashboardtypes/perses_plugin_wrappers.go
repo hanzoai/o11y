@@ -91,7 +91,7 @@ func (QueryPlugin) PrepareJSONSchema(s *jsonschema.Schema) error {
 		string(QueryKindComposite):     schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5CompositeQuery"),
 		string(QueryKindFormula):       schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderFormula"),
 		string(QueryKindPromQL):        schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5PromQuery"),
-		string(QueryKindDatastoreSQL): schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5DatastoreQuery"),
+		string(QueryKindDatastoreSQL):  schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5DatastoreQuery"),
 		string(QueryKindTraceOperator): schemaRef("DashboardtypesQueryPluginVariantGithubComO11yO11yPkgTypesQuerybuildertypesQuerybuildertypesv5QueryBuilderTraceOperator"),
 	})
 }
@@ -253,7 +253,7 @@ var (
 		QueryKindComposite:     func() any { return new(CompositeQuerySpec) },
 		QueryKindFormula:       func() any { return new(FormulaSpec) },
 		QueryKindPromQL:        func() any { return new(PromQLQuerySpec) },
-		QueryKindDatastoreSQL: func() any { return new(DatastoreSQLQuerySpec) },
+		QueryKindDatastoreSQL:  func() any { return new(DatastoreSQLQuerySpec) },
 		QueryKindTraceOperator: func() any { return new(TraceOperatorSpec) },
 	}
 	variablePluginSpecs = map[VariablePluginKind]func() any{

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/http/client/plugin"
 	"github.com/gojek/heimdall/v7"
 	"github.com/gojek/heimdall/v7/httpclient"
+	"github.com/hanzoai/o11y/pkg/http/client/plugin"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"

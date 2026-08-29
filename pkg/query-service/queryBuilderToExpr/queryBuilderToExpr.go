@@ -7,9 +7,9 @@ import (
 
 	"log/slog"
 
+	expr "github.com/expr-lang/expr"
 	"github.com/hanzoai/o11y/pkg/errors"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
-	expr "github.com/expr-lang/expr"
 )
 
 var (

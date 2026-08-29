@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	dsmock "github.com/hanzo-ds/mock"
-	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoremock"
 	"github.com/hanzo-ds/go"
+	dsmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoremock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoretelemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/telemetrystoretypes"
 )

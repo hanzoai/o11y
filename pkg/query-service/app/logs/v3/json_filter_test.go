@@ -8,12 +8,12 @@ import (
 )
 
 var testGetJSONFilterKeyData = []struct {
-	Name          string
-	Key           v3.AttributeKey
-	IsArray       bool
+	Name         string
+	Key          v3.AttributeKey
+	IsArray      bool
 	DatastoreKey string
-	Operator      v3.FilterOperator
-	Error         bool
+	Operator     v3.FilterOperator
+	Error        bool
 }{
 	{
 		Name: "Incorrect Key",
@@ -42,7 +42,7 @@ var testGetJSONFilterKeyData = []struct {
 			DataType: "array(string)",
 			IsJSON:   true,
 		},
-		IsArray:       true,
+		IsArray:      true,
 		DatastoreKey: "JSONExtract(JSON_QUERY(body, '$.\"requestor_list\"[*]'), '" + ARRAY_STRING + "')",
 	},
 	{
@@ -52,7 +52,7 @@ var testGetJSONFilterKeyData = []struct {
 			DataType: "array(string)",
 			IsJSON:   true,
 		},
-		IsArray:       true,
+		IsArray:      true,
 		DatastoreKey: "JSONExtract(JSON_QUERY(body, '$.\"nested\"[*].\"key\"[*]'), '" + ARRAY_STRING + "')",
 	},
 	{
@@ -62,7 +62,7 @@ var testGetJSONFilterKeyData = []struct {
 			DataType: "array(int64)",
 			IsJSON:   true,
 		},
-		IsArray:       true,
+		IsArray:      true,
 		DatastoreKey: "JSONExtract(JSON_QUERY(body, '$.\"int_numbers\"[*]'), '" + ARRAY_INT64 + "')",
 	},
 	{
@@ -72,7 +72,7 @@ var testGetJSONFilterKeyData = []struct {
 			DataType: "array(float64)",
 			IsJSON:   true,
 		},
-		IsArray:       true,
+		IsArray:      true,
 		DatastoreKey: "JSONExtract(JSON_QUERY(body, '$.\"nested_num\"[*].\"float_nums\"[*]'), '" + ARRAY_FLOAT64 + "')",
 	},
 	{
@@ -82,7 +82,7 @@ var testGetJSONFilterKeyData = []struct {
 			DataType: "array(bool)",
 			IsJSON:   true,
 		},
-		IsArray:       true,
+		IsArray:      true,
 		DatastoreKey: "JSONExtract(JSON_QUERY(body, '$.\"boolarray\"[*]'), '" + ARRAY_BOOL + "')",
 	},
 	{
@@ -92,7 +92,7 @@ var testGetJSONFilterKeyData = []struct {
 			DataType: "string",
 			IsJSON:   true,
 		},
-		IsArray:       false,
+		IsArray:      false,
 		DatastoreKey: "JSON_VALUE(body, '$.\"message\"')",
 	},
 	{
@@ -102,7 +102,7 @@ var testGetJSONFilterKeyData = []struct {
 			DataType: "int64",
 			IsJSON:   true,
 		},
-		IsArray:       false,
+		IsArray:      false,
 		DatastoreKey: "JSONExtract(JSON_VALUE(body, '$.\"status\"'), '" + INT64 + "')",
 	},
 	{
@@ -112,7 +112,7 @@ var testGetJSONFilterKeyData = []struct {
 			DataType: "float64",
 			IsJSON:   true,
 		},
-		IsArray:       false,
+		IsArray:      false,
 		DatastoreKey: "JSONExtract(JSON_VALUE(body, '$.\"fraction\"'), '" + FLOAT64 + "')",
 	},
 	{
@@ -122,7 +122,7 @@ var testGetJSONFilterKeyData = []struct {
 			DataType: "bool",
 			IsJSON:   true,
 		},
-		IsArray:       false,
+		IsArray:      false,
 		DatastoreKey: "JSONExtract(JSON_VALUE(body, '$.\"boolkey\"'), '" + BOOL + "')",
 	},
 	{
@@ -132,7 +132,7 @@ var testGetJSONFilterKeyData = []struct {
 			DataType: "bool",
 			IsJSON:   true,
 		},
-		IsArray:       false,
+		IsArray:      false,
 		DatastoreKey: "JSONExtract(JSON_VALUE(body, '$.\"bool-key\"'), '" + BOOL + "')",
 	},
 }

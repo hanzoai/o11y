@@ -30,7 +30,7 @@ import (
 func mounted(t *testing.T) *zip.App {
 	t.Helper()
 	app := zip.New(zip.Config{DisableStartupMessage: true})
-	if err := o11y.Mount(app); err != nil {
+	if err := o11y.Use(app); err != nil {
 		t.Fatalf("Mount: %v", err)
 	}
 	return app

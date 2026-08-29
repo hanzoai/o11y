@@ -85,9 +85,9 @@ type QueryType struct {
 }
 
 var (
-	QueryTypeBuilder       = QueryType{String: valuer.NewString("builder")}
+	QueryTypeBuilder      = QueryType{String: valuer.NewString("builder")}
 	QueryTypeDatastoreSQL = QueryType{valuer.NewString("datastore_sql")}
-	QueryTypePromQL        = QueryType{valuer.NewString("promql")}
+	QueryTypePromQL       = QueryType{valuer.NewString("promql")}
 )
 
 // Enum implements jsonschema.Enum; returns the acceptable values for QueryType.
@@ -187,4 +187,3 @@ func (rc *RuleCondition) String() string {
 	data, _ := json.Marshal(*rc)
 	return string(data)
 }
-
