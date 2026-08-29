@@ -11,6 +11,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
 	"github.com/hanzo-ds/go/lib/col"
+	"github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
 	"github.com/hanzoai/o11y/pkg/telemetrylogs"
@@ -19,7 +20,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	schemamigrator "github.com/hanzoai/otel-collector/cmd/o11yschemamigrator/schema_migrator"
 	"github.com/hanzoai/otel-collector/constants"
-	"github.com/hanzo-ds/sqlbuilder"
 )
 
 var (

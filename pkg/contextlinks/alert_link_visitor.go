@@ -5,8 +5,8 @@ import (
 	"slices"
 	"strings"
 
-	parser "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	"github.com/antlr4-go/antlr/v4"
+	parser "github.com/hanzoai/o11y/pkg/parser/filterquery/grammar"
 	"golang.org/x/exp/maps"
 
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
