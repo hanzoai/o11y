@@ -11,13 +11,7 @@
 	border-top: 1px solid var(--l1-border);
 
 	font-family:
-		'Zen',
-		-apple-system,
-		BlinkMacSystemFont,
-		'Segoe UI',
-		Roboto,
-		'Helvetica Neue',
-		sans-serif;
+		Zen, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
 	border-right: none;
 	border-left: none;
@@ -175,7 +169,7 @@
 			background: color-mix(in srgb, var(--bg-sakura-500) 10%, transparent);
 
 			color: var(--Sakura-400, #f56c87);
-			font-family: 'Zen Mono';
+			font-family: Zen Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 			font-size: 12px;
 			font-style: normal;
 			font-weight: 400;
@@ -200,7 +194,7 @@
 			background: color-mix(in srgb, var(--bg-sienna-500) 10%, transparent);
 
 			color: var(--Sienna-500, #ad7f58);
-			font-family: 'Zen Mono';
+			font-family: Zen Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 			font-size: 12px;
 			font-style: normal;
 			font-weight: 400;
@@ -266,7 +260,7 @@
 					border-bottom-left-radius: 0px !important;
 					border-bottom-right-radius: 0px !important;
 
-					font-family: 'Zen Mono';
+					font-family: Zen Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 					font-size: 12px;
 					font-style: normal;
 					font-weight: 400;
@@ -360,7 +354,7 @@
 				) !important;
 
 				color: var(--Sakura-400, #f56c87) !important;
-				font-family: 'Zen Mono';
+				font-family: Zen Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 				font-size: 14px;
 				font-style: normal;
 				font-weight: 400;
@@ -377,7 +371,7 @@
 				border: 1px solid color-mix(in srgb, var(--bg-sienna-500) 20%, transparent);
 				background: color-mix(in srgb, var(--bg-sienna-500) 10%, transparent);
 
-				font-family: 'Zen Mono';
+				font-family: Zen Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 				font-size: 14px;
 				font-style: normal;
 				font-weight: 400;
