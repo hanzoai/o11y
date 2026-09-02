@@ -50,7 +50,7 @@
     "@hanzo/font": "^1.9.3",
     "@hanzo/gui": "^8.3.1",
     "@hanzo/insights": "^1.358.1",
-    "@hanzo/ui": "^8.27.5",
+    "@hanzo/ui": "^8.27.7",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-dialog": "1.1.15",
     "@radix-ui/react-dropdown-menu": "2.1.16",
