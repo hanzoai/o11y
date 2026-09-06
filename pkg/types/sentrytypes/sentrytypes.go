@@ -99,6 +99,7 @@ type Event struct {
 	Message     string            `json:"message"`
 	Culprit     string            `json:"culprit"`
 	Fingerprint string            `json:"fingerprint"`
+	Handled     bool              `json:"handled"`
 	Platform    string            `json:"platform,omitempty"`
 	Environment string            `json:"environment,omitempty"`
 	Release     string            `json:"release,omitempty"`
@@ -111,7 +112,20 @@ type Event struct {
 	UserEmail   string            `json:"userEmail,omitempty"`
 	UserIP      string            `json:"userIp,omitempty"`
 	Tags        map[string]string `json:"tags,omitempty"`
+	Frames      []Frame           `json:"frames,omitempty"`
 	Sample      string            `json:"-"` // full normalized Occurrence JSON, for event detail
+}
+
+// Frame is one stack frame of an event. event.error stores a stack as five parallel
+// arrays (one per field) rather than a nested column, so the store zips/unzips this
+// shape on the way in and out — see implsentry.zipFrames.
+type Frame struct {
+	Function string `json:"function,omitempty"`
+	File     string `json:"file,omitempty"`
+	Line     uint32 `json:"line,omitempty"`
+	Column   uint32 `json:"column,omitempty"`
+	// Own marks a frame in the reporting application rather than a dependency.
+	Own bool `json:"own"`
 }
 
 // Window is a resolved absolute time range [From, To]. Every columnar read is bounded
@@ -162,5 +176,8 @@ type TraceSummary struct {
 	Count     uint64    `json:"count"`
 	FirstSeen time.Time `json:"firstSeen"`
 	LastSeen  time.Time `json:"lastSeen"`
-	Sample    string    `json:"sample,omitempty"`
+	// Message is the latest event's message in the trace (argMax over time), so a
+	// trace list reads as something without a second round trip per row.
+	Message string `json:"message,omitempty"`
+	Sample  string `json:"sample,omitempty"`
 }

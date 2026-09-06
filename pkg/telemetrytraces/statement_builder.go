@@ -51,7 +51,7 @@ func NewTraceQueryStatementBuilder(
 	resourceFilterResolver := telemetryresourcefilter.NewResolver[qbtypes.TraceAggregation](
 		settings,
 		DBName,
-		TracesResourceV3TableName,
+		SpanResourceTableName,
 		telemetrytypes.SignalTraces,
 		telemetrytypes.SourceUnspecified,
 		metadataStore,
@@ -310,7 +310,7 @@ func (b *traceQueryStatementBuilder) buildListQuery(
 	}
 
 	// From table
-	sb.From(fmt.Sprintf("%s.%s", DBName, SpanIndexV3TableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, SpanTableName))
 
 	// Add filter conditions
 	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
@@ -367,7 +367,7 @@ func (b *traceQueryStatementBuilder) buildTraceQuery(
 
 	distSB := sqlbuilder.NewSelectBuilder()
 	distSB.Select("trace_id")
-	distSB.From(fmt.Sprintf("%s.%s", DBName, SpanIndexV3TableName))
+	distSB.From(fmt.Sprintf("%s.%s", DBName, SpanTableName))
 
 	var (
 		cteFragments []string
@@ -397,7 +397,7 @@ func (b *traceQueryStatementBuilder) buildTraceQuery(
 	// Build the inner subquery for root spans
 	innerSB := sqlbuilder.NewSelectBuilder()
 	innerSB.Select("trace_id", "duration_nano", sqlbuilder.Escape("resource_string_service$$name as `service.name`"), "name")
-	innerSB.From(fmt.Sprintf("%s.%s", DBName, SpanIndexV3TableName))
+	innerSB.From(fmt.Sprintf("%s.%s", DBName, SpanTableName))
 	innerSB.Where("parent_span_id = ''")
 
 	// this only helps when there is a filter
@@ -529,7 +529,7 @@ func (b *traceQueryStatementBuilder) buildTimeSeriesQuery(
 		sb.SelectMore(fmt.Sprintf("%s AS __result_%d", rewritten, i))
 	}
 
-	sb.From(fmt.Sprintf("%s.%s", DBName, SpanIndexV3TableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, SpanTableName))
 	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
 	if err != nil {
 		return nil, err
@@ -682,7 +682,7 @@ func (b *traceQueryStatementBuilder) buildScalarQuery(
 	}
 
 	// From table
-	sb.From(fmt.Sprintf("%s.%s", DBName, SpanIndexV3TableName))
+	sb.From(fmt.Sprintf("%s.%s", DBName, SpanTableName))
 
 	// Add filter conditions
 	preparedWhereClause, err := b.addFilterCondition(ctx, sb, start, end, query, keys, variables, skipResourceFilter)
