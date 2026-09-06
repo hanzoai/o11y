@@ -22,8 +22,8 @@
     "@zap-proto/zap": "^1.6.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "typescript": "^5.6.0"
+    "@types/node": "26.4.0",
+    "typescript": "7.0.2"
   },
   "engines": {
     "node": ">=18.12.0"
