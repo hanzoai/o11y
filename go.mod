@@ -28,7 +28,7 @@ require (
 	github.com/hanzoai/cloud v1.801.218
 	github.com/hanzoai/govaluate v0.1.0
 	github.com/hanzoai/otel-collector v1.2.0
-	github.com/hanzoai/sqlite v0.4.0
+	github.com/hanzoai/sqlite v0.5.1
 	github.com/hanzokv/go/extra/kvotel/v9 v9.22.0
 	github.com/hanzokv/go/v9 v9.22.0
 	github.com/hanzokv/mock/v9 v9.2.2
@@ -40,7 +40,7 @@ require (
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/providers/rawbytes v1.0.0
 	github.com/knadh/koanf/v2 v2.3.5
-	github.com/luxfi/zap v1.2.6
+	github.com/luxfi/zap v1.2.7
 	github.com/mailru/easyjson v0.9.0
 	github.com/open-telemetry/opamp-go v0.22.0
 	github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza v0.144.0
@@ -90,7 +90,7 @@ require (
 	google.golang.org/api v0.275.0
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/apimachinery v0.35.3
+	k8s.io/apimachinery v0.36.2
 )
 
 require (
@@ -147,23 +147,26 @@ require (
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
 	github.com/hanzo-ds/native v0.72.0 // indirect
-	github.com/hanzoai/account v0.2.0 // indirect
+	github.com/hanzoai/account v0.2.1 // indirect
+	github.com/hanzoai/authz v1.10.29 // indirect
 	github.com/hanzoai/builder v0.3.13 // indirect
-	github.com/hanzoai/commerce v1.49.25 // indirect
+	github.com/hanzoai/cek v0.2.3 // indirect
+	github.com/hanzoai/commerce v1.50.11 // indirect
 	github.com/hanzoai/csqlite v0.1.0 // indirect
 	github.com/hanzoai/dbx v1.17.2 // indirect
-	github.com/hanzoai/decimal v0.1.1 // indirect
+	github.com/hanzoai/decimal v0.1.2 // indirect
 	github.com/hanzoai/go-openai v1.41.0 // indirect
 	github.com/hanzoai/ha v0.1.1 // indirect
-	github.com/hanzoai/iam v1.33.26 // indirect
+	github.com/hanzoai/iam v1.34.21 // indirect
 	github.com/hanzoai/metrics v1.110.2 // indirect
-	github.com/hanzoai/money v0.2.1 // indirect
-	github.com/hanzoai/orm v0.6.16 // indirect
+	github.com/hanzoai/money v0.2.5 // indirect
+	github.com/hanzoai/namespace v1.2.0 // indirect
+	github.com/hanzoai/orm v0.6.21 // indirect
 	github.com/hanzoai/s3-go v1.0.0 // indirect
 	github.com/hanzoai/sqlcipher v0.1.1 // indirect
-	github.com/hanzoai/tasks v1.52.3 // indirect
+	github.com/hanzoai/tasks v1.52.9 // indirect
 	github.com/hanzoai/vfs v0.6.6 // indirect
-	github.com/hanzoai/xorm v1.4.4 // indirect
+	github.com/hanzoai/xorm v1.4.5 // indirect
 	github.com/hashicorp/go-metrics v0.5.4 // indirect
 	github.com/huandu/go-clone v1.7.3 // indirect
 	github.com/klauspost/crc32 v1.3.0 // indirect
@@ -172,7 +175,7 @@ require (
 	github.com/luxfi/accel v1.2.4 // indirect
 	github.com/luxfi/crypto v1.20.2 // indirect
 	github.com/luxfi/mdns v0.1.1 // indirect
-	github.com/luxfi/metric v1.9.0 // indirect
+	github.com/luxfi/metric v1.10.0 // indirect
 	github.com/luxfi/trace v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-isatty v0.0.22 // indirect
@@ -200,6 +203,7 @@ require (
 	github.com/zap-proto/fiber/v3 v3.2.1 // indirect
 	github.com/zap-proto/go v1.3.0 // indirect
 	github.com/zap-proto/http v0.3.1 // indirect
+	github.com/zap-proto/mcp v1.0.5 // indirect
 	github.com/zap-proto/md v0.1.0 // indirect
 	github.com/zeebo/xxh3 v1.1.0 // indirect
 	go.mongodb.org/mongo-driver/v2 v2.5.0 // indirect
@@ -358,7 +362,7 @@ require (
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	github.com/zap-proto/zip v1.18.1
+	github.com/zap-proto/zip v1.27.0
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/collector/component v1.54.0 // indirect
 	go.opentelemetry.io/collector/component/componentstatus v0.148.0 // indirect
@@ -402,16 +406,16 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/net/http/httptrace/otelhttptrace v0.67.0 // indirect
 	go.opentelemetry.io/contrib/otelconf v0.18.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.39.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.14.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.19.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.19.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.39.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.43.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.43.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.43.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.43.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.43.0 // indirect
-	go.opentelemetry.io/otel/exporters/prometheus v0.60.0
-	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.14.0 // indirect
-	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.40.0 // indirect
+	go.opentelemetry.io/otel/exporters/prometheus v0.65.0
+	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.19.0 // indirect
+	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.43.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.44.0 // indirect
 	go.opentelemetry.io/otel/log v0.20.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.20.0 // indirect
@@ -428,7 +432,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260622175928-b703f567277d // indirect
 	google.golang.org/grpc v1.81.1 // indirect
 	gopkg.in/telebot.v3 v3.3.8 // indirect
-	k8s.io/client-go v0.35.3 // indirect
+	k8s.io/client-go v0.36.2 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
 	k8s.io/utils v0.0.0-20260319190234-28399d86e0b5 // indirect
 )
