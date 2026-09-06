@@ -8,7 +8,7 @@ import (
 )
 
 // OccurrenceSink is the OPTIONAL bridge that would also persist each occurrence to
-// the shared telemetry store (o11y_logs as an ERROR-severity record) for OTel-native
+// the shared telemetry store (event.log as an ERROR-severity record) for OTel-native
 // drill-down. It is deliberately a seam, and the default is NoopSink:
 //
 //   - Authoritative storage is o11y_issues — the grouped issue plus the latest

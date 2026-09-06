@@ -53,7 +53,7 @@ type EventStore interface {
 	ListForFingerprint(ctx context.Context, orgID, projectID valuer.UUID, fingerprint string, limit int) ([]*Event, error)
 
 	// ListForTrace returns the (org, project)-scoped error events referencing a trace
-	// id — the tenant-safe "errors in this trace" detail (the o11y_traces span plane is
+	// id — the tenant-safe "errors in this trace" detail (the event.span plane is
 	// NOT read: it has no general org column and cannot be tenant-scoped).
 	ListForTrace(ctx context.Context, orgID, projectID valuer.UUID, traceID string, limit int) ([]*Event, error)
 

@@ -9,6 +9,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 )
 
 const NANOSECOND = 1000000000
@@ -282,7 +283,9 @@ func buildTracesQuery(start, end, step int64, mq *v3.BuilderQuery, panelType v3.
 		filterSubQuery = filterSubQuery + " AND " + emptyValuesInGroupByFilter
 	}
 
-	resourceSubQuery, err := resource.BuildResourceSubQuery("o11y_traces", "distributed_traces_v3_resource", bucketStart, bucketEnd, mq.Filters, mq.GroupBy, mq.AggregateAttribute, false)
+	// The one place this builder still spelled a database. o11y_traces was
+	// dropped by HIP-0132 and distributed_traces_v3_resource IS event.span_resource.
+	resourceSubQuery, err := resource.BuildResourceSubQuery(constants.O11Y_TRACE_DBNAME, telemetrytraces.SpanResourceTableName, bucketStart, bucketEnd, mq.Filters, mq.GroupBy, mq.AggregateAttribute, false)
 	if err != nil {
 		return "", err
 	}

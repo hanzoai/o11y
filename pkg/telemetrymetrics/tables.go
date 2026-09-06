@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 )
 
@@ -20,7 +21,7 @@ import (
 // distinguish the two roles, and a sharded deployment would reintroduce the split in
 // exactly one place: here.
 const (
-	DBName = "event"
+	DBName = telemetryplane.DBName
 
 	DescriptorTableName      = "descriptor"
 	DescriptorLocalTableName = "descriptor"

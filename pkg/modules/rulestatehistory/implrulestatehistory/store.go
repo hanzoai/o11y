@@ -9,17 +9,22 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/datastoresql"
 
+	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
-	sqlbuilder "github.com/hanzo-ds/sqlbuilder"
 )
 
+// o11y_analytics is NOT the event plane and must not be repointed at it:
+// AddRuleStateHistory in this same file WRITES it, so the rows are there. It was
+// spelled here AND in datastorereader, which is two places for one name; it is
+// spelled once now, in pkg/telemetryplane, beside the plane it is not part of.
 const (
-	o11yHistoryDBName         = "o11y_analytics"
+	o11yHistoryDBName         = telemetryplane.AnalyticsDBName
 	ruleStateHistoryTableName = "distributed_rule_state_history_v0"
 )
 

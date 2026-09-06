@@ -20,7 +20,11 @@ import (
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
@@ -296,12 +300,38 @@ func (q *querier) populateQBEvent(event *qbtypes.QBEvent, queries []qbtypes.Quer
 		case qbtypes.QueryTypeDatastoreSQL:
 			sql := query.GetQuery()
 			if strings.TrimSpace(sql) != "" {
-				event.MetricsUsed = strings.Contains(sql, "o11y_metrics")
-				event.LogsUsed = strings.Contains(sql, "o11y_logs")
-				event.TracesUsed = strings.Contains(sql, "o11y_traces")
+				m, l, t := SignalsInSQL(sql)
+				event.MetricsUsed, event.LogsUsed, event.TracesUsed = m, l, t
 			}
 		}
 	}
+}
+
+// SignalsInSQL reports which signals a raw Datastore-SQL query reads.
+//
+// EXPORTED because query-service/app/query_info.go asked the same question with
+// its own copy of the answer, and two copies of a discriminator is how one of
+// them gets fixed. One function, two callers.
+//
+// IT USED TO ASK WHICH DATABASE THE SQL NAMED — o11y_metrics, o11y_logs,
+// o11y_traces. HIP-0132 unified all three into `event`, so all three tests went
+// permanently false and every raw-SQL query was recorded as touching NO signal.
+// That is a silent defect: nothing errors, the usage analytics just quietly stop
+// counting, and the number they feed is a number nobody can tell is wrong.
+//
+// With one database the discriminator is the TABLE, which is what it should have
+// been all along — a database is where rows live, a table is what they are. The
+// prefixes are deliberate: event.log also matches log_attribute and log_resource,
+// event.span matches span_attribute and span_resource, event.metric matches
+// metric_5m and event.series matches series_6h — all of which are that signal's
+// support tables and SHOULD count as that signal.
+func SignalsInSQL(sql string) (metrics, logs, traces bool) {
+	const qualify = telemetryplane.DBName + "."
+	metrics = strings.Contains(sql, qualify+telemetrymetrics.MetricTableName) ||
+		strings.Contains(sql, qualify+telemetrymetrics.SeriesTableName)
+	logs = strings.Contains(sql, qualify+telemetrylogs.LogTableName)
+	traces = strings.Contains(sql, qualify+telemetrytraces.SpanTableName)
+	return metrics, logs, traces
 }
 
 // resolveMetricMetadata fetches metadata for every metric referenced by builder

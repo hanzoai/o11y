@@ -9,6 +9,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/constants"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
 )
 
 var logOperators = map[v3.FilterOperator]string{
@@ -42,11 +44,16 @@ var skipExistsFilter = map[v3.FilterOperator]struct{}{
 }
 
 const (
-	BODY                         = "body"
-	DISTRIBUTED_LOGS_V2          = "distributed_logs_v2"
-	DISTRIBUTED_LOGS_V2_RESOURCE = "distributed_logs_v2_resource"
-	DB_NAME                      = "o11y_logs"
-	NANOSECOND                   = 1000000000
+	BODY = "body"
+
+	// distributed_logs_v2 IS event.log and distributed_logs_v2_resource IS
+	// event.log_resource; o11y_logs was dropped by HIP-0132. Aliases, not
+	// spellings — see pkg/telemetryplane.
+	DISTRIBUTED_LOGS_V2          = telemetrylogs.LogTableName
+	DISTRIBUTED_LOGS_V2_RESOURCE = telemetrylogs.LogResourceTableName
+	DB_NAME                      = telemetryplane.DBName
+
+	NANOSECOND = 1000000000
 )
 
 func getDatastoreLogsColumnDataType(columnDataType v3.AttributeKeyDataType) string {
@@ -308,7 +315,7 @@ func generateAggregateClause(panelType v3.PanelType, start, end int64, aggOp v3.
 	having string,
 	orderBy string,
 ) (string, error) {
-	queryTmpl := " %s as value from o11y_logs." + DISTRIBUTED_LOGS_V2 +
+	queryTmpl := " %s as value from " + DB_NAME + "." + DISTRIBUTED_LOGS_V2 +
 		" where " + timeFilter + "%s" +
 		"%s%s" +
 		"%s"
@@ -405,7 +412,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 	if mq.AggregateOperator == v3.AggregateOperatorNoOp {
 		// with noop any filter or different order by other than ts will use new table
 		sqlSelect := constants.LogsSQLSelectV2
-		queryTmpl := sqlSelect + "from o11y_logs.%s where %s%s order by %s"
+		queryTmpl := sqlSelect + "from " + DB_NAME + ".%s where %s%s order by %s"
 		query := fmt.Sprintf(queryTmpl, DISTRIBUTED_LOGS_V2, timeFilter, filterSubQuery, orderBy)
 		return query, nil
 		// ---- NOOP ends here ----
@@ -488,7 +495,7 @@ func buildLogsLiveTailQuery(mq *v3.BuilderQuery) (string, error) {
 	// the reader will add the timestamp and id filters
 	switch mq.AggregateOperator {
 	case v3.AggregateOperatorNoOp:
-		query := constants.LogsSQLSelectV2 + "from o11y_logs." + DISTRIBUTED_LOGS_V2 + " where "
+		query := constants.LogsSQLSelectV2 + "from " + DB_NAME + "." + DISTRIBUTED_LOGS_V2 + " where "
 		if len(filterSubQuery) > 0 {
 			query = query + filterSubQuery + " AND "
 		}

@@ -12,7 +12,7 @@ import (
 
 // addErrorTracking creates the one net-new table backing error/crash tracking:
 // o11y_issues (grouped-error lifecycle). Occurrences stay in the telemetry store
-// (o11y_traces / o11y_logs); only non-derivable lifecycle state lives here. The
+// (event.span / event.log); only non-derivable lifecycle state lives here. The
 // unique index on (org_id, fingerprint) is the grouping key the ingest upsert
 // conflicts on; (org_id, last_seen) serves the default list ordering.
 type addErrorTracking struct {

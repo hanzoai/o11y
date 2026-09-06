@@ -1,13 +1,22 @@
 package datastoreprometheus
 
-import "time"
+import (
+	"time"
 
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
+)
+
+// The names the PromQL adapter reads by. o11y_metrics was dropped by HIP-0132,
+// so every PromQL panel — the whole alerting evaluation path included — answered
+// `Code: 81 ... UNKNOWN_DATABASE`. Aliases of pkg/telemetrymetrics/tables.go:
+// time_series_v4 IS event.series and samples_v4 IS event.metric.
 const (
-	databaseName                string = "o11y_metrics"
-	distributedTimeSeriesV4     string = "distributed_time_series_v4"
-	distributedTimeSeriesV46hrs string = "distributed_time_series_v4_6hrs"
-	distributedTimeSeriesV41day string = "distributed_time_series_v4_1day"
-	distributedSamplesV4        string = "distributed_samples_v4"
+	databaseName                string = telemetryplane.DBName
+	distributedTimeSeriesV4     string = telemetrymetrics.SeriesTableName
+	distributedTimeSeriesV46hrs string = telemetrymetrics.Series6hTableName
+	distributedTimeSeriesV41day string = telemetrymetrics.Series1dTableName
+	distributedSamplesV4        string = telemetrymetrics.MetricTableName
 )
 
 var (

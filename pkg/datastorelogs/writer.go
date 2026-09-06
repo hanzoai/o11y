@@ -16,7 +16,7 @@
 //
 // WHY THIS EXISTS. Before it, the log lane's only wired path was the embedded
 // otelcol pipeline in hanzoai/cloud (datastorelogsexporter), which writes the
-// OTLP-fork family (o11y_logs.distributed_logs_v2 + its four side tables) that
+// OTLP-fork family (the retired o11y_logs.distributed_logs_v2 + its four side tables) that
 // the event-plane readers do not read. This driver is the one log write path
 // onto the envelope those readers query.
 //
