@@ -188,7 +188,7 @@ func NewO11y(ctx context.Context, config o11y.Config) (*o11y.O11y, error) {
 //     stack serves /v1/o11y/*, resolving each address against that table; the
 //     listeners are never bound. A host that runs the runtime as a separate
 //     Deployment installs o11y.Whole over its proxy instead, because for a
-//     remote every address really is the same door.
+//     remote every address really is the same endpoint.
 //
 // Both paths share this ONE construction, so identity and authz are identical.
 func NewServer(ctx context.Context, config o11y.Config) (*app.Server, *o11y.O11y, error) {

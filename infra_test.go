@@ -340,7 +340,7 @@ func TestUnnamedPathsAreNotServedButTypedOnesReachTheRuntime(t *testing.T) {
 	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		askedPath = r.URL.Path
 		w.Header().Set("Content-Type", "application/json")
-		_, _ = io.WriteString(w, `{"status":"success","data":{"door":"runtime","path":"`+r.URL.Path+`"}}`)
+		_, _ = io.WriteString(w, `{"status":"success","data":{"endpoint":"runtime","path":"`+r.URL.Path+`"}}`)
 	})))
 	t.Cleanup(func() { o11y.SetRuntime(nil) })
 
