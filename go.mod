@@ -397,3 +397,7 @@ require (
 )
 
 replace github.com/expr-lang/expr => github.com/hanzoai/expr v1.17.8
+
+exclude github.com/luxfi/consensus v1.36.2
+
+exclude github.com/luxfi/vm v1.3.1
