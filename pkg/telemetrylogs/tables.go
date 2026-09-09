@@ -1,5 +1,7 @@
 package telemetrylogs
 
+import "github.com/hanzoai/o11y/pkg/telemetryplane"
+
 // Logs live in the ONE event database beside the other signals, as event.log:
 // singular, because a row is one log line. It carries the same 15-column envelope as
 // event.event / event.error / event.span, and is sorted (org, service, time) — the
@@ -9,7 +11,7 @@ package telemetrylogs
 // name of a table are the same string. The pair is kept because the query builders
 // distinguish the two roles.
 const (
-	DBName = "event"
+	DBName = telemetryplane.DBName
 
 	LogTableName      = "log"
 	LogLocalTableName = "log"

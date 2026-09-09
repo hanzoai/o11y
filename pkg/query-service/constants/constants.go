@@ -8,6 +8,10 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
+	"github.com/hanzoai/o11y/pkg/telemetrymetadata"
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
@@ -92,33 +96,59 @@ var GroupByColMap = map[string]struct{}{
 	ResponseStatusCode: {},
 }
 
+// The names the v3/v4 query builders read by — twenty-seven call sites across
+// metrics v3, metrics v4, inframetrics and traces v4 reach the plane through
+// exactly these constants.
+//
+// BOTH DATABASE NAMES WERE DEAD. o11y_metrics and o11y_traces were dropped by
+// HIP-0132 and unified into the event plane, so every one of those call sites
+// answered `Code: 81 ... UNKNOWN_DATABASE`. They are ALIASES now — the plane is
+// spelled once, in pkg/telemetryplane, and plane_test.go enforces that.
+//
+// The table names are aliases of pkg/telemetry{traces,metrics}/tables.go for the
+// same reason: samples_v4 IS event.metric, time_series_v4 IS event.series,
+// o11y_index_v3 IS event.span. A name that says `_v4` in one file and `metric`
+// in another is one table with two names, which is how a migration leaves half
+// a plane behind.
 const (
-	O11Y_METRIC_DBNAME                       = "o11y_metrics"
-	O11Y_SAMPLES_V4_LOCAL_TABLENAME          = "samples_v4"
-	O11Y_SAMPLES_V4_TABLENAME                = "distributed_samples_v4"
-	O11Y_SAMPLES_V4_AGG_5M_TABLENAME         = "distributed_samples_v4_agg_5m"
-	O11Y_SAMPLES_V4_AGG_30M_TABLENAME        = "distributed_samples_v4_agg_30m"
-	O11Y_EXP_HISTOGRAM_TABLENAME             = "distributed_exp_hist"
-	O11Y_EXP_HISTOGRAM_LOCAL_TABLENAME       = "exp_hist"
-	O11Y_TRACE_DBNAME                        = "o11y_traces"
-	O11Y_SPAN_INDEX_TABLENAME                = "distributed_o11y_index_v2"
-	O11Y_SPAN_INDEX_V3                       = "distributed_o11y_index_v3"
-	O11Y_SPAN_INDEX_LOCAL_TABLENAME          = "o11y_index_v2"
-	O11Y_SPAN_INDEX_V3_LOCAL_TABLENAME       = "o11y_index_v3"
-	O11Y_TIMESERIES_v4_LOCAL_TABLENAME       = "time_series_v4"
-	O11Y_TIMESERIES_V4_TABLENAME             = "distributed_time_series_v4"
-	O11Y_TIMESERIES_v4_6HRS_LOCAL_TABLENAME  = "time_series_v4_6hrs"
-	O11Y_TIMESERIES_v4_1DAY_LOCAL_TABLENAME  = "time_series_v4_1day"
-	O11Y_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME = "time_series_v4_1week"
-	O11Y_TIMESERIES_v4_1DAY_TABLENAME        = "distributed_time_series_v4_1day"
-	O11Y_TOP_LEVEL_OPERATIONS_TABLENAME      = "distributed_top_level_operations"
-	O11Y_TIMESERIES_v4_TABLENAME             = "distributed_time_series_v4"
-	O11Y_TIMESERIES_v4_1WEEK_TABLENAME       = "distributed_time_series_v4_1week"
-	O11Y_TIMESERIES_v4_6HRS_TABLENAME        = "distributed_time_series_v4_6hrs"
-	O11Y_ATTRIBUTES_METADATA_TABLENAME       = "distributed_attributes_metadata"
-	O11Y_ATTRIBUTES_METADATA_LOCAL_TABLENAME = "attributes_metadata"
+	O11Y_METRIC_DBNAME                 = telemetryplane.DBName
+	O11Y_SAMPLES_V4_LOCAL_TABLENAME    = telemetrymetrics.MetricLocalTableName
+	O11Y_SAMPLES_V4_TABLENAME          = telemetrymetrics.MetricTableName
+	O11Y_SAMPLES_V4_AGG_5M_TABLENAME   = telemetrymetrics.Metric5mTableName
+	O11Y_SAMPLES_V4_AGG_30M_TABLENAME  = telemetrymetrics.Metric30mTableName
+	O11Y_EXP_HISTOGRAM_TABLENAME       = telemetrymetrics.HistogramTableName
+	O11Y_EXP_HISTOGRAM_LOCAL_TABLENAME = telemetrymetrics.HistogramLocalTableName
+
+	O11Y_TRACE_DBNAME                  = telemetryplane.DBName
+	O11Y_SPAN_INDEX_V3                 = telemetrytraces.SpanTableName
+	O11Y_SPAN_INDEX_V3_LOCAL_TABLENAME = telemetrytraces.SpanLocalTableName
+
+	O11Y_TIMESERIES_v4_LOCAL_TABLENAME       = telemetrymetrics.SeriesLocalTableName
+	O11Y_TIMESERIES_V4_TABLENAME             = telemetrymetrics.SeriesTableName
+	O11Y_TIMESERIES_v4_TABLENAME             = telemetrymetrics.SeriesTableName
+	O11Y_TIMESERIES_v4_6HRS_LOCAL_TABLENAME  = telemetrymetrics.Series6hLocalTableName
+	O11Y_TIMESERIES_v4_6HRS_TABLENAME        = telemetrymetrics.Series6hTableName
+	O11Y_TIMESERIES_v4_1DAY_LOCAL_TABLENAME  = telemetrymetrics.Series1dLocalTableName
+	O11Y_TIMESERIES_v4_1DAY_TABLENAME        = telemetrymetrics.Series1dTableName
+	O11Y_TIMESERIES_v4_1WEEK_LOCAL_TABLENAME = telemetrymetrics.Series1wLocalTableName
+	O11Y_TIMESERIES_v4_1WEEK_TABLENAME       = telemetrymetrics.Series1wTableName
+
+	// top_level_operations IS event.operation — one (service, operation) pair.
+	O11Y_TOP_LEVEL_OPERATIONS_TABLENAME = telemetrytraces.OperationTableName
+
+	// The metadata pair is NOT the plane: o11y_metadata still has a live writer.
+	O11Y_ATTRIBUTES_METADATA_TABLENAME       = telemetrymetadata.AttributesMetadataTableName
+	O11Y_ATTRIBUTES_METADATA_LOCAL_TABLENAME = telemetrymetadata.AttributesMetadataLocalTableName
 	O11Y_METADATA_TABLENAME                  = "distributed_metadata"
 	O11Y_METADATA_LOCAL_TABLENAME            = "metadata"
+)
+
+// RETIRED — the v2 span index. It was dropped with o11y_traces and the event
+// plane has no table with its columns. Kept as a literal so a read that reaches
+// it fails naming the retired table, which is the true reason.
+const (
+	O11Y_SPAN_INDEX_TABLENAME       = "distributed_o11y_index_v2"
+	O11Y_SPAN_INDEX_LOCAL_TABLENAME = "o11y_index_v2"
 )
 
 // alert related constants

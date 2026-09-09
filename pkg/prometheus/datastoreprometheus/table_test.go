@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
 	"github.com/prometheus/prometheus/prompb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -60,7 +61,9 @@ func TestRenderedSQLNamesLiveTables(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, seriesSQL, "FROM event.series ")
 	assert.Contains(t, seriesSQL, "any(labels)", "labels live on the series dimension")
-	assert.NotContains(t, seriesSQL, "o11y_metrics")
+	for _, gone := range telemetryplane.Dropped {
+		assert.NotContains(t, seriesSQL, gone)
+	}
 
 	samplesSQL, _ := buildSamplesQuery(0, time.Hour.Milliseconds(), "hanzo_service_up", seriesSQL, nil)
 	assert.Contains(t, samplesSQL, "FROM event.metric")

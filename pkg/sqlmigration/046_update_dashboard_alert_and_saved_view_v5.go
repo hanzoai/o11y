@@ -12,8 +12,27 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 	"github.com/hanzoai/o11y/pkg/transition"
+)
+
+// The three key tables both v5 migrations read. All three were qualified by
+// databases HIP-0132 dropped — o11y_logs and o11y_traces — so each migration
+// logged a warning and returned NO duplicate keys, which is indistinguishable
+// from "there are none". A migration that silently decides nothing needs
+// migrating is the false empty in its worst form: invisible in any UI, visible
+// six weeks later as a rule querying the wrong column.
+//
+// distributed_logs_attribute_keys IS event.log_key,
+// distributed_logs_resource_keys IS event.log_resource_key and
+// distributed_span_attributes_keys IS event.span_key.
+var (
+	logKeyTable         = telemetryplane.DBName + "." + telemetrylogs.LogKeyTableName
+	logResourceKeyTable = telemetryplane.DBName + "." + telemetrylogs.LogResourceKeyTableName
+	spanKeyTable        = telemetryplane.DBName + "." + telemetrytraces.SpanKeyTableName
 )
 
 type queryBuilderV5Migration struct {
@@ -52,7 +71,7 @@ func (migration *queryBuilderV5Migration) Register(migrations *migrate.Migration
 func (migration *queryBuilderV5Migration) getTraceDuplicateKeys(ctx context.Context) ([]string, error) {
 	query := `
 		SELECT tagKey
-		FROM o11y_traces.distributed_span_attributes_keys
+		FROM ` + spanKeyTable + `
 		WHERE tagType IN ('tag', 'resource')
 		GROUP BY tagKey
 		HAVING COUNT(DISTINCT tagType) > 1
@@ -83,9 +102,9 @@ func (migration *queryBuilderV5Migration) getLogDuplicateKeys(ctx context.Contex
 	query := `
 		SELECT name
 		FROM (
-			SELECT DISTINCT name FROM o11y_logs.distributed_logs_attribute_keys
+			SELECT DISTINCT name FROM ` + logKeyTable + `
 			INTERSECT
-			SELECT DISTINCT name FROM o11y_logs.distributed_logs_resource_keys
+			SELECT DISTINCT name FROM ` + logResourceKeyTable + `
 		)
 		ORDER BY name
 	`

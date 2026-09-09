@@ -149,7 +149,7 @@ func NewModules(
 	ruleStore := sqlrulestore.NewRuleStore(sqlstore, queryParser, providerSettings)
 	authDomainModule := implauthdomain.NewModule(implauthdomain.NewStore(sqlstore), authNs, authz)
 
-	// Error tracking (o11y_issues lifecycle) and trace detail (o11y_traces waterfall)
+	// Error tracking (issue lifecycle) and trace detail (the event.span waterfall)
 	// are pulled into locals so the Sentry product face can COMPOSE them rather than
 	// reconstruct them — one issue lifecycle, one trace read, two product faces.
 	errorTrackingModule := implerrortracking.NewModule(

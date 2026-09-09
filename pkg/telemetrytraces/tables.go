@@ -1,5 +1,7 @@
 package telemetrytraces
 
+import "github.com/hanzoai/o11y/pkg/telemetryplane"
+
 // Spans live in the ONE event database beside the other signals, as event.span:
 // singular, because a row is one span. It carries the same 15-column envelope as
 // event.event / event.error / event.log, so correlating a span with an error is a
@@ -10,7 +12,7 @@ package telemetrytraces
 // name of a table are the same string. The pair is kept because the query builders
 // distinguish the two roles.
 const (
-	DBName = "event"
+	DBName = telemetryplane.DBName
 
 	SpanTableName      = "span"
 	SpanLocalTableName = "span"
