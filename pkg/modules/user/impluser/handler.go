@@ -2,195 +2,57 @@ package impluser
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"time"
 
-	"github.com/hanzoai/o11y/pkg/errors"
-	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
 	root "github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
-type handler struct {
-	setter root.Setter
-	getter root.Getter
+type handler struct{}
+
+// NewHandler takes nothing, and that is the point. The user handler used to
+// hold a Setter and a Getter because it wrote passwords, minted invites, listed
+// members and edited roles. It performs none of those now, and the one route it
+// still answers reads no table at all.
+func NewHandler() root.Handler {
+	return &handler{}
 }
 
-func NewHandler(setter root.Setter, getter root.Getter) root.Handler {
-	return &handler{setter: setter, getter: getter}
-}
-
-func (handler *handler) CreateUser(rw http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	req := new(authtypes.PostableUser)
-	if err := binding.JSON.BindBody(r.Body, req); err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	user, err := types.NewUser(req.DisplayName, req.Email, valuer.MustNewUUID(claims.OrgID), types.UserStatusPendingInvite)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	roleIDs := make([]valuer.UUID, 0, len(req.UserRoles))
-	for _, role := range req.UserRoles {
-		roleIDs = append(roleIDs, role.ID)
-	}
-
-	user, err = handler.setter.CreatePendingInviteUser(ctx, valuer.MustNewUUID(claims.IdentityID()), valuer.MustNewEmail(claims.Email), req.FrontendBaseUrl, user, root.WithRoleIDs(roleIDs))
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	render.Success(rw, http.StatusCreated, types.Identifiable{ID: user.ID})
-}
-
-func (handler *handler) CreateInvite(rw http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	var req types.PostableInvite
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	invites, err := handler.setter.CreateBulkInvite(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(claims.IdentityID()), valuer.MustNewEmail(claims.Email), &types.PostableBulkInviteRequest{
-		Invites: []types.PostableInvite{req},
-	})
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	render.Success(rw, http.StatusCreated, invites[0])
-}
-
-func (handler *handler) CreateBulkInvite(rw http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	var req types.PostableBulkInviteRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	// Validate that the request contains users
-	if len(req.Invites) == 0 {
-		render.Error(rw, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "no invites provided for invitation"))
-		return
-	}
-
-	_, err = handler.setter.CreateBulkInvite(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(claims.IdentityID()), valuer.MustNewEmail(claims.Email), &req)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-
-	render.Success(rw, http.StatusCreated, nil)
-}
-
-func (handler *handler) GetUserDeprecated(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	id := coretypes.Param(r, "id")
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	user, err := handler.getter.GetDeprecatedUserByOrgIDAndID(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(id))
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusOK, user)
-}
-
-func (handler *handler) GetUser(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	userID := coretypes.Param(r, "id")
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	user, err := handler.getter.GetUserByOrgIDAndID(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(userID))
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	userRoles, err := handler.getter.GetRolesByUserID(ctx, user.ID)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	userWithRoles := &authtypes.UserWithRoles{
-		User:      user,
-		UserRoles: userRoles,
-	}
-
-	render.Success(w, http.StatusOK, userWithRoles)
-}
-
-func (handler *handler) GetMyUserDeprecated(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	user, err := handler.getter.GetDeprecatedUserByOrgIDAndID(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(claims.UserID))
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusOK, user)
-}
-
+// GetMyUser answers with the identity the EDGE asserted, projected into the
+// shape the console already reads.
+//
+// It used to SELECT the caller's row and 404 when it was missing — which made
+// o11y's own bookkeeping a precondition for rendering the app. A person the
+// gateway had authenticated, whose row had not been seated yet or had been
+// removed, got "user not found" on the very call the console uses to learn who
+// it is rendering for, and the whole console was unreachable. The identity was
+// never in doubt; the ROW was, and the row is not the identity.
+//
+// So it reads the claims. Same fields, one source, and no failure mode between
+// "the edge says you are signed in" and "the console shows you signed in":
+//
+//	id           the IAM subject          — claims.UserID
+//	orgId        the IAM org (owner)      — claims.OrgID
+//	email        the asserted address     — claims.Email
+//	displayName  the same address, which is exactly what the seated row carried
+//	             (iamidentn builds it as NewUserWithID(id, email, email, …)), so
+//	             this is not a downgrade — it is the same value without the hop
+//	isRoot       false. Root is a local-single-user notion; an IAM session is
+//	             never root, and the row never set it either
+//	status       active. The edge does not forward a session for a user who is
+//	             not, and o11y has no status of its own to disagree with
+//
+// createdAt/updatedAt are left zero: they described the ROW's lifetime, never
+// the person's, and the console renders neither. Inventing a timestamp here
+// would be inventing a fact.
+//
+// No roles ride along. They used to, and nothing read them: the console resolves
+// what it may do through POST /v1/o11y/authz/check, which is the one way. A
+// second copy of the answer here could only ever disagree with it.
 func (handler *handler) GetMyUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
@@ -201,444 +63,29 @@ func (handler *handler) GetMyUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := handler.getter.GetUserByOrgIDAndID(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(claims.UserID))
+	userID, err := valuer.NewUUID(claims.UserID)
 	if err != nil {
 		render.Error(w, err)
 		return
 	}
 
-	userRoles, err := handler.getter.GetRolesByUserID(ctx, user.ID)
+	orgID, err := valuer.NewUUID(claims.OrgID)
 	if err != nil {
 		render.Error(w, err)
 		return
 	}
 
-	userWithRoles := &authtypes.UserWithRoles{
-		User:      user,
-		UserRoles: userRoles,
-	}
-
-	render.Success(w, http.StatusOK, userWithRoles)
-}
-
-func (handler *handler) UpdateMyUser(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
+	email, err := valuer.NewEmail(claims.Email)
 	if err != nil {
-		render.Error(w, err)
-		return
+		email = valuer.Email{}
 	}
 
-	updatableUser := new(types.UpdatableUser)
-	if err := json.NewDecoder(r.Body).Decode(&updatableUser); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	_, err = handler.setter.UpdateUser(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(claims.UserID), updatableUser)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusNoContent, nil)
-}
-
-func (handler *handler) ListUsersDeprecated(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	users, err := handler.getter.ListDeprecatedUsersByOrgID(ctx, valuer.MustNewUUID(claims.OrgID))
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusOK, users)
-}
-
-func (handler *handler) ListUsers(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	users, err := handler.getter.ListUsersByOrgID(ctx, valuer.MustNewUUID(claims.OrgID))
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusOK, users)
-}
-
-func (handler *handler) UpdateUserDeprecated(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	id := coretypes.Param(r, "id")
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	user := types.DeprecatedUser{User: &types.User{}}
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	updatedUser, err := handler.setter.UpdateUserDeprecated(ctx, valuer.MustNewUUID(claims.OrgID), id, &user)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusOK, updatedUser)
-}
-
-func (handler *handler) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	userID := coretypes.Param(r, "id")
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	if userID == claims.UserID {
-		render.Error(w, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "users cannot call this api on self"))
-		return
-	}
-
-	updatableUser := new(types.UpdatableUser)
-	if err := json.NewDecoder(r.Body).Decode(&updatableUser); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	_, err = handler.setter.UpdateUser(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(userID), updatableUser)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusNoContent, nil)
-}
-
-func (handler *handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	id := coretypes.Param(r, "id")
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	if err := handler.setter.DeleteUser(ctx, valuer.MustNewUUID(claims.OrgID), id, claims.IdentityID()); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusNoContent, nil)
-}
-
-func (handler *handler) GetResetPasswordTokenDeprecated(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	id := coretypes.Param(r, "id")
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	user, err := handler.getter.GetDeprecatedUserByOrgIDAndID(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(id))
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	token, err := handler.setter.GetOrCreateResetPasswordToken(ctx, user.ID)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusOK, token)
-}
-
-func (handler *handler) GetResetPasswordToken(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	userID, err := valuer.NewUUID(coretypes.Param(r, "id"))
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	token, err := handler.getter.GetResetPasswordTokenByOrgIDAndUserID(ctx, valuer.MustNewUUID(claims.OrgID), userID)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusOK, token)
-}
-
-func (handler *handler) CreateResetPasswordToken(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	userID, err := valuer.NewUUID(coretypes.Param(r, "id"))
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	user, err := handler.getter.GetUserByOrgIDAndID(ctx, valuer.MustNewUUID(claims.OrgID), userID)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	token, err := handler.setter.GetOrCreateResetPasswordToken(ctx, user.ID)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusCreated, token)
-}
-
-func (handler *handler) VerifyResetPasswordToken(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	req := new(types.PostableVerifyResetPasswordToken)
-	if err := binding.JSON.BindBody(r.Body, req); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	err := handler.getter.VerifyResetPasswordToken(ctx, req.Token)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusNoContent, nil)
-}
-
-func (handler *handler) ResetPassword(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	req := new(types.PostableResetPassword)
-	if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	err := handler.setter.UpdatePasswordByResetPasswordToken(ctx, req.Token, req.Password)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusNoContent, nil)
-}
-
-func (handler *handler) ChangePassword(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	var req types.ChangePasswordRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	err = handler.setter.UpdatePassword(ctx, valuer.MustNewUUID(claims.UserID), req.OldPassword, req.NewPassword)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusNoContent, nil)
-}
-
-func (handler *handler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	req := new(types.PostableForgotPassword)
-	if err := binding.JSON.BindBody(r.Body, req); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	err := handler.setter.ForgotPassword(ctx, req.OrgID, req.Email, req.FrontendBaseURL)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusNoContent, nil)
-}
-
-func (handler *handler) GetRolesByUserID(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	userID := coretypes.Param(r, "id")
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	user, err := handler.getter.GetUserByOrgIDAndID(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(userID))
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	userRoles, err := handler.getter.GetRolesByUserID(ctx, user.ID)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	roles := make([]*authtypes.Role, len(userRoles))
-	for idx, userRole := range userRoles {
-		roles[idx] = userRole.Role
-	}
-
-	render.Success(w, http.StatusOK, roles)
-}
-
-func (handler *handler) SetRoleByUserID(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	userID := coretypes.Param(r, "id")
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	if userID == claims.UserID {
-		render.Error(w, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "users cannot call this api on self"))
-		return
-	}
-
-	postableRole := new(types.PostableRole)
-	if err := json.NewDecoder(r.Body).Decode(postableRole); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	if postableRole.Name == "" {
-		render.Error(w, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "role name is required"))
-		return
-	}
-
-	if err := handler.setter.AddUserRole(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(userID), postableRole.Name); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusOK, nil)
-}
-
-func (handler *handler) RemoveUserRoleByRoleID(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	userID := coretypes.Param(r, "id")
-	roleID := coretypes.Param(r, "roleId")
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	if userID == claims.UserID {
-		render.Error(w, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "users cannot call this api on self"))
-		return
-	}
-
-	if err := handler.setter.RemoveUserRole(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(userID), valuer.MustNewUUID(roleID)); err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusNoContent, nil)
-}
-
-func (handler *handler) GetUsersByRoleID(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
-	defer cancel()
-
-	roleID := coretypes.Param(r, "id")
-
-	claims, err := authtypes.ClaimsFromContext(ctx)
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	users, err := handler.getter.GetUsersByOrgIDAndRoleID(ctx, valuer.MustNewUUID(claims.OrgID), valuer.MustNewUUID(roleID))
-	if err != nil {
-		render.Error(w, err)
-		return
-	}
-
-	render.Success(w, http.StatusOK, users)
+	render.Success(w, http.StatusOK, &types.User{
+		Identifiable: types.Identifiable{ID: userID},
+		DisplayName:  claims.Email,
+		Email:        email,
+		OrgID:        orgID,
+		IsRoot:       false,
+		Status:       types.UserStatusActive,
+	})
 }

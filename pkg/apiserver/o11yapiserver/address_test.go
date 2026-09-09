@@ -12,7 +12,7 @@ import (
 // BY NAME, NOT BY COUNT.
 //
 // routes_test.go counts this registrar's routes and the module's declaration
-// counts its own, and 233 + 134 = 367 on both sides. Two sets of 367 can be 367
+// counts its own, and 197 + 132 = 329 on both sides. Two sets of 329 can be 329
 // DIFFERENT addresses and every count in the repo stays green — which is not a
 // hypothetical: three of these routes bound {traceID} where the declaration
 // named {traceId}, and nothing could see it, because a router matches by
@@ -26,9 +26,9 @@ import (
 // rather than against a list.
 //
 // Equality follows without a second test: this file and its sibling in
-// pkg/query-service/app each prove registered ⊆ declared, their counts are 233
-// and 134, the declaration's is 367, and a duplicate registration panics at boot
-// (routing.Handle). 233 + 134 distinct addresses inside a set of 367 is the whole
+// pkg/query-service/app each prove registered ⊆ declared, their counts are 197
+// and 132, the declaration's is 329, and a duplicate registration panics at boot
+// (routing.Handle). 197 + 132 distinct addresses inside a set of 329 is the whole
 // set.
 func TestEveryRegisteredAddressIsDeclaredAndResolves(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})

@@ -15,9 +15,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/statsreporter"
-	"github.com/hanzoai/o11y/pkg/tokenizer"
 	"github.com/hanzoai/o11y/pkg/types"
-	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/hanzoai/o11y/pkg/version"
 )
 
@@ -37,8 +35,6 @@ type provider struct {
 	// used to get users
 	userGetter user.Getter
 
-	// used to get tokenizer
-	tokenizer tokenizer.Tokenizer
 
 	// used to send stats to an analytics backend
 	analytics analytics.Analytics
@@ -53,9 +49,9 @@ type provider struct {
 	stopC chan struct{}
 }
 
-func NewFactory(aggregator statsreporter.Aggregator, orgGetter organization.Getter, userGetter user.Getter, tokenizer tokenizer.Tokenizer, build version.Build, analyticsConfig analytics.Config) factory.ProviderFactory[statsreporter.StatsReporter, statsreporter.Config] {
+func NewFactory(aggregator statsreporter.Aggregator, orgGetter organization.Getter, userGetter user.Getter, build version.Build, analyticsConfig analytics.Config) factory.ProviderFactory[statsreporter.StatsReporter, statsreporter.Config] {
 	return factory.NewProviderFactory(factory.MustNewName("analytics"), func(ctx context.Context, settings factory.ProviderSettings, config statsreporter.Config) (statsreporter.StatsReporter, error) {
-		return New(ctx, settings, config, aggregator, orgGetter, userGetter, tokenizer, build, analyticsConfig)
+		return New(ctx, settings, config, aggregator, orgGetter, userGetter, build, analyticsConfig)
 	})
 }
 
@@ -66,7 +62,6 @@ func New(
 	aggregator statsreporter.Aggregator,
 	orgGetter organization.Getter,
 	userGetter user.Getter,
-	tokenizer tokenizer.Tokenizer,
 	build version.Build,
 	analyticsConfig analytics.Config,
 ) (statsreporter.StatsReporter, error) {
@@ -84,7 +79,6 @@ func New(
 		orgGetter:  orgGetter,
 		userGetter: userGetter,
 		analytics:  analytics,
-		tokenizer:  tokenizer,
 		build:      build,
 		deployment: deployment,
 		stopC:      make(chan struct{}),
@@ -167,20 +161,11 @@ func (provider *provider) Report(ctx context.Context) error {
 			continue
 		}
 
-		maxLastObservedAtPerUserID, err := provider.tokenizer.ListMaxLastObservedAtByOrgID(ctx, org.ID)
-		if err != nil {
-			provider.settings.Logger().WarnContext(ctx, "failed to list max last observed at per user id", errors.Attr(err), slog.Any("org_id", org.ID))
-			maxLastObservedAtPerUserID = make(map[valuer.UUID]time.Time)
-		}
-
+		// The "last observed at" traits are gone with the tokenizer: they were
+		// derived from o11y's OWN access tokens, and o11y no longer mints one.
+		// Last-seen belongs to whoever mints the session — Hanzo IAM.
 		for _, user := range users {
-			traits := types.NewTraitsFromUser(user)
-			if maxLastObservedAt, ok := maxLastObservedAtPerUserID[user.ID]; ok {
-				traits["auth_token.last_observed_at.max.time"] = maxLastObservedAt.UTC()
-				traits["auth_token.last_observed_at.max.time_unix"] = maxLastObservedAt.Unix()
-			}
-
-			provider.analytics.IdentifyUser(ctx, org.ID.String(), user.ID.String(), traits)
+			provider.analytics.IdentifyUser(ctx, org.ID.String(), user.ID.String(), types.NewTraitsFromUser(user))
 		}
 	}
 

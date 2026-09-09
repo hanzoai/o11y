@@ -11,16 +11,26 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
-	"github.com/hanzoai/o11y/pkg/types/coretypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
+// The root-user service seeds the ONE row that local single-user mode stands in
+// for: identn::impersonation resolves every request to it, which is the whole of
+// that mode and the reason it refuses to boot beside any real resolver.
+//
+// It used to reconcile a PASSWORD onto that row on every start — create it,
+// compare it, rotate it — from `user::root::password` in the process
+// environment. Nothing reads a password any more, so there is nothing to
+// reconcile: the row's existence IS the whole fact. What is left is
+// resolve-or-create the org with its managed roles, and resolve-or-create the
+// root row with the admin role, which is the same shape iamidentn uses when a
+// real IAM subject arrives.
 type service struct {
 	settings  factory.ScopedProviderSettings
 	store     types.UserStore
-	getter    user.Getter
 	setter    user.Setter
 	orgGetter organization.Getter
+	orgSetter organization.Setter
 	authz     authz.AuthZ
 	config    user.RootConfig
 	stopC     chan struct{}
@@ -30,18 +40,18 @@ type service struct {
 func NewService(
 	providerSettings factory.ProviderSettings,
 	store types.UserStore,
-	getter user.Getter,
 	setter user.Setter,
 	orgGetter organization.Getter,
+	orgSetter organization.Setter,
 	authz authz.AuthZ,
 	config user.RootConfig,
 ) user.Service {
 	return &service{
 		settings:  factory.NewScopedProviderSettings(providerSettings, "go.o11y.io/pkg/modules/user"),
 		store:     store,
-		getter:    getter,
 		setter:    setter,
 		orgGetter: orgGetter,
+		orgSetter: orgSetter,
 		authz:     authz,
 		config:    config,
 		stopC:     make(chan struct{}),
@@ -79,31 +89,30 @@ func (s *service) Start(ctx context.Context) error {
 	}
 }
 
-func (s *service) Healthy() <-chan struct{} {
-	return s.healthyC
-}
+func (s *service) Healthy() <-chan struct{} { return s.healthyC }
 
-func (s *service) Stop(ctx context.Context) error {
-	close(s.stopC)
-	return nil
-}
+func (s *service) Stop(_ context.Context) error { close(s.stopC); return nil }
 
 func (s *service) reconcile(ctx context.Context) error {
 	org, resolvedByName, err := s.orgGetter.GetByIDOrName(ctx, s.config.Org.ID, s.config.Org.Name)
 	if err != nil {
 		if !errors.Ast(err, errors.TypeNotFound) {
-			return err // something really went wrong
-		}
-
-		if s.config.Org.ID.IsZero() {
-			newOrg := types.NewOrganization(s.config.Org.Name, s.config.Org.Name)
-			_, err := s.setter.CreateFirstUser(ctx, newOrg, s.config.Email.String(), s.config.Email, s.config.Password)
 			return err
 		}
 
-		newOrg := types.NewOrganizationWithID(s.config.Org.ID, s.config.Org.Name, s.config.Org.Name)
-		_, err = s.setter.CreateFirstUser(ctx, newOrg, s.config.Email.String(), s.config.Email, s.config.Password)
-		return err
+		newOrg := types.NewOrganization(s.config.Org.Name, s.config.Org.Name)
+		if !s.config.Org.ID.IsZero() {
+			newOrg = types.NewOrganizationWithID(s.config.Org.ID, s.config.Org.Name, s.config.Org.Name)
+		}
+
+		managedRoles := authtypes.NewManagedRoles(newOrg.ID)
+		if err := s.orgSetter.Create(ctx, newOrg, func(ctx context.Context, id valuer.UUID) error {
+			return s.authz.CreateManagedRoles(ctx, id, managedRoles)
+		}); err != nil && !errors.Ast(err, errors.TypeAlreadyExists) {
+			return err
+		}
+
+		return s.ensureRootUser(ctx, newOrg.ID)
 	}
 
 	if !s.config.Org.ID.IsZero() && resolvedByName {
@@ -111,124 +120,28 @@ func (s *service) reconcile(ctx context.Context) error {
 		return errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "organization with name %q already exists with a different ID %s (expected %s)", s.config.Org.Name, org.ID.StringValue(), s.config.Org.ID.StringValue())
 	}
 
-	return s.reconcileRootUser(ctx, org.ID)
+	return s.ensureRootUser(ctx, org.ID)
 }
 
-func (s *service) reconcileRootUser(ctx context.Context, orgID valuer.UUID) error {
-	existingStorableRoot, err := s.store.GetRootUserByOrgID(ctx, orgID)
+// ensureRootUser creates the root row on first sight, with the org's admin role.
+// A row that is already there is already the whole fact — there is nothing left
+// to bring into line now that it carries no credential.
+func (s *service) ensureRootUser(ctx context.Context, orgID valuer.UUID) error {
+	existing, err := s.store.GetRootUserByOrgID(ctx, orgID)
 	if err != nil && !errors.Ast(err, errors.TypeNotFound) {
 		return err
 	}
-
-	if existingStorableRoot == nil {
-		return s.createOrPromoteRootUser(ctx, orgID)
-	}
-
-	return s.updateExistingRootUser(ctx, orgID, existingStorableRoot)
-}
-
-func (s *service) createOrPromoteRootUser(ctx context.Context, orgID valuer.UUID) error {
-	existingUser, err := s.getter.GetNonDeletedUserByEmailAndOrgID(ctx, s.config.Email, orgID)
-	if err != nil && !errors.Ast(err, errors.TypeNotFound) {
-		return err
-	}
-
-	if existingUser != nil {
-		userRoles, err := s.getter.GetRolesByUserID(ctx, existingUser.ID)
-		if err != nil {
-			return err
-		}
-
-		existingUserRoleNames := make([]string, len(userRoles))
-		for idx, userRole := range userRoles {
-			existingUserRoleNames[idx] = userRole.Role.Name
-		}
-
-		// idempotent - safe to retry can't put this in a txn
-		if err := s.authz.ModifyGrant(ctx,
-			orgID,
-			existingUserRoleNames,
-			[]string{authtypes.O11yAdminRoleName},
-			authtypes.MustNewSubject(coretypes.NewResourceUser(), existingUser.ID.StringValue(), orgID, nil),
-		); err != nil {
-			return err
-		}
-
-		existingUser.PromoteToRoot()
-
-		err = s.store.RunInTx(ctx, func(ctx context.Context) error {
-			if err := s.setter.UpdateAnyUser(ctx, orgID, existingUser); err != nil {
-				return err
-			}
-
-			// update user_role entries
-			if err := s.setter.UpdateUserRoles(
-				ctx,
-				existingUser.OrgID,
-				existingUser.ID,
-				[]string{authtypes.O11yAdminRoleName},
-			); err != nil {
-				return err
-			}
-
-			// set password
-			return s.setPassword(ctx, existingUser.ID)
-		})
-		if err != nil {
-			return err
-		}
-
+	if existing != nil {
 		return nil
 	}
 
-	// Create new root user
-	newUser, err := types.NewRootUser(s.config.Email.String(), s.config.Email, orgID)
+	rootUser, err := types.NewRootUser(s.config.Email.String(), s.config.Email, orgID)
 	if err != nil {
 		return err
 	}
 
-	factorPassword, err := types.NewFactorPassword(s.config.Password, newUser.ID.StringValue())
-	if err != nil {
+	if err := s.setter.CreateUser(ctx, rootUser, user.WithRoleNames([]string{authtypes.O11yAdminRoleName})); err != nil && !errors.Ast(err, errors.TypeAlreadyExists) {
 		return err
-	}
-
-	return s.setter.CreateUser(ctx, newUser, user.WithFactorPassword(factorPassword), user.WithRoleNames([]string{authtypes.O11yAdminRoleName}))
-}
-
-func (s *service) updateExistingRootUser(ctx context.Context, orgID valuer.UUID, existingRoot *types.User) error {
-	existingRoot.PromoteToRoot()
-
-	if existingRoot.Email != s.config.Email {
-		existingRoot.UpdateEmail(s.config.Email)
-		if err := s.setter.UpdateAnyUser(ctx, orgID, existingRoot); err != nil {
-			return err
-		}
-	}
-
-	return s.setPassword(ctx, existingRoot.ID)
-}
-
-func (s *service) setPassword(ctx context.Context, userID valuer.UUID) error {
-	password, err := s.store.GetPasswordByUserID(ctx, userID)
-	if err != nil {
-		if !errors.Ast(err, errors.TypeNotFound) {
-			return err
-		}
-
-		factorPassword, err := types.NewFactorPassword(s.config.Password, userID.StringValue())
-		if err != nil {
-			return err
-		}
-
-		return s.store.CreatePassword(ctx, factorPassword)
-	}
-
-	if !password.Equals(s.config.Password) {
-		if err := password.Update(s.config.Password); err != nil {
-			return err
-		}
-
-		return s.store.UpdatePassword(ctx, password)
 	}
 
 	return nil

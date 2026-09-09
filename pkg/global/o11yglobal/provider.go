@@ -51,7 +51,6 @@ func (provider *provider) GetConfig(context.Context) *globaltypes.Config {
 			aiAssistantURL,
 		),
 		globaltypes.NewIdentNConfig(
-			globaltypes.TokenizerConfig{Enabled: provider.identNConfig.Tokenizer.Enabled},
 			globaltypes.APIKeyConfig{Enabled: provider.identNConfig.APIKeyConfig.Enabled},
 			globaltypes.ImpersonationConfig{Enabled: provider.identNConfig.Impersonation.Enabled},
 		),

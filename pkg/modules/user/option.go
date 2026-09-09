@@ -1,23 +1,14 @@
 package user
 
-import (
-	"github.com/hanzoai/o11y/pkg/types"
-	"github.com/hanzoai/o11y/pkg/valuer"
-)
-
+// The only thing a caller still says about a user it creates is which roles the
+// user holds. WithFactorPassword is gone with the password store, WithRoleIDs
+// with the member-administration API, and the authenticate options with the
+// sessions o11y no longer mints.
 type createUserOptions struct {
-	FactorPassword *types.FactorPassword
-	RoleNames      []string
-	RoleIDs        []valuer.UUID
+	RoleNames []string
 }
 
 type CreateUserOption func(*createUserOptions)
-
-func WithFactorPassword(factorPassword *types.FactorPassword) CreateUserOption {
-	return func(o *createUserOptions) {
-		o.FactorPassword = factorPassword
-	}
-}
 
 func WithRoleNames(roleNames []string) CreateUserOption {
 	return func(o *createUserOptions) {
@@ -25,45 +16,10 @@ func WithRoleNames(roleNames []string) CreateUserOption {
 	}
 }
 
-func WithRoleIDs(roleIDs []valuer.UUID) CreateUserOption {
-	return func(o *createUserOptions) {
-		o.RoleIDs = roleIDs
-	}
-}
-
 func NewCreateUserOptions(opts ...CreateUserOption) *createUserOptions {
-	o := &createUserOptions{
-		FactorPassword: nil,
-		RoleNames:      nil,
-	}
-
+	o := &createUserOptions{RoleNames: nil}
 	for _, opt := range opts {
 		opt(o)
 	}
-
-	return o
-}
-
-type authenticateOptions struct {
-	OrgID valuer.UUID
-}
-
-type AuthenticateOption func(*authenticateOptions)
-
-func WithOrgID(orgID valuer.UUID) AuthenticateOption {
-	return func(o *authenticateOptions) {
-		o.OrgID = orgID
-	}
-}
-
-func NewAuthenticateOptions(opts ...AuthenticateOption) *authenticateOptions {
-	o := &authenticateOptions{
-		OrgID: valuer.UUID{},
-	}
-
-	for _, opt := range opts {
-		opt(o)
-	}
-
 	return o
 }

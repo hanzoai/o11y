@@ -109,8 +109,13 @@ func (handler *handler) Update(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	diff := 0
-	// Allow multiple deletions for API key requests; enforce for others
-	if claims.IdentNProvider == authtypes.IdentNProviderTokenizer {
+	// Allow multiple widget deletions for MACHINE callers; hold a PERSON editing in
+	// the console to one at a time. This used to name the identN provider — "is this
+	// the tokenizer", i.e. o11y's own session token — which stopped naming a person
+	// the moment o11y stopped minting sessions. The distinction it was reaching for
+	// is the principal KIND, which every resolver already sets and no deletion can
+	// take away.
+	if claims.Principal == authtypes.PrincipalUser {
 		diff = 1
 	}
 

@@ -40,8 +40,8 @@ import (
 // installed they 503 with a clear error rather than pretending.
 //
 // EVERY ROUTE IS NAMED. There is no /v1/o11y/* catch-all any more. The runtime
-// registers 366 method+path pairs; 356 of them are typed ops declared in the
-// slice files below, and the remaining 10 are registered one by one in
+// registers 329 method+path pairs; 322 of them are typed ops declared in the
+// slice files below, and the remaining 7 are registered one by one in
 // mountHatches with the reason each cannot be typed written next to it. A
 // catch-all hides the difference between "converted" and "not converted" — the
 // dark-slice defect this package already shipped once was invisible precisely
@@ -88,11 +88,11 @@ func Use(app *zip.App, opts ...Option) error {
 	// a hatch because it is a stream. Same construction: they answer on the
 	// runtime, so the wire is unchanged; see logs.go.
 	mountLogs(app)
-	// The TYPED identity ops — users, invites, passwords, roles-on-users,
-	// sessions, auth domains, my-org, preferences and quick filters. Same
-	// construction: named In, named Out, answered on the runtime, wire
-	// unchanged; see identity.go. The three /complete/* sign-in callbacks stay
-	// hatches — they answer with redirects, not JSON.
+	// The TYPED identity ops — who the caller is, my-org, quick filters and
+	// preferences. Same construction: named In, named Out, answered on the
+	// runtime, wire unchanged; see identity.go. Invites, passwords, reset
+	// tokens, member administration, sessions, SSO domains and the /complete/*
+	// sign-in callbacks are GONE, not hatched: Hanzo IAM owns credentials.
 	mountIdentity(app)
 	// The TYPED access-control ops — roles, service accounts, service-account
 	// keys and the authorization probe. Same construction: named In, named Out,
@@ -164,12 +164,12 @@ func Use(app *zip.App, opts ...Option) error {
 	// The TYPED span-mapper ops — the ingest-time rules that move or copy span
 	// attributes into resource attributes; see spanmappers.go.
 	mountSpanMappers(app)
-	// And the ten that cannot be typed, each named and justified.
+	// And the seven that cannot be typed, each named and justified.
 	mountHatches(app)
 	return nil
 }
 
-// mountHatches registers the TEN routes that cannot be typed ops, one route
+// mountHatches registers the SEVEN routes that cannot be typed ops, one route
 // literal each, with the reason next to it. This list is meant to shrink and is
 // meant to be hard to grow: adding to it costs a justification in review, where
 // a catch-all cost nothing.
@@ -181,7 +181,7 @@ func Use(app *zip.App, opts ...Option) error {
 // than being absent from it — a generated client that trusts a false contract
 // fails at the customer, not at review.
 //
-// Two of these ten sit OUTSIDE /v1/o11y — the ingest routes on eventRoot —
+// Two of these seven sit OUTSIDE /v1/o11y — the ingest routes on eventRoot —
 // which is the second thing a wildcard hides. A catch-all on one root cannot
 // reach a route on another, so it does not merely obscure which routes are
 // un-typed, it obscures which are missing: both were unreachable from the
@@ -202,16 +202,7 @@ func mountHatches(app *zip.App) {
 	route(app, http.MethodGet, o11yRoot+"/query_progress")   // progress: a long poll, or a websocket when the caller upgrades
 	route(app, http.MethodPost, o11yRoot+"/export_raw_data") // chunked CSV/JSONL attachment, X-Response-Complete trailer
 
-	// ── 2. REDIRECTS: the answer is a Location, not a body ───────────────────
-	// The three sign-in callbacks answer 303 with a Location header and no
-	// payload. A typed op declares a 2xx JSON contract, so typing these would
-	// publish a response schema for a response that does not exist, and hide the
-	// header that is the entire point of the call.
-	route(app, http.MethodGet, o11yRoot+"/complete/google") // Google OIDC callback → 303 to the console
-	route(app, http.MethodGet, o11yRoot+"/complete/oidc")   // generic OIDC callback → 303
-	route(app, http.MethodPost, o11yRoot+"/complete/saml")  // SAML assertion consumer → 303
-
-	// ── 3. A FOREIGN PROTOCOL WE RECEIVE ─────────────────────────────────────
+	// ── 2. A FOREIGN PROTOCOL WE RECEIVE ─────────────────────────────────────
 	// Sentry-compatible ingest, and the only thing in this table that is not a
 	// face. The body is an application/x-sentry-envelope frame, not JSON, and
 	// the caller is a Sentry SDK authenticating with a DSN public key rather

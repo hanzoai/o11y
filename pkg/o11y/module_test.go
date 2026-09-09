@@ -28,7 +28,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/sharder/noopsharder"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstoretest"
-	"github.com/hanzoai/o11y/pkg/tokenizer/tokenizertest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -46,7 +45,6 @@ func TestNewModules(t *testing.T) {
 	maintenanceStore := sqlalertmanagerstore.NewMaintenanceStore(sqlstore, providerSettings)
 	alertmanager, err := o11yalertmanager.New(providerSettings, alertmanager.Config{}, sqlstore, orgGetter, notificationManager, maintenanceStore)
 	require.NoError(t, err)
-	tokenizer := tokenizertest.NewMockTokenizer(t)
 	emailing := emailingtest.New()
 	queryParser := queryparser.New(providerSettings)
 	require.NoError(t, err)
@@ -64,7 +62,7 @@ func TestNewModules(t *testing.T) {
 
 	retentionGetter := implretention.NewGetter(implretention.NewStore(sqlstore))
 
-	modules := NewModules(sqlstore, tokenizer, emailing, providerSettings, orgGetter, alertmanager, nil, nil, nil, nil, nil, nil, nil, queryParser, Config{}, dashboardModule, userGetter, userRoleStore, serviceAccount, implcloudintegration.NewModule(), retentionGetter, flagger, tagModule, implmetricreductionrule.NewModule())
+	modules := NewModules(sqlstore, emailing, providerSettings, orgGetter, alertmanager, nil, nil, nil, nil, nil, nil, queryParser, Config{}, dashboardModule, userGetter, userRoleStore, serviceAccount, implcloudintegration.NewModule(), retentionGetter, flagger, tagModule, implmetricreductionrule.NewModule())
 
 	reflectVal := reflect.ValueOf(modules)
 	for i := 0; i < reflectVal.NumField(); i++ {
