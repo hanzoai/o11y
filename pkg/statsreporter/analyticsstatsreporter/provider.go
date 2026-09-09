@@ -35,7 +35,6 @@ type provider struct {
 	// used to get users
 	userGetter user.Getter
 
-
 	// used to send stats to an analytics backend
 	analytics analytics.Analytics
 
