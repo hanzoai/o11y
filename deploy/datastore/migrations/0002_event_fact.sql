@@ -64,10 +64,16 @@
 -- 1) THE CUTOVER — metadata-only, reversible, and it goes FIRST.
 -- =====================================================================
 --
--- Measured on the live warehouse: `event.trace` holds ONE row against 9,130 distinct
--- trace ids in `event.span`, and `event.operation` holds two against 68 distinct
--- (service, name) pairs. Nothing ever fed them. Any design that leans on them as a
--- fallback is leaning on nothing, so step 4 rebuilds them as rollups of the fact table.
+-- Measured on the live warehouse: `event.trace` holds ONE row and `event.operation` two,
+-- against the whole trace and (service, name) population of `event.span`. Nothing ever
+-- fed them. Any design that leans on them as a fallback is leaning on nothing, so step 4
+-- rebuilds them as rollups of the fact table.
+--
+-- The populations those two are measured against are deliberately not written here. An
+-- earlier draft said 9,130 traces and 68 pairs; the live numbers are 168,151 and 300, an
+-- 18x drift on a plane that is still growing — which is the same reason step 5 refuses to
+-- write a row count into a comment. The ONE and the TWO are worth stating because they do
+-- not move: nothing writes them.
 --
 -- The gate below does not restate those numbers, it RE-DERIVES them: each rollup is
 -- refused if it holds as much as a tenth of the population it would hold were it alive.
@@ -76,6 +82,43 @@
 -- `attic` is where a superseded object waits out its own TTL. It is a DATABASE, not a
 -- suffix: nothing in this namespace is ever named `_old`, `_v2` or `_new`. Both tables
 -- carry a 30-day TTL, so they read out and leave without anyone deciding to delete them.
+--
+-- DEAD BY POPULATION IS NOT UNREAD BY CODE, AND THIS STEP SHIPS WITH THE READERS.
+-- The gate below asks how many rows a table holds. That is the wrong question to ask
+-- about a name, because a name is read by CODE and code does not appear in a row count.
+-- Both gates pass on this deployment, and three live consumers still spell the old
+-- columns:
+--
+--     pkg/datastoretraces/writer.go             INSERT INTO event.operation
+--                                                   (org, serviceName, name, time)
+--                                               INSERT INTO event.trace
+--                                                   (org, trace_id, start, end, num_spans)
+--     pkg/modules/tracedetail/.../store.go      SELECT … sum(num_spans) FROM event.trace
+--                                               — the FIRST query the trace detail page
+--                                                 issues, so the whole page depends on it
+--     pkg/telemetrytraces/condition_builder.go  SELECT DISTINCT name, serviceName
+--                                                   FROM event.operation
+--
+-- Step 4 drops `num_spans` and renames `serviceName` to `service`. Naming a column that
+-- is gone is not an empty answer, it is `UNKNOWN_IDENTIFIER` — so this step converts a
+-- read that returned NOTHING (which is what a one-row table returns against 168,151
+-- traces) into a read that THROWS. Measured on the live warehouse, both shapes, after the
+-- rename: Code 47 for `num_spans` and Code 47 for `serviceName`.
+--
+-- That is strictly worse than the state it replaces, and it is invisible until someone
+-- opens the page. No reader here has moved yet: `uniqExactIfMerge`, which is the ONLY way
+-- to read the new shape, appears in zero .go files in this repo.
+--
+-- A QUERY LOG CANNOT CLEAR THIS, and the attempt is what makes the trap worth writing
+-- down. `system.query_log` over a 2.5-day window holding 20.1 million queries showed
+-- every touch of these two tables to be interactive investigation and not one from a
+-- service — which reads exactly like proof and is not. A path that exists and has not
+-- been walked leaves the same trace as a path that does not exist. Absence of a query is
+-- absence of evidence.
+--
+-- So steps 1 and 4 belong in the SAME window as the reader repoint, never ahead of it.
+-- Landing them early is reversible — the rename is metadata and `attic` still holds the
+-- originals — but it is a live break until it is reversed.
 
 CREATE DATABASE IF NOT EXISTS attic;
 
@@ -442,6 +485,45 @@ GROUP BY org, service, name;
 -- event.operation are populated by the same four statements. There is no separate
 -- rollup backfill to write, and therefore no second spelling of the rollup's SELECT to
 -- keep in sync with the view's.
+--
+-- IDEMPOTENT IS A PROPERTY OF A TARGET, NOT OF A STATEMENT, and that is what the gate
+-- below exists to say. These four are idempotent in `event.fact`: Replacing collapses a
+-- re-derived row onto the one already there. The property does not travel. A
+-- materialized view attached to `event.fact` fires on the INSERTED BLOCK — it never sees
+-- the collapse — so it forwards every re-derived row downstream, where the guarantee is
+-- whatever THAT table's engine happens to be, and where rows the fact table has never
+-- held arrive for the first time and collide with nothing.
+--
+-- The three rollups above are exempt BY CONSTRUCTION rather than by exception: they
+-- count ids and not rows (step 3 says why), so they collapse the same re-derive the fact
+-- table does. A consumer this file did not write has semantics this file cannot know, so
+-- the gate refuses and names it rather than guessing.
+--
+-- `dependencies_table` is the engine's own list, kept current as views attach and
+-- detach. Asking the same question of `create_table_query` with a LIKE is asking a
+-- string, and it answers differently the day someone aliases the table.
+--
+-- IF THE GATE FIRES, THERE ARE TWO WAYS FORWARD AND ONLY ONE OF THEM IS THIS STEP.
+-- Detach the consumer, run the backfill, re-attach it — or skip step 5 and populate the
+-- three rollups straight from `event.fact`:
+--
+--     INSERT INTO event.session <the body of event.session_roll, verbatim>
+--
+-- which reaches no consumer at all, because the views are attached to the fact table and
+-- not to the rollups. Read the body from the view rather than copying it into a runbook:
+-- `SELECT as_select FROM system.tables WHERE database = 'event' AND name = 'session_roll'`
+-- is the same one spelling this file already refuses to duplicate.
+
+SELECT throwIf(length(unowned) > 0,
+    'A CONSUMER THIS FILE DOES NOT OWN IS ATTACHED TO event.fact. The backfill fires it once per re-derived row and it carries no collapse guarantee. See the two remedies above this statement.') AS ok,
+       unowned
+FROM (
+    SELECT arrayFilter(
+               d -> NOT has([('event', 'session_roll'), ('event', 'trace_roll'), ('event', 'operation_roll')], d),
+               arrayZip(dependencies_database, dependencies_table)) AS unowned
+    FROM system.tables
+    WHERE database = 'event' AND name = 'fact'
+);
 --
 -- NO ROW COUNT IS WRITTEN HERE. The plane is live and growing — the `log` signal alone
 -- passed two million while this file was being corrected, against the 825,095 an
