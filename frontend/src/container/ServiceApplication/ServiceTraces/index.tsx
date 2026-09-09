@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import localStorageGet from 'api/browser/localstorage/get';
 import localStorageSet from 'api/browser/localstorage/set';
 import logEvent from 'api/common/logEvent';
+import ErrorInPlace from 'components/ErrorInPlace/ErrorInPlace';
 import { SKIP_ONBOARDING } from 'constants/onboarding';
 import useErrorNotification from 'hooks/useErrorNotification';
 import { useQueryService } from 'hooks/useQueryService';
@@ -14,6 +15,7 @@ import {
 } from 'hooks/useResourceAttribute/utils';
 import { isUndefined } from 'lodash-es';
 import { AppState } from 'store/reducers';
+import APIError from 'types/api/error';
 import { GlobalReducer } from 'types/reducer/globalTime';
 import { Tags } from 'types/reducer/trace';
 
@@ -78,12 +80,23 @@ function ServiceTraces(): JSX.Element {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data]);
 
-	if (
-		services.length === 0 &&
-		isLoading === false &&
-		!skipOnboarding &&
-		isError === true
-	) {
+	// A FAILED READ IS NOT AN EMPTY ONE.
+	//
+	// This branch used to require `isError === true` and then render the
+	// "instrument your application" onboarding modal — so the ONLY way to reach
+	// that modal was for the request to FAIL. When HIP-0132 dropped the database
+	// this list reads, every customer with a fully instrumented fleet was told
+	// their fleet was not instrumented, and the actual reason
+	// (`Code: 81 UNKNOWN_DATABASE`) appeared nowhere on the page.
+	//
+	// The two states are separate now and each says what is true: a failed read
+	// shows the failure, and only a SUCCESSFUL read that returned nothing offers
+	// onboarding.
+	if (isError) {
+		return <ErrorInPlace error={error as unknown as APIError} />;
+	}
+
+	if (services.length === 0 && isLoading === false && !skipOnboarding) {
 		return <SkipOnBoardingModal onContinueClick={onContinueClick} />;
 	}
 

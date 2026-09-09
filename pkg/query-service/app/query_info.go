@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/hanzoai/o11y/pkg/querier"
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 )
 
@@ -67,16 +68,19 @@ func NewQueryInfoResult(postData *v3.QueryRangeParamsV3, version string) QueryIn
 			}
 		}
 	} else if postData.CompositeQuery.QueryType == v3.QueryTypeDatastoreSQL {
+		// This block asked which DATABASE the SQL named — o11y_metrics,
+		// o11y_logs, o11y_traces. HIP-0132 unified all three into `event`, so
+		// all three tests went permanently false and raw-SQL queries were
+		// recorded as touching no signal at all. querier.SignalsInSQL is the one
+		// answer to that question; there is no second copy of it here.
 		for _, query := range postData.CompositeQuery.DatastoreQueries {
-			if strings.Contains(query.Query, "o11y_metrics") && len(query.Query) > 0 {
-				queryInfoResult.MetricsUsed = true
+			if len(query.Query) == 0 {
+				continue
 			}
-			if strings.Contains(query.Query, "o11y_logs") && len(query.Query) > 0 {
-				queryInfoResult.LogsUsed = true
-			}
-			if strings.Contains(query.Query, "o11y_traces") && len(query.Query) > 0 {
-				queryInfoResult.TracesUsed = true
-			}
+			m, l, t := querier.SignalsInSQL(query.Query)
+			queryInfoResult.MetricsUsed = queryInfoResult.MetricsUsed || m
+			queryInfoResult.LogsUsed = queryInfoResult.LogsUsed || l
+			queryInfoResult.TracesUsed = queryInfoResult.TracesUsed || t
 		}
 	}
 

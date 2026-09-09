@@ -6,6 +6,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/flagger/flaggertest"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes"
 	"github.com/hanzoai/o11y/pkg/types/telemetrytypes/telemetrytypestest"
@@ -119,7 +120,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis-manual", "%service.name%", "%service.name\":\"redis-manual%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -134,7 +135,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE ((simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND (simpleJSONExtractString(labels, 'k8s.namespace.name') = ? AND labels LIKE ? AND labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE ((simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND (simpleJSONExtractString(labels, 'k8s.namespace.name') = ? AND labels LIKE ? AND labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis-manual", "%service.name%", "%service.name\":\"redis-manual%", "production", "%k8s.namespace.name%", "%k8s.namespace.name\":\"production%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -183,7 +184,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (simpleJSONExtractString(labels, 'service.name') ILIKE ? AND labels LIKE ? AND labels ILIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE (simpleJSONExtractString(labels, 'service.name') ILIKE ? AND labels LIKE ? AND labels ILIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis%", "%service.name%", "%service.name%redis%%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -198,7 +199,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (simpleJSONHas(labels, 'service.name') = ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE (simpleJSONHas(labels, 'service.name') = ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{true, "%service.name%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -213,7 +214,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (simpleJSONHas(labels, 'service.name') <> ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE (simpleJSONHas(labels, 'service.name') <> ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{true, expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -228,7 +229,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE ((simpleJSONExtractString(labels, 'service.name') = ? OR simpleJSONExtractString(labels, 'service.name') = ?) AND labels LIKE ? AND (labels LIKE ? OR labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE ((simpleJSONExtractString(labels, 'service.name') = ? OR simpleJSONExtractString(labels, 'service.name') = ?) AND labels LIKE ? AND (labels LIKE ? OR labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis", "postgres", "%service.name%", "%service.name\":\"redis%", "%service.name\":\"postgres%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -243,7 +244,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE ((simpleJSONExtractString(labels, 'service.name') <> ? AND simpleJSONExtractString(labels, 'service.name') <> ?) AND (labels NOT LIKE ? AND labels NOT LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE ((simpleJSONExtractString(labels, 'service.name') <> ? AND simpleJSONExtractString(labels, 'service.name') <> ?) AND (labels NOT LIKE ? AND labels NOT LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis", "postgres", "%service.name\":\"redis%", "%service.name\":\"postgres%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -258,7 +259,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (simpleJSONExtractString(labels, 'service.name') ILIKE ? AND labels LIKE ? AND labels ILIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE (simpleJSONExtractString(labels, 'service.name') ILIKE ? AND labels LIKE ? AND labels ILIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"%redis%", "%service.name%", "%service.name%redis%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -273,7 +274,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (match(simpleJSONExtractString(labels, 'service.name'), ?) AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE (match(simpleJSONExtractString(labels, 'service.name'), ?) AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis.*", "%service.name%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -288,7 +289,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (simpleJSONExtractString(labels, 'service.name') <> ? AND labels NOT LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE (simpleJSONExtractString(labels, 'service.name') <> ? AND labels NOT LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis", "%service.name\":\"redis%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -315,7 +316,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   0,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? GROUP BY fingerprint",
 				Args:  []any{"redis", "%service.name%", "%service.name\":\"redis%", expectedBucketStart},
 			},
 		},
@@ -330,7 +331,7 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE NOT (((simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?))) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE NOT (((simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?))) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis", "%service.name%", "%service.name\":\"redis%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -355,8 +356,8 @@ func TestResourceFilterStatementBuilder_Traces(t *testing.T) {
 
 	builder := New[qbtypes.TraceAggregation](
 		instrumentationtest.New().ToProviderSettings(),
-		"o11y_traces",
-		"distributed_traces_v3_resource",
+		telemetryplane.DBName,
+		"span_resource",
 		telemetrytypes.SignalTraces,
 		telemetrytypes.SourceUnspecified,
 		mockMetadataStore,
@@ -406,7 +407,7 @@ func TestResourceFilterStatementBuilder_Logs(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_logs.distributed_logs_v2_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis-manual", "%service.name%", "%service.name\":\"redis-manual%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -443,7 +444,7 @@ func TestResourceFilterStatementBuilder_Logs(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_logs.distributed_logs_v2_resource WHERE ((simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND (simpleJSONExtractString(labels, 'k8s.namespace.name') = ? AND labels LIKE ? AND labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.log_resource WHERE ((simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND (simpleJSONExtractString(labels, 'k8s.namespace.name') = ? AND labels LIKE ? AND labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis", "%service.name%", "%service.name\":\"redis%", "default", "%k8s.namespace.name%", "%k8s.namespace.name\":\"default%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -461,7 +462,7 @@ func TestResourceFilterStatementBuilder_Logs(t *testing.T) {
 			start: uint64(1769976178000000000), // These will give bucket start 1769974378 and end 1770062578
 			end:   uint64(1770062578000000000),
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_logs.distributed_logs_v2_resource WHERE ((simpleJSONExtractString(labels, 'env') = ? AND labels LIKE ? AND labels LIKE ?) AND (simpleJSONExtractString(labels, 'k8s.deployment.name') = ? AND labels LIKE ? AND labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.log_resource WHERE ((simpleJSONExtractString(labels, 'env') = ? AND labels LIKE ? AND labels LIKE ?) AND (simpleJSONExtractString(labels, 'k8s.deployment.name') = ? AND labels LIKE ? AND labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"prod", "%env%", "%env\":\"prod%", "prod-deployment", "%k8s.deployment.name%", "%k8s.deployment.name\":\"prod-deployment%", uint64(1769974378), uint64(1770062578)},
 			},
 		},
@@ -549,8 +550,8 @@ func TestResourceFilterStatementBuilder_Logs(t *testing.T) {
 
 	builder := New[qbtypes.LogAggregation](
 		instrumentationtest.New().ToProviderSettings(),
-		"o11y_logs",
-		"distributed_logs_v2_resource",
+		telemetryplane.DBName,
+		"log_resource",
 		telemetrytypes.SignalLogs,
 		telemetrytypes.SourceUnspecified,
 		mockMetadataStore,
@@ -606,7 +607,7 @@ func TestResourceFilterStatementBuilder_Variables(t *testing.T) {
 			start: testStartNs,
 			end:   testEndNs,
 			expected: &qbtypes.Statement{
-				Query: "SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
+				Query: "SELECT fingerprint FROM event.span_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint",
 				Args:  []any{"redis-manual", "%service.name%", "%service.name\":\"redis-manual%", expectedBucketStart, expectedBucketEnd},
 			},
 		},
@@ -617,8 +618,8 @@ func TestResourceFilterStatementBuilder_Variables(t *testing.T) {
 
 	builder := New[qbtypes.TraceAggregation](
 		instrumentationtest.New().ToProviderSettings(),
-		"o11y_traces",
-		"distributed_traces_v3_resource",
+		telemetryplane.DBName,
+		"span_resource",
 		telemetrytypes.SignalTraces,
 		telemetrytypes.SourceUnspecified,
 		mockMetadataStore,

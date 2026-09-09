@@ -8,7 +8,14 @@ import (
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 	"github.com/hanzoai/o11y/pkg/querybuilder"
+	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
 )
+
+// The v3 logs builder read o11y_logs.distributed_logs — a database HIP-0132
+// dropped and a table whose successor is event.log. Spelled once, here, and
+// resolved from pkg/telemetryplane like every other reader.
+const logsFrom = telemetryplane.DBName + "." + telemetrylogs.LogTableName
 
 var AggregateOperatorToPercentile = map[v3.AggregateOperator]float64{
 	v3.AggregateOperatorP05: 0.05,
@@ -285,7 +292,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 	queryTmpl =
 		queryTmpl + selectLabels +
 			" %s as value " +
-			"from o11y_logs.distributed_logs " +
+			"from " + logsFrom + " " +
 			"where " + timeFilter + "%s" +
 			"%s%s" +
 			"%s"
@@ -357,7 +364,7 @@ func buildLogsQuery(panelType v3.PanelType, start, end, step int64, mq *v3.Build
 		query := fmt.Sprintf(queryTmpl, op, filterSubQuery, groupBy, having, orderBy)
 		return query, nil
 	case v3.AggregateOperatorNoOp:
-		queryTmpl := constants.LogsSQLSelect + "from o11y_logs.distributed_logs where %s%s order by %s"
+		queryTmpl := constants.LogsSQLSelect + "from " + logsFrom + " where %s%s order by %s"
 		query := fmt.Sprintf(queryTmpl, timeFilter, filterSubQuery, orderBy)
 		return query, nil
 	default:
@@ -373,7 +380,7 @@ func buildLogsLiveTailQuery(mq *v3.BuilderQuery) (string, error) {
 
 	switch mq.AggregateOperator {
 	case v3.AggregateOperatorNoOp:
-		query := constants.LogsSQLSelect + "from o11y_logs.distributed_logs where "
+		query := constants.LogsSQLSelect + "from " + logsFrom + " where "
 		if len(filterSubQuery) > 0 {
 			query = query + filterSubQuery + " AND "
 		}

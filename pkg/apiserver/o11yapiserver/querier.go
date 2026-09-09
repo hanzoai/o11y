@@ -5,8 +5,26 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/http/handler"
 	"github.com/hanzoai/o11y/pkg/http/routing"
+	"github.com/hanzoai/o11y/pkg/telemetrylogs"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 	"github.com/hanzoai/o11y/pkg/types"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
+)
+
+// The Datastore-SQL request examples below are the ONLY documentation a customer
+// has for writing raw SQL against the plane, and they are copied verbatim into
+// real queries. They named o11y_traces and o11y_logs — databases HIP-0132 dropped
+// — so every customer who followed the docs wrote a query that could only answer
+// UNKNOWN_DATABASE. An example that teaches a dead name is worse than no example.
+//
+// They are composed from the same constants the readers use, so an example
+// cannot drift from the plane again.
+const (
+	exSpan         = telemetryplane.DBName + "." + telemetrytraces.SpanTableName
+	exSpanResource = telemetryplane.DBName + "." + telemetrytraces.SpanResourceTableName
+	exLog          = telemetryplane.DBName + "." + telemetrylogs.LogTableName
+	exLogResource  = telemetryplane.DBName + "." + telemetrylogs.LogResourceTableName
 )
 
 // DUAL DISPATCH. These registrations stay: the standalone server reaches them
@@ -374,10 +392,10 @@ func (provider *provider) addQuerierRoutes(router routing.Router) {
 								"spec": map[string]any{
 									"name": "span_rate",
 									"query": "WITH __resource_filter AS (" +
-										" SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource" +
+										" SELECT fingerprint FROM " + exSpanResource +
 										" WHERE seen_at_ts_bucket_start >= $start_timestamp - 1800 AND seen_at_ts_bucket_start <= $end_timestamp" +
 										" ) SELECT toStartOfInterval(timestamp, INTERVAL 60 SECOND) AS ts, count() AS value" +
-										" FROM o11y_traces.distributed_o11y_index_v3" +
+										" FROM " + exSpan +
 										" WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter)" +
 										" AND timestamp >= $start_datetime AND timestamp <= $end_datetime" +
 										" AND ts_bucket_start >= $start_timestamp - 1800 AND ts_bucket_start <= $end_timestamp" +
@@ -403,10 +421,10 @@ func (provider *provider) addQuerierRoutes(router routing.Router) {
 								"spec": map[string]any{
 									"name": "recent_errors",
 									"query": "WITH __resource_filter AS (" +
-										" SELECT fingerprint FROM o11y_logs.distributed_logs_v2_resource" +
+										" SELECT fingerprint FROM " + exLogResource +
 										" WHERE seen_at_ts_bucket_start >= $start_timestamp - 1800 AND seen_at_ts_bucket_start <= $end_timestamp" +
 										" ) SELECT timestamp, body" +
-										" FROM o11y_logs.distributed_logs_v2" +
+										" FROM " + exLog +
 										" WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter)" +
 										" AND timestamp >= $start_timestamp_nano AND timestamp <= $end_timestamp_nano" +
 										" AND ts_bucket_start >= $start_timestamp - 1800 AND ts_bucket_start <= $end_timestamp" +
@@ -433,10 +451,10 @@ func (provider *provider) addQuerierRoutes(router routing.Router) {
 								"spec": map[string]any{
 									"name": "total_spans",
 									"query": "WITH __resource_filter AS (" +
-										" SELECT fingerprint FROM o11y_traces.distributed_traces_v3_resource" +
+										" SELECT fingerprint FROM " + exSpanResource +
 										" WHERE seen_at_ts_bucket_start >= $start_timestamp - 1800 AND seen_at_ts_bucket_start <= $end_timestamp" +
 										" ) SELECT count() AS value" +
-										" FROM o11y_traces.distributed_o11y_index_v3" +
+										" FROM " + exSpan +
 										" WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter)" +
 										" AND timestamp >= $start_datetime AND timestamp <= $end_datetime" +
 										" AND ts_bucket_start >= $start_timestamp - 1800 AND ts_bucket_start <= $end_timestamp",

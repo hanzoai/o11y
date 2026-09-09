@@ -3,7 +3,17 @@ package tracefunnel
 import (
 	"fmt"
 	"strings"
+
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 )
+
+// spanTable is the one table every funnel query reads. All six templates below
+// spelled `o11y_traces.distributed_o11y_index_v3` — a database HIP-0132 dropped
+// and a table whose successor is event.span — so every funnel answered
+// `Code: 81 ... UNKNOWN_DATABASE`. Six copies of a name is six chances to miss
+// one; it is spelled here and interpolated.
+var spanTable = telemetryplane.DBName + "." + telemetrytraces.SpanTableName
 
 // BuildFunnelValidationQuery builds a validation query for n-step funnels.
 func BuildFunnelValidationQuery(
@@ -57,7 +67,7 @@ SELECT
 FROM (
     SELECT
         %s
-    FROM o11y_traces.distributed_o11y_index_v3
+    FROM ` + spanTable + `
     WHERE
         %s
     GROUP BY trace_id
@@ -182,7 +192,7 @@ WITH
 , funnel AS (
     SELECT
         %s
-    FROM o11y_traces.distributed_o11y_index_v3
+    FROM ` + spanTable + `
     WHERE
         %s
     GROUP BY trace_id
@@ -297,7 +307,7 @@ SELECT
 FROM (
     SELECT
         %s
-    FROM o11y_traces.distributed_o11y_index_v3
+    FROM ` + spanTable + `
     WHERE
         %s
     GROUP BY trace_id
@@ -431,7 +441,7 @@ FROM (
     FROM (
         SELECT
             %s
-        FROM o11y_traces.distributed_o11y_index_v3
+        FROM ` + spanTable + `
         WHERE
             %s
         GROUP BY trace_id
@@ -506,7 +516,7 @@ FROM (
         %[11]s AS t1_time,
         %[12]s AS t2_time,
         count() AS span_count
-    FROM o11y_traces.distributed_o11y_index_v3
+    FROM ` + spanTable + `
     WHERE
         timestamp BETWEEN start_ts AND end_ts
         AND (
@@ -584,7 +594,7 @@ FROM (
         toUInt8(anyIf(has_error, resource_string_service$$name = step1.1 AND name = step1.2)) AS t1_error,
         toUInt8(anyIf(has_error, resource_string_service$$name = step2.1 AND name = step2.2)) AS t2_error,
         count() AS span_count
-    FROM o11y_traces.distributed_o11y_index_v3
+    FROM ` + spanTable + `
     WHERE
         timestamp BETWEEN start_ts AND end_ts
         AND (

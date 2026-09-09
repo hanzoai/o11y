@@ -42,6 +42,10 @@ import (
 	"github.com/hanzo-ds/go/lib/driver"
 
 	"github.com/hanzoai/o11y/pkg/cache"
+	"github.com/hanzoai/o11y/pkg/telemetrymetadata"
+	"github.com/hanzoai/o11y/pkg/telemetrymeter"
+	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
 
 	"log/slog"
 
@@ -59,51 +63,79 @@ import (
 	"github.com/hanzoai/o11y/pkg/query-service/utils"
 )
 
+// The names this reader reads by.
+//
+// EVERY DATABASE NAME HERE IS AN ALIAS, NOT A SPELLING. This file used to spell
+// five of them — o11y_traces, o11y_metrics, o11y_metadata, o11y_meter,
+// o11y_analytics — three of which had been dropped by HIP-0132, which is why
+// every read through this reader answered `Code: 81 ... UNKNOWN_DATABASE`.
+// A name that is spelled in two files drifts; a name that is spelled once cannot.
+// pkg/telemetryplane holds the spellings and plane_test.go enforces it.
+//
+// THE TABLE NAMES MOVED TOO, and they are aliases for the same reason. The event
+// plane names a table for WHAT IT IS — span, log, metric, series — and drops the
+// `distributed_` prefix (there are no Distributed wrappers on this deployment)
+// and the `_v2`/`_v3`/`_v4` suffix (a version in a name is a second table waiting
+// to happen). The mapping below is one-to-one and comes from
+// pkg/telemetry{traces,logs,metrics}/tables.go, which is the canonical statement
+// of the plane's shape.
+//
+// THE V2-ERA TABLES ARE GONE AND ARE NOT ALIASED. durationSort, usage_explorer,
+// o11y_spans, o11y_error_index_v2, o11y_index_v2 and dependency_graph_minutes_v2
+// were dropped WITH o11y_traces and the event plane has no successor for them.
+// Their constants are DELETED rather than repointed: an alias to `event` would
+// name a table that has never existed there, and the read would fail as if the
+// plane were broken. Where they were enumerated for TTL they are removed from the
+// list — one dead name in an ALTER list fails the TTL run for every live table
+// beside it.
 const (
-	primaryNamespace          = "datastore"
-	archiveNamespace          = "datastore-archive"
-	o11yTraceDBName           = "o11y_traces"
-	o11yHistoryDBName         = "o11y_analytics"
+	primaryNamespace = "datastore"
+	archiveNamespace = "datastore-archive"
+
+	// The one plane. Traces, logs and metrics all resolve here.
+	o11yTraceDBName  = telemetryplane.DBName
+	o11yMetricDBName = telemetryplane.DBName
+
+	// Not the plane; each has a live writer. See pkg/telemetryplane.
+	o11yHistoryDBName  = telemetryplane.AnalyticsDBName
+	o11yMetadataDbName = telemetrymetadata.DBName
+	o11yMeterDBName    = telemetryplane.MeterDBName
+
 	ruleStateHistoryTableName = "distributed_rule_state_history_v0"
-	o11yDurationMVTable       = "distributed_durationSort"
-	o11yUsageExplorerTable    = "distributed_usage_explorer"
-	o11ySpansTable            = "distributed_o11y_spans"
-	o11yErrorIndexTable       = "distributed_o11y_error_index_v2"
-	o11yTraceTableName        = "distributed_o11y_index_v2"
-	o11yTraceLocalTableName   = "o11y_index_v2"
-	o11yMetricDBName          = "o11y_metrics"
-	o11yMetadataDbName        = "o11y_metadata"
-	o11yMeterDBName           = "o11y_meter"
-	o11yMeterSamplesName      = "samples_agg_1d"
 
-	o11ySampleLocalTableName = "samples_v4"
-	o11ySampleTableName      = "distributed_samples_v4"
+	o11yMeterSamplesName = telemetrymeter.SamplesAgg1dLocalTableName
 
-	o11ySamplesAgg5mLocalTableName = "samples_v4_agg_5m"
-	o11ySamplesAgg5mTableName      = "distributed_samples_v4_agg_5m"
+	// samples_v4 -> metric: a row is one sample of one metric.
+	o11ySampleLocalTableName = telemetrymetrics.MetricLocalTableName
+	o11ySampleTableName      = telemetrymetrics.MetricTableName
 
-	o11ySamplesAgg30mLocalTableName = "samples_v4_agg_30m"
-	o11ySamplesAgg30mTableName      = "distributed_samples_v4_agg_30m"
+	o11ySamplesAgg5mLocalTableName = telemetrymetrics.Metric5mLocalTableName
+	o11ySamplesAgg5mTableName      = telemetrymetrics.Metric5mTableName
 
-	o11yExpHistLocalTableName = "exp_hist"
-	o11yExpHistTableName      = "distributed_exp_hist"
+	o11ySamplesAgg30mLocalTableName = telemetrymetrics.Metric30mLocalTableName
+	o11ySamplesAgg30mTableName      = telemetrymetrics.Metric30mTableName
 
-	o11yTSLocalTableNameV4 = "time_series_v4"
-	o11yTSTableNameV4      = "distributed_time_series_v4"
+	o11yExpHistLocalTableName = telemetrymetrics.HistogramLocalTableName
+	o11yExpHistTableName      = telemetrymetrics.HistogramTableName
 
-	o11yTSLocalTableNameV46Hrs = "time_series_v4_6hrs"
-	o11yTSTableNameV46Hrs      = "distributed_time_series_v4_6hrs"
+	// time_series_v4 -> series: a row is one series.
+	o11yTSLocalTableNameV4 = telemetrymetrics.SeriesLocalTableName
+	o11yTSTableNameV4      = telemetrymetrics.SeriesTableName
 
-	o11yTSLocalTableNameV41Day = "time_series_v4_1day"
-	o11yTSTableNameV41Day      = "distributed_time_series_v4_1day"
+	o11yTSLocalTableNameV46Hrs = telemetrymetrics.Series6hLocalTableName
+	o11yTSTableNameV46Hrs      = telemetrymetrics.Series6hTableName
 
-	o11yTSLocalTableNameV41Week = "time_series_v4_1week"
-	o11yTSTableNameV41Week      = "distributed_time_series_v4_1week"
+	o11yTSLocalTableNameV41Day = telemetrymetrics.Series1dLocalTableName
+	o11yTSTableNameV41Day      = telemetrymetrics.Series1dTableName
 
-	o11yTSTableNameV4Reduced = "distributed_time_series_v4_reduced"
+	o11yTSLocalTableNameV41Week = telemetrymetrics.Series1wLocalTableName
+	o11yTSTableNameV41Week      = telemetrymetrics.Series1wTableName
 
-	o11yTableAttributesMetadata      = "distributed_attributes_metadata"
-	o11yLocalTableAttributesMetadata = "attributes_metadata"
+	o11yTSTableNameV4Reduced = telemetrymetrics.SeriesReducedTableName
+
+	// The metadata pair stays in o11y_metadata with it.
+	o11yTableAttributesMetadata      = telemetrymetadata.AttributesMetadataTableName
+	o11yLocalTableAttributesMetadata = telemetrymetadata.AttributesMetadataLocalTableName
 
 	o11yUpdatedMetricsMetadataLocalTable  = "updated_metadata"
 	o11yUpdatedMetricsMetadataTable       = "distributed_updated_metadata"
@@ -1104,12 +1136,14 @@ func (r *DatastoreReader) setTTLTraces(ctx context.Context, orgID string, params
 	// uuid is used as transaction id
 	uuidWithHyphen := uuid.New()
 	uuid := strings.Replace(uuidWithHyphen.String(), "-", "", -1)
+	// The trace plane's tables, and only the ones that exist. The three v2-era
+	// names that used to sit here — error_index_v2, usage_explorer and
+	// dependency_graph_minutes_v2 — went with o11y_traces. ALTER TABLE names one
+	// table per statement, so one dead name did not degrade this run, it FAILED
+	// it: setting retention on traces stopped working for every live table too.
 	tableNames := []string{
 		r.TraceDB + "." + r.traceTableName,
 		r.TraceDB + "." + r.traceResourceTableV3,
-		r.TraceDB + "." + o11yErrorIndexTable,
-		r.TraceDB + "." + o11yUsageExplorerTable,
-		r.TraceDB + "." + defaultDependencyGraphTable,
 		r.TraceDB + "." + r.traceSummaryTable,
 		r.TraceDB + "." + r.spanAttributesKeysTable,
 	}
@@ -2136,12 +2170,11 @@ func (r *DatastoreReader) GetTTL(ctx context.Context, orgID string, ttlParams *r
 
 	switch ttlParams.Type {
 	case retentiontypes.TraceTTL:
+		// Same list as setTTLTraces, and it has to stay the same list: this one
+		// READS the status of what that one WROTE.
 		tableNameArray := []string{
 			r.TraceDB + "." + r.traceTableName,
 			r.TraceDB + "." + r.traceResourceTableV3,
-			r.TraceDB + "." + o11yErrorIndexTable,
-			r.TraceDB + "." + o11yUsageExplorerTable,
-			r.TraceDB + "." + defaultDependencyGraphTable,
 			r.TraceDB + "." + r.traceSummaryTable,
 		}
 		tableNameArray = getLocalTableNameArray(tableNameArray)

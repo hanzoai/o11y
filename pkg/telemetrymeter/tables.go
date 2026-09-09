@@ -4,11 +4,16 @@ import (
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/errors"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
 	"github.com/hanzoai/o11y/pkg/types/metrictypes"
 )
 
+// DBName is NOT the event plane. o11y_meter holds METERING — the billing-grade
+// usage counters — which HIP-0132 did not unify and no writer has left. The name
+// is spelled in pkg/telemetryplane beside the plane it is not part of, so
+// "which databases does this binary name?" has one answer.
 const (
-	DBName                     = "o11y_meter"
+	DBName                     = telemetryplane.MeterDBName
 	SamplesTableName           = "distributed_samples"
 	SamplesLocalTableName      = "samples"
 	SamplesAgg1dTableName      = "distributed_samples_agg_1d"

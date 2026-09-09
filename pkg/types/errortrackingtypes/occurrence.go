@@ -5,7 +5,7 @@ import "time"
 // Occurrence is a single normalized error event (one exception instance). It is
 // derived from a Sentry event (envelope / legacy store item) or, later, from an
 // OTel exception span-event. It is the OTel-shaped occurrence the shim persists
-// to o11y_logs (the reused occurrence store) and the "latest event" sample kept
+// to event.log (the reused occurrence store) and the "latest event" sample kept
 // on the issue for the detail view. Purely a value — no store, no tags of its own.
 type Occurrence struct {
 	EventID     string            `json:"eventId"`

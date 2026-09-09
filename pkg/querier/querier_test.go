@@ -30,7 +30,7 @@ type mockMetricStmtBuilder struct{}
 
 func (m *mockMetricStmtBuilder) Build(_ context.Context, _, _ uint64, _ qbtypes.RequestType, _ qbtypes.QueryBuilderQuery[qbtypes.MetricAggregation], _ map[string]qbtypes.VariableItem) (*qbtypes.Statement, error) {
 	return &qbtypes.Statement{
-		Query: "SELECT ts, value FROM o11y_metrics",
+		Query: "SELECT ts, value FROM event.metric",
 		Args:  nil,
 	}, nil
 }

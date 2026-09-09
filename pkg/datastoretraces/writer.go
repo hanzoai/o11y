@@ -17,7 +17,7 @@
 // WHY THIS EXISTS. Before it, the span lane had NO event-plane writer: the only
 // wired path was the embedded otelcol pipeline in hanzoai/cloud
 // (datastoretracesexporter), which writes the OTLP-fork family
-// (o11y_traces.o11y_index_v3) that the event-plane readers do not read. This
+// (the retired o11y_traces.o11y_index_v3) that the event-plane readers do not read. This
 // driver is the one span write path onto the envelope those readers query.
 //
 // IDEMPOTENT RE-INGEST. event.span is ReplacingMergeTree(ingested_at) with

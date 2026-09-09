@@ -337,7 +337,7 @@ func TestBuildQueryWithThreeOrMoreQueriesRefAndFormula(t *testing.T) {
 		qb := NewQueryBuilder(qbOptions)
 
 		queries, err := qb.PrepareQueries(q)
-		require.Contains(t, queries["F1"], "SELECT A.`os.type` as `os.type`, A.`ts` as `ts`, A.value + B.value as value FROM (SELECT `os.type`,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, avg(value) as value FROM o11y_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'os.type') as `os.type`, fingerprint FROM o11y_metrics.time_series_v4_1day WHERE metric_name IN ['system.memory.usage'] AND temporality = '' AND __normalized = false AND unix_milli >= 1734998400000 AND unix_milli < 1735637880000 AND JSONExtractString(labels, 'os.type') = 'linux') as filtered_time_series USING fingerprint WHERE metric_name IN ['system.memory.usage'] AND unix_milli >= 1735036080000 AND unix_milli < 1735637880000 GROUP BY `os.type`, ts ORDER BY `os.type` ASC, ts) as A  INNER JOIN (SELECT * FROM (SELECT `os.type`,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value) as value FROM o11y_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'os.type') as `os.type`, fingerprint FROM o11y_metrics.time_series_v4_1day WHERE metric_name IN ['system.network.io'] AND temporality = '' AND __normalized = false AND unix_milli >= 1734998400000 AND unix_milli < 1735637880000) as filtered_time_series USING fingerprint WHERE metric_name IN ['system.network.io'] AND unix_milli >= 1735036020000 AND unix_milli < 1735637880000 GROUP BY `os.type`, ts ORDER BY `os.type` ASC, ts) HAVING value > 4) as B  ON A.`os.type` = B.`os.type` AND A.`ts` = B.`ts`")
+		require.Contains(t, queries["F1"], "SELECT A.`os.type` as `os.type`, A.`ts` as `ts`, A.value + B.value as value FROM (SELECT `os.type`,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, avg(value) as value FROM event.metric INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'os.type') as `os.type`, fingerprint FROM event.series_1d WHERE metric_name IN ['system.memory.usage'] AND temporality = '' AND __normalized = false AND unix_milli >= 1734998400000 AND unix_milli < 1735637880000 AND JSONExtractString(labels, 'os.type') = 'linux') as filtered_time_series USING fingerprint WHERE metric_name IN ['system.memory.usage'] AND unix_milli >= 1735036080000 AND unix_milli < 1735637880000 GROUP BY `os.type`, ts ORDER BY `os.type` ASC, ts) as A  INNER JOIN (SELECT * FROM (SELECT `os.type`,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value) as value FROM event.metric INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'os.type') as `os.type`, fingerprint FROM event.series_1d WHERE metric_name IN ['system.network.io'] AND temporality = '' AND __normalized = false AND unix_milli >= 1734998400000 AND unix_milli < 1735637880000) as filtered_time_series USING fingerprint WHERE metric_name IN ['system.network.io'] AND unix_milli >= 1735036020000 AND unix_milli < 1735637880000 GROUP BY `os.type`, ts ORDER BY `os.type` ASC, ts) HAVING value > 4) as B  ON A.`os.type` = B.`os.type` AND A.`ts` = B.`ts`")
 		require.NoError(t, err)
 
 	})
@@ -386,7 +386,7 @@ func TestDeltaQueryBuilder(t *testing.T) {
 				},
 			},
 			queryToTest: "A",
-			expected:    "SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM o11y_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM o11y_metrics.time_series_v4_1day WHERE metric_name IN ['o11y_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['o11y_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts",
+			expected:    "SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM event.metric INNER JOIN (SELECT DISTINCT fingerprint FROM event.series_1d WHERE metric_name IN ['o11y_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['o11y_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts",
 		},
 		{
 			name: "TestQueryWithExpression - Error rate",
@@ -456,7 +456,7 @@ func TestDeltaQueryBuilder(t *testing.T) {
 				},
 			},
 			queryToTest: "C",
-			expected:    "SELECT A.`ts` as `ts`, A.value * 100 / B.value as value FROM (SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM o11y_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM o11y_metrics.time_series_v4_1day WHERE metric_name IN ['o11y_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, 'status_code') IN ['STATUS_CODE_ERROR'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['o11y_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts) as A  INNER JOIN (SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM o11y_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT fingerprint FROM o11y_metrics.time_series_v4_1day WHERE metric_name IN ['o11y_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['o11y_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts) as B  ON A.`ts` = B.`ts`",
+			expected:    "SELECT A.`ts` as `ts`, A.value * 100 / B.value as value FROM (SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM event.metric INNER JOIN (SELECT DISTINCT fingerprint FROM event.series_1d WHERE metric_name IN ['o11y_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, 'status_code') IN ['STATUS_CODE_ERROR'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['o11y_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts) as A  INNER JOIN (SELECT  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM event.metric INNER JOIN (SELECT DISTINCT fingerprint FROM event.series_1d WHERE metric_name IN ['o11y_latency_count'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000 AND JSONExtractString(labels, 'service_name') IN ['frontend'] AND JSONExtractString(labels, 'operation') IN ['HTTP GET /dispatch'] AND JSONExtractString(labels, '__temporality__') = 'Delta') as filtered_time_series USING fingerprint WHERE metric_name IN ['o11y_latency_count'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY ts ORDER BY  ts) as B  ON A.`ts` = B.`ts`",
 		},
 		{
 			name: "TestQuery - Quantile",
@@ -484,7 +484,7 @@ func TestDeltaQueryBuilder(t *testing.T) {
 				},
 			},
 			queryToTest: "A",
-			expected:    "SELECT service_name,  ts, histogramQuantile(arrayMap(x -> toFloat64(x), groupArray(le)), groupArray(value), 0.950) as value FROM (SELECT service_name,le,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM o11y_metrics.distributed_samples_v4 INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, JSONExtractString(labels, 'le') as le, fingerprint FROM o11y_metrics.time_series_v4_1day WHERE metric_name IN ['o11y_latency_bucket'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000) as filtered_time_series USING fingerprint WHERE metric_name IN ['o11y_latency_bucket'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY service_name,le,ts ORDER BY service_name ASC,le ASC, ts) GROUP BY service_name,ts ORDER BY service_name ASC, ts",
+			expected:    "SELECT service_name,  ts, histogramQuantile(arrayMap(x -> toFloat64(x), groupArray(le)), groupArray(value), 0.950) as value FROM (SELECT service_name,le,  toStartOfInterval(toDateTime(intDiv(unix_milli, 1000)), INTERVAL 60 SECOND) as ts, sum(value)/60 as value FROM event.metric INNER JOIN (SELECT DISTINCT JSONExtractString(labels, 'service_name') as service_name, JSONExtractString(labels, 'le') as le, fingerprint FROM event.series_1d WHERE metric_name IN ['o11y_latency_bucket'] AND temporality = 'Delta' AND __normalized = false AND unix_milli >= 1650931200000 AND unix_milli < 1651078380000) as filtered_time_series USING fingerprint WHERE metric_name IN ['o11y_latency_bucket'] AND unix_milli >= 1650991980000 AND unix_milli <= 1651078380000 GROUP BY service_name,le,ts ORDER BY service_name ASC,le ASC, ts) GROUP BY service_name,ts ORDER BY service_name ASC, ts",
 		},
 	}
 
@@ -563,9 +563,9 @@ var testLogsWithFormula = []struct {
 		},
 		ExpectedQuery: "SELECT A.`key_1` as `key_1`, A.`ts` as `ts`, A.value + B.value as value FROM " +
 			"(SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] as `key_1`, toFloat64(count(*)) as value from " +
-			"o11y_logs.distributed_logs where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] = true AND " +
+			"event.log where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] = true AND " +
 			"has(attributes_bool_key, 'key_1') group by `key_1`,ts order by value DESC) as A  INNER JOIN (SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, " +
-			"attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] as `key_1`, toFloat64(count(*)) as value from o11y_logs.distributed_logs where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) " +
+			"attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] as `key_1`, toFloat64(count(*)) as value from event.log where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) " +
 			"AND attributes_bool_value[indexOf(attributes_bool_key, 'key_2')] = true AND has(attributes_bool_key, 'key_1') group by `key_1`,ts order by value DESC) as B  ON A.`key_1` = B.`key_1` AND A.`ts` = B.`ts`",
 	},
 	{
@@ -623,9 +623,9 @@ var testLogsWithFormula = []struct {
 			},
 		},
 		ExpectedQuery: "SELECT A.`key1.1` as `key1.1`, A.value + B.value as value FROM (SELECT now() as ts, attributes_bool_value[indexOf(attributes_bool_key, 'key1.1')] as `key1.1`, " +
-			"toFloat64(count(*)) as value from o11y_logs.distributed_logs where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key1.1')] = true AND " +
+			"toFloat64(count(*)) as value from event.log where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key1.1')] = true AND " +
 			"has(attributes_bool_key, 'key1.1') group by `key1.1` order by value DESC) as A  INNER JOIN (SELECT now() as ts, attributes_bool_value[indexOf(attributes_bool_key, 'key1.1')] as `key1.1`, " +
-			"toFloat64(count(*)) as value from o11y_logs.distributed_logs where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key1.2')] = true AND " +
+			"toFloat64(count(*)) as value from event.log where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key1.2')] = true AND " +
 			"has(attributes_bool_key, 'key1.1') group by `key1.1` order by value DESC) as B  ON A.`key1.1` = B.`key1.1`",
 	},
 	{
@@ -683,9 +683,9 @@ var testLogsWithFormula = []struct {
 			},
 		},
 		ExpectedQuery: "SELECT A.`key1.1` as `key1.1`, A.`ts` as `ts`, A.value - B.value as value FROM (SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, " +
-			"`attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from o11y_logs.distributed_logs where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND " +
+			"`attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from event.log where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND " +
 			"`attribute_bool_key_2` = true AND `attribute_bool_key1$$1_exists`=true group by `key1.1`,ts order by value DESC) as A  INNER JOIN (SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), " +
-			"INTERVAL 60 SECOND) AS ts, `attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from o11y_logs.distributed_logs where (timestamp >= 1702980884000000000 AND " +
+			"INTERVAL 60 SECOND) AS ts, `attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from event.log where (timestamp >= 1702980884000000000 AND " +
 			"timestamp <= 1702984484000000000) AND attributes_bool_value[indexOf(attributes_bool_key, 'key_1')] = true AND `attribute_bool_key1$$1_exists`=true group by `key1.1`,ts order by value DESC) as B  " +
 			"ON A.`key1.1` = B.`key1.1` AND A.`ts` = B.`ts`",
 	},
@@ -770,10 +770,10 @@ var testLogsWithFormulaV2 = []struct {
 		},
 		ExpectedQuery: "SELECT A.`key_1` as `key_1`, A.`ts` as `ts`, A.value + B.value as value FROM " +
 			"(SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, attributes_bool['key_1'] as `key_1`, toFloat64(count(*)) as value from " +
-			"o11y_logs.distributed_logs_v2 where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND (ts_bucket_start >= 1702977475 AND ts_bucket_start <= 1702981075) " +
+			"event.log where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND (ts_bucket_start >= 1702977475 AND ts_bucket_start <= 1702981075) " +
 			"AND attributes_bool['key_1'] = true AND mapContains(attributes_bool, 'key_1') AND mapContains(attributes_bool, 'key_1') group by `key_1`,ts order by value DESC) as A  INNER JOIN (SELECT " +
 			"toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, attributes_bool['key_1'] as `key_1`, toFloat64(count(*)) as value " +
-			"from o11y_logs.distributed_logs_v2 where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND (ts_bucket_start >= 1702977475 AND ts_bucket_start <= 1702981075) " +
+			"from event.log where (timestamp >= 1702979275000000000 AND timestamp <= 1702981075000000000) AND (ts_bucket_start >= 1702977475 AND ts_bucket_start <= 1702981075) " +
 			"AND attributes_bool['key_2'] = true AND mapContains(attributes_bool, 'key_2') AND mapContains(attributes_bool, 'key_1') group by `key_1`,ts order by value DESC) as B  ON A.`key_1` = B.`key_1` AND A.`ts` = B.`ts`",
 	},
 	{
@@ -831,9 +831,9 @@ var testLogsWithFormulaV2 = []struct {
 			},
 		},
 		ExpectedQuery: "SELECT A.`key1.1` as `key1.1`, A.value + B.value as value FROM (SELECT attributes_bool['key1.1'] as `key1.1`, " +
-			"toFloat64(count(*)) as value from o11y_logs.distributed_logs_v2 where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND (ts_bucket_start >= 1702977256 AND ts_bucket_start <= 1702982656) " +
+			"toFloat64(count(*)) as value from event.log where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) AND (ts_bucket_start >= 1702977256 AND ts_bucket_start <= 1702982656) " +
 			"AND attributes_bool['key1.1'] = true AND mapContains(attributes_bool, 'key1.1') AND mapContains(attributes_bool, 'key1.1') group by `key1.1` order by value DESC) as A  INNER JOIN (SELECT " +
-			"attributes_bool['key1.1'] as `key1.1`, toFloat64(count(*)) as value from o11y_logs.distributed_logs_v2 where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) " +
+			"attributes_bool['key1.1'] as `key1.1`, toFloat64(count(*)) as value from event.log where (timestamp >= 1702979056000000000 AND timestamp <= 1702982656000000000) " +
 			"AND (ts_bucket_start >= 1702977256 AND ts_bucket_start <= 1702982656) AND attributes_bool['key1.2'] = true AND mapContains(attributes_bool, 'key1.2') AND " +
 			"mapContains(attributes_bool, 'key1.1') group by `key1.1` order by value DESC) as B  ON A.`key1.1` = B.`key1.1`",
 	},
@@ -892,10 +892,10 @@ var testLogsWithFormulaV2 = []struct {
 			},
 		},
 		ExpectedQuery: "SELECT A.`key1.1` as `key1.1`, A.`ts` as `ts`, A.value - B.value as value FROM (SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, " +
-			"`attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from o11y_logs.distributed_logs_v2 where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND " +
+			"`attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from event.log where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND " +
 			"(ts_bucket_start >= 1702979084 AND ts_bucket_start <= 1702984484) AND `attribute_bool_key_2` = true AND `attribute_bool_key1$$1_exists`=true group by `key1.1`,ts order by value DESC) as " +
 			"A  INNER JOIN (SELECT toStartOfInterval(fromUnixTimestamp64Nano(timestamp), INTERVAL 60 SECOND) AS ts, `attribute_bool_key1$$1` as `key1.1`, toFloat64(count(*)) as value from " +
-			"o11y_logs.distributed_logs_v2 where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND (ts_bucket_start >= 1702979084 AND ts_bucket_start <= 1702984484) AND " +
+			"event.log where (timestamp >= 1702980884000000000 AND timestamp <= 1702984484000000000) AND (ts_bucket_start >= 1702979084 AND ts_bucket_start <= 1702984484) AND " +
 			"attributes_bool['key_1'] = true AND mapContains(attributes_bool, 'key_1') AND `attribute_bool_key1$$1_exists`=true group by `key1.1`,ts order by value DESC) as B  " +
 			"ON A.`key1.1` = B.`key1.1` AND A.`ts` = B.`ts`",
 	},

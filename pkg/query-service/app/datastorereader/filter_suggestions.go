@@ -139,14 +139,14 @@ func (r *DatastoreReader) getValuesForLogAttributes(
 			select * from (
 				(
 					select tag_key, string_value, number_value
-					from o11y_logs.distributed_tag_attributes_v2
+					from event.log_attribute
 					where tag_key = $1 and (
 						string_value != '' or number_value is not null
 					)
 					limit 2
 				) UNION DISTINCT (
 					select tag_key, string_value, number_value
-					from o11y_logs.distributed_tag_attributes_v2
+					from event.log_attribute
 					where tag_key = $2 and (
 						string_value != '' or number_value is not null
 					)
@@ -154,7 +154,7 @@ func (r *DatastoreReader) getValuesForLogAttributes(
 				)
 			) settings max_threads=2
 		```
-		Since tag_attributes table uses ReplacingMergeTree, the values would be distinct and no order by
+		Since log_attribute uses ReplacingMergeTree, the values would be distinct and no order by
 		is being used to ensure the `limit` clause minimizes the amount of data scanned.
 	*/
 

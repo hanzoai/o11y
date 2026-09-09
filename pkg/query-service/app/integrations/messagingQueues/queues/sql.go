@@ -6,7 +6,13 @@ import (
 
 	v3 "github.com/hanzoai/o11y/pkg/query-service/model/v3"
 	format "github.com/hanzoai/o11y/pkg/query-service/utils"
+	"github.com/hanzoai/o11y/pkg/telemetryplane"
+	"github.com/hanzoai/o11y/pkg/telemetrytraces"
 )
+
+// spanTable — see the kafka sibling. o11y_traces was dropped by HIP-0132;
+// distributed_o11y_index_v3 IS event.span.
+var spanTable = telemetryplane.DBName + "." + telemetrytraces.SpanTableName
 
 // generateOverviewSQL builds the Datastore SQL query with optional filters.
 // If a filter slice is empty, the query does not constrain on that field.
@@ -65,7 +71,7 @@ WITH
             ) AS destination,
             durationNano,
             status_code
-        FROM o11y_traces.distributed_o11y_index_v3
+        FROM `+spanTable+`
         WHERE
             ts_bucket_start >= toDateTime64(%f, 9)
             AND ts_bucket_start <= toDateTime64(%f, 9)
