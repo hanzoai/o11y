@@ -68,10 +68,18 @@ images:
     repo: ghcr.io/hanzoai/o11y-site
 
 # The pair that has been green on this fleet already. `go build ./...` fails
-# fast on a break; the test run is `-count=1` so nothing is served from cache.
-# TestEmailRejected is the one skip: it asserts an emersion/go-smtp v0.24.0
-# error string that upstream formats with quotes, so it is wrong about this
-# dependency, not about us.
+# fast on a break; the test run is `-count=1` so nothing is served from cache,
+# and it skips nothing — a suite the gate is allowed to exclude from is a suite
+# the gate does not measure.
+#
+# There was one skip, `-skip '^TestEmailRejected$'`, and it was stale the day it
+# was written. It blamed emersion/go-smtp v0.24.0 for an error string formatted
+# with quotes. The quoting was Go's own: 1.26 changed net/textproto.Error.Error
+# to `%03d %q`. ef13a025e8 had already stopped the test asserting on rendered
+# text ten days earlier — it unwraps to *textproto.Error and pins Code 501 and
+# Msg "5.5.4 Rejected!" — so there was nothing left to be wrong about. Measured
+# before removing: go test -count=10 -run '^TestEmailRejected$' passes against
+# the pinned v0.24.0, and the full suite passes with no skip at all.
 #
 # This block used to be duplicated in .hanzo/workflows/ci.yaml, which also
 # checked out hanzoai/cloud at a pinned SHA to satisfy a
@@ -85,4 +93,4 @@ test:
     run: |
       set -e
       go build ./...
-      go test -count=1 -skip '^TestEmailRejected$' ./...
+      go test -count=1 ./...
