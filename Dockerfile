@@ -31,7 +31,7 @@
 ########################################
 # Stage 1 — Go build (./cmd/community)
 ########################################
-FROM golang:1.26.5-alpine AS backend
+FROM golang:1.26.8-alpine AS backend
 RUN apk add --no-cache git ca-certificates
 WORKDIR /src
 
