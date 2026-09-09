@@ -28,16 +28,13 @@ import (
 	"github.com/hanzoai/o11y/pkg/identn/apikeyidentn"
 	"github.com/hanzoai/o11y/pkg/identn/iamidentn"
 	"github.com/hanzoai/o11y/pkg/identn/impersonationidentn"
-	"github.com/hanzoai/o11y/pkg/identn/tokenizeridentn"
 	"github.com/hanzoai/o11y/pkg/meterreporter"
 	"github.com/hanzoai/o11y/pkg/meterreporter/noopmeterreporter"
-	"github.com/hanzoai/o11y/pkg/modules/authdomain/implauthdomain"
 	"github.com/hanzoai/o11y/pkg/modules/organization"
 	"github.com/hanzoai/o11y/pkg/modules/organization/implorganization"
 	"github.com/hanzoai/o11y/pkg/modules/preference/implpreference"
 	"github.com/hanzoai/o11y/pkg/modules/promote/implpromote"
 	"github.com/hanzoai/o11y/pkg/modules/serviceaccount"
-	"github.com/hanzoai/o11y/pkg/modules/session/implsession"
 	"github.com/hanzoai/o11y/pkg/modules/user"
 	"github.com/hanzoai/o11y/pkg/modules/user/impluser"
 	"github.com/hanzoai/o11y/pkg/pprof"
@@ -62,10 +59,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoretelemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystorehook"
-	"github.com/hanzoai/o11y/pkg/tokenizer"
-	"github.com/hanzoai/o11y/pkg/tokenizer/jwttokenizer"
-	"github.com/hanzoai/o11y/pkg/tokenizer/opaquetokenizer"
-	"github.com/hanzoai/o11y/pkg/tokenizer/tokenizerstore/sqltokenizerstore"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	"github.com/hanzoai/o11y/pkg/version"
@@ -273,9 +266,9 @@ func NewSharderProviderFactories() factory.NamedMap[factory.ProviderFactory[shar
 	)
 }
 
-func NewStatsReporterProviderFactories(aggregator statsreporter.Aggregator, orgGetter organization.Getter, userGetter user.Getter, tokenizer tokenizer.Tokenizer, build version.Build, analyticsConfig analytics.Config) factory.NamedMap[factory.ProviderFactory[statsreporter.StatsReporter, statsreporter.Config]] {
+func NewStatsReporterProviderFactories(aggregator statsreporter.Aggregator, orgGetter organization.Getter, userGetter user.Getter, build version.Build, analyticsConfig analytics.Config) factory.NamedMap[factory.ProviderFactory[statsreporter.StatsReporter, statsreporter.Config]] {
 	return factory.MustNewNamedMap(
-		analyticsstatsreporter.NewFactory(aggregator, orgGetter, userGetter, tokenizer, build, analyticsConfig),
+		analyticsstatsreporter.NewFactory(aggregator, orgGetter, userGetter, build, analyticsConfig),
 		noopstatsreporter.NewFactory(),
 	)
 }
@@ -292,9 +285,7 @@ func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.Au
 			orgGetter,
 			authz,
 			implorganization.NewHandler(modules.OrgGetter, modules.OrgSetter),
-			impluser.NewHandler(modules.UserSetter, modules.UserGetter),
-			implsession.NewHandler(modules.Session, globalConfig),
-			implauthdomain.NewHandler(modules.AuthDomain),
+			impluser.NewHandler(),
 			implpreference.NewHandler(modules.Preference),
 			handlers.Global,
 			implpromote.NewHandler(modules.Promote),
@@ -327,19 +318,10 @@ func NewAPIServerProviderFactories(orgGetter organization.Getter, authz authz.Au
 	)
 }
 
-func NewTokenizerProviderFactories(cache cache.Cache, sqlstore sqlstore.SQLStore, orgGetter organization.Getter) factory.NamedMap[factory.ProviderFactory[tokenizer.Tokenizer, tokenizer.Config]] {
-	tokenStore := sqltokenizerstore.NewStore(sqlstore)
-	return factory.MustNewNamedMap(
-		opaquetokenizer.NewFactory(cache, tokenStore, orgGetter),
-		jwttokenizer.NewFactory(cache, tokenStore),
-	)
-}
-
-func NewIdentNProviderFactories(tokenizer tokenizer.Tokenizer, serviceAccount serviceaccount.Module, orgGetter organization.Getter, orgSetter organization.Setter, authz authz.AuthZ, userGetter user.Getter, userSetter user.Setter, userConfig user.Config) factory.NamedMap[factory.ProviderFactory[identn.IdentN, identn.Config]] {
+func NewIdentNProviderFactories(serviceAccount serviceaccount.Module, orgGetter organization.Getter, orgSetter organization.Setter, authz authz.AuthZ, userGetter user.Getter, userSetter user.Setter, userConfig user.Config) factory.NamedMap[factory.ProviderFactory[identn.IdentN, identn.Config]] {
 	return factory.MustNewNamedMap(
 		iamidentn.NewFactory(orgGetter, orgSetter, authz, userGetter, userSetter),
 		impersonationidentn.NewFactory(orgGetter, userGetter, userConfig),
-		tokenizeridentn.NewFactory(tokenizer),
 		apikeyidentn.NewFactory(serviceAccount),
 	)
 }

@@ -57,11 +57,11 @@ func assertRoutes(t *testing.T, want map[string]bool, prefix string) {
 	}
 }
 
-// THE WHOLE SURFACE, counted. 366 is the number of method+path pairs the o11y
+// THE WHOLE SURFACE, counted. 329 is the number of method+path pairs the o11y
 // runtime registers on its gorilla/mux tree (pkg/query-service/app/routes_*.go
-// and pkg/apiserver/o11yapiserver/*.go). Mount registers the same 366 — 353 as
+// and pkg/apiserver/o11yapiserver/*.go). Mount registers the same 329 — 319 as
 // typed ops that carry a named In, a named Out and their prose into the
-// document, 10 as named escape hatches, 3 as native service probes.
+// document, 7 as named escape hatches, 3 as native service probes.
 //
 // If this number moves, one of two things happened and both need a human: a
 // route was added to the runtime and not named here (it would 404 in the
@@ -72,8 +72,8 @@ func TestEveryRouteIsNamedAndCounted(t *testing.T) {
 	all := registered(t, app)
 
 	const (
-		wantTyped   = 353 // typed ops: in the OpenAPI document and the MCP tool list
-		wantHatches = 10  // mount.go mountHatches, each with its reason
+		wantTyped   = 319 // typed ops: in the OpenAPI document and the MCP tool list
+		wantHatches = 7   // mount.go mountHatches, each with its reason
 		wantProbes  = 3   // health.go livez/healthz/readyz, native with fall-through
 	)
 	if len(all) != wantTyped+wantHatches+wantProbes {
@@ -147,7 +147,7 @@ func setRuntime(t *testing.T, fn http.HandlerFunc) {
 	t.Cleanup(func() { o11y.SetRuntime(nil) })
 }
 
-// THE TEN. Each hatch is registered at its exact method and path, and each
+// THE SEVEN. Each hatch is registered at its exact method and path, and each
 // delegates with the path UNTOUCHED — a rewrite at this seam can only ever move
 // a request off its own route, and a mangler is invisible to the compiler, so
 // this is the only thing that catches one coming back.
@@ -157,16 +157,13 @@ func TestHatchesDelegateVerbatim(t *testing.T) {
 		{http.MethodGet, "/v1/o11y/query_progress"},
 		{http.MethodPost, "/v1/o11y/export_raw_data"},
 
-		{http.MethodGet, "/v1/o11y/complete/google"},
-		{http.MethodGet, "/v1/o11y/complete/oidc"},
-		{http.MethodPost, "/v1/o11y/complete/saml"},
 
 		{http.MethodPost, "/v1/event/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
 		{http.MethodPost, "/v1/event/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
 		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
 		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
 	}
-	if len(hatches) != 10 {
+	if len(hatches) != 7 {
 		t.Fatalf("the census itself is wrong: %d", len(hatches))
 	}
 
@@ -234,8 +231,8 @@ func TestUnderIsStillLoadBearing(t *testing.T) {
 		}
 		declared++
 	}
-	if declared+undeclared != 353 {
-		t.Fatalf("registry holds %d ops, want the 353 of TestEveryRouteIsNamedAndCounted", declared+undeclared)
+	if declared+undeclared != 319 {
+		t.Fatalf("registry holds %d ops, want the 319 of TestEveryRouteIsNamedAndCounted", declared+undeclared)
 	}
 	if undeclared == 0 {
 		t.Fatalf("every one of the %d ops now declares its id — a declared id survives "+

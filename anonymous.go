@@ -71,37 +71,27 @@ var openOps = map[string]bool{
 	"GET /v1/o11y/version": true,
 	"GET /v1/o11y/health":  true,
 
-	// The console's pre-login configuration — branding, the ingest URL, which
-	// sign-in methods this deployment offers. Read to RENDER the sign-in page,
-	// so requiring a session to read it is circular.
+	// The console's pre-session configuration — branding and the ingest URL.
+	// Read before the console knows whether it has a session, so requiring one
+	// to read it is circular.
 	"GET /v1/o11y/global/config": true,
 
-	// THE PATH TO HAVING A PRINCIPAL. Requiring one to obtain one is the same
-	// circle, and the failure it causes is total: sign-in itself stops working.
-	// Registration is here because on a fresh deployment there is no user yet to
-	// hold a principal; the runtime refuses it once setup has completed.
-	"POST /v1/o11y/register":                     true,
-	"POST /v1/o11y/sessions/email_password":      true,
-	"GET /v1/o11y/sessions/context":              true,
-	"POST /v1/o11y/sessions/rotate":              true,
-	"DELETE /v1/o11y/sessions":                   true,
-	"GET /v1/o11y/complete/google":               true,
-	"GET /v1/o11y/complete/oidc":                 true,
-	"POST /v1/o11y/complete/saml":                true,
-	"POST /v1/o11y/reset_password_tokens/verify": true,
-	"POST /v1/o11y/resetPassword":                true,
-	"POST /v1/o11y/factor_password/forgot":       true,
-
-	// SELF-ADDRESSED: the subject is the caller's own credential, never a tenant
+	// THE PATH TO HAVING A PRINCIPAL used to be eleven entries long — sign-in,
+	// registration, session rotation, sign-out, three SSO callbacks and three
+	// password-reset routes — because o11y authenticated people itself. It
+	// authenticates nobody now: Hanzo IAM does, at hanzo.id, and the edge hands
+	// this process an already-validated identity. There is no unauthenticated
+	// path to a principal here because there is no principal minted here, and
+	// the entries are DELETED rather than left standing, since an exemption is
+	// only ever a hole waiting for a route to be re-added under it.
+	//
+	// SELF-ADDRESSED: the subject is the caller's own identity, never a tenant
 	// named in the request. There is no X-Org-Id to forge into these — "me" is
 	// read from the claims the runtime resolved — so the host has nothing to
 	// protect and a caller with no claims gets the runtime's own 401.
-	"GET /v1/o11y/user/me":                  true,
-	"GET /v1/o11y/users/me":                 true,
-	"PUT /v1/o11y/users/me":                 true,
-	"PUT /v1/o11y/users/me/factor_password": true,
-	"GET /v1/o11y/service_accounts/me":      true,
-	"PUT /v1/o11y/service_accounts/me":      true,
+	"GET /v1/o11y/users/me":            true,
+	"GET /v1/o11y/service_accounts/me": true,
+	"PUT /v1/o11y/service_accounts/me": true,
 }
 
 // publicDashboardRead reports whether path is one of the two reads a SHARED

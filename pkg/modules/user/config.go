@@ -1,43 +1,31 @@
 package user
 
 import (
-	"time"
-
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
-	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
+// Config is what remains once o11y stopped holding credentials: WHICH row the
+// local single-user mode stands in for, and nothing about how anyone proves who
+// they are. The password reset and invite token lifetimes went with the tokens.
 type Config struct {
-	Password PasswordConfig `mapstructure:"password"`
-	Root     RootConfig     `mapstructure:"root"`
+	Root RootConfig `mapstructure:"root"`
 }
 
+// RootConfig seeds the one row that impersonationidentn resolves to in local
+// single-user mode. It carries NO password: nothing authenticates against this
+// row — impersonation matches every request unconditionally, which is why
+// identn::impersonation refuses to boot alongside any real resolver.
 type RootConfig struct {
-	Enabled  bool         `mapstructure:"enabled"`
-	Email    valuer.Email `mapstructure:"email"`
-	Password string       `mapstructure:"password"`
-	Org      OrgConfig    `mapstructure:"org"`
+	Enabled bool         `mapstructure:"enabled"`
+	Email   valuer.Email `mapstructure:"email"`
+	Org     OrgConfig    `mapstructure:"org"`
 }
 
 type OrgConfig struct {
 	ID   valuer.UUID `mapstructure:"id"`
 	Name string      `mapstructure:"name"`
-}
-
-type PasswordConfig struct {
-	Invite InviteConfig `mapstructure:"invite"`
-	Reset  ResetConfig  `mapstructure:"reset"`
-}
-
-type InviteConfig struct {
-	MaxTokenLifetime time.Duration `mapstructure:"max_token_lifetime"`
-}
-
-type ResetConfig struct {
-	AllowSelf        bool          `mapstructure:"allow_self"`
-	MaxTokenLifetime time.Duration `mapstructure:"max_token_lifetime"`
 }
 
 func NewConfigFactory() factory.ConfigFactory {
@@ -46,15 +34,6 @@ func NewConfigFactory() factory.ConfigFactory {
 
 func newConfig() factory.Config {
 	return &Config{
-		Password: PasswordConfig{
-			Reset: ResetConfig{
-				AllowSelf:        false,
-				MaxTokenLifetime: 6 * time.Hour,
-			},
-			Invite: InviteConfig{
-				MaxTokenLifetime: 48 * time.Hour,
-			},
-		},
 		Root: RootConfig{
 			Enabled: false,
 			Org: OrgConfig{
@@ -65,24 +44,8 @@ func newConfig() factory.Config {
 }
 
 func (c Config) Validate() error {
-	if c.Password.Reset.MaxTokenLifetime <= 0 {
-		return errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "user::password::reset::max_token_lifetime must be positive")
-	}
-
-	if c.Password.Invite.MaxTokenLifetime <= 0 {
-		return errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "user::password::invite::max_token_lifetime must be positive")
-	}
-
-	if c.Root.Enabled {
-		if c.Root.Email.IsZero() {
-			return errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "user::root::email is required when root user is enabled")
-		}
-		if c.Root.Password == "" {
-			return errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "user::root::password is required when root user is enabled")
-		}
-		if !types.IsPasswordValid(c.Root.Password) {
-			return errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "user::root::password does not meet password requirements")
-		}
+	if c.Root.Enabled && c.Root.Email.IsZero() {
+		return errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "user::root::email is required when root user is enabled")
 	}
 
 	return nil

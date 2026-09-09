@@ -21,7 +21,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/statsreporter"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
-	"github.com/hanzoai/o11y/pkg/tokenizer/tokenizertest"
 	"github.com/hanzoai/o11y/pkg/version"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -86,7 +85,7 @@ func TestNewProviderFactories(t *testing.T) {
 		userGetter := impluser.NewGetter(impluser.NewStore(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual), instrumentationtest.New().ToProviderSettings()), userRoleStore, flagger)
 		orgGetter := implorganization.NewGetter(implorganization.NewStore(sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherEqual)), nil)
 		statsAggregator := statsreporter.NewAggregator(providerSettings, []statsreporter.StatsCollector{})
-		NewStatsReporterProviderFactories(statsAggregator, orgGetter, userGetter, tokenizertest.NewMockTokenizer(t), version.Build{}, analytics.Config{Enabled: true})
+		NewStatsReporterProviderFactories(statsAggregator, orgGetter, userGetter, version.Build{}, analytics.Config{Enabled: true})
 	})
 
 	assert.NotPanics(t, func() {

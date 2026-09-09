@@ -10,7 +10,7 @@ import (
 )
 
 func TestNewAuditAttributesFromHTTP_OutcomeBoundary(t *testing.T) {
-	claims := authtypes.Claims{IdentNProvider: authtypes.IdentNProviderTokenizer}
+	claims := authtypes.Claims{IdentNProvider: authtypes.IdentNProviderIAM}
 
 	testCases := []struct {
 		name            string

@@ -37,9 +37,6 @@ func init() {
 			"O11yDashboardIDIn.id": "ID is the resource id from the path.",
 		},
 	})
-	zip.Describe("DELETE /v1/o11y/domains/:id", zip.Doc{
-		Description: "Releases an email domain and discards its SSO\nconfiguration, by id. Admin gate.",
-	})
 	zip.Describe("DELETE /v1/o11y/downtime_schedules/:id", zip.Doc{
 		Description: "Removes a planned maintenance window, by id. Editor gate.",
 	})
@@ -86,9 +83,6 @@ func init() {
 	zip.Describe("DELETE /v1/o11y/service_accounts/:id/roles/:rid", zip.Doc{
 		Description: "Removes a role from a service account.",
 	})
-	zip.Describe("DELETE /v1/o11y/sessions", zip.Doc{
-		Description: "Signs the calling session out, invalidating its tokens. The\naccess token on the call names the session to end.",
-	})
 	zip.Describe("DELETE /v1/o11y/span_mapper_groups/:groupId", zip.Doc{
 		Description: "Deletes a mapping group and every mapper under it.\n\nCallers need the admin role; the runtime's own gate enforces it.",
 	})
@@ -100,15 +94,6 @@ func init() {
 		Fields: map[string]string{
 			"O11yFunnelDeleteOut.status": "Status is \"success\".",
 		},
-	})
-	zip.Describe("DELETE /v1/o11y/user/:id", zip.Doc{
-		Description: "Removes one org member, by user id. The same operation\nas deleteUser on the legacy singular path. Admin gate.",
-	})
-	zip.Describe("DELETE /v1/o11y/users/:id", zip.Doc{
-		Description: "Removes one org member, by user id. Admin gate.",
-	})
-	zip.Describe("DELETE /v1/o11y/users/:id/roles/:roleId", zip.Doc{
-		Description: "Takes a role away from one org member, by user id and role\nid — someone else, never the caller. Admin gate.",
 	})
 	zip.Describe("DELETE /v1/o11y/users/me/dashboards/:id/pins", zip.Doc{
 		Description: "Removes the caller's pin for a dashboard. Idempotent —\nunpinning a dashboard that was not pinned still succeeds.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
@@ -420,104 +405,6 @@ func init() {
 			"O11yDisk.type": "Type is the disk's type, e.g. local or s3.",
 		},
 	})
-	zip.Describe("GET /v1/o11y/domains", zip.Doc{
-		Description: "Lists the org's auth domains — the email domains whose SSO\nconfiguration this org owns. Admin gate.",
-		Fields: map[string]string{
-			"O11yAttributeMapping.email":                      "Email is the key carrying the email; defaults to \"email\".",
-			"O11yAttributeMapping.groups":                     "Groups is the key carrying the group list; defaults to \"groups\".",
-			"O11yAttributeMapping.name":                       "Name is the key carrying the display name; defaults to \"name\".",
-			"O11yAttributeMapping.role":                       "Role is the key carrying the role; defaults to \"role\".",
-			"O11yAuthDomain.authNProviderInfo":                "AuthNProviderInfo is provider detail the console needs to finish setup.",
-			"O11yAuthDomain.config":                           "Config is the domain's SSO configuration.",
-			"O11yAuthDomain.createdAt":                        "CreatedAt is when it was claimed.",
-			"O11yAuthDomain.id":                               "ID is the auth domain id.",
-			"O11yAuthDomain.name":                             "Name is the email domain, e.g. example.com.",
-			"O11yAuthDomain.orgId":                            "OrgID is the org that claimed it.",
-			"O11yAuthDomain.updatedAt":                        "UpdatedAt is when its configuration last changed.",
-			"O11yAuthDomainConfig.googleAuthConfig":           "Google is the Google provider's settings, when SSOType is google_auth.",
-			"O11yAuthDomainConfig.oidcConfig":                 "OIDC is the OIDC provider's settings, when SSOType is oidc.",
-			"O11yAuthDomainConfig.roleMapping":                "RoleMapping maps the provider's groups onto roles for new users.",
-			"O11yAuthDomainConfig.samlConfig":                 "SAML is the SAML provider's settings, when SSOType is saml.",
-			"O11yAuthDomainConfig.ssoEnabled":                 "SSOEnabled turns enforced SSO on for the domain.",
-			"O11yAuthDomainConfig.ssoType":                    "SSOType picks the provider — saml, google_auth or oidc.",
-			"O11yAuthDomainsOut.data":                         "Data holds the domains.",
-			"O11yAuthDomainsOut.status":                       "Status is \"success\".",
-			"O11yAuthNProviderInfo.relayStatePath":            "RelayStatePath is the relay-state path a SAML IdP must be configured\nwith, when the provider needs one.",
-			"O11yGoogleConfig.allowedGroups":                  "AllowedGroups, when set, admits only members of these groups.",
-			"O11yGoogleConfig.clientId":                       "ClientID is the OAuth application's id.",
-			"O11yGoogleConfig.clientSecret":                   "ClientSecret is the OAuth application's secret.",
-			"O11yGoogleConfig.domainToAdminEmail":             "DomainToAdminEmail maps each Workspace domain to the admin the service\naccount impersonates; \"*\" is the fallback.",
-			"O11yGoogleConfig.fetchGroups":                    "FetchGroups reads the user's Workspace groups for role mapping.",
-			"O11yGoogleConfig.fetchTransitiveGroupMembership": "FetchTransitiveGroupMembership also reads groups held through other\ngroups.",
-			"O11yGoogleConfig.insecureSkipEmailVerified":      "InsecureSkipEmailVerified admits addresses Google has not verified.",
-			"O11yGoogleConfig.redirectURI":                    "RedirectURI is the callback the flow returns to.",
-			"O11yGoogleConfig.serviceAccountJson":             "ServiceAccountJSON is the service-account credential used to read\ngroups, when FetchGroups is on.",
-			"O11yOIDCConfig.claimMapping":                     "ClaimMapping names the token claims to read identity from.",
-			"O11yOIDCConfig.clientId":                         "ClientID is the OAuth application's id.",
-			"O11yOIDCConfig.clientSecret":                     "ClientSecret is the OAuth application's secret.",
-			"O11yOIDCConfig.getUserInfo":                      "GetUserInfo also queries the userinfo endpoint, for providers whose id\ntokens are thin.",
-			"O11yOIDCConfig.insecureSkipEmailVerified":        "InsecureSkipEmailVerified admits addresses the provider has not\nverified.",
-			"O11yOIDCConfig.issuer":                           "Issuer is the provider's issuer URL.",
-			"O11yOIDCConfig.issuerAlias":                      "IssuerAlias overrides the issuer for providers whose discovery document\ndisagrees with their issuer URL.",
-			"O11yRoleMapping.defaultRole":                     "DefaultRole is the role when no group mapping applies.",
-			"O11yRoleMapping.groupMappings":                   "GroupMappings maps a provider group name to a role name.",
-			"O11yRoleMapping.useRoleAttribute":                "UseRoleAttribute reads the role straight from the provider's role claim\ninstead of the group mappings.",
-			"O11ySAMLConfig.attributeMapping":                 "AttributeMapping names the assertion attributes to read identity from.",
-			"O11ySAMLConfig.insecureSkipAuthNRequestsSigned":  "InsecureSkipAuthNRequestsSigned skips signing outgoing AuthN requests,\nfor IdPs that refuse signed ones.",
-			"O11ySAMLConfig.samlCert":                         "SamlCert is the IdP's signing certificate.",
-			"O11ySAMLConfig.samlEntity":                       "SamlEntity is the IdP's entityID.",
-			"O11ySAMLConfig.samlIdp":                          "SamlIdp is the IdP's single-sign-on endpoint.",
-		},
-	})
-	zip.Describe("GET /v1/o11y/domains/:id", zip.Doc{
-		Description: "Returns one auth domain with its SSO configuration, by id.\nAdmin gate.",
-		Fields: map[string]string{
-			"O11yAttributeMapping.email":                      "Email is the key carrying the email; defaults to \"email\".",
-			"O11yAttributeMapping.groups":                     "Groups is the key carrying the group list; defaults to \"groups\".",
-			"O11yAttributeMapping.name":                       "Name is the key carrying the display name; defaults to \"name\".",
-			"O11yAttributeMapping.role":                       "Role is the key carrying the role; defaults to \"role\".",
-			"O11yAuthDomain.authNProviderInfo":                "AuthNProviderInfo is provider detail the console needs to finish setup.",
-			"O11yAuthDomain.config":                           "Config is the domain's SSO configuration.",
-			"O11yAuthDomain.createdAt":                        "CreatedAt is when it was claimed.",
-			"O11yAuthDomain.id":                               "ID is the auth domain id.",
-			"O11yAuthDomain.name":                             "Name is the email domain, e.g. example.com.",
-			"O11yAuthDomain.orgId":                            "OrgID is the org that claimed it.",
-			"O11yAuthDomain.updatedAt":                        "UpdatedAt is when its configuration last changed.",
-			"O11yAuthDomainConfig.googleAuthConfig":           "Google is the Google provider's settings, when SSOType is google_auth.",
-			"O11yAuthDomainConfig.oidcConfig":                 "OIDC is the OIDC provider's settings, when SSOType is oidc.",
-			"O11yAuthDomainConfig.roleMapping":                "RoleMapping maps the provider's groups onto roles for new users.",
-			"O11yAuthDomainConfig.samlConfig":                 "SAML is the SAML provider's settings, when SSOType is saml.",
-			"O11yAuthDomainConfig.ssoEnabled":                 "SSOEnabled turns enforced SSO on for the domain.",
-			"O11yAuthDomainConfig.ssoType":                    "SSOType picks the provider — saml, google_auth or oidc.",
-			"O11yAuthDomainOut.data":                          "Data is the domain.",
-			"O11yAuthDomainOut.status":                        "Status is \"success\".",
-			"O11yAuthNProviderInfo.relayStatePath":            "RelayStatePath is the relay-state path a SAML IdP must be configured\nwith, when the provider needs one.",
-			"O11yGoogleConfig.allowedGroups":                  "AllowedGroups, when set, admits only members of these groups.",
-			"O11yGoogleConfig.clientId":                       "ClientID is the OAuth application's id.",
-			"O11yGoogleConfig.clientSecret":                   "ClientSecret is the OAuth application's secret.",
-			"O11yGoogleConfig.domainToAdminEmail":             "DomainToAdminEmail maps each Workspace domain to the admin the service\naccount impersonates; \"*\" is the fallback.",
-			"O11yGoogleConfig.fetchGroups":                    "FetchGroups reads the user's Workspace groups for role mapping.",
-			"O11yGoogleConfig.fetchTransitiveGroupMembership": "FetchTransitiveGroupMembership also reads groups held through other\ngroups.",
-			"O11yGoogleConfig.insecureSkipEmailVerified":      "InsecureSkipEmailVerified admits addresses Google has not verified.",
-			"O11yGoogleConfig.redirectURI":                    "RedirectURI is the callback the flow returns to.",
-			"O11yGoogleConfig.serviceAccountJson":             "ServiceAccountJSON is the service-account credential used to read\ngroups, when FetchGroups is on.",
-			"O11yOIDCConfig.claimMapping":                     "ClaimMapping names the token claims to read identity from.",
-			"O11yOIDCConfig.clientId":                         "ClientID is the OAuth application's id.",
-			"O11yOIDCConfig.clientSecret":                     "ClientSecret is the OAuth application's secret.",
-			"O11yOIDCConfig.getUserInfo":                      "GetUserInfo also queries the userinfo endpoint, for providers whose id\ntokens are thin.",
-			"O11yOIDCConfig.insecureSkipEmailVerified":        "InsecureSkipEmailVerified admits addresses the provider has not\nverified.",
-			"O11yOIDCConfig.issuer":                           "Issuer is the provider's issuer URL.",
-			"O11yOIDCConfig.issuerAlias":                      "IssuerAlias overrides the issuer for providers whose discovery document\ndisagrees with their issuer URL.",
-			"O11yRoleMapping.defaultRole":                     "DefaultRole is the role when no group mapping applies.",
-			"O11yRoleMapping.groupMappings":                   "GroupMappings maps a provider group name to a role name.",
-			"O11yRoleMapping.useRoleAttribute":                "UseRoleAttribute reads the role straight from the provider's role claim\ninstead of the group mappings.",
-			"O11ySAMLConfig.attributeMapping":                 "AttributeMapping names the assertion attributes to read identity from.",
-			"O11ySAMLConfig.insecureSkipAuthNRequestsSigned":  "InsecureSkipAuthNRequestsSigned skips signing outgoing AuthN requests,\nfor IdPs that refuse signed ones.",
-			"O11ySAMLConfig.samlCert":                         "SamlCert is the IdP's signing certificate.",
-			"O11ySAMLConfig.samlEntity":                       "SamlEntity is the IdP's entityID.",
-			"O11ySAMLConfig.samlIdp":                          "SamlIdp is the IdP's single-sign-on endpoint.",
-		},
-	})
 	zip.Describe("GET /v1/o11y/downtime_schedules", zip.Doc{
 		Description: "Lists all planned maintenance windows, optionally\nnarrowed to the active ones or the recurring ones. Viewer gate.",
 		Fields: map[string]string{
@@ -788,17 +675,6 @@ func init() {
 			"O11ySearchIngestionKeysIn.name":     "Name is the substring to match ingestion-key names against.",
 			"O11ySearchIngestionKeysIn.page":     "Page is the 1-based page number.",
 			"O11ySearchIngestionKeysIn.per_page": "PerPage is the page size.",
-		},
-	})
-	zip.Describe("GET /v1/o11y/getResetPasswordToken/:id", zip.Doc{
-		Description: "Returns a user's password-reset token, creating one\nif none is live. Deprecated in favor of the reset_password_tokens pair,\nwhich separates reading from minting. Admin gate.",
-		Fields: map[string]string{
-			"O11yResetToken.expiresAt":  "ExpiresAt is when it stops working.",
-			"O11yResetToken.id":         "ID is the grant's id.",
-			"O11yResetToken.passwordId": "PasswordID is the password record it resets.",
-			"O11yResetToken.token":      "Token is the secret that redeems it.",
-			"O11yResetTokenOut.data":    "Data is the token.",
-			"O11yResetTokenOut.status":  "Status is \"success\".",
 		},
 	})
 	zip.Describe("GET /v1/o11y/global/config", zip.Doc{
@@ -1895,21 +1771,6 @@ func init() {
 			"O11yTransactionGroup.relation":    "Relation is the verb the grant allows.",
 		},
 	})
-	zip.Describe("GET /v1/o11y/roles/:id/users", zip.Doc{
-		Description: "Returns every org member holding a role, by role id. Admin\ngate.",
-		Fields: map[string]string{
-			"O11yUser.createdAt":   "CreatedAt is when they joined.",
-			"O11yUser.displayName": "DisplayName is what the console shows for them.",
-			"O11yUser.email":       "Email is their address.",
-			"O11yUser.id":          "ID is the user id.",
-			"O11yUser.isRoot":      "IsRoot marks the org's root user, which cannot be deleted or demoted.",
-			"O11yUser.orgId":       "OrgID is the org they belong to.",
-			"O11yUser.status":      "Status is their lifecycle state — active, pending_invite or deleted.",
-			"O11yUser.updatedAt":   "UpdatedAt is when their record last changed.",
-			"O11yUsersOut.data":    "Data holds the members.",
-			"O11yUsersOut.status":  "Status is \"success\".",
-		},
-	})
 	zip.Describe("GET /v1/o11y/route_policies", zip.Doc{
 		Description: "Lists the org's route policies. Viewer gate.",
 		Fields: map[string]string{
@@ -2120,36 +1981,6 @@ func init() {
 	zip.Describe("GET /v1/o11y/services/list", zip.Doc{
 		Description: "Lists the name of every service the trace store holds, with no\nwindow applied — the complete catalog, for pickers and autocomplete.",
 	})
-	zip.Describe("GET /v1/o11y/sessions/context", zip.Doc{
-		Description: "Tells a sign-in page what an email address can do: which\norgs the address belongs to and, per org, which password and SSO routes are\nopen to it. Unauthenticated: it runs before any session exists.",
-		Fields: map[string]string{
-			"O11yAuthNSupport.callback":    "Callback are the SSO routes; each is begun by visiting its URL.",
-			"O11yAuthNSupport.password":    "Password are the password routes.",
-			"O11yCallbackAuthN.provider":   "Provider is the route's provider — google_auth, saml or oidc.",
-			"O11yCallbackAuthN.url":        "URL is where the browser goes to begin the flow.",
-			"O11yErrorDetail.code":         "Code is the machine-readable code.",
-			"O11yErrorDetail.errors":       "Errors are further details, one message and its suggestions each.",
-			"O11yErrorDetail.message":      "Message is the human-readable reason.",
-			"O11yErrorDetail.retry":        "Retry says when it is worth trying again, for errors that pass.",
-			"O11yErrorDetail.suggestions":  "Suggestions say what to try instead.",
-			"O11yErrorDetail.type":         "Type is the error's category, e.g. invalid_input, not_found.",
-			"O11yErrorDetail.url":          "Url points at documentation for the error, when there is any.",
-			"O11yErrorItem.message":        "Message is the detail.",
-			"O11yErrorItem.suggestions":    "Suggestions say what to try about this detail.",
-			"O11yPasswordAuthN.provider":   "Provider is the route's provider, e.g. email_password.",
-			"O11yRetry.delay":              "Delay is how long to wait before retrying, in nanoseconds.",
-			"O11ySessionContext.exists":    "Exists says whether any account carries the address.",
-			"O11ySessionContext.orgs":      "Orgs are the orgs the address belongs to, each with its sign-in routes.",
-			"O11ySessionContextIn.email":   "Email is the address about to sign in. Required.",
-			"O11ySessionContextIn.ref":     "Ref is the page the sign-in started from, carried into SSO redirects.",
-			"O11ySessionContextOut.data":   "Data is the context.",
-			"O11ySessionContextOut.status": "Status is \"success\".",
-			"O11ySessionOrg.authNSupport":  "AuthNSupport lists the org's open sign-in routes.",
-			"O11ySessionOrg.id":            "ID is the org id.",
-			"O11ySessionOrg.name":          "Name is the org's display name.",
-			"O11ySessionOrg.warning":       "Warning reports an org whose SSO is configured but not currently usable,\nin the platform's error shape.",
-		},
-	})
 	zip.Describe("GET /v1/o11y/settings/apdex", zip.Doc{
 		Description: "Returns apdex settings for the named services.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
@@ -2279,54 +2110,6 @@ func init() {
 			"O11yUsageItem.timestamp": "Timestamp is the bucket start, as epoch nanoseconds.",
 		},
 	})
-	zip.Describe("GET /v1/o11y/user", zip.Doc{
-		Description: "Lists the org's members with their single legacy role.\nDeprecated in favor of listUsers, which answers without the role. Admin gate.",
-		Fields: map[string]string{
-			"O11yDeprecatedUser.createdAt":   "CreatedAt is when they joined.",
-			"O11yDeprecatedUser.displayName": "DisplayName is what the console shows for them.",
-			"O11yDeprecatedUser.email":       "Email is their address.",
-			"O11yDeprecatedUser.id":          "ID is the user id.",
-			"O11yDeprecatedUser.isRoot":      "IsRoot marks the org's root user.",
-			"O11yDeprecatedUser.orgId":       "OrgID is the org they belong to.",
-			"O11yDeprecatedUser.role":        "Role is their legacy role — ADMIN, EDITOR or VIEWER.",
-			"O11yDeprecatedUser.status":      "Status is their lifecycle state — active, pending_invite or deleted.",
-			"O11yDeprecatedUser.updatedAt":   "UpdatedAt is when their record last changed.",
-			"O11yDeprecatedUsersOut.data":    "Data holds the members.",
-			"O11yDeprecatedUsersOut.status":  "Status is \"success\".",
-		},
-	})
-	zip.Describe("GET /v1/o11y/user/:id", zip.Doc{
-		Description: "Returns one org member with their single legacy role, by\nuser id. Admins may read anyone; a non-admin only themselves (the runtime's\nself-access gate).",
-		Fields: map[string]string{
-			"O11yDeprecatedUser.createdAt":   "CreatedAt is when they joined.",
-			"O11yDeprecatedUser.displayName": "DisplayName is what the console shows for them.",
-			"O11yDeprecatedUser.email":       "Email is their address.",
-			"O11yDeprecatedUser.id":          "ID is the user id.",
-			"O11yDeprecatedUser.isRoot":      "IsRoot marks the org's root user.",
-			"O11yDeprecatedUser.orgId":       "OrgID is the org they belong to.",
-			"O11yDeprecatedUser.role":        "Role is their legacy role — ADMIN, EDITOR or VIEWER.",
-			"O11yDeprecatedUser.status":      "Status is their lifecycle state — active, pending_invite or deleted.",
-			"O11yDeprecatedUser.updatedAt":   "UpdatedAt is when their record last changed.",
-			"O11yDeprecatedUserOut.data":     "Data is the member.",
-			"O11yDeprecatedUserOut.status":   "Status is \"success\".",
-		},
-	})
-	zip.Describe("GET /v1/o11y/user/me", zip.Doc{
-		Description: "Returns the calling user with their single legacy role.\nDeprecated in favor of getMyUser. Open to any authenticated caller.",
-		Fields: map[string]string{
-			"O11yDeprecatedUser.createdAt":   "CreatedAt is when they joined.",
-			"O11yDeprecatedUser.displayName": "DisplayName is what the console shows for them.",
-			"O11yDeprecatedUser.email":       "Email is their address.",
-			"O11yDeprecatedUser.id":          "ID is the user id.",
-			"O11yDeprecatedUser.isRoot":      "IsRoot marks the org's root user.",
-			"O11yDeprecatedUser.orgId":       "OrgID is the org they belong to.",
-			"O11yDeprecatedUser.role":        "Role is their legacy role — ADMIN, EDITOR or VIEWER.",
-			"O11yDeprecatedUser.status":      "Status is their lifecycle state — active, pending_invite or deleted.",
-			"O11yDeprecatedUser.updatedAt":   "UpdatedAt is when their record last changed.",
-			"O11yDeprecatedUserOut.data":     "Data is the member.",
-			"O11yDeprecatedUserOut.status":   "Status is \"success\".",
-		},
-	})
 	zip.Describe("GET /v1/o11y/user/preferences", zip.Doc{
 		Description: "Lists every preference of the calling user, each with\nits current and default value. Viewer gate.",
 		Fields: map[string]string{
@@ -2353,75 +2136,6 @@ func init() {
 			"O11yPreference.valueType":     "ValueType is the JSON type a value must have — string, integer, float or\nboolean.",
 			"O11yPreferenceOut.data":       "Data is the preference.",
 			"O11yPreferenceOut.status":     "Status is \"success\".",
-		},
-	})
-	zip.Describe("GET /v1/o11y/users", zip.Doc{
-		Description: "Lists the caller's org members. Admin gate.",
-		Fields: map[string]string{
-			"O11yUser.createdAt":   "CreatedAt is when they joined.",
-			"O11yUser.displayName": "DisplayName is what the console shows for them.",
-			"O11yUser.email":       "Email is their address.",
-			"O11yUser.id":          "ID is the user id.",
-			"O11yUser.isRoot":      "IsRoot marks the org's root user, which cannot be deleted or demoted.",
-			"O11yUser.orgId":       "OrgID is the org they belong to.",
-			"O11yUser.status":      "Status is their lifecycle state — active, pending_invite or deleted.",
-			"O11yUser.updatedAt":   "UpdatedAt is when their record last changed.",
-			"O11yUsersOut.data":    "Data holds the members.",
-			"O11yUsersOut.status":  "Status is \"success\".",
-		},
-	})
-	zip.Describe("GET /v1/o11y/users/:id", zip.Doc{
-		Description: "Returns one org member together with every role they hold, by user\nid. Admin gate.",
-		Fields: map[string]string{
-			"O11yRole.createdAt":            "CreatedAt is when the role was created.",
-			"O11yRole.description":          "Description says what the role is for.",
-			"O11yRole.id":                   "ID is the role id.",
-			"O11yRole.name":                 "Name is the role's name.",
-			"O11yRole.orgId":                "OrgID is the org the role belongs to.",
-			"O11yRole.type":                 "Type is how the role came to be — managed by the platform or custom.",
-			"O11yRole.updatedAt":            "UpdatedAt is when it last changed.",
-			"O11yUserRole.createdAt":        "CreatedAt is when it was assigned.",
-			"O11yUserRole.id":               "ID is the assignment's own id.",
-			"O11yUserRole.role":             "Role is the role itself.",
-			"O11yUserRole.roleId":           "RoleID is the role held.",
-			"O11yUserRole.updatedAt":        "UpdatedAt is when the assignment last changed.",
-			"O11yUserRole.userId":           "UserID is the user holding the role.",
-			"O11yUserWithRoles.createdAt":   "CreatedAt is when they joined.",
-			"O11yUserWithRoles.displayName": "DisplayName is what the console shows for them.",
-			"O11yUserWithRoles.email":       "Email is their address.",
-			"O11yUserWithRoles.id":          "ID is the user id.",
-			"O11yUserWithRoles.isRoot":      "IsRoot marks the org's root user.",
-			"O11yUserWithRoles.orgId":       "OrgID is the org they belong to.",
-			"O11yUserWithRoles.status":      "Status is their lifecycle state — active, pending_invite or deleted.",
-			"O11yUserWithRoles.updatedAt":   "UpdatedAt is when their record last changed.",
-			"O11yUserWithRoles.userRoles":   "UserRoles are their role assignments.",
-			"O11yUserWithRolesOut.data":     "Data is the member.",
-			"O11yUserWithRolesOut.status":   "Status is \"success\".",
-		},
-	})
-	zip.Describe("GET /v1/o11y/users/:id/reset_password_tokens", zip.Doc{
-		Description: "Returns the reset-password token a user already has; absent\none, the answer is a not-found rather than a fresh token. Admin gate.",
-		Fields: map[string]string{
-			"O11yResetToken.expiresAt":  "ExpiresAt is when it stops working.",
-			"O11yResetToken.id":         "ID is the grant's id.",
-			"O11yResetToken.passwordId": "PasswordID is the password record it resets.",
-			"O11yResetToken.token":      "Token is the secret that redeems it.",
-			"O11yResetTokenOut.data":    "Data is the token.",
-			"O11yResetTokenOut.status":  "Status is \"success\".",
-		},
-	})
-	zip.Describe("GET /v1/o11y/users/:id/roles", zip.Doc{
-		Description: "Returns every role one org member holds, by user id. Admin\ngate.",
-		Fields: map[string]string{
-			"O11yRole.createdAt":   "CreatedAt is when the role was created.",
-			"O11yRole.description": "Description says what the role is for.",
-			"O11yRole.id":          "ID is the role id.",
-			"O11yRole.name":        "Name is the role's name.",
-			"O11yRole.orgId":       "OrgID is the org the role belongs to.",
-			"O11yRole.type":        "Type is how the role came to be — managed by the platform or custom.",
-			"O11yRole.updatedAt":   "UpdatedAt is when it last changed.",
-			"O11yRolesOut.data":    "Data holds the roles.",
-			"O11yRolesOut.status":  "Status is \"success\".",
 		},
 	})
 	zip.Describe("GET /v1/o11y/users/me", zip.Doc{
@@ -3220,50 +2934,6 @@ func init() {
 			"O11yDeploymentListOut.status": "Status is \"success\".",
 		},
 	})
-	zip.Describe("POST /v1/o11y/domains", zip.Doc{
-		Description: "Claims an email domain for the org and configures how its\nusers sign in; the answer is the new domain's id. Admin gate.",
-		Fields: map[string]string{
-			"O11yAttributeMapping.email":                      "Email is the key carrying the email; defaults to \"email\".",
-			"O11yAttributeMapping.groups":                     "Groups is the key carrying the group list; defaults to \"groups\".",
-			"O11yAttributeMapping.name":                       "Name is the key carrying the display name; defaults to \"name\".",
-			"O11yAttributeMapping.role":                       "Role is the key carrying the role; defaults to \"role\".",
-			"O11yAuthDomainConfig.googleAuthConfig":           "Google is the Google provider's settings, when SSOType is google_auth.",
-			"O11yAuthDomainConfig.oidcConfig":                 "OIDC is the OIDC provider's settings, when SSOType is oidc.",
-			"O11yAuthDomainConfig.roleMapping":                "RoleMapping maps the provider's groups onto roles for new users.",
-			"O11yAuthDomainConfig.samlConfig":                 "SAML is the SAML provider's settings, when SSOType is saml.",
-			"O11yAuthDomainConfig.ssoEnabled":                 "SSOEnabled turns enforced SSO on for the domain.",
-			"O11yAuthDomainConfig.ssoType":                    "SSOType picks the provider — saml, google_auth or oidc.",
-			"O11yCreated.id":                                  "ID is the new record's id.",
-			"O11yCreatedOut.data":                             "Data carries the id.",
-			"O11yCreatedOut.status":                           "Status is \"success\".",
-			"O11yGoogleConfig.allowedGroups":                  "AllowedGroups, when set, admits only members of these groups.",
-			"O11yGoogleConfig.clientId":                       "ClientID is the OAuth application's id.",
-			"O11yGoogleConfig.clientSecret":                   "ClientSecret is the OAuth application's secret.",
-			"O11yGoogleConfig.domainToAdminEmail":             "DomainToAdminEmail maps each Workspace domain to the admin the service\naccount impersonates; \"*\" is the fallback.",
-			"O11yGoogleConfig.fetchGroups":                    "FetchGroups reads the user's Workspace groups for role mapping.",
-			"O11yGoogleConfig.fetchTransitiveGroupMembership": "FetchTransitiveGroupMembership also reads groups held through other\ngroups.",
-			"O11yGoogleConfig.insecureSkipEmailVerified":      "InsecureSkipEmailVerified admits addresses Google has not verified.",
-			"O11yGoogleConfig.redirectURI":                    "RedirectURI is the callback the flow returns to.",
-			"O11yGoogleConfig.serviceAccountJson":             "ServiceAccountJSON is the service-account credential used to read\ngroups, when FetchGroups is on.",
-			"O11yOIDCConfig.claimMapping":                     "ClaimMapping names the token claims to read identity from.",
-			"O11yOIDCConfig.clientId":                         "ClientID is the OAuth application's id.",
-			"O11yOIDCConfig.clientSecret":                     "ClientSecret is the OAuth application's secret.",
-			"O11yOIDCConfig.getUserInfo":                      "GetUserInfo also queries the userinfo endpoint, for providers whose id\ntokens are thin.",
-			"O11yOIDCConfig.insecureSkipEmailVerified":        "InsecureSkipEmailVerified admits addresses the provider has not\nverified.",
-			"O11yOIDCConfig.issuer":                           "Issuer is the provider's issuer URL.",
-			"O11yOIDCConfig.issuerAlias":                      "IssuerAlias overrides the issuer for providers whose discovery document\ndisagrees with their issuer URL.",
-			"O11yPostableAuthDomain.config":                   "Config is the domain's SSO configuration.",
-			"O11yPostableAuthDomain.name":                     "Name is the email domain being claimed, e.g. example.com.",
-			"O11yRoleMapping.defaultRole":                     "DefaultRole is the role when no group mapping applies.",
-			"O11yRoleMapping.groupMappings":                   "GroupMappings maps a provider group name to a role name.",
-			"O11yRoleMapping.useRoleAttribute":                "UseRoleAttribute reads the role straight from the provider's role claim\ninstead of the group mappings.",
-			"O11ySAMLConfig.attributeMapping":                 "AttributeMapping names the assertion attributes to read identity from.",
-			"O11ySAMLConfig.insecureSkipAuthNRequestsSigned":  "InsecureSkipAuthNRequestsSigned skips signing outgoing AuthN requests,\nfor IdPs that refuse signed ones.",
-			"O11ySAMLConfig.samlCert":                         "SamlCert is the IdP's signing certificate.",
-			"O11ySAMLConfig.samlEntity":                       "SamlEntity is the IdP's entityID.",
-			"O11ySAMLConfig.samlIdp":                          "SamlIdp is the IdP's single-sign-on endpoint.",
-		},
-	})
 	zip.Describe("POST /v1/o11y/downtime_schedules", zip.Doc{
 		Description: "Creates a planned maintenance window, answering with\nthe stored schedule. Editor gate.",
 		Fields: map[string]string{
@@ -3320,14 +2990,6 @@ func init() {
 			"QueryEnvelope.spec":            "Spec is the deferred decoding of the query if any.",
 			"QueryEnvelope.type":            "Type is the type of the query.",
 			"SavedView.extraData":           "ExtraData is JSON encoded data used by frontend to store additional data",
-		},
-	})
-	zip.Describe("POST /v1/o11y/factor_password/forgot", zip.Doc{
-		Description: "Starts the forgotten-password flow: the named user is mailed\na reset link. Unauthenticated by design, and deliberately quiet about\nwhether the address exists.",
-		Fields: map[string]string{
-			"O11yForgotPasswordIn.email":           "Email is the address to mail the reset link to. Required.",
-			"O11yForgotPasswordIn.frontendBaseURL": "FrontendBaseURL is the console origin the reset link is built on.",
-			"O11yForgotPasswordIn.orgId":           "OrgID is the org the address belongs to. Required.",
 		},
 	})
 	zip.Describe("POST /v1/o11y/gateway/ingestion_keys", zip.Doc{
@@ -3476,37 +3138,6 @@ func init() {
 		Description: "Removes an integration from the caller's org by id.\nViewer gate.",
 		Fields: map[string]string{
 			"O11yIntegrationAck.status": "Status is \"success\".",
-		},
-	})
-	zip.Describe("POST /v1/o11y/invite", zip.Doc{
-		Description: "Invites one person to the caller's org by email, with the role\nthey will hold when they accept. Deprecated in favor of creating users\ndirectly; kept because callers still hold it. Admin gate, enforced by the\nruntime this op relays to.",
-		Fields: map[string]string{
-			"O11yInvite.createdAt":         "CreatedAt is when it was created.",
-			"O11yInvite.email":             "Email is the address it was sent to.",
-			"O11yInvite.id":                "ID is the invitation's id.",
-			"O11yInvite.inviteLink":        "InviteLink is the full link mailed to them.",
-			"O11yInvite.name":              "Name is the invitee's display name.",
-			"O11yInvite.orgId":             "OrgID is the org they are invited into.",
-			"O11yInvite.role":              "Role is the role the invitee will hold.",
-			"O11yInvite.token":             "Token is the secret that redeems it.",
-			"O11yInvite.updatedAt":         "UpdatedAt is when it last changed.",
-			"O11yInviteIn.email":           "Email is the address the invitation goes to.",
-			"O11yInviteIn.frontendBaseUrl": "FrontendBaseUrl is the console origin the invite link is built on.",
-			"O11yInviteIn.name":            "Name is the invitee's display name.",
-			"O11yInviteIn.role":            "Role is the role they will hold on accepting — ADMIN, EDITOR or VIEWER.",
-			"O11yInviteOut.data":           "Data is the invitation.",
-			"O11yInviteOut.status":         "Status is \"success\".",
-		},
-	})
-	zip.Describe("POST /v1/o11y/invite/bulk", zip.Doc{
-		Description: "Invites several people to the caller's org in one call,\nrefusing the whole batch when any email repeats. Deprecated alongside\ncreateInvite. Admin gate.",
-		Fields: map[string]string{
-			"O11yAck.status":               "Status is \"success\".",
-			"O11yBulkInviteIn.invites":     "Invites are the invitations to create; an email may appear only once.",
-			"O11yInviteIn.email":           "Email is the address the invitation goes to.",
-			"O11yInviteIn.frontendBaseUrl": "FrontendBaseUrl is the console origin the invite link is built on.",
-			"O11yInviteIn.name":            "Name is the invitee's display name.",
-			"O11yInviteIn.role":            "Role is the role they will hold on accepting — ADMIN, EDITOR or VIEWER.",
 		},
 	})
 	zip.Describe("POST /v1/o11y/jobs/list", zip.Doc{
@@ -4214,39 +3845,6 @@ func init() {
 			"QueryRangeRequest.variables":               "Variables is the variables to use for the request.",
 		},
 	})
-	zip.Describe("POST /v1/o11y/register", zip.Doc{
-		Description: "Creates the FIRST organization and its admin user. It is open by\ndesign — there is nobody to be signed in as yet — and refuses once setup has\ncompleted, after which new users arrive by invitation only.\n\nOpen by design; the runtime's own gate is OpenAccess.",
-		Fields: map[string]string{
-			"O11yRegisterIn.email":          "Email is the admin's email. Required.",
-			"O11yRegisterIn.name":           "Name is the admin's display name.",
-			"O11yRegisterIn.orgDisplayName": "OrgDisplayName is the organization's display name.",
-			"O11yRegisterIn.orgName":        "OrgName is the organization's name.",
-			"O11yRegisterIn.password":       "Password is the admin's password.",
-			"O11yRegisterOut.data":          "Data is the user. The runtime answers register with the same user shape\nthe identity face reads, so it is the ONE O11yUser (identity.go) — a\ncreated user is a user, and the document names it once.",
-			"O11yRegisterOut.status":        "Status is \"success\".",
-			"O11yUser.createdAt":            "CreatedAt is when they joined.",
-			"O11yUser.displayName":          "DisplayName is what the console shows for them.",
-			"O11yUser.email":                "Email is their address.",
-			"O11yUser.id":                   "ID is the user id.",
-			"O11yUser.isRoot":               "IsRoot marks the org's root user, which cannot be deleted or demoted.",
-			"O11yUser.orgId":                "OrgID is the org they belong to.",
-			"O11yUser.status":               "Status is their lifecycle state — active, pending_invite or deleted.",
-			"O11yUser.updatedAt":            "UpdatedAt is when their record last changed.",
-		},
-	})
-	zip.Describe("POST /v1/o11y/resetPassword", zip.Doc{
-		Description: "Sets a new password for whoever the reset token was minted\nfor, consuming the token. Unauthenticated: the token is the proof.",
-		Fields: map[string]string{
-			"O11yResetPasswordIn.password": "Password is the new password.",
-			"O11yResetPasswordIn.token":    "Token is the reset-password token authorizing the change.",
-		},
-	})
-	zip.Describe("POST /v1/o11y/reset_password_tokens/verify", zip.Doc{
-		Description: "Checks that a reset-password token exists and has not\nexpired, without consuming it. Unauthenticated: the token is the proof.",
-		Fields: map[string]string{
-			"O11yResetTokenRef.token": "Token is the reset-password token.",
-		},
-	})
 	zip.Describe("POST /v1/o11y/roles", zip.Doc{
 		Description: "Creates a custom role in the caller's org from a name, an optional\ndescription and the transaction groups it grants, answering the new role's id.\n\nNames are lowercase letters and hyphens only, and may not start with the\nreserved managed-role prefix; the runtime refuses anything else.",
 		Fields: map[string]string{
@@ -4432,32 +4030,6 @@ func init() {
 			"O11yServicesIn.tags":            "Tags narrow the spans counted, each a span-attribute predicate.",
 			"O11yServicesOut.data":           "Data holds one entry per service.",
 			"O11yServicesOut.status":         "Status is \"success\".",
-		},
-	})
-	zip.Describe("POST /v1/o11y/sessions/email_password", zip.Doc{
-		Description: "Signs a user in with email and password and\nanswers with the session's token pair. Unauthenticated: this call is how\nauthentication begins.",
-		Fields: map[string]string{
-			"O11yEmailPasswordSessionIn.email":    "Email is the account's address. Required.",
-			"O11yEmailPasswordSessionIn.orgId":    "OrgID picks the org to sign into when the address belongs to several.",
-			"O11yEmailPasswordSessionIn.password": "Password is the account's password. Required.",
-			"O11yToken.accessToken":               "AccessToken authenticates requests until it expires.",
-			"O11yToken.expiresIn":                 "ExpiresIn is the access token's lifetime in seconds.",
-			"O11yToken.refreshToken":              "RefreshToken buys the next pair via rotateSession.",
-			"O11yToken.tokenType":                 "TokenType is how to present the access token, e.g. bearer.",
-			"O11yTokenOut.data":                   "Data is the pair.",
-			"O11yTokenOut.status":                 "Status is \"success\".",
-		},
-	})
-	zip.Describe("POST /v1/o11y/sessions/rotate", zip.Doc{
-		Description: "Exchanges a refresh token for a fresh token pair, retiring the\nold pair. The access token being rotated identifies the session.",
-		Fields: map[string]string{
-			"O11yRotateSessionIn.refreshToken": "RefreshToken is the refresh token being redeemed.",
-			"O11yToken.accessToken":            "AccessToken authenticates requests until it expires.",
-			"O11yToken.expiresIn":              "ExpiresIn is the access token's lifetime in seconds.",
-			"O11yToken.refreshToken":           "RefreshToken buys the next pair via rotateSession.",
-			"O11yToken.tokenType":              "TokenType is how to present the access token, e.g. bearer.",
-			"O11yTokenOut.data":                "Data is the pair.",
-			"O11yTokenOut.status":              "Status is \"success\".",
 		},
 	})
 	zip.Describe("POST /v1/o11y/settings/apdex", zip.Doc{
@@ -4884,26 +4456,6 @@ func init() {
 			"O11yFieldSetting.type":             "Type is where the field lives: attributes or resources. Required.",
 		},
 	})
-	zip.Describe("POST /v1/o11y/users", zip.Doc{
-		Description: "Creates a member of the caller's org in the pending-invite state\nand mails them their invitation; the answer is the new user's id. Admin gate.",
-		Fields: map[string]string{
-			"O11yCreated.id":                   "ID is the new record's id.",
-			"O11yCreatedOut.data":              "Data carries the id.",
-			"O11yCreatedOut.status":            "Status is \"success\".",
-			"O11yPostableUser.displayName":     "DisplayName is the new member's display name.",
-			"O11yPostableUser.email":           "Email is the new member's address. Required.",
-			"O11yPostableUser.frontendBaseUrl": "FrontendBaseUrl is the console origin the invite link is built on.",
-			"O11yPostableUser.userRoles":       "UserRoles are the roles the member starts with, each by id.",
-			"O11yRoleID.id":                    "ID is the role id.",
-		},
-	})
-	zip.Describe("POST /v1/o11y/users/:id/roles", zip.Doc{
-		Description: "Assigns a role, by role name, to one org member — someone else,\nnever the caller. Admin gate.",
-		Fields: map[string]string{
-			"O11yAck.status":     "Status is \"success\".",
-			"O11ySetRoleIn.name": "Name is the role name to assign.",
-		},
-	})
 	zip.Describe("POST /v1/o11y/variables/query", zip.Doc{
 		Description: "Evaluates a dashboard variable query and returns the values the\nvariable may take.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
@@ -5103,46 +4655,6 @@ func init() {
 			"O11yPublicDashboardWriteIn.id":             "ID is the dashboard id from the path.",
 		},
 	})
-	zip.Describe("PUT /v1/o11y/domains/:id", zip.Doc{
-		Description: "Replaces one auth domain's SSO configuration, by id. Admin\ngate.",
-		Fields: map[string]string{
-			"O11yAttributeMapping.email":                      "Email is the key carrying the email; defaults to \"email\".",
-			"O11yAttributeMapping.groups":                     "Groups is the key carrying the group list; defaults to \"groups\".",
-			"O11yAttributeMapping.name":                       "Name is the key carrying the display name; defaults to \"name\".",
-			"O11yAttributeMapping.role":                       "Role is the key carrying the role; defaults to \"role\".",
-			"O11yAuthDomainConfig.googleAuthConfig":           "Google is the Google provider's settings, when SSOType is google_auth.",
-			"O11yAuthDomainConfig.oidcConfig":                 "OIDC is the OIDC provider's settings, when SSOType is oidc.",
-			"O11yAuthDomainConfig.roleMapping":                "RoleMapping maps the provider's groups onto roles for new users.",
-			"O11yAuthDomainConfig.samlConfig":                 "SAML is the SAML provider's settings, when SSOType is saml.",
-			"O11yAuthDomainConfig.ssoEnabled":                 "SSOEnabled turns enforced SSO on for the domain.",
-			"O11yAuthDomainConfig.ssoType":                    "SSOType picks the provider — saml, google_auth or oidc.",
-			"O11yGoogleConfig.allowedGroups":                  "AllowedGroups, when set, admits only members of these groups.",
-			"O11yGoogleConfig.clientId":                       "ClientID is the OAuth application's id.",
-			"O11yGoogleConfig.clientSecret":                   "ClientSecret is the OAuth application's secret.",
-			"O11yGoogleConfig.domainToAdminEmail":             "DomainToAdminEmail maps each Workspace domain to the admin the service\naccount impersonates; \"*\" is the fallback.",
-			"O11yGoogleConfig.fetchGroups":                    "FetchGroups reads the user's Workspace groups for role mapping.",
-			"O11yGoogleConfig.fetchTransitiveGroupMembership": "FetchTransitiveGroupMembership also reads groups held through other\ngroups.",
-			"O11yGoogleConfig.insecureSkipEmailVerified":      "InsecureSkipEmailVerified admits addresses Google has not verified.",
-			"O11yGoogleConfig.redirectURI":                    "RedirectURI is the callback the flow returns to.",
-			"O11yGoogleConfig.serviceAccountJson":             "ServiceAccountJSON is the service-account credential used to read\ngroups, when FetchGroups is on.",
-			"O11yOIDCConfig.claimMapping":                     "ClaimMapping names the token claims to read identity from.",
-			"O11yOIDCConfig.clientId":                         "ClientID is the OAuth application's id.",
-			"O11yOIDCConfig.clientSecret":                     "ClientSecret is the OAuth application's secret.",
-			"O11yOIDCConfig.getUserInfo":                      "GetUserInfo also queries the userinfo endpoint, for providers whose id\ntokens are thin.",
-			"O11yOIDCConfig.insecureSkipEmailVerified":        "InsecureSkipEmailVerified admits addresses the provider has not\nverified.",
-			"O11yOIDCConfig.issuer":                           "Issuer is the provider's issuer URL.",
-			"O11yOIDCConfig.issuerAlias":                      "IssuerAlias overrides the issuer for providers whose discovery document\ndisagrees with their issuer URL.",
-			"O11yRoleMapping.defaultRole":                     "DefaultRole is the role when no group mapping applies.",
-			"O11yRoleMapping.groupMappings":                   "GroupMappings maps a provider group name to a role name.",
-			"O11yRoleMapping.useRoleAttribute":                "UseRoleAttribute reads the role straight from the provider's role claim\ninstead of the group mappings.",
-			"O11ySAMLConfig.attributeMapping":                 "AttributeMapping names the assertion attributes to read identity from.",
-			"O11ySAMLConfig.insecureSkipAuthNRequestsSigned":  "InsecureSkipAuthNRequestsSigned skips signing outgoing AuthN requests,\nfor IdPs that refuse signed ones.",
-			"O11ySAMLConfig.samlCert":                         "SamlCert is the IdP's signing certificate.",
-			"O11ySAMLConfig.samlEntity":                       "SamlEntity is the IdP's entityID.",
-			"O11ySAMLConfig.samlIdp":                          "SamlIdp is the IdP's single-sign-on endpoint.",
-			"O11yUpdatableAuthDomain.config":                  "Config is the SSO configuration to store.",
-		},
-	})
 	zip.Describe("PUT /v1/o11y/downtime_schedules/:id", zip.Doc{
 		Description: "Replaces a planned maintenance window, by id. Editor gate.",
 	})
@@ -5310,64 +4822,16 @@ func init() {
 			"O11yFunnelStepsUpdateIn.timestamp":   "Timestamp is when the change was made, as a millisecond epoch.",
 		},
 	})
-	zip.Describe("PUT /v1/o11y/user/:id", zip.Doc{
-		Description: "Renames one org member and may move their legacy role,\nanswering with the updated record. Admins may update anyone; a non-admin\nonly themselves (the runtime's self-access gate).",
-		Fields: map[string]string{
-			"O11yDeprecatedUser.createdAt":         "CreatedAt is when they joined.",
-			"O11yDeprecatedUser.displayName":       "DisplayName is what the console shows for them.",
-			"O11yDeprecatedUser.email":             "Email is their address.",
-			"O11yDeprecatedUser.id":                "ID is the user id.",
-			"O11yDeprecatedUser.isRoot":            "IsRoot marks the org's root user.",
-			"O11yDeprecatedUser.orgId":             "OrgID is the org they belong to.",
-			"O11yDeprecatedUser.role":              "Role is their legacy role — ADMIN, EDITOR or VIEWER.",
-			"O11yDeprecatedUser.status":            "Status is their lifecycle state — active, pending_invite or deleted.",
-			"O11yDeprecatedUser.updatedAt":         "UpdatedAt is when their record last changed.",
-			"O11yDeprecatedUserOut.data":           "Data is the member.",
-			"O11yDeprecatedUserOut.status":         "Status is \"success\".",
-			"O11yDeprecatedUserUpdate.displayName": "DisplayName is the new display name; empty leaves it unchanged.",
-			"O11yDeprecatedUserUpdate.role":        "Role is the legacy role to move to — ADMIN, EDITOR or VIEWER; empty\nleaves it unchanged.",
-		},
-	})
 	zip.Describe("PUT /v1/o11y/user/preferences/:name", zip.Doc{
 		Description: "Sets one preference of the calling user, by name.\nViewer gate.",
 		Fields: map[string]string{
 			"O11yUpdatablePreference.value": "Value is the value to set; its JSON type must match the preference's\ndeclared value type.",
 		},
 	})
-	zip.Describe("PUT /v1/o11y/users/:id", zip.Doc{
-		Description: "Renames one org member, by user id — someone else, never the\ncaller, who renames themselves through updateMyUser. Admin gate.",
-		Fields: map[string]string{
-			"O11yUserUpdate.displayName": "DisplayName is the new display name.",
-		},
-	})
-	zip.Describe("PUT /v1/o11y/users/:id/reset_password_tokens", zip.Doc{
-		Description: "Creates or regenerates a user's reset-password token: a\nlive token is returned as it is, an expired one is replaced. Admin gate.",
-		Fields: map[string]string{
-			"O11yResetToken.expiresAt":  "ExpiresAt is when it stops working.",
-			"O11yResetToken.id":         "ID is the grant's id.",
-			"O11yResetToken.passwordId": "PasswordID is the password record it resets.",
-			"O11yResetToken.token":      "Token is the secret that redeems it.",
-			"O11yResetTokenOut.data":    "Data is the token.",
-			"O11yResetTokenOut.status":  "Status is \"success\".",
-		},
-	})
-	zip.Describe("PUT /v1/o11y/users/me", zip.Doc{
-		Description: "Renames the calling user. Open to any authenticated caller.",
-		Fields: map[string]string{
-			"O11yUpdatableUser.displayName": "DisplayName is the new display name.",
-		},
-	})
 	zip.Describe("PUT /v1/o11y/users/me/dashboards/:id/pins", zip.Doc{
 		Description: "Pins a dashboard for the calling user. A user can pin at most ten\ndashboards; pinning at the limit refuses with the runtime's conflict. Re-pinning\nan already-pinned dashboard is a no-op success. Pinning mutates only the caller's\npin list, not the dashboard, so a viewer may pin what a viewer may read.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11yDashboardIDIn.id": "ID is the resource id from the path.",
-		},
-	})
-	zip.Describe("PUT /v1/o11y/users/me/factor_password", zip.Doc{
-		Description: "Replaces the calling user's password, refusing when the old\none does not match. Open to any authenticated caller.",
-		Fields: map[string]string{
-			"O11yChangePasswordIn.newPassword": "NewPassword is the password to set.",
-			"O11yChangePasswordIn.oldPassword": "OldPassword is the current password; the change is refused when it does\nnot match.",
 		},
 	})
 	zip.Describe("PUT /v1/o11y/zeus/hosts", zip.Doc{

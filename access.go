@@ -606,3 +606,43 @@ type O11yTransactionResult struct {
 }
 
 // ── the seam ──────────────────────────────────────────────────────────────────
+
+// ── role records ──────────────────────────────────────────────────────────────
+//
+// These lived in identity.go while the identity face still administered members
+// and the roles they held. That face is gone — Hanzo IAM administers members —
+// but ROLES themselves are not identity: they are o11y's own vocabulary for what
+// may be done to o11y's own dashboards, alerts and views, which is this file's
+// subject. So the records moved to the face that uses them.
+
+// O11yRolesOut is a list of roles.
+type O11yRolesOut struct {
+	// Status is "success".
+	Status string `json:"status"`
+	// Data holds the roles.
+	Data []O11yRole `json:"data"`
+}
+
+// O11yRole is one role.
+type O11yRole struct {
+	// ID is the role id.
+	ID string `json:"id"`
+	// CreatedAt is when the role was created.
+	CreatedAt time.Time `json:"createdAt"`
+	// UpdatedAt is when it last changed.
+	UpdatedAt time.Time `json:"updatedAt"`
+	// Name is the role's name.
+	Name string `json:"name"`
+	// Description says what the role is for.
+	Description string `json:"description"`
+	// Type is how the role came to be — managed by the platform or custom.
+	Type string `json:"type"`
+	// OrgID is the org the role belongs to.
+	OrgID string `json:"orgId"`
+}
+
+// O11yCreated is a newly created record, named by id.
+type O11yCreated struct {
+	// ID is the new record's id.
+	ID string `json:"id"`
+}

@@ -2,7 +2,6 @@ package types
 
 import (
 	"context"
-	"encoding/json"
 	"slices"
 	"time"
 
@@ -57,14 +56,6 @@ type UpdatableUser struct {
 
 type PostableRole struct {
 	Name string `json:"name" required:"true"`
-}
-
-type PostableRegisterOrgAndAdmin struct {
-	Name           string       `json:"name"`
-	Email          valuer.Email `json:"email"`
-	Password       string       `json:"password"`
-	OrgDisplayName string       `json:"orgDisplayName"`
-	OrgName        string       `json:"orgName"`
 }
 
 func NewUser(displayName string, email valuer.Email, orgID valuer.UUID, status valuer.String) (*User, error) {
@@ -267,67 +258,21 @@ func NewTraitsFromDeprecatedUser(user *DeprecatedUser) map[string]any {
 	}
 }
 
-func (request *PostableRegisterOrgAndAdmin) UnmarshalJSON(data []byte) error {
-	type Alias PostableRegisterOrgAndAdmin
-
-	var temp Alias
-	if err := json.Unmarshal(data, &temp); err != nil {
-		return err
-	}
-
-	if !IsPasswordValid(temp.Password) {
-		return ErrInvalidPassword
-	}
-
-	*request = PostableRegisterOrgAndAdmin(temp)
-	return nil
-}
-
 type UserStore interface {
 	// Creates a user.
 	CreateUser(ctx context.Context, user *User) error
 
-	// Get user by id.
-	GetUser(context.Context, valuer.UUID) (*User, error)
-
 	// Get user by orgID and id.
 	GetByOrgIDAndID(ctx context.Context, orgID valuer.UUID, id valuer.UUID) (*User, error)
 
-	// Get user by email and orgID.
-	GetNonDeletedUsersByEmailAndOrgID(ctx context.Context, email valuer.Email, orgID valuer.UUID) ([]*User, error)
-
 	// List users by org.
 	ListUsersByOrgID(ctx context.Context, orgID valuer.UUID) ([]*User, error)
-
-	// List users by email and org ids.
-	ListUsersByEmailAndOrgIDs(ctx context.Context, email valuer.Email, orgIDs []valuer.UUID) ([]*User, error)
-
-	// Get users for an org id using emails and statuses
-	GetUsersByEmailsOrgIDAndStatuses(context.Context, valuer.UUID, []string, []string) ([]*User, error)
-
-	UpdateUser(ctx context.Context, orgID valuer.UUID, user *User) error
-	DeleteUser(ctx context.Context, orgID string, id string) error
-	SoftDeleteUser(ctx context.Context, orgID string, id string) error
-
-	// Creates a password.
-	CreatePassword(ctx context.Context, password *FactorPassword) error
-	CreateResetPasswordToken(ctx context.Context, resetPasswordRequest *ResetPasswordToken) error
-	GetPassword(ctx context.Context, id valuer.UUID) (*FactorPassword, error)
-	GetPasswordByUserID(ctx context.Context, userID valuer.UUID) (*FactorPassword, error)
-	GetResetPasswordToken(ctx context.Context, token string) (*ResetPasswordToken, error)
-	GetResetPasswordTokenByPasswordID(ctx context.Context, passwordID valuer.UUID) (*ResetPasswordToken, error)
-	GetResetPasswordTokenByOrgIDAndUserID(ctx context.Context, orgID valuer.UUID, userID valuer.UUID) (*ResetPasswordToken, error)
-	DeleteResetPasswordTokenByPasswordID(ctx context.Context, passwordID valuer.UUID) error
-	UpdatePassword(ctx context.Context, password *FactorPassword) error
 
 	CountByOrgID(ctx context.Context, orgID valuer.UUID) (int64, error)
 	CountByOrgIDAndStatuses(ctx context.Context, orgID valuer.UUID, statuses []string) (map[valuer.String]int64, error)
 
 	// Get root user by org.
 	GetRootUserByOrgID(ctx context.Context, orgID valuer.UUID) (*User, error)
-
-	// Get user by reset password token
-	GetUserByResetPasswordToken(ctx context.Context, token string) (*User, error)
 
 	// Get users having role by org id and role id
 	GetUsersByOrgIDAndRoleID(ctx context.Context, orgID valuer.UUID, roleID valuer.UUID) ([]*User, error)
