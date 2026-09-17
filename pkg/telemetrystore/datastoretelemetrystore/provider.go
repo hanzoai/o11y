@@ -3,7 +3,7 @@ package datastoretelemetrystore
 import (
 	"context"
 
-	"github.com/hanzo-ds/go"
+	datastore "github.com/hanzo-ds/go"
 	"github.com/hanzo-ds/go/lib/driver"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"

@@ -32,7 +32,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/hanzo-ds/go"
+	datastore "github.com/hanzo-ds/go"
 	"github.com/hanzo-ds/go/lib/driver"
 	"github.com/hanzoai/o11y/pkg/telemetrymetrics"
 	"github.com/hanzoai/o11y/pkg/zapmetricreceiver"

@@ -53,9 +53,9 @@ func getHealth() factory.Handler {
 // the runtime's handler for that probe's OWN address rather than for the whole
 // surface.
 func mountHealth(app *zip.App) {
-	app.Get(o11yRoot+"/livez", livez(o11yRoot+"/livez"))
-	app.Get(o11yRoot+"/healthz", probe(o11yRoot+"/healthz", func(h factory.Handler) http.HandlerFunc { return h.Healthz }))
-	app.Get(o11yRoot+"/readyz", probe(o11yRoot+"/readyz", func(h factory.Handler) http.HandlerFunc { return h.Readyz }))
+	app.Raw(http.MethodGet, o11yRoot+"/livez", livez(o11yRoot+"/livez"))
+	app.Raw(http.MethodGet, o11yRoot+"/healthz", probe(o11yRoot+"/healthz", func(h factory.Handler) http.HandlerFunc { return h.Healthz }))
+	app.Raw(http.MethodGet, o11yRoot+"/readyz", probe(o11yRoot+"/readyz", func(h factory.Handler) http.HandlerFunc { return h.Readyz }))
 }
 
 // The fall-through is the runtime's handler for the probe's own address, reached

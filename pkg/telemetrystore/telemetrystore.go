@@ -3,7 +3,7 @@ package telemetrystore
 import (
 	"context"
 
-	"github.com/hanzo-ds/go"
+	datastore "github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/types/telemetrystoretypes"
 )
 

@@ -61,7 +61,7 @@ import (
 // the o11yRoot group. Both roots and the seam they relay through are spelled
 // once each, in relay.go.
 func mountSentryErrors(app *zip.App) {
-	gsentry := under{app, sentinelRoot}
+	gsentry := rooted{app.Group(sentinelRoot), sentinelRoot}
 	opGet(gsentry, "/projects", sentryListProjects)
 	opPost(gsentry, "/projects", sentryCreateProject)
 	opGet(gsentry, "/projects/:id", sentryGetProject)
@@ -73,7 +73,7 @@ func mountSentryErrors(app *zip.App) {
 	opGet(gsentry, "/issues/:id/events", sentryIssueEvents)
 	opGet(gsentry, "/events/:id", sentryGetEvent)
 
-	go11y := under{app, o11yRoot}
+	go11y := rooted{app.Group(o11yRoot), o11yRoot}
 	opGet(go11y, "/errortracking/issues", errorListIssues)
 	opGet(go11y, "/errortracking/issues/:id", errorGetIssue)
 	opPost(go11y, "/errortracking/issues/:id", errorUpdateIssue)

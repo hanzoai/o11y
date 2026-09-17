@@ -59,7 +59,7 @@ import (
 // be swallowed by /integrations/:integrationId, the same disambiguation the
 // runtime's own mux tree makes.
 func mountIntegrations(app *zip.App) {
-	g := under{app, o11yRoot}
+	g := rooted{app.Group(o11yRoot), o11yRoot}
 
 	// integration catalog and install lifecycle (runtime gate: ViewAccess)
 	opGet(g, "/integrations", listIntegrations, zip.WithOperationID("ListIntegrations"))

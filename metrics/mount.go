@@ -135,13 +135,13 @@ func Use(app *zip.App, deps Deps) error {
 	}
 
 	// --- Metrics ---
-	app.Get("/v1/metrics/health", func(c *zip.Ctx) error {
+	app.Raw(http.MethodGet, "/v1/metrics/health", func(c *zip.Ctx) error {
 		return c.JSON(http.StatusOK, map[string]any{
 			"status": "ok", "service": "metrics", "version": Version,
 		})
 	})
 	// Batch ingest — luxfi/metric.MetricBatch (the ZAP MsgMetricBatch wire shape).
-	app.Post("/v1/metrics/batch", func(c *zip.Ctx) error {
+	app.Raw(http.MethodPost, "/v1/metrics/batch", func(c *zip.Ctx) error {
 		var b metric.MetricBatch
 		if err := c.Bind(&b); err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid metric batch"})
@@ -152,7 +152,7 @@ func Use(app *zip.App, deps Deps) error {
 		}
 		return c.JSON(http.StatusOK, map[string]any{"written": t.Metrics.IngestBatch(&b)})
 	})
-	app.Post("/v1/metrics/write", func(c *zip.Ctx) error {
+	app.Raw(http.MethodPost, "/v1/metrics/write", func(c *zip.Ctx) error {
 		var req struct {
 			Series []Series `json:"series"`
 		}
@@ -173,7 +173,7 @@ func Use(app *zip.App, deps Deps) error {
 		}
 		return c.JSON(http.StatusOK, map[string]any{"written": n})
 	})
-	app.Get("/v1/metrics/query", func(c *zip.Ctx) error {
+	app.Raw(http.MethodGet, "/v1/metrics/query", func(c *zip.Ctx) error {
 		start, _ := strconv.ParseInt(c.Query("start"), 10, 64)
 		end, _ := strconv.ParseInt(c.Query("end"), 10, 64)
 		t, ok := tenant(c)
@@ -185,10 +185,10 @@ func Use(app *zip.App, deps Deps) error {
 	})
 
 	// --- Logs (native, Loki-free) — folded under /v1/metrics per HIP-1241 ---
-	app.Get("/v1/metrics/logs/health", func(c *zip.Ctx) error {
+	app.Raw(http.MethodGet, "/v1/metrics/logs/health", func(c *zip.Ctx) error {
 		return c.JSON(http.StatusOK, map[string]any{"status": "ok", "service": "logs", "version": Version})
 	})
-	app.Post("/v1/metrics/logs/write", func(c *zip.Ctx) error {
+	app.Raw(http.MethodPost, "/v1/metrics/logs/write", func(c *zip.Ctx) error {
 		var req struct {
 			Records []LogRecord `json:"records"`
 		}
@@ -205,7 +205,7 @@ func Use(app *zip.App, deps Deps) error {
 		}
 		return c.JSON(http.StatusOK, map[string]any{"written": len(req.Records)})
 	})
-	app.Get("/v1/metrics/logs/query", func(c *zip.Ctx) error {
+	app.Raw(http.MethodGet, "/v1/metrics/logs/query", func(c *zip.Ctx) error {
 		start, _ := strconv.ParseInt(c.Query("start"), 10, 64)
 		end, _ := strconv.ParseInt(c.Query("end"), 10, 64)
 		limit, _ := strconv.Atoi(c.Query("limit"))
@@ -218,10 +218,10 @@ func Use(app *zip.App, deps Deps) error {
 	})
 
 	// --- Traces (native, Tempo-free) — folded under /v1/metrics per HIP-1241 ---
-	app.Get("/v1/metrics/traces/health", func(c *zip.Ctx) error {
+	app.Raw(http.MethodGet, "/v1/metrics/traces/health", func(c *zip.Ctx) error {
 		return c.JSON(http.StatusOK, map[string]any{"status": "ok", "service": "traces", "version": Version})
 	})
-	app.Post("/v1/metrics/traces/write", func(c *zip.Ctx) error {
+	app.Raw(http.MethodPost, "/v1/metrics/traces/write", func(c *zip.Ctx) error {
 		var req struct {
 			Spans []Span `json:"spans"`
 		}
@@ -238,14 +238,14 @@ func Use(app *zip.App, deps Deps) error {
 		}
 		return c.JSON(http.StatusOK, map[string]any{"written": len(req.Spans)})
 	})
-	app.Get("/v1/metrics/traces/trace", func(c *zip.Ctx) error {
+	app.Raw(http.MethodGet, "/v1/metrics/traces/trace", func(c *zip.Ctx) error {
 		t, ok := tenant(c)
 		if !ok {
 			return nil
 		}
 		return c.JSON(http.StatusOK, map[string]any{"spans": t.Traces.ByTrace(c.Query("id"))})
 	})
-	app.Get("/v1/metrics/traces/query", func(c *zip.Ctx) error {
+	app.Raw(http.MethodGet, "/v1/metrics/traces/query", func(c *zip.Ctx) error {
 		start, _ := strconv.ParseInt(c.Query("start"), 10, 64)
 		end, _ := strconv.ParseInt(c.Query("end"), 10, 64)
 		limit, _ := strconv.Atoi(c.Query("limit"))

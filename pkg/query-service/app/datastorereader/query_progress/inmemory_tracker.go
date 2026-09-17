@@ -6,7 +6,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/hanzo-ds/go"
+	datastore "github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 	"golang.org/x/exp/maps"
 )

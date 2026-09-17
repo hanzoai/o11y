@@ -75,19 +75,19 @@ var mounting *conf
 // The full address is the target's own prefix plus the declared path, so this
 // reads the same whether an op is declared on a rooted group (the usual case,
 // where path is "/metrics") or straight on the app with a full path. The prefix
-// comes from [zip.OpTarget], the interface every declaration already goes
+// comes from [*zip.Group], the interface every declaration already goes
 // through, so nothing here needs to know which group it was handed.
-func claims(on zip.OpTarget, method, path string) bool {
+func claims(root, method, path string) bool {
 	if mounting == nil || len(mounting.claimed) == 0 {
 		return false
 	}
-	return mounting.claimed[method+" "+on.OpScope().Prefix+path]
+	return mounting.claimed[method+" "+root+path]
 }
 
 // under is the OpTarget that registers on app at a ROOT — the one place this
 // package's two public roots become route prefixes.
 //
-// It replaces app.Group(o11yRoot), and the difference is the operation ids.
+// It replaces rooted{app.Group(o11yRoot), o11yRoot}, and the difference is the operation ids.
 // zip qualifies an op's id by the prefix of the OCCURRENCE it answers under
 // (walk.go occurrenceID), because a definition included TWICE declares one id
 // and produces two operations, and an OpenAPI document cannot hold two
@@ -118,15 +118,12 @@ func claims(on zip.OpTarget, method, path string) bool {
 // The middleware comes from app's own scope rather than being zeroed: Group
 // inherits the app's wrap, and dropping it here would silently unwrap every
 // typed op.
-type under struct {
-	app  *zip.App
-	root string
-}
 
-func (u under) OpScope() zip.OpScope {
-	s := u.app.OpScope()
-	s.Prefix = u.root
-	return s
+// rooted is a group together with the path it answers under. The group does the
+// registering; the root is what an address is measured from.
+type rooted struct {
+	*zip.Group
+	root string
 }
 
 // The five declaration verbs, each the zip one plus the claim check. Every typed
@@ -139,39 +136,39 @@ func (u under) OpScope() zip.OpScope {
 // resolves a target once, without a path, so a target cannot refuse one address
 // and accept another; the verb can.
 
-func opGet[In, Out any](on zip.OpTarget, path string, fn zip.TypedHandler[In, Out], opts ...zip.OpOption) {
-	if claims(on, http.MethodGet, path) {
+func opGet[In, Out any](on rooted, path string, fn zip.TypedHandler[In, Out], opts ...zip.OpOption) {
+	if claims(on.root, http.MethodGet, path) {
 		return
 	}
-	zip.Get(on, path, addressed(on, http.MethodGet, path, fn), opts...)
+	on.Get(path, addressed(on.root, http.MethodGet, path, fn), opts...)
 }
 
-func opPost[In, Out any](on zip.OpTarget, path string, fn zip.TypedHandler[In, Out], opts ...zip.OpOption) {
-	if claims(on, http.MethodPost, path) {
+func opPost[In, Out any](on rooted, path string, fn zip.TypedHandler[In, Out], opts ...zip.OpOption) {
+	if claims(on.root, http.MethodPost, path) {
 		return
 	}
-	zip.Post(on, path, addressed(on, http.MethodPost, path, fn), opts...)
+	on.Post(path, addressed(on.root, http.MethodPost, path, fn), opts...)
 }
 
-func opPut[In, Out any](on zip.OpTarget, path string, fn zip.TypedHandler[In, Out], opts ...zip.OpOption) {
-	if claims(on, http.MethodPut, path) {
+func opPut[In, Out any](on rooted, path string, fn zip.TypedHandler[In, Out], opts ...zip.OpOption) {
+	if claims(on.root, http.MethodPut, path) {
 		return
 	}
-	zip.Put(on, path, addressed(on, http.MethodPut, path, fn), opts...)
+	on.Put(path, addressed(on.root, http.MethodPut, path, fn), opts...)
 }
 
-func opPatch[In, Out any](on zip.OpTarget, path string, fn zip.TypedHandler[In, Out], opts ...zip.OpOption) {
-	if claims(on, http.MethodPatch, path) {
+func opPatch[In, Out any](on rooted, path string, fn zip.TypedHandler[In, Out], opts ...zip.OpOption) {
+	if claims(on.root, http.MethodPatch, path) {
 		return
 	}
-	zip.Patch(on, path, addressed(on, http.MethodPatch, path, fn), opts...)
+	on.Patch(path, addressed(on.root, http.MethodPatch, path, fn), opts...)
 }
 
-func opDelete[In, Out any](on zip.OpTarget, path string, fn zip.TypedHandler[In, Out], opts ...zip.OpOption) {
-	if claims(on, http.MethodDelete, path) {
+func opDelete[In, Out any](on rooted, path string, fn zip.TypedHandler[In, Out], opts ...zip.OpOption) {
+	if claims(on.root, http.MethodDelete, path) {
 		return
 	}
-	zip.Delete(on, path, addressed(on, http.MethodDelete, path, fn), opts...)
+	on.Delete(path, addressed(on.root, http.MethodDelete, path, fn), opts...)
 }
 
 // route declares one of the ten escape hatches — a raw route rather than a
@@ -182,18 +179,16 @@ func opDelete[In, Out any](on zip.OpTarget, path string, fn zip.TypedHandler[In,
 // is: the runtime's answer at that address. Naming the address is the whole
 // registration.
 func route(app *zip.App, method, path string) {
-	if claims(app, method, path) {
+	// A hatch names its whole address, so there is no root to measure from.
+	if claims("", method, path) {
 		return
 	}
-	h := hatch(method, zip.Template(app.OpScope().Prefix+path))
 	switch method {
-	case http.MethodGet:
-		app.Get(path, h)
-	case http.MethodPost:
-		app.Post(path, h)
+	case http.MethodGet, http.MethodPost:
 	default:
 		panic("o11y: route: unsupported method " + method)
 	}
+	app.Raw(method, path, hatch(method, zip.Template(path)))
 }
 
 // bridge is this package's ONE net/http adapter: every route that answers with a

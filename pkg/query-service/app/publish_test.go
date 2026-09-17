@@ -318,7 +318,7 @@ func TestPublishServesTheDeclarationVerbatim(t *testing.T) {
 func TestTheDeclarationCannotBeComposedIn(t *testing.T) {
 	app := zip.New(zip.Config{AppName: "o11y", DisableStartupMessage: true})
 	const taken = "/v1/o11y/logs"
-	app.Get(taken, func(c *zip.Ctx) error { return c.NoContent(http.StatusOK) })
+	app.Raw(http.MethodGet, taken, func(c *zip.Ctx) error { return c.NoContent(http.StatusOK) })
 
 	d, err := declaration()
 	if err != nil {
@@ -349,7 +349,7 @@ func TestServiceRoutesOutrankTheDeclaration(t *testing.T) {
 
 	const path = "/v1/o11y/logs"
 	served := false
-	app.Get(path, zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	app.Raw(http.MethodGet, path, zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		served = true
 		w.WriteHeader(http.StatusOK)
 	})))

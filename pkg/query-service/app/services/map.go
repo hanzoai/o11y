@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hanzo-ds/go"
+	datastore "github.com/hanzo-ds/go"
 	"github.com/hanzoai/o11y/pkg/query-service/model"
 )
 

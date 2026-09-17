@@ -55,7 +55,7 @@ import (
 // carries the operation id its mux registration always declared, so the document
 // names it exactly as it was named before.
 func mountDashboards(app *zip.App) {
-	g := under{app, o11yRoot}
+	g := rooted{app.Group(o11yRoot), o11yRoot}
 
 	// Dashboards — list, per-user list, create, clone, read, update, patch, delete.
 	opGet(g, "/dashboards", dashboardListV2, zip.WithOperationID("ListDashboardsV2"))

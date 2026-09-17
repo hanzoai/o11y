@@ -54,7 +54,7 @@ import (
 
 // mountIdentity registers the identity face's typed ops on the native router.
 func mountIdentity(app *zip.App) {
-	g := under{app, o11yRoot}
+	g := rooted{app.Group(o11yRoot), o11yRoot}
 
 	// who the caller is
 	opGet(g, "/users/me", getMyUser, zip.WithOperationID("GetMyUser"))

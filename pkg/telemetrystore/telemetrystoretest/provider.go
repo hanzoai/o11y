@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/hanzo-ds/go"
+	datastore "github.com/hanzo-ds/go"
 	dsmock "github.com/hanzo-ds/mock"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/datastoremock"

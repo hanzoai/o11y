@@ -44,7 +44,7 @@ import (
 // eleven infra resources, the ten infra_monitoring rollups, and the setup
 // checks.
 func mountInfra(app *zip.App) {
-	g := under{app, o11yRoot}
+	g := rooted{app.Group(o11yRoot), o11yRoot}
 
 	opGet(g, "/hosts/attribute_keys", hostAttributeKeys)
 	opGet(g, "/hosts/attribute_values", hostAttributeValues)

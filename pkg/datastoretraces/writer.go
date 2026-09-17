@@ -42,7 +42,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hanzo-ds/go"
+	datastore "github.com/hanzo-ds/go"
 	"github.com/hanzo-ds/go/lib/driver"
 	"github.com/hanzoai/o11y/pkg/sightings"
 	"github.com/hanzoai/o11y/pkg/telemetrytraces"

@@ -188,8 +188,8 @@ func TestProbesAnswerVerbatim(t *testing.T) {
 // independent of any runtime.
 func TestNativeParamAndMethod(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
-	app.Get("/thing/:id", func(c *zip.Ctx) error { return c.String(http.StatusOK, "get:"+c.Param("id")) })
-	app.Post("/thing/:id", func(c *zip.Ctx) error { return c.String(http.StatusCreated, "post:"+c.Param("id")) })
+	app.Raw(http.MethodGet, "/thing/:id", func(c *zip.Ctx) error { return c.String(http.StatusOK, "get:"+c.Param("id")) })
+	app.Raw(http.MethodPost, "/thing/:id", func(c *zip.Ctx) error { return c.String(http.StatusCreated, "post:"+c.Param("id")) })
 
 	resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/thing/abc", nil))
 	if err != nil {

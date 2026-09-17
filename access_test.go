@@ -310,7 +310,7 @@ func TestAccessTheRestOfTheFaceStillReachesTheRuntime(t *testing.T) {
 	app := zip.New(zip.Config{DisableStartupMessage: true})
 	// The host registers its /v1/o11y wildcard BEFORE the module mounts, which is
 	// the order the composed binary uses.
-	app.All("/v1/o11y/*", zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	app.Raw(zip.MethodAll, "/v1/o11y/*", zip.AdaptNetHTTP(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = io.WriteString(w, `{"endpoint":"wildcard","path":"`+r.URL.Path+`"}`)
 	})))

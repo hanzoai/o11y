@@ -38,7 +38,7 @@ import (
 	"github.com/prometheus/prometheus/promql"
 	"github.com/prometheus/prometheus/util/stats"
 
-	"github.com/hanzo-ds/go"
+	datastore "github.com/hanzo-ds/go"
 	"github.com/hanzo-ds/go/lib/driver"
 
 	"github.com/hanzoai/o11y/pkg/cache"

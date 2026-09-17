@@ -244,7 +244,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 		}
 	}
 
-	// Group("") is the App as a zip.Router with no prefix — the root every route
+	// Group("") is the App as a *zip.Group with no prefix — the root every route
 	// on this service hangs off, and the only place a prefix is not stated.
 	r := routing.New(app.Group(""), chain)
 	am := middleware.NewAuthZ(s.o11y.Instrumentation.Logger(), s.o11y.Modules.OrgGetter, s.o11y.Authz)
@@ -290,7 +290,7 @@ func (s *Server) createPublicServer(api *APIHandler, web web.Web) (*zip.App, err
 	// exactly as when it was the last route on the tree this replaces. It is
 	// unconditional: the null provider answers 404, so a headless deployment
 	// (web.enabled=false) serves exactly what an unregistered route served.
-	app.All("/*", zip.AdaptNetHTTP(chain(nil)(web)))
+	app.Raw(zip.MethodAll, "/*", zip.AdaptNetHTTP(chain(nil)(web)))
 
 	// No prefix stripping. Every route is registered at its full public path
 	// (/v1/o11y/…, /v1/o11y/sentinel/…), so the request path that arrives is the path that
@@ -377,14 +377,14 @@ func publish(app *zip.App) error {
 	// One handler for all five: the declaration app answers by PATH, so routing
 	// to it is the same decision it would make on its own listener.
 	serve := dispatch(d)
-	app.Get(zip.SpecPath, serve)
-	app.Get(zip.DocsPath, serve)
-	app.Get(zip.PluginPath, serve)
+	app.Raw(http.MethodGet, zip.SpecPath, serve)
+	app.Raw(http.MethodGet, zip.DocsPath, serve)
+	app.Raw(http.MethodGet, zip.PluginPath, serve)
 	// mcpPath is zip's default; it has no exported spelling, and this server
 	// does not set Config.MCP.Path, so the default is the contract.
-	app.Post(mcpPath, serve)
+	app.Raw(http.MethodPost, mcpPath, serve)
 	// The call plane is CallPath + the op name.
-	app.Post(zip.CallPath+"*", serve)
+	app.Raw(http.MethodPost, zip.CallPath+"*", serve)
 	return nil
 }
 

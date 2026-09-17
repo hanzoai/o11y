@@ -202,51 +202,45 @@ func TestHatchWithoutRuntimeIs503(t *testing.T) {
 	}
 }
 
-// TestUnderIsStillLoadBearing measures why relay.go's `under` cannot be a
-// Group, instead of asserting it in prose.
+// TestEveryOperationDeclaresItsOwnId holds what made this package's op target
+// unnecessary.
 //
-// zip v1.24.2 stopped composition from renaming a DECLARED operation id, which
-// removed half the reason `under` exists. The other half is still here: an op
-// with no declared id takes zip's shape-derived one, and THAT is qualified by
-// the prefix of the occurrence it answers under. Registering this package's ops
-// through app.Group(o11yRoot) would therefore publish every undeclared one as
-// "v1.o11y.<derived>" — the same rename that cost 353 ids, applied to however
-// many of them this test finds.
+// An op with no declared id takes zip's shape-derived one, and that one is
+// qualified by the prefix of the occurrence it answers under — so registering
+// through a group used to publish every undeclared op as "v1.o11y.<derived>",
+// a rename that once cost 353 ids. A struct answering with a fixed prefix was
+// the way around it. Once every op states its id, a declared id survives
+// composition verbatim and the group is just a group; the test that measured
+// that gap reached zero and said so, which is why the struct is gone.
 //
-// The number is the point. When it reaches zero — every op declares its id —
-// `under` can be deleted and the registration can be a plain Group, and this is
-// the test that will say so.
-func TestUnderIsStillLoadBearing(t *testing.T) {
+// This is the same property from the other side: the number that has to stay at
+// zero is the UNDECLARED one.
+func TestEveryOperationDeclaresItsOwnId(t *testing.T) {
 	app := mounted(t)
 	if err := app.Build(); err != nil {
 		t.Fatalf("Build: %v", err)
 	}
 
-	declared, undeclared := 0, 0
+	var undeclared []string
 	for _, op := range app.Registry() {
 		if op.OperationID == "" {
-			undeclared++
-			continue
+			undeclared = append(undeclared, op.Method+" "+op.Path)
 		}
-		declared++
 	}
-	if declared+undeclared != 319 {
-		t.Fatalf("registry holds %d ops, want the 319 of TestEveryRouteIsNamedAndCounted", declared+undeclared)
+	if len(undeclared) != 0 {
+		t.Errorf("%d of %d ops declare no id, so composition would rename them: %v",
+			len(undeclared), len(app.Registry()), undeclared)
 	}
-	if undeclared == 0 {
-		t.Fatalf("every one of the %d ops now declares its id — a declared id survives "+
-			"composition verbatim, so `under` has nothing left to protect: replace it with "+
-			"app.Group(o11yRoot) and delete it", declared)
+	if len(app.Registry()) != 319 {
+		t.Errorf("registry holds %d ops, want the 319 of TestEveryRouteIsNamedAndCounted", len(app.Registry()))
 	}
-	t.Logf("%d ops declare an id and survive any prefix; %d do not and would be "+
-		"renamed by a Group — `under` stays", declared, undeclared)
 
 	// The property itself, on the real mount: nothing this service publishes
-	// carries the occurrence qualification, declared or not.
+	// carries the occurrence qualification.
 	for _, tool := range app.MCPTools() {
 		name, _ := tool["name"].(string)
 		if strings.HasPrefix(name, "v1.") {
-			t.Errorf("published name %q is prefix-qualified — the registration reached a Group", name)
+			t.Errorf("published name %q is prefix-qualified", name)
 		}
 	}
 }

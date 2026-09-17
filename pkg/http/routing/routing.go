@@ -7,7 +7,7 @@
 // whose escape hatches a handler could reach for: the only thing a registration
 // site can say is method, path, handler.
 //
-// WHY IT IS A TYPE AND NOT JUST zip.Router. A registration carries three facts
+// WHY IT IS A TYPE AND NOT JUST *zip.Group. A registration carries three facts
 // that zip has no slot for, and each of them used to be RECOVERED at request
 // time by asking the router which route it had just matched:
 //
@@ -123,7 +123,7 @@ func (t *Table) Handler(method, path string) http.Handler {
 // Router registers routes on a zip router. Copying one is free and copies share
 // the Table: a Group is a Router with a longer prefix, not a separate tree.
 type Router struct {
-	zip   zip.Router
+	zip   *zip.Group
 	chain Chain
 	table *Table
 
@@ -142,7 +142,7 @@ type Router struct {
 }
 
 // New starts a route tree on r, serving every handler through chain.
-func New(r zip.Router, chain Chain) Router {
+func New(r *zip.Group, chain Chain) Router {
 	return Router{zip: r, chain: chain, table: &Table{}}
 }
 
@@ -190,15 +190,15 @@ func (r Router) Handle(method, path string, h http.Handler) Router {
 	spelled := colonize(path)
 	switch method {
 	case http.MethodGet:
-		r.zip.Get(spelled, leaf)
+		r.zip.Raw(http.MethodGet, spelled, leaf)
 	case http.MethodPost:
-		r.zip.Post(spelled, leaf)
+		r.zip.Raw(http.MethodPost, spelled, leaf)
 	case http.MethodPut:
-		r.zip.Put(spelled, leaf)
+		r.zip.Raw(http.MethodPut, spelled, leaf)
 	case http.MethodPatch:
-		r.zip.Patch(spelled, leaf)
+		r.zip.Raw(http.MethodPatch, spelled, leaf)
 	case http.MethodDelete:
-		r.zip.Delete(spelled, leaf)
+		r.zip.Raw(http.MethodDelete, spelled, leaf)
 	default:
 		panic("routing: " + method + " " + full + " uses a method this service does not serve")
 	}

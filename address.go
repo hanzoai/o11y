@@ -62,8 +62,8 @@ type addrKey struct{}
 // The full address is the target's own prefix plus the declared path, the same
 // composition [claims] reads and the same one zip's registry records, so the
 // three cannot name different addresses.
-func addressed[In, Out any](on zip.OpTarget, method, path string, fn zip.TypedHandler[In, Out]) zip.TypedHandler[In, Out] {
-	pattern := on.OpScope().Prefix + path
+func addressed[In, Out any](root, method, path string, fn zip.TypedHandler[In, Out]) zip.TypedHandler[In, Out] {
+	pattern := root + path
 	template := zip.Template(pattern)
 	return func(ctx context.Context, in *In) (*Out, error) {
 		return fn(context.WithValue(ctx, addrKey{}, addr{

@@ -59,7 +59,7 @@ import (
 // declarations, so the SDK method, the CLI command and the MCP tool a caller
 // already knows keep their names as the routes cross into the document.
 func mountLLMObs(app *zip.App) {
-	g := under{app, o11yRoot}
+	g := rooted{app.Group(o11yRoot), o11yRoot}
 
 	// The four gen_ai span views — projections over spans, not tables.
 	opGet(g, "/llm/observations", llmObservations, zip.WithOperationID("ListLLMObservations"))
