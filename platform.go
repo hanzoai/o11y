@@ -46,37 +46,37 @@ import (
 // routes_licenses.go, then the o11yapiserver singletons). It registers on the
 // SAME o11yRoot group logs.go mounts on, ahead of the delegation wildcard.
 func mountPlatform(app *zip.App) {
-	g := rooted{app.Group(o11yRoot), o11yRoot}
+	g := app.Group(o11yRoot)
 
 	// routes_misc.go
-	opGet(g, "/query", promQuery)
-	opPost(g, "/variables/query", dashboardVars)
-	opPost(g, "/event", event)
-	opGet(g, "/usage", usage)
-	opPost(g, "/dependency_graph", dependencyGraph)
-	opGet(g, "/version", version)
-	opGet(g, "/health", health)
-	opGet(g, "/disks", disks)
-	opPost(g, "/span_percentile", spanPercentile)
-	opPost(g, "/query_filter/analyze", analyzeQueryFilter)
-	opGet(g, "/filter_suggestions", filterSuggestions)
-	opGet(g, "/infra_onboarding/k8s/status", k8sOnboarding)
-	opGet(g, "/metric/metric_metadata", legacyMetricMetadata)
+	g.Get("/query", promQuery)
+	g.Post("/variables/query", dashboardVars)
+	g.Post("/event", event)
+	g.Get("/usage", usage)
+	g.Post("/dependency_graph", dependencyGraph)
+	g.Get("/version", version)
+	g.Get("/health", health)
+	g.Get("/disks", disks)
+	g.Post("/span_percentile", spanPercentile)
+	g.Post("/query_filter/analyze", analyzeQueryFilter)
+	g.Get("/filter_suggestions", filterSuggestions)
+	g.Get("/infra_onboarding/k8s/status", k8sOnboarding)
+	g.Get("/metric/metric_metadata", legacyMetricMetadata)
 
 	// routes_settings.go
-	opPost(g, "/settings/ttl", setRetention)
-	opGet(g, "/settings/ttl", retention)
-	opPost(g, "/settings/apdex", setApdex)
-	opGet(g, "/settings/apdex", apdex)
+	g.Post("/settings/ttl", setRetention)
+	g.Get("/settings/ttl", retention)
+	g.Post("/settings/apdex", setApdex)
+	g.Get("/settings/apdex", apdex)
 
 	// routes_licenses.go
-	opGet(g, "/licenses", licenses)
-	opGet(g, "/licenses/active", activateLicense)
+	g.Get("/licenses", licenses)
+	g.Get("/licenses/active", activateLicense)
 
 	// o11yapiserver: global.go, flagger.go, statsreporter.go
-	opGet(g, "/global/config", globalConfig)
-	opGet(g, "/features", features)
-	opGet(g, "/stats", orgStats)
+	g.Get("/global/config", globalConfig)
+	g.Get("/features", features)
+	g.Get("/stats", orgStats)
 }
 
 // ── the operations ────────────────────────────────────────────────────────────

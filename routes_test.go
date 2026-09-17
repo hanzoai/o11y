@@ -3,6 +3,8 @@ package o11y_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"sort"
 	"strings"
 	"testing"
 
@@ -107,6 +109,47 @@ func TestEveryRouteIsNamedAndCounted(t *testing.T) {
 	if ops != wantTyped {
 		t.Fatalf("OpenAPI operations = %d, want %d", ops, wantTyped)
 	}
+}
+
+// The table, address by address. The count above says how many routes there
+// are; testdata/routes.txt says which, so a route that moves, disappears or
+// changes its spelling reads as a diff instead of as a count that still adds up.
+func TestRouteTableIsTheCensus(t *testing.T) {
+	census, err := os.ReadFile("testdata/routes.txt")
+	if err != nil {
+		t.Fatalf("read the census: %v", err)
+	}
+	var got []string
+	for route := range registered(t, mounted(t)) {
+		got = append(got, route)
+	}
+	sort.Strings(got)
+	if moved := drift(strings.Split(strings.TrimSpace(string(census)), "\n"), got); moved != "" {
+		t.Errorf("the route table is not the one in testdata/routes.txt:\n%s", moved)
+	}
+}
+
+// drift names what the census holds and the mount does not, and the reverse.
+func drift(want, got []string) string {
+	held, have := map[string]bool{}, map[string]bool{}
+	for _, w := range want {
+		held[w] = true
+	}
+	for _, g := range got {
+		have[g] = true
+	}
+	var out []string
+	for _, w := range want {
+		if !have[w] {
+			out = append(out, "  gone: "+w)
+		}
+	}
+	for _, g := range got {
+		if !held[g] {
+			out = append(out, "  new:  "+g)
+		}
+	}
+	return strings.Join(out, "\n")
 }
 
 // No route may end in a wildcard. This is the invariant the whole change buys:

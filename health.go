@@ -59,7 +59,7 @@ func mountHealth(app *zip.App) {
 }
 
 // The fall-through is the runtime's handler for the probe's own address, reached
-// through the same hatch every un-typed route uses (claim.go).
+// through the same hatch every un-typed route uses (hatch.go).
 //
 // It used to be c.Next(), which worked only because a /v1/o11y/* catch-all was
 // registered after the probes and caught whatever they declined. Every route is

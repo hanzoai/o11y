@@ -33,8 +33,8 @@ package o11y
 //   - Legacy exceptions (listErrors, countErrors, errorFromErrorID,
 //     errorFromGroupID, nextPrevErrorIDs): ViewAccess, every one.
 //
-// The FOUR ingest routes — POST /v1/event/{project}/envelope|store/ and POST
-// /v1/o11y/api/{project}/envelope|store/ — are the deliberate escape hatches,
+// The FOUR ingest routes — POST /v1/event/{project}/envelope|store and POST
+// /v1/o11y/api/{project}/envelope|store — are the deliberate escape hatches,
 // NOT typed here and not on this face at all: ingest is a keyed beacon and a
 // face is read by a person, so ingest has its own root (relay.go's eventRoot,
 // the address a minted DSN spells). They are OpenAccess (a Sentry SDK presents a DSN key,
@@ -61,27 +61,27 @@ import (
 // the o11yRoot group. Both roots and the seam they relay through are spelled
 // once each, in relay.go.
 func mountSentryErrors(app *zip.App) {
-	gsentry := rooted{app.Group(sentinelRoot), sentinelRoot}
-	opGet(gsentry, "/projects", sentryListProjects)
-	opPost(gsentry, "/projects", sentryCreateProject)
-	opGet(gsentry, "/projects/:id", sentryGetProject)
-	opDelete(gsentry, "/projects/:id", sentryDeleteProject)
-	opPost(gsentry, "/projects/:id/keys/rotate", sentryRotateProjectKey)
-	opGet(gsentry, "/issues", sentryListIssues)
-	opGet(gsentry, "/issues/:id", sentryGetIssue)
-	opPut(gsentry, "/issues/:id", sentryUpdateIssue)
-	opGet(gsentry, "/issues/:id/events", sentryIssueEvents)
-	opGet(gsentry, "/events/:id", sentryGetEvent)
+	gsentry := app.Group(sentinelRoot)
+	gsentry.Get("/projects", sentryListProjects)
+	gsentry.Post("/projects", sentryCreateProject)
+	gsentry.Get("/projects/:id", sentryGetProject)
+	gsentry.Delete("/projects/:id", sentryDeleteProject)
+	gsentry.Post("/projects/:id/keys/rotate", sentryRotateProjectKey)
+	gsentry.Get("/issues", sentryListIssues)
+	gsentry.Get("/issues/:id", sentryGetIssue)
+	gsentry.Put("/issues/:id", sentryUpdateIssue)
+	gsentry.Get("/issues/:id/events", sentryIssueEvents)
+	gsentry.Get("/events/:id", sentryGetEvent)
 
-	go11y := rooted{app.Group(o11yRoot), o11yRoot}
-	opGet(go11y, "/errortracking/issues", errorListIssues)
-	opGet(go11y, "/errortracking/issues/:id", errorGetIssue)
-	opPost(go11y, "/errortracking/issues/:id", errorUpdateIssue)
-	opPost(go11y, "/listErrors", errorsList)
-	opPost(go11y, "/countErrors", errorsCount)
-	opGet(go11y, "/errorFromErrorID", errorFromErrorID)
-	opGet(go11y, "/errorFromGroupID", errorFromGroupID)
-	opGet(go11y, "/nextPrevErrorIDs", nextPrevErrorIDs)
+	go11y := app.Group(o11yRoot)
+	go11y.Get("/errortracking/issues", errorListIssues)
+	go11y.Get("/errortracking/issues/:id", errorGetIssue)
+	go11y.Post("/errortracking/issues/:id", errorUpdateIssue)
+	go11y.Post("/listErrors", errorsList)
+	go11y.Post("/countErrors", errorsCount)
+	go11y.Get("/errorFromErrorID", errorFromErrorID)
+	go11y.Get("/errorFromGroupID", errorFromGroupID)
+	go11y.Get("/nextPrevErrorIDs", nextPrevErrorIDs)
 }
 
 // ── sentry projects ─────────────────────────────────────────────────────────

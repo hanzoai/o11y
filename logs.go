@@ -45,16 +45,16 @@ import (
 // pipelines routes keep the mux tree's discipline — preview registers before
 // the parameterised version read so a version can never shadow it.
 func mountLogs(app *zip.App) {
-	g := rooted{app.Group(o11yRoot), o11yRoot}
-	opGet(g, "/logs", logRecords)
-	opGet(g, "/logs/fields", logFields)
-	opPost(g, "/logs/fields", logFieldUpdate)
-	opGet(g, "/logs/aggregate", logAggregate)
-	opPost(g, "/logs/pipelines/preview", logPipelinePreview)
-	opGet(g, "/logs/pipelines/:version", logPipelines)
-	opPost(g, "/logs/pipelines", logPipelineCreate)
-	opPost(g, "/logs/promote_paths", logPromote, zip.WithStatus(http.StatusCreated))
-	opGet(g, "/logs/promote_paths", logPromoted)
+	g := app.Group(o11yRoot)
+	g.Get("/logs", logRecords)
+	g.Get("/logs/fields", logFields)
+	g.Post("/logs/fields", logFieldUpdate)
+	g.Get("/logs/aggregate", logAggregate)
+	g.Post("/logs/pipelines/preview", logPipelinePreview)
+	g.Get("/logs/pipelines/:version", logPipelines)
+	g.Post("/logs/pipelines", logPipelineCreate)
+	g.Post("/logs/promote_paths", logPromote, zip.WithStatus(http.StatusCreated))
+	g.Get("/logs/promote_paths", logPromoted)
 }
 
 // ── the nine operations ───────────────────────────────────────────────────────

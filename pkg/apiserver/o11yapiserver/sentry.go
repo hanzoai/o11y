@@ -22,7 +22,7 @@ import (
 //   - The FACE, /v1/o11y/sentinel — Hanzo Sentry, the Sentry-parity product read by a
 //     signed-in person: projects, issues, discover, events, logs, traces, stats. Hanzo
 //     IAM authz, every one scoped to the caller's org from the validated claims.
-//   - INGEST, POST /v1/event/{project}/envelope/ and /store/ — a keyed beacon. It is
+//   - INGEST, POST /v1/event/{project}/envelope and /store — a keyed beacon. It is
 //     the address a minted DSN spells (implsentry's mintDSN), so the address a client
 //     is told and the address this router opens are one string. OpenAccess (no IAM):
 //     a Sentry SDK presents a DSN key, not a Hanzo session; the handler verifies that
@@ -161,7 +161,7 @@ func (provider *provider) addSentryRoutes(router routing.Router) {
 		fn   http.HandlerFunc
 		def  handler.OpenAPIDef
 	}{
-		{"/v1/event/{project:guid}/envelope/", provider.authzMiddleware.OpenAccess(h.EnvelopeIngest), handler.OpenAPIDef{
+		{"/v1/event/{project:guid}/envelope", provider.authzMiddleware.OpenAccess(h.EnvelopeIngest), handler.OpenAPIDef{
 			ID: "SentryIngestEnvelope", Tags: []string{"sentry"}, Summary: "Ingest a Sentry envelope",
 			Description:         "Sentry-envelope-compatible ingest. Authenticated by the DSN public key (X-Sentry-Auth or ?sentry_key), not a Hanzo session.",
 			RequestContentType:  "application/x-sentry-envelope",
@@ -169,7 +169,7 @@ func (provider *provider) addSentryRoutes(router routing.Router) {
 			ErrorStatusCodes: []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusServiceUnavailable},
 			SecuritySchemes:  []handler.OpenAPISecurityScheme{},
 		}},
-		{"/v1/event/{project:guid}/store/", provider.authzMiddleware.OpenAccess(h.StoreIngest), handler.OpenAPIDef{
+		{"/v1/event/{project:guid}/store", provider.authzMiddleware.OpenAccess(h.StoreIngest), handler.OpenAPIDef{
 			ID: "SentryIngestStore", Tags: []string{"sentry"}, Summary: "Ingest a legacy Sentry store event",
 			Description:         "Legacy single-event Sentry ingest. Authenticated by the DSN public key.",
 			RequestContentType:  "application/json",

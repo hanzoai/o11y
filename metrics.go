@@ -35,28 +35,28 @@ import (
 // Collection routes register before the parameterised ones so an id can never
 // shadow a collection.
 func mountMetrics(app *zip.App) {
-	g := rooted{app.Group(o11yRoot), o11yRoot}
+	g := app.Group(o11yRoot)
 
-	opGet(g, "/metrics", listMetrics, zip.WithOperationID("ListMetrics"))
-	opPost(g, "/metrics/stats", metricStats, zip.WithOperationID("GetMetricsStats"))
-	opPost(g, "/metrics/treemap", metricTreemap, zip.WithOperationID("GetMetricsTreemap"))
-	opGet(g, "/metrics/attributes", metricAttributes, zip.WithOperationID("GetMetricAttributes"))
-	opGet(g, "/metrics/metadata", metricMetadata, zip.WithOperationID("GetMetricMetadata"))
-	opPost(g, "/metrics/metadata", saveMetricMetadata, zip.WithOperationID("UpdateMetricMetadata"))
-	opGet(g, "/metrics/highlights", metricHighlights, zip.WithOperationID("GetMetricHighlights"))
-	opGet(g, "/metrics/alerts", metricAlerts, zip.WithOperationID("GetMetricAlerts"))
-	opGet(g, "/metrics/dashboards", metricDashboards, zip.WithOperationID("GetMetricDashboardsV2"))
-	opPost(g, "/metrics/inspect", inspectMetric, zip.WithOperationID("InspectMetrics"))
-	opGet(g, "/metrics/onboarding", metricsOnboarding, zip.WithOperationID("GetMetricsOnboardingStatus"))
+	g.Get("/metrics", listMetrics, zip.WithOperationID("ListMetrics"))
+	g.Post("/metrics/stats", metricStats, zip.WithOperationID("GetMetricsStats"))
+	g.Post("/metrics/treemap", metricTreemap, zip.WithOperationID("GetMetricsTreemap"))
+	g.Get("/metrics/attributes", metricAttributes, zip.WithOperationID("GetMetricAttributes"))
+	g.Get("/metrics/metadata", metricMetadata, zip.WithOperationID("GetMetricMetadata"))
+	g.Post("/metrics/metadata", saveMetricMetadata, zip.WithOperationID("UpdateMetricMetadata"))
+	g.Get("/metrics/highlights", metricHighlights, zip.WithOperationID("GetMetricHighlights"))
+	g.Get("/metrics/alerts", metricAlerts, zip.WithOperationID("GetMetricAlerts"))
+	g.Get("/metrics/dashboards", metricDashboards, zip.WithOperationID("GetMetricDashboardsV2"))
+	g.Post("/metrics/inspect", inspectMetric, zip.WithOperationID("InspectMetrics"))
+	g.Get("/metrics/onboarding", metricsOnboarding, zip.WithOperationID("GetMetricsOnboardingStatus"))
 
-	opGet(g, "/metric_reduction_rules", listReductionRules, zip.WithOperationID("ListMetricReductionRules"))
-	opPost(g, "/metric_reduction_rules", createReductionRule, zip.WithOperationID("CreateMetricReductionRule"), zip.WithStatus(http.StatusCreated))
-	opGet(g, "/metric_reduction_rules/stats", reductionRuleStats, zip.WithOperationID("GetMetricReductionRuleStats"))
-	opGet(g, "/metric_reduction_rules/timeseries", reductionRuleTimeseries, zip.WithOperationID("GetMetricReductionRuleTimeseries"))
-	opPost(g, "/metric_reduction_rules/preview", previewReductionRule, zip.WithOperationID("PreviewMetricReductionRule"))
-	opGet(g, "/metric_reduction_rules/:id", reductionRule, zip.WithOperationID("GetMetricReductionRuleByID"))
-	opPut(g, "/metric_reduction_rules/:id", saveReductionRule, zip.WithOperationID("UpdateMetricReductionRuleByID"))
-	opDelete(g, "/metric_reduction_rules/:id", deleteReductionRule, zip.WithOperationID("DeleteMetricReductionRuleByID"))
+	g.Get("/metric_reduction_rules", listReductionRules, zip.WithOperationID("ListMetricReductionRules"))
+	g.Post("/metric_reduction_rules", createReductionRule, zip.WithOperationID("CreateMetricReductionRule"), zip.WithStatus(http.StatusCreated))
+	g.Get("/metric_reduction_rules/stats", reductionRuleStats, zip.WithOperationID("GetMetricReductionRuleStats"))
+	g.Get("/metric_reduction_rules/timeseries", reductionRuleTimeseries, zip.WithOperationID("GetMetricReductionRuleTimeseries"))
+	g.Post("/metric_reduction_rules/preview", previewReductionRule, zip.WithOperationID("PreviewMetricReductionRule"))
+	g.Get("/metric_reduction_rules/:id", reductionRule, zip.WithOperationID("GetMetricReductionRuleByID"))
+	g.Put("/metric_reduction_rules/:id", saveReductionRule, zip.WithOperationID("UpdateMetricReductionRuleByID"))
+	g.Delete("/metric_reduction_rules/:id", deleteReductionRule, zip.WithOperationID("DeleteMetricReductionRuleByID"))
 }
 
 // ── the metrics-explorer operations ───────────────────────────────────────────

@@ -13,7 +13,7 @@ import (
 // /v1/o11y. Two families:
 //
 //   - INGEST (public, DSN-authenticated in-handler): the Sentry wire endpoints
-//     POST /v1/o11y/api/{project}/envelope/ and POST /v1/o11y/api/{project}/store/.
+//     POST /v1/o11y/api/{project}/envelope and POST /v1/o11y/api/{project}/store.
 //     They are wrapped with OpenAccess (no IAM) because the Sentry SDK presents a DSN
 //     key, not a Hanzo session; the handler verifies that key. A Sentry DSN of
 //     https://<key>@<host>/v1/o11y/<org> makes the SDK POST to exactly these paths:
@@ -41,7 +41,7 @@ func (provider *provider) addErrorTrackingRoutes(router routing.Router) {
 		fn     http.HandlerFunc
 		def    handler.OpenAPIDef
 	}{
-		{http.MethodPost, "/v1/o11y/api/{project_id}/envelope/", provider.authzMiddleware.OpenAccess(h.EnvelopeIngest), handler.OpenAPIDef{
+		{http.MethodPost, "/v1/o11y/api/{project_id}/envelope", provider.authzMiddleware.OpenAccess(h.EnvelopeIngest), handler.OpenAPIDef{
 			ID: "IngestErrorEnvelope", Tags: []string{"errortracking"}, Summary: "Ingest a Sentry envelope",
 			Description:         "Sentry-envelope-compatible ingest. Authenticated by the DSN public key (X-Sentry-Auth or ?sentry_key), not a Hanzo session.",
 			RequestContentType:  "application/x-sentry-envelope",
@@ -49,7 +49,7 @@ func (provider *provider) addErrorTrackingRoutes(router routing.Router) {
 			ErrorStatusCodes: []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusServiceUnavailable},
 			SecuritySchemes:  []handler.OpenAPISecurityScheme{},
 		}},
-		{http.MethodPost, "/v1/o11y/api/{project_id}/store/", provider.authzMiddleware.OpenAccess(h.StoreIngest), handler.OpenAPIDef{
+		{http.MethodPost, "/v1/o11y/api/{project_id}/store", provider.authzMiddleware.OpenAccess(h.StoreIngest), handler.OpenAPIDef{
 			ID: "IngestErrorStore", Tags: []string{"errortracking"}, Summary: "Ingest a legacy Sentry store event",
 			Description:         "Legacy single-event Sentry ingest. Authenticated by the DSN public key.",
 			RequestContentType:  "application/json",

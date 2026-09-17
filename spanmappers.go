@@ -38,17 +38,17 @@ func mountSpanMappers(app *zip.App) {
 	// with the collection as its prefix would register the collection routes at
 	// the empty sub-path, which lands them on a TRAILING SLASH the runtime does
 	// not serve. The collection is a path, not a prefix.
-	g := rooted{app.Group(o11yRoot), o11yRoot}
+	g := app.Group(o11yRoot)
 
-	opGet(g, "/span_mapper_groups", spanMapperGroups, op("ListSpanMapperGroups"))
-	opPost(g, "/span_mapper_groups", spanMapperGroupCreate, op("CreateSpanMapperGroup"), zip.WithStatus(http.StatusCreated))
-	opPatch(g, "/span_mapper_groups/:groupId", spanMapperGroupUpdate, op("UpdateSpanMapperGroup"), zip.WithStatus(http.StatusNoContent))
-	opDelete(g, "/span_mapper_groups/:groupId", spanMapperGroupDelete, op("DeleteSpanMapperGroup"), zip.WithStatus(http.StatusNoContent))
+	g.Get("/span_mapper_groups", spanMapperGroups, op("ListSpanMapperGroups"))
+	g.Post("/span_mapper_groups", spanMapperGroupCreate, op("CreateSpanMapperGroup"), zip.WithStatus(http.StatusCreated))
+	g.Patch("/span_mapper_groups/:groupId", spanMapperGroupUpdate, op("UpdateSpanMapperGroup"), zip.WithStatus(http.StatusNoContent))
+	g.Delete("/span_mapper_groups/:groupId", spanMapperGroupDelete, op("DeleteSpanMapperGroup"), zip.WithStatus(http.StatusNoContent))
 
-	opGet(g, "/span_mapper_groups/:groupId/span_mappers", spanMappers, op("ListSpanMappers"))
-	opPost(g, "/span_mapper_groups/:groupId/span_mappers", spanMapperCreate, op("CreateSpanMapper"), zip.WithStatus(http.StatusCreated))
-	opPatch(g, "/span_mapper_groups/:groupId/span_mappers/:mapperId", spanMapperUpdate, op("UpdateSpanMapper"), zip.WithStatus(http.StatusNoContent))
-	opDelete(g, "/span_mapper_groups/:groupId/span_mappers/:mapperId", spanMapperDelete, op("DeleteSpanMapper"), zip.WithStatus(http.StatusNoContent))
+	g.Get("/span_mapper_groups/:groupId/span_mappers", spanMappers, op("ListSpanMappers"))
+	g.Post("/span_mapper_groups/:groupId/span_mappers", spanMapperCreate, op("CreateSpanMapper"), zip.WithStatus(http.StatusCreated))
+	g.Patch("/span_mapper_groups/:groupId/span_mappers/:mapperId", spanMapperUpdate, op("UpdateSpanMapper"), zip.WithStatus(http.StatusNoContent))
+	g.Delete("/span_mapper_groups/:groupId/span_mappers/:mapperId", spanMapperDelete, op("DeleteSpanMapper"), zip.WithStatus(http.StatusNoContent))
 }
 
 // ── groups ────────────────────────────────────────────────────────────────────

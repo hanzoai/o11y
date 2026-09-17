@@ -54,25 +54,25 @@ import (
 
 // mountIdentity registers the identity face's typed ops on the native router.
 func mountIdentity(app *zip.App) {
-	g := rooted{app.Group(o11yRoot), o11yRoot}
+	g := app.Group(o11yRoot)
 
 	// who the caller is
-	opGet(g, "/users/me", getMyUser, zip.WithOperationID("GetMyUser"))
+	g.Get("/users/me", getMyUser, zip.WithOperationID("GetMyUser"))
 
 	// my organization and its quick filters
-	opGet(g, "/orgs/me", getMyOrg, zip.WithOperationID("GetMyOrganization"))
-	opPut(g, "/orgs/me", updateMyOrg, zip.WithOperationID("UpdateMyOrganization"))
-	opGet(g, "/orgs/me/filters", getQuickFilters, zip.WithOperationID("GetQuickFilters"))
-	opGet(g, "/orgs/me/filters/:signal", getSignalFilters, zip.WithOperationID("GetSignalFilters"))
-	opPut(g, "/orgs/me/filters", updateQuickFilters, zip.WithOperationID("UpdateQuickFilters"))
+	g.Get("/orgs/me", getMyOrg, zip.WithOperationID("GetMyOrganization"))
+	g.Put("/orgs/me", updateMyOrg, zip.WithOperationID("UpdateMyOrganization"))
+	g.Get("/orgs/me/filters", getQuickFilters, zip.WithOperationID("GetQuickFilters"))
+	g.Get("/orgs/me/filters/:signal", getSignalFilters, zip.WithOperationID("GetSignalFilters"))
+	g.Put("/orgs/me/filters", updateQuickFilters, zip.WithOperationID("UpdateQuickFilters"))
 
 	// preferences, per user and per org
-	opGet(g, "/user/preferences", listUserPreferences, zip.WithOperationID("ListUserPreferences"))
-	opGet(g, "/user/preferences/:name", getUserPreference, zip.WithOperationID("GetUserPreference"))
-	opPut(g, "/user/preferences/:name", updateUserPreference, zip.WithOperationID("UpdateUserPreference"))
-	opGet(g, "/org/preferences", listOrgPreferences, zip.WithOperationID("ListOrgPreferences"))
-	opGet(g, "/org/preferences/:name", getOrgPreference, zip.WithOperationID("GetOrgPreference"))
-	opPut(g, "/org/preferences/:name", updateOrgPreference, zip.WithOperationID("UpdateOrgPreference"))
+	g.Get("/user/preferences", listUserPreferences, zip.WithOperationID("ListUserPreferences"))
+	g.Get("/user/preferences/:name", getUserPreference, zip.WithOperationID("GetUserPreference"))
+	g.Put("/user/preferences/:name", updateUserPreference, zip.WithOperationID("UpdateUserPreference"))
+	g.Get("/org/preferences", listOrgPreferences, zip.WithOperationID("ListOrgPreferences"))
+	g.Get("/org/preferences/:name", getOrgPreference, zip.WithOperationID("GetOrgPreference"))
+	g.Put("/org/preferences/:name", updateOrgPreference, zip.WithOperationID("UpdateOrgPreference"))
 }
 
 // ── who the caller is ─────────────────────────────────────────────────────────

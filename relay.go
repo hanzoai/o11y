@@ -14,26 +14,10 @@ package o11y
 // per value — so a change to the seam had five sites to find, and a change to
 // the root had eight.
 //
-// THE ADDRESS IS NOT A PARAMETER OF THE TRANSPORT. That collapse left one seam
-// and one root, and one thing still spelled twice: the address. Every op stated
-// it at its registration and then stated it AGAIN, by hand, in the call —
-//
-//	opGet(g, "/traces/:traceId", traceSpans)                    // once
-//	relay(ctx, "GET", o11yRoot+"/traces/"+in.TraceID, …)        // and again
-//
-// — 706 spellings of 367 addresses, and the second spelling is the one that got
-// requested, so a route pattern that stopped agreeing with it was never
-// consulted and never contradicted. That is not hypothetical: three of these
-// addresses name their segment traceId while the runtime registered traceID, and
-// nothing in the process could tell, because a router matches by POSITION and a
-// parameter's name is invisible to it.
-//
-// So the address is stated once, at the registration, and travels with the call
-// (see claim.go's addressed). relay takes no method and no path: it reads the
-// address the request arrived at, which is a fact about the call and
-// not a decision this function makes. The 119 hand-built paths are gone with it —
-// zip.Address renders the concrete one from the same input zip bound the segments
-// into, so the round trip is exact by construction.
+// The address is not a parameter of the transport. relay takes no method and no
+// path: zip.OpOf is the operation being served and zip.AddressOf is the concrete
+// path it was called at, read back out of the input zip bound the matched
+// segments into.
 //
 // What relay is: it hands a typed op's call to the handler the runtime serves AT
 // THAT ADDRESS — the same handler the runtime's own router would dispatch to, so
@@ -104,22 +88,23 @@ const (
 // and decodes the answer into the op's Out. Pass out == nil for the operations
 // whose answer is a 204 with no body.
 //
-// The address comes from the context, not from the caller — see the file comment
-// and claim.go's addressed.
+// The address comes from the call, not from the caller (see the file comment).
 func relay(ctx context.Context, params url.Values, body, out any) error {
-	a, known := addressOf(ctx)
-	if !known {
+	op, served := zip.OpOf(ctx)
+	target, known := zip.AddressOf(ctx)
+	if !served || !known {
 		// Only reachable by calling an op's function directly rather than through
 		// the declaration that registered it, which is a programming error and not
 		// a request that can arrive.
 		return zip.ErrInternal("o11y: this operation was invoked outside its own registration, so it has no address to relay to")
 	}
-	h, err := at(a.method, a.template)
+	// The pattern resolves the handler, in the public spelling both sides state an
+	// address in; the concrete path is what the request carries.
+	h, err := at(op.Method, zip.Template(op.Path))
 	if err != nil {
 		return err
 	}
 
-	target := a.path
 	if q := params.Encode(); q != "" {
 		target += "?" + q
 	}
@@ -132,7 +117,7 @@ func relay(ctx context.Context, params url.Values, body, out any) error {
 		}
 		payload = bytes.NewReader(b)
 	}
-	req, err := http.NewRequestWithContext(ctx, a.method, target, payload)
+	req, err := http.NewRequestWithContext(ctx, op.Method, target, payload)
 	if err != nil {
 		return zip.ErrBadRequest(err.Error())
 	}

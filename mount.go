@@ -52,23 +52,11 @@ import (
 // PATH UNTOUCHED. Delegation never rewrites r.URL: every route is registered at
 // its full public path, so the route literal IS the contract — one spelling,
 // nothing to translate, nothing to drift.
-// A HOST MAY TAKE AN ADDRESS. Since every route is named there is no wildcard
-// left for a host's own route to shadow, so a host that serves one of these
-// addresses itself has to say so with [Claimed] — see claim.go for why that is a
-// statement of ownership rather than a filter. Without one, nothing changes and
-// the whole table is declared.
-func Use(app *zip.App, opts ...Option) error {
-	c := new(conf)
-	for _, o := range opts {
-		o(c)
-	}
-	// Read by the declaration verbs below, for this call only: Mount is the
-	// composition root, so the set is written once here and every declaration it
-	// makes happens before it returns.
-	mounting = c
-	defer func() { mounting = nil }()
-
-	app.Logger().Info("o11y: mounting routes", "prefix", o11yRoot, "claimed", len(c.claimed))
+// One address, one declaration. Every route is named, so a host that serves one
+// of these addresses itself gets a Build conflict from zip rather than a second
+// handler standing behind the first.
+func Use(app *zip.App) error {
+	app.Logger().Info("o11y: mounting routes", "prefix", o11yRoot)
 
 	// Native probe group, registered ahead of everything else so Fiber's
 	// in-order match serves it off the mux tree (see health.go).
@@ -216,8 +204,10 @@ func mountHatches(app *zip.App) {
 	// /api/<project>/envelope/ suffix to whatever DSN path it is given, so
 	// renaming it would break every SDK in the field. We RECEIVE this shape; we
 	// do not publish it.
-	route(app, http.MethodPost, eventRoot+"/:project/envelope/")       // the endpoint a minted DSN names
-	route(app, http.MethodPost, eventRoot+"/:project/store/")          // the same endpoint, single-event form
-	route(app, http.MethodPost, o11yRoot+"/api/:project_id/envelope/") // the suffix a stock SDK appends
-	route(app, http.MethodPost, o11yRoot+"/api/:project_id/store/")    // the same suffix, single-event form
+	// A declared address never ends in a slash, and fiber matches the SDK's
+	// trailing one against it either way.
+	route(app, http.MethodPost, eventRoot+"/:project/envelope")       // the endpoint a minted DSN names
+	route(app, http.MethodPost, eventRoot+"/:project/store")          // the same endpoint, single-event form
+	route(app, http.MethodPost, o11yRoot+"/api/:project_id/envelope") // the suffix a stock SDK appends
+	route(app, http.MethodPost, o11yRoot+"/api/:project_id/store")    // the same suffix, single-event form
 }
