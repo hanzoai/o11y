@@ -74,7 +74,7 @@ require (
 	github.com/yuin/goldmark v1.7.16
 	github.com/zap-proto/fiber/v3 v3.2.1
 	github.com/zap-proto/zap2pb v0.2.0
-	github.com/zap-proto/zip v1.37.3
+	github.com/zap-proto/zip v1.37.6
 	go.opentelemetry.io/collector/confmap v1.54.0
 	go.opentelemetry.io/collector/otelcol v0.144.0
 	go.opentelemetry.io/collector/pdata v1.54.0
