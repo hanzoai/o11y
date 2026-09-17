@@ -110,7 +110,10 @@ func tenant(c *zip.Ctx) (*tenantSet, bool) {
 }
 
 // Mount registers the native observability routes on the shared cloud App.
-func Use(app *zip.App, deps Deps) error {
+// Use registers the metrics surface on the group it is given. It takes the
+// GROUP rather than the app because registering routes is all it does — it
+// installs no middleware anywhere — so it has no reason to hold the host.
+func Use(app *zip.Group, deps Deps) error {
 	// Fail closed, and fail at BOOT. A nil decision could only default to
 	// something, and every default here is a tenant an unauthenticated caller
 	// gets to name. Refusing to mount is the one outcome that cannot ship a
