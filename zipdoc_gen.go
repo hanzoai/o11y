@@ -4442,7 +4442,7 @@ func init() {
 		Fields: map[string]string{
 			"O11yTraceWaterfallOut.data":   "Data holds the waterfall.",
 			"O11yTraceWaterfallOut.status": "Status is \"success\".",
-			"WaterfallSpan.db_name":        "Calculated fields https://o11y.io/docs/traces-management/guides/derived-fields-spans",
+			"WaterfallSpan.db_name":        "Calculated fields, derived from the span's attributes.",
 		},
 	})
 	zip.Describe("POST /v1/o11y/traces/fields", zip.Doc{

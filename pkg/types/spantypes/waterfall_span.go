@@ -70,7 +70,7 @@ type WaterfallSpan struct {
 	TraceState   string            `json:"trace_state"`
 	References   []OtelSpanRef     `json:"references" required:"true" nullable:"false"`
 
-	// Calculated fields https://o11y.io/docs/traces-management/guides/derived-fields-spans
+	// Calculated fields, derived from the span's attributes.
 	DBName             string `json:"db_name,omitempty"`
 	DBOperation        string `json:"db_operation,omitempty"`
 	ExternalHTTPMethod string `json:"external_http_method,omitempty"`
