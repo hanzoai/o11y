@@ -2579,8 +2579,9 @@ func (aH *APIHandler) logFieldUpdate(w http.ResponseWriter, r *http.Request) {
 // query window, newest first. Reads the configured logs table via the reader
 // (real Datastore rows), replacing the former {"results":[]} stub. Params:
 // limit (default 100, max 1000), timestampStart / timestampEnd (nanosecond
-// epochs; default the last 15 minutes). Honest: a read error surfaces as an
-// error, never a fabricated empty list.
+// epochs; default the last 15 minutes). The read is the caller's tenant only;
+// a request that carries none is 403. A read error surfaces as an error, never
+// a fabricated empty list.
 func (aH *APIHandler) getLogs(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	limit := 100
@@ -2596,6 +2597,10 @@ func (aH *APIHandler) getLogs(w http.ResponseWriter, r *http.Request) {
 		start = v
 	}
 
+	if _, err := authtypes.TenantFromContext(r.Context()); err != nil {
+		RespondError(w, &model.ApiError{Typ: model.ErrorForbidden, Err: err}, nil)
+		return
+	}
 	rows, err := aH.reader.GetRecentLogs(r.Context(), start, end, limit)
 	if err != nil {
 		RespondError(w, &model.ApiError{Typ: model.ErrorInternal, Err: err}, "Failed to fetch logs from the DB")

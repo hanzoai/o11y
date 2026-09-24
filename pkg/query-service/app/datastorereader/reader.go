@@ -23,6 +23,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	"github.com/hanzoai/o11y/pkg/types/featuretypes"
 	"github.com/hanzoai/o11y/pkg/types/instrumentationtypes"
@@ -4184,11 +4185,16 @@ func (r *DatastoreReader) GetTimeSeriesResultV3(ctx context.Context, query strin
 
 // GetListResultV3 runs the query and returns list of rows
 func (r *DatastoreReader) GetListResultV3(ctx context.Context, query string) ([]*v3.Row, error) {
+	return r.listRows(ctx, query)
+}
+
+// listRows runs query with its bound args and scans each row into a v3.Row.
+func (r *DatastoreReader) listRows(ctx context.Context, query string, args ...any) ([]*v3.Row, error) {
 	ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
 		instrumentationtypes.CodeNamespace:    "datastore-reader",
 		instrumentationtypes.CodeFunctionName: "GetListResultV3",
 	})
-	rows, err := r.db.Query(ctx, query)
+	rows, err := r.db.Query(ctx, query, args...)
 	if err != nil {
 		r.logger.Error("error while reading time series result", errorsV2.Attr(err))
 		return nil, errors.New(err.Error())
@@ -5600,15 +5606,17 @@ func (r *DatastoreReader) GetNormalizedStatus(
 	return result, nil
 }
 
-// GetRecentLogs reads the most recent logs in [startNano, endNano], newest first,
-// capped at limit, from the configured logs table (r.logsDB.r.logsTableV2) — the
-// real read behind GET /v1/o11y/logs, replacing the empty
-// {"results":[]} stub. The bounds are int64 nanosecond epochs and limit is an int
-// (never user strings), so the fmt.Sprintf interpolation is injection-safe. It
-// selects the core log columns plus service.name and the k8s namespace/pod/
-// container the OTel collector tags each line with, and reuses the shared
-// GetListResultV3 row scanner (one row-reading path).
+// GetRecentLogs reads the tenant's most recent logs in [startNano, endNano],
+// newest first, capped at limit, from the configured logs table — the read
+// behind GET /v1/o11y/logs. The tenant comes from ctx and is bound as
+// `org = ?`; a ctx without one is refused. The columns are event.log's own:
+// time, service, and the attributes map that carries the k8s resource labels.
+// Rows are scanned by the shared v3 row reader.
 func (r *DatastoreReader) GetRecentLogs(ctx context.Context, startNano, endNano int64, limit int) ([]*v3.Row, error) {
+	tenant, err := authtypes.TenantFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 	if limit <= 0 {
 		limit = 100
 	}
@@ -5621,16 +5629,18 @@ func (r *DatastoreReader) GetRecentLogs(ctx context.Context, startNano, endNano 
 	if startNano <= 0 || startNano >= endNano {
 		startNano = endNano - int64(15*time.Minute)
 	}
-	table := r.logsDB + "." + r.logsTableV2
-	query := fmt.Sprintf(
-		"SELECT timestamp, id, trace_id, span_id, severity_text, severity_number, body, "+
-			"resources_string['service.name'] AS service, "+
-			"resource.`service.name`::String AS service_name, "+
-			"resource.`k8s.namespace.name`::String AS k8s_namespace, "+
-			"resource.`k8s.pod.name`::String AS k8s_pod, "+
-			"resource.`k8s.container.name`::String AS k8s_container "+
-			"FROM %s WHERE timestamp >= %d AND timestamp <= %d "+
-			"ORDER BY timestamp DESC LIMIT %d",
-		table, startNano, endNano, limit)
-	return r.GetListResultV3(ctx, query)
+	return r.listRows(ctx, recentLogsQuery(r.logsDB+"."+r.logsTableV2),
+		tenant, fmt.Sprintf("%d", startNano), fmt.Sprintf("%d", endNano), limit)
+}
+
+// recentLogsQuery is GetRecentLogs' statement over table. time is DateTime64(9),
+// so the nanosecond bounds compare against it directly.
+func recentLogsQuery(table string) string {
+	return "SELECT time AS timestamp, id, trace_id, span_id, severity_text, severity_number, body, " +
+		"service, service AS service_name, " +
+		"attributes['k8s.namespace.name'] AS k8s_namespace, " +
+		"attributes['k8s.pod.name'] AS k8s_pod, " +
+		"attributes['k8s.container.name'] AS k8s_container " +
+		"FROM " + table + " WHERE org = ? AND time >= ? AND time <= ? " +
+		"ORDER BY time DESC LIMIT ?"
 }
