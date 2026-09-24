@@ -50,7 +50,11 @@ func TestJSONBinding_BindBodyErrors(t *testing.T) {
 		{name: "CustomValid", body: `{"a":9}`, opts: nil, obj: new(s), code: errors.CodeInvalidInput, message: "a must be greater than 10", a: []string{}},
 		{name: "CustomInvalidJSON", body: `{"a:9}`, opts: nil, obj: new(s), code: ErrCodeInvalidRequestBody, message: ErrMessageInvalidJSON, a: []string{io.ErrUnexpectedEOF.Error()}},
 		{name: "CustomMismatchedType", body: `{"a":"b"}`, opts: nil, obj: new(s), code: ErrCodeInvalidRequestField, message: ErrMessageInvalidField, a: []string{`value of type 'string' was received for field 'a', try sending 'int' instead?`}},
-		{name: "CustomNestedMismatchedType", body: `{"s":{"a":"b"}}`, opts: nil, obj: new(n), code: ErrCodeInvalidRequestField, message: ErrMessageInvalidField, a: []string{`value of type 'string' was received for field 's.a', try sending 'int' instead?`}},
+		// The field is named from the value whose UnmarshalJSON failed, not from
+		// the root: since Go 1.27, encoding/json no longer prefixes an error a
+		// nested Unmarshaler returns with the path to that value, so s's own
+		// Unmarshal reports 'a' where it once read 's.a'.
+		{name: "CustomNestedMismatchedType", body: `{"s":{"a":"b"}}`, opts: nil, obj: new(n), code: ErrCodeInvalidRequestField, message: ErrMessageInvalidField, a: []string{`value of type 'string' was received for field 'a', try sending 'int' instead?`}},
 	}
 
 	for _, testCase := range testCases {

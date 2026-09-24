@@ -197,13 +197,13 @@ var answers = []answer{
 	{method: http.MethodGet, path: zip.PluginPath, status: 200, ctype: "application/json; charset=utf-8"},
 	{
 		method: http.MethodPost, path: mcpPath, body: `{"jsonrpc":"2.0","id":1,"method":"tools/list"}`,
-		status: 200, ctype: "application/json; charset=utf-8",
+		status: 200, ctype: "application/json",
 	},
 	{
 		method: http.MethodPost, path: mcpPath, body: `{"jsonrpc":"2.0","id":2,"method":"initialize"}`,
-		status: 200, ctype: "application/json; charset=utf-8",
-		bytes: `{"id":2,"jsonrpc":"2.0","result":{"capabilities":{"tools":{"listChanged":false}},` +
-			`"protocolVersion":"2025-06-18","serverInfo":{"name":"o11y","version":""}}}`,
+		status: 200, ctype: "application/json",
+		bytes: `{"jsonrpc":"2.0","id":2,"result":{"capabilities":{"tools":{"listChanged":false}},` +
+			`"protocolVersion":"2026-07-28","serverInfo":{"name":"o11y","version":""}}}`,
 	},
 	// The call plane names the op in the path and answers in ZAP, refusal
 	// included — application/json is the boundary encoding, and this plane is not
@@ -219,22 +219,25 @@ var answers = []answer{
 	// no path cleaning in front of these: a dot segment, a bare "." segment and a
 	// doubled slash are all matched literally and all miss, where an http.ServeMux
 	// would have answered 301 to the cleaned form before matching anything. The
-	// body is JSON, not "404 page not found", and no X-Content-Type-Options rides
-	// with it (see nosniffIsNotOurs).
-	{method: http.MethodPost, path: zip.CallPath, body: `{}`, status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
-	{method: http.MethodGet, path: "/docs/../docs", status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
-	{method: http.MethodGet, path: "//docs", status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
-	{method: http.MethodGet, path: "/./docs", status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
-	{method: http.MethodGet, path: zip.SpecPath + "/extra", status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
-	{method: http.MethodGet, path: "/missing", status: 404, ctype: "application/json; charset=utf-8", bytes: missBody},
+	// body is an RFC 9457 problem document, not "404 page not found", and no
+	// X-Content-Type-Options rides with it (see nosniffIsNotOurs).
+	{method: http.MethodPost, path: zip.CallPath, body: `{}`, status: 404, ctype: problemType, bytes: missBody},
+	{method: http.MethodGet, path: "/docs/../docs", status: 404, ctype: problemType, bytes: missBody},
+	{method: http.MethodGet, path: "//docs", status: 404, ctype: problemType, bytes: missBody},
+	{method: http.MethodGet, path: "/./docs", status: 404, ctype: problemType, bytes: missBody},
+	{method: http.MethodGet, path: zip.SpecPath + "/extra", status: 404, ctype: problemType, bytes: missBody},
+	{method: http.MethodGet, path: "/missing", status: 404, ctype: problemType, bytes: missBody},
 	{
 		method: http.MethodPost, path: zip.DocsPath,
-		status: 405, ctype: "application/json; charset=utf-8", allow: "GET, HEAD",
-		bytes: `{"status":405,"error":"Method Not Allowed"}`,
+		status: 405, ctype: problemType, allow: "GET, HEAD",
+		bytes: `{"detail":"Method Not Allowed","status":405,"title":"Method Not Allowed","type":"about:blank"}`,
 	},
 }
 
-const missBody = `{"status":404,"error":"Not Found"}`
+const (
+	problemType = "application/problem+json"
+	missBody    = `{"detail":"Not Found","status":404,"title":"Not Found","type":"about:blank"}`
+)
 
 // ask puts one probe to a router and returns the whole answer.
 func (a answer) ask(t *testing.T, app *zip.App) (*http.Response, []byte) {

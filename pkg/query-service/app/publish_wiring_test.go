@@ -20,9 +20,10 @@ package app
 //
 //   - it calls publish, or the document, the MCP tool list and the call plane are
 //     all empty in the process that serves them;
-//   - it calls publish BEFORE the console catch-all app.All("/*", …), because
-//     the router matches in registration order and a terminal route registered
-//     first would swallow every published path.
+//   - it calls publish BEFORE the console catch-all — the one route registered
+//     at "/*", app.Raw(zip.MethodAll, "/*", …) — because the router matches in
+//     registration order and a terminal route registered first would swallow
+//     every published path.
 //
 // Constructing a real Server to observe this would need the whole module graph —
 // stores, telemetry, licensing — so the wiring is read from the source, which is
@@ -37,8 +38,14 @@ import (
 	"testing"
 )
 
+// catchAll names a registration at "/*" by its path rather than by the verb that
+// registers it, so the assertion survives the verb changing (app.All became
+// app.Raw(zip.MethodAll, …)) and fails only if the route itself goes.
+const catchAll = `"/*"`
+
 // compositionRoot returns the ordered list of calls createPublicServer makes, as
-// "receiver.Selector" / "function" names.
+// "receiver.Selector" / "function" names, and catchAll for any call registering
+// the "/*" path.
 func compositionRoot(t *testing.T) []string {
 	t.Helper()
 	fset := token.NewFileSet()
@@ -61,6 +68,12 @@ func compositionRoot(t *testing.T) []string {
 					call, ok := n.(*ast.CallExpr)
 					if !ok {
 						return true
+					}
+					for _, arg := range call.Args {
+						if lit, ok := arg.(*ast.BasicLit); ok && lit.Kind == token.STRING && lit.Value == catchAll {
+							calls = append(calls, catchAll)
+							return true
+						}
 					}
 					switch fun := call.Fun.(type) {
 					case *ast.Ident:
@@ -92,7 +105,7 @@ func TestCreatePublicServerPublishesTheSurface(t *testing.T) {
 			if publishAt < 0 {
 				publishAt = i
 			}
-		case "app.All":
+		case catchAll:
 			if catchAllAt < 0 {
 				catchAllAt = i
 			}
@@ -105,7 +118,7 @@ func TestCreatePublicServerPublishesTheSurface(t *testing.T) {
 			"in this package still passes because they all call publish themselves")
 	}
 	if catchAllAt < 0 {
-		t.Fatal("createPublicServer no longer registers the console catch-all app.All(\"/*\", …); " +
+		t.Fatal("createPublicServer no longer registers the console catch-all at \"/*\"; " +
 			"this test's ordering assertion is measuring something that moved")
 	}
 	if publishAt > catchAllAt {
