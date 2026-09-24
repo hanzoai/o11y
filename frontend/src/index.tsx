@@ -15,6 +15,7 @@ import { GlobalTimeStoreAdapter } from 'components/GlobalTimeStoreAdapter/Global
 import { ThemeProvider } from 'hooks/useDarkMode';
 import { NuqsAdapter } from 'nuqs/adapters/react';
 import { AppProvider } from 'providers/App/App';
+import { Gui } from 'providers/Gui';
 import { TenantProvider } from 'providers/Tenant';
 import TimezoneProvider from 'providers/Timezone';
 import store from 'store';
@@ -57,15 +58,17 @@ if (container) {
 			<NuqsAdapter>
 				<TenantProvider>
 					<ThemeProvider>
-						<TimezoneProvider>
-							<QueryClientProvider client={queryClient}>
-								<Provider store={store}>
-									<AppProvider>
-										<AppRoutes />
-									</AppProvider>
-								</Provider>
-							</QueryClientProvider>
-						</TimezoneProvider>
+						<Gui>
+							<TimezoneProvider>
+								<QueryClientProvider client={queryClient}>
+									<Provider store={store}>
+										<AppProvider>
+											<AppRoutes />
+										</AppProvider>
+									</Provider>
+								</QueryClientProvider>
+							</TimezoneProvider>
+						</Gui>
 					</ThemeProvider>
 				</TenantProvider>
 			</NuqsAdapter>
