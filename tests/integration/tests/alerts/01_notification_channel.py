@@ -65,7 +65,7 @@ def test_webhook_notification_channel(
     # Call test API for the notification channel
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     response = requests.post(
-        url=o11y.self.host_configs["8080"].get("/api/v1/testChannel"),
+        url=o11y.self.host_configs["8080"].get("/v1/o11y/testChannel"),
         json={
             "name": notification_channel_name,
             "webhook_configs": [

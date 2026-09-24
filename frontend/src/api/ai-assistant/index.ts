@@ -8,8 +8,8 @@
  * HAND EDIT: every `url` is built from `AI_API_PATH` instead of a hard-coded
  * prefix, so the assistant path is spelled in exactly one place. `orval.config.ts`
  * has no target for this spec, so nothing here regenerates today — if that ever
- * changes, re-apply the substitution rather than letting `/api/v1/assistant`
- * literals back in.
+ * changes, re-apply the substitution rather than letting hard-coded assistant
+ * path literals back in.
  */
 import { useMutation, useQuery } from 'react-query';
 import type {

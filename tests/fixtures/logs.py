@@ -555,7 +555,7 @@ def materialize_log_field(
         field_type: str,
     ) -> None:
         response = requests.post(
-            o11y.self.host_configs["8080"].get("/api/v1/logs/fields"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/logs/fields"),
             headers={"authorization": f"Bearer {token}"},
             json={
                 "name": name,

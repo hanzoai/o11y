@@ -133,7 +133,7 @@ logger = setup_logger(__name__)
 
 def test_version(o11y: types.O11y) -> None:
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/version"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/version"),
         timeout=2,
     )
     logger.info(response)
@@ -163,7 +163,7 @@ logger = setup_logger(__name__)
 def test_user_registration(o11y: types.O11y) -> None:
     """Test user registration functionality."""
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/register"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/register"),
         json={
             "name": "testuser",
             "orgId": "",

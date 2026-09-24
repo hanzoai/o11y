@@ -106,7 +106,7 @@ def test_metrics_fill_no_group_by(
     _maybe_add_functions(query_spec, fill_mode)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -213,7 +213,7 @@ def test_metrics_fill_with_group_by(
     _maybe_add_functions(query_spec, fill_mode)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -316,7 +316,7 @@ def test_metrics_fill_formula(
     _maybe_add_formula_functions(formula_spec, fill_mode)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -487,7 +487,7 @@ def test_metrics_fill_formula_with_group_by(
     _maybe_add_formula_functions(formula_spec, fill_mode)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -640,7 +640,7 @@ def test_non_existent_metrics_returns_404(
     assert get_error_message(response.json()) == "could not find the metric whatevergoennnsgoeshere"
 
 
-# Verify /api/v1/fields/values filters label values by metricNamespace prefix.
+# Verify /v1/o11y/fields/values filters label values by metricNamespace prefix.
 # Inserts metrics under ns.a and ns.b, then asserts a specific prefix returns
 # only matching values while a common prefix returns both.
 def test_metric_namespace_values_filtering(
@@ -671,7 +671,7 @@ def test_metric_namespace_values_filtering(
 
     # Specific prefix: metricNamespace=ns.a should return only svc-a
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -691,7 +691,7 @@ def test_metric_namespace_values_filtering(
 
     # Common prefix: metricNamespace=ns should return both
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -710,7 +710,7 @@ def test_metric_namespace_values_filtering(
     assert "svc-b" in values
 
 
-# Verify /api/v1/fields/values with name=metric_name filters metric names by
+# Verify /v1/o11y/fields/values with name=metric_name filters metric names by
 # metricNamespace prefix. A specific prefix returns only its metric names;
 # a common prefix returns metric names from all matching namespaces.
 def test_metric_namespace_metric_name_values_filtering(
@@ -741,7 +741,7 @@ def test_metric_namespace_metric_name_values_filtering(
 
     # Specific prefix: metricNamespace=ns.a should return only ns.a.* metric names
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -761,7 +761,7 @@ def test_metric_namespace_metric_name_values_filtering(
 
     # Common prefix: metricNamespace=ns should return both
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -780,7 +780,7 @@ def test_metric_namespace_metric_name_values_filtering(
     assert "ns.b.cpu.utilization" in values
 
 
-# Verify /api/v1/fields/keys filters attribute keys by metricNamespace prefix.
+# Verify /v1/o11y/fields/keys filters attribute keys by metricNamespace prefix.
 # Metrics under ns.a and ns.b carry distinct labels; a specific prefix returns
 # only its keys while a common prefix returns keys from both namespaces.
 def test_metric_namespace_keys_filtering(
@@ -811,7 +811,7 @@ def test_metric_namespace_keys_filtering(
 
     # Specific prefix: metricNamespace=ns.a should return only a_only_label
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/keys"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/keys"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -830,7 +830,7 @@ def test_metric_namespace_keys_filtering(
 
     # Common prefix: metricNamespace=ns should return both keys
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/keys"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/keys"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={

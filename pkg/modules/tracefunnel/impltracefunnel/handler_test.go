@@ -61,7 +61,7 @@ func TestHandler_List(t *testing.T) {
 	mockModule := new(MockModule)
 	handler := NewHandler(mockModule)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/trace-funnels/list", nil)
+	req := httptest.NewRequest(http.MethodGet, "/v1/o11y/trace-funnels/list", nil)
 
 	orgID := valuer.GenerateUUID()
 	claims := authtypes.Claims{

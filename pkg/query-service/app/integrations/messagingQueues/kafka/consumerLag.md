@@ -5,7 +5,7 @@
 API endpoint:
 
 ```
-POST /api/v1/messaging-queues/kafka/consumer-lag/consumer-details
+POST /v1/o11y/messaging-queues/kafka/consumer-lag/consumer-details
 ```
 
 Request-Body
@@ -82,7 +82,7 @@ Response in query range `table` format
 API endpoint:
 
 ```
-POST /api/v1/messaging-queues/kafka/consumer-lag/producer-details
+POST /v1/o11y/messaging-queues/kafka/consumer-lag/producer-details
 ```
 
 Request-Body
@@ -150,7 +150,7 @@ Response in query range `table` format
 API endpoint:
 
 ```
-POST /api/v1/messaging-queues/kafka/consumer-lag/network-latency
+POST /v1/o11y/messaging-queues/kafka/consumer-lag/network-latency
 ```
 
 Request-Body
@@ -231,7 +231,7 @@ Response in query range `table` format
 ### Onboarding APIs
 
 ```
-/api/v1/messaging-queues/kafka/onboarding/producers
+/v1/o11y/messaging-queues/kafka/onboarding/producers
 ```
 
 ```json
@@ -321,7 +321,7 @@ Response in query range `table` format
 
 
 ```
-/api/v1/messaging-queues/kafka/onboarding/consumers
+/v1/o11y/messaging-queues/kafka/onboarding/consumers
 ```
 
 ```json
@@ -453,7 +453,7 @@ Response in query range `table` format
 ```
 
 ```
-/api/v1/messaging-queues/kafka/onboarding/kafka
+/v1/o11y/messaging-queues/kafka/onboarding/kafka
 ```
 
 ```json
@@ -523,7 +523,7 @@ Response in query range `table` format
 ### Partition Latency
 
 ```json
-/api/v1/messaging-queues/kafka/partition-latency/overview
+/v1/o11y/messaging-queues/kafka/partition-latency/overview
 ```
 ```json
 {
@@ -589,7 +589,7 @@ Response in query range `table` format
 ---------
 
 ```json
-/api/v1/messaging-queues/kafka/partition-latency/consumer
+/v1/o11y/messaging-queues/kafka/partition-latency/consumer
 ```
 ```json
 {
@@ -658,7 +658,7 @@ Response in query range `table` format
 ### Topic throughput
 
 ```json
-/api/v1/messaging-queues/kafka/topic-throughput/producer
+/v1/o11y/messaging-queues/kafka/topic-throughput/producer
 ```
 ```json
 {
@@ -767,7 +767,7 @@ Response in query range `table` format
 ### Topic throughput
 
 ```json
-/api/v1/messaging-queues/kafka/topic-throughput/producer-details
+/v1/o11y/messaging-queues/kafka/topic-throughput/producer-details
 ```
 ```json
 {
@@ -830,7 +830,7 @@ Response in query range `table` format
 ### Topic throughput
 
 ```json
-/api/v1/messaging-queues/kafka/topic-throughput/consumer
+/v1/o11y/messaging-queues/kafka/topic-throughput/consumer
 ```
 ```json
 {
@@ -920,7 +920,7 @@ Response in query range `table` format
 ### Topic throughput
 
 ```json
-/api/v1/messaging-queues/kafka/topic-throughput/consumer-details
+/v1/o11y/messaging-queues/kafka/topic-throughput/consumer-details
 ```
 ```json
 {

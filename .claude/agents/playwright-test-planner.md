@@ -87,7 +87,7 @@ The dashboards list page (`/dashboard`) lists all dashboards in the workspace. F
 - All Dashboards section header rendered.
 - Search input, sort button, and at least one dashboard thumbnail visible.
 
-**Cleanup:** delete the seeded dashboard via `DELETE /api/v1/dashboards/<id>`.
+**Cleanup:** delete the seeded dashboard via `DELETE /v1/o11y/dashboards/<id>`.
 
 #### TC-02 ...
 </example-spec>

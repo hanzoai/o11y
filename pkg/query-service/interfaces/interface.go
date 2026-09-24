@@ -64,7 +64,7 @@ type Reader interface {
 	GetListResultV3(ctx context.Context, query string) ([]*v3.Row, error)
 	// GetRecentLogs reads the most recent logs in [startNano, endNano] (nanosecond
 	// epochs), newest first, capped at limit, from the configured logs table — the
-	// real read behind the classic GET /api/v1/logs endpoint (un-stubbed).
+	// real read behind GET /v1/o11y/logs.
 	GetRecentLogs(ctx context.Context, startNano, endNano int64, limit int) ([]*v3.Row, error)
 	// Logs
 	GetLogFields(ctx context.Context) (*model.GetFieldsResponse, *model.ApiError)

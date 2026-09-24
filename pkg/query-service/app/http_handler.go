@@ -2575,7 +2575,7 @@ func (aH *APIHandler) logFieldUpdate(w http.ResponseWriter, r *http.Request) {
 	aH.WriteJSON(w, r, field)
 }
 
-// getLogs serves the classic GET /api/v1/logs — the most recent logs over the
+// getLogs serves GET /v1/o11y/logs — the most recent logs over the
 // query window, newest first. Reads the configured logs table via the reader
 // (real Datastore rows), replacing the former {"results":[]} stub. Params:
 // limit (default 100, max 1000), timestampStart / timestampEnd (nanosecond

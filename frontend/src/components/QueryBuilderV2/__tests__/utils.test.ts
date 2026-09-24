@@ -119,7 +119,7 @@ describe('convertFiltersToExpression', () => {
 					id: '3',
 					key: { key: 'path', type: 'string' },
 					op: '=',
-					value: '/api/v1/users',
+					value: '/v1/users',
 				},
 			],
 			op: 'AND',
@@ -128,7 +128,7 @@ describe('convertFiltersToExpression', () => {
 		const result = convertFiltersToExpression(filters);
 		expect(result).toStrictEqual({
 			expression:
-				"message = 'user\\'s data' AND description = '' AND path = '/api/v1/users'",
+				"message = 'user\\'s data' AND description = '' AND path = '/v1/users'",
 		});
 	});
 
@@ -451,7 +451,7 @@ describe('convertFiltersToExpression', () => {
 					id: '5',
 					key: { key: 'path', type: 'string' },
 					op: '=',
-					value: '/api/v1/users/123?filter=true',
+					value: '/v1/users/123?filter=true',
 				},
 			],
 			op: 'AND',
@@ -460,7 +460,7 @@ describe('convertFiltersToExpression', () => {
 		const result = convertFiltersToExpression(filters);
 		expect(result).toStrictEqual({
 			expression:
-				"is_active = true AND is_deleted = false AND email = 'user@example.com' AND description = 'Contains \"quotes\" and \\'apostrophes\\'' AND path = '/api/v1/users/123?filter=true'",
+				"is_active = true AND is_deleted = false AND email = 'user@example.com' AND description = 'Contains \"quotes\" and \\'apostrophes\\'' AND path = '/v1/users/123?filter=true'",
 		});
 	});
 
@@ -1454,7 +1454,7 @@ describe('formatValueForExpression', () => {
 		});
 
 		it('should handle strings with special characters', () => {
-			expect(formatValueForExpression('/api/v1/users')).toBe("'/api/v1/users'");
+			expect(formatValueForExpression('/v1/users')).toBe("'/v1/users'");
 			expect(formatValueForExpression('user@example.com')).toBe(
 				"'user@example.com'",
 			);

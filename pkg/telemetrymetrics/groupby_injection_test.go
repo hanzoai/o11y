@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// A group-by key name is caller text: it arrives as JSON on /api/v5/query_range
+// A group-by key name is caller text: it arrives as JSON on /v1/o11y/query_range
 // and is replayed out of stored dashboards and alert rules — the rule evaluator
 // builds a QueryRangeRequest and calls the querier directly, so a name on that
 // path never meets the request validator at all.

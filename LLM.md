@@ -51,18 +51,21 @@ public `/v1/o11y/...` paths. Cloud's `describe.go` reads that registry from a re
 mount and weaves the result into the one published document. Change a struct and
 the document follows; there is nothing to keep in sync.
 
-There was a second emitter and it is **deleted**: `cmd/openapi.go` ran a swaggest
-reflector over the runtime's gorilla/mux tree and wrote a committed 629 KB
-`docs/api/openapi.yml` — 120 paths, 174 ops, spelled `/api/v1` ×59, `/api/v2` ×57,
-`/api/v3`, `/api/v4`, `/api/v5` ×2, and **zero** `/v1/o11y`. It described the
-fork's internal tree behind the delegation wildcard's `/v1/o11y/* -> /api/*`
-rewrite, so it documented a surface no customer can address, in a shape that
-breaks two house rules on its face. No CI regenerated or verified it, so it could
-only drift. Gone with it: `pkg/o11y/openapi.go` (the reflector — unreachable once
-the command went) and `registerGenerateOpenAPI` from `cmd/generate.go`.
+There is no second emitter. A reflector over the runtime's router tree once wrote
+a committed `docs/api/openapi.yml` describing an internal versioned tree no customer
+could address; it is deleted with `pkg/o11y/openapi.go` and
+`registerGenerateOpenAPI`. Do not add one back.
 
 **If a route is not in the typed registry it is in no document.** That is the only
 place to fix it; do not add a second writer.
+
+## No `/api/`
+
+Every route is `/v1/o11y/…`; the host already says api. `apiprefix_test.go`
+fails on a registered route outside `/v1/` and on any `/api/v<N>` spelling in
+the tree, so an upstream re-sync cannot bring the old namespace back. The one
+`/api/` segment served is the Sentry SDK's envelope suffix under
+`/v1/o11y/api/<project>/`, which a stock SDK appends to its DSN.
 
 ## The console (`pkg/web`) is router-agnostic
 
@@ -361,7 +364,7 @@ user authorized for their own org. Cross-org is denied by org scoping
 
 **The setup gate is gone.** `NewAPIHandler` (`pkg/query-service/app/http_handler.go`)
 now sets `SetupCompleted = true` unconditionally — no org/user counting, no root
-gate. So `/api/v1/register` is inert ("self-registration is disabled") and the SPA
+gate. There is no register route, and the SPA
 never shows an onboarding wizard. Native login/session/invite endpoints remain
 compiled but are dead: no native users are ever created, so nothing can log in
 through them. `apikeyidentn` (service-account API keys, `O11Y-API-KEY`) stays for

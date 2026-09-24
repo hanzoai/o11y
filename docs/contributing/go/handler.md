@@ -24,7 +24,7 @@ Each route wraps a module handler method with the following:
 For example, in `pkg/apiserver/o11yapiserver`:
 
 ```go
-if err := router.Handle("/api/v1/invite", handler.New(
+if err := router.Handle("/v1/o11y/invite", handler.New(
     provider.authZ.AdminAccess(provider.userHandler.CreateInvite),
     handler.OpenAPIDef{
         ID:                  "CreateInvite",
@@ -114,7 +114,7 @@ func (h *handler) CreateThing(rw http.ResponseWriter, req *http.Request) {
 In `pkg/apiserver/o11yapiserver`, add a route in the appropriate `add*Routes` function (`addUserRoutes`, `addSessionRoutes`, `addOrgRoutes`, etc.). The pattern is:
 
 ```go
-if err := router.Handle("/api/v1/things", handler.New(
+if err := router.Handle("/v1/o11y/things", handler.New(
     provider.authZ.AdminAccess(provider.thingHandler.CreateThing),
     handler.OpenAPIDef{
         ID:                  "CreateThing",
@@ -193,10 +193,10 @@ type OpenAPIExample struct {
 }
 ```
 
-For reference, see `pkg/apiserver/o11yapiserver/querier.go` which defines examples inline for the `/api/v5/query_range` endpoint:
+For reference, see `pkg/apiserver/o11yapiserver/querier.go` which defines examples inline for the `/v1/o11y/query_range` endpoint:
 
 ```go
-if err := router.Handle("/api/v5/query_range", handler.New(provider.authZ.ViewAccess(provider.querierHandler.QueryRange), handler.OpenAPIDef{
+if err := router.Handle("/v1/o11y/query_range", handler.New(provider.authZ.ViewAccess(provider.querierHandler.QueryRange), handler.OpenAPIDef{
     ID:                 "QueryRangeV5",
     Tags:               []string{"querier"},
     Summary:            "Query range",

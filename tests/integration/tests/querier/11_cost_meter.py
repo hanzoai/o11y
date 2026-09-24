@@ -88,7 +88,7 @@ def test_list_meter_metric_names(
     token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/metrics"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/metrics"),
         params={
             "start": start_ms,
             "end": end_ms,
@@ -108,7 +108,7 @@ def test_list_meter_metric_names(
     assert metric_name in metric_names, f"Expected {metric_name} in metric names, got: {metric_names}"
 
 
-# Verify /api/v1/fields/values with source=meter filters label values by metricNamespace
+# Verify /v1/o11y/fields/values with source=meter filters label values by metricNamespace
 # prefix. Inserts meter-source metrics under ns.a and ns.b, then asserts a specific
 # prefix returns only matching values while a common prefix returns both.
 def test_metric_namespace_meter_values_filtering(
@@ -145,7 +145,7 @@ def test_metric_namespace_meter_values_filtering(
 
     # Specific prefix: metricNamespace=meter.ns.a should return only billing-a
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={
@@ -166,7 +166,7 @@ def test_metric_namespace_meter_values_filtering(
 
     # Common prefix: metricNamespace=meter.ns should return both
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         params={

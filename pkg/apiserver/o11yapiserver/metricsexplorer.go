@@ -161,8 +161,7 @@ func (provider *provider) addMetricsExplorerRoutes(router routing.Router) {
 			SecuritySchemes:     newSecuritySchemes(types.RoleViewer),
 		}))
 
-	// GetMetricDashboards (formerly /api/v2/metrics/dashboards) is superseded by
-	// GetMetricDashboardsV2 below (formerly /api/v3) — highest version wins.
+	// GetMetricDashboardsV2 is the one handler for /v1/o11y/metrics/dashboards.
 	router.Get("/v1/o11y/metrics/dashboards", handler.New(
 		provider.authzMiddleware.ViewAccess(provider.metricsExplorerHandler.GetMetricDashboardsV2),
 		handler.OpenAPIDef{

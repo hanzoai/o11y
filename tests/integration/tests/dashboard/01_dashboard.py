@@ -16,7 +16,7 @@ def test_create_and_delete_dashboard_without_license(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/dashboards"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/dashboards"),
         json={"title": "Sample Title", "uploadedGrafana": False, "version": "v5"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -28,7 +28,7 @@ def test_create_and_delete_dashboard_without_license(
     dashboard_id = data["id"]
 
     response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/dashboards/{dashboard_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -56,7 +56,7 @@ def test_create_and_delete_dashboard_with_license(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/dashboards"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/dashboards"),
         json={"title": "Sample Title", "uploadedGrafana": False, "version": "v5"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -68,7 +68,7 @@ def test_create_and_delete_dashboard_with_license(
     dashboard_id = data["id"]
 
     response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/dashboards/{dashboard_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )

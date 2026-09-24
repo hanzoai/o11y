@@ -94,7 +94,7 @@ def test_logs_list(
 
     # Query Logs for the last 10 seconds and check if the logs are returned in the correct order
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -176,7 +176,7 @@ def test_logs_list(
 
     # Query values of severity_text attribute from the autocomplete API
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/autocomplete/attribute_values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -202,7 +202,7 @@ def test_logs_list(
 
     # Query values of severity_text attribute from the fields API
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -224,7 +224,7 @@ def test_logs_list(
 
     # Query values of code.file attribute from the autocomplete API
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/autocomplete/attribute_values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -250,7 +250,7 @@ def test_logs_list(
 
     # Query values of code.file attribute from the fields API
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -272,7 +272,7 @@ def test_logs_list(
 
     # Query values of code.line attribute from the autocomplete API
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/autocomplete/attribute_values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -297,7 +297,7 @@ def test_logs_list(
 
     # Query values of code.line attribute from the fields API
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -318,7 +318,7 @@ def test_logs_list(
 
     # Query keys from the fields API with context specified in the key
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/keys"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/keys"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -338,7 +338,7 @@ def test_logs_list(
 
     # Do not treat `metric.` as a context prefix for logs
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/keys"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/keys"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -357,7 +357,7 @@ def test_logs_list(
 
     # Query values of service.name resource attribute using context-prefixed key
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -378,7 +378,7 @@ def test_logs_list(
 
     # Query values of metric.domain_id (string attribute) and ensure context collision doesn't break it
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -607,7 +607,7 @@ def test_logs_time_series_count(
 
     # count() of all logs for the last 5 minutes
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -674,7 +674,7 @@ def test_logs_time_series_count(
 
     # count() of all logs where code.line = 7 for last 5 minutes
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -742,7 +742,7 @@ def test_logs_time_series_count(
 
     # count() of all logs where service.name = "erlang" OR cloud.account.id = "000" for last 5 minutes
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -803,7 +803,7 @@ def test_logs_time_series_count(
 
     # count() of all logs grouped by host.name for the last 5 minutes
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1035,7 +1035,7 @@ def test_datatype_collision(
 
     # count() of all logs for the where severity_number > '7'
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1076,7 +1076,7 @@ def test_datatype_collision(
 
     # count() of all logs for the where severity_number > '7.0'
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1117,7 +1117,7 @@ def test_datatype_collision(
 
     # Test 2: severity_number comparison with string value
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1159,7 +1159,7 @@ def test_datatype_collision(
 
     # Test 3: http.status_code with numeric value (query contains number, actual value is string "200")
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1201,7 +1201,7 @@ def test_datatype_collision(
 
     # Test 4: http.status_code with string value (query contains string, actual value is numeric 404)
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1243,7 +1243,7 @@ def test_datatype_collision(
 
     # Test 5: Edge case - empty string comparison
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1318,7 +1318,7 @@ def test_logs_fill_gaps(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1404,7 +1404,7 @@ def test_logs_fill_gaps_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1505,7 +1505,7 @@ def test_logs_fill_gaps_formula(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1612,7 +1612,7 @@ def test_logs_fill_gaps_formula_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1733,7 +1733,7 @@ def test_logs_fill_zero(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1816,7 +1816,7 @@ def test_logs_fill_zero_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1916,7 +1916,7 @@ def test_logs_fill_zero_formula(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -2024,7 +2024,7 @@ def test_logs_fill_zero_formula_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={

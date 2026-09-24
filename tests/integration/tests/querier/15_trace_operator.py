@@ -1,6 +1,6 @@
 """
 Integration tests for TraceOperatorQuery (builder_trace_operator) through the
-/api/v5/query_range endpoint.
+/v1/o11y/query_range endpoint.
 
 Covers:
 1. Order-by variants (A -> B, A => B) with returnSpansFrom="A".
@@ -417,7 +417,7 @@ def test_trace_operator(
         spec["order"] = case["order"]
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={

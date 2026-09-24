@@ -25,7 +25,7 @@ func (aH *APIHandler) mountMisc(router routing.Router, am *middleware.AuthZ) {
 	router.Get("/v1/o11y/query", am.ViewAccess(aH.queryMetrics))
 
 	// dashboards + dashboards/{id} + dashboards/{id}/lock are served by
-	// o11yapiserver/dashboard.go (formerly /api/v2/dashboards). Highest version wins.
+	// o11yapiserver/dashboard.go.
 	router.Post("/v1/o11y/variables/query", am.ViewAccess(aH.queryDashboardVarsV2))
 
 	router.Post("/v1/o11y/event", am.ViewAccess(aH.registerEvent))
@@ -34,7 +34,7 @@ func (aH *APIHandler) mountMisc(router routing.Router, am *middleware.AuthZ) {
 	router.Post("/v1/o11y/dependency_graph", am.ViewAccess(aH.dependencyGraph))
 
 	router.Get("/v1/o11y/version", am.OpenAccess(aH.getVersion))
-	// features is served by o11yapiserver/flagger.go (formerly /api/v2/features).
+	// features is served by o11yapiserver/flagger.go.
 	router.Get("/v1/o11y/health", am.OpenAccess(aH.getHealth))
 
 	router.Get("/v1/o11y/disks", am.ViewAccess(aH.getDisks))

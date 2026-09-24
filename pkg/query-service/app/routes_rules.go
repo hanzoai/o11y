@@ -8,9 +8,7 @@ import (
 // mountRules registers alert-rule evaluation and rule state history. 5 routes.
 //
 // rules + rules/{id} (GET/POST/PUT/DELETE/PATCH) are NOT here: they are served
-// by o11yapiserver/ruler.go (formerly /api/v2/rules). Highest version wins —
-// the same handler the version-less /v1/o11y contract already resolved to
-// before the flatten.
+// by o11yapiserver/ruler.go, the one handler /v1/o11y/rules resolves to.
 // ALL of these routes are ALSO declared as typed ops at the module's mount seam
 // (rulesalerts.go in the repo root) — the v1 history reads and the legacy
 // /testRule — which is what carries them into the composed document, the SDK,

@@ -29,7 +29,7 @@ def test_user_invite_accept_role_grant(
         "role": "EDITOR",
     }
     invite_response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/invite"),
         json=invite_payload,
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -39,7 +39,7 @@ def test_user_invite_accept_role_grant(
     reset_token = invited_user["token"]
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/resetPassword"),
         json={"password": USER_EDITOR_PASSWORD, "token": reset_token},
         timeout=2,
     )
@@ -48,7 +48,7 @@ def test_user_invite_accept_role_grant(
     # Login with editor email and password
     editor_token = get_token(USER_EDITOR_EMAIL, USER_EDITOR_PASSWORD)
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/users/me"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/users/me"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=5,
     )
@@ -58,14 +58,14 @@ def test_user_invite_accept_role_grant(
 
     # check the forbidden response for admin api for editor user
     admin_roles_response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/roles"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=2,
     )
     assert admin_roles_response.status_code == HTTPStatus.FORBIDDEN
 
     roles_response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -104,7 +104,7 @@ def test_user_update_role_grant(
     # Get the editor user's id
     editor_token = get_token(USER_EDITOR_EMAIL, USER_EDITOR_PASSWORD)
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/users/me"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/users/me"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=5,
     )
@@ -115,7 +115,7 @@ def test_user_update_role_grant(
     # Get the role id for viewer
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     roles_response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -171,7 +171,7 @@ def test_user_delete_role_revoke(
     # login with editor to get the user_id and check if user exists
     editor_token = get_token(USER_EDITOR_EMAIL, USER_EDITOR_PASSWORD)
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/users/me"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/users/me"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=5,
     )
@@ -182,7 +182,7 @@ def test_user_delete_role_revoke(
     # delete the editor user
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     delete_response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v1/user/{editor_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/user/{editor_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -190,7 +190,7 @@ def test_user_delete_role_revoke(
 
     # get the role id from roles list
     roles_response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )

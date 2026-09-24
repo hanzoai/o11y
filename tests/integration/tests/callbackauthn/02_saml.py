@@ -41,7 +41,7 @@ def test_create_auth_domain(
     get_token: Callable[[str, str], str],
 ) -> None:
     # Create a saml client in the idp.
-    create_saml_client("saml.integration.test", "/api/v1/complete/saml")
+    create_saml_client("saml.integration.test", "/v1/o11y/complete/saml")
 
     # Get the saml settings from keycloak.
     settings = get_saml_settings()
@@ -50,7 +50,7 @@ def test_create_auth_domain(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "name": "saml.integration.test",
             "config": {
@@ -71,7 +71,7 @@ def test_create_auth_domain(
 
     # Get the domains from o11y
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -174,7 +174,7 @@ def test_saml_update_domain_with_group_mappings(
 
     # update the existing saml domain to have role mappings also
     response = requests.put(
-        o11y.self.host_configs["8080"].get(f"/api/v1/domains/{domain['id']}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/domains/{domain['id']}"),
         json={
             "config": {
                 "ssoEnabled": True,
@@ -338,7 +338,7 @@ def test_saml_update_domain_with_use_role_claim(
     settings = get_saml_settings()
 
     response = requests.put(
-        o11y.self.host_configs["8080"].get(f"/api/v1/domains/{domain['id']}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/domains/{domain['id']}"),
         json={
             "config": {
                 "ssoEnabled": True,
@@ -520,7 +520,7 @@ def test_saml_sso_login_activates_pending_invite_user(
 
     # Invite user as ADMIN
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/invite"),
         json={"email": email, "role": "ADMIN", "name": "SAML SSO Pending User"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -559,7 +559,7 @@ def test_saml_sso_deleted_user_gets_new_user_on_login(
 
     # --- Step 1: Invite and activate via password reset ---
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/invite"),
         json={"email": email, "role": "EDITOR", "name": "SAML SSO Lifecycle User"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -569,7 +569,7 @@ def test_saml_sso_deleted_user_gets_new_user_on_login(
     reset_token = response.json()["data"]["token"]
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/resetPassword"),
         json={"password": "password123Z$", "token": reset_token},
         timeout=2,
     )
@@ -577,7 +577,7 @@ def test_saml_sso_deleted_user_gets_new_user_on_login(
 
     # --- Step 2: Soft delete via DB using API
     response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v1/user/{user_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/user/{user_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -600,7 +600,7 @@ def test_saml_sso_deleted_user_gets_new_user_on_login(
 
     # Verify a NEW active user was auto-provisioned via SSO
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/users"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/users"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
     )
@@ -614,7 +614,7 @@ def test_saml_sso_deleted_user_gets_new_user_on_login(
     assert new_user["status"] == "active"
     # Fetch full user with roles to check the assigned role
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v2/users/{new_user['id']}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/users/{new_user['id']}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
     )

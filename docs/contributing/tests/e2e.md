@@ -120,7 +120,7 @@ Each spec follows these principles:
     const token = await page.evaluate(
       () => (globalThis as any).localStorage.getItem('AUTH_TOKEN') || '',
     );
-    await page.request.post('/api/v1/dashboards', {
+    await page.request.post('/v1/o11y/dashboards', {
       data: { title: 'my-name', uploadedGrafana: false },
       headers: { Authorization: `Bearer ${token}` },
     });

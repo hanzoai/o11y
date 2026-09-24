@@ -182,7 +182,7 @@ def make_query_request(
         payload["variables"] = variables
 
     return requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=timeout,
         headers={"authorization": f"Bearer {token}"},
         json=payload,

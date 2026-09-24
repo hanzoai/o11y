@@ -3,7 +3,7 @@ package querybuilder
 import "strings"
 
 // A telemetry field key NAME is caller text. It arrives as JSON on
-// /api/v5/query_range, and it is replayed out of stored dashboards and alert
+// /v1/o11y/query_range, and it is replayed out of stored dashboards and alert
 // rules — the rule evaluator builds a QueryRangeRequest and calls the querier
 // directly, so a name on that path never passes the request validator at all.
 //

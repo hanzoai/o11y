@@ -23,7 +23,7 @@ describe('MyComponent', () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 });
 
     server.use(
-      rest.get('*/api/v1/example', (_req, res, ctx) => res(ctx.status(200), ctx.json({ value: 42 })))
+      rest.get('*/v1/o11y/example', (_req, res, ctx) => res(ctx.status(200), ctx.json({ value: 42 })))
     );
 
     render(<MyComponent />, undefined, { initialRoute: '/foo' });
@@ -52,10 +52,10 @@ Repo-specific reasons:
 MSW overrides per test:
 ```ts
 server.use(
-  rest.get(`${ENVIRONMENT.baseURL}/api/v1/orgs/me/filters/logs`, (_req, res, ctx) =>
+  rest.get(`${ENVIRONMENT.baseURL}/v1/o11y/orgs/me/filters/logs`, (_req, res, ctx) =>
     res(ctx.status(200), ctx.json(quickFiltersListResponse)),
   ),
-  rest.put(`${ENVIRONMENT.baseURL}/api/v1/orgs/me/filters`, async (req, res, ctx) => {
+  rest.put(`${ENVIRONMENT.baseURL}/v1/o11y/orgs/me/filters`, async (req, res, ctx) => {
     // capture payload if needed
     return res(ctx.status(200), ctx.json({}));
   }),

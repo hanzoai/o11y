@@ -16,7 +16,7 @@ def test_create_and_get_domain(
 
     # Get domains which should be an empty list
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -28,7 +28,7 @@ def test_create_and_get_domain(
 
     # Create a domain with google auth config
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "name": "domain-google.integration.test",
             "config": {
@@ -49,7 +49,7 @@ def test_create_and_get_domain(
 
     # Create a domain with saml config
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "name": "domain-saml.integration.test",
             "config": {
@@ -70,7 +70,7 @@ def test_create_and_get_domain(
 
     # List the domains
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -98,7 +98,7 @@ def test_create_invalid(
 
     # Create a domain with type saml and body for oidc, this should fail because oidcConfig is not allowed for saml
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "name": "domain.integration.test",
             "config": {
@@ -119,7 +119,7 @@ def test_create_invalid(
 
     # Create a domain with invalid name
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "name": "$%^invalid",
             "config": {
@@ -140,7 +140,7 @@ def test_create_invalid(
 
     # Create a domain with no name
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "config": {
                 "ssoEnabled": True,
@@ -160,7 +160,7 @@ def test_create_invalid(
 
     # Create a domain with no config
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "name": "domain.integration.test",
         },
@@ -181,7 +181,7 @@ def test_create_invalid_role_mapping(
 
     # Create domain with invalid defaultRole
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "name": "invalid-role-test.integration.test",
             "config": {
@@ -205,7 +205,7 @@ def test_create_invalid_role_mapping(
 
     # Create domain with invalid role in groupMappings
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "name": "invalid-group-role.integration.test",
             "config": {
@@ -232,7 +232,7 @@ def test_create_invalid_role_mapping(
 
     # Valid role mapping should succeed
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "name": "valid-role-mapping.integration.test",
             "config": {

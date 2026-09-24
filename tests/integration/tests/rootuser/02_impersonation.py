@@ -11,11 +11,11 @@ logger = setup_logger(__name__)
 
 def test_global_config_returns_impersonation_enabled(o11y: types.O11y) -> None:
     """
-    GET /api/v1/global/config without any auth header should return 200
+    GET /v1/o11y/global/config without any auth header should return 200
     and report impersonation as enabled.
     """
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/global/config"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/global/config"),
         timeout=2,
     )
 
@@ -33,7 +33,7 @@ def test_impersonated_user_is_admin(o11y: types.O11y) -> None:
     Listing users is an admin-only endpoint.
     """
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/users"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/users"),
         timeout=2,
     )
 
@@ -50,7 +50,7 @@ def test_impersonated_user_is_admin(o11y: types.O11y) -> None:
 
     # Verify root user has admin role via v2 detail endpoint
     root_detail = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v2/users/{root_user['id']}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/users/{root_user['id']}"),
         timeout=2,
     )
     assert root_detail.status_code == HTTPStatus.OK

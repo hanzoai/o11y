@@ -107,7 +107,7 @@ func TestParseAggregateAttrReques(t *testing.T) {
 	}
 
 	for _, reqCase := range reqCases {
-		r := httptest.NewRequest("GET", "/api/v3/autocomplete/aggregate_attributes?"+reqCase.queryString, nil)
+		r := httptest.NewRequest("GET", "/v1/o11y/autocomplete/aggregate_attributes?"+reqCase.queryString, nil)
 		aggregateAttrRequest, err := parseAggregateAttributeRequest(r)
 		if reqCase.expectErr {
 			if err == nil {
@@ -231,7 +231,7 @@ func TestParseFilterAttributeKeyRequest(t *testing.T) {
 	}
 
 	for _, reqCase := range reqCases {
-		r := httptest.NewRequest("GET", "/api/v3/autocomplete/filter_attributes?"+reqCase.queryString, nil)
+		r := httptest.NewRequest("GET", "/v1/o11y/autocomplete/filter_attributes?"+reqCase.queryString, nil)
 		filterAttrRequest, err := parseFilterAttributeKeyRequest(r)
 		if reqCase.expectErr {
 			if err == nil {
@@ -328,7 +328,7 @@ func TestParseFilterAttributeValueRequest(t *testing.T) {
 	}
 
 	for _, reqCase := range reqCases {
-		r := httptest.NewRequest("GET", "/api/v3/autocomplete/filter_attribute_values?"+reqCase.queryString, nil)
+		r := httptest.NewRequest("GET", "/v1/o11y/autocomplete/filter_attribute_values?"+reqCase.queryString, nil)
 		filterAttrRequest, err := parseFilterAttributeValueRequest(r)
 		if reqCase.expectErr {
 			if err == nil {
@@ -624,7 +624,7 @@ func TestParseQueryRangeParamsCompositeQuery(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/api/v3/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/query_range", body)
 
 			params, apiErr := ParseQueryRangeParams(req)
 			if tc.expectErr {
@@ -725,7 +725,7 @@ func TestParseQueryRangeParamsExpressions(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/api/v3/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/query_range", body)
 
 			_, apiErr := ParseQueryRangeParams(req)
 			if tc.expectErr {
@@ -961,7 +961,7 @@ func TestParseQueryRangeParamsDashboardVarsSubstitution(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/api/v3/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/query_range", body)
 
 			parsedQueryRangeParams, apiErr := ParseQueryRangeParams(req)
 			if tc.expectErr {
@@ -1133,7 +1133,7 @@ func TestParseQueryRangeParamsPromQLVars(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/api/v3/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/query_range", body)
 
 			parsedQueryRangeParams, apiErr := ParseQueryRangeParams(req)
 			if tc.expectErr {
@@ -1494,7 +1494,7 @@ func TestQueryRangeFormula(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/api/v4/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/query_range", body)
 
 			_, apiErr := ParseQueryRangeParams(req)
 			if tc.expectErr {
@@ -1591,7 +1591,7 @@ func TestParseQueryRangeParamsStepIntervalAdjustment(t *testing.T) {
 			body := &bytes.Buffer{}
 			err := json.NewEncoder(body).Encode(queryRangeParams)
 			require.NoError(t, err)
-			req := httptest.NewRequest(http.MethodPost, "/api/v3/query_range", body)
+			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/query_range", body)
 
 			p, apiErr := ParseQueryRangeParams(req)
 			if apiErr != nil && apiErr.Err != nil {

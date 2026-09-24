@@ -9,7 +9,7 @@ from fixtures.logger import setup_logger
 
 logger = setup_logger(__name__)
 
-ROLES_BASE = "/api/v1/roles"
+ROLES_BASE = "/v1/o11y/roles"
 
 
 def find_role_by_name(o11y: types.O11y, token: str, name: str) -> str:
@@ -55,7 +55,7 @@ def patch_role_objects(
     additions=None,
     deletions=None,
 ) -> None:
-    """PATCH /api/v1/roles/{id}/relations/{relation}/objects."""
+    """PATCH /v1/o11y/roles/{id}/relations/{relation}/objects."""
     body = {}
     if additions is not None:
         body["additions"] = additions

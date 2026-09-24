@@ -5602,7 +5602,7 @@ func (r *DatastoreReader) GetNormalizedStatus(
 
 // GetRecentLogs reads the most recent logs in [startNano, endNano], newest first,
 // capped at limit, from the configured logs table (r.logsDB.r.logsTableV2) — the
-// real read behind the classic GET /api/v1/logs endpoint, replacing the empty
+// real read behind GET /v1/o11y/logs, replacing the empty
 // {"results":[]} stub. The bounds are int64 nanosecond epochs and limit is an int
 // (never user strings), so the fmt.Sprintf interpolation is injection-safe. It
 // selects the core log columns plus service.name and the k8s namespace/pod/

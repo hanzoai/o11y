@@ -74,7 +74,7 @@ def test_create_ingestion_key_limit_only_size(
     )
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
         json={
             "signal": "logs",
             "config": {"day": {"size": 1000}},
@@ -130,7 +130,7 @@ def test_create_ingestion_key_limit_only_count(
     )
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
         json={
             "signal": "traces",
             "config": {"day": {"count": 500}},
@@ -183,7 +183,7 @@ def test_create_ingestion_key_limit_both_size_and_count(
     )
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/gateway/ingestion_keys/{TEST_KEY_ID}/limits"),
         json={
             "signal": "metrics",
             "config": {
@@ -240,7 +240,7 @@ def test_update_ingestion_key_limit_only_size(
     )
 
     response = requests.patch(
-        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
         json={
             "config": {"day": {"size": 2000}},
             "tags": ["test"],
@@ -286,7 +286,7 @@ def test_update_ingestion_key_limit_only_count(
     )
 
     response = requests.patch(
-        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
         json={
             "config": {"day": {"count": 750}},
             "tags": ["test"],
@@ -331,7 +331,7 @@ def test_update_ingestion_key_limit_both_size_and_count(
     )
 
     response = requests.patch(
-        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
         json={
             "config": {"day": {"size": 1000, "count": 500}},
             "tags": ["test"],
@@ -360,7 +360,7 @@ def test_delete_ingestion_key_limit(
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
-    """DELETE /api/v2/gateway/ingestion_keys/limits/{limitId} deletes a limit."""
+    """DELETE /v1/o11y/gateway/ingestion_keys/limits/{limitId} deletes a limit."""
     editor_token = get_token(GATEWAY_APIS_EDITOR_EMAIL, GATEWAY_APIS_EDITOR_PASSWORD)
 
     gateway_url = f"/v1/workspaces/me/limits/{TEST_LIMIT_ID}"
@@ -381,7 +381,7 @@ def test_delete_ingestion_key_limit(
     )
 
     response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/gateway/ingestion_keys/limits/{TEST_LIMIT_ID}"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )

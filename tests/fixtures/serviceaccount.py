@@ -10,7 +10,7 @@ from fixtures.role import ROLES_BASE, find_role_by_name  # noqa: F401 — re-exp
 
 logger = setup_logger(__name__)
 
-SERVICE_ACCOUNT_BASE = "/api/v1/service_accounts"
+SERVICE_ACCOUNT_BASE = "/v1/o11y/service_accounts"
 
 
 def create_service_account(o11y: types.O11y, token: str, name: str, role: str = "o11y-viewer") -> str:

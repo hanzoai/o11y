@@ -35,7 +35,7 @@ def test_list_services_without_account(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -70,7 +70,7 @@ def test_list_services_with_account(
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services?cloud_integration_id={account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services?cloud_integration_id={account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -95,7 +95,7 @@ def test_get_service_details_without_account(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -128,7 +128,7 @@ def test_get_service_details_with_account(
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -149,7 +149,7 @@ def test_get_service_not_found(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services/non-existent-service"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services/non-existent-service"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -173,7 +173,7 @@ def test_update_service_config(
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     put_response = requests.put(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}/services/{SERVICE_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}/services/{SERVICE_ID}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         json={"config": {"aws": {"metrics": {"enabled": True}, "logs": {"enabled": True}}}},
         timeout=10,
@@ -182,7 +182,7 @@ def test_update_service_config(
     assert put_response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {put_response.status_code}: {put_response.text}"
 
     get_response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -211,7 +211,7 @@ def test_update_service_config_disable(
     checkin = simulate_agent_checkin(o11y, admin_token, CLOUD_PROVIDER, account_id, str(uuid.uuid4()))
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
-    endpoint = o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}/services/{SERVICE_ID}")
+    endpoint = o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}/services/{SERVICE_ID}")
 
     # Enable
     r = requests.put(
@@ -232,7 +232,7 @@ def test_update_service_config_disable(
     assert r.status_code == HTTPStatus.NO_CONTENT, f"Disable failed: {r.status_code}: {r.text}"
 
     get_response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -253,7 +253,7 @@ def test_update_service_account_not_found(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.put(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{uuid.uuid4()}/services/{SERVICE_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{uuid.uuid4()}/services/{SERVICE_ID}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         json={"config": {"aws": {"metrics": {"enabled": True}}}},
         timeout=10,
@@ -271,7 +271,7 @@ def test_list_services_unsupported_provider(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/cloud_integrations/gcp/services"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/cloud_integrations/gcp/services"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -295,14 +295,14 @@ def test_list_services_account_removed(
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     delete_response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
     assert delete_response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204 on delete, got {delete_response.status_code}"
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services?cloud_integration_id={account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services?cloud_integration_id={account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -326,14 +326,14 @@ def test_get_service_details_account_removed(
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     delete_response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
     assert delete_response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204 on delete, got {delete_response.status_code}"
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -357,14 +357,14 @@ def test_update_service_account_removed(
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     delete_response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
     assert delete_response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204 on delete, got {delete_response.status_code}"
 
     response = requests.put(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}/services/{SERVICE_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}/services/{SERVICE_ID}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         json={"config": {"aws": {"metrics": {"enabled": True}}}},
         timeout=10,
@@ -389,7 +389,7 @@ def test_enable_metrics_provisions_dashboards(
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     put_response = requests.put(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}/services/{SERVICE_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}/services/{SERVICE_ID}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         json={"config": {"aws": {"metrics": {"enabled": True}, "logs": {"enabled": False}}}},
         timeout=10,
@@ -398,7 +398,7 @@ def test_enable_metrics_provisions_dashboards(
 
     # Assertion 1: GetService returns provisioned dashboard UUIDs
     get_svc_response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -450,7 +450,7 @@ def test_disable_metrics_deprovisions_dashboards(
     checkin = simulate_agent_checkin(o11y, admin_token, CLOUD_PROVIDER, account_id, str(uuid.uuid4()))
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
-    endpoint = o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}/services/{SERVICE_ID}")
+    endpoint = o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}/services/{SERVICE_ID}")
 
     # Enable metrics to provision dashboards first
     enable_response = requests.put(
@@ -463,7 +463,7 @@ def test_disable_metrics_deprovisions_dashboards(
 
     # Capture the provisioned dashboard IDs before disabling
     get_svc_response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -482,7 +482,7 @@ def test_disable_metrics_deprovisions_dashboards(
 
     # Assertion 1: GetService no longer returns UUID dashboard IDs
     get_svc_after = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/services/{SERVICE_ID}?cloud_integration_id={account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -497,7 +497,7 @@ def test_disable_metrics_deprovisions_dashboards(
 
     # Assertion 2: Dashboards listing API no longer contains the provisioned dashboard IDs
     list_response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/dashboards"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/dashboards"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )

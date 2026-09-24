@@ -106,7 +106,7 @@ def test_set_ttl_traces_success(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -154,7 +154,7 @@ def test_set_ttl_traces_with_cold_storage(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -214,7 +214,7 @@ def test_set_ttl_metrics_success(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -264,7 +264,7 @@ def test_set_ttl_metrics_with_cold_storage(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -325,7 +325,7 @@ def test_set_ttl_invalid_type(o11y: types.O11y, get_token: Callable[[str, str], 
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -355,7 +355,7 @@ def test_set_custom_retention_ttl_basic(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -415,7 +415,7 @@ def test_set_custom_retention_ttl_basic_with_cold_storage(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -481,7 +481,7 @@ def test_set_custom_retention_ttl_basic_fallback(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -543,7 +543,7 @@ def test_set_custom_retention_ttl_basic_101_times(
         headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
         response = requests.post(
-            o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
             json=payload,
             headers=headers,
             timeout=30,
@@ -591,7 +591,7 @@ def test_set_custom_retention_ttl_with_conditions(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -607,7 +607,7 @@ def test_set_custom_retention_ttl_with_conditions(
     ]
     insert_logs(logs)
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -700,7 +700,7 @@ def test_set_custom_retention_ttl_with_invalid_cold_storage(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -740,7 +740,7 @@ def test_set_custom_retention_ttl_duplicate_conditions(o11y: types.O11y, get_tok
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -773,7 +773,7 @@ def test_set_custom_retention_ttl_invalid_condition(o11y: types.O11y, get_token:
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,
@@ -807,7 +807,7 @@ def test_get_custom_retention_ttl(o11y: types.O11y, get_token: Callable[[str, st
 
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
     set_response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         json=set_payload,
         headers=headers,
         timeout=30,
@@ -821,7 +821,7 @@ def test_get_custom_retention_ttl(o11y: types.O11y, get_token: Callable[[str, st
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     get_response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         params={"type": "logs"},
         headers=headers,
         timeout=30,
@@ -855,7 +855,7 @@ def test_set_ttl_logs_success(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         params=payload,
         headers=headers,
         timeout=30,
@@ -893,7 +893,7 @@ def test_get_ttl_traces_success(o11y: types.O11y, get_token: Callable[[str, str]
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     set_response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         params=set_payload,
         headers=headers,
         timeout=30,
@@ -906,7 +906,7 @@ def test_get_ttl_traces_success(o11y: types.O11y, get_token: Callable[[str, str]
 
     # Now get the TTL configuration for traces
     get_response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         params={"type": "traces"},
         headers=headers,
         timeout=30,
@@ -954,7 +954,7 @@ def test_large_ttl_conditions_list(
     headers = {"Authorization": f"Bearer {get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)}"}
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/settings/ttl"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/settings/ttl"),
         json=payload,
         headers=headers,
         timeout=30,

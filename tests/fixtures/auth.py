@@ -31,13 +31,13 @@ USER_VIEWER_NAME = "viewer"
 USER_VIEWER_EMAIL = "viewer@integration.test"
 USER_VIEWER_PASSWORD = "password123Z$"
 
-USERS_BASE = "/api/v2/users"
+USERS_BASE = "/v1/o11y/users"
 
 
 def _login(o11y: types.O11y, email: str, password: str) -> str:
     """Complete GET /sessions/context + POST /sessions/email_password; return accessToken."""
     ctx = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/sessions/context"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/sessions/context"),
         params={
             "email": email,
             "ref": f"{o11y.self.host_configs['8080'].base()}",
@@ -48,7 +48,7 @@ def _login(o11y: types.O11y, email: str, password: str) -> str:
     org_id = ctx.json()["data"]["orgs"][0]["id"]
 
     login = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/sessions/email_password"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/sessions/email_password"),
         json={"email": email, "password": password, "orgId": org_id},
         timeout=5,
     )
@@ -60,7 +60,7 @@ def _login(o11y: types.O11y, email: str, password: str) -> str:
 def create_user_admin(o11y: types.O11y, request: pytest.FixtureRequest, pytestconfig: pytest.Config) -> types.Operation:
     def create() -> None:
         response = requests.post(
-            o11y.self.host_configs["8080"].get("/api/v1/register"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/register"),
             json={
                 "name": USER_ADMIN_NAME,
                 "orgName": "",
@@ -95,7 +95,7 @@ def create_user_admin(o11y: types.O11y, request: pytest.FixtureRequest, pytestco
 def get_session_context(o11y: types.O11y) -> Callable[[str, str], str]:
     def _get_session_context(email: str) -> str:
         response = requests.get(
-            o11y.self.host_configs["8080"].get("/api/v2/sessions/context"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/sessions/context"),
             params={
                 "email": email,
                 "ref": f"{o11y.self.host_configs['8080'].base()}",
@@ -113,7 +113,7 @@ def get_session_context(o11y: types.O11y) -> Callable[[str, str], str]:
 def get_token(o11y: types.O11y) -> Callable[[str, str], str]:
     def _get_token(email: str, password: str) -> str:
         response = requests.get(
-            o11y.self.host_configs["8080"].get("/api/v2/sessions/context"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/sessions/context"),
             params={
                 "email": email,
                 "ref": f"{o11y.self.host_configs['8080'].base()}",
@@ -125,7 +125,7 @@ def get_token(o11y: types.O11y) -> Callable[[str, str], str]:
         org_id = response.json()["data"]["orgs"][0]["id"]
 
         response = requests.post(
-            o11y.self.host_configs["8080"].get("/api/v2/sessions/email_password"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/sessions/email_password"),
             json={
                 "email": email,
                 "password": password,
@@ -144,7 +144,7 @@ def get_token(o11y: types.O11y) -> Callable[[str, str], str]:
 def get_tokens(o11y: types.O11y) -> Callable[[str, str], tuple[str, str]]:
     def _get_tokens(email: str, password: str) -> str:
         response = requests.get(
-            o11y.self.host_configs["8080"].get("/api/v2/sessions/context"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/sessions/context"),
             params={
                 "email": email,
                 "ref": f"{o11y.self.host_configs['8080'].base()}",
@@ -156,7 +156,7 @@ def get_tokens(o11y: types.O11y) -> Callable[[str, str], tuple[str, str]]:
         org_id = response.json()["data"]["orgs"][0]["id"]
 
         response = requests.post(
-            o11y.self.host_configs["8080"].get("/api/v2/sessions/email_password"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/sessions/email_password"),
             json={
                 "email": email,
                 "password": password,
@@ -180,7 +180,7 @@ def apply_license(
     request: pytest.FixtureRequest,
     pytestconfig: pytest.Config,
 ) -> types.Operation:
-    """Stub Zeus license-lookup, then POST /api/v3/licenses so the BE flips
+    """Stub Zeus license-lookup, then POST /v1/o11y/licenses so the BE flips
     to ENTERPRISE. Package-scoped so an e2e bootstrap can pull it in and
     every spec inherits the licensed state."""
 
@@ -220,7 +220,7 @@ def apply_license(
         # 202 = applied, 409 = already applied. Retry transient failures —
         # the BE occasionally 5xxs right after startup before the license
         # sync goroutine is ready.
-        license_url = o11y.self.host_configs["8080"].get("/api/v3/licenses")
+        license_url = o11y.self.host_configs["8080"].get("/v1/o11y/licenses")
         auth_header = {"Authorization": f"Bearer {access_token}"}
         for attempt in range(10):
             resp = requests.post(
@@ -239,7 +239,7 @@ def apply_license(
         # redirects first-time admins to a questionnaire. Mark the preference
         # complete so specs can navigate directly to the feature under test.
         pref_resp = requests.put(
-            o11y.self.host_configs["8080"].get("/api/v1/org/preferences/org_onboarding"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/org/preferences/org_onboarding"),
             json={"value": True},
             headers=auth_header,
             timeout=5,
@@ -308,7 +308,7 @@ def add_license(
     access_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.post(
-        url=o11y.self.host_configs["8080"].get("/api/v3/licenses"),
+        url=o11y.self.host_configs["8080"].get("/v1/o11y/licenses"),
         json={"key": "secret-key"},
         headers={"Authorization": "Bearer " + access_token},
         timeout=5,
@@ -338,7 +338,7 @@ def create_active_user(
 ) -> str:
     """Invite a user and activate via resetPassword. Returns user ID."""
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/invite"),
         json={"email": email, "role": role, "name": name},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
@@ -347,7 +347,7 @@ def create_active_user(
     invited_user = response.json()["data"]
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/resetPassword"),
         json={"password": password, "token": invited_user["token"]},
         timeout=5,
     )

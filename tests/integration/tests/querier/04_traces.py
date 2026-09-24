@@ -153,7 +153,7 @@ def test_traces_list(
 
     # Query all traces for the past 5 minutes
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -328,7 +328,7 @@ def test_traces_list(
 
     # Query root spans for the last 5 minutes and check if the spans are returned in the correct order
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -383,7 +383,7 @@ def test_traces_list(
 
     # Query values of http.request.method attribute from the autocomplete API
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v3/autocomplete/attribute_values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/autocomplete/attribute_values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -409,7 +409,7 @@ def test_traces_list(
 
     # Query values of http.request.method attribute from the fields API
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -431,7 +431,7 @@ def test_traces_list(
 
     # Query keys from the fields API with context specified in the key
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/keys"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/keys"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -451,7 +451,7 @@ def test_traces_list(
 
     # Query values of service.name resource attribute using context-prefixed key
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/fields/values"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/fields/values"),
         timeout=2,
         headers={
             "authorization": f"Bearer {token}",
@@ -1119,7 +1119,7 @@ def test_traces_fill_gaps(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1215,7 +1215,7 @@ def test_traces_fill_gaps_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1328,7 +1328,7 @@ def test_traces_fill_gaps_formula(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1448,7 +1448,7 @@ def test_traces_fill_gaps_formula_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1576,7 +1576,7 @@ def test_traces_fill_zero(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1672,7 +1672,7 @@ def test_traces_fill_zero_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1786,7 +1786,7 @@ def test_traces_fill_zero_formula(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={
@@ -1906,7 +1906,7 @@ def test_traces_fill_zero_formula_with_group_by(
     end_ms = int(now.timestamp() * 1000)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={

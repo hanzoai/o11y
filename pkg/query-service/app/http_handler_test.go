@@ -158,7 +158,7 @@ func TestPrepareQuery(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			req := httptest.NewRequest(http.MethodPost, "/api/v2/variables/query", &b)
+			req := httptest.NewRequest(http.MethodPost, "/v1/o11y/variables/query", &b)
 			query, err := prepareQuery(req)
 
 			if tc.expectedErr {

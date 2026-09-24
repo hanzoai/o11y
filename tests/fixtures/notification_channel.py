@@ -83,7 +83,7 @@ def create_webhook_notification_channel(
         send_resolved: bool = True,
     ) -> str:
         response = requests.post(
-            o11y.self.host_configs["8080"].get("/api/v1/channels"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/channels"),
             json={
                 "name": channel_name,
                 "webhook_configs": [

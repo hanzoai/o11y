@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 def test_setup(o11y: types.O11y) -> None:
-    response = requests.get(o11y.self.host_configs["8080"].get("/api/v1/version"), timeout=2)
+    response = requests.get(o11y.self.host_configs["8080"].get("/v1/o11y/version"), timeout=2)
     assert response.status_code == HTTPStatus.OK
 
-    healthz = requests.get(o11y.self.host_configs["8080"].get("/api/v2/healthz"), timeout=2)
+    healthz = requests.get(o11y.self.host_configs["8080"].get("/v1/o11y/healthz"), timeout=2)
     logger.info("healthz response: %s", healthz.json())
     assert healthz.status_code == HTTPStatus.OK
 

@@ -33,7 +33,7 @@ def test_list_accounts_empty(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -63,7 +63,7 @@ def test_list_accounts_after_checkin(
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -92,7 +92,7 @@ def test_get_account(
     account_id = account["id"]
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -117,7 +117,7 @@ def test_get_account_not_found(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{uuid.uuid4()}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{uuid.uuid4()}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -143,7 +143,7 @@ def test_update_account(
     updated_regions = ["us-east-1", "us-west-2", "eu-west-1"]
 
     response = requests.put(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         json={"config": {"aws": {"regions": updated_regions}}},
         timeout=10,
@@ -152,7 +152,7 @@ def test_update_account(
     assert response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {response.status_code}"
 
     get_response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -185,7 +185,7 @@ def test_update_account_after_checkin_preserves_connected_status(
 
     # 3. Verify the account appears in the connected list
     list_response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -197,7 +197,7 @@ def test_update_account_after_checkin_preserves_connected_status(
     # 4. Update account config
     updated_regions = ["us-east-1", "us-west-2"]
     update_response = requests.put(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         json={"config": {"aws": {"regions": updated_regions}}},
         timeout=10,
@@ -206,7 +206,7 @@ def test_update_account_after_checkin_preserves_connected_status(
 
     # 5. Verify the account still appears in the connected list with correct fields
     list_response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -236,7 +236,7 @@ def test_disconnect_account(
     assert checkin.status_code == HTTPStatus.OK, f"Check-in failed: {checkin.text}"
 
     response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{account_id}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -244,7 +244,7 @@ def test_disconnect_account(
     assert response.status_code == HTTPStatus.NO_CONTENT, f"Expected 204, got {response.status_code}"
 
     list_response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )
@@ -261,7 +261,7 @@ def test_disconnect_account_idempotent(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/accounts/{uuid.uuid4()}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/accounts/{uuid.uuid4()}"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )

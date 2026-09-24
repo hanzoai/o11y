@@ -13,14 +13,14 @@ def test_root_user_created(o11y: types.O11y) -> None:
     """
     The root user service reconciles asynchronously after startup.
 
-    Phase 1: Poll /api/v1/version until setupCompleted=true.
-    Phase 2: Poll /api/v2/users until it returns 200, confirming the root
+    Phase 1: Poll /v1/o11y/version until setupCompleted=true.
+    Phase 2: Poll /v1/o11y/users until it returns 200, confirming the root
              user actually exists and the impersonation provider works.
     """
     # Phase 1: wait for setupCompleted
     for attempt in range(15):
         response = requests.get(
-            o11y.self.host_configs["8080"].get("/api/v1/version"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/version"),
             timeout=2,
         )
         assert response.status_code == HTTPStatus.OK
@@ -37,13 +37,13 @@ def test_root_user_created(o11y: types.O11y) -> None:
     # Phase 2: wait for root user to be fully resolved
     for attempt in range(15):
         response = requests.get(
-            o11y.self.host_configs["8080"].get("/api/v2/users"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/users"),
             timeout=2,
         )
         if response.status_code == HTTPStatus.OK:
             return
         logger.info(
-            "Attempt %s: /api/v2/users returned %s, retrying ...",
+            "Attempt %s: /v1/o11y/users returned %s, retrying ...",
             attempt + 1,
             response.status_code,
         )

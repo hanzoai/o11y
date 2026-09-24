@@ -6,7 +6,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 )
 
-// PostableChecks is the request for GET /api/v2/infra_monitoring/checks.
+// PostableChecks is the request for GET /v1/o11y/infra_monitoring/checks.
 // The single `type` query param selects which infra-monitoring subsection the
 // readiness check runs for.
 type PostableChecks struct {
@@ -30,7 +30,7 @@ func (req *PostableChecks) Validate() error {
 	return nil
 }
 
-// Checks is the response for GET /api/v2/infra_monitoring/checks.
+// Checks is the response for GET /v1/o11y/infra_monitoring/checks.
 //
 // The three present/missing pairs partition a type's requirements into three
 // dimensions — default-enabled metrics, optional metrics, required attributes —

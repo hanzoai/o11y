@@ -2,15 +2,15 @@
 #
 # o11y-site — the o11y browser SPA served by hanzoai/static (house-native static
 # plugin, scratch + Go binary), NOT nginx. The main server image (Dockerfile) is
-# HEADLESS (O11Y_WEB_ENABLED=false, serves only /api/*); this image serves the
-# dashboard SPA at the edge, and the ingress routes o11y.hanzo.ai here while
-# /api/* goes to the backend (universe infra/k8s/o11y/ingress.yaml).
+# HEADLESS (O11Y_WEB_ENABLED=false, serves only /v1/o11y/*); this image serves
+# the dashboard SPA at the edge, and the ingress routes o11y.hanzo.ai here while
+# /v1/o11y/* goes to the backend.
 #
 # CONTENT: built FROM SOURCE (frontend/) now that the @o11yhq -> @hanzo/ui
 # migration is complete, tsgo --noEmit is clean, and `pnpm build` is green. The
 # production build resolves the [[.BaseHref]]/[[.Settings]] Go-template placeholders
 # at build time (vite.config.ts) so index.html is placeholder-free; assets are
-# relative (base './') under <base href="/">, and the SPA calls same-origin /api/*
+# relative (base './') under <base href="/">, and the SPA calls same-origin /v1/o11y/*
 # — so a static --spa serve is faithful with no backend templating.
 
 # 1) Build the SPA from source.

@@ -27,7 +27,7 @@ def create_alert_rule(o11y: types.O11y, get_token: Callable[[str, str], str]) ->
 
     def _create_alert_rule(rule_data: dict) -> str:
         response = requests.post(
-            o11y.self.host_configs["8080"].get("/api/v1/rules"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/rules"),
             json=rule_data,
             headers={"Authorization": f"Bearer {admin_token}"},
             timeout=5,
@@ -40,7 +40,7 @@ def create_alert_rule(o11y: types.O11y, get_token: Callable[[str, str], str]) ->
     def _delete_alert_rule(rule_id: str):
         logger.info("Deleting rule: %s", {"rule_id": rule_id})
         response = requests.delete(
-            o11y.self.host_configs["8080"].get(f"/api/v1/rules/{rule_id}"),
+            o11y.self.host_configs["8080"].get(f"/v1/o11y/rules/{rule_id}"),
             headers={"Authorization": f"Bearer {admin_token}"},
             timeout=5,
         )

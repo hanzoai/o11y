@@ -57,7 +57,7 @@ def test_create_account_unsupported_provider(
     """Test that creating an account with an unsupported cloud provider returns 400."""
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
     cloud_provider = "gcp"
-    endpoint = f"/api/v1/cloud_integrations/{cloud_provider}/accounts"
+    endpoint = f"/v1/o11y/cloud_integrations/{cloud_provider}/accounts"
 
     response = requests.post(
         o11y.self.host_configs["8080"].get(endpoint),

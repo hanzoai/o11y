@@ -379,7 +379,7 @@ def create_json_index(
 ) -> Generator[Callable[[str, list[dict[str, Any]]], None]]:
     """
     Create ClickHouse data-skipping indexes on body_v2 JSON sub-columns via
-    POST /api/v1/logs/promote_paths.
+    POST /v1/o11y/logs/promote_paths.
 
     **Must be called BEFORE insert_logs** so that newly inserted data parts are
     covered by the index and the QB uses the indexed condition path.
@@ -416,7 +416,7 @@ def create_json_index(
 
     def _create_json_body_index(token: str, paths: list[dict[str, Any]]) -> None:
         response = requests.post(
-            o11y.self.host_configs["8080"].get("/api/v1/logs/promote_paths"),
+            o11y.self.host_configs["8080"].get("/v1/o11y/logs/promote_paths"),
             headers={"authorization": f"Bearer {token}"},
             json=paths,
             timeout=30,

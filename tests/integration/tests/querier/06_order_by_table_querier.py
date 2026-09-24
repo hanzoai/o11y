@@ -93,7 +93,7 @@ def make_scalar_query_request(
     lookback_minutes: int = 5,
 ) -> requests.Response:
     return requests.post(
-        o11y.self.host_configs["8080"].get("/api/v5/query_range"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/query_range"),
         timeout=5,
         headers={"authorization": f"Bearer {token}"},
         json={

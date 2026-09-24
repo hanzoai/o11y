@@ -78,7 +78,7 @@ This command:
 
 2. Verify it's working:
    ```bash
-   curl http://localhost:8080/api/v1/health
+   curl http://localhost:8080/v1/o11y/health
    ```
 
    You should see: `{"status":"ok"}`
@@ -116,7 +116,7 @@ To verify everything is working correctly:
 
 1. **Check Datastore**: `curl http://localhost:8123/ping` (should return "Ok.")
 2. **Check OTel Collector**: `curl http://localhost:13133` (should return health status)
-3. **Check Backend**: `curl http://localhost:8080/api/v1/health` (should return `{"status":"ok"}`)
+3. **Check Backend**: `curl http://localhost:8080/v1/o11y/health` (should return `{"status":"ok"}`)
 4. **Check Frontend**: Open `http://localhost:3301` in your browser
 
 ## How to send test data?

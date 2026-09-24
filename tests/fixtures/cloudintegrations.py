@@ -31,7 +31,7 @@ def deprecated_create_cloud_integration_account(
         admin_token: str,
         cloud_provider: str = "aws",
     ) -> dict:
-        endpoint = f"/api/v1/cloud-integrations/{cloud_provider}/accounts/generate-connection-url"
+        endpoint = f"/v1/o11y/cloud-integrations/{cloud_provider}/accounts/generate-connection-url"
 
         request_payload = {
             "account_config": {"regions": ["us-east-1"]},
@@ -68,7 +68,7 @@ def deprecated_create_cloud_integration_account(
         try:
             admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
             for account_id, cloud_provider in created_accounts:
-                disconnect_endpoint = f"/api/v1/cloud-integrations/{cloud_provider}/accounts/{account_id}/disconnect"
+                disconnect_endpoint = f"/v1/o11y/cloud-integrations/{cloud_provider}/accounts/{account_id}/disconnect"
                 r = requests.post(
                     o11y.self.host_configs["8080"].get(disconnect_endpoint),
                     headers={"Authorization": f"Bearer {admin_token}"},
@@ -101,7 +101,7 @@ def create_cloud_integration_account(
         if regions is None:
             regions = ["us-east-1"]
 
-        endpoint = f"/api/v1/cloud_integrations/{cloud_provider}/accounts"
+        endpoint = f"/v1/o11y/cloud_integrations/{cloud_provider}/accounts"
 
         request_payload = {
             "config": {
@@ -139,7 +139,7 @@ def create_cloud_integration_account(
         try:
             admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
             for account_id, cloud_provider in created_accounts:
-                delete_endpoint = f"/api/v1/cloud_integrations/{cloud_provider}/accounts/{account_id}"
+                delete_endpoint = f"/v1/o11y/cloud_integrations/{cloud_provider}/accounts/{account_id}"
                 r = requests.delete(
                     o11y.self.host_configs["8080"].get(delete_endpoint),
                     headers={"Authorization": f"Bearer {admin_token}"},
@@ -163,7 +163,7 @@ def deprecated_simulate_agent_checkin(
     account_id: str,
     cloud_account_id: str,
 ) -> requests.Response:
-    endpoint = f"/api/v1/cloud-integrations/{cloud_provider}/agent-check-in"
+    endpoint = f"/v1/o11y/cloud-integrations/{cloud_provider}/agent-check-in"
 
     checkin_payload = {
         "account_id": account_id,
@@ -264,7 +264,7 @@ def simulate_agent_checkin(
     cloud_account_id: str,
     data: dict | None = None,
 ) -> requests.Response:
-    endpoint = f"/api/v1/cloud_integrations/{cloud_provider}/accounts/check_in"
+    endpoint = f"/v1/o11y/cloud_integrations/{cloud_provider}/accounts/check_in"
 
     checkin_payload = {
         "cloudIntegrationId": account_id,

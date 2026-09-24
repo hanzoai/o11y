@@ -330,7 +330,7 @@ def test_role_fga_cleanup(
 
     # Remove the custom role from the user first.
     resp = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v2/users/{user['id']}/roles"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/users/{user['id']}/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
     )
@@ -339,7 +339,7 @@ def test_role_fga_cleanup(
     custom_entry = next((r for r in roles if r["name"] == ROLE_FGA_CUSTOM_ROLE_NAME), None)
     if custom_entry is not None:
         resp = requests.delete(
-            o11y.self.host_configs["8080"].get(f"/api/v2/users/{user['id']}/roles/{custom_entry['id']}"),
+            o11y.self.host_configs["8080"].get(f"/v1/o11y/users/{user['id']}/roles/{custom_entry['id']}"),
             headers={"Authorization": f"Bearer {admin_token}"},
             timeout=5,
         )

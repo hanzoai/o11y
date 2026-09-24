@@ -6,9 +6,8 @@ package o11y
 // WHY THE ANSWER LIVES HERE. It is a fact about these routes, so it belongs
 // beside them. It used to live in the embedding host instead — hanzoai/cloud's
 // apps/o11y kept its own list of "the o11y paths that need no principal" — and
-// that list named /v1/o11y/api/v1/health, /api/v2/healthz, /api/v2/readyz and
-// /api/v2/livez: the INTERNAL namespace this module used to rewrite onto before
-// PATH UNTOUCHED (mount.go) removed the rewrite. The paths it named stopped
+// that list named the probes under an INTERNAL versioned namespace this module
+// used to rewrite onto before PATH UNTOUCHED (mount.go) removed the rewrite. The paths it named stopped
 // existing and the paths that exist were never named, so the host's exemption
 // matched nothing at all and every public op — /version, /health, the three
 // probes, sign-in, the shared-dashboard reads — was refused 403 at the unified

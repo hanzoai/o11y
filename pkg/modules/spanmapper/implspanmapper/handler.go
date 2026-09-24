@@ -23,7 +23,7 @@ func NewHandler(module spanmapper.Module) spanmapper.Handler {
 	return &handler{module: module}
 }
 
-// ListGroups handles GET /api/v1/span_mapper_groups.
+// ListGroups handles GET /v1/o11y/span_mapper_groups.
 func (h *handler) ListGroups(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
@@ -51,7 +51,7 @@ func (h *handler) ListGroups(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusOK, spantypes.NewGettableSpanMapperGroups(groups))
 }
 
-// CreateGroup handles POST /api/v1/span_mapper_groups.
+// CreateGroup handles POST /v1/o11y/span_mapper_groups.
 func (h *handler) CreateGroup(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
@@ -79,7 +79,7 @@ func (h *handler) CreateGroup(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusCreated, group)
 }
 
-// UpdateGroup handles PUT /api/v1/span_mapper_groups/{id}.
+// UpdateGroup handles PUT /v1/o11y/span_mapper_groups/{id}.
 func (h *handler) UpdateGroup(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
@@ -112,7 +112,7 @@ func (h *handler) UpdateGroup(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusNoContent, nil)
 }
 
-// DeleteGroup handles DELETE /api/v1/span_mapper_groups/{id}.
+// DeleteGroup handles DELETE /v1/o11y/span_mapper_groups/{id}.
 func (h *handler) DeleteGroup(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
@@ -139,7 +139,7 @@ func (h *handler) DeleteGroup(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusNoContent, nil)
 }
 
-// ListMappers handles GET /api/v1/span_mapper_groups/{id}/span_mappers.
+// ListMappers handles GET /v1/o11y/span_mapper_groups/{id}/span_mappers.
 func (h *handler) ListMappers(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
@@ -167,7 +167,7 @@ func (h *handler) ListMappers(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusOK, spantypes.NewGettableSpanMappers(mappers))
 }
 
-// CreateMapper handles POST /api/v1/span_mapper_groups/{id}/span_mappers.
+// CreateMapper handles POST /v1/o11y/span_mapper_groups/{id}/span_mappers.
 func (h *handler) CreateMapper(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
@@ -201,7 +201,7 @@ func (h *handler) CreateMapper(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusCreated, mapper)
 }
 
-// UpdateMapper handles PUT /api/v1/span_mapper_groups/{groupId}/span_mappers/{mapperId}.
+// UpdateMapper handles PUT /v1/o11y/span_mapper_groups/{groupId}/span_mappers/{mapperId}.
 func (h *handler) UpdateMapper(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
@@ -240,7 +240,7 @@ func (h *handler) UpdateMapper(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusNoContent, nil)
 }
 
-// DeleteMapper handles DELETE /api/v1/span_mapper_groups/{groupId}/span_mappers/{mapperId}.
+// DeleteMapper handles DELETE /v1/o11y/span_mapper_groups/{groupId}/span_mappers/{mapperId}.
 func (h *handler) DeleteMapper(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()

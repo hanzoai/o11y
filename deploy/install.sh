@@ -248,7 +248,7 @@ wait_for_containers_start() {
 
     # The while loop is important because for-loops don't work for dynamic values
     while [[ $timeout -gt 0 ]]; do
-        status_code="$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/api/v1/health?live=1" || true)"
+        status_code="$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8080/v1/o11y/health?live=1" || true)"
         if [[ status_code -eq 200 ]]; then
             break
         else

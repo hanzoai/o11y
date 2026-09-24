@@ -29,7 +29,7 @@ func claimsCtx() context.Context {
 func TestViewRequest_TenantScopeFromHeader(t *testing.T) {
 	// A client tries to inject the tenant via ?orgSlug=evil; the header is the real
 	// tenant. ViewQuery.OrgSlug has no `query` tag, so the param is ignored.
-	r := httptest.NewRequest(http.MethodGet, "/api/observations?orgSlug=evil&traceId=t1", nil)
+	r := httptest.NewRequest(http.MethodGet, "/v1/o11y/llm/observations?orgSlug=evil&traceId=t1", nil)
 	r.Header.Set("X-Org-Id", "acme")
 
 	_, q, err := viewRequest(claimsCtx(), r)
@@ -47,14 +47,14 @@ func TestViewRequest_TenantScopeFromHeader(t *testing.T) {
 // TestViewRequest_FailsClosedWithoutTenant proves a span-view request with no
 // gateway-asserted tenant is REFUSED — never run as an un-scoped, all-orgs query.
 func TestViewRequest_FailsClosedWithoutTenant(t *testing.T) {
-	r := httptest.NewRequest(http.MethodGet, "/api/observations", nil) // no X-Org-Id
+	r := httptest.NewRequest(http.MethodGet, "/v1/o11y/llm/observations", nil) // no X-Org-Id
 
 	if _, _, err := viewRequest(claimsCtx(), r); err == nil {
 		t.Fatal("viewRequest must FAIL CLOSED when X-Org-Id is absent (would otherwise read every tenant)")
 	}
 
 	// A blank header is likewise refused.
-	r2 := httptest.NewRequest(http.MethodGet, "/api/observations", nil)
+	r2 := httptest.NewRequest(http.MethodGet, "/v1/o11y/llm/observations", nil)
 	r2.Header.Set("X-Org-Id", "   ")
 	if _, _, err := viewRequest(claimsCtx(), r2); err == nil {
 		t.Fatal("viewRequest must FAIL CLOSED on a blank X-Org-Id")

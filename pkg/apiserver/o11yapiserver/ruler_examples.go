@@ -433,7 +433,7 @@ func postableRuleExamples() []handler.OpenAPIExample {
 									"signal":       "traces",
 									"stepInterval": 60,
 									"aggregations": []any{map[string]any{"expression": "p99(duration_nano)"}},
-									"filter":       map[string]any{"expression": "service.name = 'search-api' AND name = 'GET /api/v1/search'"},
+									"filter":       map[string]any{"expression": "service.name = 'search-api' AND name = 'GET /v1/search'"},
 									"groupBy": []any{
 										map[string]any{"name": "service.name", "fieldContext": "resource", "fieldDataType": "string"},
 										map[string]any{"name": "http.route", "fieldContext": "attribute", "fieldDataType": "string"},

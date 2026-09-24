@@ -60,7 +60,7 @@ images:
       VARIANT: community
 
   # The browser SPA (frontend/), served by hanzoai/static at the edge while
-  # /api/* goes to the server above. Takes no build-args and no secrets.
+  # /v1/o11y/* goes to the server above. Takes no build-args and no secrets.
   #
   # It builds on every push now, where docker-site.yaml filtered on
   # `paths: [Dockerfile.site, frontend/**]`. That filter is not expressible in

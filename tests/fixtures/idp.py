@@ -621,7 +621,7 @@ def _ensure_groups_client_scope(client: KeycloakAdmin) -> None:
 def get_oidc_domain(o11y: types.O11y, admin_token: str) -> dict:
     """Helper to get the OIDC domain."""
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -634,7 +634,7 @@ def get_oidc_domain(o11y: types.O11y, admin_token: str) -> dict:
 def get_user_by_email(o11y: types.O11y, admin_token: str, email: str) -> dict:
     """Helper to get a user by email."""
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/user"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/user"),
         timeout=2,
         headers={"Authorization": f"Bearer {admin_token}"},
     )
@@ -664,7 +664,7 @@ def perform_oidc_login(
 
 def get_saml_domain(o11y: types.O11y, admin_token: str) -> dict:
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )

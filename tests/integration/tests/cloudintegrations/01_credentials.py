@@ -17,7 +17,7 @@ from fixtures.logger import setup_logger
 logger = setup_logger(__name__)
 
 CLOUD_PROVIDER = "aws"
-CREDENTIALS_ENDPOINT = f"/api/v1/cloud_integrations/{CLOUD_PROVIDER}/credentials"
+CREDENTIALS_ENDPOINT = f"/v1/o11y/cloud_integrations/{CLOUD_PROVIDER}/credentials"
 
 
 def test_apply_license(
@@ -143,7 +143,7 @@ def test_get_credentials_unsupported_provider(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/cloud_integrations/gcp/credentials"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/cloud_integrations/gcp/credentials"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=10,
     )

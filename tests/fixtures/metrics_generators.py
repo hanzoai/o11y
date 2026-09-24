@@ -249,9 +249,9 @@ class MetricsDataGenerator:
             services = ["api", "web", "auth"]
         if endpoints is None:
             endpoints = [
-                "/api/v1/users",
-                "/api/v1/orders",
-                "/api/v1/products",
+                "/v1/users",
+                "/v1/orders",
+                "/v1/products",
                 "/health",
                 "/metrics",
             ]
@@ -304,9 +304,9 @@ class MetricsDataGenerator:
             services = ["api", "web", "auth"]
         if endpoints is None:
             endpoints = [
-                "/api/v1/users",
-                "/api/v1/orders",
-                "/api/v1/products",
+                "/v1/users",
+                "/v1/orders",
+                "/v1/products",
                 "/health",
                 "/metrics",
             ]

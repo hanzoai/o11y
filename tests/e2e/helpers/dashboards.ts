@@ -71,7 +71,7 @@ async function postDashboard(
 	body: Record<string, unknown>,
 ): Promise<string> {
 	const token = await authToken(page);
-	const res = await page.request.post('/api/v1/dashboards', {
+	const res = await page.request.post('/v1/o11y/dashboards', {
 		data: body,
 		headers: { Authorization: `Bearer ${token}` },
 	});
@@ -104,7 +104,7 @@ async function loadDashboardFromTemplate(
 ): Promise<string> {
 	const id = await postDashboard(page, { title, uploadedGrafana: false });
 	const token = await authToken(page);
-	const putRes = await page.request.put(`/api/v1/dashboards/${id}`, {
+	const putRes = await page.request.put(`/v1/o11y/dashboards/${id}`, {
 		data: { ...template, title },
 		headers: { Authorization: `Bearer ${token}` },
 	});
@@ -272,7 +272,7 @@ export async function awaitVariablesResolved(
 	await expect
 		.poll(
 			async () => {
-				const res = await page.request.get(`/api/v1/dashboards/${dashboardId}`, {
+				const res = await page.request.get(`/v1/o11y/dashboards/${dashboardId}`, {
 					headers: { Authorization: `Bearer ${token}` },
 				});
 				if (!res.ok()) {
@@ -342,7 +342,7 @@ export async function deleteDashboardViaApi(
 	token: string,
 ): Promise<void> {
 	await request
-		.delete(`/api/v1/dashboards/${id}`, {
+		.delete(`/v1/o11y/dashboards/${id}`, {
 			headers: { Authorization: `Bearer ${token}` },
 		})
 		.catch(() => undefined);
@@ -354,7 +354,7 @@ export async function findDashboardIdByTitle(
 	title: string,
 ): Promise<string | undefined> {
 	const token = await authToken(page);
-	const res = await page.request.get('/api/v1/dashboards', {
+	const res = await page.request.get('/v1/o11y/dashboards', {
 		headers: { Authorization: `Bearer ${token}` },
 	});
 	if (!res.ok()) {

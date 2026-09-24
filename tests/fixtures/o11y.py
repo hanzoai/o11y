@@ -110,7 +110,7 @@ def create_o11y(
             for attempt in range(10):
                 try:
                     response = requests.get(
-                        f"http://{container.get_container_host_ip()}:{container.get_exposed_port(8080)}/api/v2/healthz",
+                        f"http://{container.get_container_host_ip()}:{container.get_exposed_port(8080)}/v1/o11y/healthz",
                         timeout=2,
                     )
                     if response.status_code == HTTPStatus.OK:

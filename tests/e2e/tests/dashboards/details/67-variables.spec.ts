@@ -382,7 +382,7 @@ test.describe('Dashboard Detail — Variables', () => {
 		// `k8s.namespace.name=o11y-<service>` for 8 distinct services.
 		// O11y's `o11y_metrics.distributed_metadata` table is populated
 		// naturally by the collector's o11ydatastoremetrics exporter, and
-		// `/api/v1/fields/values?signal=metrics&name=k8s.namespace.name`
+		// `/v1/o11y/fields/values?signal=metrics&name=k8s.namespace.name`
 		// surfaces the values so the Dynamic variable auto-resolves.
 		await gotoVariablesDashboard(page);
 
@@ -473,7 +473,7 @@ test.describe('Dashboard Detail — Variables', () => {
 
 		// Restore the persisted variable so subsequent serial-mode tests still pass.
 		const token = await authToken(page);
-		await page.request.put(`/api/v1/dashboards/${varDashboardId}`, {
+		await page.request.put(`/v1/o11y/dashboards/${varDashboardId}`, {
 			data: { ...variablesTemplate, title: 'detail-variables-suite' },
 			headers: { Authorization: `Bearer ${token}` },
 		});

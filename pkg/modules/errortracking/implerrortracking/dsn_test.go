@@ -60,18 +60,18 @@ func TestOrgUUIDFromProject_EmptyRejected(t *testing.T) {
 }
 
 func TestSentryKeyFromRequest_Header(t *testing.T) {
-	r := httptest.NewRequest("POST", "/api/acme/envelope/", nil)
+	r := httptest.NewRequest("POST", "/v1/o11y/api/acme/envelope/", nil)
 	r.Header.Set("X-Sentry-Auth", "Sentry sentry_version=7, sentry_key=pubkey123, sentry_client=sentry.python/1.40")
 	assert.Equal(t, "pubkey123", sentryKeyFromRequest(r))
 }
 
 func TestSentryKeyFromRequest_QueryFallback(t *testing.T) {
-	r := httptest.NewRequest("POST", "/api/acme/envelope/?sentry_key=qkey456", nil)
+	r := httptest.NewRequest("POST", "/v1/o11y/api/acme/envelope/?sentry_key=qkey456", nil)
 	assert.Equal(t, "qkey456", sentryKeyFromRequest(r))
 }
 
 func TestSentryKeyFromRequest_HeaderWins(t *testing.T) {
-	r := httptest.NewRequest("POST", "/api/acme/envelope/?sentry_key=qkey", nil)
+	r := httptest.NewRequest("POST", "/v1/o11y/api/acme/envelope/?sentry_key=qkey", nil)
 	r.Header.Set("X-Sentry-Auth", "Sentry sentry_key=hkey")
 	assert.Equal(t, "hkey", sentryKeyFromRequest(r))
 }

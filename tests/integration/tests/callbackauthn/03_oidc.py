@@ -45,7 +45,7 @@ def test_create_auth_domain(
     """
     client_id = f"oidc.integration.test.{o11y.self.host_configs['8080'].address}:{o11y.self.host_configs['8080'].port}"
     # Create a saml client in the idp.
-    create_oidc_client(client_id, "/api/v1/complete/oidc")
+    create_oidc_client(client_id, "/v1/o11y/complete/oidc")
 
     # Get the saml settings from keycloak.
     settings = get_oidc_settings(client_id)
@@ -54,7 +54,7 @@ def test_create_auth_domain(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/domains"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/domains"),
         json={
             "name": "oidc.integration.test",
             "config": {
@@ -130,7 +130,7 @@ def test_oidc_update_domain_with_group_mappings(
     settings = get_oidc_settings(client_id)
 
     response = requests.put(
-        o11y.self.host_configs["8080"].get(f"/api/v1/domains/{domain['id']}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/domains/{domain['id']}"),
         json={
             "config": {
                 "ssoEnabled": True,
@@ -299,7 +299,7 @@ def test_oidc_update_domain_with_use_role_claim(
     settings = get_oidc_settings(client_id)
 
     response = requests.put(
-        o11y.self.host_configs["8080"].get(f"/api/v1/domains/{domain['id']}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/domains/{domain['id']}"),
         json={
             "config": {
                 "ssoEnabled": True,
@@ -487,7 +487,7 @@ def test_oidc_sso_login_activates_pending_invite_user(
 
     # Invite user as ADMIN
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/invite"),
         json={"email": email, "role": "ADMIN", "name": "OIDC SSO Pending User"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,

@@ -44,7 +44,7 @@ def test_create_editor_user(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     invite_response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/invite"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/invite"),
         json={"email": GATEWAY_APIS_EDITOR_EMAIL, "role": "EDITOR"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
@@ -53,7 +53,7 @@ def test_create_editor_user(
     reset_token = invite_response.json()["data"]["token"]
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/resetPassword"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/resetPassword"),
         json={"password": GATEWAY_APIS_EDITOR_PASSWORD, "token": reset_token},
         timeout=5,
     )
@@ -71,7 +71,7 @@ def test_create_ingestion_key(
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
-    """POST /api/v2/gateway/ingestion_keys creates a key via the gateway."""
+    """POST /v1/o11y/gateway/ingestion_keys creates a key via the gateway."""
     editor_token = get_token(GATEWAY_APIS_EDITOR_EMAIL, GATEWAY_APIS_EDITOR_PASSWORD)
 
     make_http_mocks(
@@ -99,7 +99,7 @@ def test_create_ingestion_key(
     )
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/gateway/ingestion_keys"),
         json={
             "name": "my-test-key",
             "tags": ["env:test", "team:platform"],
@@ -128,7 +128,7 @@ def test_get_ingestion_keys(
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
-    """GET /api/v2/gateway/ingestion_keys lists keys via the gateway."""
+    """GET /v1/o11y/gateway/ingestion_keys lists keys via the gateway."""
     editor_token = get_token(GATEWAY_APIS_EDITOR_EMAIL, GATEWAY_APIS_EDITOR_PASSWORD)
 
     # Default page=1, per_page=10 → gateway gets ?page=1&per_page=10
@@ -171,7 +171,7 @@ def test_get_ingestion_keys(
     )
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/gateway/ingestion_keys"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )
@@ -191,7 +191,7 @@ def test_get_ingestion_keys_custom_pagination(
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
-    """GET /api/v2/gateway/ingestion_keys with custom pagination params."""
+    """GET /v1/o11y/gateway/ingestion_keys with custom pagination params."""
     editor_token = get_token(GATEWAY_APIS_EDITOR_EMAIL, GATEWAY_APIS_EDITOR_PASSWORD)
 
     make_http_mocks(
@@ -221,7 +221,7 @@ def test_get_ingestion_keys_custom_pagination(
     )
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys?page=2&per_page=5"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/gateway/ingestion_keys?page=2&per_page=5"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )
@@ -240,7 +240,7 @@ def test_search_ingestion_keys(
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
-    """GET /api/v2/gateway/ingestion_keys/search searches keys by name."""
+    """GET /v1/o11y/gateway/ingestion_keys/search searches keys by name."""
     editor_token = get_token(GATEWAY_APIS_EDITOR_EMAIL, GATEWAY_APIS_EDITOR_PASSWORD)
 
     # name, page, per_page are sorted alphabetically by Go url.Values.Encode()
@@ -283,7 +283,7 @@ def test_search_ingestion_keys(
     )
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys/search?name=my-test"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/gateway/ingestion_keys/search?name=my-test"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )
@@ -331,7 +331,7 @@ def test_search_ingestion_keys_empty(
     )
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/gateway/ingestion_keys/search?name=nonexistent"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/gateway/ingestion_keys/search?name=nonexistent"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )
@@ -349,7 +349,7 @@ def test_update_ingestion_key(
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
-    """PATCH /api/v2/gateway/ingestion_keys/{keyId} updates a key via the gateway."""
+    """PATCH /v1/o11y/gateway/ingestion_keys/{keyId} updates a key via the gateway."""
     editor_token = get_token(GATEWAY_APIS_EDITOR_EMAIL, GATEWAY_APIS_EDITOR_PASSWORD)
 
     gateway_url = f"/v1/workspaces/me/keys/{TEST_KEY_ID}"
@@ -370,7 +370,7 @@ def test_update_ingestion_key(
     )
 
     response = requests.patch(
-        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/gateway/ingestion_keys/{TEST_KEY_ID}"),
         json={
             "name": "renamed-key",
             "tags": ["env:prod"],
@@ -395,7 +395,7 @@ def test_delete_ingestion_key(
     make_http_mocks: Callable[[types.TestContainerDocker, list], None],
     get_token: Callable[[str, str], str],
 ) -> None:
-    """DELETE /api/v2/gateway/ingestion_keys/{keyId} deletes a key via the gateway."""
+    """DELETE /v1/o11y/gateway/ingestion_keys/{keyId} deletes a key via the gateway."""
     editor_token = get_token(GATEWAY_APIS_EDITOR_EMAIL, GATEWAY_APIS_EDITOR_PASSWORD)
 
     gateway_url = f"/v1/workspaces/me/keys/{TEST_KEY_ID}"
@@ -416,7 +416,7 @@ def test_delete_ingestion_key(
     )
 
     response = requests.delete(
-        o11y.self.host_configs["8080"].get(f"/api/v2/gateway/ingestion_keys/{TEST_KEY_ID}"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/gateway/ingestion_keys/{TEST_KEY_ID}"),
         headers={"Authorization": f"Bearer {editor_token}"},
         timeout=10,
     )

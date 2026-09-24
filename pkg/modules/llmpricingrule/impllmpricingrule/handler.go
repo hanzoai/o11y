@@ -25,7 +25,7 @@ func NewHandler(module llmpricingrule.Module) llmpricingrule.Handler {
 	return &handler{module: module}
 }
 
-// List handles GET /api/v1/llm_pricing_rules.
+// List handles GET /v1/o11y/llm_pricing_rules.
 func (h *handler) List(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
@@ -63,7 +63,7 @@ func (h *handler) List(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusOK, llmpricingruletypes.NewGettableLLMPricingRulesFromLLMPricingRules(rules, total, q.Offset, q.Limit))
 }
 
-// Get handles GET /api/v1/llm_pricing_rules/{id}.
+// Get handles GET /v1/o11y/llm_pricing_rules/{id}.
 func (h *handler) Get(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()
@@ -118,7 +118,7 @@ func (h *handler) CreateOrUpdate(rw http.ResponseWriter, r *http.Request) {
 	render.Success(rw, http.StatusNoContent, nil)
 }
 
-// Delete handles DELETE /api/v1/llm_pricing_rules/{id}.
+// Delete handles DELETE /v1/o11y/llm_pricing_rules/{id}.
 func (h *handler) Delete(rw http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
 	defer cancel()

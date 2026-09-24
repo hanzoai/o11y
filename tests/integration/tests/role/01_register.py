@@ -20,7 +20,7 @@ def test_managed_roles_create_on_register(
 
     # get the list of all roles.
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -52,7 +52,7 @@ def test_root_user_o11y_admin_assignment(
 
     # Get the user from the v2 /users/me endpoint and extract the id
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v2/users/me"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/users/me"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=5,
     )
@@ -61,7 +61,7 @@ def test_root_user_o11y_admin_assignment(
     user_id = user_data["id"]
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -111,7 +111,7 @@ def test_anonymous_user_o11y_anonymous_assignment(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )

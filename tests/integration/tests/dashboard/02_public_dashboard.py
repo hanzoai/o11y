@@ -32,7 +32,7 @@ def test_create_and_get_public_dashboard(
     admin_token = get_token(USER_ADMIN_EMAIL, USER_ADMIN_PASSWORD)
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/dashboards"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/dashboards"),
         json={"title": "Sample Title", "uploadedGrafana": False, "version": "v5"},
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -44,7 +44,7 @@ def test_create_and_get_public_dashboard(
     dashboard_id = data["id"]
 
     response = requests.post(
-        o11y.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/dashboards/{dashboard_id}/public"),
         json={
             "timeRangeEnabled": True,
             "defaultTimeRange": "10s",
@@ -57,7 +57,7 @@ def test_create_and_get_public_dashboard(
     assert "id" in response.json()["data"]
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/dashboards/{dashboard_id}/public"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -151,7 +151,7 @@ def test_public_dashboard_widget_query_range(
         ],
     }
     create_response = requests.post(
-        o11y.self.host_configs["8080"].get("/api/v1/dashboards"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/dashboards"),
         json=dashboard_req,
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
@@ -162,7 +162,7 @@ def test_public_dashboard_widget_query_range(
 
     # create public dashboard
     response = requests.post(
-        o11y.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/dashboards/{dashboard_id}/public"),
         json={
             "timeRangeEnabled": False,
             "defaultTimeRange": "10m",
@@ -175,7 +175,7 @@ def test_public_dashboard_widget_query_range(
     assert "id" in response.json()["data"]
 
     response = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/dashboards/{dashboard_id}/public"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/dashboards/{dashboard_id}/public"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
@@ -186,20 +186,20 @@ def test_public_dashboard_widget_query_range(
     public_dashboard_id = public_path.split("/public/dashboard/")[-1]
 
     resp = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/public/dashboards/{public_dashboard_id}/widgets/0/query_range"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/public/dashboards/{public_dashboard_id}/widgets/0/query_range"),
         timeout=2,
     )
     assert resp.status_code == HTTPStatus.OK
     assert resp.json().get("status") == "success"
 
     resp = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/public/dashboards/{public_dashboard_id}/widgets/-1/query_range"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/public/dashboards/{public_dashboard_id}/widgets/-1/query_range"),
         timeout=2,
     )
     assert resp.status_code == HTTPStatus.BAD_REQUEST
 
     resp = requests.get(
-        o11y.self.host_configs["8080"].get(f"/api/v1/public/dashboards/{public_dashboard_id}/widgets/1/query_range"),
+        o11y.self.host_configs["8080"].get(f"/v1/o11y/public/dashboards/{public_dashboard_id}/widgets/1/query_range"),
         timeout=2,
     )
     assert resp.status_code == HTTPStatus.BAD_REQUEST
@@ -218,7 +218,7 @@ def test_anonymous_role_has_public_dashboard_permission(
 
     # Get the roles to find the org_id
     response = requests.get(
-        o11y.self.host_configs["8080"].get("/api/v1/roles"),
+        o11y.self.host_configs["8080"].get("/v1/o11y/roles"),
         headers={"Authorization": f"Bearer {admin_token}"},
         timeout=2,
     )
