@@ -2,6 +2,8 @@ package datastoretelemetrystore
 
 import (
 	"context"
+	"net/url"
+	"time"
 
 	datastore "github.com/hanzo-ds/go"
 	"github.com/hanzo-ds/go/lib/driver"
@@ -93,6 +95,9 @@ var datastoreExceptionWrappers = map[int32]func(cause error, ex *datastore.Excep
 	},
 }
 
+// connLifetime bounds one pooled warehouse connection.
+const connLifetime = 5 * time.Minute
+
 type provider struct {
 	settings      factory.ScopedProviderSettings
 	datastoreConn datastore.Conn
@@ -109,10 +114,21 @@ func NewFactory(hookFactories ...factory.ProviderFactory[telemetrystore.Telemetr
 func New(ctx context.Context, providerSettings factory.ProviderSettings, config telemetrystore.Config, hookFactories ...factory.ProviderFactory[telemetrystore.TelemetryStoreHook, telemetrystore.Config]) (telemetrystore.TelemetryStore, error) {
 	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/telemetrystore/datastoretelemetrystore")
 
+	if config.Datastore.Token == nil {
+		return nil, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "telemetrystore: no IAM identity to present — the warehouse admits an IAM token and nothing else")
+	}
+	if u, err := url.Parse(config.Datastore.DSN); err != nil || u.User != nil {
+		return nil, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "telemetrystore: the datastore DSN names a credential; it says where the warehouse is, and the process's IAM identity says who is asking")
+	}
 	options, err := datastore.ParseDSN(config.Datastore.DSN)
 	if err != nil {
 		return nil, err
 	}
+	options.GetJWT = config.Datastore.Token
+	// The warehouse knows a connection's identity as of its handshake, so a
+	// connection lives no longer than an identity should outlast a revocation,
+	// and each one that replaces it presents a fresh token.
+	options.ConnMaxLifetime = connLifetime
 	options.MaxIdleConns = config.Connection.MaxIdleConns
 	options.MaxOpenConns = config.Connection.MaxOpenConns
 	options.DialTimeout = config.Connection.DialTimeout

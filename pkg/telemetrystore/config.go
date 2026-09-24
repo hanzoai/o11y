@@ -1,6 +1,7 @@
 package telemetrystore
 
 import (
+	"context"
 	"time"
 
 	"github.com/hanzoai/o11y/pkg/factory"
@@ -29,8 +30,18 @@ type ConnectionConfig struct {
 }
 
 type DatastoreConfig struct {
-	// DSN is the database source name.
+	// DSN is the database source name: where the warehouse is, never who is
+	// asking. A DSN that carries a user or password is refused.
 	DSN string `mapstructure:"dsn"`
+
+	// Token answers the IAM access token every warehouse connection presents,
+	// minted for the "datastore" audience. The warehouse trusts Hanzo IAM and no
+	// stored secret, so this is the only credential a connection carries, and it
+	// is asked at every handshake so a renewing source keeps each new connection
+	// current. It is the embedding process's identity and is never read from
+	// configuration: the host sets it (cmd/community for the standalone server,
+	// hanzoai/cloud for the embed) before the store is built.
+	Token func(context.Context) (string, error) `mapstructure:"-" json:"-" yaml:"-"`
 
 	// Cluster is the cluster name to use for datastore.
 	Cluster string `mapstructure:"cluster"`

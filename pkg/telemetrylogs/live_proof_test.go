@@ -28,13 +28,16 @@ func liveLogTelemetryStore(t *testing.T) telemetrystore.TelemetryStore {
 	}
 	dsn := os.Getenv("O11Y_PROOF_DSN")
 	require.NotEmpty(t, dsn, "O11Y_PROOF_DSN required")
+	require.NotEmpty(t, os.Getenv("O11Y_PROOF_TOKEN"), "O11Y_PROOF_TOKEN required: an IAM access token for the datastore audience")
 	ts, err := datastoretelemetrystore.New(
 		context.Background(),
 		instrumentationtest.New().ToProviderSettings(),
 		telemetrystore.Config{
 			Provider:   "datastore",
 			Connection: telemetrystore.ConnectionConfig{MaxOpenConns: 2, MaxIdleConns: 1, DialTimeout: 5 * time.Second},
-			Datastore:  telemetrystore.DatastoreConfig{DSN: dsn},
+			Datastore: telemetrystore.DatastoreConfig{DSN: dsn, Token: func(context.Context) (string, error) {
+				return os.Getenv("O11Y_PROOF_TOKEN"), nil
+			}},
 		},
 	)
 	require.NoError(t, err)

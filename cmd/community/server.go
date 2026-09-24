@@ -38,6 +38,13 @@ func runServer(ctx context.Context, config o11y.Config, logger *slog.Logger) err
 	// print the version
 	version.Info.PrettyPrint(config.Version)
 
+	token, err := identity()
+	if err != nil {
+		logger.ErrorContext(ctx, "failed to create o11y server", errors.Attr(err))
+		return err
+	}
+	config.TelemetryStore.Datastore.Token = token
+
 	// community.NewServer is the ONE construction shared with the hanzoai/cloud
 	// embed — same providers, same identity (iamidentn gateway-header auth), same
 	// wiring. Standalone owns the process: bind listeners, run background
