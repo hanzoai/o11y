@@ -29,10 +29,15 @@
 # from KMS (falling back to the org GH_PAT), which is the same BuildKit
 # `gh_token` this Dockerfile already reads. Nothing had to be given up to fold.
 #
-# No `version:` key: this repo carries no package.json/VERSION for it to name,
-# so bin/imgver derives the series from the highest semver already published for
-# each image and adds a patch — 1.5.63 -> 1.5.64 — which is the numbering the
-# v1.5.x tags already follow. A release tag still publishes itself verbatim.
+# `version:` names the release both images publish. bin/imgver publishes it
+# verbatim when it is above what the registry holds, and the next patch of the
+# registry's highest once it is not, so it is stated once and never needs
+# chasing. It is stated at all because each image's series is its own: o11y had
+# reached 1.5.88 and o11y-site 1.5.82 while the git tags stopped at v1.5.75, so
+# derived numbers disagreed between the two images and a git tag — which
+# publishes its own name verbatim, with nothing refusing an existing one — would
+# have overwritten an August image of the same number. Release from main.
+version: 1.5.89
 
 images:
   # The headless server (./cmd/community, O11Y_WEB_ENABLED=false). This is the

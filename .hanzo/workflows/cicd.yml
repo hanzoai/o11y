@@ -11,5 +11,12 @@ on:
   workflow_dispatch:
 jobs:
   cicd:
-    uses: hanzoai/ci/.github/workflows/build.yml@v1
+    uses: hanzoai/ci/.github/workflows/build.yml@v1.0.117
+    with:
+      # Only linux-amd64 gates: the o11y pod runs on amd64 (nodeSelector
+      # kubernetes.io/arch: amd64), and the one arm64 node is shared with every
+      # other runner, so its leg queued for hours and held the release. arm64
+      # still runs and reports as the advisory leg, which nothing waits on.
+      test-runners: '["linux-amd64"]'
+      advisory-runners: '["linux-arm64"]'
     secrets: inherit
