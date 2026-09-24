@@ -67,6 +67,17 @@ images:
     dockerfile: Dockerfile.site
     repo: ghcr.io/hanzoai/o11y-site
 
+# The console reaches o11y.hanzo.ai off the Sites plane, not off an image: the
+# ingress serves s3://hanzo-sites/hanzo/o11y-site (universe static-sites.yaml,
+# o11y-site-static) and /v1/o11y alone reaches the pod. The o11y-site image
+# above builds the same export and nothing routes to it; this is the lane that
+# puts the console live. A release tag publishes; so does main.
+site:
+  slug: o11y-site
+  dir: frontend/build
+  build: cd frontend && pnpm install --frozen-lockfile && pnpm build
+  on: [main]
+
 # The pair that has been green on this fleet already. `go build ./...` fails
 # fast on a break; the test run is `-count=1` so nothing is served from cache,
 # and it skips nothing — a suite the gate is allowed to exclude from is a suite
