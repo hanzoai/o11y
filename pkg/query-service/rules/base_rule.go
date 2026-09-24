@@ -358,21 +358,10 @@ func (r *BaseRule) ActiveAlerts() []*ruletypes.Alert {
 	return res
 }
 
+// SendAlerts hands the rule's alerts that are due to notifyFunc, addressed to
+// the rule's own org: its alertmanager holds the channels and route policies
+// the rule's thresholds name.
 func (r *BaseRule) SendAlerts(ctx context.Context, ts time.Time, resendDelay time.Duration, interval time.Duration, notifyFunc NotifyFunc) {
-	var orgID string
-	err := r.
-		sqlstore.
-		BunDB().
-		NewSelect().
-		Table("organizations").
-		ColumnExpr("id").
-		Limit(1).
-		Scan(ctx, &orgID)
-	if err != nil {
-		r.logger.ErrorContext(ctx, "failed to get org ids", errors.Attr(err))
-		return
-	}
-
 	alerts := []*ruletypes.Alert{}
 	r.ForEachActiveAlert(func(alert *ruletypes.Alert) {
 		if alert.NeedsSending(ts, resendDelay) {
@@ -386,7 +375,7 @@ func (r *BaseRule) SendAlerts(ctx context.Context, ts time.Time, resendDelay tim
 			alerts = append(alerts, &anew)
 		}
 	})
-	notifyFunc(ctx, orgID, alerts...)
+	notifyFunc(ctx, r.orgID.StringValue(), alerts...)
 }
 
 // withTenant scopes ctx to the rule's org when req reads event.log or

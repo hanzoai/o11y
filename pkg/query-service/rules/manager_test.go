@@ -14,8 +14,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
 	"github.com/hanzoai/o11y/pkg/prometheus"
 	"github.com/hanzoai/o11y/pkg/prometheus/prometheustest"
-	"github.com/hanzoai/o11y/pkg/sqlstore"
-	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstoretest"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/telemetrystore/telemetrystoretest"
 	"github.com/hanzoai/o11y/pkg/types/alertmanagertypes"
@@ -58,14 +56,6 @@ func TestManager_TestNotification_SendUnmatched_ThresholdRule(t *testing.T) {
 							triggeredTestAlerts = append(triggeredTestAlerts, args.Get(3).(map[*alertmanagertypes.PostableAlert][]string))
 						}).Return(nil).Times(tc.ExpectAlerts)
 					}
-				},
-				SqlStoreHook: func(store sqlstore.SQLStore) {
-					mockStore := store.(*sqlstoretest.Provider)
-					// Mock the organizations query that SendAlerts makes
-					// Bun generates: SELECT id FROM organizations LIMIT 1 (or SELECT "id" FROM "organizations" LIMIT 1)
-					orgRows := mockStore.Mock().NewRows([]string{"id"}).AddRow(orgID.StringValue())
-					// Match bun's generated query pattern - bun may quote identifiers
-					mockStore.Mock().ExpectQuery("SELECT (.+) FROM (.+)organizations(.+) LIMIT (.+)").WillReturnRows(orgRows)
 				},
 				TelemetryStoreHook: func(store telemetrystore.TelemetryStore) {
 					mockStore := store.(*telemetrystoretest.Provider)
@@ -171,12 +161,6 @@ func TestManager_TestNotification_SendUnmatched_PromRule(t *testing.T) {
 							triggeredTestAlerts = append(triggeredTestAlerts, args.Get(3).(map[*alertmanagertypes.PostableAlert][]string))
 						}).Return(nil).Times(tc.ExpectAlerts)
 					}
-				},
-				SqlStoreHook: func(store sqlstore.SQLStore) {
-					mockStore := store.(*sqlstoretest.Provider)
-					// Mock the organizations query that SendAlerts makes
-					orgRows := mockStore.Mock().NewRows([]string{"id"}).AddRow(orgID.StringValue())
-					mockStore.Mock().ExpectQuery("SELECT (.+) FROM (.+)organizations(.+) LIMIT (.+)").WillReturnRows(orgRows)
 				},
 				TelemetryStoreHook: func(store telemetrystore.TelemetryStore) {
 					mockStore := store.(*telemetrystoretest.Provider)
