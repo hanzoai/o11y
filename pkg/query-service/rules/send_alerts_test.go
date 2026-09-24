@@ -5,7 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/hanzoai/o11y/pkg/instrumentation/instrumentationtest"
+	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstoretest"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/stretchr/testify/require"
@@ -16,10 +19,17 @@ import (
 func TestSendAlertsAddressesTheRulesOrg(t *testing.T) {
 	orgID := valuer.GenerateUUID()
 	now := time.Now()
+
+	// The organizations table lists another org first.
+	store := sqlstoretest.New(sqlstore.Config{Provider: "sqlite"}, sqlmock.QueryMatcherRegexp)
+	store.Mock().ExpectQuery(`SELECT .* FROM .*organizations`).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(valuer.GenerateUUID().StringValue()))
+
 	r := &BaseRule{
-		id:     "rule-1",
-		orgID:  orgID,
-		logger: instrumentationtest.New().Logger(),
+		id:       "rule-1",
+		orgID:    orgID,
+		sqlstore: store,
+		logger:   instrumentationtest.New().Logger(),
 		Active: map[uint64]*ruletypes.Alert{
 			1: {State: ruletypes.StateFiring, FiredAt: now.Add(-time.Minute)},
 		},
