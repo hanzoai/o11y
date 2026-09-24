@@ -62,6 +62,9 @@ func (m *IdentN) Wrap(next http.Handler) http.Handler {
 		}
 
 		ctx = authtypes.NewContextWithClaims(ctx, claims)
+		if identity.Tenant != "" {
+			ctx = authtypes.NewContextWithTenant(ctx, identity.Tenant)
+		}
 
 		comment := ctxtypes.CommentFromContext(ctx)
 		comment.Set("identn_provider", claims.IdentNProvider.StringValue())

@@ -12,6 +12,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/modules/rulestatehistory"
 	"github.com/hanzoai/o11y/pkg/queryparser"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
@@ -386,6 +387,43 @@ func (r *BaseRule) SendAlerts(ctx context.Context, ts time.Time, resendDelay tim
 		}
 	})
 	notifyFunc(ctx, orgID, alerts...)
+}
+
+// withTenant scopes ctx to the rule's org when req reads event.log or
+// event.span, whose builders bind `org = ?`. The tenant is the org's name, the
+// slug its rows carry in `org`. A metrics-only request needs none.
+func (r *BaseRule) withTenant(ctx context.Context, req *qbtypes.QueryRangeRequest) (context.Context, error) {
+	if !readsEvents(req) {
+		return ctx, nil
+	}
+	var name string
+	err := r.sqlstore.BunDB().NewSelect().
+		Table("organizations").
+		Column("name").
+		Where("id = ?", r.orgID.StringValue()).
+		Scan(ctx, &name)
+	if err != nil {
+		return ctx, errors.Wrapf(err, errors.TypeNotFound, errors.CodeNotFound, "rule %s: no name for org %s to scope its reads", r.id, r.orgID.StringValue())
+	}
+	return authtypes.NewContextWithTenant(ctx, name), nil
+}
+
+// readsEvents reports whether req has a logs or traces builder query, or a
+// trace operator — the queries that read event.log and event.span.
+func readsEvents(req *qbtypes.QueryRangeRequest) bool {
+	if req == nil {
+		return false
+	}
+	for _, q := range req.CompositeQuery.Queries {
+		if q.Type == qbtypes.QueryTypeTraceOperator {
+			return true
+		}
+		switch q.Spec.(type) {
+		case qbtypes.QueryBuilderQuery[qbtypes.LogAggregation], qbtypes.QueryBuilderQuery[qbtypes.TraceAggregation]:
+			return true
+		}
+	}
+	return false
 }
 
 func (r *BaseRule) ForEachActiveAlert(f func(*ruletypes.Alert)) {

@@ -1,7 +1,6 @@
 package telemetrylogs
 
 import (
-	"context"
 	"regexp"
 	"testing"
 	"time"
@@ -72,8 +71,8 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 				},
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint), __limit_cte AS (SELECT toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, countDistinct(multiIf(notEmpty(service), service, NULL)) AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? GROUP BY `service.name` ORDER BY __result_0 DESC LIMIT ?) SELECT toStartOfInterval(time, INTERVAL 30 SECOND) AS ts, toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, countDistinct(multiIf(notEmpty(service), service, NULL)) AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND (`service.name`) GLOBAL IN (SELECT `service.name` FROM __limit_cte) GROUP BY ts, `service.name`",
-				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1705397400), uint64(1705485600), "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600), 10, "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600)},
+				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint), __limit_cte AS (SELECT toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, countDistinct(multiIf(notEmpty(service), service, NULL)) AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? GROUP BY `service.name` ORDER BY __result_0 DESC LIMIT ?) SELECT toStartOfInterval(time, INTERVAL 30 SECOND) AS ts, toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, countDistinct(multiIf(notEmpty(service), service, NULL)) AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? AND (`service.name`) GLOBAL IN (SELECT `service.name` FROM __limit_cte) GROUP BY ts, `service.name`",
+				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1705397400), uint64(1705485600), "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600), testTenant, 10, "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600), testTenant},
 			},
 			expectedErr: nil,
 		},
@@ -103,8 +102,8 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 				},
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __limit_cte AS (SELECT toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, countDistinct(multiIf(notEmpty(service), service, NULL)) AS __result_0 FROM event.log WHERE (service = ? OR (attributes['http.method'] = ? AND mapContains(attributes, 'http.method') = ?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? GROUP BY `service.name` ORDER BY __result_0 DESC LIMIT ?) SELECT toStartOfInterval(time, INTERVAL 30 SECOND) AS ts, toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, countDistinct(multiIf(notEmpty(service), service, NULL)) AS __result_0 FROM event.log WHERE (service = ? OR (attributes['http.method'] = ? AND mapContains(attributes, 'http.method') = ?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND (`service.name`) GLOBAL IN (SELECT `service.name` FROM __limit_cte) GROUP BY ts, `service.name`",
-				Args:  []any{"redis-manual", "GET", true, "1705226400000000000", uint64(1705224600), "1705485600000000000", uint64(1705485600), 10, "redis-manual", "GET", true, "1705226400000000000", uint64(1705224600), "1705485600000000000", uint64(1705485600)},
+				Query: "WITH __limit_cte AS (SELECT toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, countDistinct(multiIf(notEmpty(service), service, NULL)) AS __result_0 FROM event.log WHERE (service = ? OR (attributes['http.method'] = ? AND mapContains(attributes, 'http.method') = ?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? GROUP BY `service.name` ORDER BY __result_0 DESC LIMIT ?) SELECT toStartOfInterval(time, INTERVAL 30 SECOND) AS ts, toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, countDistinct(multiIf(notEmpty(service), service, NULL)) AS __result_0 FROM event.log WHERE (service = ? OR (attributes['http.method'] = ? AND mapContains(attributes, 'http.method') = ?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? AND (`service.name`) GLOBAL IN (SELECT `service.name` FROM __limit_cte) GROUP BY ts, `service.name`",
+				Args:  []any{"redis-manual", "GET", true, "1705226400000000000", uint64(1705224600), "1705485600000000000", uint64(1705485600), testTenant, 10, "redis-manual", "GET", true, "1705226400000000000", uint64(1705224600), "1705485600000000000", uint64(1705485600), testTenant},
 			},
 			expectedErr: nil,
 		},
@@ -144,8 +143,8 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 				},
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint), __limit_cte AS (SELECT toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, count() AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? GROUP BY `service.name` ORDER BY `service.name` desc LIMIT ?) SELECT toStartOfInterval(time, INTERVAL 30 SECOND) AS ts, toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, count() AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND (`service.name`) GLOBAL IN (SELECT `service.name` FROM __limit_cte) GROUP BY ts, `service.name` ORDER BY `service.name` desc, ts desc",
-				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1705397400), uint64(1705485600), "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600), 10, "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600)},
+				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint), __limit_cte AS (SELECT toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, count() AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? GROUP BY `service.name` ORDER BY `service.name` desc LIMIT ?) SELECT toStartOfInterval(time, INTERVAL 30 SECOND) AS ts, toString(multiIf(notEmpty(service), service, NULL)) AS `service.name`, count() AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? AND (`service.name`) GLOBAL IN (SELECT `service.name` FROM __limit_cte) GROUP BY ts, `service.name` ORDER BY `service.name` desc, ts desc",
+				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1705397400), uint64(1705485600), "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600), testTenant, 10, "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600), testTenant},
 			},
 			expectedErr: nil,
 		},
@@ -177,8 +176,8 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 				},
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint), __limit_cte AS (SELECT toString(multiIf(mapContains(attributes, 'materialized.key.name') = ?, attributes['materialized.key.name'], NULL)) AS `materialized.key.name`, count() AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? GROUP BY `materialized.key.name` ORDER BY __result_0 DESC LIMIT ?) SELECT toStartOfInterval(time, INTERVAL 30 SECOND) AS ts, toString(multiIf(mapContains(attributes, 'materialized.key.name') = ?, attributes['materialized.key.name'], NULL)) AS `materialized.key.name`, count() AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND (`materialized.key.name`) GLOBAL IN (SELECT `materialized.key.name` FROM __limit_cte) GROUP BY ts, `materialized.key.name`",
-				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1705397400), uint64(1705485600), true, "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600), 10, true, "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600)},
+				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint), __limit_cte AS (SELECT toString(multiIf(mapContains(attributes, 'materialized.key.name') = ?, attributes['materialized.key.name'], NULL)) AS `materialized.key.name`, count() AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? GROUP BY `materialized.key.name` ORDER BY __result_0 DESC LIMIT ?) SELECT toStartOfInterval(time, INTERVAL 30 SECOND) AS ts, toString(multiIf(mapContains(attributes, 'materialized.key.name') = ?, attributes['materialized.key.name'], NULL)) AS `materialized.key.name`, count() AS __result_0 FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? AND (`materialized.key.name`) GLOBAL IN (SELECT `materialized.key.name` FROM __limit_cte) GROUP BY ts, `materialized.key.name`",
+				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1705397400), uint64(1705485600), true, "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600), testTenant, 10, true, "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600), testTenant},
 			},
 		},
 		{
@@ -200,14 +199,14 @@ func TestStatementBuilderTimeSeries(t *testing.T) {
 				Limit: 10,
 			},
 			expected: qbtypes.Statement{
-				Query: "SELECT toStartOfInterval(time, INTERVAL 30 SECOND) AS ts, count() AS __result_0 FROM event.log WHERE ((match(attributes['materialized.key.name'], ?) AND mapContains(attributes, 'materialized.key.name') = ?) OR (attributes['materialized.key.name'] = ? AND mapContains(attributes, 'materialized.key.name') = ?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? GROUP BY ts",
-				Args:  []any{"redis.*", true, "memcached", true, "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600)},
+				Query: "SELECT toStartOfInterval(time, INTERVAL 30 SECOND) AS ts, count() AS __result_0 FROM event.log WHERE ((match(attributes['materialized.key.name'], ?) AND mapContains(attributes, 'materialized.key.name') = ?) OR (attributes['materialized.key.name'] = ? AND mapContains(attributes, 'materialized.key.name') = ?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? GROUP BY ts",
+				Args:  []any{"redis.*", true, "memcached", true, "1705399200000000000", uint64(1705397400), "1705485600000000000", uint64(1705485600), testTenant},
 			},
 			expectedErr: nil,
 		},
 	}
 
-	ctx := context.Background()
+	ctx := tenantCtx()
 	fl := flaggertest.New(t)
 
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
@@ -273,8 +272,8 @@ func TestStatementBuilderListQuery(t *testing.T) {
 				Limit: 10,
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1747945619), uint64(1747983448), "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1747945619), uint64(1747983448), "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -301,8 +300,8 @@ func TestStatementBuilderListQuery(t *testing.T) {
 				},
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? ORDER BY attributes['materialized.key.name'] AS `materialized.key.name` desc LIMIT ?",
-				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1747945619), uint64(1747983448), "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? ORDER BY attributes['materialized.key.name'] AS `materialized.key.name` desc LIMIT ?",
+				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1747945619), uint64(1747983448), "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -329,8 +328,8 @@ func TestStatementBuilderListQuery(t *testing.T) {
 				},
 			},
 			expected: qbtypes.Statement{
-				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE ((match(attributes['materialized.key.name'], ?) AND mapContains(attributes, 'materialized.key.name') = ?) OR (attributes['materialized.key.name'] = ? AND mapContains(attributes, 'materialized.key.name') = ?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? ORDER BY attributes['materialized.key.name'] AS `materialized.key.name` desc LIMIT ?",
-				Args:  []any{"redis.*", true, "memcached", true, "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE ((match(attributes['materialized.key.name'], ?) AND mapContains(attributes, 'materialized.key.name') = ?) OR (attributes['materialized.key.name'] = ? AND mapContains(attributes, 'materialized.key.name') = ?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? ORDER BY attributes['materialized.key.name'] AS `materialized.key.name` desc LIMIT ?",
+				Args:  []any{"redis.*", true, "memcached", true, "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -352,7 +351,7 @@ func TestStatementBuilderListQuery(t *testing.T) {
 		},
 	}
 
-	ctx := context.Background()
+	ctx := tenantCtx()
 	fl := flaggertest.New(t)
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
 	fm := NewFieldMapper(fl)
@@ -419,8 +418,8 @@ func TestStatementBuilderListQueryResourceTests(t *testing.T) {
 				Limit: 10,
 			},
 			expected: qbtypes.Statement{
-				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE match(LOWER(body), LOWER(?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:  []any{"hello", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE match(LOWER(body), LOWER(?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:  []any{"hello", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -447,8 +446,8 @@ func TestStatementBuilderListQueryResourceTests(t *testing.T) {
 				},
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND match(LOWER(body), LOWER(?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? ORDER BY attributes['materialized.key.name'] AS `materialized.key.name` desc LIMIT ?",
-				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1747945619), uint64(1747983448), "hello", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND match(LOWER(body), LOWER(?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? ORDER BY attributes['materialized.key.name'] AS `materialized.key.name` desc LIMIT ?",
+				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1747945619), uint64(1747983448), "hello", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -463,8 +462,8 @@ func TestStatementBuilderListQueryResourceTests(t *testing.T) {
 				Limit: 10,
 			},
 			expected: qbtypes.Statement{
-				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE (JSON_VALUE(body, '$.\"status\"') = ? AND JSON_EXISTS(body, '$.\"status\"')) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:  []any{"success", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE (JSON_VALUE(body, '$.\"status\"') = ? AND JSON_EXISTS(body, '$.\"status\"')) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:  []any{"success", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -479,8 +478,8 @@ func TestStatementBuilderListQueryResourceTests(t *testing.T) {
 				Limit: 10,
 			},
 			expected: qbtypes.Statement{
-				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE ((JSONExtract(JSON_QUERY(body, '$.\"user_names\"[*]'), 'Array(String)') = ?) AND JSON_EXISTS(body, '$.\"user_names\"[*]')) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:  []any{"john_doe", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE ((JSONExtract(JSON_QUERY(body, '$.\"user_names\"[*]'), 'Array(String)') = ?) AND JSON_EXISTS(body, '$.\"user_names\"[*]')) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:  []any{"john_doe", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -495,14 +494,14 @@ func TestStatementBuilderListQueryResourceTests(t *testing.T) {
 				Limit: 10,
 			},
 			expected: qbtypes.Statement{
-				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE has(JSONExtract(JSON_QUERY(body, '$.\"user_names\"[*]'), 'Array(String)'), ?) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:  []any{"john_doe", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE has(JSONExtract(JSON_QUERY(body, '$.\"user_names\"[*]'), 'Array(String)'), ?) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:  []any{"john_doe", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
 	}
 
-	ctx := context.Background()
+	ctx := tenantCtx()
 	fl := flaggertest.New(t)
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
 	fm := NewFieldMapper(fl)
@@ -581,7 +580,7 @@ func TestStatementBuilderTimeSeriesBodyGroupBy(t *testing.T) {
 		},
 	}
 
-	ctx := context.Background()
+	ctx := tenantCtx()
 	fl := flaggertest.New(t)
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
 	fm := NewFieldMapper(fl)
@@ -644,8 +643,8 @@ func TestStatementBuilderListQueryServiceCollision(t *testing.T) {
 				Limit: 10,
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE ((simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND (body ILIKE ?) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1747945619), uint64(1747983448), "%error%", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE ((simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?)) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND (body ILIKE ?) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1747945619), uint64(1747983448), "%error%", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 			expectWarn:  true,
@@ -673,15 +672,15 @@ func TestStatementBuilderListQueryServiceCollision(t *testing.T) {
 				},
 			},
 			expected: qbtypes.Statement{
-				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND body ILIKE ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? ORDER BY attributes['materialized.key.name'] AS `materialized.key.name` desc LIMIT ?",
-				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1747945619), uint64(1747983448), "%error%", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "WITH __resource_filter AS (SELECT fingerprint FROM event.log_resource WHERE (simpleJSONExtractString(labels, 'service.name') = ? AND labels LIKE ? AND labels LIKE ?) AND seen_at_ts_bucket_start >= ? AND seen_at_ts_bucket_start <= ? GROUP BY fingerprint) SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter) AND body ILIKE ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? ORDER BY attributes['materialized.key.name'] AS `materialized.key.name` desc LIMIT ?",
+				Args:  []any{"cartservice", "%service.name%", "%service.name\":\"cartservice%", uint64(1747945619), uint64(1747983448), "%error%", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 			expectWarn:  true,
 		},
 	}
 
-	ctx := context.Background()
+	ctx := tenantCtx()
 	mockMetadataStore := telemetrytypestest.NewMockMetadataStore()
 	fl := flaggertest.New(t)
 	fm := NewFieldMapper(fl)
@@ -968,8 +967,8 @@ func TestStmtBuilderBodyField(t *testing.T) {
 			},
 			enableUseJSONBody: true,
 			expected: qbtypes.Statement{
-				Query:    "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body_v2 as body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body_v2.message <> ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:     []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query:    "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body_v2 as body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body_v2.message <> ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:     []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 				Warnings: []string{bodySearchDefaultWarning},
 			},
 			expectedErr: nil,
@@ -984,8 +983,8 @@ func TestStmtBuilderBodyField(t *testing.T) {
 			},
 			enableUseJSONBody: false,
 			expected: qbtypes.Statement{
-				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body <> ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:  []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body <> ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:  []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -999,8 +998,8 @@ func TestStmtBuilderBodyField(t *testing.T) {
 			},
 			enableUseJSONBody: true,
 			expected: qbtypes.Statement{
-				Query:    "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body_v2 as body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body_v2.message = ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:     []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query:    "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body_v2 as body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body_v2.message = ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:     []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 				Warnings: []string{bodySearchDefaultWarning},
 			},
 			expectedErr: nil,
@@ -1015,8 +1014,8 @@ func TestStmtBuilderBodyField(t *testing.T) {
 			},
 			enableUseJSONBody: false,
 			expected: qbtypes.Statement{
-				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body = ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:  []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body = ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:  []any{"", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -1030,8 +1029,8 @@ func TestStmtBuilderBodyField(t *testing.T) {
 			},
 			enableUseJSONBody: true,
 			expected: qbtypes.Statement{
-				Query:    "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body_v2 as body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body_v2.message ILIKE ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:     []any{"%error%", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query:    "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body_v2 as body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body_v2.message ILIKE ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:     []any{"%error%", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 				Warnings: []string{bodySearchDefaultWarning},
 			},
 			expectedErr: nil,
@@ -1046,8 +1045,8 @@ func TestStmtBuilderBodyField(t *testing.T) {
 			},
 			enableUseJSONBody: false,
 			expected: qbtypes.Statement{
-				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body ILIKE ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:  []any{"%error%", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE body ILIKE ? AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:  []any{"%error%", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -1079,7 +1078,7 @@ func TestStmtBuilderBodyField(t *testing.T) {
 				100000,
 			)
 
-			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
+			q, err := statementBuilder.Build(tenantCtx(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
 			if c.expectedErr != nil {
 				require.Error(t, err)
 				require.Contains(t, err.Error(), c.expectedErr.Error())
@@ -1116,8 +1115,8 @@ func TestStmtBuilderBodyFullTextSearch(t *testing.T) {
 			},
 			enableUseJSONBody: true,
 			expected: qbtypes.Statement{
-				Query:    "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body_v2 as body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE match(LOWER(body_v2.message), LOWER(?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:     []any{"error", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query:    "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body_v2 as body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE match(LOWER(body_v2.message), LOWER(?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:     []any{"error", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 				Warnings: []string{querybuilder.BodyFullTextSearchDefaultWarning},
 			},
 			expectedErr: nil,
@@ -1132,8 +1131,8 @@ func TestStmtBuilderBodyFullTextSearch(t *testing.T) {
 			},
 			enableUseJSONBody: true,
 			expected: qbtypes.Statement{
-				Query:    "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body_v2 as body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE match(LOWER(body_v2.message), LOWER(?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:     []any{"error", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query:    "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body_v2 as body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE match(LOWER(body_v2.message), LOWER(?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:     []any{"error", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 				Warnings: []string{querybuilder.BodyFullTextSearchDefaultWarning},
 			},
 			expectedErr: nil,
@@ -1148,8 +1147,8 @@ func TestStmtBuilderBodyFullTextSearch(t *testing.T) {
 			},
 			enableUseJSONBody: false,
 			expected: qbtypes.Statement{
-				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE match(LOWER(body), LOWER(?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? LIMIT ?",
-				Args:  []any{"error", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), 10},
+				Query: "SELECT toUnixTimestamp64Nano(time) AS timestamp, id, trace_id, span_id, toUInt32OrZero(attributes['trace_flags']) AS trace_flags, severity_text, severity_number, attributes['scope.name'] AS scope_name, attributes['scope.version'] AS scope_version, body, attributes AS attributes_string, CAST(map() AS Map(String, Float64)) AS attributes_number, CAST(map() AS Map(String, Bool)) AS attributes_bool, map('service.name', toString(service), 'host', toString(host)) AS resources_string, CAST(map() AS Map(String, String)) AS scope_string FROM event.log WHERE match(LOWER(body), LOWER(?)) AND time >= ? AND ts_bucket_start >= ? AND time < ? AND ts_bucket_start <= ? AND org = ? LIMIT ?",
+				Args:  []any{"error", "1747947419000000000", uint64(1747945619), "1747983448000000000", uint64(1747983448), testTenant, 10},
 			},
 			expectedErr: nil,
 		},
@@ -1181,7 +1180,7 @@ func TestStmtBuilderBodyFullTextSearch(t *testing.T) {
 				100000,
 			)
 
-			q, err := statementBuilder.Build(context.Background(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
+			q, err := statementBuilder.Build(tenantCtx(), 1747947419000, 1747983448000, c.requestType, c.query, nil)
 			if c.expectedErr != nil {
 				require.Error(t, err)
 				require.Contains(t, err.Error(), c.expectedErr.Error())
@@ -1220,7 +1219,7 @@ func TestSkipResourceFingerprintLogs(t *testing.T) {
 	t.Run("disabled uses the legacy CTE", func(t *testing.T) {
 		sb := newSkipResourceFingerprintLogsBuilder(t, nil, false, threshold)
 
-		stmt, err := sb.Build(context.Background(), startMs, endMs, qbtypes.RequestTypeRaw, query, nil)
+		stmt, err := sb.Build(tenantCtx(), startMs, endMs, qbtypes.RequestTypeRaw, query, nil)
 		require.NoError(t, err)
 		require.Contains(t, stmt.Query, "__resource_filter AS (SELECT fingerprint")
 		require.Contains(t, stmt.Query, "resource_fingerprint GLOBAL IN (SELECT fingerprint FROM __resource_filter)")
@@ -1237,7 +1236,7 @@ func TestSkipResourceFingerprintLogs(t *testing.T) {
 
 		sb := newSkipResourceFingerprintLogsBuilder(t, mockStore, true, threshold)
 
-		stmt, err := sb.Build(context.Background(), startMs, endMs, qbtypes.RequestTypeRaw, query, nil)
+		stmt, err := sb.Build(tenantCtx(), startMs, endMs, qbtypes.RequestTypeRaw, query, nil)
 		require.NoError(t, err)
 
 		require.Contains(t, stmt.Query, "__resource_filter AS (SELECT fingerprint")
@@ -1257,7 +1256,7 @@ func TestSkipResourceFingerprintLogs(t *testing.T) {
 
 		sb := newSkipResourceFingerprintLogsBuilder(t, mockStore, true, threshold)
 
-		stmt, err := sb.Build(context.Background(), startMs, endMs, qbtypes.RequestTypeRaw, query, nil)
+		stmt, err := sb.Build(tenantCtx(), startMs, endMs, qbtypes.RequestTypeRaw, query, nil)
 		require.NoError(t, err)
 
 		require.NotContains(t, stmt.Query, "__resource_filter AS")

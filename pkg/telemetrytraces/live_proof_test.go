@@ -94,7 +94,7 @@ func TestLiveProofTraces(t *testing.T) {
 			Order: []qbtypes.OrderBy{{Key: qbtypes.OrderByKey{TelemetryFieldKey: telemetrytypes.TelemetryFieldKey{Name: "time"}}, Direction: qbtypes.OrderDirectionDesc}},
 			Limit: 10,
 		}
-		stmt, err := statementBuilder.Build(context.Background(), start, end, qbtypes.RequestTypeRaw, q, nil)
+		stmt, err := statementBuilder.Build(tenantCtx(), start, end, qbtypes.RequestTypeRaw, q, nil)
 		require.NoError(t, err)
 		n := execCount(t, ts, *stmt)
 		t.Logf("span list rows=%d\nSQL: %s\nARGS: %v", n, stmt.Query, stmt.Args)
@@ -107,7 +107,7 @@ func TestLiveProofTraces(t *testing.T) {
 			Filter: &qbtypes.Filter{Expression: "kind_string = 'client' AND has_error = true AND duration_nano > 1000"},
 			Limit:  10,
 		}
-		stmt, err := statementBuilder.Build(context.Background(), start, end, qbtypes.RequestTypeRaw, q, nil)
+		stmt, err := statementBuilder.Build(tenantCtx(), start, end, qbtypes.RequestTypeRaw, q, nil)
 		require.NoError(t, err)
 		n := execCount(t, ts, *stmt)
 		t.Logf("intrinsic rows=%d\nSQL: %s\nARGS: %v", n, stmt.Query, stmt.Args)
@@ -123,7 +123,7 @@ func TestLiveProofTraces(t *testing.T) {
 			GroupBy:      []qbtypes.GroupByKey{{TelemetryFieldKey: telemetrytypes.TelemetryFieldKey{Name: "service.name"}}},
 			Limit:        10,
 		}
-		stmt, err := statementBuilder.Build(context.Background(), start, end, qbtypes.RequestTypeTimeSeries, q, nil)
+		stmt, err := statementBuilder.Build(tenantCtx(), start, end, qbtypes.RequestTypeTimeSeries, q, nil)
 		require.NoError(t, err)
 		n := execCount(t, ts, *stmt)
 		t.Logf("timeseries rows=%d\nSQL: %s\nARGS: %v", n, stmt.Query, stmt.Args)
@@ -136,7 +136,7 @@ func TestLiveProofTraces(t *testing.T) {
 			Filter: &qbtypes.Filter{Expression: "service.name = 'o11y-writeside-proof'"},
 			Limit:  10,
 		}
-		stmt, err := statementBuilder.Build(context.Background(), start, end, qbtypes.RequestTypeTrace, q, nil)
+		stmt, err := statementBuilder.Build(tenantCtx(), start, end, qbtypes.RequestTypeTrace, q, nil)
 		require.NoError(t, err)
 		n := execCount(t, ts, *stmt)
 		t.Logf("trace query rows=%d\nSQL: %s\nARGS: %v", n, stmt.Query, stmt.Args)
@@ -149,7 +149,7 @@ func TestLiveProofTraces(t *testing.T) {
 			Filter: &qbtypes.Filter{Expression: "isroot = true"},
 			Limit:  5,
 		}
-		stmt, err := statementBuilder.Build(context.Background(), start, end, qbtypes.RequestTypeRaw, q, nil)
+		stmt, err := statementBuilder.Build(tenantCtx(), start, end, qbtypes.RequestTypeRaw, q, nil)
 		require.NoError(t, err)
 		n := execCount(t, ts, *stmt)
 		t.Logf("isroot rows=%d\nSQL: %s\nARGS: %v", n, stmt.Query, stmt.Args)
@@ -162,7 +162,7 @@ func TestLiveProofTraces(t *testing.T) {
 			Filter: &qbtypes.Filter{Expression: "isentrypoint = true"},
 			Limit:  5,
 		}
-		stmt, err := statementBuilder.Build(context.Background(), start, end, qbtypes.RequestTypeRaw, q, nil)
+		stmt, err := statementBuilder.Build(tenantCtx(), start, end, qbtypes.RequestTypeRaw, q, nil)
 		require.NoError(t, err)
 		n := execCount(t, ts, *stmt)
 		t.Logf("isentrypoint rows=%d\nSQL: %s\nARGS: %v", n, stmt.Query, stmt.Args)

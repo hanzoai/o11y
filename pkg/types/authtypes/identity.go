@@ -32,6 +32,9 @@ type Identity struct {
 	OrgID            valuer.UUID    `json:"orgId"`
 	IdenNProvider    IdentNProvider `json:"identNProvider"`
 	Email            valuer.Email   `json:"email"`
+	// Tenant is the org slug the identity's warehouse reads are scoped to. Only
+	// the Hanzo IAM provider sets it, from the validated X-Org-Id.
+	Tenant string `json:"tenant,omitempty"`
 }
 
 func NewIdentity(userID valuer.UUID, serviceAccountID valuer.UUID, principal Principal, orgID valuer.UUID, email valuer.Email, identNProvider IdentNProvider) *Identity {

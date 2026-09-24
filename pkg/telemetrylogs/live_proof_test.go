@@ -89,7 +89,7 @@ func TestLiveProofLogs(t *testing.T) {
 			Order:  []qbtypes.OrderBy{{Key: qbtypes.OrderByKey{TelemetryFieldKey: telemetrytypes.TelemetryFieldKey{Name: "time"}}, Direction: qbtypes.OrderDirectionDesc}},
 			Limit:  10,
 		}
-		stmt, err := statementBuilder.Build(context.Background(), start, end, qbtypes.RequestTypeRaw, q, nil)
+		stmt, err := statementBuilder.Build(tenantCtx(), start, end, qbtypes.RequestTypeRaw, q, nil)
 		require.NoError(t, err)
 		n := execLogCount(t, ts, *stmt)
 		t.Logf("log search rows=%d\nSQL: %s\nARGS: %v", n, stmt.Query, stmt.Args)
@@ -105,7 +105,7 @@ func TestLiveProofLogs(t *testing.T) {
 			GroupBy:      []qbtypes.GroupByKey{{TelemetryFieldKey: telemetrytypes.TelemetryFieldKey{Name: "severity_text"}}},
 			Limit:        10,
 		}
-		stmt, err := statementBuilder.Build(context.Background(), start, end, qbtypes.RequestTypeTimeSeries, q, nil)
+		stmt, err := statementBuilder.Build(tenantCtx(), start, end, qbtypes.RequestTypeTimeSeries, q, nil)
 		require.NoError(t, err)
 		n := execLogCount(t, ts, *stmt)
 		t.Logf("log timeseries rows=%d\nSQL: %s\nARGS: %v", n, stmt.Query, stmt.Args)
@@ -118,7 +118,7 @@ func TestLiveProofLogs(t *testing.T) {
 			Filter: &qbtypes.Filter{Expression: "trace_id EXISTS"},
 			Limit:  10,
 		}
-		stmt, err := statementBuilder.Build(context.Background(), start, end, qbtypes.RequestTypeRaw, q, nil)
+		stmt, err := statementBuilder.Build(tenantCtx(), start, end, qbtypes.RequestTypeRaw, q, nil)
 		require.NoError(t, err)
 		n := execLogCount(t, ts, *stmt)
 		t.Logf("log trace_id exists rows=%d\nSQL: %s\nARGS: %v", n, stmt.Query, stmt.Args)

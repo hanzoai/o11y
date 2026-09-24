@@ -178,6 +178,10 @@ func (r *ThresholdRule) buildAndRunQuery(ctx context.Context, orgID valuer.UUID,
 		instrumentationtypes.CodeFunctionName: "buildAndRunQuery",
 	})
 
+	ctx, err = r.withTenant(ctx, params)
+	if err != nil {
+		return nil, err
+	}
 	v5Result, err := r.querier.QueryRange(ctx, orgID, params)
 	if err != nil {
 		return nil, err

@@ -839,7 +839,7 @@ func TestThresholdRuleTracesLink(t *testing.T) {
 		queryString := "SELECT any"
 		telemetryStore.Mock().
 			ExpectQuery(queryString).
-			WithArgs(nil, nil, nil, nil, nil, nil, nil).
+			WithArgs(nil, nil, nil, nil, nil, nil, nil, nil).
 			WillReturnRows(rows)
 
 		querier := prepareQuerierForTraces(t, telemetryStore, keysMap)
@@ -867,7 +867,8 @@ func TestThresholdRuleTracesLink(t *testing.T) {
 		}
 
 		externalURL := mustParseURL(t, "http://localhost:8080")
-		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, querier, logger, externalURL)
+		orgID := valuer.GenerateUUID()
+		rule, err := NewThresholdRule("69", orgID, &postableRule, querier, logger, externalURL, WithSQLStore(orgNameStore(t, orgID, "acme")))
 		if err != nil {
 			assert.NoError(t, err)
 		}
@@ -957,7 +958,7 @@ func TestThresholdRuleLogsLink(t *testing.T) {
 		queryString := "SELECT any"
 		telemetryStore.Mock().
 			ExpectQuery(queryString).
-			WithArgs(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil).
+			WithArgs(nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil).
 			WillReturnRows(rows)
 
 		querier := prepareQuerierForLogs(t, telemetryStore, keysMap)
@@ -985,7 +986,8 @@ func TestThresholdRuleLogsLink(t *testing.T) {
 		}
 
 		externalURL := mustParseURL(t, "http://localhost:8080")
-		rule, err := NewThresholdRule("69", valuer.GenerateUUID(), &postableRule, querier, logger, externalURL)
+		orgID := valuer.GenerateUUID()
+		rule, err := NewThresholdRule("69", orgID, &postableRule, querier, logger, externalURL, WithSQLStore(orgNameStore(t, orgID, "acme")))
 		if err != nil {
 			assert.NoError(t, err)
 		}

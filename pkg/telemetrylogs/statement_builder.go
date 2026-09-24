@@ -712,6 +712,12 @@ func (b *logQueryStatementBuilder) addFilterCondition(
 		sb.Where(sb.L("time", fmt.Sprintf("%d", end)), sb.LE("ts_bucket_start", endBucket))
 	}
 
+	tenant, err := querybuilder.TenantCondition(ctx, sb)
+	if err != nil {
+		return preparedWhereClause, err
+	}
+	sb.Where(tenant)
+
 	return preparedWhereClause, nil
 }
 

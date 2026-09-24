@@ -63,7 +63,9 @@ func (b *traceOperatorCTEBuilder) collectQueries() error {
 
 func (b *traceOperatorCTEBuilder) build(ctx context.Context, requestType qbtypes.RequestType) (*qbtypes.Statement, error) {
 
-	b.buildAllSpansCTE(ctx)
+	if err := b.buildAllSpansCTE(ctx); err != nil {
+		return nil, err
+	}
 
 	rootCTEName, err := b.buildExpressionCTEs(ctx, b.operator.ParsedExpression)
 	if err != nil {
@@ -131,7 +133,7 @@ func (b *traceOperatorCTEBuilder) build(ctx context.Context, requestType qbtypes
 }
 
 // Will be used in Indirect descendant Query, will not be used in any other query.
-func (b *traceOperatorCTEBuilder) buildAllSpansCTE(ctx context.Context) {
+func (b *traceOperatorCTEBuilder) buildAllSpansCTE(ctx context.Context) error {
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select("*")
 	sb.SelectMore("service AS `service.name`")
@@ -139,15 +141,21 @@ func (b *traceOperatorCTEBuilder) buildAllSpansCTE(ctx context.Context) {
 	sb.From(fmt.Sprintf("%s.%s", DBName, SpanTableName))
 	startBucket := b.start/querybuilder.NsToSeconds - querybuilder.BucketAdjustment
 	endBucket := b.end / querybuilder.NsToSeconds
+	tenant, err := querybuilder.TenantCondition(ctx, sb)
+	if err != nil {
+		return err
+	}
 	sb.Where(
 		sb.GE("time", fmt.Sprintf("%d", b.start)),
 		sb.L("time", fmt.Sprintf("%d", b.end)),
 		sb.GE("ts_bucket_start", startBucket),
 		sb.LE("ts_bucket_start", endBucket),
+		tenant,
 	)
 	sql, args := sb.BuildWithFlavor(datastoresql.Flavor)
 	b.stmtBuilder.logger.DebugContext(ctx, "Built all_spans CTE")
 	b.addCTE("all_spans", sql, args, nil)
+	return nil
 }
 
 func (b *traceOperatorCTEBuilder) buildTimeConstantsCTE() string {
@@ -250,11 +258,16 @@ func (b *traceOperatorCTEBuilder) buildQueryCTE(ctx context.Context, queryName s
 	}
 	startBucket := b.start/querybuilder.NsToSeconds - querybuilder.BucketAdjustment
 	endBucket := b.end / querybuilder.NsToSeconds
+	tenant, err := querybuilder.TenantCondition(ctx, sb)
+	if err != nil {
+		return "", err
+	}
 	sb.Where(
 		sb.GE("time", fmt.Sprintf("%d", b.start)),
 		sb.L("time", fmt.Sprintf("%d", b.end)),
 		sb.GE("ts_bucket_start", startBucket),
 		sb.LE("ts_bucket_start", endBucket),
+		tenant,
 	)
 
 	if query.Filter != nil && query.Filter.Expression != "" {

@@ -146,7 +146,9 @@ func (p *provider) GetIdentity(req *http.Request) (*authtypes.Identity, error) {
 		return nil, err
 	}
 
-	return authtypes.NewPrincipalUserIdentity(userID, orgID, email, authtypes.IdentNProviderIAM), nil
+	identity := authtypes.NewPrincipalUserIdentity(userID, orgID, email, authtypes.IdentNProviderIAM)
+	identity.Tenant = orgSlug
+	return identity, nil
 }
 
 // provision resolves-or-creates the tenant org AND the person's o11y user row,

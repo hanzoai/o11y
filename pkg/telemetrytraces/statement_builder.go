@@ -412,6 +412,11 @@ func (b *traceQueryStatementBuilder) buildTraceQuery(
 		innerSB.L("time", fmt.Sprintf("%d", end)),
 		innerSB.GE("ts_bucket_start", startBucket),
 		innerSB.LE("ts_bucket_start", endBucket))
+	innerTenant, err := querybuilder.TenantCondition(ctx, innerSB)
+	if err != nil {
+		return nil, err
+	}
+	innerSB.Where(innerTenant)
 
 	// order by duration and limit 1 per trace (duration_nano is the SELECT alias)
 	innerSB.OrderBy("duration_nano DESC")
@@ -783,6 +788,12 @@ func (b *traceQueryStatementBuilder) addFilterCondition(
 	endBucket := end / querybuilder.NsToSeconds
 
 	sb.Where(sb.GE("time", fmt.Sprintf("%d", start)), sb.L("time", fmt.Sprintf("%d", end)), sb.GE("ts_bucket_start", startBucket), sb.LE("ts_bucket_start", endBucket))
+
+	tenant, err := querybuilder.TenantCondition(ctx, sb)
+	if err != nil {
+		return preparedWhereClause, err
+	}
+	sb.Where(tenant)
 
 	return preparedWhereClause, nil
 }

@@ -1,7 +1,6 @@
 package telemetrytraces
 
 import (
-	"context"
 	"strings"
 	"testing"
 	"time"
@@ -110,7 +109,7 @@ func TestTraceTimeRangeOptimization(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := context.Background()
+			ctx := tenantCtx()
 
 			stmt, err := statementBuilder.Build(
 				ctx,
