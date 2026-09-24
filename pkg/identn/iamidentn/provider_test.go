@@ -75,8 +75,9 @@ func (f *fakeAuthorizer) CreateManagedRoles(_ context.Context, _ valuer.UUID, _ 
 // rows in the one call — so what this records IS the founding grant.
 type fakeUserStore struct {
 	mu    sync.Mutex
-	users map[string]*types.User // by "<orgID>/<userID>", the key GET /users/me reads
-	seats []seatCall
+	users  map[string]*types.User // by "<orgID>/<userID>", the key GET /users/me reads
+	seats  []seatCall
+	rekeys int
 }
 
 type seatCall struct {
@@ -101,6 +102,8 @@ func (f *fakeUserStore) GetUserByOrgIDAndID(_ context.Context, orgID, userID val
 	return nil, errors.NewNotFoundf(types.ErrCodeUserNotFound, "user not found")
 }
 
+// CreateUser refuses a second row for an (org, email) as well as for an
+// (org, id), as the partial unique index on users(email, org_id) does.
 func (f *fakeUserStore) CreateUser(_ context.Context, u *types.User, opts ...user.CreateUserOption) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
@@ -108,9 +111,33 @@ func (f *fakeUserStore) CreateUser(_ context.Context, u *types.User, opts ...use
 	if _, ok := f.users[k]; ok {
 		return errors.Newf(errors.TypeAlreadyExists, errors.CodeAlreadyExists, "already exists")
 	}
+	for _, existing := range f.users {
+		if existing.OrgID == u.OrgID && existing.Email == u.Email {
+			return errors.Newf(errors.TypeAlreadyExists, errors.CodeAlreadyExists, "email already exists in org")
+		}
+	}
 	f.users[k] = u
 	f.seats = append(f.seats, seatCall{orgID: u.OrgID, userID: u.ID, email: u.Email.String(), roles: user.NewCreateUserOptions(opts...).RoleNames})
 	return nil
+}
+
+func (f *fakeUserStore) RekeyUser(_ context.Context, orgID valuer.UUID, email valuer.Email, userID valuer.UUID) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	for k, existing := range f.users {
+		if existing.OrgID != orgID || existing.Email != email {
+			continue
+		}
+		if existing.ID == userID {
+			return nil
+		}
+		delete(f.users, k)
+		existing.ID = userID
+		f.users[userKey(orgID, userID)] = existing
+		f.rekeys++
+		return nil
+	}
+	return errors.NewNotFoundf(types.ErrCodeUserNotFound, "user not found")
 }
 
 func newProvider(t *testing.T, store *fakeOrgStore, authorizer *fakeAuthorizer, users *fakeUserStore) *provider {
@@ -339,5 +366,41 @@ func TestGetIdentity_ExistingSeatReused(t *testing.T) {
 	}
 	if got := users.users[userKey(orgID, userID)].DisplayName; got != "Seeded Human" {
 		t.Fatalf("display name = %q, want the untouched %q", got, "Seeded Human")
+	}
+}
+
+// A person seated before the guard asserted the IAM subject has a row keyed by
+// uuid5 of their NAME. The subject then misses that row, and the create it falls
+// through to collides on the email. That collision must re-key the row onto the
+// subject: answering it with success left the row under the old key, so every
+// lookup by the subject the session now asserts came back user_not_found.
+func TestGetIdentity_RekeysARowSeatedUnderAName(t *testing.T) {
+	store := newFakeOrgStore()
+	authorizer := &fakeAuthorizer{}
+	users := newFakeUserStore()
+	p := newProvider(t, store, authorizer, users)
+
+	orgID := toUUID("org", "hanzo")
+	byName := toUUID("user", "z")
+	seeded, err := types.NewUserWithID(byName, "z", valuer.MustNewEmail("z@hanzo.ai"), orgID, types.UserStatusActive)
+	if err != nil {
+		t.Fatalf("NewUserWithID: %v", err)
+	}
+	users.users[userKey(orgID, byName)] = seeded
+
+	const subject = "2d4d67ab-30f1-474e-b81f-f60461852259"
+	identity, err := p.GetIdentity(requestWithSession("hanzo", subject, "z@hanzo.ai"))
+	if err != nil {
+		t.Fatalf("GetIdentity: %v", err)
+	}
+
+	if _, err := users.GetUserByOrgIDAndID(context.Background(), orgID, identity.UserID); err != nil {
+		t.Fatalf("the row is not keyed by the asserted subject %s: %v", identity.UserID, err)
+	}
+	if _, err := users.GetUserByOrgIDAndID(context.Background(), orgID, byName); err == nil {
+		t.Fatalf("a row is still keyed by the name-derived id %s", byName)
+	}
+	if users.rekeys != 1 || len(users.seats) != 0 {
+		t.Fatalf("rekeys=%d seats=%d, want the one existing row re-keyed and none created", users.rekeys, len(users.seats))
 	}
 }

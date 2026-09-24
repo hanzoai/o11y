@@ -3,6 +3,7 @@ package impluser
 import (
 	"context"
 
+	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/factory"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
 	"github.com/hanzoai/o11y/pkg/types"
@@ -48,6 +49,85 @@ func (store *store) GetByOrgIDAndID(ctx context.Context, orgID valuer.UUID, id v
 	}
 
 	return user, nil
+}
+
+func (store *store) GetByOrgIDAndEmail(ctx context.Context, orgID valuer.UUID, email valuer.Email) (*types.User, error) {
+	user := new(types.User)
+
+	err := store.
+		sqlstore.
+		BunDBCtx(ctx).
+		NewSelect().
+		Model(user).
+		Where("org_id = ?", orgID).
+		Where("email = ?", email).
+		Where("status != ?", types.UserStatusDeleted.StringValue()).
+		Scan(ctx)
+	if err != nil {
+		return nil, store.sqlstore.WrapNotFoundErrf(err, types.ErrCodeUserNotFound, "user with email %s does not exist in org %s", email, orgID)
+	}
+
+	return user, nil
+}
+
+// Rekey renames a primary key that other tables point at. SQLite checks a
+// foreign key at the end of every statement, and no single statement can move
+// a parent and its children together, so the checks wait for COMMIT
+// (defer_foreign_keys, which SQLite clears when the transaction ends). The
+// children are found in the schema rather than listed here: a table that
+// references users.id and is not moved leaves COMMIT with a dangling key, and
+// the whole transaction is refused instead of committing half a person.
+func (store *store) Rekey(ctx context.Context, orgID valuer.UUID, from valuer.UUID, to valuer.UUID) error {
+	db := store.sqlstore.BunDBCtx(ctx)
+
+	if _, err := db.ExecContext(ctx, "PRAGMA defer_foreign_keys = ON"); err != nil {
+		return err
+	}
+
+	result, err := db.
+		NewUpdate().
+		Model((*types.User)(nil)).
+		Set("id = ?", to).
+		Where("org_id = ?", orgID).
+		Where("id = ?", from).
+		Exec(ctx)
+	if err != nil {
+		return err
+	}
+
+	moved, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if moved != 1 {
+		return errors.Newf(errors.TypeNotFound, types.ErrCodeUserNotFound, "user with id %s does not exist in org %s", from, orgID)
+	}
+
+	var references []struct {
+		Table  string `bun:"table_name"`
+		Column string `bun:"column_name"`
+	}
+	err = db.
+		NewRaw(`SELECT m.name AS table_name, f."from" AS column_name
+			FROM sqlite_master AS m, pragma_foreign_key_list(m.name) AS f
+			WHERE m.type = 'table' AND f."table" = 'users' AND (f."to" = 'id' OR f."to" IS NULL)`).
+		Scan(ctx, &references)
+	if err != nil {
+		return err
+	}
+
+	for _, reference := range references {
+		if _, err := db.
+			NewUpdate().
+			Table(reference.Table).
+			Set("? = ?", bun.Ident(reference.Column), to).
+			Where("? = ?", bun.Ident(reference.Column), from).
+			Exec(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (store *store) ListUsersByOrgID(ctx context.Context, orgID valuer.UUID) ([]*types.User, error) {

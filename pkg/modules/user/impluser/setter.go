@@ -83,6 +83,50 @@ func (module *setter) CreateUser(ctx context.Context, user *types.User, opts ...
 	return nil
 }
 
+// RekeyUser re-seats a person whose row was written under an earlier key — the
+// uuid5 of a name, from a guard that asserted names before it asserted the IAM
+// subject — onto the subject, so the rows keyed to them follow.
+//
+// The rows move in one transaction. The grants follow the rows after it
+// commits: the new subject gains the roles the moved user_role rows name and the
+// old one loses them, which is the state localauthz would rehydrate on restart.
+func (module *setter) RekeyUser(ctx context.Context, orgID valuer.UUID, email valuer.Email, userID valuer.UUID) error {
+	var from valuer.UUID
+	var roleNames []string
+
+	err := module.store.RunInTx(ctx, func(ctx context.Context) error {
+		existing, err := module.store.GetByOrgIDAndEmail(ctx, orgID, email)
+		if err != nil {
+			return err
+		}
+
+		if existing.ID == userID {
+			return nil
+		}
+
+		userRoles, err := module.userRoleStore.GetUserRolesByUserID(ctx, existing.ID)
+		if err != nil {
+			return err
+		}
+
+		for _, userRole := range userRoles {
+			roleNames = append(roleNames, userRole.Role.Name)
+		}
+
+		from = existing.ID
+		return module.store.Rekey(ctx, orgID, existing.ID, userID)
+	})
+	if err != nil || from.IsZero() || len(roleNames) == 0 {
+		return err
+	}
+
+	if err := module.authz.Grant(ctx, orgID, roleNames, authtypes.MustNewSubject(coretypes.NewResourceUser(), userID.StringValue(), orgID, nil)); err != nil {
+		return err
+	}
+
+	return module.authz.Revoke(ctx, orgID, roleNames, authtypes.MustNewSubject(coretypes.NewResourceUser(), from.StringValue(), orgID, nil))
+}
+
 func (module *setter) createUserRoleEntries(ctx context.Context, orgID, userID valuer.UUID, roleNames []string) error {
 	roles, err := module.authz.ListByOrgIDAndNames(ctx, orgID, roleNames)
 	if err != nil {

@@ -75,9 +75,11 @@ type UserResolver interface {
 }
 
 // UserCreator writes an o11y user row and grants it roles — the Hanzo IAM grant
-// AND the local user_role entries, in that one call. Satisfied by user.Setter.
+// AND the local user_role entries, in that one call — and re-keys a row seated
+// under an earlier key onto the subject. Satisfied by user.Setter.
 type UserCreator interface {
 	CreateUser(context.Context, *types.User, ...user.CreateUserOption) error
+	RekeyUser(context.Context, valuer.UUID, valuer.Email, valuer.UUID) error
 }
 
 type provider struct {
@@ -189,8 +191,12 @@ func (p *provider) provision(ctx context.Context, orgID valuer.UUID, orgSlug str
 // a subject but no address cannot be seated, and says so rather than seating a
 // half-built identity that fails later, further away.
 //
-// A lost create race resolves to success — the row the winner wrote is the same
-// row, because both derive its id from the same IAM subject.
+// A create that finds the email already seated in the org re-keys that row onto
+// the subject. The row is this person's either way: a concurrent request won the
+// create (already keyed to the subject, so the re-key leaves it alone), or an
+// earlier guard asserted a name and the row took uuid5 of it. Returning success
+// on the second left GET /users/me and every row keyed to the person pointing at
+// an id no session asserts any more.
 func (p *provider) ensureUser(ctx context.Context, orgID, userID valuer.UUID, email valuer.Email) error {
 	if _, err := p.users.GetUserByOrgIDAndID(ctx, orgID, userID); err == nil {
 		return nil
@@ -208,10 +214,14 @@ func (p *provider) ensureUser(ctx context.Context, orgID, userID valuer.UUID, em
 	}
 
 	if err := p.userMaker.CreateUser(ctx, u, user.WithRoleNames([]string{authtypes.O11yAdminRoleName})); err != nil {
-		if errors.Ast(err, errors.TypeAlreadyExists) {
-			return nil
+		if !errors.Ast(err, errors.TypeAlreadyExists) {
+			return err
 		}
-		return err
+		if err := p.userMaker.RekeyUser(ctx, orgID, email, userID); err != nil {
+			return err
+		}
+		p.settings.Logger().InfoContext(ctx, "re-keyed o11y user to its Hanzo IAM subject", "org_id", orgID.String(), "user_id", userID.String())
+		return nil
 	}
 
 	p.settings.Logger().InfoContext(ctx, "seated Hanzo IAM user in o11y org", "org_id", orgID.String(), "user_id", userID.String())

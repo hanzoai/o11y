@@ -31,6 +31,11 @@ type Setter interface {
 	// is what localauthz rehydrates from after a restart.
 	CreateUser(ctx context.Context, user *types.User, opts ...CreateUserOption) error
 
+	// RekeyUser moves the org's row for an email — with its user_role rows and
+	// every other row keyed to it — onto userID, in one transaction, and moves
+	// its role grants with it. A row already keyed userID is left as it is.
+	RekeyUser(ctx context.Context, orgID valuer.UUID, email valuer.Email, userID valuer.UUID) error
+
 	statsreporter.StatsCollector
 }
 

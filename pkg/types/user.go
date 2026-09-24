@@ -265,6 +265,14 @@ type UserStore interface {
 	// Get user by orgID and id.
 	GetByOrgIDAndID(ctx context.Context, orgID valuer.UUID, id valuer.UUID) (*User, error)
 
+	// Get the org's live (not deleted) user holding an email — the row the
+	// partial unique index on (email, org_id) admits one of.
+	GetByOrgIDAndEmail(ctx context.Context, orgID valuer.UUID, email valuer.Email) (*User, error)
+
+	// Rekey moves the user (orgID, from) to the id `to`, together with every row
+	// that references users.id by foreign key. Run it inside RunInTx.
+	Rekey(ctx context.Context, orgID valuer.UUID, from valuer.UUID, to valuer.UUID) error
+
 	// List users by org.
 	ListUsersByOrgID(ctx context.Context, orgID valuer.UUID) ([]*User, error)
 
