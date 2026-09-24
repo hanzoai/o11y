@@ -154,9 +154,10 @@ CREATE TABLE IF NOT EXISTS event.fact
     -- validated principal, first in every sort key in this namespace. Never a UUID,
     -- never an integer, never translated through a lookup table.
     `org`          LowCardinality(String),
-    -- signal is the closed discriminator: act | clip | error | log | span. The endpoint
-    -- derives what it accepts from the set of writers, so this vocabulary and the
-    -- storage cannot disagree.
+    -- signal is the closed discriminator: act | clip | error | log | span | economic
+    -- (economic from 0004, which gives it its retention). The endpoint derives what it
+    -- accepts from the set of writers, so this vocabulary and the storage cannot
+    -- disagree.
     `signal`       LowCardinality(String),
     -- time is when it HAPPENED, on the caller's clock (clamped forward to now).
     `time`         DateTime64(9) CODEC(DoubleDelta, ZSTD(1)),
@@ -312,10 +313,10 @@ ENGINE = ReplacingMergeTree(ingested_at)
 PARTITION BY (signal, toYYYYMM(ingested_at))
 PRIMARY KEY (org, time)
 ORDER BY (org, time, id)
--- The four retentions the plane already had, preserved. The signal set is CLOSED and
--- enforced at the endpoint (a fact whose signal has no writer is refused, not accepted and
--- discarded), so every partition this table can hold is covered by a clause below and
--- nothing can grow without a retention.
+-- The four retentions the plane already had, preserved; 0004 adds the economic signal's.
+-- The signal set is CLOSED and enforced at the endpoint (a fact whose signal has no writer
+-- is refused, not accepted and discarded), so every partition this table can hold is
+-- covered by a clause — and a new signal ships with its clause, or nothing bounds it.
 TTL toDateTime(ingested_at) + INTERVAL 30 DAY DELETE WHERE signal IN ('log', 'span', 'clip'),
     toDateTime(ingested_at) + INTERVAL 90 DAY DELETE WHERE signal = 'error',
     toDateTime(ingested_at) + INTERVAL 2 YEAR DELETE WHERE signal = 'act'
