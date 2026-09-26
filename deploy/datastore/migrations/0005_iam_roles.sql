@@ -32,7 +32,8 @@
 -- SuperAdmin, no password. `schema` may create exactly these four roles, may grant only
 -- SELECT and INSERT on `event`, only to reader, writer and sink (the warehouse's IAM
 -- <grantees>), and may create policies only on `event`, so this file cannot reach
--- anything outside the plane it owns.
+-- anything outside the plane it owns. It creates no dictionaries and tables only with the
+-- MergeTree family and Null (the warehouse requires a grant per table engine).
 --
 -- ONE PREDICATE, ON THE WHOLE NAMESPACE. Every table in `event` is org-first (0002,
 -- 0003, and the telemetry schema.sql files lead each sort key with `org`), so the
@@ -56,7 +57,8 @@
 -- app writes it: `sink` inserts there and nowhere else, and `writer` (the telemetry
 -- tables: span, trace, log, metric and the rest) inserts everywhere in `event` except
 -- there, by a partial revoke, so a new telemetry table needs no grant while the facts
--- keep one writer.
+-- keep one writer. The one exception is `schema`, the plane's owner, which may write
+-- any table in `event`, event.fact included, because a migration backfills.
 --
 -- WHAT A ROW POLICY DOES NOT COVER. It filters reads. The two writers insert rows for
 -- every org because they are the platform's own ingest; that is what `sink` and
