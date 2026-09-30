@@ -9,46 +9,60 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
 )
 
-// This file is the PURE query layer over event.error: every function is a
+// This file is the PURE query layer over the error facts of event.fact: every function is a
 // bytes-and-args builder with no connection, so the security-critical invariants —
-// (1) org AND product (the project) are always the leading, BOUND predicates, (2) the
+// (1) org, the error signal AND product (the project) are always the leading
+// predicates, org and product BOUND, (2) the
 // time window is always bound, (3) every column/aggregation/interval a client can name
 // is resolved through a fixed ALLOWLIST and never interpolated — are exhaustively
 // unit-testable in isolation. The IO layer (eventstore.go) only executes what these
 // return.
 //
-// The Sentry vocabulary maps onto the shared envelope rather than a private schema:
+// The Sentry vocabulary maps onto the shared envelope rather than a private schema
+// (deploy/datastore/migrations/0002_event_fact.sql):
 //
 //	org         -> org          the tenant
+//	(signal)    -> signal       always 'error' — the slice of the plane this face reads
 //	project     -> product      which surface produced the fact
 //	event id    -> id
 //	timestamp   -> time
 //	received    -> ingested_at
-//	fingerprint -> group        what event.error is sorted by, after org
+//	fingerprint -> issue        the grouping key the ingest computed
+//	level       -> severity     read back as its band's word (levelExpr)
 //	type        -> class
-//	culprit     -> site
+//	culprit     -> origin       the place of the fault
+//	environment -> env
 //	transaction -> path
 //	user id     -> person_id
 //	tags        -> attributes
 //
 // so a Sentry read and an analytics read name the same fact the same way.
 
-// group is a reserved word in the SQL dialect, so the sort-key column is always
-// written quoted. It is referenced often enough to be worth one name.
-const groupCol = "`group`"
+// issueCol is the grouping column. It is referenced often enough to be worth one name.
+const issueCol = "issue"
+
+// errorSignal is the plane's discriminator for this face's facts. It is a constant
+// of this file, never client input, so it is written into the SQL rather than bound.
+const errorSignal = "signal = 'error'"
+
+// levelExpr reads the stored severity number back as the Sentry level word, on the
+// same bands the ingest maps a word onto a number (cloud apps/event severityOf):
+// 1-4 trace, 5-8 debug, 9-12 info, 13-16 warning, 17-20 error, 21+ fatal.
+const levelExpr = "multiIf(severity = 0, '', severity < 5, 'trace', severity < 9, 'debug', " +
+	"severity < 13, 'info', severity < 17, 'warning', severity < 21, 'error', 'fatal')"
 
 // eventColumns is the allowlist mapping an API field name to its physical column
 // expression. A field NOT in this map is rejected — a client field name never reaches
 // the SQL as an identifier. All values are constants defined here, never request data.
 var eventColumns = map[string]colKind{
 	"timestamp":    {"time", kindTime},
-	"level":        {"level", kindString},
+	"level":        {levelExpr, kindString},
 	"type":         {"class", kindString},
 	"message":      {"message", kindString},
-	"culprit":      {"site", kindString},
-	"fingerprint":  {groupCol, kindString},
+	"culprit":      {"origin", kindString},
+	"fingerprint":  {issueCol, kindString},
 	"handled":      {"handled", kindBool},
-	"environment":  {"environment", kindString},
+	"environment":  {"env", kindString},
 	"release":      {"release", kindString},
 	"service_name": {"service", kindString},
 	"transaction":  {"path", kindString},
@@ -74,7 +88,7 @@ var eventAggs = map[string]colKind{
 	"count":        {"count()", kindUint},
 	"users":        {"count(DISTINCT person_id)", kindUint},
 	"traces":       {"count(DISTINCT trace_id)", kindUint},
-	"fingerprints": {"count(DISTINCT " + groupCol + ")", kindUint},
+	"fingerprints": {"count(DISTINCT " + issueCol + ")", kindUint},
 	"first_seen":   {"min(time)", kindTime},
 	"last_seen":    {"max(time)", kindTime},
 }
@@ -131,12 +145,13 @@ func resolveWindow(period string, now time.Time) sentrytypes.Window {
 	return sentrytypes.Window{From: now.Add(-d), To: now}
 }
 
-// scope is the mandatory (org, project) + window prefix shared by every read: two
-// bound tenant predicates FIRST — matching event.error's (org, group, time) sort key
-// on its leading column — then the bound time bounds. It returns the WHERE fragment
-// and its args in order, so no read can omit the tenant boundary.
+// scope is the mandatory (org, project) + window prefix shared by every read: the
+// bound tenant predicate FIRST — matching event.fact's (org, time) sort key on its
+// leading column — then the error signal, the bound product, and the bound time
+// bounds. It returns the WHERE fragment and its args in order, so no read can omit
+// the tenant boundary or read a fact of another signal.
 func scope(orgID, projectID string, w sentrytypes.Window) (string, []any) {
-	return "org = ? AND product = ? AND time >= ? AND time <= ?",
+	return "org = ? AND " + errorSignal + " AND product = ? AND time >= ? AND time <= ?",
 		[]any{orgID, projectID, w.From, w.To}
 }
 
@@ -240,21 +255,27 @@ func buildFilters(filters []sentrytypes.DiscoverFilter) (string, []any, error) {
 // occurrences / logs). Order MUST match scanEvent in eventstore.go. The five
 // frames.* arrays are parallel — one element per stack frame — and are zipped back
 // into []Frame on read.
-const selectColumns = "org, product, id, time, ingested_at, level, class, message, site, " +
-	groupCol + ", handled, environment, release, service, path, trace_id, span_id, " +
-	"attributes['platform'], attributes['server'], person_id, attributes['user_email'], " +
-	"attributes['user_ip'], attributes, " +
-	"frames.function, frames.file, frames.line, frames.column, frames.own"
+var selectColumns = strings.Join(selectList, ", ")
+
+// selectList is selectColumns one expression per entry, so the projection's width is
+// countable even though levelExpr carries commas of its own.
+var selectList = []string{
+	"org", "product", "id", "time", "ingested_at", levelExpr, "class", "message", "origin",
+	issueCol, "handled", "env", "release", "service", "path", "trace_id", "span_id",
+	"attributes['platform']", "attributes['server']", "person_id", "attributes['user_email']",
+	"attributes['user_ip']", "attributes",
+	"frames.function", "frames.file", "frames.line", "frames.column", "frames.own",
+}
 
 func buildGetEvent(db, table, orgID, projectID, eventID string) (string, []any) {
-	// Tenant boundary FIRST (org, then project — a project is the DSN-bearing
+	// Tenant boundary FIRST (org, the error signal, then project — a project is the
 	// isolation unit), then event id; a foreign org/project/event returns zero rows.
-	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org = ? AND product = ? AND id = ? ORDER BY time DESC LIMIT 1", selectColumns, db, table),
+	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org = ? AND %s AND product = ? AND id = ? ORDER BY time DESC LIMIT 1", selectColumns, db, table, errorSignal),
 		[]any{orgID, projectID, eventID}
 }
 
 func buildListForFingerprint(db, table, orgID, projectID, fingerprint string, limit int) (string, []any) {
-	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org = ? AND product = ? AND %s = ? ORDER BY time DESC LIMIT ?", selectColumns, db, table, groupCol),
+	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org = ? AND %s AND product = ? AND %s = ? ORDER BY time DESC LIMIT ?", selectColumns, db, table, errorSignal, issueCol),
 		[]any{orgID, projectID, fingerprint, clampLimit(limit, defaultReadLimit, maxReadLimit)}
 }
 
@@ -264,7 +285,7 @@ func buildListForFingerprint(db, table, orgID, projectID, fingerprint string, li
 // the bound org+product predicates: a caller only ever sees their OWN project's events
 // for a trace.
 func buildListForTrace(db, table, orgID, projectID, traceID string, limit int) (string, []any) {
-	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org = ? AND product = ? AND trace_id = ? ORDER BY time ASC LIMIT ?", selectColumns, db, table),
+	return fmt.Sprintf("SELECT %s FROM %s.%s WHERE org = ? AND %s AND product = ? AND trace_id = ? ORDER BY time ASC LIMIT ?", selectColumns, db, table, errorSignal),
 		[]any{orgID, projectID, traceID, clampLimit(limit, defaultReadLimit, maxReadLimit)}
 }
 
@@ -281,7 +302,7 @@ func buildListLogs(db, table, orgID, projectID, query string, w sentrytypes.Wind
 
 func buildDistinctFingerprints(db, table, orgID, projectID string, w sentrytypes.Window) (string, []any) {
 	where, args := scope(orgID, projectID, w)
-	return fmt.Sprintf("SELECT DISTINCT %s FROM %s.%s WHERE %s AND %s != ''", groupCol, db, table, where, groupCol), args
+	return fmt.Sprintf("SELECT DISTINCT %s FROM %s.%s WHERE %s AND %s != ''", issueCol, db, table, where, issueCol), args
 }
 
 func buildListTraces(db, table, orgID, projectID string, w sentrytypes.Window, limit int) (string, []any) {
@@ -297,8 +318,8 @@ func buildListTraces(db, table, orgID, projectID string, w sentrytypes.Window, l
 var statsFields = map[string]string{
 	"":         "",
 	"events":   "",
-	"errors":   " AND level IN ('error','fatal')",
-	"warnings": " AND level = 'warning'",
+	"errors":   " AND severity >= 17",
+	"warnings": " AND severity >= 13 AND severity < 17",
 }
 
 // buildStats assembles the bucketed event-count timeseries. The bucket width is

@@ -12,7 +12,7 @@ import (
 
 // THE PLANE'S VOCABULARY, said once.
 //
-// `event.error` is a slice of the ONE event plane, and the plane names a tenant by its
+// The error facts are a slice of the ONE event plane (event.fact, signal 'error'), and the plane names a tenant by its
 // IAM organization SLUG and a surface by its PRODUCT — the strings every other writer
 // on it emits (`hanzo`, `docs`) and every reader binds. This module works in UUIDs,
 // because that is what the HTTP surface and the project rows are keyed on. The two
@@ -47,13 +47,10 @@ import (
 // path for it (sentry.Module has Create/Get/List/Rotate/Delete and no Update), so it
 // is stable enough to key rows on.
 //
-// A CONSEQUENCE WORTH SAYING OUT LOUD: because cloud writes `product = 'docs'` for the
-// same org, a Sentry project slugged `docs` now reads cloud's errors for that surface
-// as well as its own. That is the one table doing what it is for — same tenant, same
-// surface, same kind of fact — and it cannot cross a tenant, because `org` leads every
-// predicate. It is a UNION, not a leak. If a project ever needs to see only what its
-// own DSN captured, that is a narrower on how the fact ARRIVED, and the honest place
-// for it is a column that says so, not a second spelling of the surface.
+// A CONSEQUENCE WORTH SAYING OUT LOUD: a Sentry project slugged `docs` reads every
+// error fact the org's `docs` surface reported. That is the one table doing what it is
+// for — same tenant, same surface, same kind of fact — and it cannot cross a tenant,
+// because `org` leads every predicate.
 
 // Scope resolves the identifiers a caller works in to the names the plane stores. It
 // is the ONE place a uuid becomes a name; everything above it speaks uuid and

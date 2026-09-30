@@ -2,75 +2,42 @@ package implsentry
 
 import (
 	"context"
-	"fmt"
 	"time"
 
-	"github.com/hanzo-ds/go/lib/driver"
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/telemetrystore"
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
-// Sentry error events are rows of event.error — the ONE error table, sharing the
-// envelope with event.event / event.log / event.span. The database is named for what
-// it holds and the table for what it is, so a query reads FROM error.
+// Sentry error events are the error facts of event.fact — the ONE occurrence table,
+// discriminated by signal. The database is named for what it holds and the table for
+// what it is, so a query reads FROM fact WHERE signal = 'error'.
 const (
 	defaultEventsDB    = "event"
-	defaultEventsTable = "error"
+	defaultEventsTable = "fact"
 )
 
-// errorKind is the envelope's kind discriminator for a captured exception. event.error
-// holds errors; kind says which sort of error a row is.
-const errorKind = "exception"
-
-// insertColumns is the fixed-order column list the batch sink appends to. Order is
-// identical to the Append call in Insert. Columns the Sentry wire has no value for
-// (session_id, distinct_id, anonymous_id, url, el) are omitted so the table's own
-// defaults apply.
-const insertColumns = "org, product, id, time, ingested_at, name, kind, level, class, " +
-	"message, site, " + groupCol + ", handled, environment, release, service, path, " +
-	"trace_id, span_id, person_id, attributes, " +
-	"frames.function, frames.file, frames.line, frames.column, frames.own"
-
-// eventStore is the datastore-backed EventStore over event.error.
+// eventStore is the datastore-backed EventStore over the error facts of event.fact.
 //
-// It does NOT create its schema. The event plane is applied as one schema; a reader
-// that also runs CREATE DATABASE / CREATE TABLE quietly resurrects whatever it names
-// the moment the process restarts, which is how a dropped database comes back from the
-// dead. Schema is a deploy artifact, this is a client.
+// It reads only. The ingest that accepted an error wrote its fact; a second writer
+// here would be a second copy of the same failure. It does NOT create its schema
+// either: schema is a deploy artifact, this is a client.
 type eventStore struct {
 	store telemetrystore.TelemetryStore
 	scope Scope
 	db    string
 	table string
-	now   func() time.Time
 }
 
-// Option configures the event store.
-type Option func(*eventStore)
-
-func WithDatabase(db string) Option { return func(s *eventStore) { s.db = db } }
-func WithTable(t string) Option     { return func(s *eventStore) { s.table = t } }
-
-// NewEventStore builds the events plane over the shared datastore connection.
+// NewEventStore builds the reads over the shared datastore connection.
 //
-// `scope` is REQUIRED, not an Option, because it is the tenant boundary: it is what
+// `scope` is REQUIRED, not an option, because it is the tenant boundary: it is what
 // turns the ids this process works in into the names the plane stores (see plane.go).
-// A store that could be built without one could write a row under a spelling no
-// reader binds, which is exactly the split this seam exists to close.
-func NewEventStore(store telemetrystore.TelemetryStore, scope Scope, opts ...Option) sentrytypes.EventStore {
-	s := &eventStore{
-		store: store,
-		scope: scope,
-		db:    defaultEventsDB,
-		table: defaultEventsTable,
-		now:   func() time.Time { return time.Now().UTC() },
-	}
-	for _, o := range opts {
-		o(s)
-	}
-	return s
+// A store that could be built without one could read under a spelling no writer
+// uses, which is exactly the split this seam exists to close.
+func NewEventStore(store telemetrystore.TelemetryStore, scope Scope) sentrytypes.EventStore {
+	return &eventStore{store: store, scope: scope, db: defaultEventsDB, table: defaultEventsTable}
 }
 
 // names is every operation's first act: the (org, product) this one is about, in the
@@ -82,44 +49,6 @@ func (s *eventStore) names(ctx context.Context, orgID, projectID valuer.UUID) (s
 			"event store has no scope: the plane's names cannot be resolved")
 	}
 	return s.scope(ctx, orgID, projectID)
-}
-
-func (s *eventStore) Insert(ctx context.Context, orgID, projectID valuer.UUID, events []*sentrytypes.Event) error {
-	if len(events) == 0 {
-		return nil
-	}
-	org, product, err := s.names(ctx, orgID, projectID)
-	if err != nil {
-		return err
-	}
-	batch, err := s.store.Datastore().PrepareBatch(ctx,
-		fmt.Sprintf("INSERT INTO %s.%s (%s)", s.db, s.table, insertColumns), driver.WithReleaseConnection())
-	if err != nil {
-		return err
-	}
-	defer func() { _ = batch.Abort() }()
-
-	received := s.now()
-	for _, e := range events {
-		if err := batch.Append(row(org, product, received, e)...); err != nil {
-			return err
-		}
-	}
-	return batch.Send()
-}
-
-// row is ONE occurrence as the plane stores it, in insertColumns order. Pure, so the
-// row a write produces can be asserted without a sink — and the two facts that make a
-// row legible, the tenant's NAME and the product's, are read off the result rather
-// than inferred from the call.
-func row(org, product string, received time.Time, e *sentrytypes.Event) []any {
-	fn, file, line, col, own := unzipFrames(e.Frames)
-	return []any{
-		org, product, e.EventID, e.Timestamp, received, e.Type, errorKind, e.Level, e.Type,
-		e.Message, e.Culprit, e.Fingerprint, e.Handled, e.Environment, e.Release,
-		e.ServiceName, e.Transaction, e.TraceID, e.SpanID, e.UserID, attributesOf(e),
-		fn, file, line, col, own,
-	}
 }
 
 func (s *eventStore) Discover(ctx context.Context, orgID, projectID valuer.UUID, req *sentrytypes.DiscoverRequest, w sentrytypes.Window) (*sentrytypes.DiscoverResult, error) {
@@ -291,39 +220,6 @@ func (s *eventStore) queryEvents(ctx context.Context, sql string, args []any) ([
 		out = append(out, e)
 	}
 	return out, rows.Err()
-}
-
-// attributesOf folds an event's tags plus the envelope-adjacent values that live in
-// the attributes map (platform, server, user contact) into the one map column. Tags
-// are copied, never mutated in place, so the caller's map is untouched.
-func attributesOf(e *sentrytypes.Event) map[string]string {
-	attrs := make(map[string]string, len(e.Tags)+4)
-	for k, v := range e.Tags {
-		attrs[k] = v
-	}
-	for k, v := range map[string]string{
-		"platform":   e.Platform,
-		"server":     e.ServerName,
-		"user_email": e.UserEmail,
-		"user_ip":    e.UserIP,
-	} {
-		if v != "" {
-			attrs[k] = v
-		}
-	}
-	return attrs
-}
-
-// unzipFrames splits []Frame into the five parallel arrays event.error stores. A nil
-// slice yields empty (not nil) arrays so a batch column is never null.
-func unzipFrames(frames []sentrytypes.Frame) (fn, file []string, line, col []uint32, own []bool) {
-	fn, file = make([]string, len(frames)), make([]string, len(frames))
-	line, col = make([]uint32, len(frames)), make([]uint32, len(frames))
-	own = make([]bool, len(frames))
-	for i, f := range frames {
-		fn[i], file[i], line[i], col[i], own[i] = f.Function, f.File, f.Line, f.Column, f.Own
-	}
-	return
 }
 
 // zipFrames rebuilds []Frame from the parallel arrays, tolerating a short array (a

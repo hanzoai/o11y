@@ -94,13 +94,9 @@ type Modules struct {
 	LLMPricingRule      llmpricingrule.Module
 	LLMObs              llmobs.Module
 	ErrorTracking       errortracking.Module
-	// ErrorTrackingRevocations backs per-org DSN-key rotation; the handler consults
-	// it on every ingest. Built here because it needs the sqlstore.
-	ErrorTrackingRevocations implerrortracking.RevocationStore
-	// Sentry is the /v1/o11y/sentinel product face: it COMPOSES the reused errortracking
-	// engine + issue lifecycle, the columnar events plane (telemetryStore) and the
-	// reused tracedetail read. Built here because it needs BOTH the sqlstore (projects)
-	// and the telemetryStore (events plane).
+	// Sentry is the /v1/o11y/sentinel product face: it COMPOSES the reused issue
+	// lifecycle and the error facts of the event plane (telemetryStore). Built here
+	// because it needs BOTH the sqlstore (projects) and the telemetryStore.
 	Sentry sentry.Module
 	Tag    tag.Module
 }
@@ -139,7 +135,6 @@ func NewModules(
 	// reconstruct them — one issue lifecycle, one trace read, two product faces.
 	errorTrackingModule := implerrortracking.NewModule(
 		implerrortracking.NewStore(sqlstore),
-		implerrortracking.NewNoopSink(),
 		implerrortracking.WithRetention(errorTrackingRetention()),
 	)
 	traceDetailModule := impltracedetail.NewModule(impltracedetail.NewTraceStore(telemetryStore), providerSettings, config.TraceDetail)
@@ -151,43 +146,37 @@ func NewModules(
 		sentryProjects,
 		implsentry.NewEventStore(telemetryStore, implsentry.NewScope(orgGetter, sentryProjects)),
 		errorTrackingModule,
-		implsentry.Config{
-			IngestSecret: errorTrackingIngestSecret(),
-			Host:         sentryIngestHost(),
-			CapturePII:   errorTrackingCapturePII(),
-		},
 	)
 
 	return Modules{
-		OrgGetter:                orgGetter,
-		OrgSetter:                orgSetter,
-		Preference:               implpreference.NewModule(implpreference.NewStore(sqlstore), preferencetypes.NewAvailablePreference()),
-		SavedView:                implsavedview.NewModule(sqlstore),
-		Apdex:                    implapdex.NewModule(sqlstore),
-		Dashboard:                dashboard,
-		UserSetter:               userSetter,
-		UserGetter:               userGetter,
-		RetentionGetter:          retentionGetter,
-		QuickFilter:              quickfilter,
-		TraceFunnel:              impltracefunnel.NewModule(impltracefunnel.NewStore(sqlstore)),
-		RawDataExport:            implrawdataexport.NewModule(querier),
-		SpanPercentile:           implspanpercentile.NewModule(querier, providerSettings),
-		Services:                 implservices.NewModule(querier, telemetryStore),
-		MetricsExplorer:          implmetricsexplorer.NewModule(telemetryStore, telemetryMetadataStore, cache, ruleStore, dashboard, fl, providerSettings, config.MetricsExplorer),
-		MetricReductionRule:      metricReductionRule,
-		InfraMonitoring:          implinframonitoring.NewModule(telemetryStore, telemetryMetadataStore, querier, fl, providerSettings, config.InfraMonitoring),
-		Promote:                  implpromote.NewModule(telemetryMetadataStore, telemetryStore),
-		ServiceAccount:           serviceAccount,
-		LogsPipeline:             impllogspipeline.NewModule(sqlstore),
-		RuleStateHistory:         implrulestatehistory.NewModule(implrulestatehistory.NewStore(telemetryStore, telemetryMetadataStore, providerSettings.Logger)),
-		CloudIntegration:         cloudIntegrationModule,
-		TraceDetail:              traceDetailModule,
-		SpanMapper:               implspanmapper.NewModule(implspanmapper.NewStore(sqlstore), fl),
-		LLMPricingRule:           impllmpricingrule.NewModule(impllmpricingrule.NewStore(sqlstore), fl),
-		LLMObs:                   impllmobs.NewModule(querier, impllmobs.NewStore(sqlstore)),
-		ErrorTracking:            errorTrackingModule,
-		ErrorTrackingRevocations: implerrortracking.NewSQLRevocations(sqlstore),
-		Sentry:                   sentryModule,
-		Tag:                      tagModule,
+		OrgGetter:           orgGetter,
+		OrgSetter:           orgSetter,
+		Preference:          implpreference.NewModule(implpreference.NewStore(sqlstore), preferencetypes.NewAvailablePreference()),
+		SavedView:           implsavedview.NewModule(sqlstore),
+		Apdex:               implapdex.NewModule(sqlstore),
+		Dashboard:           dashboard,
+		UserSetter:          userSetter,
+		UserGetter:          userGetter,
+		RetentionGetter:     retentionGetter,
+		QuickFilter:         quickfilter,
+		TraceFunnel:         impltracefunnel.NewModule(impltracefunnel.NewStore(sqlstore)),
+		RawDataExport:       implrawdataexport.NewModule(querier),
+		SpanPercentile:      implspanpercentile.NewModule(querier, providerSettings),
+		Services:            implservices.NewModule(querier, telemetryStore),
+		MetricsExplorer:     implmetricsexplorer.NewModule(telemetryStore, telemetryMetadataStore, cache, ruleStore, dashboard, fl, providerSettings, config.MetricsExplorer),
+		MetricReductionRule: metricReductionRule,
+		InfraMonitoring:     implinframonitoring.NewModule(telemetryStore, telemetryMetadataStore, querier, fl, providerSettings, config.InfraMonitoring),
+		Promote:             implpromote.NewModule(telemetryMetadataStore, telemetryStore),
+		ServiceAccount:      serviceAccount,
+		LogsPipeline:        impllogspipeline.NewModule(sqlstore),
+		RuleStateHistory:    implrulestatehistory.NewModule(implrulestatehistory.NewStore(telemetryStore, telemetryMetadataStore, providerSettings.Logger)),
+		CloudIntegration:    cloudIntegrationModule,
+		TraceDetail:         traceDetailModule,
+		SpanMapper:          implspanmapper.NewModule(implspanmapper.NewStore(sqlstore), fl),
+		LLMPricingRule:      impllmpricingrule.NewModule(impllmpricingrule.NewStore(sqlstore), fl),
+		LLMObs:              impllmobs.NewModule(querier, impllmobs.NewStore(sqlstore)),
+		ErrorTracking:       errorTrackingModule,
+		Sentry:              sentryModule,
+		Tag:                 tagModule,
 	}
 }

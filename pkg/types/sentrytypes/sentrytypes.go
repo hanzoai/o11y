@@ -2,9 +2,9 @@
 // Sentry-parity error/log/trace product face served under /v1/o11y/sentinel. It COMPOSES
 // the shared observability substrate rather than reforking it:
 //
-//   - Projects are the DSN-bearing unit under an IAM org (relational lifecycle).
-//   - Raw error EVENTS are columnar rows on the ONE datastore (high-volume, queried
-//     by Discover / events / stats / logs / traces).
+//   - Projects are the surfaces (products) under an IAM org (relational lifecycle).
+//   - Raw error EVENTS are the error facts of the ONE event plane (event.fact,
+//     signal 'error'), queried by Discover / events / stats / logs / traces.
 //   - Grouped ISSUE lifecycle stays in o11y_issues (errortracking, reused verbatim).
 //
 // Every read is org-scoped from the validated IAM principal; the client never names
@@ -29,8 +29,7 @@ var (
 	ErrCodeSentryConflict     = errors.MustNewCode("sentry_conflict")
 )
 
-// ProjectStatus is a project's lifecycle state. A revoked/archived project fails
-// ingest closed (its DSN stops verifying) without deleting its history.
+// ProjectStatus is a project's lifecycle state.
 type ProjectStatus string
 
 const (
@@ -38,11 +37,9 @@ const (
 	ProjectDisabled ProjectStatus = "disabled"
 )
 
-// Project is a DSN-bearing unit under an IAM org. It is a thin relational row: the
-// DSN itself is NOT stored — it is derived on demand from the platform ingest secret
-// (KMS) + the project id + KeyVersion, so rotating a project is a single-row bump
-// with no secret at rest. Tenancy: OrgID is the mandatory boundary; every store
-// query filters org_id.
+// Project is one surface (a product) under an IAM org: a thin relational row whose
+// slug is the product name the event plane stores. Tenancy: OrgID is the mandatory
+// boundary; every store query filters org_id.
 type Project struct {
 	bun.BaseModel `bun:"table:o11y_sentry_projects,alias:o11y_sentry_projects" json:"-"`
 
@@ -55,22 +52,15 @@ type Project struct {
 	Slug     string        `bun:"slug,type:text,notnull" json:"slug"`
 	Platform string        `bun:"platform,type:text" json:"platform,omitempty"`
 	Status   ProjectStatus `bun:"status,type:text,notnull,default:'active'" json:"status"`
-
-	// KeyVersion is the per-project DSN rotation watermark. A DSN key is
-	// "<version>:<hmac>"; a key whose version is below KeyVersion no longer verifies.
-	// Rotation bumps this by one — isolated to THIS project, no global secret roll and
-	// no shared revocation table.
-	KeyVersion int `bun:"key_version,type:bigint,notnull,default:1" json:"-"`
 }
 
-// GettableProject is the API view of a project including its freshly-derived DSN.
+// GettableProject is the API view of a project.
 type GettableProject struct {
 	*Project
-	DSN string `json:"dsn"`
 }
 
 // PostableProject creates a project. Only Name (and optional Slug/Platform) are
-// client-supplied; org/id/dsn/key are server-assigned.
+// client-supplied; org and id are server-assigned.
 type PostableProject struct {
 	Name     string `json:"name"`
 	Slug     string `json:"slug,omitempty"`

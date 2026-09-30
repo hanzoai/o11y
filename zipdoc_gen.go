@@ -102,7 +102,7 @@ func init() {
 		},
 	})
 	zip.Describe("DELETE /v1/o11y/sentinel/projects/:id", zip.Doc{
-		Description: "Deletes one Sentry project of the caller's org. Its DSN\nstops resolving immediately, so ingest for that id fails closed exactly as an\nunknown project does; retained events are not touched. Answers 204.\n\nCallers need the editor role; the runtime's own gate enforces it.",
+		Description: "Deletes one Sentry project of the caller's org; retained\nevents are not touched. Answers 204.\n\nCallers need the editor role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11ySentryProjectRef.id": "ID is the project id.",
 		},
@@ -2437,10 +2437,9 @@ func init() {
 		},
 	})
 	zip.Describe("GET /v1/o11y/sentinel/projects", zip.Doc{
-		Description: "Lists the caller's org's Sentry projects, each with its\nfreshly-derived DSN.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
+		Description: "Lists the caller's org's Sentry projects — one per product\nthat has reported an error, plus any created by hand.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11ySentryProject.createdAt":  "CreatedAt is when the project was created.",
-			"O11ySentryProject.dsn":        "DSN is the project's freshly-derived ingest DSN.",
 			"O11ySentryProject.id":         "ID is the project id.",
 			"O11ySentryProject.name":       "Name is the project's display name.",
 			"O11ySentryProject.platform":   "Platform is the reporting runtime, e.g. go, python, javascript.",
@@ -2454,10 +2453,9 @@ func init() {
 		},
 	})
 	zip.Describe("GET /v1/o11y/sentinel/projects/:id", zip.Doc{
-		Description: "Returns one Sentry project of the caller's org, DSN included.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
+		Description: "Returns one Sentry project of the caller's org.\n\nCallers need the viewer role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11ySentryProject.createdAt": "CreatedAt is when the project was created.",
-			"O11ySentryProject.dsn":       "DSN is the project's freshly-derived ingest DSN.",
 			"O11ySentryProject.id":        "ID is the project id.",
 			"O11ySentryProject.name":      "Name is the project's display name.",
 			"O11ySentryProject.platform":  "Platform is the reporting runtime, e.g. go, python, javascript.",
@@ -4487,13 +4485,12 @@ func init() {
 		},
 	})
 	zip.Describe("POST /v1/o11y/sentinel/projects", zip.Doc{
-		Description: "Creates a Sentry project under the caller's org and\nreturns it, DSN included. Only the name, and optionally a slug and platform,\nare the caller's to set; the org, id and key are server-assigned.\n\nCallers need the editor role; the runtime's own gate enforces it.",
+		Description: "Creates a Sentry project under the caller's org and\nreturns it. Only the name, and optionally a slug and platform, are the caller's\nto set; the org and id are server-assigned. The slug is the product name the\nevent plane stores, so a project reads that product's errors.\n\nCallers need the editor role; the runtime's own gate enforces it.",
 		Fields: map[string]string{
 			"O11ySentryPostableProject.name":     "Name is the project's display name. Required.",
 			"O11ySentryPostableProject.platform": "Platform is the reporting runtime, e.g. go, python, javascript.",
 			"O11ySentryPostableProject.slug":     "Slug is the project's short name. Server-assigned from Name when empty.",
 			"O11ySentryProject.createdAt":        "CreatedAt is when the project was created.",
-			"O11ySentryProject.dsn":              "DSN is the project's freshly-derived ingest DSN.",
 			"O11ySentryProject.id":               "ID is the project id.",
 			"O11ySentryProject.name":             "Name is the project's display name.",
 			"O11ySentryProject.platform":         "Platform is the reporting runtime, e.g. go, python, javascript.",
@@ -4502,22 +4499,6 @@ func init() {
 			"O11ySentryProject.updatedAt":        "UpdatedAt is when the project last changed.",
 			"O11ySentryProjectOut.data":          "Data is the project.",
 			"O11ySentryProjectOut.status":        "Status is \"success\".",
-		},
-	})
-	zip.Describe("POST /v1/o11y/sentinel/projects/:id/keys/rotate", zip.Doc{
-		Description: "Rotates a project's DSN key — bumping its rotation\nwatermark so keys below it stop verifying — and returns the project with its\nnew DSN.\n\nCallers need the editor role; the runtime's own gate enforces it.",
-		Fields: map[string]string{
-			"O11ySentryProject.createdAt": "CreatedAt is when the project was created.",
-			"O11ySentryProject.dsn":       "DSN is the project's freshly-derived ingest DSN.",
-			"O11ySentryProject.id":        "ID is the project id.",
-			"O11ySentryProject.name":      "Name is the project's display name.",
-			"O11ySentryProject.platform":  "Platform is the reporting runtime, e.g. go, python, javascript.",
-			"O11ySentryProject.slug":      "Slug is the project's short name.",
-			"O11ySentryProject.status":    "Status is the project's lifecycle state: active or disabled.",
-			"O11ySentryProject.updatedAt": "UpdatedAt is when the project last changed.",
-			"O11ySentryProjectOut.data":   "Data is the project.",
-			"O11ySentryProjectOut.status": "Status is \"success\".",
-			"O11ySentryProjectRef.id":     "ID is the project id.",
 		},
 	})
 	zip.Describe("PUT /v1/o11y/channels/:id", zip.Doc{

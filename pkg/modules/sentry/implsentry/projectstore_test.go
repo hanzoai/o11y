@@ -52,11 +52,10 @@ func newProject(orgID valuer.UUID, name, slug string) *sentrytypes.Project {
 		Name:          name,
 		Slug:          slug,
 		Status:        sentrytypes.ProjectActive,
-		KeyVersion:    1,
 	}
 }
 
-func TestProjectStore_CRUDAndRotate(t *testing.T) {
+func TestProjectStore_CRUD(t *testing.T) {
 	ctx := context.Background()
 	store := NewProjectStore(newTestSQLStore(t))
 	org := valuer.GenerateUUID()
@@ -67,31 +66,15 @@ func TestProjectStore_CRUDAndRotate(t *testing.T) {
 	got, err := store.Get(ctx, org, p.ID)
 	require.NoError(t, err)
 	assert.Equal(t, "web", got.Slug)
-	assert.Equal(t, 1, got.KeyVersion)
+	assert.Equal(t, sentrytypes.ProjectActive, got.Status)
 
 	list, err := store.List(ctx, org)
 	require.NoError(t, err)
 	require.Len(t, list, 1)
-
-	// Rotate bumps the key watermark.
-	v, err := store.Rotate(ctx, org, p.ID)
-	require.NoError(t, err)
-	assert.Equal(t, 2, v)
-	got, err = store.Get(ctx, org, p.ID)
-	require.NoError(t, err)
-	assert.Equal(t, 2, got.KeyVersion)
-
-	// Resolve (ingest path) returns the owning org + watermark.
-	rOrg, ver, status, found, err := store.Resolve(ctx, p.ID)
-	require.NoError(t, err)
-	assert.True(t, found)
-	assert.Equal(t, org, rOrg)
-	assert.Equal(t, 2, ver)
-	assert.Equal(t, sentrytypes.ProjectActive, status)
 }
 
-// TestProjectStore_TenantIsolation is the mandatory two-org isolation test: org B can
-// neither read nor rotate org A's project, and each org lists only its own.
+// TestProjectStore_TenantIsolation is the mandatory two-org isolation test: org B cannot
+// read org A's project, and each org lists only its own.
 func TestProjectStore_TenantIsolation(t *testing.T) {
 	ctx := context.Background()
 	store := NewProjectStore(newTestSQLStore(t))
@@ -106,14 +89,6 @@ func TestProjectStore_TenantIsolation(t *testing.T) {
 	_, err := store.Get(ctx, orgB, pa.ID)
 	require.Error(t, err)
 
-	// org B cannot ROTATE org A's project.
-	_, err = store.Rotate(ctx, orgB, pa.ID)
-	require.Error(t, err)
-	// ...and org A's key is untouched by B's attempt.
-	stillA, err := store.Get(ctx, orgA, pa.ID)
-	require.NoError(t, err)
-	assert.Equal(t, 1, stillA.KeyVersion)
-
 	// Each org lists only its own.
 	la, _ := store.List(ctx, orgA)
 	lb, _ := store.List(ctx, orgB)
@@ -121,14 +96,6 @@ func TestProjectStore_TenantIsolation(t *testing.T) {
 	require.Len(t, lb, 1)
 	assert.Equal(t, pa.ID, la[0].ID)
 	assert.Equal(t, pb.ID, lb[0].ID)
-}
-
-func TestProjectStore_ResolveUnknownFailsClosed(t *testing.T) {
-	ctx := context.Background()
-	store := NewProjectStore(newTestSQLStore(t))
-	_, _, _, found, err := store.Resolve(ctx, valuer.GenerateUUID())
-	require.NoError(t, err)
-	assert.False(t, found, "an unknown project must resolve to found=false, never a tenant")
 }
 
 func TestProjectStore_Delete(t *testing.T) {
@@ -169,24 +136,4 @@ func TestProjectStore_DeleteIsOrgScoped(t *testing.T) {
 	got, err := store.Get(ctx, orgA, pa.ID)
 	require.NoError(t, err)
 	assert.Equal(t, "a-app", got.Slug)
-}
-
-func TestProjectStore_DeletedProjectStopsResolving(t *testing.T) {
-	ctx := context.Background()
-	store := NewProjectStore(newTestSQLStore(t))
-	org := valuer.GenerateUUID()
-
-	p := newProject(org, "Revoked", "revoked")
-	require.NoError(t, store.Create(ctx, p))
-
-	_, _, _, found, err := store.Resolve(ctx, p.ID)
-	require.NoError(t, err)
-	require.True(t, found)
-
-	// Deleting revokes the DSN: ingest resolution fails closed with no separate
-	// revocation step, exactly as it does for an id that never existed.
-	require.NoError(t, store.Delete(ctx, org, p.ID))
-	_, _, _, found, err = store.Resolve(ctx, p.ID)
-	require.NoError(t, err)
-	assert.False(t, found)
 }

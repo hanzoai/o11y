@@ -10,54 +10,20 @@ import (
 	"github.com/hanzoai/o11y/pkg/types/sentrytypes"
 )
 
-// The ingest {project} path var is constrained to a UUID — {project:guid} — so a
-// project segment is a UUID and nothing else, and a garbage segment is a 404 from the
-// router rather than a body handed to the DSN verifier. The constraint is the router's
-// own `guid` — a UUID parse, not a hand-written character class that has to be read to
-// know what it accepts.
-
-// addSentryRoutes registers TWO families, and they answer on two roots because they
-// answer two different callers:
+// addSentryRoutes registers the FACE, /v1/o11y/sentinel — Sentinel, the
+// Sentry-parity product read by a signed-in person: projects, issues, discover,
+// events, logs, traces, stats. Hanzo IAM authz, every one scoped to the caller's
+// org from the validated claims. There is no ingest here: errors enter through
+// /v1/event only.
 //
-//   - The FACE, /v1/o11y/sentinel — Hanzo Sentry, the Sentry-parity product read by a
-//     signed-in person: projects, issues, discover, events, logs, traces, stats. Hanzo
-//     IAM authz, every one scoped to the caller's org from the validated claims.
-//   - INGEST, POST /v1/event/{project}/envelope and /store — a keyed beacon. It is
-//     the address a minted DSN spells (implsentry's mintDSN), so the address a client
-//     is told and the address this router opens are one string. OpenAccess (no IAM):
-//     a Sentry SDK presents a DSN key, not a Hanzo session; the handler verifies that
-//     key against the project's rotation watermark.
-//
-// ONE WIRE, ONE PUBLIC ADDRESS. Ingest used to sit under the face's root as well,
-// which put one wire at two addresses and put an unauthenticated write inside a
-// principal-gated subtree — so the face's gate had to carry an exemption shaped like
-// the ingest paths, and the exemption is what anything under that root had to be
-// checked against. Off the face there is nothing to exempt.
-//
-// Both are literal paths on the SAME router the o11y read plane uses, so no
-// /v1/o11y→/api rewrite applies (see createPublicServer: the path that arrives is the
-// path that matches).
-//
-// FIVE of the read routes — discover, logs, traces, traces/{id}, stats — are ALSO
-// declared as typed ops at the module's mount seam (telemetry.go in the repo root),
-// which is what carries them into the composed document, the SDK, the CLI and the
-// agent surface. That is a second DISPATCH, never a second implementation: the ops
-// answer by handing the call to this router, so the handlers below stay the one
-// place the reads are performed. Both are needed — the ops serve the composed
-// binary, this router serves the standalone process, which has no native router to
-// register an op on — so deleting either half drops one of the two deployments.
-//
-// The OTHER ten reads/writes of this face — projects (list/create/get/delete/
-// rotate-key), issues (list/get/update/events) and one event — are ALSO typed ops
-// at that seam (sentryerrors.go), the same second DISPATCH into this router. The two
-// INGEST routes below are named at that seam as HATCHES rather than ops (mount.go's
-// mountHatches): OpenAccess, DSN-authenticated, carrying an opaque Sentry-envelope
-// body a typed relay would corrupt, so they are named but not typed and stay out of
-// the document by design.
+// These are literal paths on the SAME router the o11y read plane uses, so no
+// rewrite applies (see createPublicServer: the path that arrives is the path that
+// matches). The module's mount seam declares them again as typed ops
+// (sentryerrors.go, telemetry.go) that dispatch into this router, so the handlers
+// below stay the one place the reads are performed.
 func (provider *provider) addSentryRoutes(router routing.Router) {
 	h := provider.sentryHandler
 
-	// The FACE.
 	staticRoutes := []struct {
 		method string
 		path   string
@@ -85,12 +51,6 @@ func (provider *provider) addSentryRoutes(router routing.Router) {
 		{http.MethodDelete, "/v1/o11y/sentinel/projects/{id}", provider.authzMiddleware.EditAccess(h.DeleteProject), handler.OpenAPIDef{
 			ID: "SentryDeleteProject", Tags: []string{"sentry"}, Summary: "Delete a Sentry project",
 			SuccessStatusCode: http.StatusNoContent, ErrorStatusCodes: []int{http.StatusNotFound},
-			SecuritySchemes: newSecuritySchemes(types.RoleEditor),
-		}},
-		{http.MethodPost, "/v1/o11y/sentinel/projects/{id}/keys/rotate", provider.authzMiddleware.EditAccess(h.RotateProjectKey), handler.OpenAPIDef{
-			ID: "SentryRotateProjectKey", Tags: []string{"sentry"}, Summary: "Rotate a project's DSN key",
-			Response: new(sentrytypes.GettableProject), ResponseContentType: "application/json",
-			SuccessStatusCode: http.StatusOK, ErrorStatusCodes: []int{http.StatusNotFound},
 			SecuritySchemes: newSecuritySchemes(types.RoleEditor),
 		}},
 		{http.MethodGet, "/v1/o11y/sentinel/issues", provider.authzMiddleware.ViewAccess(h.ListIssues), handler.OpenAPIDef{
@@ -155,30 +115,4 @@ func (provider *provider) addSentryRoutes(router routing.Router) {
 		router.Handle(rt.method, rt.path, handler.New(rt.fn, rt.def))
 	}
 
-	// INGEST — on its own root, UUID-constrained project segment.
-	ingestRoutes := []struct {
-		path string
-		fn   http.HandlerFunc
-		def  handler.OpenAPIDef
-	}{
-		{"/v1/event/{project:guid}/envelope", provider.authzMiddleware.OpenAccess(h.EnvelopeIngest), handler.OpenAPIDef{
-			ID: "SentryIngestEnvelope", Tags: []string{"sentry"}, Summary: "Ingest a Sentry envelope",
-			Description:         "Sentry-envelope-compatible ingest. Authenticated by the DSN public key (X-Sentry-Auth or ?sentry_key), not a Hanzo session.",
-			RequestContentType:  "application/x-sentry-envelope",
-			ResponseContentType: "application/json", SuccessStatusCode: http.StatusOK,
-			ErrorStatusCodes: []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusServiceUnavailable},
-			SecuritySchemes:  []handler.OpenAPISecurityScheme{},
-		}},
-		{"/v1/event/{project:guid}/store", provider.authzMiddleware.OpenAccess(h.StoreIngest), handler.OpenAPIDef{
-			ID: "SentryIngestStore", Tags: []string{"sentry"}, Summary: "Ingest a legacy Sentry store event",
-			Description:         "Legacy single-event Sentry ingest. Authenticated by the DSN public key.",
-			RequestContentType:  "application/json",
-			ResponseContentType: "application/json", SuccessStatusCode: http.StatusOK,
-			ErrorStatusCodes: []int{http.StatusBadRequest, http.StatusUnauthorized, http.StatusServiceUnavailable},
-			SecuritySchemes:  []handler.OpenAPISecurityScheme{},
-		}},
-	}
-	for _, rt := range ingestRoutes {
-		router.Post(rt.path, handler.New(rt.fn, rt.def))
-	}
 }

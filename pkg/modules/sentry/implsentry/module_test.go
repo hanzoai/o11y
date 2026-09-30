@@ -17,9 +17,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// fakeEvents is an in-memory EventStore: it records every write keyed by (org,
-// project) so a test can assert BOTH that ingest reached the events plane AND that a
-// read is only ever asked for the caller's own tenant.
+// fakeEvents is an in-memory EventStore standing in for the error facts of the event
+// plane, keyed by (org, project), so a test can seed what the ingest would have
+// written and assert that a read is only ever asked for the caller's own tenant.
 type fakeEvents struct {
 	inserts   map[[2]string][]*sentrytypes.Event
 	lastOrg   string
@@ -33,9 +33,14 @@ func newFakeEvents() *fakeEvents {
 
 func (f *fakeEvents) key(o, p valuer.UUID) [2]string { return [2]string{o.String(), p.String()} }
 
-func (f *fakeEvents) Insert(_ context.Context, o, p valuer.UUID, e []*sentrytypes.Event) error {
-	f.inserts[f.key(o, p)] = append(f.inserts[f.key(o, p)], e...)
-	return nil
+// seed puts facts on the plane the way the ingest that accepted them would have.
+func (f *fakeEvents) seed(o, p valuer.UUID, occs ...*errortrackingtypes.Occurrence) {
+	for _, occ := range occs {
+		f.inserts[f.key(o, p)] = append(f.inserts[f.key(o, p)], &sentrytypes.Event{
+			OrgID: o.String(), ProjectID: p.String(), EventID: occ.EventID,
+			Fingerprint: occ.Fingerprint, TraceID: occ.TraceID, Timestamp: occ.Timestamp,
+		})
+	}
 }
 func (f *fakeEvents) Discover(_ context.Context, o, p valuer.UUID, _ *sentrytypes.DiscoverRequest, _ sentrytypes.Window) (*sentrytypes.DiscoverResult, error) {
 	f.lastOrg, f.lastProj, f.discovers = o.String(), p.String(), f.discovers+1
@@ -94,8 +99,6 @@ func (f *fakeEvents) Stats(_ context.Context, o, p valuer.UUID, _ string, _ sent
 	return nil, nil
 }
 
-const testSecret = "platform-ingest-secret"
-
 type harness struct {
 	mod      sentry.Module
 	events   *fakeEvents
@@ -106,9 +109,9 @@ func newModuleHarness(t *testing.T) *harness {
 	t.Helper()
 	store := newModuleSQLStore(t)
 	projects := NewProjectStore(store)
-	issues := errortracking.Module(implerrortracking.NewModule(implerrortracking.NewStore(store), implerrortracking.NewNoopSink()))
+	issues := errortracking.Module(implerrortracking.NewModule(implerrortracking.NewStore(store)))
 	events := newFakeEvents()
-	mod := NewModule(projects, events, issues, Config{IngestSecret: []byte(testSecret), Host: "api.hanzo.ai"})
+	mod := NewModule(projects, events, issues)
 	return &harness{mod: mod, events: events, projects: projects}
 }
 
@@ -142,114 +145,52 @@ func occTrace(fp, eventID, traceID string) *errortrackingtypes.Occurrence {
 	}
 }
 
-// TestIngest_WritesEventsAndIssues proves the dual write: one Ingest lands the
-// occurrence on BOTH the columnar events plane and the grouped-issue lifecycle.
-func TestIngest_WritesEventsAndIssues(t *testing.T) {
+// ingest does what the event.error consumer does: the facts are already on the
+// plane (seeded here), and Ingest files them into the org's issues.
+func ingest(t *testing.T, h *harness, org string, project *sentrytypes.GettableProject, occs ...*errortrackingtypes.Occurrence) []*errortrackingtypes.Issue {
+	t.Helper()
+	h.events.seed(iamidentn.OrgUUID(org), project.Project.ID, occs...)
+	created, err := h.mod.Ingest(context.Background(), org, project.Slug, occs)
+	require.NoError(t, err)
+	return created
+}
+
+// TestIngest_FilesIssuesAndReportsTheNewOnes: Ingest groups a batch into the org's
+// issues, reports an issue as created exactly once, and provisions the product's
+// project under the slug the plane stores — so a surface appears on its first error.
+func TestIngest_FilesIssuesAndReportsTheNewOnes(t *testing.T) {
 	ctx := context.Background()
 	h := newModuleHarness(t)
-	org := valuer.GenerateUUID()
-	proj := mustProject(t, h, org, "web")
-	pid := proj.Project.ID
 
-	require.NoError(t, h.mod.Ingest(ctx, org, pid, []*errortrackingtypes.Occurrence{occ("fp-1", "e1"), occ("fp-1", "e2")}))
+	created, err := h.mod.Ingest(ctx, "acme", "docs", []*errortrackingtypes.Occurrence{occ("fp-1", "e1"), occ("fp-1", "e2")})
+	require.NoError(t, err)
+	require.Len(t, created, 1, "two facts of one failure are one new issue")
+	assert.Equal(t, "fp-1", created[0].Fingerprint)
 
-	// Events plane got both occurrences under (org, project).
-	assert.Len(t, h.events.inserts[[2]string{org.String(), pid.String()}], 2)
-
-	// Issue lifecycle grouped them into one issue for the org.
+	org := iamidentn.OrgUUID("acme")
 	issues, err := h.mod.ListIssues(ctx, org, nil, &errortrackingtypes.IssuesQuery{}, testWindow())
 	require.NoError(t, err)
 	require.Len(t, issues.Items, 1)
-	assert.Equal(t, "fp-1", issues.Items[0].Fingerprint)
 	assert.Equal(t, int64(2), issues.Items[0].Count)
-}
 
-// withIngestKeyResolver installs a resolver for one test and puts back whatever
-// was there. The resolver is package state read per request, so a test that left
-// its own behind would decide the answer for every test after it.
-func withIngestKeyResolver(t *testing.T, fn IngestKeyResolver) {
-	t.Helper()
-	prev := getIngestKeyResolver()
-	SetIngestKeyResolver(fn)
-	t.Cleanup(func() { SetIngestKeyResolver(prev) })
-}
-
-const testOrgSlug = "acme"
-
-// resolverFor answers only for key, and names no org for anything else — a stand-in
-// for the host asking IAM whether a publishable key belongs to somebody.
-func resolverFor(key string) IngestKeyResolver {
-	return func(_ context.Context, presented string) (string, bool) {
-		if presented == key {
-			return testOrgSlug, true
-		}
-		return "", false
-	}
-}
-
-// TestResolveIngest_FailsClosed is the ingest gate. Attribution is the org's
-// publishable key — the same one /v1/event takes — resolved by the host, so what
-// has to hold is that every way of not presenting a good one stays shut: no
-// resolver installed at all, a key the resolver rejects, an empty key, and a
-// resolver that answers ok with no org. Only a key naming an org resolves, and the
-// project in the DSN is born under that org on first sight.
-func TestResolveIngest_FailsClosed(t *testing.T) {
-	ctx := context.Background()
-	h := newModuleHarness(t)
-	pid := valuer.GenerateUUID()
-	const goodKey = "pk-live-good"
-
-	// The default. A host that never installed a resolver ingests nothing.
-	_, ok := h.mod.ResolveIngest(ctx, pid, goodKey)
-	assert.False(t, ok, "no resolver installed must not resolve")
-
-	withIngestKeyResolver(t, resolverFor(goodKey))
-
-	gotOrg, ok := h.mod.ResolveIngest(ctx, pid, goodKey)
-	require.True(t, ok)
-	assert.Equal(t, iamidentn.OrgUUID(testOrgSlug), gotOrg, "resolves to the org the key names")
-
-	// The DSN's project is provisioned under that org, so nobody had to create it.
-	_, _, status, found, err := h.projects.Resolve(ctx, pid)
+	projects, err := h.mod.ListProjects(ctx, org)
 	require.NoError(t, err)
-	require.True(t, found, "first keyed ingest provisions the project")
-	assert.Equal(t, sentrytypes.ProjectActive, status)
+	require.Len(t, projects.Items, 1)
+	assert.Equal(t, "docs", projects.Items[0].Slug, "the project is the product, by the plane's name")
 
-	// A key the resolver does not recognise.
-	_, ok = h.mod.ResolveIngest(ctx, pid, "pk-live-someone-else")
-	assert.False(t, ok)
+	again, err := h.mod.Ingest(ctx, "acme", "docs", []*errortrackingtypes.Occurrence{occ("fp-1", "e3")})
+	require.NoError(t, err)
+	assert.Empty(t, again, "a known failure is not announced twice")
 
-	// No key at all.
-	_, ok = h.mod.ResolveIngest(ctx, pid, "")
-	assert.False(t, ok)
+	_, err = h.mod.Ingest(ctx, "", "docs", nil)
+	require.Error(t, err, "an ingest that names no org is refused")
 
-	// A resolver that says yes but names no org is not an authorisation.
-	withIngestKeyResolver(t, func(context.Context, string) (string, bool) { return "", true })
-	_, ok = h.mod.ResolveIngest(ctx, pid, goodKey)
-	assert.False(t, ok, "ok with an empty org slug must not resolve")
-}
-
-// TestResolveIngest_DisabledProjectFailsClosed covers the other half: the key is
-// good and the org is real, and the project still refuses because it was disabled.
-// Turning a project off is how ingest is stopped without rotating an org's key.
-func TestResolveIngest_DisabledProjectFailsClosed(t *testing.T) {
-	ctx := context.Background()
-	h := newModuleHarness(t)
-	org := iamidentn.OrgUUID(testOrgSlug)
-	proj := mustProject(t, h, org, "web")
-	pid := proj.Project.ID
-	const goodKey = "pk-live-good"
-
-	withIngestKeyResolver(t, resolverFor(goodKey))
-
-	// Active first, so the disabled result below is the disabling and nothing else.
-	_, ok := h.mod.ResolveIngest(ctx, pid, goodKey)
-	require.True(t, ok, "an active project resolves with a good key")
-
-	disableProject(t, h, org, pid)
-
-	_, ok = h.mod.ResolveIngest(ctx, pid, goodKey)
-	assert.False(t, ok, "a disabled project must not resolve even with a good key")
+	created, err = h.mod.Ingest(ctx, "acme", "", []*errortrackingtypes.Occurrence{occ("fp-2", "e4")})
+	require.NoError(t, err)
+	assert.Len(t, created, 1, "a fact with no product still files its issue")
+	projects, err = h.mod.ListProjects(ctx, org)
+	require.NoError(t, err)
+	assert.Len(t, projects.Items, 1, "and lists no project for it")
 }
 
 // TestReads_ForeignProjectDenied is the mandatory read isolation: a project id that
@@ -286,12 +227,12 @@ func TestReads_ForeignProjectDenied(t *testing.T) {
 func TestListIssues_ProjectFilterViaEventsPlane(t *testing.T) {
 	ctx := context.Background()
 	h := newModuleHarness(t)
-	org := valuer.GenerateUUID()
-	web := mustProject(t, h, org, "web").Project.ID
-	api := mustProject(t, h, org, "api").Project.ID
+	org := iamidentn.OrgUUID("acme")
+	webP, apiP := mustProject(t, h, org, "web"), mustProject(t, h, org, "api")
+	web := webP.Project.ID
 
-	require.NoError(t, h.mod.Ingest(ctx, org, web, []*errortrackingtypes.Occurrence{occ("fp-web", "e1")}))
-	require.NoError(t, h.mod.Ingest(ctx, org, api, []*errortrackingtypes.Occurrence{occ("fp-api", "e2")}))
+	ingest(t, h, "acme", webP, occ("fp-web", "e1"))
+	ingest(t, h, "acme", apiP, occ("fp-api", "e2"))
 
 	// Whole-org list sees BOTH issues.
 	all, err := h.mod.ListIssues(ctx, org, nil, &errortrackingtypes.IssuesQuery{}, testWindow())
@@ -319,15 +260,15 @@ func TestListIssues_ProjectFilterViaEventsPlane(t *testing.T) {
 func TestTraceDetail_CrossTenantTraceIsolation(t *testing.T) {
 	ctx := context.Background()
 	h := newModuleHarness(t)
-	orgA, orgB := valuer.GenerateUUID(), valuer.GenerateUUID()
-	pA := mustProject(t, h, orgA, "a").Project.ID
-	pB := mustProject(t, h, orgB, "b").Project.ID
+	orgA, orgB := iamidentn.OrgUUID("acme"), iamidentn.OrgUUID("globex")
+	projA, projB := mustProject(t, h, orgA, "a"), mustProject(t, h, orgB, "b")
+	pA, pB := projA.Project.ID, projB.Project.ID
 
 	const victimTrace = "VICTIM-TRACE-DEADBEEF"
 	// org A's real event on the victim trace.
-	require.NoError(t, h.mod.Ingest(ctx, orgA, pA, []*errortrackingtypes.Occurrence{occTrace("fp-a", "a-secret", victimTrace)}))
+	ingest(t, h, "acme", projA, occTrace("fp-a", "a-secret", victimTrace))
 	// org B forges an event CLAIMING the same trace id in ITS OWN project.
-	require.NoError(t, h.mod.Ingest(ctx, orgB, pB, []*errortrackingtypes.Occurrence{occTrace("fp-b", "b-own", victimTrace)}))
+	ingest(t, h, "globex", projB, occTrace("fp-b", "b-own", victimTrace))
 
 	// org B reads the trace in its own project: sees ONLY its own event, never org A's.
 	detail, err := h.mod.TraceDetail(ctx, orgB, pB, victimTrace)
@@ -350,10 +291,10 @@ func TestTraceDetail_CrossTenantTraceIsolation(t *testing.T) {
 func TestGetEvent_ProjectScoped(t *testing.T) {
 	ctx := context.Background()
 	h := newModuleHarness(t)
-	org := valuer.GenerateUUID()
-	web := mustProject(t, h, org, "web").Project.ID
-	api := mustProject(t, h, org, "api").Project.ID
-	require.NoError(t, h.mod.Ingest(ctx, org, web, []*errortrackingtypes.Occurrence{occ("fp", "evt-web")}))
+	org := iamidentn.OrgUUID("acme")
+	webP := mustProject(t, h, org, "web")
+	web, api := webP.Project.ID, mustProject(t, h, org, "api").Project.ID
+	ingest(t, h, "acme", webP, occ("fp", "evt-web"))
 
 	// Correct project → found.
 	got, err := h.mod.GetEvent(ctx, org, web, "evt-web")
@@ -377,11 +318,11 @@ func TestGetEvent_ProjectScoped(t *testing.T) {
 func TestIssueEvents_ProjectScoped(t *testing.T) {
 	ctx := context.Background()
 	h := newModuleHarness(t)
-	org := valuer.GenerateUUID()
-	web := mustProject(t, h, org, "web").Project.ID
-	api := mustProject(t, h, org, "api").Project.ID
-	require.NoError(t, h.mod.Ingest(ctx, org, web, []*errortrackingtypes.Occurrence{occ("fp-shared", "e-web")}))
-	require.NoError(t, h.mod.Ingest(ctx, org, api, []*errortrackingtypes.Occurrence{occ("fp-shared", "e-api")}))
+	org := iamidentn.OrgUUID("acme")
+	webP, apiP := mustProject(t, h, org, "web"), mustProject(t, h, org, "api")
+	web := webP.Project.ID
+	ingest(t, h, "acme", webP, occ("fp-shared", "e-web"))
+	ingest(t, h, "acme", apiP, occ("fp-shared", "e-api"))
 
 	// One org-scoped issue exists for fp-shared; find it.
 	issues, err := h.mod.ListIssues(ctx, org, nil, &errortrackingtypes.IssuesQuery{}, testWindow())
@@ -400,16 +341,4 @@ func TestIssueEvents_ProjectScoped(t *testing.T) {
 	foreign := mustProject(t, h, other, "x").Project.ID
 	_, err = h.mod.IssueEvents(ctx, org, issueID, foreign, 0)
 	require.Error(t, err)
-}
-
-// disableProject flips a project's status to disabled via a direct store write.
-func disableProject(t *testing.T, h *harness, org, id valuer.UUID) {
-	t.Helper()
-	ps := h.projects.(*projectStore)
-	_, err := ps.sqlstore.BunDB().NewUpdate().
-		Model((*sentrytypes.Project)(nil)).
-		Set("status = ?", sentrytypes.ProjectDisabled).
-		Where("org_id = ?", org).Where("id = ?", id).
-		Exec(context.Background())
-	require.NoError(t, err)
 }

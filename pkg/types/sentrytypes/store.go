@@ -6,40 +6,24 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
-// ProjectStore persists o11y_sentry_projects. Every method is org-scoped EXCEPT
-// Resolve, the ingest-time lookup that maps an unguessable project id to its owning
-// org + key watermark (ingest carries no IAM principal — it authenticates the DSN).
+// ProjectStore persists o11y_sentry_projects. Every method is org-scoped.
 type ProjectStore interface {
 	Create(ctx context.Context, p *Project) error
 	List(ctx context.Context, orgID valuer.UUID) ([]*Project, error)
 	Get(ctx context.Context, orgID, id valuer.UUID) (*Project, error)
 
-	// Rotate bumps the project's KeyVersion (invalidating below-watermark DSNs) and
-	// returns the new version, org-scoped and idempotent-safe.
-	Rotate(ctx context.Context, orgID, id valuer.UUID) (int, error)
-
-	// Delete removes a project, org-scoped. Its DSN stops resolving, so ingest for
-	// that id fails closed exactly as an unknown project does. Retained events are
-	// NOT touched: they live in the columnar plane keyed by (org, project), and
-	// deleting a project must not silently destroy history.
+	// Delete removes a project, org-scoped. Retained events are NOT touched: they
+	// live on the event plane keyed by (org, product), and deleting a project must
+	// not silently destroy history.
 	Delete(ctx context.Context, orgID, id valuer.UUID) error
-
-	// Resolve maps a project id to its owning org, current key version and status —
-	// the ONLY non-org-scoped read, used by the public DSN-authenticated ingest path.
-	// Fail-closed: an unknown project returns found=false.
-	Resolve(ctx context.Context, id valuer.UUID) (orgID valuer.UUID, keyVersion int, status ProjectStatus, found bool, err error)
 }
 
-// EventStore is the columnar events plane on the ONE datastore. Insert is the finished
-// ingest sink; the reads back Discover / event detail / issue occurrences / logs /
-// traces / stats. Every read takes the org (mandatory tenant boundary) and a project
-// as separate, server-validated arguments — no query shape carries a client-named
-// tenant.
+// EventStore reads the error facts of the ONE event plane (event.fact, signal
+// 'error'): Discover / event detail / issue occurrences / logs / traces / stats. It
+// writes nothing — /v1/event is the only way an error enters. Every read takes the
+// org (mandatory tenant boundary) and a project as separate, server-validated
+// arguments — no query shape carries a client-named tenant.
 type EventStore interface {
-	// Insert writes a batch of occurrences for one (org, project). Fail-soft is the
-	// caller's contract: the durable issue upsert must not depend on this write.
-	Insert(ctx context.Context, orgID, projectID valuer.UUID, events []*Event) error
-
 	// Discover runs a bounded, allowlist-checked aggregation scoped to (org, project).
 	Discover(ctx context.Context, orgID, projectID valuer.UUID, req *DiscoverRequest, w Window) (*DiscoverResult, error)
 

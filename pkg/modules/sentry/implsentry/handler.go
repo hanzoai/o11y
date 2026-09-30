@@ -2,7 +2,6 @@ package implsentry
 
 import (
 	"context"
-	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -10,7 +9,6 @@ import (
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/http/binding"
 	"github.com/hanzoai/o11y/pkg/http/render"
-	"github.com/hanzoai/o11y/pkg/modules/errortracking/implerrortracking"
 	"github.com/hanzoai/o11y/pkg/modules/sentry"
 	"github.com/hanzoai/o11y/pkg/types/authtypes"
 	"github.com/hanzoai/o11y/pkg/types/coretypes"
@@ -20,105 +18,18 @@ import (
 )
 
 const (
-	viewTimeout   = 30 * time.Second
-	writeTimeout  = 15 * time.Second
-	ingestTimeout = 15 * time.Second
+	viewTimeout  = 30 * time.Second
+	writeTimeout = 15 * time.Second
 )
 
-// eventParser turns a decoded ingest body into events; the two wire formats differ
-// only here (reused engine parsers).
-type eventParser func([]byte) ([]*errortrackingtypes.SentryEvent, error)
-
 type handler struct {
-	module        sentry.Module
-	ingestEnabled bool
-	capturePII    bool
+	module sentry.Module
 }
 
-// NewHandler builds the /v1/o11y/sentinel HTTP surface. ingestEnabled reflects whether the
-// KMS ingest secret is configured (empty => ingest fails closed 503, reads still
-// work); capturePII retains end-user PII on ingest when true (default false = scrub).
-func NewHandler(module sentry.Module, ingestEnabled, capturePII bool) sentry.Handler {
-	return &handler{module: module, ingestEnabled: ingestEnabled, capturePII: capturePII}
-}
-
-// --- ingest (public, DSN-authenticated) ---
-
-func (h *handler) EnvelopeIngest(rw http.ResponseWriter, r *http.Request) {
-	h.ingest(rw, r, implerrortracking.ParseEnvelope)
-}
-
-func (h *handler) StoreIngest(rw http.ResponseWriter, r *http.Request) {
-	h.ingest(rw, r, implerrortracking.ParseStoreBody)
-}
-
-// ingest is the shared pipeline: enabled-check → parse the project id → resolve org +
-// verify the DSN key against the project watermark (fail-closed) → per-project rate
-// limit → bounded read+decode → parse (event-count capped) → normalize (scrub) →
-// persist to the events plane AND the issue lifecycle. Every failure fails closed and
-// leaks no internal detail to the untrusted client. Reuses the errortracking engine
-// verbatim for decode/parse/normalize/key-verify/rate-limit.
-func (h *handler) ingest(rw http.ResponseWriter, r *http.Request, parse eventParser) {
-	ctx, cancel := context.WithTimeout(r.Context(), ingestTimeout)
-	defer cancel()
-
-	if !h.ingestEnabled {
-		http.Error(rw, "sentry ingest is not configured", http.StatusServiceUnavailable)
-		return
-	}
-
-	projectID, err := valuer.NewUUID(coretypes.Param(r, "project"))
-	if err != nil {
-		http.Error(rw, "invalid project", http.StatusBadRequest)
-		return
-	}
-
-	orgID, ok := h.module.ResolveIngest(ctx, projectID, implerrortracking.SentryKeyFromRequest(r))
-	if !ok {
-		// Sentry SDKs treat 401 as "bad DSN" and drop the event (no retry storm).
-		http.Error(rw, "invalid ingest key", http.StatusUnauthorized)
-		return
-	}
-
-	if !h.module.RateAllow(projectID) {
-		rw.Header().Set("Retry-After", "1")
-		http.Error(rw, "rate limited", http.StatusTooManyRequests)
-		return
-	}
-
-	r.Body = http.MaxBytesReader(rw, r.Body, implerrortracking.MaxCompressedBody)
-	raw, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(rw, "payload too large", http.StatusRequestEntityTooLarge)
-		return
-	}
-	decoded, err := implerrortracking.DecodeBody(raw, r.Header.Get("Content-Encoding"))
-	if err != nil {
-		http.Error(rw, "cannot decode body", http.StatusBadRequest)
-		return
-	}
-	events, err := parse(decoded)
-	if err != nil {
-		http.Error(rw, "invalid payload", http.StatusBadRequest)
-		return
-	}
-
-	occs := make([]*errortrackingtypes.Occurrence, 0, len(events))
-	lastID := ""
-	for _, ev := range events {
-		occ := implerrortracking.NormalizeEvent(ev, h.capturePII)
-		if occ.Fingerprint == "" {
-			continue
-		}
-		occs = append(occs, occ)
-		lastID = occ.EventID
-	}
-
-	if err := h.module.Ingest(ctx, orgID, projectID, occs); err != nil {
-		http.Error(rw, "ingest failed", http.StatusInternalServerError)
-		return
-	}
-	render.Success(rw, http.StatusOK, map[string]string{"id": lastID})
+// NewHandler builds the /v1/o11y/sentinel HTTP surface. Errors enter through
+// /v1/event only; this face reads and manages what the event plane holds.
+func NewHandler(module sentry.Module) sentry.Handler {
+	return &handler{module: module}
 }
 
 // --- projects ---
@@ -174,27 +85,6 @@ func (h *handler) GetProject(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	p, err := h.module.GetProject(ctx, orgID, id)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-	render.Success(rw, http.StatusOK, p)
-}
-
-func (h *handler) RotateProjectKey(rw http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), writeTimeout)
-	defer cancel()
-	orgID, err := orgFromContext(ctx)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-	id, err := idFromPath(r)
-	if err != nil {
-		render.Error(rw, err)
-		return
-	}
-	p, err := h.module.RotateProjectKey(ctx, orgID, id)
 	if err != nil {
 		render.Error(rw, err)
 		return

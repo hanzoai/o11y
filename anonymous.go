@@ -30,8 +30,8 @@ package o11y
 // AND at the runtime, which is one rule enforced twice, not two rules.
 //
 // Anonymous does NOT authorize. It says a principal is not the ADMISSION test;
-// the op's own credential still is — a DSN key on the ingest wires, a
-// service-account key on service_accounts/me, the share's scope on a public
+// the op's own credential still is — a service-account key on
+// service_accounts/me, the share's scope on a public
 // dashboard, a session cookie on /users/me (which answers 401 without one, and
 // that is the honest answer rather than the host's 403 for a route the runtime
 // would have served).
@@ -53,7 +53,7 @@ func Anonymous(method, path string) bool {
 	if openOps[method+" "+path] {
 		return true
 	}
-	return publicDashboardRead(method, path) || IngestWire(method, path)
+	return publicDashboardRead(method, path)
 }
 
 // openOps is every FIXED-path op the runtime serves without a principal. Each
@@ -117,33 +117,4 @@ func publicDashboardRead(method, path string) bool {
 		return seg[0] != "" && seg[1] == "widgets" && seg[2] != "" && seg[3] == "query_range"
 	}
 	return false
-}
-
-// IngestWire reports whether method+path is a Sentry-compatible error-ingest
-// WRITE — the one foreign protocol this surface RECEIVES. The caller is a Sentry
-// SDK presenting a DSN public key, not a Hanzo session, and the runtime verifies
-// that key itself (constant-time HMAC, fail-closed) and derives the org from the
-// project segment. Refusing it for lacking a principal it can never carry would
-// take every SDK in the field off the air.
-//
-//	POST /v1/event/{project}/envelope|store     (the ingest endpoint a minted DSN names)
-//	POST /v1/o11y/api/{project}/envelope|store  (the suffix a stock SDK appends)
-//
-// It matches by METHOD + PREFIX + SUFFIX and never by a bare prefix, so nothing
-// else on either root is reachable through it: the faces stay gated — issues,
-// discover, logs, traces, stats — and so does /v1/event itself, the product
-// event endpoint beside this one. The trailing slash is the protocol's form; the
-// slash-less variant is tolerated defensively. Exported because the EDGE needs
-// the identical answer: the gateway waives its JWT check on exactly these, and a
-// request the gateway lets through tokenless must not then be refused here for
-// having no token.
-func IngestWire(method, path string) bool {
-	if method != http.MethodPost {
-		return false
-	}
-	if !strings.HasPrefix(path, eventRoot+"/") && !strings.HasPrefix(path, o11yRoot+"/api/") {
-		return false
-	}
-	return strings.HasSuffix(path, "/envelope/") || strings.HasSuffix(path, "/envelope") ||
-		strings.HasSuffix(path, "/store/") || strings.HasSuffix(path, "/store")
 }

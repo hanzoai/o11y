@@ -58,8 +58,9 @@ import (
 // sign-in callbacks, and five SSO auth-domain routes. addSessionRoutes and
 // addAuthDomainRoutes are not merely uncalled — the files are deleted, which is
 // the only shape of removal this census can tell apart from the defect it
-// exists to catch.
-const wantAPIServerRoutes = 197
+// exists to catch. Five more left with Sentry-wire ingest (four) and DSN-key
+// rotation (one): errors enter through /v1/event only.
+const wantAPIServerRoutes = 192
 
 // every handler field satisfied by an embedded nil interface: the route table is
 // a fact about REGISTRATION, and registration only takes method values off these

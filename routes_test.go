@@ -59,11 +59,11 @@ func assertRoutes(t *testing.T, want map[string]bool, prefix string) {
 	}
 }
 
-// THE WHOLE SURFACE, counted. 329 is the number of method+path pairs the o11y
+// THE WHOLE SURFACE, counted. 324 is the number of method+path pairs the o11y
 // runtime registers on its gorilla/mux tree (pkg/query-service/app/routes_*.go
-// and pkg/apiserver/o11yapiserver/*.go). Mount registers the same 329 — 319 as
+// and pkg/apiserver/o11yapiserver/*.go). Mount registers the same 324 — 318 as
 // typed ops that carry a named In, a named Out and their prose into the
-// document, 7 as named escape hatches, 3 as native service probes.
+// document, 3 as named escape hatches, 3 as native service probes.
 //
 // If this number moves, one of two things happened and both need a human: a
 // route was added to the runtime and not named here (it would 404 in the
@@ -74,8 +74,8 @@ func TestEveryRouteIsNamedAndCounted(t *testing.T) {
 	all := registered(t, app)
 
 	const (
-		wantTyped   = 319 // typed ops: in the OpenAPI document and the MCP tool list
-		wantHatches = 7   // mount.go mountHatches, each with its reason
+		wantTyped   = 318 // typed ops: in the OpenAPI document and the MCP tool list
+		wantHatches = 3   // mount.go mountHatches, each with its reason
 		wantProbes  = 3   // health.go livez/healthz/readyz, native with fall-through
 	)
 	if len(all) != wantTyped+wantHatches+wantProbes {
@@ -190,7 +190,7 @@ func setRuntime(t *testing.T, fn http.HandlerFunc) {
 	t.Cleanup(func() { o11y.SetRuntime(nil) })
 }
 
-// THE SEVEN. Each hatch is registered at its exact method and path, and each
+// THE THREE. Each hatch is registered at its exact method and path, and each
 // delegates with the path UNTOUCHED — a rewrite at this seam can only ever move
 // a request off its own route, and a mangler is invisible to the compiler, so
 // this is the only thing that catches one coming back.
@@ -199,13 +199,8 @@ func TestHatchesDelegateVerbatim(t *testing.T) {
 		{http.MethodGet, "/v1/o11y/logs/livetail"},
 		{http.MethodGet, "/v1/o11y/query_progress"},
 		{http.MethodPost, "/v1/o11y/export_raw_data"},
-
-		{http.MethodPost, "/v1/event/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
-		{http.MethodPost, "/v1/event/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
-		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"},
-		{http.MethodPost, "/v1/o11y/api/6ba7b810-9dad-11d1-80b4-00c04fd430c8/store/"},
 	}
-	if len(hatches) != 7 {
+	if len(hatches) != 3 {
 		t.Fatalf("the census itself is wrong: %d", len(hatches))
 	}
 
@@ -274,8 +269,8 @@ func TestEveryOperationDeclaresItsOwnId(t *testing.T) {
 		t.Errorf("%d of %d ops declare no id, so composition would rename them: %v",
 			len(undeclared), len(app.Registry()), undeclared)
 	}
-	if len(app.Registry()) != 319 {
-		t.Errorf("registry holds %d ops, want the 319 of TestEveryRouteIsNamedAndCounted", len(app.Registry()))
+	if len(app.Registry()) != 318 {
+		t.Errorf("registry holds %d ops, want the 318 of TestEveryRouteIsNamedAndCounted", len(app.Registry()))
 	}
 
 	// The property itself, on the real mount: nothing this service publishes

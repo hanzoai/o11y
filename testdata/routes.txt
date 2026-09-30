@@ -176,10 +176,6 @@ PATCH /v1/o11y/gateway/ingestion_keys/limits/:limitId
 PATCH /v1/o11y/rules/:id
 PATCH /v1/o11y/span_mapper_groups/:groupId
 PATCH /v1/o11y/span_mapper_groups/:groupId/span_mappers/:mapperId
-POST /v1/event/:project/envelope
-POST /v1/event/:project/store
-POST /v1/o11y/api/:project_id/envelope
-POST /v1/o11y/api/:project_id/store
 POST /v1/o11y/authz/check
 POST /v1/o11y/auto_complete/attribute_values
 POST /v1/o11y/channels
@@ -263,7 +259,6 @@ POST /v1/o11y/rules/:id/history/top_contributors
 POST /v1/o11y/rules/test
 POST /v1/o11y/sentinel/discover
 POST /v1/o11y/sentinel/projects
-POST /v1/o11y/sentinel/projects/:id/keys/rotate
 POST /v1/o11y/service/entry_point_operations
 POST /v1/o11y/service/top_level_operations
 POST /v1/o11y/service/top_operations

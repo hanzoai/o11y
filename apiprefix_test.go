@@ -12,8 +12,7 @@ import (
 )
 
 // Every o11y route is /v1/o11y/…: the host is api.hanzo.ai, so a path never
-// says api again. The one /api/ segment served is the Sentry SDK's envelope
-// suffix under /v1/o11y/api/, which a stock SDK appends to its DSN.
+// says api again.
 
 func TestNoRouteIsServedOutsideV1(t *testing.T) {
 	for route := range registered(t, mounted(t)) {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/hanzoai/o11y/pkg/errors"
@@ -45,26 +44,6 @@ func TestTheUUIDIsDerivedFromTheSlug(t *testing.T) {
 	assert.Equal(t, "dfb7a19b-108f-5150-8131-7d207488bf48", orgUUID("admin"))
 }
 
-// TestRowWritesTheNamesNotTheIDs is the regression gate on the writer. It asserts the
-// ROW, not the call: whatever ids the caller works in, what lands in `org` and
-// `product` is what the plane calls them, and no uuid spelling appears anywhere in it.
-func TestRowWritesTheNamesNotTheIDs(t *testing.T) {
-	orgID := valuer.MustNewUUID(orgUUID("hanzo"))
-	projectID := valuer.GenerateUUID()
-
-	got := row("hanzo", "docs", time.Unix(0, 0).UTC(), &sentrytypes.Event{EventID: "e-1"})
-
-	require.Len(t, got, countCols(insertColumns), "a row is exactly the insert column list")
-	assert.Equal(t, "hanzo", got[0], "org is the IAM org slug")
-	assert.Equal(t, "docs", got[1], "product is the project's slug")
-	for _, cell := range got {
-		if s, ok := cell.(string); ok {
-			assert.NotEqual(t, orgID.String(), s, "no uuid spelling of the tenant reaches the plane")
-			assert.NotEqual(t, projectID.String(), s, "no uuid spelling of the product reaches the plane")
-		}
-	}
-}
-
 // TestUnnamedTenantFailsClosed: an id the plane has no name for must refuse the
 // operation. Writing it under a placeholder is exactly the commingling this seam
 // exists to prevent — a bucket nobody owns is a bucket several tenants share.
@@ -74,23 +53,19 @@ func TestUnnamedTenantFailsClosed(t *testing.T) {
 		scope: func(context.Context, valuer.UUID, valuer.UUID) (string, string, error) { return "", "", boom },
 		db:    defaultEventsDB,
 		table: defaultEventsTable,
-		now:   func() time.Time { return time.Unix(0, 0).UTC() },
 	}
-	// store is nil, so reaching the sink at all would panic rather than pass.
-	require.Error(t, s.Insert(context.Background(), valuer.GenerateUUID(), valuer.GenerateUUID(),
-		[]*sentrytypes.Event{{EventID: "e-1"}}))
-
+	// store is nil, so reaching the datastore at all would panic rather than pass.
 	_, err := s.Discover(context.Background(), valuer.GenerateUUID(), valuer.GenerateUUID(),
 		&sentrytypes.DiscoverRequest{}, testWindow())
-	require.Error(t, err, "reads fail closed for the same reason writes do")
+	require.Error(t, err, "a read under an unnamed tenant fails closed")
 }
 
-// TestAStoreWithoutAScopeCannotWrite: the resolver is a constructor argument, but a
-// zero-value store must still refuse rather than write a nameless row.
-func TestAStoreWithoutAScopeCannotWrite(t *testing.T) {
-	s := &eventStore{db: defaultEventsDB, table: defaultEventsTable, now: time.Now}
-	require.Error(t, s.Insert(context.Background(), valuer.GenerateUUID(), valuer.GenerateUUID(),
-		[]*sentrytypes.Event{{EventID: "e-1"}}))
+// TestAStoreWithoutAScopeCannotRead: the resolver is a constructor argument, but a
+// zero-value store must still refuse rather than read under no name.
+func TestAStoreWithoutAScopeCannotRead(t *testing.T) {
+	s := &eventStore{db: defaultEventsDB, table: defaultEventsTable}
+	_, err := s.GetEvent(context.Background(), valuer.GenerateUUID(), valuer.GenerateUUID(), "e-1")
+	require.Error(t, err)
 }
 
 // TestScopeResolvesFromTheRecordsThatOwnTheNames pins NewScope: the org's name comes

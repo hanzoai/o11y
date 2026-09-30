@@ -15,8 +15,9 @@ type Store interface {
 	// fingerprint, with Count = occurrences-in-batch) in ONE transaction. New
 	// fingerprints are admitted only while the org is under `ceiling` (the per-org
 	// issue cap — backpressure against a fingerprint-explosion DoS); existing issues
-	// always bump count/last-seen and reopen-on-regression. Returns issues written.
-	UpsertIssues(ctx context.Context, orgID valuer.UUID, issues []*Issue, ceiling int) (int, error)
+	// always bump count/last-seen and reopen-on-regression. Returns the issues the
+	// batch created.
+	UpsertIssues(ctx context.Context, orgID valuer.UUID, issues []*Issue, ceiling int) ([]*Issue, error)
 
 	ListIssues(ctx context.Context, orgID valuer.UUID, q *IssuesQuery) ([]*Issue, int, error)
 	GetIssue(ctx context.Context, orgID, id valuer.UUID) (*Issue, error)

@@ -376,34 +376,6 @@ func TestTheFaceIsGatedWholesale(t *testing.T) {
 	}
 }
 
-// Ingest reaches the runtime through its OWN named route, path
-// untouched, while the typed reads on the face dispatch as ops.
-func TestTheIngestDoorIsANamedHatch(t *testing.T) {
-	app := mounted(t)
-
-	var saw string
-	o11y.SetRuntime(o11y.Whole(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		saw = r.URL.Path
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = io.WriteString(w, `{"id":"e1"}`)
-	})))
-	t.Cleanup(func() { o11y.SetRuntime(nil) })
-
-	const target = "/v1/event/6ba7b810-9dad-11d1-80b4-00c04fd430c8/envelope/"
-	if status, body := call(t, app, member(http.MethodPost, target, strings.NewReader("{}"))); status != http.StatusOK {
-		t.Fatalf("status=%d body=%s", status, body)
-	}
-	if saw != target {
-		t.Fatalf("runtime received %q, want %q verbatim", saw, target)
-	}
-
-	// ...and the typed reads next to it still dispatch as ops.
-	runtime(t, map[string]any{"items": []*sentrytypes.Event{}})
-	if status, body := call(t, app, member(http.MethodGet, "/v1/o11y/sentinel/logs?project=p1", nil)); status != http.StatusOK {
-		t.Fatalf("the typed op did not answer: status=%d %s", status, body)
-	}
-}
-
 // THE POINT OF THE PORT: the five reads are in the document now, each with its
 // operation id, its prose and its inputs. A route behind the wildcard had none
 // of that — no SDK method, no command, no agent tool, no reference page — which

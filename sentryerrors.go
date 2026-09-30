@@ -26,24 +26,15 @@ package o11y
 // pkg/query-service/app/routes_errors.go):
 //
 //   - Sentry projects: ViewAccess on the reads (list, get), EditAccess on the
-//     writes (create, delete, rotate-key).
+//     writes (create, delete).
 //   - Sentry issues: ViewAccess on list/get/events, EditAccess on update.
 //   - Sentry event detail: ViewAccess.
 //   - Error-tracking issues: ViewAccess on list/get, EditAccess on update.
 //   - Legacy exceptions (listErrors, countErrors, errorFromErrorID,
 //     errorFromGroupID, nextPrevErrorIDs): ViewAccess, every one.
 //
-// The FOUR ingest routes — POST /v1/event/{project}/envelope|store and POST
-// /v1/o11y/api/{project}/envelope|store — are the deliberate escape hatches,
-// NOT typed here and not on this face at all: ingest is a keyed beacon and a
-// face is read by a person, so ingest has its own root (relay.go's eventRoot,
-// the address a minted DSN spells). They are OpenAccess (a Sentry SDK presents a DSN key,
-// not a Hanzo session) and carry an OPAQUE Sentry-envelope body — a foreign wire
-// protocol we receive verbatim, like /.well-known. A typed relay JSON-encodes
-// its input, which would corrupt that raw envelope, so they stay on the runtime
-// mux byte-identical (pkg/apiserver/o11yapiserver/{sentry,errortracking}.go pin
-// them) and out of the document, which cannot describe an opaque proxy honestly.
-// This is the same call telemetry.go's livetail note makes for a stream.
+// There is no ingest here: errors enter through /v1/event only, and a consumer of
+// the event.error subject files them into issues.
 //
 // Collection routes register before their parameterised siblings so an id can
 // never shadow a collection — specific-beats-wildcard is what the router does
@@ -66,7 +57,6 @@ func mountSentryErrors(app *zip.App) {
 	gsentry.Post("/projects", sentryCreateProject)
 	gsentry.Get("/projects/:id", sentryGetProject)
 	gsentry.Delete("/projects/:id", sentryDeleteProject)
-	gsentry.Post("/projects/:id/keys/rotate", sentryRotateProjectKey)
 	gsentry.Get("/issues", sentryListIssues)
 	gsentry.Get("/issues/:id", sentryGetIssue)
 	gsentry.Put("/issues/:id", sentryUpdateIssue)
@@ -86,8 +76,8 @@ func mountSentryErrors(app *zip.App) {
 
 // ── sentry projects ─────────────────────────────────────────────────────────
 
-// sentryListProjects lists the caller's org's Sentry projects, each with its
-// freshly-derived DSN.
+// sentryListProjects lists the caller's org's Sentry projects — one per product
+// that has reported an error, plus any created by hand.
 //
 // Callers need the viewer role; the runtime's own gate enforces it.
 func sentryListProjects(ctx context.Context, _ *struct{}) (*O11ySentryProjectsOut, error) {
@@ -96,8 +86,9 @@ func sentryListProjects(ctx context.Context, _ *struct{}) (*O11ySentryProjectsOu
 }
 
 // sentryCreateProject creates a Sentry project under the caller's org and
-// returns it, DSN included. Only the name, and optionally a slug and platform,
-// are the caller's to set; the org, id and key are server-assigned.
+// returns it. Only the name, and optionally a slug and platform, are the caller's
+// to set; the org and id are server-assigned. The slug is the product name the
+// event plane stores, so a project reads that product's errors.
 //
 // Callers need the editor role; the runtime's own gate enforces it.
 func sentryCreateProject(ctx context.Context, in *O11ySentryPostableProject) (*O11ySentryProjectOut, error) {
@@ -105,7 +96,7 @@ func sentryCreateProject(ctx context.Context, in *O11ySentryPostableProject) (*O
 	return out, relay(ctx, nil, in, out)
 }
 
-// sentryGetProject returns one Sentry project of the caller's org, DSN included.
+// sentryGetProject returns one Sentry project of the caller's org.
 //
 // Callers need the viewer role; the runtime's own gate enforces it.
 func sentryGetProject(ctx context.Context, in *O11ySentryProjectRef) (*O11ySentryProjectOut, error) {
@@ -113,9 +104,8 @@ func sentryGetProject(ctx context.Context, in *O11ySentryProjectRef) (*O11ySentr
 	return out, relay(ctx, nil, nil, out)
 }
 
-// sentryDeleteProject deletes one Sentry project of the caller's org. Its DSN
-// stops resolving immediately, so ingest for that id fails closed exactly as an
-// unknown project does; retained events are not touched. Answers 204.
+// sentryDeleteProject deletes one Sentry project of the caller's org; retained
+// events are not touched. Answers 204.
 //
 // Callers need the editor role; the runtime's own gate enforces it.
 func sentryDeleteProject(ctx context.Context, in *O11ySentryProjectRef) (*struct{}, error) {
@@ -125,16 +115,6 @@ func sentryDeleteProject(ctx context.Context, in *O11ySentryProjectRef) (*struct
 		return nil, err
 	}
 	return nil, nil
-}
-
-// sentryRotateProjectKey rotates a project's DSN key — bumping its rotation
-// watermark so keys below it stop verifying — and returns the project with its
-// new DSN.
-//
-// Callers need the editor role; the runtime's own gate enforces it.
-func sentryRotateProjectKey(ctx context.Context, in *O11ySentryProjectRef) (*O11ySentryProjectOut, error) {
-	out := new(O11ySentryProjectOut)
-	return out, relay(ctx, nil, nil, out)
 }
 
 // ── sentry issues ───────────────────────────────────────────────────────────
@@ -534,8 +514,7 @@ type O11ySentryProjectOut struct {
 	Data O11ySentryProject `json:"data,omitempty"`
 }
 
-// O11ySentryProject is a Sentry project — a DSN-bearing unit under an org. The
-// DSN is derived on demand, never stored.
+// O11ySentryProject is a Sentry project — one product under an org.
 type O11ySentryProject struct {
 	// ID is the project id.
 	ID string `json:"id"`
@@ -551,8 +530,6 @@ type O11ySentryProject struct {
 	Platform string `json:"platform,omitempty"`
 	// Status is the project's lifecycle state: active or disabled.
 	Status string `json:"status"`
-	// DSN is the project's freshly-derived ingest DSN.
-	DSN string `json:"dsn"`
 }
 
 // O11yErrorIssuesOut is the {status, data} envelope around a page of grouped

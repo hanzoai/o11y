@@ -96,7 +96,7 @@ func TestEveryExemptOpIsNamed(t *testing.T) {
 		method, path, _ := strings.Cut(route, " ")
 		switch {
 		case !o11y.Anonymous(method, path), named[route]:
-		case strings.HasPrefix(path, "/v1/o11y/public/dashboards/"), o11y.IngestWire(method, path):
+		case strings.HasPrefix(path, "/v1/o11y/public/dashboards/"):
 		default:
 			t.Errorf("%s is exempt from the principal gate but is not named in fixedExemptions", route)
 		}
@@ -116,10 +116,6 @@ func TestPublicOpsAreExempt(t *testing.T) {
 		"GET /v1/o11y/users/me",
 		"GET /v1/o11y/public/dashboards/d1",
 		"GET /v1/o11y/public/dashboards/d1/widgets/0/query_range",
-		"POST /v1/event/proj/envelope/",
-		"POST /v1/event/proj/store",
-		"POST /v1/o11y/api/proj/envelope/",
-		"POST /v1/o11y/api/proj/store",
 	} {
 		method, path, _ := strings.Cut(route, " ")
 		if !o11y.Anonymous(method, path) {
@@ -140,15 +136,14 @@ func TestTenantOpsStayGated(t *testing.T) {
 		"GET /v1/o11y/public/dashboards",   // the collection is not a share
 		"GET /v1/o11y/public/dashboards//", // an empty share id
 		"GET /v1/o11y/public/dashboards/d1/widgets/0/query_rangex",
-		"GET /v1/event/proj/envelope/",  // ingest is a WRITE; a GET is not it
-		"POST /v1/o11y/api/v3/issues",   // a read API under the DSN prefix
 		"POST /v1/o11y/sentinel/issues", // the face is a face, whatever the suffix
-		// Ingest moved off the face. The old spelling must buy nothing, or
-		// the move left an unauthenticated hole where the route used to be.
+		// Errors enter through /v1/event only. No Sentry-wire spelling is open,
+		// here or on any root.
+		"POST /v1/event/proj/envelope/",
+		"POST /v1/event/proj/store",
+		"POST /v1/o11y/api/proj/envelope/",
+		"POST /v1/o11y/api/proj/store",
 		"POST /v1/o11y/sentinel/proj/envelope/",
-		"POST /v1/o11y/sentinel/proj/store",
-		"POST /v1/o11y/api/proj/envelopes",
-		"POST /v1/event",        // the product event endpoint is not the Sentry wire
 		"GET /v1/o11y/version/", // a route that does not exist is not public
 		"GET /V1/O11Y/VERSION",  // and the match is exact, never folded
 	} {

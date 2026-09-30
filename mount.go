@@ -152,12 +152,12 @@ func Use(app *zip.App) error {
 	// The TYPED span-mapper ops — the ingest-time rules that move or copy span
 	// attributes into resource attributes; see spanmappers.go.
 	mountSpanMappers(app)
-	// And the seven that cannot be typed, each named and justified.
+	// And the three that cannot be typed, each named and justified.
 	mountHatches(app)
 	return nil
 }
 
-// mountHatches registers the SEVEN routes that cannot be typed ops, one route
+// mountHatches registers the THREE routes that cannot be typed ops, one route
 // literal each, with the reason next to it. This list is meant to shrink and is
 // meant to be hard to grow: adding to it costs a justification in review, where
 // a catch-all cost nothing.
@@ -169,13 +169,7 @@ func Use(app *zip.App) error {
 // than being absent from it — a generated client that trusts a false contract
 // fails at the customer, not at review.
 //
-// Two of these seven sit OUTSIDE /v1/o11y — the ingest routes on eventRoot —
-// which is the second thing a wildcard hides. A catch-all on one root cannot
-// reach a route on another, so it does not merely obscure which routes are
-// un-typed, it obscures which are missing: both were unreachable from the
-// composed binary until every route was named.
-//
-// It was three, and the third is gone rather than moved: /ws/query_progress was
+// The stream list was three, and the third is gone rather than moved: /ws/query_progress was
 // the same read as o11yRoot+"/query_progress" over an Upgrade, and one read at
 // two addresses is one address too many. The Upgrade is a property of the
 // request, so both protocols answer at the /v1/o11y address now.
@@ -190,24 +184,4 @@ func mountHatches(app *zip.App) {
 	route(app, http.MethodGet, o11yRoot+"/query_progress")   // progress: a long poll, or a websocket when the caller upgrades
 	route(app, http.MethodPost, o11yRoot+"/export_raw_data") // chunked CSV/JSONL attachment, X-Response-Complete trailer
 
-	// ── 2. A FOREIGN PROTOCOL WE RECEIVE ─────────────────────────────────────
-	// Sentry-compatible ingest, and the only thing in this table that is not a
-	// face. The body is an application/x-sentry-envelope frame, not JSON, and
-	// the caller is a Sentry SDK authenticating with a DSN public key rather
-	// than a Hanzo session.
-	//
-	// SO IT ANSWERS AT THE INGEST ENDPOINT, NOT UNDER A PRODUCT'S ROOT (relay.go).
-	// eventRoot is what a minted DSN spells, so a beacon has exactly one address
-	// to knock on and the face beside it keeps its own gate.
-	//
-	// The /api/ segment is NOT ours to name: a stock SDK appends its own fixed
-	// /api/<project>/envelope/ suffix to whatever DSN path it is given, so
-	// renaming it would break every SDK in the field. We RECEIVE this shape; we
-	// do not publish it.
-	// A declared address never ends in a slash, and fiber matches the SDK's
-	// trailing one against it either way.
-	route(app, http.MethodPost, eventRoot+"/:project/envelope")       // the endpoint a minted DSN names
-	route(app, http.MethodPost, eventRoot+"/:project/store")          // the same endpoint, single-event form
-	route(app, http.MethodPost, o11yRoot+"/api/:project_id/envelope") // the suffix a stock SDK appends
-	route(app, http.MethodPost, o11yRoot+"/api/:project_id/store")    // the same suffix, single-event form
 }

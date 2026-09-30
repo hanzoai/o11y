@@ -35,7 +35,7 @@ func TestEventStore_ReadsWithoutIssuingDDL(t *testing.T) {
 	mock.ExpectQuery("SELECT DISTINCT").
 		WithArgs(nil, nil, nil, nil). // nil = match-any (dsmock.matchArg); 4 = the tenant+window scope
 		WillReturnRows(dsmock.NewRows(
-			[]dsmock.ColumnType{{Name: "group", Type: "String"}},
+			[]dsmock.ColumnType{{Name: "issue", Type: "String"}},
 			[][]any{{"fp-1"}, {"fp-2"}},
 		))
 
@@ -47,36 +47,31 @@ func TestEventStore_ReadsWithoutIssuingDDL(t *testing.T) {
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
-// TestEventStoreTargetsEventError pins WHICH table the plane reads and writes. The
-// database is named for what it holds and the table for what it is.
-func TestEventStoreTargetsEventError(t *testing.T) {
+// TestEventStoreTargetsEventFact pins WHICH table the plane reads: the one fact
+// table, whose error slice every read selects by signal.
+func TestEventStoreTargetsEventFact(t *testing.T) {
 	s := NewEventStore(nil, namedScope("acme", "docs")).(*eventStore)
 	assert.Equal(t, "event", s.db)
-	assert.Equal(t, "error", s.table)
+	assert.Equal(t, "fact", s.table)
 }
 
-// TestInsertMatchesAppend pins the insert-sink invariant: the INSERT column list and
-// the batch.Append argument list are the same length and order, and the read
-// projection scans exactly as many columns as it selects — so a written row reads back
-// field-for-field.
-func TestInsertMatchesAppend(t *testing.T) {
-	assert.Equal(t, 26, countCols(insertColumns), "insert writes 26 columns")
-	assert.Equal(t, 28, countCols(selectColumns),
+// TestProjectionMatchesScan pins the read invariant: queryEvents scans exactly as many
+// targets as selectColumns selects.
+func TestProjectionMatchesScan(t *testing.T) {
+	assert.Len(t, selectList, 28,
 		"the read projection selects the 5 frame arrays plus the attribute-backed fields")
+	assert.Equal(t, strings.Join(selectList, ", "), selectColumns)
 }
 
-// countCols counts a comma-separated column list. Every expression in these lists is
-// a bare column or a constant map/array subscript, none of which contain a comma.
-func countCols(list string) int { return strings.Count(list, ",") + 1 }
-
-// Frames survive the round trip through the five parallel arrays event.error stores.
-func TestFramesRoundTrip(t *testing.T) {
-	in := []sentrytypes.Frame{
+// Frames read back from the five parallel arrays event.fact stores.
+func TestFramesRead(t *testing.T) {
+	want := []sentrytypes.Frame{
 		{Function: "handle", File: "app/svc.py", Line: 42, Column: 7, Own: true},
 		{Function: "connect", File: "inpage.js", Line: 1, Column: 84179, Own: false},
 	}
-	fn, file, line, col, own := unzipFrames(in)
-	assert.Equal(t, in, zipFrames(fn, file, line, col, own))
+	got := zipFrames([]string{"handle", "connect"}, []string{"app/svc.py", "inpage.js"},
+		[]uint32{42, 1}, []uint32{7, 84179}, []bool{true, false})
+	assert.Equal(t, want, got)
 }
 
 // A short parallel array must read as a zero value, never panic — the shape a row
@@ -91,27 +86,6 @@ func TestFramesTolerateShortArrays(t *testing.T) {
 // No frames means no frames — not one empty frame.
 func TestFramesEmpty(t *testing.T) {
 	assert.Nil(t, zipFrames(nil, nil, nil, nil, nil))
-	fn, file, line, col, own := unzipFrames(nil)
-	assert.Empty(t, fn)
-	assert.Empty(t, file)
-	assert.Empty(t, line)
-	assert.Empty(t, col)
-	assert.Empty(t, own)
-}
-
-// attributesOf folds tags plus the envelope-adjacent values into the one map column,
-// without mutating the caller's tag map.
-func TestAttributesOfDoesNotMutateTags(t *testing.T) {
-	tags := map[string]string{"release_channel": "beta"}
-	e := &sentrytypes.Event{Tags: tags, Platform: "python", ServerName: "web-1"}
-
-	attrs := attributesOf(e)
-	assert.Equal(t, "beta", attrs["release_channel"])
-	assert.Equal(t, "python", attrs["platform"])
-	assert.Equal(t, "web-1", attrs["server"])
-	assert.NotContains(t, attrs, "user_email", "an empty value is not stored")
-
-	assert.Equal(t, map[string]string{"release_channel": "beta"}, tags, "the caller's map is untouched")
 }
 
 var _ sentrytypes.EventStore = (*eventStore)(nil)

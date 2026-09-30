@@ -59,7 +59,7 @@ func answer(method, template string) http.Handler {
 //
 // That pass-through is the point. Every route registered this way is one whose
 // answer cannot be named: an unbounded log tail, a long poll, a chunked export, a
-// 303 whose whole content is a Location, a Sentry envelope frame. relay buffers a
+// 303 whose whole content is a Location. relay buffers a
 // complete answer before it can decode one, so a typed op would hang on the first
 // tail and would return a progress report only after the query it reports on had
 // finished. Here the runtime's handler writes to the caller's own

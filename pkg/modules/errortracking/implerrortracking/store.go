@@ -36,20 +36,20 @@ func NewStore(sqlstore sqlstore.SQLStore) errortrackingtypes.Store {
 // identically on SQLite and PostgreSQL; the boolean/enum writes use bound
 // placeholders. A separate idempotent statement reopens a RESOLVED issue on
 // recurrence (an IGNORED issue stays muted). Ingest never touches `version`.
-func (s *store) UpsertIssues(ctx context.Context, orgID valuer.UUID, issues []*errortrackingtypes.Issue, ceiling int) (int, error) {
+func (s *store) UpsertIssues(ctx context.Context, orgID valuer.UUID, issues []*errortrackingtypes.Issue, ceiling int) ([]*errortrackingtypes.Issue, error) {
 	if len(issues) == 0 {
-		return 0, nil
+		return nil, nil
 	}
 
 	tx, err := s.sqlstore.BunDB().BeginTx(ctx, nil)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	defer func() { _ = tx.Rollback() }()
 
 	current, err := tx.NewSelect().Model((*errortrackingtypes.Issue)(nil)).Where("org_id = ?", orgID).Count(ctx)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	// Which of the batch's fingerprints already exist for this org (they bump even at
@@ -68,14 +68,14 @@ func (s *store) UpsertIssues(ctx context.Context, orgID valuer.UUID, issues []*e
 		Where("org_id = ?", orgID).
 		Where("fingerprint IN (?)", bun.In(fps)).
 		Scan(ctx, &rows); err != nil {
-		return 0, err
+		return nil, err
 	}
 	for _, r := range rows {
 		existing[r.Fingerprint] = true
 	}
 
 	headroom := ceiling - current
-	written := 0
+	var created []*errortrackingtypes.Issue
 	for _, issue := range issues {
 		if !existing[issue.Fingerprint] {
 			if headroom <= 0 {
@@ -83,6 +83,7 @@ func (s *store) UpsertIssues(ctx context.Context, orgID valuer.UUID, issues []*e
 			}
 			headroom--
 			existing[issue.Fingerprint] = true
+			created = append(created, issue)
 		}
 
 		if _, err := tx.NewInsert().
@@ -100,7 +101,7 @@ func (s *store) UpsertIssues(ctx context.Context, orgID valuer.UUID, issues []*e
 			Set("sample_event = EXCLUDED.sample_event").
 			Set("updated_at = EXCLUDED.updated_at").
 			Exec(ctx); err != nil {
-			return 0, err
+			return nil, err
 		}
 
 		if _, err := tx.NewUpdate().
@@ -112,15 +113,14 @@ func (s *store) UpsertIssues(ctx context.Context, orgID valuer.UUID, issues []*e
 			Where("fingerprint = ?", issue.Fingerprint).
 			Where("status = ?", errortrackingtypes.StatusResolved).
 			Exec(ctx); err != nil {
-			return 0, err
+			return nil, err
 		}
-		written++
 	}
 
 	if err := tx.Commit(); err != nil {
-		return 0, err
+		return nil, err
 	}
-	return written, nil
+	return created, nil
 }
 
 func (s *store) ListIssues(ctx context.Context, orgID valuer.UUID, q *errortrackingtypes.IssuesQuery) ([]*errortrackingtypes.Issue, int, error) {

@@ -62,26 +62,18 @@ import (
 	"github.com/zap-proto/zip"
 )
 
-// The three public roots this package answers on, each spelled ONCE.
-//
-// Two of them are FACES and one is INGEST, and that is the whole reason there
-// are three. A face is read by a signed-in person and answers about what is
-// already stored; ingest is called by a keyed beacon that holds no session
-// and carries something in. Different nouns, different callers, different
-// credentials — so the same wire does not get to answer at both.
+// The two public roots this package answers on, each spelled ONCE. Both are
+// FACES, read by a signed-in person about what is already stored. Nothing here
+// takes data in: /v1/event is the one ingest, and it is not this package's.
 //
 //   - o11yRoot is the observability face: metrics, traces, logs, dashboards,
 //     alerts, identity, access, infra, LLM observability — everything the
 //     console calls.
 //   - sentinelRoot is the error-tracking face: projects, issues, occurrences,
 //     discover and the event-rate stats.
-//   - eventRoot is the ingest endpoint. It is the address a minted DSN spells
-//     (implsentry's mintDSN), so the address a client is TOLD about and the one
-//     this service SERVES are one string.
 const (
 	o11yRoot     = "/v1/o11y"
 	sentinelRoot = "/v1/o11y/sentinel"
-	eventRoot    = "/v1/event"
 )
 
 // relay hands one typed op's call to the runtime handler at the op's OWN address

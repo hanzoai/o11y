@@ -1,10 +1,10 @@
-// Package sentry is Hanzo Sentry — the Sentry-parity error/log/trace product face
-// under /v1/o11y/sentinel. It is a COMPOSITION, not a refork: the ingest engine (envelope
-// parse, fingerprint, DSN verify, scrub, rate-limit) is the reused errortracking
-// engine; identity is Hanzo IAM; storage is the ONE datastore (columnar events) plus
-// o11y_issues (grouped-issue lifecycle, reused verbatim). This package owns only the
-// product surface: projects, the events plane, and the read/query shapes that give
-// Discover / logs / traces / stats their Sentry semantics.
+// Package sentry is Sentinel — the Sentry-parity error/log/trace product face under
+// /v1/o11y/sentinel. It is a COMPOSITION, not a refork: errors enter through /v1/event
+// only and land on the ONE event plane (event.fact, signal 'error'); a consumer of the
+// event.error subject hands each batch to Ingest, which keeps the grouped-issue
+// lifecycle (o11y_issues, reused verbatim); identity is Hanzo IAM. This package owns
+// only the product surface: projects, the reads over the error facts, and the query
+// shapes that give Discover / logs / traces / stats their Sentry semantics.
 package sentry
 
 import (
@@ -16,33 +16,25 @@ import (
 	"github.com/hanzoai/o11y/pkg/valuer"
 )
 
-// Module is the org-scoped business surface. Ingest is the only method that takes a
-// project (resolved from the DSN, no principal); every other method is scoped to the
-// caller's org and validates any project against it.
+// Module is the org-scoped business surface. Ingest is the only method that takes
+// the plane's names (an org slug and a product) rather than ids: its caller is the
+// event.error consumer, which reads them off the fact. Every other method is scoped to
+// the caller's org and validates any project against it.
 type Module interface {
-	// Ingest persists a request's occurrences for (org, project): the columnar events
-	// plane (Insert) AND the grouped-issue lifecycle (reused errortracking upsert).
-	Ingest(ctx context.Context, orgID, projectID valuer.UUID, occs []*errortrackingtypes.Occurrence) error
+	// Ingest files one (org, product)'s error facts into the org's issues and returns
+	// the issues it created. An empty product files the issues and lists no project. The facts are already on the event plane; this writes the
+	// lifecycle only. Each occurrence's Fingerprint is the fact's `issue`.
+	Ingest(ctx context.Context, org, product string, occs []*errortrackingtypes.Occurrence) ([]*errortrackingtypes.Issue, error)
 
-	// Projects — org-scoped CRUD + DSN rotation. Create/Get/List/Rotate all stamp or
-	// filter org_id; the DSN is derived, never stored.
+	// Projects — org-scoped CRUD. A project is a product: its slug is the product
+	// name the event plane stores, and Ingest creates one on a product's first error.
 	CreateProject(ctx context.Context, orgID valuer.UUID, in *sentrytypes.PostableProject) (*sentrytypes.GettableProject, error)
 	ListProjects(ctx context.Context, orgID valuer.UUID) (*sentrytypes.GettableProjects, error)
 	GetProject(ctx context.Context, orgID, id valuer.UUID) (*sentrytypes.GettableProject, error)
-	RotateProjectKey(ctx context.Context, orgID, id valuer.UUID) (*sentrytypes.GettableProject, error)
 
-	// DeleteProject removes a project. Its DSN stops resolving immediately, so ingest
-	// for that id fails closed exactly as an unknown project does. Retained events are
-	// not touched — deleting a project must not double as a history wipe.
+	// DeleteProject removes a project. Retained events are not touched — deleting a
+	// project must not double as a history wipe.
 	DeleteProject(ctx context.Context, orgID, id valuer.UUID) error
-
-	// ResolveIngest maps a DSN project id to its owning org, verifying the presented
-	// DSN key against the project's rotation watermark. Fail-closed: an unknown,
-	// disabled or below-watermark project/key returns ok=false.
-	ResolveIngest(ctx context.Context, projectID valuer.UUID, presentedKey string) (orgID valuer.UUID, ok bool)
-
-	// RateAllow reports whether the project is within its ingest rate budget.
-	RateAllow(projectID valuer.UUID) bool
 
 	// Issues — reused errortracking lifecycle, org-scoped, optionally narrowed to a
 	// project via the events-plane fingerprint projection.
@@ -62,20 +54,14 @@ type Module interface {
 	Stats(ctx context.Context, orgID, projectID valuer.UUID, field, period string) ([]sentrytypes.StatsPoint, error)
 }
 
-// Handler is the HTTP surface of Hanzo Sentry: the product face under /v1/o11y/sentinel,
-// behind Hanzo IAM authz and org-scoped from the validated claims, plus the ingest
-// endpoint under /v1/event, which is PUBLIC and DSN-authenticated in-handler.
+// Handler is the HTTP surface of Sentinel: the product face under /v1/o11y/sentinel,
+// behind Hanzo IAM authz and org-scoped from the validated claims.
 type Handler interface {
-	// Ingest (public, DSN-auth): POST /v1/event/{project}/envelope|store/.
-	EnvelopeIngest(http.ResponseWriter, *http.Request)
-	StoreIngest(http.ResponseWriter, *http.Request)
-
 	// Projects.
 	ListProjects(http.ResponseWriter, *http.Request)
 	CreateProject(http.ResponseWriter, *http.Request)
 	GetProject(http.ResponseWriter, *http.Request)
 	DeleteProject(http.ResponseWriter, *http.Request)
-	RotateProjectKey(http.ResponseWriter, *http.Request)
 
 	// Issues.
 	ListIssues(http.ResponseWriter, *http.Request)

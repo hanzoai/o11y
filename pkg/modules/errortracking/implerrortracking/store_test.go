@@ -46,17 +46,12 @@ func newTestStore(t *testing.T) sqlstore.SQLStore {
 	_, err = store.BunDB().Exec(`CREATE UNIQUE INDEX IF NOT EXISTS uq_o11y_issues_org_fingerprint ON o11y_issues (org_id, fingerprint)`)
 	require.NoError(t, err)
 
-	_, err = store.BunDB().NewCreateTable().
-		Model((*ingestRevocation)(nil)).
-		IfNotExists().
-		Exec(context.Background())
-	require.NoError(t, err)
 	return store
 }
 
 func newTestModule(t *testing.T) (errortracking.Module, valuer.UUID, valuer.UUID) {
 	t.Helper()
-	m := NewModule(NewStore(newTestStore(t)), NewNoopSink())
+	m := NewModule(NewStore(newTestStore(t)))
 	return m, valuer.GenerateUUID(), valuer.GenerateUUID()
 }
 

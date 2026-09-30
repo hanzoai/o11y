@@ -266,8 +266,8 @@ func toUUID(kind, value string) valuer.UUID {
 }
 
 // OrgUUID maps a Hanzo org slug to its o11y org UUID — the SAME deterministic
-// mapping a session takes, so a KEYED (pk-) ingest that has only the org slug
-// resolves to the exact org a logged-in session would. Exported for the keyed
-// ingest path (implsentry.ResolveIngest), which has no session to read `owner`
-// from. One mapping, one place: this is the whole tenant identity, no state.
+// mapping a session takes, so a caller that has only the org slug resolves to the
+// exact org a logged-in session would. Exported for the event.error consumer
+// (implsentry.Ingest), which reads the slug off the fact and has no session. One
+// mapping, one place: this is the whole tenant identity, no state.
 func OrgUUID(slug string) valuer.UUID { return toUUID("org", slug) }

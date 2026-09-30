@@ -20,7 +20,7 @@ func testWindow() sentrytypes.Window {
 // interpolated). org leads event.error's sort key, so the boundary is also the fast path.
 func TestScopeIsTenantFirst(t *testing.T) {
 	where, args := scope("org-A", "proj-1", testWindow())
-	assert.Equal(t, "org = ? AND product = ? AND time >= ? AND time <= ?", where)
+	assert.Equal(t, "org = ? AND signal = 'error' AND product = ? AND time >= ? AND time <= ?", where)
 	require.Len(t, args, 4)
 	assert.Equal(t, "org-A", args[0])
 	assert.Equal(t, "proj-1", args[1])
@@ -40,9 +40,9 @@ func TestBuildDiscover_ScopedAndBound(t *testing.T) {
 	// org + project are the FIRST two bound args, always.
 	assert.Equal(t, "org-A", args[0])
 	assert.Equal(t, "proj-1", args[1])
-	assert.Contains(t, sql, "org = ? AND product = ?")
+	assert.Contains(t, sql, "org = ? AND signal = 'error' AND product = ?")
 	// The filter value is bound, never inlined.
-	assert.Contains(t, sql, "environment = ?")
+	assert.Contains(t, sql, "env = ?")
 	assert.Contains(t, args, "prod")
 	// Fixed aggregation expressions, aliased by key.
 	assert.Contains(t, sql, "count() AS count")
@@ -100,8 +100,8 @@ func TestBuildStats_ScopedAndFieldAllowlist(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "org-A", args[0])
 	assert.Equal(t, "proj-1", args[1])
-	assert.Contains(t, sql, "org = ? AND product = ?")
-	assert.Contains(t, sql, "level IN ('error','fatal')")
+	assert.Contains(t, sql, "org = ? AND signal = 'error' AND product = ?")
+	assert.Contains(t, sql, "severity >= 17")
 
 	_, _, err = buildStats("db", "t", "org", "proj", "sneaky') OR 1=1 --", testWindow())
 	require.Error(t, err, "unknown stats field must be rejected")
@@ -110,35 +110,35 @@ func TestBuildStats_ScopedAndFieldAllowlist(t *testing.T) {
 func TestRowReads_AreOrgAndProjectScoped(t *testing.T) {
 	// Event detail is org+project bound (a project is an isolation unit).
 	get, gArgs := buildGetEvent("db", "t", "org-A", "proj-1", "evt-1")
-	assert.Contains(t, get, "org = ? AND product = ? AND id = ?")
+	assert.Contains(t, get, "org = ? AND signal = 'error' AND product = ? AND id = ?")
 	assert.Equal(t, "org-A", gArgs[0])
 	assert.Equal(t, "proj-1", gArgs[1])
 
 	// Issue occurrences are org+project bound.
 	fp, fArgs := buildListForFingerprint("db", "t", "org-A", "proj-1", "fp-1", 10)
-	assert.Contains(t, fp, "org = ? AND product = ? AND `group` = ?")
+	assert.Contains(t, fp, "org = ? AND signal = 'error' AND product = ? AND issue = ?")
 	assert.Equal(t, "org-A", fArgs[0])
 	assert.Equal(t, "proj-1", fArgs[1])
 
 	// Trace detail reads the errors on the trace (org+project+trace bound), not spans.
 	ft, ftArgs := buildListForTrace("db", "t", "org-A", "proj-1", "trace-xyz", 10)
-	assert.Contains(t, ft, "org = ? AND product = ? AND trace_id = ?")
+	assert.Contains(t, ft, "org = ? AND signal = 'error' AND product = ? AND trace_id = ?")
 	assert.Equal(t, "org-A", ftArgs[0])
 	assert.Equal(t, "proj-1", ftArgs[1])
 	assert.Equal(t, "trace-xyz", ftArgs[2])
 
 	logs, lArgs := buildListLogs("db", "t", "org-A", "proj-1", "boom", testWindow(), 10)
-	assert.Contains(t, logs, "org = ? AND product = ?")
+	assert.Contains(t, logs, "org = ? AND signal = 'error' AND product = ?")
 	assert.Equal(t, "org-A", lArgs[0])
 	assert.Equal(t, "proj-1", lArgs[1])
 	assert.Contains(t, logs, "message LIKE ? OR class LIKE ?")
 
 	tr, tArgs := buildListTraces("db", "t", "org-A", "proj-1", testWindow(), 10)
-	assert.Contains(t, tr, "org = ? AND product = ?")
+	assert.Contains(t, tr, "org = ? AND signal = 'error' AND product = ?")
 	assert.Equal(t, "org-A", tArgs[0])
 
 	df, dArgs := buildDistinctFingerprints("db", "t", "org-A", "proj-1", testWindow())
-	assert.Contains(t, df, "org = ? AND product = ?")
+	assert.Contains(t, df, "org = ? AND signal = 'error' AND product = ?")
 	assert.Equal(t, "org-A", dArgs[0])
 }
 
