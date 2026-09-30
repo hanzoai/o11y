@@ -913,45 +913,10 @@ func (m *module) checkForLabelInMetric(ctx context.Context, metricName string, l
 	return hasLabel, nil
 }
 
+// insertMetricsMetadata refuses: metric metadata is read from the series the
+// collector writes, and the event plane has no table an edit could land in.
 func (m *module) insertMetricsMetadata(ctx context.Context, orgID valuer.UUID, req *metricsexplorertypes.UpdateMetricMetadataRequest) error {
-	ctx = m.withMetricsExplorerContext(ctx, "insertMetricsMetadata")
-	createdAt := time.Now().UnixMilli()
-
-	ib := sqlbuilder.NewInsertBuilder()
-	ib.InsertInto(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.DescriptorTableName))
-	ib.Cols("metric_name", "temporality", "is_monotonic", "type", "description", "unit", "created_at")
-	ib.Values(
-		req.MetricName,
-		req.Temporality,
-		req.IsMonotonic,
-		req.Type,
-		req.Description,
-		req.Unit,
-		createdAt,
-	)
-
-	query, args := ib.BuildWithFlavor(datastoresql.Flavor)
-
-	valueCtx := ctxtypes.SetDatastoreMaxThreads(ctx, m.config.TelemetryStore.Threads)
-	db := m.telemetryStore.Datastore()
-	if err := db.Exec(valueCtx, query, args...); err != nil {
-		return errors.WrapInternalf(err, errors.CodeInternal, "failed to insert metrics metadata")
-	}
-
-	// Set in cache after successful DB insert
-	metricMetadata := &metricsexplorertypes.MetricMetadata{
-		Description: req.Description,
-		MetricType:  req.Type,
-		MetricUnit:  req.Unit,
-		Temporality: req.Temporality,
-		IsMonotonic: req.IsMonotonic,
-	}
-	cacheKey := generateMetricMetadataCacheKey(req.MetricName)
-	if err := m.cache.Set(ctx, orgID, cacheKey, metricMetadata, 0); err != nil {
-		m.logger.WarnContext(ctx, "failed to set metric metadata in cache after insert", slog.String("metric_name", req.MetricName), errors.Attr(err))
-	}
-
-	return nil
+	return errors.Newf(errors.TypeUnsupported, errors.CodeUnsupported, "metric %q metadata is read from its series and cannot be edited", req.MetricName)
 }
 
 func (m *module) buildFilterClause(ctx context.Context, filter *qbtypes.Filter, startMillis, endMillis int64) (*sqlbuilder.WhereClause, error) {
