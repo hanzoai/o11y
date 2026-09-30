@@ -8,6 +8,8 @@ import (
 	"github.com/hanzoai/o11y/pkg/licensing"
 )
 
+// noopLicensingAPI answers the active license with no license: this build has
+// no enterprise edition, so the question is not an error.
 type noopLicensingAPI struct{}
 
 func NewLicenseAPI() licensing.API {
@@ -15,11 +17,11 @@ func NewLicenseAPI() licensing.API {
 }
 
 func (api *noopLicensingAPI) Activate(rw http.ResponseWriter, r *http.Request) {
-	render.Error(rw, errors.New(errors.TypeUnsupported, licensing.ErrCodeUnsupported, "not implemented"))
+	render.Success(rw, http.StatusOK, nil)
 }
 
 func (api *noopLicensingAPI) GetActive(rw http.ResponseWriter, r *http.Request) {
-	render.Error(rw, errors.New(errors.TypeUnsupported, licensing.ErrCodeUnsupported, "not implemented"))
+	render.Success(rw, http.StatusOK, nil)
 }
 
 func (api *noopLicensingAPI) Refresh(rw http.ResponseWriter, r *http.Request) {
