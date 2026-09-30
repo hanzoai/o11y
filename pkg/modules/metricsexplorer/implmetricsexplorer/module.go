@@ -698,6 +698,8 @@ func (m *module) fetchMetadataFromCache(ctx context.Context, orgID valuer.UUID, 
 	return hits, misses
 }
 
+// fetchUpdatedMetadata reads each metric's newest description, type, unit and
+// temporality from the series table, which carries them beside its dimensions.
 func (m *module) fetchUpdatedMetadata(ctx context.Context, orgID valuer.UUID, metricNames []string) (map[string]*metricsexplorertypes.MetricMetadata, error) {
 	ctx = m.withMetricsExplorerContext(ctx, "fetchUpdatedMetadata")
 
@@ -713,13 +715,13 @@ func (m *module) fetchUpdatedMetadata(ctx context.Context, orgID valuer.UUID, me
 	sb := sqlbuilder.NewSelectBuilder()
 	sb.Select(
 		"metric_name",
-		"argMax(description, created_at) AS description",
-		"argMax(type, created_at) AS type",
-		"argMax(unit, created_at) AS unit",
-		"argMax(temporality, created_at) AS temporality",
-		"argMax(is_monotonic, created_at) AS is_monotonic",
+		"argMax(description, unix_milli) AS description",
+		"argMax(type, unix_milli) AS type",
+		"argMax(unit, unix_milli) AS unit",
+		"argMax(temporality, unix_milli) AS temporality",
+		"argMax(is_monotonic, unix_milli) AS is_monotonic",
 	)
-	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.DescriptorTableName))
+	sb.From(fmt.Sprintf("%s.%s", telemetrymetrics.DBName, telemetrymetrics.SeriesTableName))
 	sb.Where(sb.In("metric_name", args...))
 	sb.GroupBy("metric_name")
 
