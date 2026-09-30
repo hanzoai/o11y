@@ -30,8 +30,8 @@ const (
 // now only says WHICH of them each role takes.
 //
 // THE V2-ERA NAMES ARE NOT ALIASED, and the second block below is where they
-// stay. operations, index_v2, error_index_v2, durationSort, usage_explorer,
-// o11y_spans and dependency_graph_minutes_v2 were dropped WITH o11y_traces and
+// stay. operations, index_v2, durationSort, usage_explorer, o11y_spans and
+// dependency_graph_minutes_v2 were dropped WITH o11y_traces and
 // the plane has no successor with their columns. Pointing one at an event-plane
 // table would swap `UNKNOWN_TABLE`, which names the retired table and is true,
 // for `THERE_IS_NO_COLUMN`, which names a live table and reads like the plane is
@@ -65,25 +65,26 @@ const (
 
 	defaultMetadataDB    string = telemetrymetadata.DBName
 	defaultMetadataTable string = telemetrymetadata.AttributesMetadataTableName
+
+	// Exceptions are the fact table's signal = 'error' rows (errors.go).
+	defaultErrorTable string = "fact"
 )
 
 // RETIRED — the v2-era tables of the old trace schema. Every one of them was
 // dropped with o11y_traces and NONE of them has an event-plane successor that
-// carries its columns: the exceptions pages read errorID/groupID/exceptionType,
-// the service map reads a precomputed edge table, and the usage explorer reads a
-// per-hour count. The event plane stores the SPANS those were derived from and
-// nothing else.
+// carries its columns: the service map reads a precomputed edge table, and the
+// usage explorer reads a per-hour count. The event plane stores the SPANS those
+// were derived from and nothing else.
 //
 // They are kept as literals, in one block, so that the read that reaches one
-// fails with `Code: 60 UNKNOWN_TABLE: event.distributed_o11y_error_index_v2` —
-// a message that names the retired table, which is the true reason. The
-// alternative is a false empty, and a customer told "no errors" by a page that
+// fails with `Code: 60 UNKNOWN_TABLE: event.distributed_usage_explorer` — a
+// message that names the retired table, which is the true reason. The
+// alternative is a false empty, and a customer told "nothing" by a page that
 // cannot see the table burns a day before opening a ticket.
 const (
 	defaultOperationsTable      string = "distributed_o11y_operations"
 	defaultIndexTable           string = "distributed_o11y_index_v2"
 	defaultLocalIndexTable      string = "o11y_index_v2"
-	defaultErrorTable           string = "distributed_o11y_error_index_v2"
 	defaultDurationTable        string = "distributed_durationSort"
 	defaultUsageExplorerTable   string = "distributed_usage_explorer"
 	defaultSpansTable           string = "distributed_o11y_spans"

@@ -996,7 +996,8 @@ func (aH *APIHandler) listErrors(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, apiErr := aH.reader.ListErrors(r.Context(), query)
-	if apiErr != nil && aH.HandleError(w, apiErr.Err, http.StatusInternalServerError) {
+	if apiErr != nil {
+		RespondError(w, apiErr, nil)
 		return
 	}
 
