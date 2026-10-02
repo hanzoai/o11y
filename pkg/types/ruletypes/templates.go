@@ -258,7 +258,7 @@ func (te *TemplateExpander) preprocessTemplate() {
 			// If it's a Go template block, leave it unchanged
 			return match
 		}
-		path := match[1:] // Remove the '$'
+		path := labelPath(match[1:]) // Remove the '$'
 		return fmt.Sprintf(`{{index $labels "%s"}}`, path)
 	})
 
@@ -282,10 +282,16 @@ func (te *TemplateExpander) preprocessTemplate() {
 			return match
 		}
 		// get the variable name from {{$variable}} syntax
-		variable := strings.TrimPrefix(match, "{{$")
-		variable = strings.TrimSuffix(variable, "}}")
-		return fmt.Sprintf(`{{index .Labels "%s"}}`, variable)
+		variable := reVariable.FindStringSubmatch(match)[1]
+		return fmt.Sprintf(`{{index .Labels "%s"}}`, labelPath(variable))
 	})
+}
+
+// labelPath is the label a $-reference names. `$labels.service` is the
+// Prometheus spelling of `$service`: the label is `service`, not one called
+// "labels.service", which no series carries and which renders empty.
+func labelPath(path string) string {
+	return strings.TrimPrefix(path, "labels.")
 }
 
 // Funcs adds the functions in fm to the Expander's function map.

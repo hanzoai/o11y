@@ -83,3 +83,24 @@ func TestTemplateExpander_WithVariableSyntax(t *testing.T) {
 	}
 	require.Equal(t, "test my-service exceeds 100 and observed at 200", result)
 }
+
+// The Prometheus spelling, {{$labels.service}}, names the label `service`. The
+// {{$variable}} rewrite read it as a label called "labels.service", which no
+// series carries, so every rule written that way rendered the label empty:
+// "  has failed its health probe" with the service missing from the page.
+func TestTemplateExpander_WithPrometheusLabelsSyntax(t *testing.T) {
+	defs := "{{$labels := .Labels}}{{$value := .Value}}{{$threshold := .Threshold}}"
+	data := AlertTemplateData(map[string]string{"service": "billing", "service.name": "my-service"}, "0", "0")
+	for text, want := range map[string]string{
+		"{{$labels.service}} has failed":       "billing has failed",
+		"{{ $labels.service }} has failed":     "billing has failed",
+		"{{$labels.service.name}} is down":     "my-service is down",
+		"$labels.service has failed":           "billing has failed",
+		"{{$service}} and {{$labels.service}}": "billing and billing",
+	} {
+		expander := NewTemplateExpander(context.Background(), defs+text, "test", data, nil)
+		result, err := expander.Expand()
+		require.NoError(t, err, text)
+		require.Equal(t, want, result, text)
+	}
+}
