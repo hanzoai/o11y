@@ -70,10 +70,9 @@ import { getO11yInstanceUrl } from 'utils/o11yInstanceUrl';
 // This used to carry a rotate-and-replay wrapper: on a 401 at stream open it
 // exchanged a refresh token for a fresh access token and sent the request
 // again. There is no refresh token to exchange — o11y minted the pair and it
-// mints nothing now — and the session it would have been refreshing is a cookie
-// the browser attaches on its own. A 401 here means the EDGE has stopped
-// vouching for this browser, and the only thing that can fix that is a full
-// navigation back through the guard, which no fetch can perform.
+// mints nothing now. A 401 here means IAM's session for this browser is gone,
+// and the only thing that can fix that is a full navigation to hanzo.id, which
+// no fetch can perform.
 //
 // So the 401 is returned as the answer it is, and the caller renders it.
 // ---------------------------------------------------------------------------

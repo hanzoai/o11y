@@ -221,16 +221,10 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 						history.push(ROUTES.UN_AUTHORIZED);
 					}
 				} else {
-					// THE EDGE DECIDES WHO YOU ARE, so this app has nowhere to send you.
-					//
-					// It used to push /login: an o11y sign-in page. That page is gone —
-					// credentials live at hanzo.id — and reaching this branch behind the
-					// guard means something other than "not signed in", because the guard
-					// answers an unauthenticated page load with a 302 to hanzo.id before
-					// this bundle ever loads. What it means is that o11y would not confirm
-					// the identity the guard asserted, which is a fault, not a login
-					// prompt, and the only thing that can re-establish a session is a full
-					// navigation back through the guard.
+					// IAM DECIDES WHO YOU ARE, so this app has nowhere to send you.
+					// Credentials live at hanzo.id, and o11y has no sign-in page of its
+					// own: reaching this branch means o11y would not confirm the identity
+					// it was given, which is a fault, not a login prompt.
 					history.push(ROUTES.SOMETHING_WENT_WRONG);
 				}
 			} else if (isLoggedInState) {

@@ -108,11 +108,10 @@ export const interceptorsRequestBasePath = (
 // behaviour the app ALREADY had whenever no-auth mode was on: reject, and let
 // the caller render the error.
 //
-// The distinction that makes this correct: identity now lives in a cookie the
-// EDGE issued. A 401 from o11y is either an authorization answer (you are signed
-// in and may not do this), which no retry can change, or a session the edge has
-// stopped vouching for — and only a full navigation back through the guard can
-// fix that, which an XHR cannot perform. Logging out on a 401 would take a
+// The distinction that makes this correct: identity is IAM's. A 401 from o11y is
+// either an authorization answer (you are signed in and may not do this), which
+// no retry can change, or an IAM session that has ended — and only a full
+// navigation to hanzo.id can fix that, which an XHR cannot perform. Logging out on a 401 would take a
 // perfectly good session away for the first reason.
 export const interceptorRejected = async (
 	value: AxiosResponse<any>,

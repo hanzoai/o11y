@@ -1,16 +1,11 @@
 import deleteLocalStorageKey from 'api/browser/localstorage/remove';
 import { LOCALSTORAGE } from 'constants/localStorage';
 
-// GUARD_LOGOUT is the edge's sign-out, on this same origin, and it is a fixed
-// contract exactly as the identity headers are: the hop that put a session in
-// front of this app (admin-guard) is the only thing that can end one.
-//
-// This used to DELETE /v1/o11y/sessions and push the SPA at its own /login. Both
-// halves were wrong once identity moved to the edge: o11y mints no session to
-// delete, and /login re-entered an app the browser still had a valid cookie for
-// — clicking "Sign out" cleared some localStorage keys and put you straight back
-// where you were. Clearing local state is housekeeping, not signing out.
-const GUARD_LOGOUT = '/__guard/logout';
+// IAM_LOGOUT is Hanzo IAM's end-session endpoint (end_session_endpoint in
+// https://hanzo.id/.well-known/openid-configuration). o11y mints no session of
+// its own, so signing out is ending the IAM session; clearing local state is
+// housekeeping, not signing out.
+const IAM_LOGOUT = 'https://hanzo.id/v1/iam/oauth/logout';
 
 export const Logout = (): void => {
 	deleteLocalStorageKey(LOCALSTORAGE.IS_LOGGED_IN);
@@ -21,7 +16,7 @@ export const Logout = (): void => {
 	deleteLocalStorageKey(LOCALSTORAGE.USER_ID);
 	deleteLocalStorageKey(LOCALSTORAGE.QUICK_FILTERS_SETTINGS_ANNOUNCEMENT);
 	window.dispatchEvent(new CustomEvent('LOGOUT'));
-	window.location.assign(GUARD_LOGOUT);
+	window.location.assign(IAM_LOGOUT);
 };
 
 export const UnderscoreToDotMap: Record<string, string> = {

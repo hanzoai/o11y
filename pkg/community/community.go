@@ -121,26 +121,23 @@ func NewO11y(ctx context.Context, config o11y.Config) (*o11y.O11y, error) {
 			// Authorization is selected by the TRUST BOUNDARY, not by pluggable policy —
 			// the enforced policy is identical either way, only where the relationship
 			// tuples live differs:
-			//   - "local" (O11Y_AUTHZ_PROVIDER=local): an edge gateway has ALREADY
-			//     validated the Hanzo IAM session and injected the trusted identity
-			//     headers, and the sharder gates cross-org — so authorizing that user
-			//     for their own org is a local decision, and a round-trip back out to
-			//     IAM is redundant with the edge trust already spent. See
-			//     pkg/authz/localauthz.
+			//   - "local" (O11Y_AUTHZ_PROVIDER=local): the identity headers were minted
+			//     by cloud from a Hanzo IAM bearer it validated (cloud embeds this
+			//     module, and its /v1/o11y proxies to a standalone runtime with the
+			//     same headers), and the sharder gates cross-org — so authorizing that
+			//     user for their own org is a local decision. See pkg/authz/localauthz.
 			//   - "iam" (default): every decision AND every tuple WRITE is delegated to
 			//     Hanzo IAM's Casbin enforcer.
 			//
-			// The boundary is a property of the DEPLOYMENT, not of standalone-vs-embed.
-			// This comment used to say "iam" was what standalone means and "local" what
-			// the embed means, which stopped being true the moment a standalone host was
-			// put behind the same gateway hop: o11y.hanzo.ai is fronted by admin-guard's
-			// verify-authn, so its boundary is the embed's boundary and it runs "local".
+			// The boundary is a property of the DEPLOYMENT, not of standalone-vs-embed:
+			// a standalone runtime that only cloud reaches has the embed's boundary and
+			// runs "local". No public route may reach one.
 			//
 			// A WARNING the default cannot express: "iam" requires IAM to serve
 			// add-policy / remove-policy / get-policies / batch-enforce, and IAM v1.34 —
 			// the clean-room zip v2 — does not. Selecting it today makes the founding
-			// grant fail with authz_unavailable on every sign-in. Either front the host
-			// with the gateway and choose "local", or restore those routes first.
+			// grant fail with authz_unavailable on every sign-in. Choose "local" for a
+			// runtime only cloud reaches, or restore those routes first.
 			if config.Provider == "local" {
 				return localauthz.NewProviderFactory(sqlstore), nil
 			}
