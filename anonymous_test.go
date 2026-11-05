@@ -60,8 +60,8 @@ func TestNoCredentialSurfaceIsExemptOrRouted(t *testing.T) {
 
 // THE DRIFT GUARD. The unified binary refused every public o11y op — /version,
 // /health, the three probes, sign-in — because the embedding host's exemption
-// list named /v1/o11y/api/v2/livez and three siblings under an internal /api/
-// namespace this module had stopped rewriting onto. Four names, zero routes,
+// list named four probes under an old internal namespace this module had
+// stopped rewriting onto. Four names, zero routes,
 // and nothing anywhere said so. This test is what says so: every path the
 // exemption names must be a route Mount registers, at that method.
 //
@@ -141,8 +141,6 @@ func TestTenantOpsStayGated(t *testing.T) {
 		// here or on any root.
 		"POST /v1/event/proj/envelope/",
 		"POST /v1/event/proj/store",
-		"POST /v1/o11y/api/proj/envelope/",
-		"POST /v1/o11y/api/proj/store",
 		"POST /v1/o11y/sentinel/proj/envelope/",
 		"GET /v1/o11y/version/", // a route that does not exist is not public
 		"GET /V1/O11Y/VERSION",  // and the match is exact, never folded

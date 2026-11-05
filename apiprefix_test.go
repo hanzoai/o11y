@@ -20,16 +20,18 @@ func TestNoRouteIsServedOutsideV1(t *testing.T) {
 		if !strings.HasPrefix(path, "/v1/") {
 			t.Errorf("%s is served outside /v1/", route)
 		}
+		if strings.Contains(path, "/api/") || strings.HasSuffix(path, "/api") {
+			t.Errorf("%s contains /api/ after /v1/", route)
+		}
 	}
 }
 
 // versioned is the spelling every first-party route had before /v1/o11y.
-var versioned = regexp.MustCompile(`/api/v[0-9]`)
+var versioned = regexp.MustCompile(`/api/v[0-9]|/v1/[^"\s` + "`" + `']*?/api/`)
 
 // Matches preceded by one of these are not o11y routes: TypeScript module
-// paths (types/api/v5/…), Go modules (etcd/api/v3, alertmanager/api/v2) and
-// the Sentry DSN namespace (/v1/o11y/api/…).
-var notARoute = []string{"types", "etcd", "alertmanager", "/v1/o11y"}
+// paths (types/api/v5/…) and Go modules (etcd/api/v3, alertmanager/api/v2).
+var notARoute = []string{"types", "etcd", "alertmanager"}
 
 var skipDirs = map[string]bool{".git": true, "node_modules": true, "build": true, "dist": true}
 

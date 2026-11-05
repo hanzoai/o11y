@@ -62,10 +62,9 @@ place to fix it; do not add a second writer.
 ## No `/api/`
 
 Every route is `/v1/o11y/…`; the host already says api. `apiprefix_test.go`
-fails on a registered route outside `/v1/` and on any `/api/v<N>` spelling in
-the tree, so an upstream re-sync cannot bring the old namespace back. The one
-`/api/` segment served is the Sentry SDK's envelope suffix under
-`/v1/o11y/api/<project>/`, which a stock SDK appends to its DSN.
+fails on a registered route outside `/v1/`, on any route with `/api/` after
+`/v1/`, and on any `/api/v<N>` spelling in the tree, so an upstream re-sync
+cannot bring the old namespace back.
 
 ## The console (`pkg/web`) is router-agnostic
 
