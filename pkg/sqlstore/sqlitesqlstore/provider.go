@@ -70,15 +70,21 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 	sqldb.SetMaxOpenConns(config.Connection.MaxOpenConns)
 	sqldb.SetConnMaxLifetime(config.Connection.MaxConnLifetime)
 
-	sqliteDialect := sqlitedialect.New()
-	bunDB := sqlstore.NewBunDB(settings, sqldb, sqliteDialect, hooks)
+	return NewWithDB(ctx, providerSettings, sqldb, hooks...), nil
+}
+
+// NewWithDB wraps a database the host already opened (a pool it sized and keyed). The
+// store never closes it. The database must enforce foreign keys.
+func NewWithDB(ctx context.Context, providerSettings factory.ProviderSettings, sqldb *sql.DB, hooks ...sqlstore.SQLStoreHook) sqlstore.SQLStore {
+	settings := factory.NewScopedProviderSettings(providerSettings, "github.com/hanzoai/o11y/pkg/sqlitesqlstore")
+	bunDB := sqlstore.NewBunDB(settings, sqldb, sqlitedialect.New(), hooks)
 	return &provider{
 		settings:  settings,
 		sqldb:     sqldb,
 		bundb:     bunDB,
 		dialect:   new(dialect),
 		formatter: newFormatter(bunDB.Dialect()),
-	}, nil
+	}
 }
 
 func (provider *provider) BunDB() *bun.DB {

@@ -49,8 +49,10 @@ import (
 	"github.com/hanzoai/o11y/pkg/sharder/singlesharder"
 	"github.com/hanzoai/o11y/pkg/sqlmigration"
 	"github.com/hanzoai/o11y/pkg/sqlschema"
+	"github.com/hanzoai/o11y/pkg/sqlschema/postgressqlschema"
 	"github.com/hanzoai/o11y/pkg/sqlschema/sqlitesqlschema"
 	"github.com/hanzoai/o11y/pkg/sqlstore"
+	"github.com/hanzoai/o11y/pkg/sqlstore/postgressqlstore"
 	"github.com/hanzoai/o11y/pkg/sqlstore/sqlitesqlstore"
 	"github.com/hanzoai/o11y/pkg/sqlstore/sqlstorehook"
 	"github.com/hanzoai/o11y/pkg/statsreporter"
@@ -98,12 +100,14 @@ func NewPProfProviderFactories() factory.NamedMap[factory.ProviderFactory[pprof.
 func NewSQLStoreProviderFactories() factory.NamedMap[factory.ProviderFactory[sqlstore.SQLStore, sqlstore.Config]] {
 	return factory.MustNewNamedMap(
 		sqlitesqlstore.NewFactory(sqlstorehook.NewLoggingFactory(), sqlstorehook.NewInstrumentationFactory()),
+		postgressqlstore.NewFactory(sqlstorehook.NewLoggingFactory(), sqlstorehook.NewInstrumentationFactory()),
 	)
 }
 
 func NewSQLSchemaProviderFactories(sqlstore sqlstore.SQLStore) factory.NamedMap[factory.ProviderFactory[sqlschema.SQLSchema, sqlschema.Config]] {
 	return factory.MustNewNamedMap(
 		sqlitesqlschema.NewFactory(sqlstore),
+		postgressqlschema.NewFactory(sqlstore),
 	)
 }
 

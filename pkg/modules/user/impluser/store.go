@@ -9,6 +9,7 @@ import (
 	"github.com/hanzoai/o11y/pkg/types"
 	"github.com/hanzoai/o11y/pkg/valuer"
 	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect"
 )
 
 type store struct {
@@ -79,8 +80,36 @@ func (store *store) GetByOrgIDAndEmail(ctx context.Context, orgID valuer.UUID, e
 // the whole transaction is refused instead of committing half a person.
 func (store *store) Rekey(ctx context.Context, orgID valuer.UUID, from valuer.UUID, to valuer.UUID) error {
 	db := store.sqlstore.BunDBCtx(ctx)
+	postgres := db.Dialect().Name() == dialect.PG
 
-	if _, err := db.ExecContext(ctx, "PRAGMA defer_foreign_keys = ON"); err != nil {
+	var references []struct {
+		Table  string `bun:"table_name"`
+		Column string `bun:"column_name"`
+		// Constraint is the foreign key's name (postgres only).
+		Constraint string `bun:"constraint_name"`
+	}
+
+	if postgres {
+		// A foreign key is checked at the end of its statement unless it is deferrable.
+		// Make the ones that point at users deferrable (transactional DDL, so a rollback
+		// leaves them as they were) and hold the checks until COMMIT.
+		if err := db.NewRaw(`SELECT t.relname AS table_name, a.attname AS column_name, c.conname AS constraint_name
+			FROM pg_constraint c
+			JOIN pg_class t ON t.oid = c.conrelid
+			JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = c.conkey[1]
+			WHERE c.contype = 'f' AND c.confrelid = 'users'::regclass AND t.relnamespace = current_schema()::regnamespace`).
+			Scan(ctx, &references); err != nil {
+			return err
+		}
+		for _, reference := range references {
+			if _, err := db.ExecContext(ctx, "ALTER TABLE ? ALTER CONSTRAINT ? DEFERRABLE INITIALLY IMMEDIATE", bun.Ident(reference.Table), bun.Ident(reference.Constraint)); err != nil {
+				return err
+			}
+		}
+		if _, err := db.ExecContext(ctx, "SET CONSTRAINTS ALL DEFERRED"); err != nil {
+			return err
+		}
+	} else if _, err := db.ExecContext(ctx, "PRAGMA defer_foreign_keys = ON"); err != nil {
 		return err
 	}
 
@@ -103,17 +132,15 @@ func (store *store) Rekey(ctx context.Context, orgID valuer.UUID, from valuer.UU
 		return errors.Newf(errors.TypeNotFound, types.ErrCodeUserNotFound, "user with id %s does not exist in org %s", from, orgID)
 	}
 
-	var references []struct {
-		Table  string `bun:"table_name"`
-		Column string `bun:"column_name"`
-	}
-	err = db.
-		NewRaw(`SELECT m.name AS table_name, f."from" AS column_name
+	if !postgres {
+		err = db.
+			NewRaw(`SELECT m.name AS table_name, f."from" AS column_name
 			FROM sqlite_master AS m, pragma_foreign_key_list(m.name) AS f
 			WHERE m.type = 'table' AND f."table" = 'users' AND (f."to" = 'id' OR f."to" IS NULL)`).
-		Scan(ctx, &references)
-	if err != nil {
-		return err
+			Scan(ctx, &references)
+		if err != nil {
+			return err
+		}
 	}
 
 	for _, reference := range references {
