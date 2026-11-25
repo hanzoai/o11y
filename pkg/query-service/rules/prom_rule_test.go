@@ -1587,12 +1587,11 @@ func TestPromRule_NoData_AbsentFor(t *testing.T) {
 					{"test_metric", fingerprint, baseTime.Add(2 * time.Minute).UnixMilli(), 100.0, uint32(0)},
 				}))
 
-			// Second eval (t2) - no data
+			// Second eval (t2) - no data.
+			// Series fingerprints/labels are served from datastoreprometheus's
+			// bounded 60s series cache (same org, metric, matchers, and hour bucket),
+			// so only the samples query hits ClickHouse.
 			queryStart2, queryEnd2 := calcQueryRange(t2)
-			telemetryStore.Mock().
-				ExpectQuery("SELECT fingerprint, any").
-				WithArgs("test_metric", "__name__", "test_metric").
-				WillReturnRows(dsmock.NewRows(fingerprintCols, [][]any{{fingerprint, labelsJSON}}))
 			telemetryStore.Mock().
 				ExpectQuery("SELECT metric_name, fingerprint, unix_milli").
 				WithArgs("test_metric", "test_metric", "__name__", "test_metric", queryStart2, queryEnd2).

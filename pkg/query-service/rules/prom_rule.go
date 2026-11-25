@@ -13,6 +13,7 @@ import (
 
 	"github.com/hanzoai/o11y/pkg/errors"
 	"github.com/hanzoai/o11y/pkg/prometheus"
+	"github.com/hanzoai/o11y/pkg/types/ctxtypes"
 	qbtypes "github.com/hanzoai/o11y/pkg/types/querybuildertypes/querybuildertypesv5"
 	"github.com/hanzoai/o11y/pkg/types/rulestatehistorytypes"
 	"github.com/hanzoai/o11y/pkg/types/ruletypes"
@@ -376,6 +377,12 @@ func (r *PromRule) String() string {
 }
 
 func (r *PromRule) RunAlertQuery(ctx context.Context, qs string, start, end time.Time, interval time.Duration) (promql.Matrix, error) {
+	if orgID := r.orgID.StringValue(); orgID != "" {
+		ctx = ctxtypes.NewContextWithCommentVals(ctx, map[string]string{
+			"org_id": orgID,
+		})
+	}
+
 	q, err := r.prometheus.Engine().NewRangeQuery(ctx, r.prometheus.Storage(), nil, qs, start, end, interval)
 	if err != nil {
 		return nil, err
