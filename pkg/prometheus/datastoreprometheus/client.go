@@ -24,12 +24,14 @@ import (
 type client struct {
 	settings       factory.ScopedProviderSettings
 	telemetryStore telemetrystore.TelemetryStore
+	seriesCache    *seriesCache
 }
 
 func NewReadClient(settings factory.ScopedProviderSettings, telemetryStore telemetrystore.TelemetryStore) remote.ReadClient {
 	return &client{
 		settings:       settings,
 		telemetryStore: telemetryStore,
+		seriesCache:    newSeriesCache(defaultSeriesCacheMaxEntries, defaultSeriesCacheTTL),
 	}
 }
 
@@ -68,7 +70,16 @@ func (client *client) Read(ctx context.Context, query *prompb.Query, sortSeries 
 		return nil, err
 	}
 
-	fingerprints, err := client.getFingerprintsFromDatastoreQuery(ctx, datastoreQuery, args)
+	var fingerprints map[uint64][]prompb.Label
+	if client.seriesCache != nil {
+		start, end, tableName := getStartAndEndAndTableName(query.StartTimestampMs, query.EndTimestampMs)
+		cacheKey := buildSeriesCacheKey(ctx, metricName, tableName, start, end, !constants.IsDotMetricsEnabled, query.Matchers)
+		fingerprints, err = client.seriesCache.getOrLoad(ctx, cacheKey, func(loadCtx context.Context) (map[uint64][]prompb.Label, error) {
+			return client.getFingerprintsFromDatastoreQuery(loadCtx, datastoreQuery, args)
+		})
+	} else {
+		fingerprints, err = client.getFingerprintsFromDatastoreQuery(ctx, datastoreQuery, args)
+	}
 	if err != nil {
 		return nil, err
 	}
