@@ -71,8 +71,8 @@ def pytest_addoption(parser: pytest.Parser):
     parser.addoption(
         "--postgres-version",
         action="store",
-        default="15",
-        help="postgres version",
+        default="18.0.10",
+        help="hanzo sql (ghcr.io/hanzoai/sql) image tag",
     )
     parser.addoption(
         "--datastore-version",

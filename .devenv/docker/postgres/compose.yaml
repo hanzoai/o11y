@@ -1,12 +1,12 @@
 services:
 
   postgres:
-    image: postgres:15
+    image: ghcr.io/hanzoai/sql:18.0.10
     container_name: postgres
     environment:
-      POSTGRES_DB: observe
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      SQL_DB: observe
+      SQL_USER: postgres
+      SQL_PASSWORD: password
     healthcheck:
       test:
         [

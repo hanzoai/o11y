@@ -21,13 +21,17 @@ def postgres(network: Network, request: pytest.FixtureRequest, pytestconfig: pyt
         version = request.config.getoption("--postgres-version")
 
         container = PostgresContainer(
-            image=f"postgres:{version}",
+            image=f"ghcr.io/hanzoai/sql:{version}",
             port=5432,
             username="o11y",
             password="password",
             dbname="o11y",
             driver="psycopg2",
         )
+        # ghcr.io/hanzoai/sql entrypoint requires SQL_* variables (never POSTGRES_*).
+        container.with_env("SQL_USER", "o11y")
+        container.with_env("SQL_PASSWORD", "password")
+        container.with_env("SQL_DB", "o11y")
         container.with_network(network)
         container.start()
 

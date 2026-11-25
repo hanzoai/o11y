@@ -223,7 +223,7 @@ Tests can be configured using pytest options:
 
 - `--sqlstore-provider` — Choose the SQL store provider (default: `postgres`)
 - `--sqlite-mode` — SQLite journal mode: `delete` or `wal` (default: `delete`). Only relevant when `--sqlstore-provider=sqlite`.
-- `--postgres-version` — PostgreSQL version (default: `15`)
+- `--postgres-version` — Hanzo SQL (`ghcr.io/hanzoai/sql`) image tag (default: `18.0.10`)
 - `--datastore-version` — Datastore version (default: `25.5.6`)
 - `--zookeeper-version` — Zookeeper version (default: `3.7.1`)
 - `--schema-migrator-version` — O11y schema migrator version (default: `v0.144.2`)
