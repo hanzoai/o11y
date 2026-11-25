@@ -32,9 +32,10 @@ func NewStore(sqlstore sqlstore.SQLStore) errortrackingtypes.Store {
 // under `ceiling`; existing issues always bump. This bounds single-request write
 // amplification and caps per-org issue growth (fingerprint-explosion backpressure).
 //
-// Portable SET exprs: `count = count + EXCLUDED.count` and `EXCLUDED.x` behave
-// identically on SQLite and PostgreSQL; the boolean/enum writes use bound
-// placeholders. A separate idempotent statement reopens a RESOLVED issue on
+// Portable SET exprs: `count = o11y_issues.count + EXCLUDED.count` and `EXCLUDED.x`
+// behave identically on SQLite and PostgreSQL (PostgreSQL rejects unqualified `count`
+// in ON CONFLICT DO UPDATE as SQLSTATE 42702 ambiguous column reference); the boolean/enum
+// writes use bound placeholders. A separate idempotent statement reopens a RESOLVED issue on
 // recurrence (an IGNORED issue stays muted). Ingest never touches `version`.
 func (s *store) UpsertIssues(ctx context.Context, orgID valuer.UUID, issues []*errortrackingtypes.Issue, ceiling int) ([]*errortrackingtypes.Issue, error) {
 	if len(issues) == 0 {
@@ -89,7 +90,7 @@ func (s *store) UpsertIssues(ctx context.Context, orgID valuer.UUID, issues []*e
 		if _, err := tx.NewInsert().
 			Model(issue).
 			On("CONFLICT (org_id, fingerprint) DO UPDATE").
-			Set("count = count + EXCLUDED.count").
+			Set("count = o11y_issues.count + EXCLUDED.count").
 			Set("last_seen = EXCLUDED.last_seen").
 			Set("value = EXCLUDED.value").
 			Set("level = EXCLUDED.level").
