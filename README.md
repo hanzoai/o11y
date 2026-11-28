@@ -28,6 +28,28 @@ OpenTelemetry SDK or the OTel Collector at it:
 export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
 ```
 
+### Ingestion Environment Variables (Local `hanzoai/cloud`)
+
+When emitting telemetry from a local `hanzoai/cloud` instance, configure the standard OpenTelemetry variables:
+
+```bash
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://127.0.0.1:4318"
+export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT="http://127.0.0.1:4318/v1/traces"
+export OTEL_EXPORTER_OTLP_METRICS_ENDPOINT="http://127.0.0.1:4318/v1/metrics"
+export OTEL_EXPORTER_OTLP_LOGS_ENDPOINT="http://127.0.0.1:4318/v1/logs"
+export OTEL_SERVICE_NAME="hanzo-cloud-local"
+export OTEL_EXPORTER_OTLP_PROTOCOL="http/json"
+```
+
+### OTLP Ingest Smoke Test
+
+Run the automated smoke test script to verify trace, metric, and log ingestion round-trip:
+
+```bash
+pnpm test
+# or: node scripts/otlp_smoke.mjs
+```
+
 Traces, metrics and logs land in Datastore and show up under APM, Logs, Traces, Metrics
 and Exceptions in the UI. Dashboards and alerting are built on the same queries.
 

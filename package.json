@@ -1,0 +1,16 @@
+{
+  "name": "hanzo-o11y",
+  "version": "1.0.0",
+  "description": "Unified observability platform for metrics, traces, and logs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/otlp_smoke.mjs",
+    "test:otlp": "node scripts/otlp_smoke.mjs",
+    "test:frontend": "cd frontend && pnpm test"
+  },
+  "packageManager": "pnpm@10.33.4",
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
